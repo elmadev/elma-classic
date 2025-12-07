@@ -144,7 +144,7 @@ void besttimes_egytipus( int single ) {
 	else
 		strcpy( val.cim, "Multi Player Best Times" );
 
-	for( i = 0; i < palyaszam; i++ ) {
+	for( int i = 0; i < palyaszam; i++ ) {
 		palyaegyfeleidok* pidok = &State->palyakidejei[i].singleidok;
 		if( !single )
 			pidok = &State->palyakidejei[i].multiidok;

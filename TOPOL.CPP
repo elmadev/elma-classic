@@ -152,7 +152,7 @@ static int titkoswrite( void* mut, int hossz, FILE* h ) {
         return 0;
     a = 21, b = 9783, c = 3389;
 
-    for( i = 0; i < hossz; i++ ) {
+    for( int i = 0; i < hossz; i++ ) {
         pc[i] ^= a;
         a %= c;
         b += a*c;
@@ -473,9 +473,9 @@ topol::topol( void ) {
 
     for( int i = 0; i < MAXGYURU; i++ )
         ptomb[i] = NULL;
-    for( i = 0; i < MAXKEREK; i++ )
+    for( int i = 0; i < MAXKEREK; i++ )
         kerektomb[i] = NULL;
-    for( i = 0; i < MAXSPRITE; i++ )
+    for( int i = 0; i < MAXSPRITE; i++ )
         spritetomb[i] = NULL;
 
     memset( &idok, 0, sizeof( idok ) );
@@ -495,12 +495,12 @@ topol::~topol( void ) {
             delete ptomb[i];
         ptomb[i] = NULL;
     }
-    for( i = 0; i < MAXKEREK; i++ ) {
+    for( int i = 0; i < MAXKEREK; i++ ) {
         if( kerektomb[i] )
             delete kerektomb[i];
         kerektomb[i] = NULL;
     }
-    for( i = 0; i < MAXSPRITE; i++ ) {
+    for( int i = 0; i < MAXSPRITE; i++ ) {
         if( spritetomb[i] )
             delete spritetomb[i];
         spritetomb[i] = NULL;
@@ -714,12 +714,12 @@ void topol::kirajzol( void ) {
             }
         }
     }
-    for( i = 0; i < MAXKEREK; i++ ) {
+    for( int i = 0; i < MAXKEREK; i++ ) {
         if( kerektomb[i] ) {
             kerektomb[i]->kirajzol();
         }
     }
-    for( i = 0; i < MAXSPRITE; i++ ) {
+    for( int i = 0; i < MAXSPRITE; i++ ) {
         if( spritetomb[i] ) {
             if( Rajzolkepek )
                 spritetomb[i]->kirajzol();
@@ -849,7 +849,7 @@ static void makelgrtabla( void ) {
 	if( !chartomb )
 		hiba( "memory" );
 
-	for( i = 1; i <= Palyaszam; i++ ) {
+	for( int i = 1; i <= Palyaszam; i++ ) {
 		Lgrtabla[i] = &chartomb[10*(i-1)];
 		strcpy( Lgrtabla[i], "default" );
 	}
@@ -946,9 +946,9 @@ void topol::loadkulso( char* filenev ) {
 
     for( int i = 0; i < MAXGYURU; i++ )
         ptomb[i] = NULL;
-    for( i = 0; i < MAXKEREK; i++ )
+    for( int i = 0; i < MAXKEREK; i++ )
         kerektomb[i] = NULL;
-	for( i = 0; i < MAXSPRITE; i++ )
+	for( int i = 0; i < MAXSPRITE; i++ )
         spritetomb[i] = NULL;
 
     FILE* h = NULL;
@@ -1128,7 +1128,7 @@ void topol::loadkulso( char* filenev ) {
                 break;
         }
     #else
-        for( i = 0; i < gyuruszam; i++ )
+        for( int i = 0; i < gyuruszam; i++ )
             ptomb[i] = new gyuru( h, verzio );
     #endif
 
@@ -1143,7 +1143,7 @@ void topol::loadkulso( char* filenev ) {
     if( kerekszam <= 0 )
 		hiba( "topol::topol-ban kerekszam <= 0!" );
 
-    for( i = 0; i < kerekszam; i++ ) {
+    for( int i = 0; i < kerekszam; i++ ) {
         // Beolvassa sok kereket:
         kerektomb[i] = new kerek( h, verzio );
         // Shareware-ben egy kis zavaras:
@@ -1176,7 +1176,7 @@ void topol::loadkulso( char* filenev ) {
         if( verzio < 8 && spriteszam > 0 )
             hiba( "verzio < 8 && spriteszam > 0!", filenev );
 
-        for( i = 0; i < spriteszam; i++ ) {
+        for( int i = 0; i < spriteszam; i++ ) {
             // Beolvassa sok kereket:
             spritetomb[i] = new sprite( h );
         }
@@ -1236,9 +1236,9 @@ void topol::loadbelso( char* filenev ) {
 
     for( int i = 0; i < MAXGYURU; i++ )
         ptomb[i] = NULL;
-    for( i = 0; i < MAXKEREK; i++ )
+    for( int i = 0; i < MAXKEREK; i++ )
         kerektomb[i] = NULL;
-    for( i = 0; i < MAXSPRITE; i++ )
+    for( int i = 0; i < MAXSPRITE; i++ )
         spritetomb[i] = NULL;
 
     FILE* h = NULL;
@@ -1381,11 +1381,11 @@ void topol::loadbelso( char* filenev ) {
         hiba( "topol::topol-ban kerekszam <= 0!" );
 
     // Beolvassa sok gyurut:
-    for( i = 0; i < gyuruszam; i++ )
+    for( int i = 0; i < gyuruszam; i++ )
         ptomb[i] = new gyuru( h, verzio );
 
     // Beolvassa sok kereket:
-    for( i = 0; i < kerekszam; i++ )
+    for( int i = 0; i < kerekszam; i++ )
         kerektomb[i] = new kerek( h, verzio );
 
     if( verzio > 6 ) {
@@ -1404,7 +1404,7 @@ void topol::loadbelso( char* filenev ) {
         if( verzio < 8 && spriteszam > 0 )
             hiba( "verzio < 8 && spriteszam > 0!", filenev );
 
-        for( i = 0; i < spriteszam; i++ ) {
+        for( int i = 0; i < spriteszam; i++ ) {
             // Beolvassa sok kereket:
             spritetomb[i] = new sprite( h );
         }
@@ -1545,7 +1545,7 @@ void topol::save( char* filenev, int nemkellcheck ) {
     double gyuruirtszam = gyuruszam+0.4643643;
 
     int kerekszam = 0;
-	for( i = 0; i < MAXKEREK; i++ ) {
+	for( int i = 0; i < MAXKEREK; i++ ) {
         if( kerektomb[i] )
             kerekszam++;
     }
@@ -1560,7 +1560,7 @@ void topol::save( char* filenev, int nemkellcheck ) {
     #endif
 
     // Kimentjuk sok gyurut:
-    for( i = 0; i < MAXGYURU; i++ ) {
+    for( int i = 0; i < MAXGYURU; i++ ) {
         if( ptomb[i] )
             ptomb[i]->save( h, this );
     }
@@ -1571,19 +1571,19 @@ void topol::save( char* filenev, int nemkellcheck ) {
     #endif
 
     // Kimentjuk sok kereket:
-    for( i = 0; i < MAXKEREK; i++ ) {
+    for( int i = 0; i < MAXKEREK; i++ ) {
         if( kerektomb[i] )
             kerektomb[i]->save( h );
     }
     // Kimentjuk spriteokat:
     int spriteszam = 0;
-    for( i = 0; i < MAXSPRITE; i++ ) {
+    for( int i = 0; i < MAXSPRITE; i++ ) {
         if( spritetomb[i] )
             spriteszam++;
     }
     double spriteirtszam = spriteszam+0.2345672;
     fwrite( &spriteirtszam, 1, sizeof( spriteirtszam ), h );
-    for( i = 0; i < MAXSPRITE; i++ ) {
+    for( int i = 0; i < MAXSPRITE; i++ ) {
         if( spritetomb[i] )
 			spritetomb[i]->save( h );
     }
@@ -1647,7 +1647,7 @@ void topol::getminmax( double* px1, double* py1, double* px2, double* py2,
         }
     }
     if( kerekkel ) {
-        for( i = 0; i < MAXKEREK; i++ ) {
+        for( int i = 0; i < MAXKEREK; i++ ) {
             if( kerektomb[i] ) {
                 if( *px1 > kerektomb[i]->r.x )
                     *px1 = kerektomb[i]->r.x;
@@ -1659,7 +1659,7 @@ void topol::getminmax( double* px1, double* py1, double* px2, double* py2,
                     *py2 = kerektomb[i]->r.y;
             }
         }
-        for( i = 0; i < MAXSPRITE; i++ ) {
+        for( int i = 0; i < MAXSPRITE; i++ ) {
             if( spritetomb[i] ) {
                 if( *px1 > spritetomb[i]->r.x )
                     *px1 = spritetomb[i]->r.x;
@@ -1681,13 +1681,13 @@ double topol::belyegszamitas( int kellspriteis ) {
             belyeg += ptomb[i]->belyegszamitas();
         }
     }
-    for( i = 0; i < MAXKEREK; i++ ) {
+    for( int i = 0; i < MAXKEREK; i++ ) {
         if( kerektomb[i] ) {
             belyeg += kerektomb[i]->belyegszamitas();
         }
     }
     if( kellspriteis ) {
-        for( i = 0; i < MAXSPRITE; i++ ) {
+        for( int i = 0; i < MAXSPRITE; i++ ) {
             if( spritetomb[i] ) {
                 belyeg += spritetomb[i]->belyegszamitas();
             }
@@ -1716,7 +1716,7 @@ void topol::checklevelforsarvari( void ) {
             hiba( "checklevelforsarvari-ban tul sok gyuru!" );
 
         int kerekszam = 0;
-        for( i = 0; i < MAXKEREK; i++ ) {
+        for( int i = 0; i < MAXKEREK; i++ ) {
             if( kerektomb[i] ) {
                 kerekszam++;
             }
@@ -1852,7 +1852,7 @@ void topol::killerekelore( void ) {
         if( pker )
             szam++;
     }
-    for( i = 0; i < szam; i++ ) {
+    for( int i = 0; i < szam; i++ ) {
         kerek* pker = Ptop->kerektomb[i];
         if( !pker )
             hiba( "topol::killerekelore-ben hezagos kerek tomb!" );

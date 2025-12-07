@@ -98,7 +98,7 @@ static void gombotvalaszt( int rubrikaszam, billmuttomb bmuttomb, int sorszam ) 
 				if( *Pbilltomb0[j] == i )
 					*Pbilltomb0[j] = 0;
 			}
-			for( j = 0; j < Rubrikaszam12; j++ ) {    // 0-tol megy
+			for( int j = 0; j < Rubrikaszam12; j++ ) {    // 0-tol megy
 				if( *Pbilltomb1[j] == i )
 					*Pbilltomb1[j] = 0;
 				if( *Pbilltomb2[j] == i )

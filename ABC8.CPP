@@ -26,7 +26,7 @@ abc8::abc8( char* nev ) {
 		uzenet( "memory" );
 		return;
 	}
-	for( i = 0; i < 256; i++ )
+	for( int i = 0; i < 256; i++ )
 		ytomb[i] = 0;
 	FILE* h = qopen( nev, "rb" );
 	if( !h ) {

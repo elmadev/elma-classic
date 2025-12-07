@@ -101,7 +101,7 @@ void mv_main( void ) {
 				uzenet( tmp );
 			}
 		}
-		for( i = 0; i < memkell; i++ )
+		for( int i = 0; i < memkell; i++ )
 			DELETE tomb[i]; }
 	}
 

@@ -124,7 +124,7 @@ wav::wav( char* nev, double maxamplitudo, int start, int ucsoutani ) {
 	}
 	// Kiszamolja szorzot:
 	double szorzo = 32000.0*maxamplitudo/double(maxamp);
-	for( i = 0; i < size; i++ ) {
+	for( int i = 0; i < size; i++ ) {
 		tomb[i] *= szorzo;
 	}
 }

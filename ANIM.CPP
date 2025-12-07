@@ -21,7 +21,7 @@ anim::anim( pic8* nagykep, char* uzenet_filenev ) {
 		uzenet( tmp, uzenet_filenev );
 	}
 
-	for( i = 0; i < frameszam; i++ ) {
+	for( int i = 0; i < frameszam; i++ ) {
 		ppictomb[i] = new pic8( Animsize, Animsize );
 		blt8( ppictomb[i], nagykep, -Animsize*i, 0 );
 		forditkepet( ppictomb[i] );
@@ -70,7 +70,7 @@ void anim::korrigal( void ) {
 			}
 		}
 		// Most behuzunk atlatszot jobbrol jobb szelig:
-		for( x = Animsize-1; x > 0; x-- ) {
+		for( int x = Animsize-1; x > 0; x-- ) {
 			if( ujpic->gpixel( x, 1 ) != atlatszo ) {
 				for( int j = x-3; j < Animsize; j++ )
 					ujpic->ppixel( j, 0, atlatszo );

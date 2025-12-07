@@ -390,7 +390,7 @@ void t_create_vert_esc( void ) {
 				hiba( "t_create_vert_nyomva_esc-ban gyuruszam <= 1 (7pq4)!" );
 
 			int talalt = 0;
-			for( i = 0; i < MAXGYURU; i++ ) {
+			for( int i = 0; i < MAXGYURU; i++ ) {
 				if( Ptop->ptomb[i] == Pgy ) {
 					// Megtalaltuk:
 					talalt = 1;
@@ -538,7 +538,7 @@ void t_delete_poly_nyomva( int mx, int my ) {
 		dialog( "This is the only polygon, so you cannot delete it." );
 		return;
 	}
-	for( i = 0; i < MAXGYURU; i++ ) {
+	for( int i = 0; i < MAXGYURU; i++ ) {
 		if( Ptop->ptomb[i] == pgy ) {
 			delete Ptop->ptomb[i];
 			Ptop->ptomb[i] = NULL;
@@ -585,7 +585,7 @@ void t_create_kerek_nyomva( int mx, int my, int food ) {
 		}
 	#endif
 
-	for( i = 0; i < MAXKEREK; i++ ) {
+	for( int i = 0; i < MAXKEREK; i++ ) {
 		if( !Ptop->kerektomb[i] ) {
 			double x = konvx_i2d( mx );
 			double y = konvy_i2d( my );
@@ -765,7 +765,7 @@ void t_create_sprite_nyomva( int mx, int my ) {
 		!(Plgr->aktiv_texturanev[0] && Plgr->aktiv_maszknev[0]) )
 		return; // Nincs kitoltve aktiv sprite
 
-	for( i = 0; i < MAXSPRITE; i++ ) {
+	for( int i = 0; i < MAXSPRITE; i++ ) {
 		if( !Ptop->spritetomb[i] ) {
 			double x = konvx_i2d( mx );
 			double y = konvy_i2d( my );

@@ -373,7 +373,7 @@ int szoveglista::kirajzolanim( double ido ) {
 		}
 
 		// Rairjuk szovegeket:
-		for( i = 0; i < elemszam; i++ )
+		for( int i = 0; i < elemszam; i++ )
 			Pmenuabc->write( Tmpbuffer, sorok[i].x, sorok[i].y,
 								sorok[i].text );
 
@@ -432,7 +432,7 @@ int szoveglista::kirajzolanim( double ido ) {
 	}
 
 	// Rairjuk szovegeket:
-	for( i = 0; i < elemszam; i++ )
+	for( int i = 0; i < elemszam; i++ )
 		Pmenuabc->write( Tmpbuffer, sorok[i].x, sorok[i].y+frame-480,
 							sorok[i].text );
 
@@ -523,7 +523,7 @@ void grafikushiba( char* text1, char* text2, char* text3 ) {
 	}
 
 	// Rairjuk szovegeket:
-	for( i = 0; i < sorszam; i++ ) {
+	for( int i = 0; i < sorszam; i++ ) {
 		int y = 240-20-sorszam*(40/2)+i*40;
 		Pmenuabc->writekozep( Buffsima, 320, y, Hibasortomb[i] );
 	}

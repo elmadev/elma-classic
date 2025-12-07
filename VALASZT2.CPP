@@ -233,11 +233,11 @@ int valaszt2::valassz( egyszovsor* preszovegek, int preszovegszam,
 			}
 
 			pszovlist->addszoveg_kozep( cim, 320, cimy );
-			for( i = 0; i < egykepen && i < szam-felso; i++ ) {
+			for( int i = 0; i < egykepen && i < szam-felso; i++ ) {
 				pszovlist->addszoveg( rubrikak[felso+i], x0, y0+i*dy );
 			}
 			if( tabos ) {
-				for( i = 0; i < egykepen && i < szam-felso; i++ ) {
+				for( int i = 0; i < egykepen && i < szam-felso; i++ ) {
 					pszovlist->addszoveg( rubrikak_tab[felso+i], x0_tab, y0+i*dy );
 				}
 			}

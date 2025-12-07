@@ -287,7 +287,7 @@ static void mergeegyfele( palyaegyfeleidok* pst, palyaegyfeleidok* pmrg,
 		//if( strcmp( nevek1[i], "VJ32" ) != 0 && strcmp( nevek2[i], "VJ32" ) )
 		//	idok[i] = 300000;
 	}
-	for( i = 0; i < pmrg->idokszama; i++ ) {
+	for( int i = 0; i < pmrg->idokszama; i++ ) {
 		int idest = pst->idokszama + i;
 		idok[idest] =  pmrg->idok[i];
 		ujetomb[idest] = 1;
@@ -298,7 +298,7 @@ static void mergeegyfele( palyaegyfeleidok* pst, palyaegyfeleidok* pmrg,
 			strcpy( nevek2[idest], pmrg->nevek2[i] );
 	}
 	// Rendezzuk oket:
-	for( i = 0; i < idokszama+4; i++ ) {
+	for( int i = 0; i < idokszama+4; i++ ) {
 		for( int j = 0; j < idokszama-1; j++ ) {
 			// Megnezzuk hogy kell-e csere:
 			// Eloszor ido szamit, utana elso es masodik nev, majd
@@ -352,7 +352,7 @@ static void mergeegyfele( palyaegyfeleidok* pst, palyaegyfeleidok* pmrg,
 
 	// Most egyforma idoket egy forma versenyzoktol kiszedjuk:
 	// (csak az uj idoket):
-	for( i = 0; i < idokszama+2; i++ ) {
+	for( int i = 0; i < idokszama+2; i++ ) {
 		for( int j = 0; j < idokszama-1; j++ ) {
 			if( idok[j] == idok[j+1] &&
 				strcmp( nevek1[j], nevek1[j+1] ) == 0 &&
@@ -379,13 +379,13 @@ static void mergeegyfele( palyaegyfeleidok* pst, palyaegyfeleidok* pmrg,
 	pst->idokszama = idokszama;
 
 	// Biztonsagi nullazas:
-	for( i = 0; i < MAXIDOK; i++ ) {
+	for( int i = 0; i < MAXIDOK; i++ ) {
 		pst->idok[i] = -1;
 		*(pst->nevek1[i]) = 0;
 		*(pst->nevek2[i]) = 0;
 	}
 	// Masolas:
-	for( i = 0; i < idokszama; i++ ) {
+	for( int i = 0; i < idokszama; i++ ) {
 		pst->idok[i] =  idok[i];
 		strcpy( pst->nevek1[i], nevek1[i] );
 		strcpy( pst->nevek2[i], nevek2[i] );

@@ -173,7 +173,7 @@ void upgradehakell( void ) {
 
 	// Itt tortenik 40.000 byte masolasa:
 	fseek( holdres, 1600000, SEEK_SET );
-	for( i = 0; i < 40000; i++ ) {
+	for( int i = 0; i < 40000; i++ ) {
 		int a1 = fgetc( helmaupg );
 		if( a1 == EOF )
 			uzenet( "Read error from file, elmaupg.res!",
@@ -195,7 +195,7 @@ void upgradehakell( void ) {
 		fseek( helmaupg, 40000, SEEK_CUR );
 
 	// Most tortenik elmaupg.res hatralevo reszenek masolasa elma.res-be:
-	for( i = 0; i < elmareshossz - 40000; i++ ) {
+	for( int i = 0; i < elmareshossz - 40000; i++ ) {
 		int c = fgetc( helmaupg );
 		if( c == EOF )
 			uzenet( "Read error from file, elmaupg.res!",

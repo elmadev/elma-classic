@@ -80,7 +80,7 @@ void starthanghigh( void ) {
 	Pw42b = new wav2( Pw4 ); 
     Pw42b->reset();
 
-    for( i = 0; i < MAXWAV; i++ ) {
+    for( int i = 0; i < MAXWAV; i++ ) {
         Ezmegy[i] = 0;
         Kovhang[i] = 0;
         Hangerok[i] = 0;

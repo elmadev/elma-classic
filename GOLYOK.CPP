@@ -62,20 +62,20 @@ void initgolyo( void ) {
 	if( !Idok )
 		sikerultlefoglalni = 0;
 	if( sikerultlefoglalni )
-		for( i = 0; i < Ngolyok+4; i++ )
+		for( int i = 0; i < Ngolyok+4; i++ )
 			Idok[i] = NULL;
 	if( sikerultlefoglalni )
-		for( i = 0; i < Ngolyok+4 && sikerultlefoglalni; i++ ) {
+		for( int i = 0; i < Ngolyok+4 && sikerultlefoglalni; i++ ) {
 			Idok[i] = new double[Ngolyok+4];
 			if( Idok[i] )
-				for( j = 0; j < Ngolyok+4; j++ )
+				for( int j = 0; j < Ngolyok+4; j++ )
 					Idok[i][j] = -2;
 			if( !Idok[i] )
 				sikerultlefoglalni = 0;
 		}
 	if( !sikerultlefoglalni ) {
 		if( Idok ) {
-			for( i = 0; i < Ngolyok+4; i++ )
+			for( int i = 0; i < Ngolyok+4; i++ )
 				if( Idok[i] )
 					delete Idok[i];
 			delete Idok;
@@ -170,7 +170,7 @@ void leptetgolyo( double stept ) {
 		Golyok[i].t = 0;
 	}
 	// Idok tablaban mindenbol kivon stept idot:
-	for( i = 0; i < Ngolyok; i++ )
+	for( int i = 0; i < Ngolyok; i++ )
 		for( int j = i+1; j < Ngolyok+4; j++ )
 			Idok[i][j] -= stept;
 	Pillanatnyiido = 0;

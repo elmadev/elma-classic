@@ -413,7 +413,7 @@ void ecset::mutatotlanit( void ) {
 	if( !nagydarabtomb )
 		hibanincsmem();
 	int szammost = 0;
-	for( i = 0; i < sorszam; i++ ) {
+	for( int i = 0; i < sorszam; i++ ) {
 		if( i == 1000 )
 			semmi();
 		if( i == 7792 )
@@ -913,7 +913,7 @@ void ecset::kovetotextura( koveto* pkov, int index, int xo, int yo, int fazis ) 
 	}
 
 	// Beadjuk textura darabokat ecset-be:
-	for( y = 0; y < ysize; y++ ) {
+	for( int y = 0; y < ysize; y++ ) {
 		int x = 0;
 		unsigned char* sor = Buffsima->getptr( ysize-1-y );
 		while( x < xsize ) {
@@ -930,14 +930,14 @@ void ecset::kovetotextura( koveto* pkov, int index, int xo, int yo, int fazis ) 
 	// Most beadjuk alul vagy felul megtoldott reszt is:
 	if( felso ) {
 		// Felso:
-		for( y = 0; y < FUGGTOLDAS; y++ ) {
+		for( int y = 0; y < FUGGTOLDAS; y++ ) {
 			addbytesor( (unsigned char*)(textindex+10), tavolsag,
 							xo, xo+xsize-1, yo+ysize+y, fazis );
 		}
 	}
 	else {
 		// Also:
-		for( y = 0; y < FUGGTOLDAS; y++ ) {
+		for( int y = 0; y < FUGGTOLDAS; y++ ) {
 			addbytesor( (unsigned char*)(textindex+10), tavolsag,
 							xo, xo+xsize-1, yo-1-y, fazis );
 		}
@@ -1224,7 +1224,7 @@ ecset::ecset( int view_p ) {
 		hiba( "ecset::ecset sorszam-10 > MAXECSETSOR!" );
 
 	// Inicializaljuk minden sor elejet foldre:
-	for( i = 0; i < sorszam; i++ ) {
+	for( int i = 0; i < sorszam; i++ ) {
 		msorok[i] = newmdarab();
 		msorok[i]->pkov = NULL;
 		msorok[i]->xsize = 1;
@@ -1243,7 +1243,7 @@ ecset::ecset( int view_p ) {
 	}
 
 	// Sorrendbe rendezzuk egy sor elemeit:
-	for( i = 0; i < sorszam; i++ ) {
+	for( int i = 0; i < sorszam; i++ ) {
 		rendez( msorok[i] );
 		kurxposok_A[i] = kurxposok_B[i] = sizeraallit( msorok[i] );
 	}
@@ -1311,7 +1311,7 @@ ecset::ecset( ecset* pold ) {
 	sorszam = pold->sorszam;
 
 	// Inicializaljuk minden sor elejet uresre:
-	for( i = 0; i < sorszam; i++ ) {
+	for( int i = 0; i < sorszam; i++ ) {
 		kurxposok_A[i] = 1;
 		kurxposok_B[i] = 1;
 

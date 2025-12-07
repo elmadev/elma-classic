@@ -149,7 +149,7 @@ piclist::piclist( void ) {
 	for( int i = 0; i < (MAXPICLISTKEPSZAM+10)*10; i++ )
 		nevek[i] = 0;
 
-	for( i = 0; i < MAXPICLISTKEPSZAM+10; i++ ) {
+	for( int i = 0; i < MAXPICLISTKEPSZAM+10; i++ ) {
 		tipusok[i] = 0;
 		tavolsagok[i] = 0;
 		hatarolok[i] = 0;

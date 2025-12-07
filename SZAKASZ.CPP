@@ -32,7 +32,7 @@ szakaszok::szakaszok( topol* ptop ) {
 		memset( &tomb[i], 0, sizeof( vonal ) );
 
 	// Normal szakaszok beolvasasa:
-	for( i = 0; i < MAXGYURU; i++ ) {
+	for( int i = 0; i < MAXGYURU; i++ ) {
 		gyuru* pgy = ptop->ptomb[i];
 		if( !pgy )
 			continue;

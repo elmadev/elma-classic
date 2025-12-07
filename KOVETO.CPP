@@ -113,7 +113,7 @@ int makevonal( gyuru* pgy, int* ytomb, int* phossz, int* px0,
 	// Vegigmegyunk szakaszokon:
 	*px0 = -1;
 	int cur = -1;
-	for( i = 0; i < pgy->pontszam-1; i++ ) {
+	for( int i = 0; i < pgy->pontszam-1; i++ ) {
 		// Eloszor lepunk mert osszekoto szakaszrol indultunk:
 		if( elore ) {
 			p1++;

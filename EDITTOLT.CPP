@@ -166,7 +166,7 @@ void tolt_open( void ) {
 	abcberendez( nevszam );
 
 	int kur = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
-	for( i = 0; i < nevszam; i++ ) {
+	for( int i = 0; i < nevszam; i++ ) {
 		char tmp[50];
 		strcpy( tmp, &Soknev[i*10] );
 		strcat( tmp, ".lev" );
@@ -338,7 +338,7 @@ void kivalasztkezdetit( void ) {
 	abcberendez( nevszam );
 
 	int kur = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
-	for( i = 0; i < nevszam; i++ ) {
+	for( int i = 0; i < nevszam; i++ ) {
 		char tmp[50];
 		strcpy( tmp, &Soknev[i*10] );
 		strcat( tmp, ".lev" );
@@ -1304,7 +1304,7 @@ int tolt_picklgrfile( char* lgrnev ) {
 	abcberendez( nevszam );
 
 	int kur = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
-	for( i = 0; i < nevszam; i++ ) {
+	for( int i = 0; i < nevszam; i++ ) {
 		if( strcmpi( &Soknev[i*10], lgrnev ) == 0 )
 			kur = i;
 	}

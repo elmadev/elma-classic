@@ -49,10 +49,10 @@ int dialog( char* text1, char* text2, char* text3,
 		}
 	}
 	char* gombtomb[30];
-	for( i = 0; i < 24; i++ )
+	for( int i = 0; i < 24; i++ )
 		gombtomb[i] = NULL;
 	int gombszam = 0;
-	for( i = 0; i < textszam; i++ ) {
+	for( int i = 0; i < textszam; i++ ) {
 		if( strcmp( texttomb[i], "GOMBOK" ) == 0 ) {
 			gombszam = textszam-i-1;
 			if( gombszam <= 0 )
@@ -91,7 +91,7 @@ int dialog( char* text1, char* text2, char* text3,
 	invalidateegesz();
 
 	int xsize = 0;
-	for( i = 0; i < textszam; i++ )
+	for( int i = 0; i < textszam; i++ )
 		if( xsize < Pabc2->len( texttomb[i] ) + 16 )
 			xsize = Pabc2->len( texttomb[i] ) + 16;
 
@@ -102,7 +102,7 @@ int dialog( char* text1, char* text2, char* text3,
 	int x2 = 320+xsize/2;
 	int y2 = 240+ysize/2;
 	kirajzbox( Buffsima, x1, y1, x2, y2, Dialogszin, Dialogszelszin );
-	for( i = 0; i < textszam; i++ )
+	for( int i = 0; i < textszam; i++ )
 		Pabc2->writekozep( Buffsima, 320, y1+22+i*dy, texttomb[i] );
 
 	// Kirajzoljuk gombokat is:
@@ -122,7 +122,7 @@ int dialog( char* text1, char* text2, char* text3,
 	}
 	if( gombszam > 3 )
 		hiba( "uofiufriufr" );
-	for( i = 0; i < gombszam; i++ ) {
+	for( int i = 0; i < gombszam; i++ ) {
 		int xs = Pabc2->len( gombtomb[i] ) + 10;
 		gx2tomb[i] = gx1tomb[i] + xs/2;
 		gx1tomb[i] = gx1tomb[i] - xs/2;

@@ -60,12 +60,12 @@ int pic8::lefoglal( long xsizep, long ysizep ) {
     for( int i = 0; i < ysizep; i++ ) {
         sormuttomb[i] = NULL;
     }
-    for( i = 0; i < szegnum; i++ ) {
+    for( int i = 0; i < szegnum; i++ ) {
         szegmuttomb[i] = NULL;
     }
     if( vanplussz )
         szegmuttomb[unsigned(szegnum)] = NULL;
-    for( i = 0; i < szegnum; i++ ) {
+    for( int i = 0; i < szegnum; i++ ) {
         { szegmuttomb[i] = NEW(unsigned char*) unsigned char[unsigned(egyszegben*xsizep)]; }
         if( !szegmuttomb[i] ) {
             uzenet( "pic8::alloc memory!" );

@@ -48,7 +48,7 @@ void seteditorpal( void ) {
 	pal[62*3+0] = 255; pal[62*3+1] = 255; pal[62*3+2] = 255; //  62. Kisabc
 
 	// Kitoltjuk trucolor paletta szineit:
-	for( i = 0; i < 64; i++ ) {
+	for( int i = 0; i < 64; i++ ) {
 		int r = i>>4;
 		int g = (i>>2) & 3;
 		int b = i & 3;
@@ -58,7 +58,7 @@ void seteditorpal( void ) {
 	}
 
 	// Kitoltjuk eger szineket:
-	for( i = 0; i < 128; i++ ) {
+	for( int i = 0; i < 128; i++ ) {
 		if( pal[3*i] + pal[3*i+1] + pal[3*i+2] >= 384 ) {
 			pal[3*(i+128)] = pal[3*(i+128)+1] = pal[3*(i+128)+2] = 0;
 		}
@@ -67,7 +67,7 @@ void seteditorpal( void ) {
 		}
 	}
 
-	for( i = 0; i < 768; i++ )
+	for( int i = 0; i < 768; i++ )
 		pal[i] /= 4;
 
 	if( Pal_editor )

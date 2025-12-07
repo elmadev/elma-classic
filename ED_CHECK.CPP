@@ -13,7 +13,7 @@ int check_topology( int kelldialog ) {
 	}
 
 	// Most megszuntetjuk hegyes szogeket:
-	for( i = 0; i < MAXGYURU; i++ ) {
+	for( int i = 0; i < MAXGYURU; i++ ) {
 		gyuru* pgy = Ptop->ptomb[i];
 		if( pgy && !pgy->koveto )
 			pgy->pozitivkorjaras(); // Ez automatikusan megcsinalja:
@@ -21,7 +21,7 @@ int check_topology( int kelldialog ) {
 
 	// Most megnezzuk, hogy nincs-e tul sok pont osszesen:
 	int pontszam = 0;
-	for( i = 0; i < MAXGYURU; i++ ) {
+	for( int i = 0; i < MAXGYURU; i++ ) {
 		gyuru* pgy = Ptop->ptomb[i];
 		if( pgy )
 			pontszam += pgy->pontszam;
@@ -44,7 +44,7 @@ int check_topology( int kelldialog ) {
 
 
 	// Most megnezzuk, hogy nincsenek-e egymast metszo vonalak:
-	for( i = 0; i < MAXGYURU; i++ ) {
+	for( int i = 0; i < MAXGYURU; i++ ) {
 		gyuru* pgy = Ptop->ptomb[i];
 		if( pgy && !pgy->koveto ) {
 			for( int j = 0; j < pgy->pontszam; j++ ) {
@@ -91,7 +91,7 @@ int check_topology( int kelldialog ) {
 	y1 -= 1.0;
 	x2 += 1.0;
 	y2 += 1.0;
-	for( i = 0; i < MAXKEREK; i++ ) {
+	for( int i = 0; i < MAXKEREK; i++ ) {
 		kerek* pker = Ptop->kerektomb[i];
 		if( pker ) {
 			if( pker->r.x < x1 || pker->r.x > x2 ||
@@ -112,7 +112,7 @@ int check_topology( int kelldialog ) {
 	}
 
 	// Most megnezzuk, hogy bal kerek nincs-e kint:
-	for( i = 0; i < MAXKEREK; i++ ) {
+	for( int i = 0; i < MAXKEREK; i++ ) {
 		kerek* pker = Ptop->kerektomb[i];
 		if( pker && pker->tipus == T_KEZDO ) {
 			if( !Ptop->levegoben( NULL, &pker->r ) ) {

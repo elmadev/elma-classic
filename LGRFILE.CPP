@@ -389,7 +389,7 @@ static unsigned char* makenegalttomb( unsigned char* pal ) {
 	// Megkeressuk legsotetebb szint:
 	eddigiertek = 1000;
 	int legsotet = 0;
-	for( i = 0; i < 256; i++ ) {
+	for( int i = 0; i < 256; i++ ) {
 		int ujertek = pal[i*3] + pal[i*3+1] + pal[i*3+2];
 		if( eddigiertek > ujertek ) {
 			eddigiertek = ujertek;
@@ -399,7 +399,7 @@ static unsigned char* makenegalttomb( unsigned char* pal ) {
 
 	// Most lookup tabla minden szinehez hozza rendeljuk feketet (0 index),
 	// vagy legvilagosabbat:
-	for( i = 0; i < 256; i++ ) {
+	for( int i = 0; i < 256; i++ ) {
 		if( (pal[i*3  ] < 20) &&
 			(pal[i*3+1] < 20) &&
 			(pal[i*3+2] < 20) )
@@ -419,9 +419,9 @@ lgrfile::lgrfile( char* lgrnev ) {
 	texturaszam = 0;
 	for( int i = 0; i < MAXKEPSZAM; i++ )
 		BYTESET( &kepek[i], 0, sizeof(kep) );
-	for( i = 0; i < MAXMASZKSZAM; i++ )
+	for( int i = 0; i < MAXMASZKSZAM; i++ )
 		BYTESET( &maszkok[i], 0, sizeof(maszk) );
-	for( i = 0; i < MAXTEXTURASZAM; i++ )
+	for( int i = 0; i < MAXTEXTURASZAM; i++ )
 		BYTESET( &texturak[i], 0, sizeof(textura) );
 
 	pkoveto = NULL;
@@ -441,7 +441,7 @@ lgrfile::lgrfile( char* lgrnev ) {
 	fgnevbent[0] = bgnevbent[0] = 0;
 
 	foodszam = 0;
-	for( i = 0; i < MAXFOODSZAM; i++ )
+	for( int i = 0; i < MAXFOODSZAM; i++ )
 		foodtomb[i] = NULL;
 
 	pkoveto = new koveto;
@@ -479,7 +479,7 @@ lgrfile::lgrfile( char* lgrnev ) {
 	pic8* p1biker = NULL;
 	pic8* p2biker = NULL;
 	pic8* pcolors = NULL;
-	for( i = 0; i < osszkepszam; i++ ) {
+	for( int i = 0; i < osszkepszam; i++ ) {
 		// Egy kep:
 		char nev[30];
 		if( fread( nev, 1, 20, h ) != 20 )
@@ -722,13 +722,13 @@ lgrfile::lgrfile( char* lgrnev ) {
 	// ecsetben mutato fog hivatkozni rajuk (max 3 egymas utan):
 	viewexit[2] = viewexit[1] = viewexit[0];
 	viewkiller[2] = viewkiller[1] = viewkiller[0];
-	for( i = 1; i < 640; i++ ) {
+	for( int i = 1; i < 640; i++ ) {
 		viewfoldsor[i] = viewfoldsor[0];
 		viewegsor[i] = viewegsor[0];
 	}
 
 	// Most texturakat kibovitjuk vizszintes iranyban:
-	for( i = 0; i < texturaszam; i++ ) {
+	for( int i = 0; i < texturaszam; i++ ) {
 		textura* pt = &texturak[i];
 		if( !pt->ppic )
 			hiba( "iuo4gt" );
@@ -751,7 +751,7 @@ lgrfile::lgrfile( char* lgrnev ) {
 	}
 
 	// Most kepeket abc sorrendbe rendezzuk:
-	for( i = 0; i < kepszam+2; i++ ) {
+	for( int i = 0; i < kepszam+2; i++ ) {
 		for( int j = 0; j < kepszam-1; j++ ) {
 			if( strcmpi( kepek[j].nev, kepek[j+1].nev ) == 0 )
 				uzenet( "Picture name is duplicated in LGR file!: ",
@@ -767,7 +767,7 @@ lgrfile::lgrfile( char* lgrnev ) {
 	}
 
 	// Most maszkokat abc sorrendbe rendezzuk:
-	for( i = 0; i < maszkszam+2; i++ ) {
+	for( int i = 0; i < maszkszam+2; i++ ) {
 		for( int j = 0; j < maszkszam-1; j++ ) {
 			if( strcmpi( maszkok[j].nev, maszkok[j+1].nev ) == 0 )
 				uzenet( "Mask name is duplicated in LGR file!: ",
@@ -783,7 +783,7 @@ lgrfile::lgrfile( char* lgrnev ) {
 	}
 
 	// Most texturakat abc sorrendbe rendezzuk:
-	for( i = 0; i < texturaszam+2; i++ ) {
+	for( int i = 0; i < texturaszam+2; i++ ) {
 		for( int j = 0; j < texturaszam-1; j++ ) {
 			if( strcmpi( texturak[j].nev, texturak[j+1].nev ) == 0 )
 				uzenet( "Texture name is duplicated in LGR file!: ",
@@ -815,7 +815,7 @@ lgrfile::lgrfile( char* lgrnev ) {
 
 	// Most meg food-okat megszamoljuk:
 	foodszam = 0;
-	for( i = 0; i < 9; i++ ) {
+	for( int i = 0; i < 9; i++ ) {
 		if( foodtomb[i] )
 			foodszam = i+1;
 		else
@@ -859,13 +859,13 @@ lgrfile::~lgrfile( void ) {
 		delete kepek[i].adatok;
 		kepek[i].adatok = NULL;
 	}
-	for( i = 0; i < maszkszam; i++ ) {
+	for( int i = 0; i < maszkszam; i++ ) {
 		if( !maszkok[i].adatok )
 			hiba( "gk7u6tk" );
 		delete maszkok[i].adatok;
 		maszkok[i].adatok = NULL;
 	}
-	for( i = 0; i < texturaszam; i++ ) {
+	for( int i = 0; i < texturaszam; i++ ) {
 		if( !texturak[i].ppic )
 			hiba( "6r5uy" );
 		delete texturak[i].ppic;
@@ -902,7 +902,7 @@ lgrfile::~lgrfile( void ) {
 	pkiller = pexit = NULL;
 
 	foodszam = 0;
-	for( i = 0; i < MAXFOODSZAM; i++ ) {
+	for( int i = 0; i < MAXFOODSZAM; i++ ) {
 		if( foodtomb[i] ) {
 			delete foodtomb[i];
 			foodtomb[i] = NULL;

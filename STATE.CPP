@@ -319,7 +319,7 @@ void state_s::exportjatekossum( FILE* h, char* nev, int single ) {
 	fprintf( h, "%s\n", nev );
 }
 
-void state_s::export( void ) {
+void state_s::export_( void ) {
 	FILE* h = fopen( "stats.txt", "wt" );
 	if( !h )
 		uzenet( "Could not open STATS.TXT for writing!" );

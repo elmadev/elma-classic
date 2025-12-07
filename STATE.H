@@ -75,7 +75,7 @@ public:
 	void exportjatekossum( FILE* h, char* nev, int single );
 	void exportanonim( FILE* h, int single, char* text1, char* text2,
 															char* text3 );
-	void export( void );
+	void export_( void );
 	void resetcontrols( void );
 };
 

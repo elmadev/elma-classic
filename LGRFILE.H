@@ -56,7 +56,7 @@ struct motkepek {
 
 class lgrfile {
 	// Konstruktor hasznalja:
-	void lgrfile::chopbiker( pic8* pbiker, motkepek* pkepek );
+	void chopbiker( pic8* pbiker, motkepek* pkepek );
 
 	void beirkepet( pic8* ppic, piclist* ppiclist, int index );
 	void beirtexturat( pic8* ppic, piclist* ppiclist, int index );

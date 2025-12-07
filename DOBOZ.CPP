@@ -10,7 +10,7 @@ static double Affinaranyy = 1.0;
 
 static double Tulvizszintes = 0.005;
 
-#define LEGYENASM _ 
+// #define LEGYENASM _
 
 #ifdef LEGYENASM
 

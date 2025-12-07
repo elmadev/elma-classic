@@ -6,6 +6,8 @@
 #include	<ctype.h>
 #ifdef _WIN32
 #include	<io.h>
+#else
+#include	<unistd.h>
 #endif
 
 // Ez Win95-os verzio h file-ja, csak ennek egy szinten kell

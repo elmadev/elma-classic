@@ -59,7 +59,7 @@ int Leveldescinited = 0;
 char Leveldescek[(DESCNEVHOSSZ+2)*MAXBEEPLEVELSZAM+6];
 
 // Ki is lep:
-static void kiirdesceket( void ) {
+void kiirdesceket( void ) {
     FILE* h = fopen( "desclist.txt", "wt" );
     if( !h )
         hiba( "6deyhqe" );

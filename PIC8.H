@@ -8,11 +8,16 @@ typedef unsigned char* puchar;
 // kezdodik. LGR file beolvasas es betolthattereket alatt aktiv:
 extern int Paratlankepsorok;
 
+class pic8;
+
+void blt8( pic8* pd, pic8* ps, int x = 0, int y = 0,
+		int x1 = -10000, int y1 = -10000, int x2 = -10000, int y2 = -10000 );
+
 class pic8 {
 public:
 	// Baratok:
-	friend void blt8( pic8* pd, pic8* ps, int x = 0, int y = 0,
-		int x1 = -10000, int y1 = -10000, int x2 = -10000, int y2 = -10000 );
+	friend void blt8( pic8* pd, pic8* ps, int x, int y,
+		int x1, int y1, int x2, int y2 );
 	//friend void blt8fizrefejjelle( pic8* ps );
 	friend void spriteosit( pic8* ppic, int szin );
 	friend void spriteosit( pic8* ppic );

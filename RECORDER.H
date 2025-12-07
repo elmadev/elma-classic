@@ -12,6 +12,9 @@ struct egyhang {
 	float hangero;
 };
 
+long loadrecek( char* nev, int demo );
+void saverecek( char* nev, long belyeg, int tag );
+
 class recorder {
 	// demo eseten resource file-bol nyit:
 	// belyeg-et adja vissza, vagy 0-at:

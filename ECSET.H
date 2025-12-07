@@ -40,6 +40,8 @@ struct darab {
 	unsigned char* pixelek;
 };
 
+void betoltecseteket( void );
+
 class ecset {
 	friend void betoltecseteket( void );
 	friend void segedfv( void );

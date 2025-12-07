@@ -11,6 +11,11 @@ void k_memcpy( void *dest, const void *src, size_t n ) {
 
 static int  Fiben = 0;
 
+int fifirst( char* minta, char* filenev ) { return 1; }
+int finext( char* filenev ) { return 1; }
+void ficlose( void ) {}
+
+#if 0
 #ifdef W_95
 
 /*struct _finddata_t c_file;
@@ -168,6 +173,7 @@ void ficlose( void ) {
 	Fiben = 0;
 }
 
+#endif
 #endif
 
 

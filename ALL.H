@@ -1,13 +1,12 @@
 #include	<stdio.h>
 #include	<stdlib.h>
-#include	<io.h>
-#include	<dos.h>
-#include	<conio.h>
-//#include	<mem.h>
 #include	<string.h>
 #include	<math.h>
 #include	<time.h>
 #include	<ctype.h>
+#ifdef _WIN32
+#include	<io.h>
+#endif
 
 // Ez Win95-os verzio h file-ja, csak ennek egy szinten kell
 // lennie tobbi forras file-lal.

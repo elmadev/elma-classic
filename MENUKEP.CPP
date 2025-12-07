@@ -108,7 +108,7 @@ void szoveglista::clear( void ) {
 
 static pic8* Tmpbuffer = NULL; // Ideiglenes
 
-static Scrolly1 = 0; // Ennel kiseb x-ek helyere sotet zoldet rak kirazgolyo
+static int Scrolly1 = 0; // Ennel kiseb x-ek helyere sotet zoldet rak kirazgolyo
 static unsigned char Introhatter = 254;
 static unsigned char* Zoldsor = NULL;
 static unsigned char* Hattersor = NULL;

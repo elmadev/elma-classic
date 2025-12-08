@@ -52,7 +52,6 @@ elma_sources = files(
     'SZAKASZ.CPP',
     'TELJES.CPP',
     'TOPOL.CPP',
-    'UPGRADE.CPP',
     'UTKOZES.CPP',
     'UTKOZES2.CPP',
     'VALASZT2.CPP',

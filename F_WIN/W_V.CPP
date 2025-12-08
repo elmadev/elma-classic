@@ -130,10 +130,6 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,				LPSTR lpszC
 
 	Aktiv = 1;
 
-	// Ha nem shareware, megprobal upgrade-elni emupg.res-bol:
-	void upgradehakell( void );
-	upgradehakell();
-
 	void initqopen( void );
 	initqopen();
 

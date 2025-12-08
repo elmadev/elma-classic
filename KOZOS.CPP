@@ -1,4 +1,5 @@
 #include	"all.h"
+#include <assert.h>
 #ifndef _WIN32
 #include <string>
 #endif

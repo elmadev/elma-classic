@@ -10,6 +10,14 @@ extern double K_2pi;
 #define _fstrnicmp _strnicmp
 #endif
 
+#ifdef _WIN32
+#define itoa _itoa
+#define strcmpi _strcmpi
+#define strlwr _strlwr
+#define access _access
+#define strupr _strupr
+#endif
+
 typedef char finame[20];
 int fifirst( char* minta, char* filenev );
 int finext( char* filenev );

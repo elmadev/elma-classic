@@ -91,20 +91,6 @@ void starthanghigh( void ) {
 	Pw2->hangero( 0.4 );
 }
 
-/*void stophanghigh( void ) {
-    if( !Hangenabled )
-        return;
-    if( !Hanghighbevoltkapcsolva )
-        hiba( "Hanghighbevoltkapcsolva hamis stophanghigh-ban!" );
-    //stophang();
-    for( int i = 0; i < WAVBANKSZAM; i++ ) {
-        if( Wavbank[i] ) {
-            DELETE Wavbank[i]; }
-            Wavbank[i] = NULL;
-        }
-    }
-}*/
-
 enum allapot { A_INDIT = 0, A_ALACSONY, A_ATMENETBE, A_ATMENET,
                     A_MAGAS, A_VISSZAMENET };
 

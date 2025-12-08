@@ -28,14 +28,8 @@
 #include	"main.h"
 #include	"pic8.h"
 #include	"anim.h"
-//#include	"picmcga.h"
-//#include	"picl8ves.h"
 
 #include	"abc8.h"
-
-//#include	"mouse.h"
-
-#include	"rayback.h"
 
 #include	"vekt2.h"
 #include	"kor.h"
@@ -80,7 +74,6 @@
 
 #include	"custom.h"
 #include	"options.h"
-#include	"crccheck.h"
 
 #include	"newuj.h"
 
@@ -121,8 +114,3 @@
 #include	"m_k.h"
 #include	"m_v.h"
 #include	"m_pic.h"
-
-
-#include	"d_nempub.h"
-
-

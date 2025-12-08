@@ -15,11 +15,13 @@ void k_memcpy( void *dest, const void *src, size_t n ) {
 
 static int  Fiben = 0;
 
+#ifndef _WIN32
 int fifirst( char* minta, char* filenev ) { return 1; }
 int finext( char* filenev ) { return 1; }
 void ficlose( void ) {}
 
-#if 0
+#else
+
 #ifdef W_95
 
 /*struct _finddata_t c_file;

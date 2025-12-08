@@ -69,7 +69,7 @@ recorder::recorder( void ) {
 	psurlero = new unsigned char[Darabszam];
 	pgazhatra = new unsigned char[Darabszam];
 
-	phangok = NEW(egyhang*) egyhang[Hangdarabszam];
+	phangok = new egyhang[Hangdarabszam];
 
 	if( !pk1rx || !pk1ry || !pk2rx || !pk2ry || !pk4rx || !pk4ry ||
 	!pvezrx || !pvezry ||

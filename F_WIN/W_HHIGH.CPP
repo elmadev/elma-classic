@@ -53,22 +53,22 @@ void starthanghigh( void ) {
     for( int i = 0; i < WAVBANKSZAM; i++ ) {
         Wavbank[i] = NULL;
     }
-    { Wavbank[WAV_UTODES] = NEW(wav*) wav( "utodes.wav", 0.25 ); }
-    { Wavbank[WAV_TORES] = NEW(wav*) wav( "torik.wav", 0.34 ); }
-    { Wavbank[WAV_SIKER] = NEW(wav*) wav( "siker.wav", 0.8 ); } // 0.34
-    { Wavbank[WAV_EVES] = NEW(wav*) wav( "eves.wav", 0.5 ); }
-    { Wavbank[WAV_FORDULAS] = NEW(wav*) wav( "fordul.wav", 0.3 ); }
-    { Wavbank[WAV_UGRAS1] = NEW(wav*) wav( "ugras.wav", 0.34 ); }
+    { Wavbank[WAV_UTODES] = new wav( "utodes.wav", 0.25 ); }
+    { Wavbank[WAV_TORES] = new wav( "torik.wav", 0.34 ); }
+    { Wavbank[WAV_SIKER] = new wav( "siker.wav", 0.8 ); } // 0.34
+    { Wavbank[WAV_EVES] = new wav( "eves.wav", 0.5 ); }
+    { Wavbank[WAV_FORDULAS] = new wav( "fordul.wav", 0.3 ); }
+    { Wavbank[WAV_UGRAS1] = new wav( "ugras.wav", 0.34 ); }
     { Wavbank[WAV_UGRAS2] = Wavbank[WAV_UGRAS1]; }
 
-    { Psurl = NEW(wav*) wav( "dorzsol.wav", 0.44 ); }
+    { Psurl = new wav( "dorzsol.wav", 0.44 ); }
     Psurl->loopol( Mix );
 
     double berregero = 0.26;
-    { Pw1 = NEW(wav*) wav( "harl.wav", berregero, 0, I1+Mix ); }
-    { Pw2 = NEW(wav*) wav( "harl.wav", berregero, I1, I2 ); }
-    { Pw3 = NEW(wav*) wav( "harl.wav", berregero, I2-Mix, I3 ); }
-    { Pw4 = NEW(wav*) wav( "harl2.wav", berregero, I4, I5 ); }
+    { Pw1 = new wav( "harl.wav", berregero, 0, I1+Mix ); }
+    { Pw2 = new wav( "harl.wav", berregero, I1, I2 ); }
+    { Pw3 = new wav( "harl.wav", berregero, I2-Mix, I3 ); }
+    { Pw4 = new wav( "harl2.wav", berregero, I4, I5 ); }
 
     Pw2->loopol( Mix );
     //Pw2->save( "alacsony.wav" );
@@ -408,7 +408,7 @@ static int Surltart = 0;
 // Ennek hozza kell adnia eddigi ertekhez:
 static void surlodaselintezes( short* sbuff, int buffsize ) {
     /*if( !Ppic8 ) {
-        { Ppic8 = NEW(pic8*) pic8( 320, 2 ); }
+        { Ppic8 = new pic8( 320, 2 ); }
         for( int i = 0; i < 320; i++ ) {
             Ppic8->ppixel( i, 0, 0 );
             Ppic8->ppixel( i, 1, 0 );

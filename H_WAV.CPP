@@ -3,7 +3,7 @@
 void wav::lefoglal( void ) {
 	if( size > 1000000 )
 		hiba( "wav::alloc-ban size > 1000000!" );
-	{ tomb = NEW(signed short*) signed short[size]; }
+	{ tomb = new signed short[size]; }
 	if( !tomb )
 		uzenet( "wav::alloc-ban memory!" );
 }
@@ -181,7 +181,7 @@ wav2::wav2( wav* pwav ) {
 	#endif
 	if( pwav->size > 64000 )
 		hiba( "wav2-ben size > 64000!" );
-	{ mtomb = NEW(short*) short[pwav->size]; }
+	{ mtomb = new short[pwav->size]; }
 	if( !mtomb )
 		uzenet( "memory" );
 	for( int i = 0; i < pwav->size-1; i++ )

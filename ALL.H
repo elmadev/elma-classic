@@ -75,8 +75,6 @@
 #include	"custom.h"
 #include	"options.h"
 
-#include	"newuj.h"
-
 #include	"topol.h"
 #include	"edituj.h"
 #include	"dialog.h"

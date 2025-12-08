@@ -92,11 +92,11 @@ void mv_main( void ) {
 		// Ha nem talalja nemmem.inf-et:
 		// mem Totall Free 11600K-nal meg eppen elmegy, 101 mar uzenetet ir:
 		int memkell = 100;
-		char* tomb[110];
-		for( int i = 0; i < memkell; i++ ) {
-			{ tomb[i] = NEW(char*) char[100000]; }
-			if( !tomb[i] ) {
-				char tmp[200];
+	char* tomb[110];
+	for( int i = 0; i < memkell; i++ ) {
+		{ tomb[i] = new char[100000]; }
+		if( !tomb[i] ) {
+			char tmp[200];
 				sprintf( tmp, "You need about %d00K more free memory!\n", memkell-i );
 				uzenet( tmp );
 			}

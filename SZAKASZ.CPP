@@ -75,7 +75,7 @@ szakaszok::~szakaszok( void ) {
 
 vonalnode* szakaszok::getnewnode( void ) {
 	if( !pelsocsomag ) {
-		{ pelsocsomag = NEW(soknodecsomag*) soknodecsomag; }
+		{ pelsocsomag = new soknodecsomag; }
 		if( !pelsocsomag )
 			uzenet( "memory!" );
 		pelsocsomag->nextcsomag = NULL;
@@ -85,7 +85,7 @@ vonalnode* szakaszok::getnewnode( void ) {
 	while( curcsomag->nextcsomag )
 		curcsomag = curcsomag->nextcsomag;
 	if( csomagbanbetelt == CSOMAGBANNODESZAM ) {
-		{ curcsomag->nextcsomag = NEW(soknodecsomag*) soknodecsomag; }
+		{ curcsomag->nextcsomag = new soknodecsomag; }
 		curcsomag = curcsomag->nextcsomag;
 		if( !curcsomag )
 			uzenet( "memory!" );
@@ -269,7 +269,7 @@ void szakaszok::rendez( double maxtav ) {
 
 	// Lefoglalja tombot:
 	unsigned tombmeret = xdim * ydim;
-	{ tertomb = NEW(pvonalnode*) pvonalnode[tombmeret]; }
+	{ tertomb = new pvonalnode[tombmeret]; }
 	if( !tertomb )
 		uzenet( "memory!" );
 	int hatar = xdim*ydim;

@@ -56,7 +56,7 @@ void initqopen( void ) {
 	if( !Egybol )
 		return;
 
-	{ Leirotomb = NEW(fileleiro*) fileleiro[FILESZAM]; }
+	{ Leirotomb = new fileleiro[FILESZAM]; }
 	if( !Leirotomb )
 		uzenet( "initqopen-ben memory!" );
 	FILE* h = fopen( Nagyfilenev, "rb" );

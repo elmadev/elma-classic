@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: python -m pip install meson==1.10.0 ninja
+
+      - name: Visual Studio 17
+        if: runner.os == 'windows'
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: "[17.1,18.0)"
+
+      - name: Configure
+        if: runner.os == 'windows'
+        run: meson setup build -Dbuildtype=release --vsenv
+
+      - name: Configure
+        if: runner.os != 'windows'
+        run: meson setup build -Dbuildtype=release
+
+      - name: Build
+        run: meson compile -C build

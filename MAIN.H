@@ -5,7 +5,7 @@
 #define CFUGGVENY
 #endif
 
-#define SARVARI
+// #define SARVARI
 extern int Sarvari;
 
 //#define BUTITOTT

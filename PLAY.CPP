@@ -284,9 +284,6 @@ void saveplay( long belyeg ) {
 
 // Idot beirja tablaba, ha kell:
 void idoelintezes( long ido, char* valasz, int level, char* filenev ) {
-	if( (ido > 0) && (ido%4 == 0) )
-		kimentreadme();
-
 	int extlev = 0;
 	if( filenev )
 		extlev = 1;

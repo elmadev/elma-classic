@@ -107,8 +107,6 @@
 #include	"golyutk.h"
 
 
-#include	"readme.h"
-
 #include	"m_dd.h"
 #include	"m_k.h"
 #include	"m_v.h"

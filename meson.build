@@ -64,10 +64,7 @@ cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
     cpp_args = ['/Zc:strictStrings-', '/D_CRT_SECURE_NO_WARNINGS']
 else
-    cpp_args = [
-        '-Wno-write-strings',
-        '-Wno-deprecated-declarations',
-    ]
+    cpp_args = ['-Wno-write-strings', '-Wno-deprecated-declarations']
 
     if cpp.get_id() == 'clang'
         cpp_args += ['-Wno-nonportable-include-path']

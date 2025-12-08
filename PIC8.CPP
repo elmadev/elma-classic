@@ -103,13 +103,13 @@ pic8::~pic8( void ) {
     if( nemdestrukt )
         return;
     if( sormuttomb )
-        DELETE sormuttomb; }
+        delete sormuttomb;
     if( szegmuttomb )
         for( int i = 0; i < szegnum; i++ )
-            DELETE szegmuttomb[i]; }
-    DELETE szegmuttomb; }
+            delete szegmuttomb[i];
+    delete szegmuttomb;
     if( sprite )
-        DELETE sprite; }
+        delete sprite;
 }
 
 pic8::pic8( int xsizep, int ysizep ) {

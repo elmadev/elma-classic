@@ -93,15 +93,15 @@ abc8::~abc8( void ) {
 	if( ppsprite ) {
 		for( int i = 0; i < 256; i++ ) {
 			if( ppsprite[i] ) {
-				DELETE ppsprite[i]; }
+				delete ppsprite[i];
 				ppsprite[i] = NULL;
 			}
 		}
-		DELETE ppsprite; }
+		delete ppsprite;
 		ppsprite = NULL;
 	}
 	if( ytomb ) {
-		DELETE ytomb; }
+		delete ytomb;
 		ytomb = NULL;
 	}
 }

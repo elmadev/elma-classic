@@ -57,7 +57,7 @@ unsigned char* spriteadat8( pic8* ppic, unsigned char szin,
 			}
 			if( buf >= MAXBUFFER ) {
 				hiba( "Nem fer be egy szegmensbe spriteadat!" );
-				DELETE buffer; }
+				delete buffer;
 				return NULL;
 			}
 		}
@@ -69,14 +69,14 @@ unsigned char* spriteadat8( pic8* ppic, unsigned char szin,
 	{ jobuffer = NEW(unsigned char*) unsigned char[buf]; }
 	if( !jobuffer ) {
 		uzenet( "spriteadat8-ban memory!" );
-		DELETE buffer; }
+		delete buffer;
 		return NULL;
 	}
 	BYTECOPY( jobuffer, buffer, buf );
 
 	*pspritehossz = buf;
 
-	DELETE buffer; }
+	delete buffer;
 	return jobuffer;
 }
 

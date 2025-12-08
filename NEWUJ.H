@@ -4,4 +4,3 @@
 
 
 #define NEW( a )    new
-#define DELETE      { delete

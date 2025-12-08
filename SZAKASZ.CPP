@@ -62,10 +62,10 @@ szakaszok::szakaszok( topol* ptop ) {
 
 szakaszok::~szakaszok( void ) {
 	if( tomb ) {
-		DELETE tomb; }
+		delete tomb;
 	}
 	if( tertomb ) {
-		DELETE tertomb; }
+		delete tertomb;
 	}
 	deleteallnodes();
 }
@@ -102,7 +102,7 @@ void szakaszok::deleteallnodes( void ) {
 	while( curcsomag ) {
 		soknodecsomag* elozocsomag = curcsomag;
 		curcsomag = curcsomag->nextcsomag;
-		DELETE elozocsomag; }
+		delete elozocsomag;
 	}
 }
 

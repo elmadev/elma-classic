@@ -20,10 +20,10 @@ kiskep::kiskep( char* pic8nev, pic8* ppic ) {
 		for( int x = 0; x < xsize; x++ )
 			tomb[y*256+x] = ppic->gpixel( x, y );
 
-	DELETE ppic; }
+	delete ppic;
 }
 
 kiskep::~kiskep( void ) {
 	if( tomb )
-		DELETE tomb; }
+		delete tomb;
 }

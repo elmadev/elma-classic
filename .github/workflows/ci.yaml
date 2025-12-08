@@ -11,6 +11,31 @@ on:
       - "**.md"
 
 jobs:
+  clang-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install clang-format 19
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format-19
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: python -m pip install meson==1.10.0 ninja
+
+      - name: Configure
+        run: meson setup build
+
+      - name: Check formatting
+        run: ninja -C build clang-format-check
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:

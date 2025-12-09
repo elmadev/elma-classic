@@ -3,10 +3,6 @@
 int sdl_init(void);
 int main() { return sdl_init(); }
 
-ddpal::ddpal(unsigned char* tomb) {}
-ddpal::~ddpal() {}
-void ddpal::set() {}
-
 void uzenet(char* text1, char* text2, char* text3) { printf("%s %s %s\n", text1, text2, text3); }
 
 void hiba(char* text1, char* text2, char* text3) { printf("%s %s %s\n", text1, text2, text3); }

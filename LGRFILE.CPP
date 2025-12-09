@@ -243,7 +243,7 @@ void lgrfile::beirkepet( pic8* ppic, piclist* ppiclist, int index ) {
 			if( i+telix > PICTOMBMERET )
 				uzenet( "Picture is too big in lgr file! Picture name:",
 															pkep->nev );
-			BYTECOPY( &Tmptomb[i], &sor[x], telix );
+			memcpy( &Tmptomb[i], &sor[x], telix );
 
 			x += telix;
 			i += telix;
@@ -253,7 +253,7 @@ void lgrfile::beirkepet( pic8* ppic, piclist* ppiclist, int index ) {
 	pkep->adatok = new unsigned char[i+10];
 	if( !pkep->adatok )
 		hiba( "Not enough memory!" );
-	BYTECOPY( pkep->adatok, Tmptomb, i );
+	memcpy( pkep->adatok, Tmptomb, i );
 
 	kepszam++;
 }

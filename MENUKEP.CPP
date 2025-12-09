@@ -154,7 +154,7 @@ static void kirajzgolyo( vekt2 g, double r, pic8* forras ) {
 		}
 		else
 			source = forras->getptr( y ) + x1;
-		BYTECOPY( dest, source, x2-x1+1 );
+		memcpy( dest, source, x2-x1+1 );
 
 		y++;
 	}

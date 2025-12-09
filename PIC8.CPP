@@ -772,7 +772,7 @@ void blt8( pic8* pd, pic8* ps, int x, int y,
 										//&ps->sormuttomb[sy][xkezd],
 										//xveg-xkezd+1 );
 									else
-										BYTECOPY( &pd->sormuttomb[desty][x+xkezd-x1],
+										memcpy( &pd->sormuttomb[desty][x+xkezd-x1],
 										&ps->sormuttomb[sy][xkezd],
 										xveg-xkezd+1 );
 								}
@@ -785,7 +785,7 @@ void blt8( pic8* pd, pic8* ps, int x, int y,
                                     //&ps->sormuttomb[sy][sx],
                                     //buffer[buf] );
                                 else
-									BYTECOPY( &pd->sormuttomb[desty][x+sx-x1],
+									memcpy( &pd->sormuttomb[desty][x+sx-x1],
                                     &ps->sormuttomb[sy][sx],
                                     buffer[buf] );
                             }
@@ -824,7 +824,7 @@ void blt8( pic8* pd, pic8* ps, int x, int y,
 	//	hiba( "Itt van 18!" );
 
     for( int fy = y1; fy <= y2; fy++ ) {
-		BYTECOPY( &pd->sormuttomb[dfy++][x], &ps->sormuttomb[fy][x1], xmeret );
+		memcpy( &pd->sormuttomb[dfy++][x], &ps->sormuttomb[fy][x1], xmeret );
     }
 	//if( Debugblt )	
 	//	hiba( "Itt van 19!" ); idejott

@@ -512,8 +512,8 @@ void CustomMixer( void* buffer1, int byteszam1,
 			// Most pont korulfordulasi hataran van buffernek:
 			// Ideiglenes bufferbe masoljuk:
 			callbackhang( Buffer16bit, (byteszam1+byteszam2)/2 );
-			BYTECOPY( buffer1, Buffer16bit, byteszam1 );
-			BYTECOPY( buffer2, &Buffer16bit[byteszam1/2], 
+			memcpy( buffer1, Buffer16bit, byteszam1 );
+			memcpy( buffer2, &Buffer16bit[byteszam1/2], 
 												byteszam2 );
 		}
 		else {
@@ -534,8 +534,8 @@ void CustomMixer( void* buffer1, int byteszam1,
 	            tmp8bit[i] = (unsigned char)
 							((Buffer16bit[i]>>8)+128);
 			// Most bemasoljuk vegleges bufferekbe:
-			BYTECOPY( buffer1, tmp8bit, byteszam1 );
-			BYTECOPY( buffer2, &tmp8bit[byteszam1], 
+			memcpy( buffer1, tmp8bit, byteszam1 );
+			memcpy( buffer2, &tmp8bit[byteszam1], 
 												byteszam2 );
 		}
 		else {
@@ -547,7 +547,7 @@ void CustomMixer( void* buffer1, int byteszam1,
 	            tmp8bit[i] = (unsigned char)
 							((Buffer16bit[i]>>8)+128);
 			// Most bemasoljuk vegleges bufferekbe:
-			BYTECOPY( buffer1, Buffer16bit, byteszam1 );
+			memcpy( buffer1, Buffer16bit, byteszam1 );
 		}
 	}
 }

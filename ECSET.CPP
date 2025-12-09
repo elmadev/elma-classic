@@ -1382,16 +1382,16 @@ void ecset::kiegysor_A( unsigned char* pc, int ye ) {
 		// Ha eppen vegeig log, akkor is ide jon
 		if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 			// Normal kep copi:
-			BYTECOPY( pc, &pda->pixelek[Xe1-xpos], ujpdaxsize-ures );
+			memcpy( pc, &pda->pixelek[Xe1-xpos], ujpdaxsize-ures );
 		}
 		else {
 			// Eg, Fold, vagy ures:
 			if( !pda->pixelek ) { // Eg
-				BYTECOPY( pc, Egsor, ujpdaxsize-ures );
+				memcpy( pc, Egsor, ujpdaxsize-ures );
 				return;
 			}
 			if( (pixelek_t)pda->pixelek == PX_FOLD )
-				BYTECOPY( pc, Foldsor, ujpdaxsize-ures );
+				memcpy( pc, Foldsor, ujpdaxsize-ures );
 			else {
 				#ifdef TEST
 					if( (pixelek_t)pda->pixelek != PX_URES ) hiba( "(pixelek_t)pda->pixelek != PX_URES iueghyreg!" );
@@ -1405,15 +1405,15 @@ void ecset::kiegysor_A( unsigned char* pc, int ye ) {
 	int size = pda->xsize-ures;
 	if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 		// Normal kep copi:
-		BYTECOPY( pc, &pda->pixelek[Xe1-xpos], size );
+		memcpy( pc, &pda->pixelek[Xe1-xpos], size );
 	}
 	else {
 		// Eg, Fold, vagy ures:
 		if( !pda->pixelek )  // Eg
-			BYTECOPY( pc, Egsor, size );
+			memcpy( pc, Egsor, size );
 		else {
 			if( (pixelek_t)pda->pixelek == PX_FOLD )
-				BYTECOPY( pc, Foldsor, size );
+				memcpy( pc, Foldsor, size );
 			else {
 				#ifdef TEST
 					if( (pixelek_t)pda->pixelek != PX_URES )
@@ -1443,15 +1443,15 @@ void ecset::kiegysor_A( unsigned char* pc, int ye ) {
 			// Ez az utolso darab, ki is loghat:
 			if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 				// Normal kep copi:
-				BYTECOPY( pc, pda->pixelek, Xe2-xpos+1 );
+				memcpy( pc, pda->pixelek, Xe2-xpos+1 );
 				return;
 			}
 			if( !pda->pixelek ) {
-				BYTECOPY( pc, Egsor + (xpos-Xe1), Xe2-xpos+1 );
+				memcpy( pc, Egsor + (xpos-Xe1), Xe2-xpos+1 );
 				return;
 			}
 			if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-				BYTECOPY( pc, Foldsor + (xpos-Xe1), Xe2-xpos+1 );
+				memcpy( pc, Foldsor + (xpos-Xe1), Xe2-xpos+1 );
 				return;
 			}
 			#ifdef TEST
@@ -1463,15 +1463,15 @@ void ecset::kiegysor_A( unsigned char* pc, int ye ) {
 		// Ez a darab nem log ki:
 		if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 			// Normal kep copi:
-			BYTECOPY( pc, pda->pixelek, pda->xsize );
+			memcpy( pc, pda->pixelek, pda->xsize );
 		}
 		else {
 			if( !pda->pixelek ) {
-				BYTECOPY( pc, Egsor + (xpos-Xe1), pda->xsize );
+				memcpy( pc, Egsor + (xpos-Xe1), pda->xsize );
 			}
 			else {
 				if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-					BYTECOPY( pc, Foldsor + (xpos-Xe1), pda->xsize );
+					memcpy( pc, Foldsor + (xpos-Xe1), pda->xsize );
 				}
 				else {
 					#ifdef TEST
@@ -1518,16 +1518,16 @@ void ecset::kiegysor_B( unsigned char* pc, int ye ) {
 		// Ha eppen vegeig log, akkor is ide jon
 		if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 			// Normal kep copi:
-			BYTECOPY( pc, &pda->pixelek[Xe1-xpos], ujpdaxsize-ures );
+			memcpy( pc, &pda->pixelek[Xe1-xpos], ujpdaxsize-ures );
 		}
 		else {
 			// Eg, Fold, vagy ures:
 			if( !pda->pixelek ) { // Eg
-				BYTECOPY( pc, Egsor, ujpdaxsize-ures );
+				memcpy( pc, Egsor, ujpdaxsize-ures );
 				return;
 			}
 			if( (pixelek_t)pda->pixelek == PX_FOLD )
-				BYTECOPY( pc, Foldsor, ujpdaxsize-ures );
+				memcpy( pc, Foldsor, ujpdaxsize-ures );
 			else {
 				#ifdef TEST
 					if( (pixelek_t)pda->pixelek != PX_URES ) hiba( "(pixelek_t)pda->pixelek != PX_URES iueghyreg!" );
@@ -1541,15 +1541,15 @@ void ecset::kiegysor_B( unsigned char* pc, int ye ) {
 	int size = pda->xsize-ures;
 	if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 		// Normal kep copi:
-		BYTECOPY( pc, &pda->pixelek[Xe1-xpos], size );
+		memcpy( pc, &pda->pixelek[Xe1-xpos], size );
 	}
 	else {
 		// Eg, Fold, vagy ures:
 		if( !pda->pixelek )  // Eg
-			BYTECOPY( pc, Egsor, size );
+			memcpy( pc, Egsor, size );
 		else {
 			if( (pixelek_t)pda->pixelek == PX_FOLD )
-				BYTECOPY( pc, Foldsor, size );
+				memcpy( pc, Foldsor, size );
 			else {
 				#ifdef TEST
 					if( (pixelek_t)pda->pixelek != PX_URES )
@@ -1576,15 +1576,15 @@ void ecset::kiegysor_B( unsigned char* pc, int ye ) {
 			// Ez az utolso darab, ki is loghat:
 			if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 				// Normal kep copi:
-				BYTECOPY( pc, pda->pixelek, Xe2-xpos+1 );
+				memcpy( pc, pda->pixelek, Xe2-xpos+1 );
 				return;
 			}
 			if( !pda->pixelek ) {
-				BYTECOPY( pc, Egsor + (xpos-Xe1), Xe2-xpos+1 );
+				memcpy( pc, Egsor + (xpos-Xe1), Xe2-xpos+1 );
 				return;
 			}
 			if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-				BYTECOPY( pc, Foldsor + (xpos-Xe1), Xe2-xpos+1 );
+				memcpy( pc, Foldsor + (xpos-Xe1), Xe2-xpos+1 );
 				return;
 			}
 			#ifdef TEST
@@ -1596,15 +1596,15 @@ void ecset::kiegysor_B( unsigned char* pc, int ye ) {
 		// Ez a darab nem log ki:
 		if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 			// Normal kep copi:
-			BYTECOPY( pc, pda->pixelek, pda->xsize );
+			memcpy( pc, pda->pixelek, pda->xsize );
 		}
 		else {
 			if( !pda->pixelek ) {
-				BYTECOPY( pc, Egsor + (xpos-Xe1), pda->xsize );
+				memcpy( pc, Egsor + (xpos-Xe1), pda->xsize );
 			}
 			else {
 				if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-					BYTECOPY( pc, Foldsor + (xpos-Xe1), pda->xsize );
+					memcpy( pc, Foldsor + (xpos-Xe1), pda->xsize );
 				}
 				else {
 					#ifdef TEST
@@ -1677,18 +1677,18 @@ void ecset::kiegysor_FF( unsigned char* pc, int ye ) {
 		// Ha eppen vegeig log, akkor is ide jon
 		if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 			// Normal kep copi:
-			BYTECOPY( pc, FFsor, ujpdaxsize-ures );
+			memcpy( pc, FFsor, ujpdaxsize-ures );
 			ffmutvalt();
 		}
 		else {
 			// Eg, Fold, vagy ures:
 			if( !pda->pixelek ) { // Eg
-				BYTECOPY( pc, FFsor, ujpdaxsize-ures );
+				memcpy( pc, FFsor, ujpdaxsize-ures );
 				ffmutvalt();
 				return;
 			}
 			if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-				BYTECOPY( pc, FFsor, ujpdaxsize-ures );
+				memcpy( pc, FFsor, ujpdaxsize-ures );
 				ffmutvalt();
 			}
 			else {
@@ -1704,19 +1704,19 @@ void ecset::kiegysor_FF( unsigned char* pc, int ye ) {
 	int size = pda->xsize-ures;
 	if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 		// Normal kep copi:
-		BYTECOPY( pc, FFsor, size );
+		memcpy( pc, FFsor, size );
 		ffmutvalt();
 	}
 	else {
 		// Eg, Fold, vagy ures:
 		if( !pda->pixelek ) {
 			// Eg:
-			BYTECOPY( pc, FFsor, size );
+			memcpy( pc, FFsor, size );
 			ffmutvalt();
 		}
 		else {
 			if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-				BYTECOPY( pc, FFsor, size );
+				memcpy( pc, FFsor, size );
 				ffmutvalt();
 			}
 			else {
@@ -1741,17 +1741,17 @@ void ecset::kiegysor_FF( unsigned char* pc, int ye ) {
 			// Ez az utolso darab, ki is loghat:
 			if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 				// Normal kep copi:
-				BYTECOPY( pc, FFsor, Xe2-xpos+1 );
+				memcpy( pc, FFsor, Xe2-xpos+1 );
 				ffmutvalt();
 				return;
 			}
 			if( !pda->pixelek ) {
-				BYTECOPY( pc, FFsor, Xe2-xpos+1 );
+				memcpy( pc, FFsor, Xe2-xpos+1 );
 				ffmutvalt();
 				return;
 			}
 			if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-				BYTECOPY( pc, FFsor, Xe2-xpos+1 );
+				memcpy( pc, FFsor, Xe2-xpos+1 );
 				ffmutvalt();
 				return;
 			}
@@ -1764,17 +1764,17 @@ void ecset::kiegysor_FF( unsigned char* pc, int ye ) {
 		// Ez a darab nem log ki:
 		if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
 			// Normal kep copi:
-			BYTECOPY( pc, FFsor, pda->xsize );
+			memcpy( pc, FFsor, pda->xsize );
 			ffmutvalt();
 		}
 		else {
 			if( !pda->pixelek ) {
-				BYTECOPY( pc, FFsor, pda->xsize );
+				memcpy( pc, FFsor, pda->xsize );
 				ffmutvalt();
 			}
 			else {
 				if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-					BYTECOPY( pc, FFsor, pda->xsize );
+					memcpy( pc, FFsor, pda->xsize );
 					ffmutvalt();
 				}
 				else {

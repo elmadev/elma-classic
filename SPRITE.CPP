@@ -72,7 +72,7 @@ unsigned char* spriteadat8( pic8* ppic, unsigned char szin,
 		delete buffer;
 		return NULL;
 	}
-	BYTECOPY( jobuffer, buffer, buf );
+	memcpy( jobuffer, buffer, buf );
 
 	*pspritehossz = buf;
 

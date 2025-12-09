@@ -17,8 +17,6 @@
 
 //#include	<graph.h>
 
-#define VEGLEGES
-
 //#define TEST
 
 #include	"main.h"

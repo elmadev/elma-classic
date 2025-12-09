@@ -5,8 +5,6 @@ typedef uintptr_t pixelek_t;
 // Regen a file vegen volt egy kikomentezett eget keszit nevu fuggveny is
 // hegyekhez, de ezt 99.05.19-en kiszedtem.
 
-//#define FFECSET // Ha definialva, fekete-feheren rajzol
-
 //static pic8* Egtmp = NULL;
 //static pic8* Hegy1 = NULL;
 //static pic8* Hegy2 = NULL;
@@ -1610,179 +1608,6 @@ void ecset::kiegysor_B( unsigned char* pc, int ye ) {
 	}
 }
 
-#ifdef FFECSET
-
-static unsigned char Feketesor[650], Fehersor[650];
-static unsigned char* FFsor = Feketesor;
-static int FFallapot = 0, FFinited = 0;
-static void ffmutvalt( void ) {
-	FFallapot = !FFallapot;
-	if( FFallapot )
-		FFsor = Feketesor;
-	else
-		FFsor = Fehersor;
-}
-
-// Fekete-feher-ben rak ki (csak tesztre):
-void ecset::kiegysor_FF( unsigned char* pc, int ye ) {
-	if( !FFinited ) {
-		FFinited = 1;
-		for( int i = 0; i < 640; i++) {
-			Feketesor[i] = 10;
-			Fehersor[i] = 120;
-		}
-	}
-
-	FFsor = Feketesor;
-	FFallapot = 0;
-	ffmutvalt();
-
-	// Visszalepunk amig kell:
-	darab* pda = curdarabok_A[ye];
-	int xpos = kurxposok_A[ye];
-	while( xpos > Xe1 ) {
-		pda--;
-		xpos -= pda->xsize;
-	}
-	// Elorelepunk amig kell:
-	while( xpos + pda->xsize <= Xe1 ) {
-		xpos += pda->xsize;
-		pda++;
-
-	}
-	// Elmentjuk kurrens darabot:
-	curdarabok_A[ye] = pda;
-	kurxposok_A[ye] = xpos;
-
-
-	// ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-	// ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-	// ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-	// ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-	int ures = Xe1-xpos;
-	if( xpos + pda->xsize > Xe2 ) {
-		// ATLOG VEGIG:
-		int ujpdaxsize = Xe2-xpos+1;
-		// Ha eppen vegeig log, akkor is ide jon
-		if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
-			// Normal kep copi:
-			memcpy( pc, FFsor, ujpdaxsize-ures );
-			ffmutvalt();
-		}
-		else {
-			// Eg, Fold, vagy ures:
-			if( !pda->pixelek ) { // Eg
-				memcpy( pc, FFsor, ujpdaxsize-ures );
-				ffmutvalt();
-				return;
-			}
-			if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-				memcpy( pc, FFsor, ujpdaxsize-ures );
-				ffmutvalt();
-			}
-			else {
-				#ifdef TEST
-					if( (pixelek_t)pda->pixelek != PX_URES ) hiba( "(pixelek_t)pda->pixelek != PX_URES iueghyreg!" );
-				#endif
-			}
-		}
-		return;
-	}
-
-	// Elso szakasz nem log at vegig:
-	int size = pda->xsize-ures;
-	if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
-		// Normal kep copi:
-		memcpy( pc, FFsor, size );
-		ffmutvalt();
-	}
-	else {
-		// Eg, Fold, vagy ures:
-		if( !pda->pixelek ) {
-			// Eg:
-			memcpy( pc, FFsor, size );
-			ffmutvalt();
-		}
-		else {
-			if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-				memcpy( pc, FFsor, size );
-				ffmutvalt();
-			}
-			else {
-				#ifdef TEST
-					if( (pixelek_t)pda->pixelek != PX_URES )
-						hiba( "(pixelek_t)pda->pixelek != PX_URES iygvfrgiyvr!" );
-				#endif
-			}
-		}
-	}
-	// Atugrunk kovetkezore:
-	xpos += pda->xsize;
-	pda++;
-	pc += size;
-
-	// BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-	// BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-	// BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-	// BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-	while( xpos <= Xe2 ) {
-		if( xpos + pda->xsize > Xe2 ) {
-			// Ez az utolso darab, ki is loghat:
-			if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
-				// Normal kep copi:
-				memcpy( pc, FFsor, Xe2-xpos+1 );
-				ffmutvalt();
-				return;
-			}
-			if( !pda->pixelek ) {
-				memcpy( pc, FFsor, Xe2-xpos+1 );
-				ffmutvalt();
-				return;
-			}
-			if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-				memcpy( pc, FFsor, Xe2-xpos+1 );
-				ffmutvalt();
-				return;
-			}
-			#ifdef TEST
-				if( (pixelek_t)pda->pixelek != PX_URES )
-					hiba( "(pixelek_t)pda->pixelek != PX_URES 653wetgki!" );
-			#endif
-		}
-
-		// Ez a darab nem log ki:
-		if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
-			// Normal kep copi:
-			memcpy( pc, FFsor, pda->xsize );
-			ffmutvalt();
-		}
-		else {
-			if( !pda->pixelek ) {
-				memcpy( pc, FFsor, pda->xsize );
-				ffmutvalt();
-			}
-			else {
-				if( (pixelek_t)pda->pixelek == PX_FOLD ) {
-					memcpy( pc, FFsor, pda->xsize );
-					ffmutvalt();
-				}
-				else {
-					#ifdef TEST
-						if( (pixelek_t)pda->pixelek != PX_URES )
-							hiba( "(pixelek_t)pda->pixelek != PX_URES 653wetgki!" );
-					#endif
-				}
-			}
-		}
-
-		xpos += pda->xsize;
-		pc += pda->xsize;
-		pda++;
-	}
-}
-
-#endif
-
 void ecset::getbalalso_int( vekt2 balalso, int* px, int* py ) {
 	vekt2 relat = balalso-origo;
 	if( view ) {
@@ -1878,12 +1703,7 @@ void ecset::kitesz( int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int
 
 			// Eg fol-le nem scrollozodik:
 			Egsor = Plgr->peg->getptr( (y-y1) % egymodulus ) + egdx;
-
-			#ifdef FFECSET
-				kiegysor_FF( ppic->getptr(y)+x1, ye );
-			#else
-				kiegysor_A( ppic->getptr(y)+x1, ye );
-			#endif
+			kiegysor_A( ppic->getptr(y)+x1, ye );
 		}
 	}
 	else {
@@ -1895,12 +1715,7 @@ void ecset::kitesz( int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int
 			//				egdx;
 			Egsor = Plgr->peg->getptr( (y-y1) % egymodulus ) +
 							egdx;
-
-			#ifdef FFECSET
-				kiegysor_FF( ppic->getptr(y)+x1, ye );
-			#else
-				kiegysor_B( ppic->getptr(y)+x1, ye );
-			#endif
+			kiegysor_B( ppic->getptr(y)+x1, ye );
 		}
 	}
 }

@@ -14,10 +14,6 @@
 // osszes levelt igy ki is menti:
 //#define BELSOTIR
 
-// Ha define-olva van, Csabinak ment shareware listat
-// kiirsharewarelista fuggveny:
-//#define KIIRSHAREWARELISTA
-
 static char Levelnevek[MAXPALYASZAM+2][14] = {
 	"nulla.leb",
 	"a01.leb", "a02.leb", "a03.leb", "a04.leb", "a05.leb",
@@ -913,10 +909,6 @@ topol::topol( char* filenev_p ) {
 	}
 }
 
-#ifdef KIIRSHAREWARELISTA
-static int Ucsolevsarvari = 0;
-#endif
-
 void topol::loadkulso( char* filenev ) {
     ////int kulso = 1;
 
@@ -997,12 +989,6 @@ void topol::loadkulso( char* filenev ) {
 	if( sarvarertek + belyeg_d < 9786.0 ||
 		sarvarertek + belyeg_d > 36546.0 )
 		hiba( "topol::topol-ban sarvarertek kivul esik tartomanyon!" );
-
-	#ifdef KIIRSHAREWARELISTA
-		Ucsolevsarvari = 1;
-		if( sarvarertek + belyeg_d <= 20000.0 )
-			Ucsolevsarvari = 0;
-	#endif
 
 	// Levels that can only be played in Registered would meet the condition: sarvarertek + belyeg_d <= 20000.0
 
@@ -1819,40 +1805,3 @@ void topol::kerekjolalljon( void ) {
 		}
 	}
 }
-
-// Csabi reszere kulon exe:
-// Kiirja osszes lev-rol slister.txt file-ba hogy melyik shareware es
-// melyik nem:
-void kiirsharewarelista( void ) {
-#ifdef KIIRSHAREWARELISTA
-	if( Sarvari )
-		uzenet( "KIIRSHAREWARELISTA eseten Sarvari!" );
-
-	FILE* h = fopen( "slister.txt", "wt" );
-	if( !h )
-		uzenet( "Nem nyilik slister.txt irasra!" );
-
-	finame fname;
-	int done = fifirst( "lev\\*.lev", fname );
-	// Vegigmegyunk osszes lev file-on es kimentjuk oket belsokent:
-	while( !done ) {
-		topol* ptop = new topol( fname );
-
-		if( Ucsolevsarvari )
-			fprintf( h, "%s %s\n", fname, "SHAREWARE" );
-		else
-			fprintf( h, "%s %s\n", fname, "FULL" );
-
-		delete ptop;
-
-		done = finext( fname );
-	}
-
-	ficlose();
-
-	fclose( h );
-
-	hiba( "Kiirta slister.txt file-ba hogy melyek shareware palyak!" );
-#endif
-}
-

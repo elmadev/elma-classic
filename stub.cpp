@@ -3,16 +3,6 @@
 int sdl_init(void);
 int main() { return sdl_init(); }
 
-int Locky0_alul = 0;
-
-unsigned char** lockbackbuffer(int unused) { return nullptr; }
-
-void unlockbackbuffer() {}
-
-unsigned char** lockfrontbuffer() { return nullptr; }
-
-void unlockfrontbuffer() {}
-
 ddpal::ddpal(unsigned char* tomb) {}
 ddpal::~ddpal() {}
 void ddpal::set() {}

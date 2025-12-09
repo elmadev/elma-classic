@@ -3,6 +3,10 @@
 
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
+SDL_Surface* SDLSurfacePaletted;
+
+// Ha igaz, alulrol indul y (kirajz320 allitja igazba):
+int Locky0_alul = 0;
 
 int sdl_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
@@ -33,5 +37,65 @@ int sdl_init() {
     SDL_UnlockSurface(SDLSurfaceMain);
     SDL_UpdateWindowSurface(SDLWindow);
 
+    SDLSurfacePaletted = SDL_CreateRGBSurfaceWithFormat(0, SDLSurfaceMain->w, SDLSurfaceMain->h, 0,
+                                                        SDL_PIXELFORMAT_INDEX8);
+    if (!SDLSurfacePaletted) {
+        hiba((char*)SDL_GetError());
+        return 1;
+    }
+
     return 0;
+}
+
+static unsigned char* Mutbuffer[480];
+static int Bufflocked = 0;
+
+unsigned char** lockbackbuffer(int unused) {
+    if (Bufflocked) {
+        hiba("lockbackbuffer-ben Bufflocked!");
+    }
+    Bufflocked = 1;
+
+    unsigned char* mut = (unsigned char*)SDLSurfacePaletted->pixels;
+    if (Locky0_alul) {
+        // Set the row buffer bottom-down
+        for (int y = 0; y < 480; y++) {
+            Mutbuffer[480 - 1 - y] = mut;
+            mut += SDLSurfacePaletted->w;
+        }
+    } else {
+        // Set the row buffer top-down
+        for (int y = 0; y < 480; y++) {
+            Mutbuffer[y] = mut;
+            mut += SDLSurfacePaletted->w;
+        }
+    }
+
+    return Mutbuffer;
+}
+
+void unlockbackbuffer(void) {
+    if (!Bufflocked) {
+        hiba("unlockbackbuffer-ben !Bufflocked!");
+    }
+    Bufflocked = 0;
+
+    SDL_BlitSurface(SDLSurfacePaletted, NULL, SDLSurfaceMain, NULL);
+    SDL_UpdateWindowSurface(SDLWindow);
+}
+
+unsigned char** lockfrontbuffer(void) {
+    if (Bufflocked) {
+        hiba("lockfrontbuffer-ben Bufflocked!");
+    }
+
+    return lockbackbuffer(0);
+}
+
+void unlockfrontbuffer(void) {
+    if (!Bufflocked) {
+        hiba("unlockbackbuffer-ben !Bufflocked!");
+    }
+
+    unlockbackbuffer();
 }

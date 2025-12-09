@@ -9,13 +9,6 @@
 
 #define BELYEGSZORZO (3247.764325643)
 
-#ifdef SARVARI
-int Maxpont_sarvari =  10;
-int Maxkerek_sarvari = 8;
-int Maxgyuru_sarvari = 5;
-int Maxsprite_sarvari = 20;
-#endif
-
 // Ha define-olva van, save belso lev formatumban, .leb kiterjesztessel
 // ment mintha shareware lenne, plusz hakellmentbelleveket fuggveny
 // osszes levelt igy ki is menti:
@@ -31,13 +24,7 @@ static char Levelnevek[MAXPALYASZAM+2][14] = {
 	"a06.leb", "a07.leb", "ujtag.leb", "a08.leb", "a09.leb", "ujgrav.leb", "a10.leb",
 
 	"a11.leb", "a12.leb", "a13.leb", "a14.leb", "a15.leb",
-	"a16.leb",
-
-	#ifdef SARVARI
-		"ujvege.leb",
-	#else
-		"a17.leb",
-	#endif
+	"a16.leb", "a17.leb",
 
 	"ujupdown.leb", "a18.leb", "a19.leb", "a20.leb",
 
@@ -1017,13 +1004,7 @@ void topol::loadkulso( char* filenev ) {
 			Ucsolevsarvari = 0;
 	#endif
 
-	// Ha igaz, akkor ezt a level file-t regisztraltbol-bol mentettek:
-	// Csak en regisztraltbol is sarvar-nak mentek:
-	#ifdef SARVARI
-		if( sarvarertek + belyeg_d <= 20000.0 )
-			uzenet( "Sorry, this level file can only be loaded into the registered version!:\n",
-												filenev );
-	#endif
+	// Levels that can only be played in Registered would meet the condition: sarvarertek + belyeg_d <= 20000.0
 
     // Beolvassuk hogy hibas-e:
     double hibaertek;
@@ -1091,43 +1072,8 @@ void topol::loadkulso( char* filenev ) {
         hiba( "topol::topol-ban gyuruszam <= 0!" );
 
     // Beolvassa sok gyurut:
-    #ifdef SARVARI
-        gyuru* pgy4 = NULL;
-        gyuru* pgy5 = NULL;
-        gyuru* pgy3 = NULL;
-        gyuru* pgy1 = NULL;
-        gyuru* pgy2 = NULL;
-        switch( gyuruszam ) {
-			case 4:
-                pgy1 = new gyuru( h, verzio );
-                pgy2 = new gyuru( h, verzio );
-                pgy3 = new gyuru( h, verzio );
-                pgy4 = new gyuru( h, verzio );
-                break;
-            case 1:
-                pgy1 = new gyuru( h, verzio );
-                break;
-            case 5:
-                pgy1 = new gyuru( h, verzio );
-                pgy2 = new gyuru( h, verzio );
-                pgy3 = new gyuru( h, verzio );
-                pgy4 = new gyuru( h, verzio );
-                pgy5 = new gyuru( h, verzio );
-                break;
-            case 3:
-                pgy1 = new gyuru( h, verzio );
-                pgy2 = new gyuru( h, verzio );
-                pgy3 = new gyuru( h, verzio );
-				break;
-            default: // ez csak 2 lehet, vagy csalas:
-                pgy1 = new gyuru( h, verzio );
-                pgy2 = new gyuru( h, verzio );
-                break;
-        }
-    #else
-        for( int i = 0; i < gyuruszam; i++ )
-            ptomb[i] = new gyuru( h, verzio );
-    #endif
+    for( int i = 0; i < gyuruszam; i++ )
+        ptomb[i] = new gyuru( h, verzio );
 
     // Kerekek szama:
     double kerekolvszam = 0;
@@ -1143,19 +1089,7 @@ void topol::loadkulso( char* filenev ) {
     for( int i = 0; i < kerekszam; i++ ) {
         // Beolvassa sok kereket:
         kerektomb[i] = new kerek( h, verzio );
-        // Shareware-ben egy kis zavaras:
-        #ifdef SARVARI
-            if( i == 10 && ptomb[10] )
-                ptomb[10]->pontszam += 1;
-        #endif
     }
-
-    #ifdef SARVARI
-        ptomb[4] = pgy5;
-        if( verzio >= -10000 )
-            ptomb[1] = pgy2;
-        ptomb[3] = pgy4;
-    #endif
 
     if( verzio > 6 ) {
 		// Most van SPRITE beolvasas is:
@@ -1178,11 +1112,6 @@ void topol::loadkulso( char* filenev ) {
             spritetomb[i] = new sprite( h );
         }
     }
-
-    #ifdef SARVARI
-        ptomb[0] = pgy1;
-        ptomb[2] = pgy3;
-    #endif
 
     // Ezekutan mar csak idotabla lehet!!!
 
@@ -1290,14 +1219,6 @@ void topol::loadbelso( char* filenev ) {
     if( sarvarertek + belyeg_d < 9786.0 ||
         sarvarertek + belyeg_d > 36546.0 )
         hiba( "topol::topol-ban sarvarertek kivul esik tartomanyon!" );
-
-    // Ha igaz, akkor ezt a level file-t regisztraltbol-bol mentettek:
-    // Csak en regisztraltbol is sarvar-nak mentek:
-    #ifdef SARVARI
-        if( sarvarertek + belyeg_d <= 20000.0 )
-            uzenet( "Sorry, this level file can only be loaded into the registered version!:\n",
-                                                filenev );
-    #endif
 
     // Beolvassuk hogy hibas-e:
     double hibaertek;
@@ -1486,12 +1407,9 @@ void topol::save( char* filenev, int nemkellcheck ) {
     fwrite( &belyeg_d, 1, sizeof( belyeg_d ), h );
 
     // Kiirjuk hogy sarvari-e:
-    // Ha sarvarertek + double(belyeg_l) > 20000.0, akkor sarvari:
-    #ifdef SARVARI
-        double sarvarertek = 20961.0 + s_random( 4982 ) - belyeg_d;
-    #else
-        double sarvarertek = 11877.0 + s_random( 5871 ) - belyeg_d;
-    #endif
+    // Shareware levels would meet the criteria sarvarertek + double(belyeg_l) > 20000.0
+    // which originally was calculated as 20961.0 + s_random( 4982 ) - belyeg_d;
+    double sarvarertek = 11877.0 + s_random( 5871 ) - belyeg_d;
 
 	// Regisztralt verzioju file-t is shareware-nek tunteti fol:
     #ifdef BELSOTIR
@@ -1692,30 +1610,6 @@ double topol::belyegszamitas( int kellspriteis ) {
 // Ha Sarvari, megvizsgalja hogy palya megfelel-e sarvari verzionak:
 // Ha nem, akkor kilep corrupt hibauzenettel:
 void topol::checklevelforsarvari( void ) {
-    //Maxpont_sarvari
-    //Maxkerek_sarvari
-    //Maxgyuru_sarvari
-    #ifdef SARVARI
-        int gyuruszam = 0;
-        for( int i = 0; i < MAXGYURU; i++ ) {
-            if( ptomb[i] ) {
-                gyuruszam++;
-                if( ptomb[i]->pontszam > Maxpont_sarvari )
-                    hiba( "checklevelforsarvari-ban tul sok pont!" );
-            }
-        }
-        if( gyuruszam > Maxgyuru_sarvari )
-            hiba( "checklevelforsarvari-ban tul sok gyuru!" );
-
-        int kerekszam = 0;
-        for( int i = 0; i < MAXKEREK; i++ ) {
-            if( kerektomb[i] ) {
-                kerekszam++;
-            }
-        }
-        if( kerekszam > Maxkerek_sarvari )
-            hiba( "checklevelforsarvari-ban tul sok kerek!" );
-    #endif
 }
 
 

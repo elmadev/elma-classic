@@ -274,19 +274,10 @@ void replay( void ) {
 
 static void demo( void ) {
 	int demoszam = 3;
-	//if( Sarvari )
-	//	demoszam = 2;
-	#ifdef SARVARI
-		char demonevek[14][14] = { "demos1.rec",
-								   "demos2.rec",
-								   "demos3.rec"
-								 };
-	#else
-		char demonevek[14][14] = { "demor1.rec",
-								   "demor2.rec",
-								   "demor3.rec"
-								 };
-	#endif
+	char demonevek[14][14] = { "demor1.rec",
+								"demor2.rec",
+								"demor3.rec"
+								};
 
 	int elozodemo = -1;
 	int elozoelotti = -1;

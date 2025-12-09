@@ -6,12 +6,6 @@
 void semmi( void ) {
 }
 
-#ifdef SARVARI
-	int Sarvari = 1;
-#else
-	int Sarvari = 0;
-#endif
-
 int Sajatugras = 0; // (forditva mint regen) Ha igaz, akkor jo ugras (right-clockwise)
 int Otszoros = 0; // Ha igaz, mindig otszor rakja ki palyat
 int Dupladuplabuffer = 0; // Ha igaz duplan huzza az idot (Win95)

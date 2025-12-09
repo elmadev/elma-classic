@@ -1,8 +1,6 @@
 
 #define MAXPONT (1000) // Ennyit csak akkor foglal le, ha kell
 
-extern int Maxpont_sarvari; // 10
-
 class topol;
 
 class gyuru {
@@ -44,8 +42,6 @@ void set_gyuru_attributes( gyuru* pgy );
 
 #define MAXKEREK (52)
 
-extern int Maxkerek_sarvari; // 8
-
 enum { T_CEL = 1, T_KAJA, T_HALALOS, T_KEZDO };
 enum { KT_NORMAL, KT_UP, KT_DOWN, KT_LEFT, KT_RIGHT };
 
@@ -70,8 +66,6 @@ public:
 };
 
 #define MAXSPRITE (5000)
-
-extern int Maxsprite_sarvari; // 20
 
 #define HATAROL_G (1)
 #define HATAROL_S (2)
@@ -98,8 +92,6 @@ public:
 };
 
 #define MAXGYURU (300)
-
-extern int Maxgyuru_sarvari; // 3
 
 typedef gyuru* ptrgyuru;
 #define LEVELNAMEHOSSZ (50) // 13-as verzioig (14) volt

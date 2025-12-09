@@ -6,11 +6,7 @@ static char Nagyfilenev[] = "elma.res";
 
 struct fileleiro {
 	char nev[16];
-	#ifdef SARVARI
-		long kezdet, hossz;
-	#else
-		long hossz, kezdet;
-	#endif
+	long hossz, kezdet; // In Shareware the order of these two vars is inversed
 };
 
 static fileleiro* Leirotomb = NULL;
@@ -22,11 +18,7 @@ static fileleiro* Leirotomb = NULL;
 static long Fileszam = 0;
 
 static void titkosit( void ) {
-	#ifdef SARVARI
-		short a = 23, b = 9882, c = 3391;
-	#else
-		short a = 23, b = 9982, c = 3391;
-	#endif
+	short a = 23, b = 9982, c = 3391; // In Shareware, b is 9882
 
 	if( !Leirotomb )
 		hiba( "titkosit-ban !Leirotomb!" );

@@ -5,9 +5,6 @@
 #define CFUGGVENY
 #endif
 
-// #define SARVARI
-extern int Sarvari;
-
 extern int Billint; // Billentyuzet interraptos!
 
 extern int Sajatugras; // Ha 1, akkor left->pozitiv forgas

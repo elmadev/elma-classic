@@ -1,10 +1,6 @@
 #include	"all.h"
 
-#ifdef SARVARI
-	int Palyaszam = 19; // End-del egyutt
-#else
-	int Palyaszam = 55; // Vizittel egyutt
-#endif
+int Palyaszam = 55; // Vizittel egyutt
 
 int getstatesoundon( void ) {
 	return State->soundon;
@@ -128,15 +124,9 @@ state_s::state_s( char* nev ) {
 	if( fread( &checknumber, 1, sizeof( long ), h ) !=
 					sizeof( long ) )
 		uzenet( "Corrupt file, please rename it!", nev );
-	if( Sarvari ) {
-		if( checknumber != Checknumber_state_s )
-			uzenet( "Corrupt file or registered version's file, please rename it!", nev );
-	}
-	else {
-		if( checknumber != Checknumber_state_s &&
-			checknumber != Checknumber_state_r )
-			uzenet( "Corrupt file, please rename it!", nev );
-	}
+	if( checknumber != Checknumber_state_s &&
+		checknumber != Checknumber_state_r )
+		uzenet( "Corrupt file, please rename it!", nev );
 
 	fclose( h );
 }
@@ -212,8 +202,6 @@ void state_s::save( void ) {
 	titkoswrite( &playextfilenev[0], 20, h );
 
 	long checknumber = Checknumber_state_r;
-	if( Sarvari )
-		checknumber = Checknumber_state_s;
 	if( fwrite( &checknumber, 1, sizeof( long ), h ) !=
 					sizeof( long ) )
 		hiba( "Nem megy beolvasas state file-ba!: ", Statenev );
@@ -326,10 +314,6 @@ void state_s::export_( void ) {
 "changes next time you run the game. This is only an output file, the\n" );
 	fprintf( h,
 "best times are stored in the STATE.DAT binary file.\n" );
-	if( Sarvari )
-	fprintf( h,
-"Shareware version 1.0\n" );
-	else
 	fprintf( h,
 "Registered version 1.0\n" );
 

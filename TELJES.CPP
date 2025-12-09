@@ -86,16 +86,9 @@ void teljes( void ) {
 	Pintro = new pic8( "intro.pcx" );
 	// Itt most atirjuk verziot 1.1-re:
 	//blt8( Pintro, Pintro, 343, 433, 520, 459, 530, 468 ); // a betu
-	if( Sarvari ) {
-		blt8( Pintro, Pintro, 321, 420, 296, 420, 314, 441 );
-		blt8( Pintro, Pintro, 321+15, 420, 296, 420, 314, 441 );
-		blt8( Pintro, Pintro, 321+15+17, 432, 88, 458, 98, 468 );
-	}
-	else {
-		blt8( Pintro, Pintro, 321, 420, 297, 420, 315, 441 );
-		blt8( Pintro, Pintro, 321+15, 420, 297, 420, 315, 441 );
-		blt8( Pintro, Pintro, 321+15+16, 432, 88, 458, 98, 468 );
-	}
+	blt8( Pintro, Pintro, 321, 420, 297, 420, 315, 441 );
+	blt8( Pintro, Pintro, 321+15, 420, 297, 420, 315, 441 );
+	blt8( Pintro, Pintro, 321+15+16, 432, 88, 458, 98, 468 );
 	spriteosit( Pintro );
 	pic8* tmpintro = new pic8( 640, 480 ); // ezt majd kesobb szabaditjuk fel
 	tmpintro->fillbox( 254 );
@@ -109,32 +102,6 @@ void teljes( void ) {
 	pintropal->set();
 	bltfront( tmpintro );
 	delete pintropal; pintropal = NULL;
-
-	// Vegekep beolvasas:
-	#ifdef SARVARI
-	pic8* tmpkep = new pic8( "vegekep.pcx" );
-	// 1.0-at kijavitjuk 1.1-re:
-	blt8( tmpkep, tmpkep, 273, 5, 259, 5, 269, 16 );
-
-	////////
-	Vegekep1 = new pic8( 640, 120 );
-	blt8( Vegekep1, tmpkep );
-	spriteosit( Vegekep1 );
-	////////
-	Vegekep2 = new pic8( 640, 120 );
-	blt8( Vegekep2, tmpkep, 0, -120 );
-	spriteosit( Vegekep2 );
-	////////
-	Vegekep3 = new pic8( 640, 120 );
-	blt8( Vegekep3, tmpkep, 0, -240 );
-	spriteosit( Vegekep3 );
-	////////
-	Vegekep4 = new pic8( 640, 120 );
-	blt8( Vegekep4, tmpkep, 0, -360 );
-	spriteosit( Vegekep4 );
-
-	delete tmpkep; tmpkep = NULL;
-	#endif
 
 	// Egy par beolvasas:
 	Pabc1 = new abc8( "kisbetu1.abc" );
@@ -223,28 +190,17 @@ void kilep( void ) {
 } */
 
 void kilep( void ) {
-	/*
-	#ifndef SARVARI
-		mv_exit();
-	#endif
-	*/
 	Nincsfal = 1; // golyok ezentul kimenek falon kivulre
-	if( Sarvari )
-		tilevaltas();
 	szoveglista* pszovlist = new szoveglista;
-	#ifndef SARVARI
-		pszovlist->addszoveg_kozep( "Thank you for registering the game!",
-												320, 220 );
-		pszovlist->addszoveg_kozep( "Please do not distribute!",
-												320, 300 );
-	#endif
+	pszovlist->addszoveg_kozep( "Thank you for registering the game!",
+											320, 220 );
+	pszovlist->addszoveg_kozep( "Please do not distribute!",
+											320, 300 );
 
 	double kezdoido = mv_stopperido();
 	while( 1 ) {
 		pszovlist->kirajzol( 0, Vegekep1, Vegekep2, Vegekep3, Vegekep4 );
-		double idovaras = 332.0;
-		if( !Sarvari )
-			idovaras = 50.0;
+		double idovaras = 50.0;
 		if( (mv_stopperido() > (kezdoido + idovaras)) && mk_kbhit() ) {
 			int c = mk_getextchar();
 			if( c == ' ' || c == MK_ENTER || c == MK_ESC ) {

@@ -510,11 +510,6 @@ long recorder::load( char* nev, FILE* h, int demo ) {
 	if( fread( palyanev, 1, 16, h ) != 16 )
 		olvhiba( nev );
 
-	// Ehelyett lehet hogy kene valami hasonlo:
-	//if( Sarvari && !belyeg && (level > 15 && level != 22) )
-	//	uzenet( "This REC file can only be replayed with a registered version of the game!",
-	//				nev );
-
 	int hosszf = betoltve*sizeof( float );
 	//int hosszi = betoltve*sizeof( int );
 	int hosszc = betoltve*sizeof( char );
@@ -770,24 +765,6 @@ long loadrecek( char* nev, int demo ) {
 	}
 	else {
 		belyeg = Prec1->load( nev, NULL, demo );
-	}
-
-	if( Sarvari ) {
-		char ctmp = Prec1->palyanev[5];
-		Prec1->palyanev[5] = 0;
-		char tmpnev[10];
-		strcpy( tmpnev, Prec1->palyanev );
-		Prec1->palyanev[5] = ctmp;
-		if( strcmpi( tmpnev, "QWQUU" ) == 0 ) {
-			int belsopalyaszam = nevanalizis( Prec1->palyanev );
-			if( belsopalyaszam < 1 ||
-				(
-					belsopalyaszam > Palyaszam-1 &&
-					belsopalyaszam != 34
-				) ) // utolso palya mar nem mehet, de demo igen
-				uzenet(
-"This rec file can only be played in the registered version!:", nev );
-		}
 	}
 
 	return belyeg;

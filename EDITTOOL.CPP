@@ -290,20 +290,11 @@ void t_create_vert_nyomva( int mx, int my ) {
 			for( int i = 0; i < MAXGYURU; i++ )
 				if( Ptop->ptomb[i] )
 					gyuruszam++;
-			#ifdef SARVARI
-				if( gyuruszam >= Maxgyuru_sarvari ) {
-					dialog( "You cannot create a new polygon",
-							"because you have already reached the maximum number of polygons!",
-							"In the shareware version this number is 5." );
-					return;
-				}
-			#else
 				if( gyuruszam >= MAXGYURU ) {
 					dialog( "You cannot create a new polygon",
 							"because you have already reached the maximum number of polygons (300)!" );
 					return;
 				}
-			#endif
 
 			toolhelp( "Click the left button to place the second point. ESC or right button cancels." );
 			Egypont = 1;
@@ -323,21 +314,11 @@ void t_create_vert_nyomva( int mx, int my ) {
 
 	if( Pgy ) {
 		// Most fogunk letenni uj pontot:
-		#ifdef SARVARI
-			// Azert +1, mivel mikor elengedi polygont, letorli utolso pontot:
-			if( Pgy->getpontszam() >= Maxpont_sarvari+1 ) {
-				dialog( "You cannot create a new vertex, because you have",
-						"already reached the maximum number of vertices in this polygon!",
-						"In the shareware version this number is 10." );
-				return;
-			}
-		#else
-			if( Pgy->getpontszam() >= MAXPONT ) {
-				dialog( "You cannot create a new vertex, because you have",
-						"already reached the maximum number of vertices in this polygon (1000)!" );
-				return;
-			}
-		#endif
+		if( Pgy->getpontszam() >= MAXPONT ) {
+			dialog( "You cannot create a new vertex, because you have",
+					"already reached the maximum number of vertices in this polygon (1000)!" );
+			return;
+		}
 		toolhelp( "Click the left button to place point. SPACE and ENTER swaps. ESC or right button cancels." );
 		Pgy->beszur( K );
 		invalidate();
@@ -570,20 +551,10 @@ void t_create_kerek_nyomva( int mx, int my, int food ) {
 	for( int i = 0; i < MAXKEREK; i++ )
 		if( Ptop->kerektomb[i] )
 			objszam++;
-	#ifdef SARVARI
-		if( objszam >= Maxkerek_sarvari ) {
-			dialog( "You cannot create a new object",
-					"because you have already reached the maximum number of objects!",
-					// exit es start objectet nem szamolom bele:
-					"In the shareware version this number is 6." );
-			return;
-		}
-	#else
 		if( objszam >= MAXKEREK ) {
 			dialog( "You have already reached the maximum number of objects (50)!" );
 			return;
 		}
-	#endif
 
 	for( int i = 0; i < MAXKEREK; i++ ) {
 		if( !Ptop->kerektomb[i] ) {
@@ -747,19 +718,10 @@ void t_create_sprite_nyomva( int mx, int my ) {
 	for( int i = 0; i < MAXSPRITE; i++ )
 		if( Ptop->spritetomb[i] )
 			spriteszam++;
-	#ifdef SARVARI
-		if( spriteszam >= Maxsprite_sarvari ) {
-			dialog( "You cannot create a new picture",
-					"because you have already reached the maximum number of pictures!",
-					"In the shareware version this number is 20." );
-			return;
-		}
-	#else
 		if( spriteszam >= MAXSPRITE ) {
 			dialog( "You have already reached the maximum number of pictures (5000)!" );
 			return;
 		}
-	#endif
 
 	if( !Plgr->aktiv_kepnev[0] &&
 		!(Plgr->aktiv_texturanev[0] && Plgr->aktiv_maszknev[0]) )

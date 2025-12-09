@@ -2,8 +2,6 @@
 
 int skippelheto( int level ) {
 	int maxskippelheto = 5;
-	if( Sarvari )
-		maxskippelheto = 3;
 
 	int jatekosindex = getjatekosindex( State->jatekosa );
 	jatekos* pjatekos = &State->jatekosok[jatekosindex];

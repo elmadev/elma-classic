@@ -6,18 +6,6 @@
 void edithelp( void ) {
 	dialog(
 "GENERAL HELP",
-
-#ifdef SARVARI
-"This shareware version of the editor has severe limitations, it is included mainly to",
-"give you a preview of the full editor that comes with the registered version. You can",
-"make only a maximum of 5 polygons on a level with only a maximum of ten vertices per",
-"polygon. The maximum number of objects (food and killer) is 6. In the registered",
-"version these numbers are: maximum 300 polygons, maximum 1000 vertices per polygon",
-"(but no more than 5000 altogether), maximum 50 objects.",
-"",
-"USAGE",
-#endif
-
 "On the left of the screen is a column of buttons. The buttons in the upper half are",
 "command buttons, that means they will take action at the moment you click on them with",
 "the left mouse button. The buttons in the lower half are the tool selection buttons.",

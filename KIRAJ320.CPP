@@ -583,7 +583,6 @@ static void kirakegyjatekost(
 
 	//ppic->fillbox( 100 );
 	Pecsetalso->kitesz( ajatekos, ppic, sarok, 0, 0, Cxsize-1, Cysize-1 );
-	int sordarabszam = Kisordarabszam;
 
 	hang( /*"Ecsetalso utan"*/ );
 
@@ -675,7 +674,6 @@ static void kirakegyjatekost(
 
 	// Felso ecset kitevese:
 	Pecsetfelso->kitesz( ajatekos, ppic, sarok, 0, 0, Cxsize-1, Cysize-1 );
-	sordarabszam += Kisordarabszam;
 
 	if( viewki ) {
 		if( Single )

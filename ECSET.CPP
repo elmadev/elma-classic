@@ -7,10 +7,6 @@ typedef uintptr_t pixelek_t;
 
 //#define FFECSET // Ha definialva, fekete-feheren rajzol
 
-//#define KIIRDARABOT
-
-int Kisordarabszam = 0;
-
 //static pic8* Egtmp = NULL;
 //static pic8* Hegy1 = NULL;
 //static pic8* Hegy2 = NULL;
@@ -1432,9 +1428,6 @@ void ecset::kiegysor_A( unsigned char* pc, int ye ) {
 	// BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
 	// BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
 	while( xpos <= Xe2 ) {
-		#ifdef KIIRDARABOT
-			Kisordarabszam++;
-		#endif
 		if( ye == 1071 && xpos == 12020 /*12055*/ ) {
 			semmi();
 		}
@@ -1568,10 +1561,6 @@ void ecset::kiegysor_B( unsigned char* pc, int ye ) {
 	// BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
 	// BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
 	while( xpos <= Xe2 ) {
-		#ifdef KIIRDARABOT
-			Kisordarabszam++;
-		#endif
-
 		if( xpos + pda->xsize > Xe2 ) {
 			// Ez az utolso darab, ki is loghat:
 			if( (pixelek_t)pda->pixelek & PIXELMASZK ) {
@@ -1857,8 +1846,6 @@ static void egetkeszit( pic8* peg, int xhely, int xkezd, int xmodulus ) {
 void ecset::kitesz( int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int x2, int y2 ) {
 	if( x1 >= x2 || y1 >= y2 )
 		hiba( "ecset::kitesz x1 >= x2 || y1 >= y2!" );
-
-	Kisordarabszam = 0;
 
 	int ye1 = 0;
 	getbalalso_int( balalso, &Xe1, &ye1 );

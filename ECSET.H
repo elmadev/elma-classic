@@ -106,7 +106,6 @@ class ecset {
 	~ecset( void );
 public:
 	void getbalalso_int( vekt2 balalso, int* px, int* py );
-	// Beallitja Kisordarabszam-ot is ha define-olt (escet.cpp eleje):
 	void kitesz(     int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int x2, int y2 );
 	void kiteszview( int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int x2, int y2 );
 
@@ -116,8 +115,6 @@ public:
 extern ecset* Pecsetalso;
 extern ecset* Pecsetfelso;
 extern ecset* Pecsetview;
-
-extern int Kisordarabszam;
 
 // Ket kis utility fuggveny (hasznalja oket LGR.CPP):
 // Visszaadja hany pixel lyuk szinu x-tol kezdve:

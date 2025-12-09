@@ -1,6 +1,7 @@
 #include "ALL.H"
 
-int main() { return 0; }
+int sdl_init(void);
+int main() { return sdl_init(); }
 
 int Locky0_alul = 0;
 

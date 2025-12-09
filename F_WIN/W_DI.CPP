@@ -437,7 +437,7 @@ char* kodtobillnev(int billkod) {
         return "YEN"; // On Japanese keyboard
     case DIK_NUMPADEQUALS:
         return "PAD_="; // On numeric keypad (NEC PC98)
-    case DIK_CIRCUMFLEX:
+    case DIK_PREVTRACK:
         return "CIRCUMFLEX"; // On Japanese keyboard
     case DIK_AT:
         return "AT"; // On Japanese keyboard
@@ -495,7 +495,7 @@ char* kodtobillnev(int billkod) {
         // Japan:
 
         /*case DIK_AT: return "";
-        case DIK_CIRCUMFLEX: return "";
+        case DIK_PREVTRACK: return "";
         case DIK_COLON: return "";
         case DIK_CONVERT: return "";
         case DIK_KANA: return "";

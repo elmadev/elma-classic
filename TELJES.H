@@ -1,9 +1,6 @@
 
-void teljes( void );
+void teljes(void);
 
-void kilep( void );
+void kilep(void);
 
 #define SM (15)
-
-
-

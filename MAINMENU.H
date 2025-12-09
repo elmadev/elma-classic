@@ -1,5 +1,4 @@
 
-void mainmenu( void );
+void mainmenu(void);
 
-//void showinstruct( void );
-
+// void showinstruct( void );

@@ -1,7 +1,4 @@
 
 
-void initdsound( void );
-void dsoundfinish( void );
-
-
-
+void initdsound(void);
+void dsoundfinish(void);

@@ -1,10 +1,11 @@
-#include	"all.h"
+#include "all.h"
 
-//#define UCSOSOROK "", "You can dismiss this dialog by pressing ENTER, ESC, or clicking the right mouse button." );
+// #define UCSOSOROK "", "You can dismiss this dialog by pressing ENTER, ESC, or clicking the right
+// mouse button." );
 #define UCSOSOROK "" );
 
-void edithelp( void ) {
-	dialog(
+void edithelp(void) {
+    dialog(
 "GENERAL HELP",
 "On the left of the screen is a column of buttons. The buttons in the upper half are",
 "command buttons, that means they will take action at the moment you click on them with",
@@ -24,8 +25,8 @@ void edithelp( void ) {
 UCSOSOROK
 }
 
-void menuhelp_exit( void ) {
-	dialog(
+void menuhelp_exit(void) {
+    dialog(
 //"EXIT HELP SCREEN",
 "With the Exit button you can exit the editor.",
 "If there are any unsaved changes in the level file in the editor, a dialog will",
@@ -33,8 +34,8 @@ void menuhelp_exit( void ) {
 UCSOSOROK
 }
 
-void menuhelp_zoomout( void ) {
-	dialog(
+void menuhelp_zoomout(void) {
+    dialog(
 //"ZOOM OUT HELP SCREEN",
 "With the Zoom Out button you can make larger the view window of the editor.",
 "In the upper right corner you can always see the actual zoom value. If this value is 1",
@@ -42,8 +43,8 @@ void menuhelp_zoomout( void ) {
 UCSOSOROK
 }
 
-void menuhelp_save( void ) {
-	dialog(
+void menuhelp_save(void) {
+    dialog(
 //"SAVE HELP SCREEN",
 "With the Save button you can save the content of the editor to a level file.",
 "The name of the level file is always displayed at the top of the screen.",
@@ -54,8 +55,8 @@ void menuhelp_save( void ) {
 UCSOSOROK
 }
 
-void menuhelp_save_as( void ) {
-	dialog(
+void menuhelp_save_as(void) {
+    dialog(
 //"SAVE AS HELP SCREEN",
 "With the Save As button you can save the content of the editor to a level file",
 "with a new name.",
@@ -69,8 +70,8 @@ void menuhelp_save_as( void ) {
 UCSOSOROK
 }
 
-void menuhelp_open( void ) {
-	dialog(
+void menuhelp_open(void) {
+    dialog(
 //"OPEN HELP SCREEN",
 "With the Open button you can open a level file in the editor.",
 "A dialog will appear with a list of the level files (all files with .LEV extension) in",
@@ -84,15 +85,15 @@ void menuhelp_open( void ) {
 UCSOSOROK
 }
 
-void menuhelp_new( void ) {
-	dialog(
+void menuhelp_new(void) {
+    dialog(
 //"NEW HELP SCREEN",
 "With the New button you can start to edit a new level file in the editor.",
 UCSOSOROK
 }
 
-void menuhelp_play( void ) {
-	dialog(
+void menuhelp_play(void) {
+    dialog(
 //"SAVE AND PLAY HELP SCREEN",
 "With the Save and Play button you can try out the level that you are currently editing.",
 "You can press the P shortcut key also to try your level.",
@@ -100,16 +101,16 @@ void menuhelp_play( void ) {
 UCSOSOROK
 }
 
-void menuhelp_zoom_fill( void ) {
-	dialog(
+void menuhelp_zoom_fill(void) {
+    dialog(
 //"ZOOM FILL HELP SCREEN",
 "With the Zoom Fill button you can make the view window fit the entire content of",
 "the editor.",
 UCSOSOROK
 }
 
-void menuhelp_check( void ) {
-	dialog(
+void menuhelp_check(void) {
+    dialog(
 //"CHECK HELP SCREEN",
 "With the Check Topology button you can check the level you are editing for any",
 "basic errors. Before you want to try a level, you may want to check it first.",
@@ -120,8 +121,8 @@ void menuhelp_check( void ) {
 UCSOSOROK
 }
 
-void menuhelp_properties( void ) {
-	dialog(
+void menuhelp_properties(void) {
+    dialog(
 //"LEVEL NAME HELP SCREEN",
 "With the Properties button you can set four level properties:",
 "the background texture,",
@@ -131,8 +132,8 @@ void menuhelp_properties( void ) {
 UCSOSOROK
 }
 
-void menuhelp_view( void ) {
-	dialog(
+void menuhelp_view(void) {
+    dialog(
 "With the View Options button you can chooses what type of things should be displayed",
 "and what type of things should be hidden in the editor window.",
 UCSOSOROK
@@ -203,8 +204,8 @@ UCSOSOROK
 // TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
 // TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
 
-void menuhelp_move( void ) {
-	dialog(
+void menuhelp_move(void) {
+    dialog(
 //"MOVE TOOL HELP SCREEN",
 "With the Move tool you can move vertices, objects and pictures",
 "Click the left mouse button near a vertex or the center of an object to grab it. If you want",
@@ -218,8 +219,8 @@ void menuhelp_move( void ) {
 UCSOSOROK
 }
 
-void menuhelp_zoom_in( void ) {
-	dialog(
+void menuhelp_zoom_in(void) {
+    dialog(
 //"ZOOM IN TOOL HELP SCREEN",
 "With the Zoom In tool you can zoom the view window into any part of the window",
 "you see at the moment. Click the left mouse button to place the first corner of",
@@ -228,8 +229,8 @@ void menuhelp_zoom_in( void ) {
 UCSOSOROK
 }
 
-void menuhelp_create_vertex( void ) {
-	dialog(
+void menuhelp_create_vertex(void) {
+    dialog(
 //"CREATE VERTEX TOOL HELP SCREEN",
 "With the Create Vertex tool you can create new vertices. If you click the left",
 "mouse button near an existing vertex, you will add vertices to an existing polygon.",
@@ -252,8 +253,8 @@ void menuhelp_create_vertex( void ) {
 UCSOSOROK
 }
 
-void menuhelp_delete_vertex( void ) {
-	dialog(
+void menuhelp_delete_vertex(void) {
+    dialog(
 //"DELETE VERTEX TOOL HELP SCREEN",
 "With the Delete Vertex tool you can delete vertices. Just click the left mouse",
 "button near a vertex and it will disappear. You cannot delete any vertices of a",
@@ -262,9 +263,8 @@ void menuhelp_delete_vertex( void ) {
 UCSOSOROK
 }
 
-
-void menuhelp_delete_polygon( void ) {
-	dialog(
+void menuhelp_delete_polygon(void) {
+    dialog(
 //"DELETE POLYGON TOOL HELP SCREEN",
 "With the Delete Polygon tool you can delete polygons. Just click the left mouse",
 "button near a vertex of a polygon and the polygon will disappear. You cannot",
@@ -273,9 +273,8 @@ void menuhelp_delete_polygon( void ) {
 UCSOSOROK
 }
 
-
-void menuhelp_create_food( void ) {
-	dialog(
+void menuhelp_create_food(void) {
+    dialog(
 //"CREATE FOOD TOOL HELP SCREEN",
 "With the Create Food tool you can create new food objects. Just click the left",
 "mouse button to place a new food object. You can see an 'F' inside the food objects.",
@@ -285,18 +284,16 @@ void menuhelp_create_food( void ) {
 UCSOSOROK
 }
 
-
-void menuhelp_create_killer( void ) {
-	dialog(
+void menuhelp_create_killer(void) {
+    dialog(
 //"CREATE KILLER TOOL HELP SCREEN",
 "With the Create Killer tool you can create new killer objects. Just click the left",
 "mouse button to place a new killer object. You can see a 'K' inside the killer objects.",
 UCSOSOROK
 }
 
-
-void menuhelp_delete_object( void ) {
-	dialog(
+void menuhelp_delete_object(void) {
+    dialog(
 //"DELETE OBJECT TOOL HELP SCREEN",
 "With the Delete Object tool you can delete food and killer objects. Just click the left",
 "mouse button near the center of an object and it will disappear.",
@@ -305,8 +302,8 @@ void menuhelp_delete_object( void ) {
 UCSOSOROK
 }
 
-void menuhelp_create_sprite( void ) {
-	dialog(
+void menuhelp_create_sprite(void) {
+    dialog(
 //"CREATE SPRITE TOOL HELP SCREEN",
 "With the Create Picture tool you can create new pictures. Just click the left",
 "mouse button where you want to place the selected picture.",
@@ -326,19 +323,10 @@ void menuhelp_create_sprite( void ) {
 UCSOSOROK
 }
 
-
-void menuhelp_delete_sprite( void ) {
-	dialog(
+void menuhelp_delete_sprite(void) {
+    dialog(
 //"DELETE SPRITE TOOL HELP SCREEN",
 "With the Delete Picture tool you can delete pictures. Just click the left",
 "mouse button near the up-left corner of a picture and it will disappear.",
 UCSOSOROK
 }
-
-
-
-
-
-
-
-

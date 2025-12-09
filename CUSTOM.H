@@ -1,4 +1,3 @@
 
 
-void customize( void );
-
+void customize(void);

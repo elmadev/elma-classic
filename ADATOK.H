@@ -1,7 +1,7 @@
 
 
 extern double Elszakadasisebhat, Belsosav, G;
-extern double  Talppontegybeolvadasitav;
+extern double Talppontegybeolvadasitav;
 
 extern double Ugrassebesseg1, Ugrassebesseg2;
 extern double Ugroturelem;
@@ -9,7 +9,7 @@ extern double Vegenvaras;
 
 extern double Drsugar, Drtang, Sr;
 
-void initadatok( void );
+void initadatok(void);
 
 extern double Magassag, Szelesseg;
 
@@ -19,7 +19,7 @@ extern double Fejsugar;
 extern double Objektumsugar;
 
 extern double Spritemaxsugar; // Targykereseshez!
-extern double Ketmaxsugar; // Targykereseshez!
+extern double Ketmaxsugar;    // Targykereseshez!
 
 // Match-ben fej es kerek tavolsag vizsgalathoz:
 extern double Fejkerektavnegyzet;
@@ -31,9 +31,8 @@ extern double Kerekrajzsugar;
 
 extern double Arany, Aranyrec;
 
-
 extern double Kord2x, Kord2y, Kord4x, Kord4y,
-				Kord5y; // Ez az utolso vezeto helye
+    Kord5y; // Ez az utolso vezeto helye
 
 extern double Fekegyutthato;
 
@@ -42,24 +41,24 @@ extern double Fekegyutthato;
 extern int Viewzoom;
 
 struct motorst {
-	kor kor1, kor2, kor4;
-	vekt2 fejr; // kor1-bol Kor12Fejr fuggveny allitja elo (leptet.h)!
-	int hatra_f;
-	int hatra_h;
-	int gravirany; // 1 a normalis (0:UP 1:DOWN 2:LEFT 3:RIGHT)
-	//double labalfa; Bicigli
+    kor kor1, kor2, kor4;
+    vekt2 fejr; // kor1-bol Kor12Fejr fuggveny allitja elo (leptet.h)!
+    int hatra_f;
+    int hatra_h;
+    int gravirany; // 1 a normalis (0:UP 1:DOWN 2:LEFT 3:RIGHT)
+    // double labalfa; Bicigli
 
-	vekt2 vezetor, vezetov; // Motoros
+    vekt2 vezetor, vezetov; // Motoros
 
-	int kajaszam; // hanyat evett ez a motoros
+    int kajaszam; // hanyat evett ez a motoros
 
-	// Leptet ezeket is hasznalja:
-	int voltfek;
-	double dfek2, dfek4;
+    // Leptet ezeket is hasznalja:
+    int voltfek;
+    double dfek2, dfek4;
 
-	int ugrasban1, ugrasban2;
-	double ugras1kezd, ugras2kezd;
-	double kezdoomega1, kezdoomega2;
+    int ugrasban1, ugrasban2;
+    double ugras1kezd, ugras2kezd;
+    double kezdoomega1, kezdoomega2;
 };
 
 extern motorst *Pmot1, *Pmot2;
@@ -67,6 +66,6 @@ extern motorst *Pmot1, *Pmot2;
 // reorder.h-ban friend-kent mar deklaralva van:
 // pgazhatra-ba beepiti betoltvet:
 class recorder;
-void berakrecbehosszat( recorder* prec );
+void berakrecbehosszat(recorder* prec);
 // pgazhatra alapjan ellenorzi hosszt:
-int jorechossza( recorder* prec );
+int jorechossza(recorder* prec);

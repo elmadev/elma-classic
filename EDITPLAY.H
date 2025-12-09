@@ -1,5 +1,3 @@
 
 
-void editplay( void );
-
-
+void editplay(void);

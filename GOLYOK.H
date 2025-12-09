@@ -1,11 +1,6 @@
 
 extern double Hosszuido;
 
-extern int 		Konstrualva;
+extern int Konstrualva;
 extern double** Idok;
-extern double*  T;
-
-
-
-
-
+extern double* T;

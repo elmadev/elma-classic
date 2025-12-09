@@ -17,9 +17,9 @@ extern double K_2pi;
 #endif
 
 typedef char finame[20];
-int fifirst( char* minta, char* filenev );
-int finext( char* filenev );
-void ficlose( void );
+int fifirst(char* minta, char* filenev);
+int finext(char* filenev);
+void ficlose(void);
 
 #ifndef _WIN32
 

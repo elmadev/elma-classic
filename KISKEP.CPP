@@ -16,9 +16,7 @@ kiskep::kiskep(char* pic8nev, pic8* ppic) {
         hiba("kiskepben size > 255!");
     }
     hossz = ysize * 256l;
-    {
-        tomb = new unsigned char[unsigned(hossz)];
-    }
+    tomb = new unsigned char[unsigned(hossz)];
     if (!tomb) {
         uzenet("memory!");
     }

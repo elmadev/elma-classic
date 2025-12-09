@@ -43,17 +43,11 @@ int pic8::lefoglal(long xsizep, long ysizep) {
     szegnum = unsigned(ysizep) / egyszegben;
     long pluszszegbensorok = ysizep - szegnum * egyszegben;
     int vanplussz = pluszszegbensorok != 0;
-    {
-        sormuttomb = new puchar[unsigned(ysizep)];
-    }
+    sormuttomb = new puchar[unsigned(ysizep)];
     if (vanplussz) {
-        {
-            szegmuttomb = new puchar[unsigned(szegnum + 1)];
-        }
+        szegmuttomb = new puchar[unsigned(szegnum + 1)];
     } else {
-        {
-            szegmuttomb = new puchar[unsigned(szegnum)];
-        }
+        szegmuttomb = new puchar[unsigned(szegnum)];
     }
     if (!sormuttomb || !szegmuttomb) {
         uzenet("pic8::alloc memory!");
@@ -69,9 +63,7 @@ int pic8::lefoglal(long xsizep, long ysizep) {
         szegmuttomb[unsigned(szegnum)] = NULL;
     }
     for (int i = 0; i < szegnum; i++) {
-        {
-            szegmuttomb[i] = new unsigned char[unsigned(egyszegben * xsizep)];
-        }
+        szegmuttomb[i] = new unsigned char[unsigned(egyszegben * xsizep)];
         if (!szegmuttomb[i]) {
             uzenet("pic8::alloc memory!");
             return 0;
@@ -81,10 +73,7 @@ int pic8::lefoglal(long xsizep, long ysizep) {
         }
     }
     if (vanplussz) {
-        {
-            szegmuttomb[unsigned(szegnum)] =
-                new unsigned char[unsigned(pluszszegbensorok * xsizep)];
-        }
+        szegmuttomb[unsigned(szegnum)] = new unsigned char[unsigned(pluszszegbensorok * xsizep)];
         if (!szegmuttomb[unsigned(szegnum)]) {
             uzenet("pic8::alloc memory!");
             return 0;
@@ -450,9 +439,7 @@ void pic8::spritebeolvas(char* nev, FILE* h) {
 
     // long l = farcoreleft();
     // dummy( l );
-    {
-        sprite = new unsigned char[spritehossz];
-    }
+    sprite = new unsigned char[spritehossz];
     if (!sprite) {
         hiba("Nincs eleg hely SPRITE beolvasoban!: ", nev);
         if (!volth) {
@@ -949,9 +936,7 @@ int pcxtopal(char* nev, ddpal** ppddpal) {
         // Egy kicsit gany, teljes.cpp-bol hivodik ilyen parameterrel.
         pal[0] = pal[1] = pal[2] = 0;
     }
-    {
-        *ppddpal = new ddpal(pal);
-    }
+    *ppddpal = new ddpal(pal);
     return 1;
 }
 void mintavetel8(pic8* pdest, pic8* psour, int x1, int y1, int x2, int y2) {

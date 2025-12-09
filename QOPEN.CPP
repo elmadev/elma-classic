@@ -52,9 +52,7 @@ void initqopen(void) {
         return;
     }
 
-    {
-        Leirotomb = new fileleiro[FILESZAM];
-    }
+    Leirotomb = new fileleiro[FILESZAM];
     if (!Leirotomb) {
         uzenet("initqopen-ben memory!");
     }

@@ -52,46 +52,21 @@ void starthanghigh(void) {
     for (int i = 0; i < WAVBANKSZAM; i++) {
         Wavbank[i] = NULL;
     }
-    {
-        Wavbank[WAV_UTODES] = new wav("utodes.wav", 0.25);
-    }
-    {
-        Wavbank[WAV_TORES] = new wav("torik.wav", 0.34);
-    }
-    {
-        Wavbank[WAV_SIKER] = new wav("siker.wav", 0.8);
-    } // 0.34
-    {
-        Wavbank[WAV_EVES] = new wav("eves.wav", 0.5);
-    }
-    {
-        Wavbank[WAV_FORDULAS] = new wav("fordul.wav", 0.3);
-    }
-    {
-        Wavbank[WAV_UGRAS1] = new wav("ugras.wav", 0.34);
-    }
-    {
-        Wavbank[WAV_UGRAS2] = Wavbank[WAV_UGRAS1];
-    }
-
-    {
-        Psurl = new wav("dorzsol.wav", 0.44);
-    }
+    Wavbank[WAV_UTODES] = new wav("utodes.wav", 0.25);
+    Wavbank[WAV_TORES] = new wav("torik.wav", 0.34);
+    Wavbank[WAV_SIKER] = new wav("siker.wav", 0.8);
+    Wavbank[WAV_EVES] = new wav("eves.wav", 0.5);
+    Wavbank[WAV_FORDULAS] = new wav("fordul.wav", 0.3);
+    Wavbank[WAV_UGRAS1] = new wav("ugras.wav", 0.34);
+    Wavbank[WAV_UGRAS2] = Wavbank[WAV_UGRAS1];
+    Psurl = new wav("dorzsol.wav", 0.44);
     Psurl->loopol(Mix);
 
     double berregero = 0.26;
-    {
-        Pw1 = new wav("harl.wav", berregero, 0, I1 + Mix);
-    }
-    {
-        Pw2 = new wav("harl.wav", berregero, I1, I2);
-    }
-    {
-        Pw3 = new wav("harl.wav", berregero, I2 - Mix, I3);
-    }
-    {
-        Pw4 = new wav("harl2.wav", berregero, I4, I5);
-    }
+    Pw1 = new wav("harl.wav", berregero, 0, I1 + Mix);
+    Pw2 = new wav("harl.wav", berregero, I1, I2);
+    Pw3 = new wav("harl.wav", berregero, I2 - Mix, I3);
+    Pw4 = new wav("harl2.wav", berregero, I4, I5);
 
     Pw2->loopol(Mix);
     // Pw2->save( "alacsony.wav" );

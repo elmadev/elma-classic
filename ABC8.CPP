@@ -15,9 +15,7 @@ abc8::abc8(char* nev) {
     tav = 0;
     ppsprite = NULL;
     ytomb = NULL;
-    {
-        ppsprite = new ptrpic8[256];
-    }
+    ppsprite = new ptrpic8[256];
     if (!ppsprite) {
         uzenet("memory");
         return;
@@ -25,9 +23,7 @@ abc8::abc8(char* nev) {
     for (int i = 0; i < 256; i++) {
         ppsprite[i] = NULL;
     }
-    {
-        ytomb = new short[256];
-    }
+    ytomb = new short[256];
     if (!ytomb) {
         uzenet("memory");
         return;
@@ -87,9 +83,7 @@ abc8::abc8(char* nev) {
             hiba("Egy karakter ketszer van meg abc file-ban!: ", nev);
             return;
         }
-        {
-            ppsprite[c] = new pic8(".spr", h);
-        }
+        ppsprite[c] = new pic8(".spr", h);
         if (!ppsprite[c]->success) {
             hiba("Nem tudta beolvasni SPRITE-ot abc file-bol!: ", nev);
             return;

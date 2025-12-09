@@ -26,9 +26,7 @@ static int nemkellszinudb(pic8* ppic, int x, int y, unsigned char szin) {
 unsigned char* spriteadat8(pic8* ppic, unsigned char szin, unsigned short* pspritehossz) {
     *pspritehossz = 0;
     unsigned char* buffer = NULL;
-    {
-        buffer = new unsigned char[MAXBUFFER];
-    }
+    buffer = new unsigned char[MAXBUFFER];
     if (!buffer) {
         uzenet("spriteadat8-ban memory!");
         return NULL;
@@ -64,9 +62,7 @@ unsigned char* spriteadat8(pic8* ppic, unsigned char szin, unsigned short* pspri
     // Most letrehozunk egy szegmenst, ami csak olyan hosszu, amilyen kell:
 
     unsigned char* jobuffer = NULL;
-    {
-        jobuffer = new unsigned char[buf];
-    }
+    jobuffer = new unsigned char[buf];
     if (!jobuffer) {
         uzenet("spriteadat8-ban memory!");
         delete buffer;

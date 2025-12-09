@@ -297,9 +297,7 @@ void szakaszok::rendez(double maxtav) {
 
     // Lefoglalja tombot:
     unsigned tombmeret = xdim * ydim;
-    {
-        tertomb = new pvonalnode[tombmeret];
-    }
+    tertomb = new pvonalnode[tombmeret];
     if (!tertomb) {
         uzenet("memory!");
     }

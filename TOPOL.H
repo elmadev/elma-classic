@@ -148,10 +148,6 @@ public:
 	void getminmax( double* px1, double* py1, double* px2, double* py2,
 									int kerekkel );
 
-	// Ha Sarvari, megvizsgalja hogy palya megfelel-e sarvari verzionak:
-	// Ha nem, akkor kilep corrupt hibauzenettel:
-	void checklevelforsarvari( void );
-
 	// Kerekkel kapcsolatos dolgok:
 	// Motor helyzetet is o allitja be, kajaszamot adja vissza:
 	int setallaktiv( motorst* pmot ); // eheto kerekeket aktivizalja

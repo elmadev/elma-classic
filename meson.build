@@ -97,10 +97,13 @@ if needs_stub
     elma_sources += files('H_DUMMY.CPP', 'stub.cpp')
 endif
 
+sdl2_dep = dependency('sdl2', static: build_machine.system() == 'windows')
+
 elma = executable(
     'elma',
     elma_sources,
     cpp_args: cpp_args,
     link_args: link_args,
+    dependencies: [sdl2_dep],
     win_subsystem: win_subsystem,
 )

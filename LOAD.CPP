@@ -97,7 +97,6 @@ int floadlevel_e( char* nev, int forceload ) {
 		if( Ptop->pic_selejtez( Plgr ) )
 			dialogselejtez();
 	}
-	Ptop->checklevelforsarvari();
 
 	if( Pszak ) // ervenytelenites
 		delete Pszak;

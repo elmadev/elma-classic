@@ -1607,14 +1607,6 @@ double topol::belyegszamitas( int kellspriteis ) {
     return BELYEGSZORZO*belyeg;
 }
 
-// Ha Sarvari, megvizsgalja hogy palya megfelel-e sarvari verzionak:
-// Ha nem, akkor kilep corrupt hibauzenettel:
-void topol::checklevelforsarvari( void ) {
-}
-
-
-
-
 // Barmilyen hiba eseten 1-el ter vissza:
 unsigned long getbelyeg( char* nev ) {
     char tmp[30];

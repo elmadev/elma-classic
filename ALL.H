@@ -15,8 +15,6 @@
 
 #define W_95
 
-#define WATCOM
-
 //#include	<i86.h>
 
 //#include	<graph.h>

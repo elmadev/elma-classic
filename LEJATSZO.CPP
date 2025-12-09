@@ -390,13 +390,8 @@ long lejatszo( char* filenev ) {
 		//	eddig = cel-1.0;
 
 		/* Most nincs idoellenorzes:
-		#ifdef WATCOM
-			if( cel - eddig > 2.0*0.432 && idoszerint ) // Maximum 2 sec a turelem!
-				uzenet( "System not fast enough!" );
-		#else
-			if( cel - eddig > 5.0*0.432 && idoszerint ) // Maximum 5 sec a turelem!
-				uzenet( "System not fast enough!" );
-		#endif
+		if( cel - eddig > 2.0*0.432 && idoszerint ) // Maximum 2 sec a turelem!
+			uzenet( "System not fast enough!" );
 		*/
 	
 		//mv_check( "Lej torlendo, ciklus kezdodik" );

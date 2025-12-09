@@ -176,9 +176,6 @@ void wav::hangero( double szorzo ) {
 wav2::wav2( wav* pwav ) {
 	mtomb = NULL;
 	tomb = pwav->tomb;
-	#ifndef WATCOM
-		hiba( "wav2 csak Watcom alatt mukodik!" );
-	#endif
 	if( pwav->size > 64000 )
 		hiba( "wav2-ben size > 64000!" );
 	{ mtomb = new short[pwav->size]; }

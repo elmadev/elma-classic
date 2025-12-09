@@ -263,7 +263,6 @@ void szakaszok::rendez( double maxtav ) {
 	ydim = ysized/cellameret+1;
 	if( xdim < 0 || ydim < 0 )
 		hiba( "xdim < 0 || ydim < 0!" );
-	// WATCOM:
 	if( xdim > 200 || ydim > 200 )
 		hiba( "xdim > 200 || ydim > 200!" );
 

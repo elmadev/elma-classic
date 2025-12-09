@@ -13,13 +13,8 @@ static long FAR PASCAL WndProc( HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM 
 HINSTANCE ghInstance = 0;
 HWND GhWnd = 0;
 
-#ifdef BUTITOTT
-static char szAppName[100] = "EM Test";
-static char szCaption[100] = "EM Test";
-#else
 static char szAppName[100] = "Elasto Mania";
 static char szCaption[100] = "Elasto Mania";
-#endif
 
 static int Aktiv = 0;
 

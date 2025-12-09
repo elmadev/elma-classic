@@ -354,17 +354,10 @@ static void kibike( int ajatekos, pic8* ppic, double t, vekt2 sarok,
 	}
 
 	// Kerekek:
-	#ifdef BUTITOTT
-	if( elsokerekrogton )
-		kidobozkerek( p_k1, Kerekrajzsugar, 0, ppic, pmk->pkiskerek );
-	if( hatsokerekrogton )
-		kidobozkerek( p_k2, Kerekrajzsugar, 0, ppic, pmk->pkiskerek );
-	#else
 	if( elsokerekrogton )
 		kidobozkerek( p_k1, Kerekrajzsugar, pmot->kor2.alfa, ppic, pmk->pkiskerek );
 	if( hatsokerekrogton )
 		kidobozkerek( p_k2, Kerekrajzsugar, pmot->kor4.alfa, ppic, pmk->pkiskerek );
-	#endif
 
 	vekt2 kozep = pmot->kor1.r-sarok;
 	vekt2 jobbra = vekt2( cos( pmot->kor1.alfa ), sin( pmot->kor1.alfa ) );
@@ -568,17 +561,10 @@ static void kibike( int ajatekos, pic8* ppic, double t, vekt2 sarok,
 			p_k1 = p_k2;
 			p_k2 = tmpv;
 		}
-		#ifdef BUTITOTT
-		if( !elsokerekrogton )
-			kidobozkerek( p_k1, pmot->kor2.sugar, 0, ppic, pmk->pkiskerek );
-		if( !hatsokerekrogton )
-			kidobozkerek( p_k2, pmot->kor4.sugar, 0, ppic, pmk->pkiskerek );
-		#else
 		if( !elsokerekrogton )
 			kidobozkerek( p_k1, pmot->kor2.sugar, pmot->kor2.alfa, ppic, pmk->pkiskerek );
 		if( !hatsokerekrogton )
 			kidobozkerek( p_k2, pmot->kor4.sugar, pmot->kor4.alfa, ppic, pmk->pkiskerek );
-		#endif
 	}
 }
 

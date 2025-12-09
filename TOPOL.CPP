@@ -931,9 +931,6 @@ static int Ucsolevsarvari = 0;
 #endif
 
 void topol::loadkulso( char* filenev ) {
-#ifdef BUTITOTT
-	uzenet( "Kulso file-t most nem szabad olvasni!" );
-#else
     ////int kulso = 1;
 
     nincslgrje = 0;
@@ -1221,7 +1218,6 @@ void topol::loadkulso( char* filenev ) {
     double szamitottbelyeg = belyegszamitas( verzio > 6 );
     if( fabs( szamitottbelyeg - belyeg_d ) > 0.01 )
 		uzenet( "Corrupt .LEV file!: ", filenev );
-#endif
 }
 
 // Ezt ha ujra kell kepezni loadkulso atalakitasaval kell:
@@ -1438,9 +1434,6 @@ static long longosit( double belyeg ) {
 }
 
 void topol::save( char* filenev, int nemkellcheck ) {
-#ifdef BUTITOTT
-	uzenet( "Menteni most nem szabad!" );
-#else
 	memset( &idok, 0, sizeof( idok ) );
     //if( lezart )
     //  hiba( "topol::save-ben lezart!" );
@@ -1605,7 +1598,6 @@ void topol::save( char* filenev, int nemkellcheck ) {
                 "You cannot play on this level until you correct these problems. To see what the",
                 "problems are, please push the Check Topology button in the editor." );
 	}
-	#endif
 }
 
 // Csak eredetileg beolvasott filenev-vel szabad meghivni:

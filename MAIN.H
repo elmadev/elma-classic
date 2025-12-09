@@ -8,8 +8,6 @@
 // #define SARVARI
 extern int Sarvari;
 
-//#define BUTITOTT
-
 extern int Billint; // Billentyuzet interraptos!
 
 extern int Sajatugras; // Ha 1, akkor left->pozitiv forgas

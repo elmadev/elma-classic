@@ -277,10 +277,6 @@ static void vezeto_hatarolas( motorst* pmot, vekt2 i, vekt2 j ) {
 	//r = vekt2( 0.2, 0.22 );
 	//r = r + vekt2( -(0.06), (0.14) );
 
-	#ifdef BUTITOTT
-	r = vekt2( 0.0, 0.22 );
-	#endif
-
 	// Konverzio i, j koordinata rendszerbol:
 	if( pmot->hatra_f )
 		pmot->vezetor = j*r.y - i*r.x + pmot->kor1.r;

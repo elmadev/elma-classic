@@ -1,15 +1,9 @@
 #include	"all.h"
 
-#ifdef BUTITOTT
-	int Palyaszam = 2;
-#endif
-
-#ifndef BUTITOTT
 #ifdef SARVARI
 	int Palyaszam = 19; // End-del egyutt
 #else
 	int Palyaszam = 55; // Vizittel egyutt
-#endif
 #endif
 
 int getstatesoundon( void ) {

@@ -41,11 +41,7 @@ static void betolt( char* nev ) {
 	strcpy( State->editfilenev, tmp );
 
 	Valtozott = 0;
-	#ifdef BUTITOTT
-	if( !floadlevel_e( "_uj_topol_", 1 ) )
-	#else
 	if( !floadlevel_e( tmp, 1 ) )
-	#endif
 		State->editfilenev[0] = 0;
 
 	kitolt();

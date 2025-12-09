@@ -568,7 +568,6 @@ void editor( void ) {
 	}*/
 
 	// Most megnezzuk, hogy megvannak-e palyai fazonnak:
-	#ifndef BUTITOTT
 	if( hanypalyavanmeg() < 5 ) {
 		char tmp[50];
 		if( hanypalyavanmeg() > 1 )
@@ -579,7 +578,6 @@ void editor( void ) {
 				tmp );
 		return;
 	}
-	#endif
 
 	// Beolvassuk file-t:
 	kivalasztkezdetit();

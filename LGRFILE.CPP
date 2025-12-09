@@ -418,11 +418,11 @@ lgrfile::lgrfile( char* lgrnev ) {
 	maszkszam = 0;
 	texturaszam = 0;
 	for( int i = 0; i < MAXKEPSZAM; i++ )
-		BYTESET( &kepek[i], 0, sizeof(kep) );
+		memset( &kepek[i], 0, sizeof(kep) );
 	for( int i = 0; i < MAXMASZKSZAM; i++ )
-		BYTESET( &maszkok[i], 0, sizeof(maszk) );
+		memset( &maszkok[i], 0, sizeof(maszk) );
 	for( int i = 0; i < MAXTEXTURASZAM; i++ )
-		BYTESET( &texturak[i], 0, sizeof(textura) );
+		memset( &texturak[i], 0, sizeof(textura) );
 
 	pkoveto = NULL;
 
@@ -430,8 +430,8 @@ lgrfile::lgrfile( char* lgrnev ) {
 	paltomb = NULL;
 	idonegtomb = NULL;
 
-	BYTESET( &mkepek1, 0, sizeof( mkepek1 ) );
-	BYTESET( &mkepek2, 0, sizeof( mkepek2 ) );
+	memset( &mkepek1, 0, sizeof( mkepek1 ) );
+	memset( &mkepek2, 0, sizeof( mkepek2 ) );
 	pkiszaszlo = NULL;
 
 	pkiller = pexit = NULL;

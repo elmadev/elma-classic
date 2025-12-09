@@ -266,9 +266,9 @@ static void kiview( int ajatekos, pic8* ppic, double baljobb,
 		ppic->ppixel( vx2, y, Plgr->keretindex );
 	}
 	unsigned char* sor = ppic->getptr( vy1 ) + vx1 + 1;
-	BYTESET( sor, Plgr->keretindex, Viewxsize );
+	memset( sor, Plgr->keretindex, Viewxsize );
 	sor = ppic->getptr( vy2 ) + vx1 +1;
-	BYTESET( sor, Plgr->keretindex, Viewxsize );
+	memset( sor, Plgr->keretindex, Viewxsize );
 }
 
 // Mentes lemezre:

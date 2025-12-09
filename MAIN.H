@@ -14,8 +14,6 @@ extern int Dupladuplabuffer; // Ha igaz duplan huzza az idot (Win95)
 // Ha nem igaz, csak memoriaba ir es nem flip-pel:
 extern int Waitforretrace; // Csak Windows-os w_v.cpp-ben allitodik
 
-#define BYTESET(a,b,c) memset( a, b, c )
-
 void semmi( void );
 
 void inkremental( void );

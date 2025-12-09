@@ -138,7 +138,7 @@ static void belsoresz( motorst* pmot, jatekosopciok* popciok,
 
 			// Valtozok inicializalasa:
 			int showkep = pvalt->showkep;
-			BYTESET( pvalt, 0, sizeof( valtozok ) );
+			memset( pvalt, 0, sizeof( valtozok ) );
 			pvalt->baljobbv_f.ucsoford    = -1000.0;
 			pvalt->baljobbv_f.ucsoforgas  = -1000.0;
 			pvalt->baljobbv_h.ucsoford    = -1000.0;
@@ -344,9 +344,9 @@ long lejatszo( char* filenev ) {
 
 	// Valtozok inicializalasa:
 	valtozok valt1; // Inicializalni kell !!!!!!!!!!!!
-	BYTESET( &valt1, 0, sizeof( valt1 ) );
+	memset( &valt1, 0, sizeof( valt1 ) );
 	valtozok valt2;
-	BYTESET( &valt2, 0, sizeof( valt2 ) );
+	memset( &valt2, 0, sizeof( valt2 ) );
 	valt1.baljobbv_f.ucsoford    = valt2.baljobbv_f.ucsoford    = -1000.0;
 	valt1.baljobbv_f.ucsoforgas  = valt2.baljobbv_f.ucsoforgas  = -1000.0;
 	valt1.baljobbv_h.ucsoford    = valt2.baljobbv_h.ucsoford    = -1000.0;
@@ -753,9 +753,9 @@ long lejatszo_r( char* filenev, int showkepmarad ) {
 
 	// Valtozok inicializalasa:
 	valtozok valt1; // Inicializalni kell !!!!!!!!!!!!
-	BYTESET( &valt1, 0, sizeof( valt1 ) );
+	memset( &valt1, 0, sizeof( valt1 ) );
 	valtozok valt2;
-	BYTESET( &valt2, 0, sizeof( valt2 ) );
+	memset( &valt2, 0, sizeof( valt2 ) );
 	valt1.baljobbv_f.ucsoford    = valt2.baljobbv_f.ucsoford    = -1000.0;
 	valt1.baljobbv_f.ucsoforgas  = valt2.baljobbv_f.ucsoforgas  = -1000.0;
 	valt1.baljobbv_h.ucsoford    = valt2.baljobbv_h.ucsoford    = -1000.0;

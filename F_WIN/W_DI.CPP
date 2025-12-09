@@ -1,5 +1,4 @@
 #include "w_all.h"
-#include "..\state.h"
 
 static LPDIRECTINPUT g_pdi = NULL;
 static LPDIRECTINPUTDEVICE g_pKeyboard = NULL;
@@ -224,31 +223,6 @@ case DIERR_INCOMPLETEEFFECT     :
 case DIERR_NOTBUFFERED           :
 case DIERR_EFFECTPLAYING          :
 */
-
-void di_reset_state(state_s* mut) {
-    mut->opciok1.billgaz = DIK_UP;
-    mut->opciok1.billfek = DIK_DOWN;
-    mut->opciok1.billugras1 = DIK_RIGHT;
-    mut->opciok1.billugras2 = DIK_LEFT;
-    mut->opciok1.billfordul = DIK_SPACE;
-    mut->opciok1.billview = DIK_V;
-    mut->opciok1.billtime = DIK_T;
-    mut->opciok1.billshowkep = DIK_1;
-
-    mut->opciok2.billgaz = DIK_NUMPAD5;
-    mut->opciok2.billfek = DIK_NUMPAD2;
-    mut->opciok2.billugras1 = DIK_NUMPAD3;
-    mut->opciok2.billugras2 = DIK_NUMPAD1;
-    mut->opciok2.billfordul = DIK_NUMPAD0;
-    mut->opciok2.billview = DIK_B;
-    mut->opciok2.billtime = DIK_Y;
-    mut->opciok2.billshowkep = DIK_2;
-
-    // Kozos:
-    mut->billplussz = DIK_EQUALS;
-    mut->billminusz = DIK_MINUS;
-    mut->billsnap = DIK_I;
-}
 
 // Ezt a ket fv.-t valaszt2.cpp hivja sound volume allitashoz:
 /*int itissoundup( int billkod ) {

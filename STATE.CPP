@@ -1,4 +1,5 @@
 #include "all.h"
+#include "directinput_scancodes.h"
 
 int Palyaszam = 55; // Vizittel egyutt
 
@@ -379,8 +380,28 @@ void state_s::export_(void) {
 }
 
 void state_s::resetcontrols(void) {
-    void di_reset_state(state_s * mut);
-    di_reset_state(this);
+    opciok1.billgaz = DIK_UP;
+    opciok1.billfek = DIK_DOWN;
+    opciok1.billugras1 = DIK_RIGHT;
+    opciok1.billugras2 = DIK_LEFT;
+    opciok1.billfordul = DIK_SPACE;
+    opciok1.billview = DIK_V;
+    opciok1.billtime = DIK_T;
+    opciok1.billshowkep = DIK_1;
+
+    opciok2.billgaz = DIK_NUMPAD5;
+    opciok2.billfek = DIK_NUMPAD2;
+    opciok2.billugras1 = DIK_NUMPAD3;
+    opciok2.billugras2 = DIK_NUMPAD1;
+    opciok2.billfordul = DIK_NUMPAD0;
+    opciok2.billview = DIK_B;
+    opciok2.billtime = DIK_Y;
+    opciok2.billshowkep = DIK_2;
+
+    // Kozos:
+    billplussz = DIK_EQUALS;
+    billminusz = DIK_MINUS;
+    billsnap = DIK_I;
 }
 
 int getjatekosindex(char* nev) {

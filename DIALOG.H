@@ -3,12 +3,14 @@
 extern int Editorban_dialnak;
 
 // Visszaadja, hogy hanyadik gombot nyomtak:
-int dialog(char* text1, char* text2 = NULL, char* text3 = NULL, char* text4 = NULL,
-           char* text5 = NULL, char* text6 = NULL, char* text7 = NULL, char* text8 = NULL,
-           char* text9 = NULL, char* text10 = NULL, char* text11 = NULL, char* text12 = NULL,
-           char* text13 = NULL, char* text14 = NULL, char* text15 = NULL, char* text16 = NULL,
-           char* text17 = NULL, char* text18 = NULL, char* text19 = NULL, char* text20 = NULL,
-           char* text21 = NULL, char* text22 = NULL, char* text23 = NULL, char* text24 = NULL);
+int dialog(const char* text1, const char* text2 = NULL, const char* text3 = NULL,
+           const char* text4 = NULL, const char* text5 = NULL, const char* text6 = NULL,
+           const char* text7 = NULL, const char* text8 = NULL, const char* text9 = NULL,
+           const char* text10 = NULL, const char* text11 = NULL, const char* text12 = NULL,
+           const char* text13 = NULL, const char* text14 = NULL, const char* text15 = NULL,
+           const char* text16 = NULL, const char* text17 = NULL, const char* text18 = NULL,
+           const char* text19 = NULL, const char* text20 = NULL, const char* text21 = NULL,
+           const char* text22 = NULL, const char* text23 = NULL, const char* text24 = NULL);
 
 extern unsigned char Dialogszin;
 extern unsigned char Dialogszelszin;

@@ -18,7 +18,7 @@ void mv_startstopper(void);
 // Ezt valojaban csak crc fuggvenyek hasznaljak veletlen generalasara:
 void getbiostort(unsigned short* pbios, unsigned short* ptort);
 
-void hiba(char* text1, char* text2 = NULL, char* text3 = NULL);
-void uzenet(char* text1, char* text2 = NULL, char* text3 = NULL);
+void hiba(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
+void uzenet(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
 
 int s_random(int); // Ugyanaz mint random, de az nincs WATCOM-ban

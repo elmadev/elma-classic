@@ -81,7 +81,7 @@ class lgrfile {
 
     int texturaszam;
     textura texturak[MAXTEXTURASZAM];
-    int gettexturaindex(char* nev); // vagy -1
+    int gettexturaindex(const char* nev); // vagy -1
 
     int vanfu;
     // Textura szelekcio lista utolso eleme kimarad (qgrass):

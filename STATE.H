@@ -73,7 +73,7 @@ class state_s {
 
     void save(void);
     void exportjatekossum(FILE* h, char* nev, int single);
-    void exportanonim(FILE* h, int single, char* text1, char* text2, char* text3);
+    void exportanonim(FILE* h, int single, const char* text1, const char* text2, const char* text3);
     void export_(void);
     void resetcontrols(void);
 };

@@ -3,9 +3,10 @@
 #define MAXSOR32 (6)
 
 // Visszaadja lenyomott billentyut:
-int dialog320(char* text1, char* text2, char* text3, char* text4, char* text5, char* text6) {
+int dialog320(const char* text1, const char* text2, const char* text3, const char* text4,
+              const char* text5, const char* text6) {
     int szam;
-    char* textek[MAXSOR32 + 1] = {text1, text2, text3, text4, text5, text6, NULL};
+    const char* textek[MAXSOR32 + 1] = {text1, text2, text3, text4, text5, text6, NULL};
     for (szam = 0; szam < 6; szam++) {
         if (!textek[szam]) {
             break;

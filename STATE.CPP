@@ -233,7 +233,8 @@ static void exportegylevel(FILE* h, palyaegyfeleidok* pidok, int single) {
 static int const Nincsmegpalyaido = 100 * 60 * 10;
 
 // Anonymous total times:
-void state_s::exportanonim(FILE* h, int single, char* text1, char* text2, char* text3) {
+void state_s::exportanonim(FILE* h, int single, const char* text1, const char* text2,
+                           const char* text3) {
     int sum = 0;
     for (int i = 0; i < Palyaszam - 1; i++) { // ucso palyat nem szamitjuk
         int levelsum = 100000000;

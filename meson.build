@@ -68,7 +68,7 @@ needs_stub = true
 
 cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
-    cpp_args = ['/Zc:strictStrings-', '/D_CRT_SECURE_NO_WARNINGS']
+    cpp_args = ['/D_CRT_SECURE_NO_WARNINGS']
     if host_machine.cpu_family() == 'x86'
         win_subsystem = 'windows'
         needs_stub = false
@@ -90,7 +90,7 @@ if cpp.get_id() == 'msvc'
         ]
     endif
 else
-    cpp_args = ['-Wno-write-strings', '-Wno-deprecated-declarations']
+    cpp_args = ['-Wno-deprecated-declarations']
 
     if cpp.get_id() == 'clang'
         cpp_args += ['-Wno-nonportable-include-path']

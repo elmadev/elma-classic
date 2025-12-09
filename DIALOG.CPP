@@ -28,13 +28,15 @@ int boxban(int x, int y, box boxa) {
     }
 }
 
-int dialog(char* text1, char* text2, char* text3, char* text4, char* text5, char* text6,
-           char* text7, char* text8, char* text9, char* text10, char* text11, char* text12,
-           char* text13, char* text14, char* text15, char* text16, char* text17, char* text18,
-           char* text19, char* text20, char* text21, char* text22, char* text23, char* text24) {
-    char* texttomb[30] = {text1,  text2,  text3,  text4,  text5,  text6,  text7,  text8,
-                          text9,  text10, text11, text12, text13, text14, text15, text16,
-                          text17, text18, text19, text20, text21, text22, text23, text24};
+int dialog(const char* text1, const char* text2, const char* text3, const char* text4,
+           const char* text5, const char* text6, const char* text7, const char* text8,
+           const char* text9, const char* text10, const char* text11, const char* text12,
+           const char* text13, const char* text14, const char* text15, const char* text16,
+           const char* text17, const char* text18, const char* text19, const char* text20,
+           const char* text21, const char* text22, const char* text23, const char* text24) {
+    const char* texttomb[30] = {text1,  text2,  text3,  text4,  text5,  text6,  text7,  text8,
+                                text9,  text10, text11, text12, text13, text14, text15, text16,
+                                text17, text18, text19, text20, text21, text22, text23, text24};
     int textszam = 24;
     for (int i = 0; i < 24; i++) {
         if (!texttomb[i]) {
@@ -42,7 +44,7 @@ int dialog(char* text1, char* text2, char* text3, char* text4, char* text5, char
             break;
         }
     }
-    char* gombtomb[30];
+    const char* gombtomb[30];
     for (int i = 0; i < 24; i++) {
         gombtomb[i] = NULL;
     }

@@ -67,7 +67,7 @@ static void igazit(int* pkur, int* pfelso, int nevszam, int helyszam) {
     }
 }
 
-static void boxbair(pic8* ppic, box abox, unsigned char szin, char* text, int alahuzas = 0) {
+static void boxbair(pic8* ppic, box abox, unsigned char szin, const char* text, int alahuzas = 0) {
     ppic->fillbox(abox.x1 + 1, abox.y1 + 1, abox.x2 - 1, abox.y2 - 1, szin);
     if (alahuzas) {
         int hossz = Pabc2->len(text);
@@ -81,7 +81,7 @@ static void boxbair(pic8* ppic, box abox, unsigned char szin, char* text, int al
     }
 }
 
-static void boxbair_balra(pic8* ppic, box abox, unsigned char szin, char* text) {
+static void boxbair_balra(pic8* ppic, box abox, unsigned char szin, const char* text) {
     ppic->fillbox(abox.x1 + 1, abox.y1 + 1, abox.x2 - 1, abox.y2 - 1, szin);
     Pabc2->write(ppic, abox.x1 + 2, (abox.y1 + abox.y2) / 2 + 5, text);
 }
@@ -1898,7 +1898,7 @@ void set_gyuru_attributes(gyuru* pgy) {
     }
 }
 
-void set_kerek_tipus(char* fejlec, int* pkajatipus, int* pfoodsorszam) {
+void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
     invalidateegesz();
 
     // Koordok megadasa:

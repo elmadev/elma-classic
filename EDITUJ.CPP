@@ -198,7 +198,7 @@ void pop(void) {
 
 static char Toolhelpszoveg[110] = "";
 
-void toolhelp(char* text) {
+void toolhelp(const char* text) {
     if (text) {
         if (strlen(text) > 100) {
             hiba("toolhelp-ben strlen( text ) > 100!", text);
@@ -301,7 +301,8 @@ static pic8* Pspritenevbuffer = NULL;
 // Ezekbe kikereknev() is neha beleir (gany):
 static char Kepnevkint[10] = "", Texturanevkint[10] = "", Maszknevkint[10] = "";
 
-void kispritenev(char* kepnev, char* texturanev, char* maszknev, int tav, int hatarol) {
+void kispritenev(const char* kepnev, const char* texturanev, const char* maszknev, int tav,
+                 int hatarol) {
     if (strcmp(kepnev, Kepnevkint) == 0 && strcmp(texturanev, Texturanevkint) == 0 &&
         strcmp(maszknev, Maszknevkint) == 0) {
         return;

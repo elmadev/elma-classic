@@ -1149,7 +1149,7 @@ int lgrfile::getmaszkindex(char* nev) {
 }
 
 // Ha nincs ilye nevu, akkor -1-et ad vissza
-int lgrfile::gettexturaindex(char* nev) {
+int lgrfile::gettexturaindex(const char* nev) {
     if (!nev[0]) {
         return -1;
     }

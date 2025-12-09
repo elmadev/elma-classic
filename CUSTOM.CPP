@@ -2,7 +2,7 @@
 #include "directinput_scancodes.h"
 
 // Customize kiirashoz kell:
-char* kodtobillnev(int billkod) {
+const char* kodtobillnev(int billkod) {
     switch (billkod) {
     case DIK_1:
         return "1";
@@ -295,10 +295,10 @@ static billmuttomb Pbilltomb2;
 static int Rubrikaszam0 = 6;
 static int Rubrikaszam12 = 8;
 
-static void betolt(billmuttomb bmuttomb, int sorszam, char* szoveg, int* pbillkod) {
+static void betolt(billmuttomb bmuttomb, int sorszam, const char* szoveg, int* pbillkod) {
     strcpy(Rubrikak[sorszam], szoveg);
 
-    char* billnev = kodtobillnev(*pbillkod);
+    const char* billnev = kodtobillnev(*pbillkod);
     char tmp[20] = "";
     if (!billnev) {
         if (*pbillkod == 0) {
@@ -398,7 +398,7 @@ static void bejegyez12(billmuttomb bmuttomb, jatekosopciok* pjatopc) {
     betolt(bmuttomb, 7, "Toggle Show/Hide", &pjatopc->billshowkep);
 }
 
-static void customizeplayer(billmuttomb bmuttomb, jatekosopciok* pjatopc, char* ABjel) {
+static void customizeplayer(billmuttomb bmuttomb, jatekosopciok* pjatopc, const char* ABjel) {
     int kurrens = 0;
     while (1) {
         valaszt2 val;

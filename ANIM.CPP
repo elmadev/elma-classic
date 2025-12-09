@@ -2,7 +2,7 @@
 
 const int Animsize = 40;
 
-anim::anim(pic8* nagykep, char* uzenet_filenev) {
+anim::anim(pic8* nagykep, const char* uzenet_filenev) {
     frameszam = 0;
     for (int i = 0; i < MAXANIMFRAME; i++) {
         ppictomb[i] = NULL;

@@ -10,109 +10,6 @@ static double Affinaranyy = 1.0;
 
 static double Tulvizszintes = 0.005;
 
-// #define LEGYENASM _
-
-#ifdef LEGYENASM
-
-#ifdef W_95
-
-// VISUAL C assembler:
-
-void __cdecl egysor( unsigned char lyuk,  unsigned char szam,
-			 unsigned char* sor, unsigned char* tomb,
-			 long futox, long futoy, long ddx, long ddy ) {
-	__asm
-	{
-		xor eax, eax      // nullazzuk eax-et
-		mov edi, futox    // betoltjuk futox also szo
-		mov esi, futoy    // betoltjuk futoy also szo
-		mov cl,  lyuk     // ez regen regiszterben jott
-		mov ch,  szam     // betoltjuk szam
-		mov edx, sor	  // betoltjuk sor
-		mov al,  [ebp+1ah] // betoltjuk futox felso szo
-		mov ah,  [ebp+1eh] // betoltjuk futoy felso szo
-		jmp kezd
-
-		ciklus2:
-		dec ch            // szam-ot csokkentjuk
-		jz vege           // ha 0, befejezzuk
-
-		ciklus:
-		inc edx
-		add di, [ebp+20h]  // hozzaadunk dx also  szojat
-		adc al, [ebp+22h]  // hozzaadunk dx felso szojat
-		add si, [ebp+24h]   // hozzaadunk dy also  szojat
-		adc ah, [ebp+26h]   // hozzaadunk dy felso szojat
-		kezd:
-
-		mov ebx, tomb     // betoltjuk tombot (kiskep)
-		add ebx, eax      // indexelunk fy-ra
-		mov bl, [ebx]     // bl-be kiskepbol
-		cmp bl, cl        // if( c != lyuk )
-		jz ciklus2
-		mov [edx], bl     // kiirjuk sor-ba pontot (nagykep)
-		dec ch            // szam-ot csokkentjuk
-		jnz ciklus        // ha nem 0, folytatjuk
-
-		vege:
-   }
-}
-
-#else
-
-// WATCOM assembler:
-
-void egysor( unsigned char lyuk,  short szam,
-			 unsigned char* sor, unsigned char* tomb, 
-			 long futox, long futoy, long dx, long dy );
-
-#pragma aux	egysor = "push ebp" \
-					 "mov ebp, esp" \
-					 "sub esp, 100" \
-					 "add ebp, 36" \
-					 "xor eax, eax" \
-					 "mov di, [ebp-20]" \
-					 "mov si, [ebp-16]" \
-					 "mov ch, [ebp-32]" \
-					 "mov edx, [[ebp-28]" \
-					 "mov al, [ebp-18]" \
-					 "mov ah, [ebp-14]" \
-					 "jmp kezd" \
-					 "ciklus2:" \
-					 "dec ch" \
-					 "jz vege" \
-					 "ciklus:" \
-					 "inc edx" \
-					 "add di, [ebp-12]" \
-					 "adc al, [ebp-10]" \
-					 "add si, [ebp-8]" \
-					 "adc ah, [ebp-6]" \
-					 "kezd:" \
-					 "mov ebx, [[ebp-24]" \
-					 "add ebx, eax" \
-					 "mov bl, [ebx]" \
-					 "cmp bl, cl" \
-					 "jz ciklus2" \
-					 "mov [edx], bl" \
-					 "dec ch" \
-					 "jnz ciklus" \
-					 "vege:" \
-					 "sub ebp, 36" \
-					 "mov esp, ebp" \
-					 "pop ebp" \
-					 "add esp, 28" \
-				  parm [cl] \
-				  modify [eax ebx ecx edx esi edi]
-
-//void proba( void ) {
-//	unsigned char* pc = (unsigned char*)0x0feeeeeee;
-//	egysor( 1, 2, pc, pc+1, 3, 4, 5, 6 );
-//}
-
-#endif
-
-#else
-
 void egysor( unsigned char lyuk, unsigned char szam, unsigned char* sor,
 		unsigned char* tomb, long futox, long futoy, long dx, long dy ) {
 	short* pf_futox = (short*)(&futox);
@@ -132,8 +29,6 @@ void egysor( unsigned char lyuk, unsigned char szam, unsigned char* sor,
 		futoy += dy;
 	}
 }
-
-#endif
 
 // Ez a fuggveny kilogas eseten hivodik meg, plussz parametere xhossz:
 void egysor( unsigned char lyuk, short szam, unsigned char* sor,

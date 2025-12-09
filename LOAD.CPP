@@ -8,7 +8,7 @@ static char Bentlevelnev[20] = "";
 // Torli es kitolti Ptop, Plgr, Pszak, ecset mutatokat.
 // Ha belso file-ban is megvan palya onnan veszi:
 // Hamissal ter vissza, ha hibas topologiaju level:
-int floadlevel_p(char* nev) {
+int floadlevel_p(const char* nev) {
     if (!nev) {
         hiba("floadlevel_p-ben !nev!");
     }
@@ -65,7 +65,7 @@ int floadlevel_p(char* nev) {
 // Pszak, ecset mutatokat torli:
 // Ha belso file-ban is megvan palya onnan veszi:
 // Igaz ha file nem volt lezarva, kulonben new palya hamissal:
-int floadlevel_e(char* nev, int forceload) {
+int floadlevel_e(const char* nev, int forceload) {
     int levoltzarva = 0;
 
     if (!nev) {

@@ -6,7 +6,7 @@ static int ErrorOnMissingCodepoint = 1;
 static int ErrorOnMissingCodepoint = 0;
 #endif
 
-abc8::abc8(char* filename) {
+abc8::abc8(const char* filename) {
     default_spacing = 0;
     ppsprite = NULL;
     y_offset = NULL;
@@ -107,7 +107,7 @@ abc8::~abc8(void) {
 static int SpaceWidth = 5;
 static int SpaceWidthMenu = 10;
 
-void abc8::write(pic8* dest, int x, int y, char* text) {
+void abc8::write(pic8* dest, int x, int y, const char* text) {
     while (*text) {
         int index = (unsigned char)*text;
         if (index == ' ') {
@@ -136,7 +136,7 @@ void abc8::write(pic8* dest, int x, int y, char* text) {
     }
 }
 
-int abc8::len(char* text) {
+int abc8::len(const char* text) {
     int width = 0;
     while (*text) {
         int index = (unsigned char)*text;
@@ -167,7 +167,7 @@ int abc8::len(char* text) {
 
 void abc8::set_spacing(int spacing) { default_spacing = spacing; }
 
-void abc8::write_centered(pic8* dest, int x, int y, char* text) {
+void abc8::write_centered(pic8* dest, int x, int y, const char* text) {
     int hossz = len(text);
     write(dest, x - hossz / 2, y, text);
 }

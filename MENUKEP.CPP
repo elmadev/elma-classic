@@ -70,7 +70,7 @@ szoveglista::~szoveglista(void) {
     sorok = NULL;
 }
 
-void szoveglista::addszoveg(char* text, int x, int y) {
+void szoveglista::addszoveg(const char* text, int x, int y) {
     if (strlen(text) > 100) {
         hiba("89ygui");
     }
@@ -84,7 +84,7 @@ void szoveglista::addszoveg(char* text, int x, int y) {
     ervenyes = 0;
 }
 
-void szoveglista::addszoveg_kozep(char* text, int x, int y) {
+void szoveglista::addszoveg_kozep(const char* text, int x, int y) {
     addszoveg(text, x - Pmenuabc->len(text) / 2, y);
 }
 
@@ -451,7 +451,7 @@ typedef char hibasor[MAXHIBASORHOSSZ + 4];
 #define MAXHIBASOR (10)
 static hibasor Hibasortomb[MAXHIBASOR];
 
-void grafikushiba(char* text1, char* text2, char* text3) {
+void grafikushiba(const char* text1, const char* text2, const char* text3) {
     // Kirajzoljuk hatteret Buffsima-ba:
     int y = 0;
     int paros = 0;

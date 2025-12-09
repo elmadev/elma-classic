@@ -149,7 +149,7 @@ static int titkoswrite(void* mut, int hossz, FILE* h) {
     return 1;
 }
 
-char* getleveldescription(int level) {
+const char* getleveldescription(int level) {
     if (!Leveldescinited) {
         Leveldescinited = 1;
         FILE* h = qopen("desclist.txt", "rt");
@@ -942,7 +942,7 @@ static void makelgrtabla(void) {
 }
 
 // QWQUU001 elso palya:
-topol::topol(char* filenev_p) {
+topol::topol(const char* filenev_p) {
     if (!Lgrtabla[1]) {
         makelgrtabla();
     }

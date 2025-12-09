@@ -100,8 +100,8 @@ class lgrfile;
 
 class topol {
     friend int menu_exit(void);
-    friend int floadlevel_e(char* nev, int forceload);
-    friend int floadlevel_p(char* nev);
+    friend int floadlevel_e(const char* nev, int forceload);
+    friend int floadlevel_p(const char* nev);
     friend void invalidate_ptop(void);
     friend void kiirdesceket(void);
     friend void hakellmentbelleveket(void); // topol.cpp-ben
@@ -110,7 +110,7 @@ class topol {
 
     topol(void);
     // QWQUU001 elso palya:
-    topol(char* filenev);
+    topol(const char* filenev);
     ~topol(void);
     void loadkulso(char* filenev);
     void loadbelso(char* filenev);
@@ -176,7 +176,7 @@ int getbelyegheznev(unsigned long belyeg, char* nev);
 // char* getlevelname( char* nev ); mar nem hasznalt
 
 // 0-tol kezdodnek:
-char* getleveldescription(int level);
+const char* getleveldescription(int level);
 
 // Belso belyegszamitasokhoz kell:
 /*unsigned long double2belyeg( double* px );

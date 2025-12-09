@@ -50,8 +50,9 @@ void invalidateegesz(void);
 
 void editor(void);
 
-void toolhelp(char* text = NULL);
+void toolhelp(const char* text = NULL);
 
 #define SZ_ZOOMVONAL (90)
 
-void kispritenev(char* kepnev, char* texturanev, char* maszknev, int tav, int hatarol);
+void kispritenev(const char* kepnev, const char* texturanev, const char* maszknev, int tav,
+                 int hatarol);

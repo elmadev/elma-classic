@@ -16,7 +16,7 @@ wav::wav(unsigned sizepar) {
     lefoglal();
 }
 
-static void nevwavtest(char* nev) {
+static void nevwavtest(const char* nev) {
     int i = strlen(nev) - 1;
     while (i > 0) {
         if (nev[i] == '.') {
@@ -49,7 +49,7 @@ struct wavheader {
     long hossz;
 };
 
-wav::wav(char* nev, double maxamplitudo, int start, int ucsoutani) {
+wav::wav(const char* nev, double maxamplitudo, int start, int ucsoutani) {
     tomb = NULL;
     nevwavtest(nev);
     // Lemeri file hosszat:
@@ -142,7 +142,7 @@ wav::wav(char* nev, double maxamplitudo, int start, int ucsoutani) {
     }
 }
 
-void wav::save(char* nev) {
+void wav::save(const char* nev) {
     nevwavtest(nev);
     // Lemeri file hosszat:
     FILE* h = fopen(nev, "wb");

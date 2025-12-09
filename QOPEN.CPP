@@ -96,7 +96,7 @@ static int Indextomb[MAXNYITVA];
 
 static int Nyitva = 0;
 
-FILE* qopen(char* nev, char* paramok) {
+FILE* qopen(const char* nev, const char* paramok) {
     if (!Qopeninited) {
         hiba("qopen initqopen nelkul!");
     }

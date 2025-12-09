@@ -4,7 +4,7 @@
 // void initmenukep1( void );
 // void initmenukep2( void );
 
-void grafikushiba(char* text1, char* text2 = NULL, char* text3 = NULL);
+void grafikushiba(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
 
 extern pic8* Buffsima;
 extern pic8* Buffgolyo;
@@ -31,8 +31,8 @@ class szoveglista {
   public:
     szoveglista(void);
     ~szoveglista(void);
-    void addszoveg(char* text, int x, int y);
-    void addszoveg_kozep(char* text, int x, int y);
+    void addszoveg(const char* text, int x, int y);
+    void addszoveg_kozep(const char* text, int x, int y);
     void setsisak(int x, int y);
     void clear(void);
     void kirajzol(int nemkellgolyo = 0, pic8* rarakkep1 = NULL, pic8* rarakkep2 = NULL,

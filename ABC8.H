@@ -8,10 +8,10 @@ class abc8 {
     int default_spacing;
 
   public:
-    abc8(char* filename);
+    abc8(const char* filename);
     ~abc8(void);
-    void write(pic8* dest, int x, int y, char* text);
-    void write_centered(pic8* dest, int x, int y, char* text);
-    int len(char* text);
+    void write(pic8* dest, int x, int y, const char* text);
+    void write_centered(pic8* dest, int x, int y, const char* text);
+    int len(const char* text);
     void set_spacing(int spacing);
 };

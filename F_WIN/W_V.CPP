@@ -238,7 +238,7 @@ void mv_startstopper(void) { Startido = timeGetTime() * 0.182; }
 static int Hibaban = 0;
 static char Tmphibatext[500];
 
-static void directhiba(char* text1, char* text2, char* text3, char* text4) {
+static void directhiba(const char* text1, const char* text2, const char* text3, const char* text4) {
     FILE* h;
     if (Hibaban) {
         h = fopen("error_b.txt", "wt");
@@ -278,7 +278,7 @@ static void directhiba(char* text1, char* text2, char* text3, char* text4) {
                 text3 = Tmphibatext;
             }
         }
-        void grafikushiba(char* text1, char* text2 = NULL, char* text3 = NULL);
+        void grafikushiba(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
         grafikushiba(text1, text2, text3);
         while (1) {
             int c = mk_getextchar();
@@ -306,14 +306,14 @@ static void directhiba(char* text1, char* text2, char* text3, char* text4) {
     mv_exit();
 }
 
-void hiba(char* text1, char* text2, char* text3) {
+void hiba(const char* text1, const char* text2, const char* text3) {
     if (access("message.inf", 0) == 0) {
         directhiba("<<message.inf accessed>>", text1, text2, text3);
     }
     directhiba("Sorry, internal error.", NULL, NULL, NULL);
 }
 
-void uzenet(char* text1, char* text2, char* text3) {
+void uzenet(const char* text1, const char* text2, const char* text3) {
     // about azert kell, hogy kezdo memchecknel ne agazzon el:
     if (strstr(text1, "memory") && !strstr(text1, "about")) {
         // Ha memory szerepel text1-ben:

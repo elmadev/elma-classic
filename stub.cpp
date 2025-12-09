@@ -3,9 +3,13 @@
 int sdl_init(void);
 int main() { return sdl_init(); }
 
-void uzenet(char* text1, char* text2, char* text3) { printf("%s %s %s\n", text1, text2, text3); }
+void uzenet(const char* text1, const char* text2, const char* text3) {
+    printf("%s %s %s\n", text1, text2, text3);
+}
 
-void hiba(char* text1, char* text2, char* text3) { printf("%s %s %s\n", text1, text2, text3); }
+void hiba(const char* text1, const char* text2, const char* text3) {
+    printf("%s %s %s\n", text1, text2, text3);
+}
 
 int s_random(int maximum) { return 0; }
 

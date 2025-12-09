@@ -149,7 +149,7 @@ pic8::pic8(int xsizep, int ysizep, unsigned char** ppc) {
     success = 1;
 }
 
-pic8::pic8(char* nev, FILE* h) {
+pic8::pic8(const char* nev, FILE* h) {
     nemdestrukt = 0;
     success = 0;
     sormuttomb = NULL;
@@ -177,7 +177,7 @@ pic8::pic8(char* nev, FILE* h) {
     hiba("pic8 konstruktor nem talalt pontot nevben!: ", nev);
 }
 
-int pic8::save(char* nev, unsigned char* pal, FILE* h) {
+int pic8::save(const char* nev, unsigned char* pal, FILE* h) {
     if (!success) {
         hiba("pic8::save-ben nem success!");
         return 0;
@@ -346,7 +346,7 @@ void pic8::fuggszegmens_look(int x, int y, int size, unsigned char* lookup) {
     l++;
 } */
 
-void pic8::spritebeolvas(char* nev, FILE* h) {
+void pic8::spritebeolvas(const char* nev, FILE* h) {
     int volth = 1;
     if (!h) {
         volth = 0;
@@ -460,7 +460,7 @@ void pic8::spritebeolvas(char* nev, FILE* h) {
     success = 1;
 }
 
-int pic8::spritesave(char* nev, FILE* h) {
+int pic8::spritesave(const char* nev, FILE* h) {
     int volth = 1;
     if (!h) {
         volth = 0;
@@ -515,7 +515,7 @@ struct pcxdescriptor {
     unsigned char Padding[127 - 70 + 1];
 };
 
-void pic8::pcxbeolvas(char* nev, FILE* h) {
+void pic8::pcxbeolvas(const char* nev, FILE* h) {
     // Gany:
     success = 1;
 
@@ -591,7 +591,7 @@ static int numberofrepeats(pic8* ppic, int x, int y, int xsize) {
     return db;
 }
 
-int pic8::pcxsave(char* nev, unsigned char* pal) {
+int pic8::pcxsave(const char* nev, unsigned char* pal) {
     FILE* h = fopen(nev, "wb");
     if (!h) {
         hiba("pcxsave-ben nem nyilik file!: ", nev);
@@ -892,7 +892,7 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
     }
 } */
 
-int pcxtopal(char* nev, unsigned char* pal) {
+int pcxtopal(const char* nev, unsigned char* pal) {
     // Paletta beolvasasa:
     FILE* h = qopen(nev, "rb");
     if (!h) {
@@ -929,7 +929,7 @@ int pcxtopal(char* nev, unsigned char* pal) {
     return 1;
 }
 
-int pcxtopal(char* nev, ddpal** ppddpal) {
+int pcxtopal(const char* nev, ddpal** ppddpal) {
     unsigned char pal[768];
     pcxtopal(nev, pal);
     if (strcmp(nev, "intro.pcx") == 0) {

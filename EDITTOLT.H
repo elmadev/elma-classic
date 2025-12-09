@@ -19,7 +19,7 @@ int tolt_picklgrfile(char* lgrnev); // lgrnevbe masol max 8 chart
 
 void setspritetav(sprite* psp);
 
-void set_kerek_tipus(char* fejlec, int* pkajatipus, int* pfoodsorszam);
+void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam);
 
 extern int Rajzolpoligon;
 extern int Rajzolkoveto;

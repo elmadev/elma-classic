@@ -14,7 +14,7 @@ void k_memcpy(void* dest, const void* src, size_t n) {
 }
 
 #ifndef _WIN32
-int fifirst(char* minta, char* filenev) { return 1; }
+int fifirst(const char* minta, char* filenev) { return 1; }
 int finext(char* filenev) { return 1; }
 void ficlose(void) {}
 
@@ -23,7 +23,7 @@ void ficlose(void) {}
 static int Fiben = 0;
 static long Fihandler = -1;
 
-int fifirst(char* minta, char* filenev) {
+int fifirst(const char* minta, char* filenev) {
     if (Fiben || Fihandler != -1L) {
         hiba("fifirst");
     }

@@ -1,5 +1,5 @@
 
-FILE* qopen(char* nev, char* paramok);
+FILE* qopen(const char* nev, const char* paramok);
 void qclose(FILE* h);
 int qseek(FILE* stream, long offset, int whence);
 

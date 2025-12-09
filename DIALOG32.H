@@ -1,4 +1,4 @@
 
 // Visszaadja lenyomott billentyut:
-int dialog320(char* text1, char* text2 = NULL, char* text3 = NULL, char* text4 = NULL,
-              char* text5 = NULL, char* text6 = NULL);
+int dialog320(const char* text1, const char* text2 = NULL, const char* text3 = NULL,
+              const char* text4 = NULL, const char* text5 = NULL, const char* text6 = NULL);

@@ -42,7 +42,7 @@ void loadlgrfile(char* nev) {
     }
 
     char lgrtmp[30];
-    sprintf(lgrtmp, "lgr\\%s.lgr", nev);
+    sprintf(lgrtmp, "lgr/%s.lgr", nev);
     if (access(lgrtmp, 0) != 0) {
         if (!Ptop) {
             hiba("loadlgrfile-ban !Ptop!");
@@ -78,7 +78,7 @@ void loadlgrfile(char* nev) {
             return;
         }
 
-        strcpy(lgrtmp, "lgr\\default.lgr");
+        strcpy(lgrtmp, "lgr/default.lgr");
         strcpy(Bentlgrnev, "DEFAULT");
 
         Ptop->nincslgrje = 1;
@@ -477,7 +477,7 @@ lgrfile::lgrfile(char* lgrnev) {
 
     // Megnyitja file-t:
     char lgrtmp[30];
-    sprintf(lgrtmp, "lgr\\%s.lgr", lgrnev);
+    sprintf(lgrtmp, "lgr/%s.lgr", lgrnev);
     FILE* h = fopen(lgrtmp, "rb");
     if (!h) {
         uzenet("Cannot find file:", lgrtmp);

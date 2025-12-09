@@ -136,7 +136,7 @@ void tolt_open(void) {
         Soknev[i] = 0;
     }
     finame fname;
-    int done = fifirst("lev\\*.lev", fname);
+    int done = fifirst("lev/*.lev", fname);
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
@@ -325,7 +325,7 @@ void kivalasztkezdetit(void) {
         Soknev[i] = 0;
     }
     finame fname;
-    int done = fifirst("lev\\*.lev", fname);
+    int done = fifirst("lev/*.lev", fname);
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
@@ -612,7 +612,7 @@ int tolt_save_as(int lokkolhato) {
                 // Eloallitjuk nevet:
                 strcat(nev, ".lev");
                 char tmpnev[40];
-                strcpy(tmpnev, "lev\\");
+                strcpy(tmpnev, "lev/");
                 strcat(tmpnev, nev);
                 if (access(tmpnev, 0) == 0) {
                     if (dialog("File exists, overwrite?", nev, "GOMBOK", "Yes", "No") == 1) {
@@ -1378,7 +1378,7 @@ int tolt_picklgrfile(char* lgrnev) {
         Soknev[i] = 0;
     }
     finame fname;
-    int done = fifirst("lgr\\*.lgr", fname);
+    int done = fifirst("lgr/*.lgr", fname);
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {

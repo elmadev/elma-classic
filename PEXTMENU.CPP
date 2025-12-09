@@ -107,7 +107,7 @@ static void abcberendez(int szam) {
 void playextmenu(void) {
     // Kiirjuk osszes lev file nevet ide:
     finame fname;
-    int done = fifirst("lev\\*.lev", fname);
+    int done = fifirst("lev/*.lev", fname);
     int szam = 0;
     while (!done) {
         char* filenev = fname;

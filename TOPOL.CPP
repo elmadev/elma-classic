@@ -87,7 +87,7 @@ void kiirdesceket(void) {
 void hakellmentbelleveket(void) {
 #ifdef BELSOTIR
     finame fname;
-    int done = fifirst("lev\\*.lev", fname);
+    int done = fifirst("lev/*.lev", fname);
     // Vegigmegyunk osszes lev file-on es kimentjuk oket belsokent:
     while (!done) {
         topol* ptop = new topol(fname);
@@ -838,7 +838,7 @@ int access_topol(char* filenev) {
         return 0;
     }
     char tmp[30];
-    sprintf(tmp, "lev\\%s", filenev);
+    sprintf(tmp, "lev/%s", filenev);
     return access(tmp, 0);
 }
 
@@ -909,7 +909,7 @@ static void makelgrtabla(void) {
     }
 
     // Most fel van toltve default ertekekkel, beolvassuk file-t:
-    FILE* h = fopen("lgr\\lgrlist.txt", "rt");
+    FILE* h = fopen("lgr/lgrlist.txt", "rt");
     if (!h) {
         return;
     }
@@ -982,7 +982,7 @@ topol::topol(char* filenev_p) {
         //		hiba( "4i4fyuif" );
         // #endif
         char tmp[40];
-        sprintf(tmp, "lgr\\%s.lgr", Lgrtabla[belsopalyaszam]);
+        sprintf(tmp, "lgr/%s.lgr", Lgrtabla[belsopalyaszam]);
         if (access(tmp, 0) == 0) { // Csak ha letezik file:
             strcpy(lgrnev, Lgrtabla[belsopalyaszam]);
         }
@@ -1013,7 +1013,7 @@ void topol::loadkulso(char* filenev) {
     FILE* h = NULL;
     ////if( kulso ) {
     char tmpnev[40];
-    sprintf(tmpnev, "lev\\%s", filenev);
+    sprintf(tmpnev, "lev/%s", filenev);
     h = fopen(tmpnev, "rb");
     if (!h) {
         hiba("topol::topol-ban nem tudta nyitni file-t!: ", tmpnev);
@@ -1499,7 +1499,7 @@ void topol::save(char* filenev, int nemkellcheck) {
     }
 
     char tmpnev[40];
-    sprintf(tmpnev, "lev\\%s", filenev);
+    sprintf(tmpnev, "lev/%s", filenev);
 #ifdef BELSOTIR
     if (!strstr(tmpnev, ".lev") && !strstr(tmpnev, ".LEV")) {
         hiba("78t4678r4");
@@ -1660,7 +1660,7 @@ void topol::saveidok(char* filenev_p) {
 
     // Hozzacsapjuk nevhez LEV direktorit is:
     char filenev[40];
-    sprintf(filenev, "lev\\%s", filenev_p);
+    sprintf(filenev, "lev/%s", filenev_p);
 
     FILE* h = fopen(filenev, "r+b");
     if (!h) {
@@ -1757,7 +1757,7 @@ double topol::belyegszamitas(int kellspriteis) {
 // Barmilyen hiba eseten 1-el ter vissza:
 unsigned long getbelyeg(char* nev) {
     char tmp[30];
-    sprintf(tmp, "lev\\%s", nev);
+    sprintf(tmp, "lev/%s", nev);
     FILE* h = fopen(tmp, "rb");
     if (!h) {
         return 1;

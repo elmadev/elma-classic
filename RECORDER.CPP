@@ -470,7 +470,7 @@ long recorder::load(char* nev, FILE* h, int demo) {
             }
         } else {
             char tmpnev[40];
-            sprintf(tmpnev, "rec\\%s", nev);
+            sprintf(tmpnev, "rec/%s", nev);
             h = fopen(tmpnev, "rb");
             if (!h) {
                 uzenet("Could not open for reading record file!:", tmpnev);
@@ -650,7 +650,7 @@ void recorder::save(char* nev, FILE* h, long belyeg, int tag_p) {
     if (!h) {
         // Itt meg kell hagyni fopen-t!:
         char tmpnev[40];
-        sprintf(tmpnev, "rec\\%s", nev);
+        sprintf(tmpnev, "rec/%s", nev);
         h = fopen(tmpnev, "wb");
         if (!h) {
             hiba("Could not open for writing record file!: ", tmpnev);
@@ -766,7 +766,7 @@ long loadrecek(char* nev, int demo) {
         }
     } else {
         char tmpnev[40];
-        sprintf(tmpnev, "rec\\%s", nev);
+        sprintf(tmpnev, "rec/%s", nev);
         h = fopen(tmpnev, "rb");
         if (!h) {
             uzenet("Could not open for reading record file!:", tmpnev);
@@ -838,7 +838,7 @@ long loadrecek(char* nev, int demo) {
 void saverecek(char* nev, long belyeg, int tag) {
     if (Multirec) {
         char tmpnev[40];
-        sprintf(tmpnev, "rec\\%s", nev);
+        sprintf(tmpnev, "rec/%s", nev);
         FILE* h = fopen(tmpnev, "wb");
         if (!h) {
             uzenet("Could not open for writing record file!: !: ", tmpnev);

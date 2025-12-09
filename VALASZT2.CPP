@@ -17,7 +17,7 @@ void initrubrikak(void) {
     // Megszamolja maximalis lev es rec file-okat:
     int levszam = 0;
     finame fname;
-    int done = fifirst("lev\\*.lev", fname);
+    int done = fifirst("lev/*.lev", fname);
     while (!done) {
         done = finext(fname);
         levszam++;
@@ -25,7 +25,7 @@ void initrubrikak(void) {
     ficlose();
 
     int recszam = 0;
-    done = fifirst("rec\\*.rec", fname);
+    done = fifirst("rec/*.rec", fname);
     while (!done) {
         done = finext(fname);
         recszam++;

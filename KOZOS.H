@@ -6,9 +6,7 @@ extern double K_pi;
 extern double K_pip2;
 extern double K_2pi;
 
-#ifdef W_95
 #define _fstrnicmp _strnicmp
-#endif
 
 #ifdef _WIN32
 #define itoa _itoa

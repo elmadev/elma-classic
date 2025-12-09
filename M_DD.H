@@ -7,11 +7,7 @@ class recorder;
 class ddpal {
 	friend void lassufizre( pic8* ppic, ddpal* ppal );
 public:
-	#ifdef W_95
-		void* pddpal;
-	#else
-		unsigned char* tomb;
-	#endif
+	void* pddpal;
 
 	ddpal( unsigned char* tomb );
 	~ddpal( void );

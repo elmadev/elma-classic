@@ -109,16 +109,6 @@ void valaszt2::bead( int szam_p, int tabos_p ) {
 	}
 }
 
-// RECidomenteshez kell (mainmenu.cpp-ben is):
-#ifndef W_95
-static int controlaltnyomva( void ) {
-	// DOS-os verzioban v-t es t-t hasznalunk:
-	if( mk_getstate( 'v' ) && mk_getstate( 't' ) )
-		return 1;
-	return 0;
-}
-#endif
-
 int RECidokellhet = 0;
 int RECidokellis = 0;
 

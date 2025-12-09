@@ -407,33 +407,8 @@ void state_s::export_( void ) {
 }
 
 void state_s::resetcontrols( void ) {
-#ifdef W_95
 	void di_reset_state( state_s* mut );
 	di_reset_state( this );
-#else
-	opciok1.billgaz    = 22;
-	opciok1.billfek    = 40;
-	opciok1.billugras1 = 37;
-	opciok1.billugras2 = 35;
-	opciok1.billfordul = ' ';
-	opciok1.billview   = 'v';
-	opciok1.billtime   = 't';
-	opciok1.billshowkep= 59; // F1
-
-	opciok2.billgaz = 71;    // Home
-	opciok2.billfek = 79;
-	opciok2.billugras1 = 81;
-	opciok2.billugras2 = 83;
-	opciok2.billfordul = 29; // CTRL
-	opciok2.billview   = 'b';
-	opciok2.billtime   = 'y';
-	opciok2.billshowkep= 60;
-
-	// Kozos:
-	billplussz = '+';
-	billminusz = '-';
-	billsnap = 'i';
-#endif
 }
 
 int getjatekosindex( char* nev ) {

@@ -22,11 +22,9 @@ static void initsoundlejatszoban( void ) {
 		Hangenabled = 1;
 
 		Mute = 1;
-		#ifdef W_95
-			starthanghigh();
-			void initdsound( int );
-			initdsound( State->secondarybuffer );
-		#endif
+		starthanghigh();
+		void initdsound( int );
+		initdsound( State->secondarybuffer );
 	}
 }
 

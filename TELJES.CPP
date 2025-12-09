@@ -217,11 +217,7 @@ void kilep( void ) {
 	while( 1 ) {
 		int c = mk_getextchar();
 		if( c == ' ' || c == MK_ENTER || c == MK_ESC ) {
-			#ifdef W_95
-				mv_exit();
-			#else
-				uzenet( "DOS-os kilepes!" );
-			#endif
+			mv_exit();
 		}
 	}
 } */
@@ -229,11 +225,7 @@ void kilep( void ) {
 void kilep( void ) {
 	/*
 	#ifndef SARVARI
-		#ifdef W_95
-			mv_exit();
-		#else
-			uzenet( "DOS-os kilepes!" );
-		#endif
+		mv_exit();
 	#endif
 	*/
 	Nincsfal = 1; // golyok ezentul kimenek falon kivulre
@@ -256,11 +248,7 @@ void kilep( void ) {
 		if( (mv_stopperido() > (kezdoido + idovaras)) && mk_kbhit() ) {
 			int c = mk_getextchar();
 			if( c == ' ' || c == MK_ENTER || c == MK_ESC ) {
-				#ifdef W_95
-					mv_exit();
-				#else
-					uzenet( "DOS-os kilepes!" );
-				#endif
+				mv_exit();
 			}
 		}
 	}

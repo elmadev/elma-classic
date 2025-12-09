@@ -45,9 +45,6 @@ void  unlockbackbuffer_pic( void ) {
 	}
 }
 
-#ifdef W_95
-
-// WINDOWSOS:
 void  lockfrontbuffer_pic( void ) {
 	if( Frontpiclocked || Backpiclocked )
 		hiba( "lfb_pw lock!" );
@@ -63,7 +60,6 @@ void  lockfrontbuffer_pic( void ) {
 	Lockbuff->sormuttomb = lockfrontbuffer();
 }
 
-// WINDOWSOS:
 void  unlockfrontbuffer_pic( void ) {
 	if( !Frontpiclocked || Backpiclocked )
 		hiba( "ulfb_pw lock!" );
@@ -71,75 +67,22 @@ void  unlockfrontbuffer_pic( void ) {
 	unlockfrontbuffer();
 }
 
-// WINDOWSOS:
 void  ppixelfront( int x, int y, unsigned char szin ) {
 	if( !Frontpiclocked )
 		hiba( "u53e983w" );
 	Lockbuff->ppixel( x, y, szin );
 }
 
-// WINDOWSOS:
 void  bltfront( pic8* ppic ) {
 	lockfrontbuffer_pic();
 	blt8( Lockbuff, ppic );
 	unlockfrontbuffer_pic();
 }
-// WINDOWSOS:
 void  bltfront( pic8* ppic, int x1, int y1, int x2, int y2 ) {
 	lockfrontbuffer_pic();
 	blt8( Lockbuff, ppic, x1, y1, x1, y1, x2, y2 );
 	unlockfrontbuffer_pic();
 }
-
-#else
-
-extern pic8* Pscr8;
-
-// DOSOS:
-void  lockfrontbuffer_pic( void ) {
-	if( Frontpiclocked || Backpiclocked )
-		hiba( "lfb_p lock!" );
-	Frontpiclocked = 1;
-}
-
-// DOSOS:
-void  unlockfrontbuffer_pic( void ) {
-	if( !Frontpiclocked || Backpiclocked )
-		hiba( "ulfb_p lock!" );
-	Frontpiclocked = 0;
-}
-
-// DOSOS:
-void  ppixelfront( int x, int y, unsigned char szin ) {
-	if( !Frontpiclocked )
-		hiba( "53e983" );
-	Pscr8->ppixel( x, y, szin );
-}
-
-// DOSOS:
-void  bltfront( pic8* ppic ) {
-	if( Frontpiclocked )
-		hiba( "5398765" );
-	extern int Locky0_alul;
-	if( Locky0_alul ) {
-		if( ppic->getxsize() != 640 || ppic->getysize() != 480 )
-			hiba( "5646879" );
-		for( int y = 0; y < 480; y++ )
-			putline8_l( 0, y, ppic->sormuttomb[479-y], 640 );
-	}
-	else {
-		blt8( Pscr8, ppic );
-	}
-}
-
-// DOSOS:
-void  bltfront( pic8* ppic, int x1, int y1, int x2, int y2 ) {
-	if( Frontpiclocked )
-		hiba( "879666" );
-	blt8( Pscr8, ppic, x1, y1, x1, y1, x2, y2 );
-}
-
-#endif
 
 
 

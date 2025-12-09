@@ -2,10 +2,6 @@
 
 typedef unsigned char* puchar;
 
-#ifndef W_95
-	extern pic8* Pscr8;
-#endif
-
 /*class pic8 {
     friend blt8( pic8* pd, pic8* ps, int x = 0, int y = 0,
         int x1 = -10000, int y1 = -10000, int x2 = -1000, int y2 = -10000 );
@@ -228,11 +224,7 @@ void pic8::ppixel( int x, int y, unsigned char szin ) {
         return;
     }
 	// Fizikai:
-	#ifdef W_95
-		hiba( "ppixel fizikaira!" );
-	#else
-		putpixel8_l( x, y, szin );
-	#endif
+    hiba( "ppixel fizikaira!" );
 }
 
 unsigned char pic8::gpixel( int x, int y ) {
@@ -677,12 +669,6 @@ void blt8( pic8* pd, pic8* ps, int x, int y,
             hiba( "blt8 hivasa y2 == -10000 (default), de elotte nem mind!" );
             return;
         }
-	  #ifndef W_95
-		if( pd == Pscr8 && ps == Pscr8 ) {
-			hiba( "blt8 hivasa, dest es source is fizikai kepernyo!" );
-			return;
-		}
-	  #endif
 		if( !pd || !ps ) {
 			hiba( "blt8 hivasa, dest vagy source NULL!" );
 			return;
@@ -824,29 +810,11 @@ void blt8( pic8* pd, pic8* ps, int x, int y,
 	// Most mar tuti jok koordok!
 	if( pd->fizkep ) {
 		// Fizikai kepernyore iras:
-		#ifdef W_95
-			hiba( "0895t" );
-		#else
-			int xmeret = x2-x1+1;
-			int dfy = y;
-			for( int fy = y1; fy <= y2; fy++ ) {
-				putline8_l( x, dfy++, &ps->sormuttomb[fy][x1], xmeret );
-			}
-			return;
-		#endif
+        hiba( "0895t" );
 	}
 	if( ps->fizkep ) {
 		// Fizikai kepernyorol olvasas:
-		#ifdef W_95
-			hiba( "8795t" );
-		#else
-			int xmeret = x2-x1+1;
-			int dfy = y;
-			for( int fy = y1; fy <= y2; fy++ ) {
-				getline8_l( x1, fy, &pd->sormuttomb[dfy++][x], xmeret );
-			}
-			return;
-		#endif
+        hiba( "8795t" );
 	}
 	// Memoria-memoria atvitel!
 	int xmeret = x2-x1+1;

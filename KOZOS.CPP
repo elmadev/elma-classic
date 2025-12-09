@@ -22,8 +22,6 @@ void ficlose( void ) {}
 
 #else
 
-#ifdef W_95
-
 /*struct _finddata_t c_file;
     long hFile;
 
@@ -60,8 +58,6 @@ void ficlose( void ) {}
 
 static long Fihandler = -1;
 
-// WINDOWS-os
-
 int fifirst( char* minta, char* filenev ) {
 	if( Fiben || Fihandler != -1L )
 		hiba( "fifirst" );
@@ -88,8 +84,6 @@ int fifirst( char* minta, char* filenev ) {
 	// Tul hosszu volt nev, tehat nezzuk tovabb:
 	return finext( filenev );
 }
-
-// WINDOWS-os
 
 int finext( char* filenev ) {
 	if( !Fiben || Fihandler == -1L )
@@ -120,8 +114,6 @@ int finext( char* filenev ) {
 	}
 }
 
-// WINDOWS-os
-
 void ficlose( void ) {
 	if( !Fiben )
 		hiba( "908uy6" );
@@ -132,54 +124,6 @@ void ficlose( void ) {
 	}
 }
 
-#else
-
-// DOS-os
-
-static find_t Ffblk;
-
-int fifirst( char* minta, char* filenev ) {
-	if( Fiben )
-		hiba( "fifirst" );
-	Fiben = 1;
-	int done = _dos_findfirst( minta, _A_NORMAL, &Ffblk );
-
-	filenev[0] = 0;
-	if( !done ) {
-		if( strlen( Ffblk.name ) > 12 )
-			hiba( "89tt38ju" );
-		strcpy( filenev, Ffblk.name );
-	}
-
-	return done;
-}
-
-// DOS-os
-
-int finext( char* filenev ) {
-	if( !Fiben )
-		hiba( "8794t" );
-	int done = _dos_findnext( &Ffblk );
-
-	filenev[0] = 0;
-	if( !done ) {
-		if( strlen( Ffblk.name ) > 12 )
-			hiba( "89tt38ju" );
-		strcpy( filenev, Ffblk.name );
-	}
-
-	return done;
-}
-
-// DOS-os
-
-void ficlose( void ) {
-	if( !Fiben )
-		hiba( "908uy6" );
-	Fiben = 0;
-}
-
-#endif
 #endif
 
 #ifndef _WIN32

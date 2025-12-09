@@ -1,28 +1,6 @@
 #include "all.h"
 
-#ifdef W_95
-// W_DI.CPP-ben van definialva:
 char* kodtobillnev( int billkod );
-#else
-static char* kodtobillnev( int billkod ) {
-	static char egybetu[] = "A";
-	if( billkod >= 'a' && billkod <= 'z' ) {
-		egybetu[0] = (char)billkod;
-		return egybetu;
-	}
-	switch( billkod ) {
-		case MK_UP: 		return "Up";
-		case MK_DOWN: 		return "Down";
-		case MK_LEFT: 		return "Left";
-		case MK_RIGHT: 		return "Right";
-		case MK_PGUP:       return "PageUp";
-		case MK_PGDOWN:     return "PageDown";
-		case MK_BACKSPACE:  return "Backspace";
-
-		default: return NULL;
-	}
-}
-#endif
 
 typedef int* billmuttomb[MAXRUBRIKASZAM_TAB+1];
 
@@ -76,11 +54,7 @@ static void gombotvalaszt( int rubrikaszam, billmuttomb bmuttomb, int sorszam ) 
 			if( mk_getstate( MK_ESC ) )
 				return;
 
-			#ifdef W_95
-				if( i == 28 || i == MK_ESC )
-			#else
-				if( i == MK_ENTER || i == MK_ESC )
-			#endif
+			if( i == 28 || i == MK_ESC )
 				continue;
 
 			if( !mk_getstate( i ) )

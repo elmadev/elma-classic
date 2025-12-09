@@ -13,8 +13,6 @@
 // Ez Win95-os verzio h file-ja, csak ennek egy szinten kell
 // lennie tobbi forras file-lal.
 
-#define W_95
-
 //#include	<i86.h>
 
 //#include	<graph.h>

@@ -11,8 +11,6 @@
 #include <string.h>
 #include <math.h>
 
-#define W_95
-
 #define   DIRECTDRAW_VERSION 0x0300
 
 

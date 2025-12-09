@@ -7,8 +7,6 @@ static pic8 *Kisnevsima = NULL, *Kisnevgolyo = NULL;
 abc8* Pmenuabc = NULL;
 anim* Psisak = NULL;
 
-static pic8 *Vegetile1 = NULL, *Vegetile2 = NULL;
-
 ddpal* Pmenupal = NULL;
 unsigned char Menupaltomb[768];
 
@@ -40,9 +38,6 @@ void initmenukep1( void ) {
 	delete sisaktmp; sisaktmp = NULL;
 	Psisak->korrigal();
 
-	Vegetile1 = new pic8( "ures1b.pcx" );
-	Vegetile2 = new pic8( "ures2b.pcx" );
-
 	initgolyo();
 }
 
@@ -51,15 +46,6 @@ void initmenukep2( void ) {
 		hiba( "initmenukep2-ben Pmenupal!" );
 	pcxtopal( "intro.pcx", &Pmenupal ); // O new-ik egy ddpal-t
 	pcxtopal( "intro.pcx", Menupaltomb );
-}
-
-void tilevaltas( void ) {
-	for( int y = 0; y < Kisnevsima->getysize(); y += Vegetile1->getysize() ) {
-		for( int x = 0; x < Kisnevsima->getxsize(); x += Vegetile1->getxsize() ) {
-			blt8( Kisnevsima, Vegetile1, x, y );
-			blt8( Kisnevgolyo, Vegetile2, x, y );
-		}
-	}
 }
 
 szoveglista::szoveglista( void ) {

@@ -42,11 +42,6 @@ void cheatplayer( void ) {
 	}
 } */
 
-static pic8* Vegekep1 = NULL;
-static pic8* Vegekep2 = NULL;
-static pic8* Vegekep3 = NULL;
-static pic8* Vegekep4 = NULL;
-
 static void mergestatedat( void );
 
 void teljes( void ) {
@@ -199,7 +194,7 @@ void kilep( void ) {
 
 	double kezdoido = mv_stopperido();
 	while( 1 ) {
-		pszovlist->kirajzol( 0, Vegekep1, Vegekep2, Vegekep3, Vegekep4 );
+		pszovlist->kirajzol();
 		double idovaras = 50.0;
 		if( (mv_stopperido() > (kezdoido + idovaras)) && mk_kbhit() ) {
 			int c = mk_getextchar();

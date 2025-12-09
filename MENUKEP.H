@@ -40,9 +40,6 @@ public:
 	int  kirajzolanim( double ido );
 };
 
-// Letorli Elasto Mania feliratot hatterkeprol:
-void tilevaltas( void );
-
 // Teljes olvassa be es elso kiirloading szabaditja fel:
 extern pic8* Pintro;
 

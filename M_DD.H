@@ -16,7 +16,7 @@ class ddpal {
 // Ha igaz, alulrol indul y (kirajz320 allitja igazba):
 extern int Locky0_alul;
 
-unsigned char** lockbackbuffer(int fizikai);
+unsigned char** lockbackbuffer();
 void unlockbackbuffer(void); // Ki is teszi
 
 unsigned char** lockfrontbuffer(void);

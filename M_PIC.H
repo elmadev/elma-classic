@@ -1,6 +1,6 @@
 
 
-pic8* lockbackbuffer_pic(int fizikai);
+pic8* lockbackbuffer_pic(void);
 void unlockbackbuffer_pic(void);
 
 void lockfrontbuffer_pic(void);

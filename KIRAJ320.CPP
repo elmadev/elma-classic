@@ -738,7 +738,7 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
     }
 
     Locky0_alul = 1;
-    pic8* npic = lockbackbuffer_pic(0);
+    pic8* npic = lockbackbuffer_pic();
     Locky0_alul = 0;
 
     if (!Bpic) {

@@ -50,7 +50,7 @@ int sdl_init() {
 static unsigned char* Mutbuffer[480];
 static int Bufflocked = 0;
 
-unsigned char** lockbackbuffer(int unused) {
+unsigned char** lockbackbuffer() {
     if (Bufflocked) {
         hiba("lockbackbuffer-ben Bufflocked!");
     }
@@ -89,7 +89,7 @@ unsigned char** lockfrontbuffer(void) {
         hiba("lockfrontbuffer-ben Bufflocked!");
     }
 
-    return lockbackbuffer(0);
+    return lockbackbuffer();
 }
 
 void unlockfrontbuffer(void) {

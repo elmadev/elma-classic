@@ -8,7 +8,7 @@ static int Backpiclocked = 0, Frontpiclocked = 0;
 
 static pic8* Pmindigfpic = NULL;
 
-pic8* lockbackbuffer_pic(int fizikai) {
+pic8* lockbackbuffer_pic() {
     if (Backpiclocked || Frontpiclocked) {
         hiba("lbb_p lock!");
     }
@@ -22,7 +22,7 @@ pic8* lockbackbuffer_pic(int fizikai) {
     }
 
     if (Waitforretrace) {
-        Lockbuff->sormuttomb = lockbackbuffer(fizikai);
+        Lockbuff->sormuttomb = lockbackbuffer();
         return Lockbuff;
     } else {
         if (!Pmindigfpic) {

@@ -1,5 +1,7 @@
 #include "all.h"
 #include <assert.h>
+#include <filesystem>
+#include <regex>
 #ifndef _WIN32
 #include <string>
 #endif
@@ -13,93 +15,71 @@ void k_memcpy(void* dest, const void* src, size_t n) {
     memcpy(dest, src, n);
 }
 
-static int Fiben = 0;
+static std::filesystem::directory_iterator current_iterator;
+static std::filesystem::directory_iterator end_iterator;
+static std::regex current_pattern;
+static bool find_in_progress = false;
 
-#ifndef _WIN32
-int fifirst(char* minta, char* filenev) { return 1; }
-int finext(char* filenev) { return 1; }
-void ficlose(void) {}
-
-#else
-
-static long Fihandler = -1;
-
-int fifirst(char* minta, char* filenev) {
-    if (Fiben || Fihandler != -1L) {
+int fifirst(char* m, char* filenev) {
+    if (find_in_progress) {
         hiba("fifirst");
     }
-    Fiben = 1;
 
-    filenev[0];
-    struct _finddata_t c_file;
-    Fihandler = _findfirst(minta, &c_file);
-    if (Fihandler == -1) {
+    // Extract directory and filename pattern
+    std::string pattern(m);
+    size_t slash_pos = pattern.find_last_of('/');
+    std::string directory = (slash_pos != std::string::npos) ? pattern.substr(0, slash_pos) : ".";
+    std::string file_pattern =
+        (slash_pos != std::string::npos) ? pattern.substr(slash_pos + 1) : pattern;
+
+    // Convert glob pattern to regex
+    file_pattern = std::regex_replace(file_pattern, std::regex("\\."), "\\.");
+    file_pattern = std::regex_replace(file_pattern, std::regex("\\*"), ".*");
+    current_pattern = std::regex(file_pattern, std::regex_constants::icase);
+
+    try {
+        current_iterator = std::filesystem::directory_iterator(directory);
+        find_in_progress = true;
+        return finext(filenev);
+    } catch (const std::filesystem::filesystem_error&) {
         return 1;
     }
-
-    // Megvizsgaljuk nem tul hosszu-e nev:
-    if (strlen(c_file.name) <= 12) {
-        char tmpnev[20];
-        strcpy(tmpnev, c_file.name);
-        // Levagjuk vegerol kiterjesztest:
-        if (strstr(tmpnev, ".")) {
-            *strstr(tmpnev, ".") = 0;
-        }
-        if (strlen(tmpnev) <= 8) {
-            strcpy(filenev, c_file.name);
-            return 0;
-        }
-    }
-    // Tul hosszu volt nev, tehat nezzuk tovabb:
-    return finext(filenev);
 }
 
 int finext(char* filenev) {
-    if (!Fiben || Fihandler == -1L) {
+    if (!find_in_progress) {
         hiba("8794t");
     }
 
     filenev[0] = 0;
 
-    while (1) {
-        struct _finddata_t c_file;
-        if (_findnext(Fihandler, &c_file) != 0) {
-            return 1;
+    while (current_iterator != end_iterator) {
+        const auto& entry = *current_iterator;
+
+        if (entry.is_regular_file()) {
+            std::string filename = entry.path().filename().string();
+
+            if (std::regex_match(filename, current_pattern)) {
+                strncpy(filenev, filename.c_str(), filename.length());
+                filenev[filename.length()] = 0;
+                ++current_iterator;
+                return 0;
+            }
         }
 
-        // Megvizsgaljuk nem tul hosszu-e nev:
-        if (strlen(c_file.name) > 12) {
-            continue; // Tul hosszu nev
-        }
-
-        char tmpnev[20];
-        strcpy(tmpnev, c_file.name);
-        // Levagjuk vegerol kiterjesztest:
-        if (strstr(tmpnev, ".")) {
-            *strstr(tmpnev, ".") = 0;
-        }
-        if (strlen(tmpnev) > 8) {
-            continue; // Tul hosszu nev
-        }
-
-        // Nev rendben van:
-        strcpy(filenev, c_file.name);
-        return 0;
+        ++current_iterator;
     }
+
+    return 1;
 }
 
-void ficlose(void) {
-    if (!Fiben) {
+void ficlose() {
+    if (!find_in_progress) {
         hiba("908uy6");
     }
-    Fiben = 0;
-    if (Fihandler != -1L) {
-        _findclose(Fihandler);
-        Fihandler = -1L;
-    }
+    find_in_progress = false;
+    current_iterator = end_iterator;
 }
-
-#endif
 
 #ifndef _WIN32
 void itoa(int value, char* str, int base) {

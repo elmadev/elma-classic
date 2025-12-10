@@ -6,7 +6,6 @@ class palyaleiro;
 class recorder;
 
 class ddpal {
-    friend void lassufizre(pic8* ppic, ddpal* ppal);
     SDL_Color pal[256];
 
   public:

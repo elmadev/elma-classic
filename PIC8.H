@@ -81,5 +81,3 @@ int pcxtopal(char* nev, ddpal** ppddpal);
 
 void mintavetel8(pic8* pdest, pic8* psour, int x1, int y1, int x2, int y2);
 void mintavetel8(pic8* pdest, pic8* psour);
-
-// void lassufizre( pic8* ppic, ddpal* ppal );

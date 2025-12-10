@@ -984,20 +984,6 @@ void mintavetel8(pic8* pdest, pic8* psour) {
     mintavetel8(pdest, psour, 0, 0, pdest->getxsize() - 1, pdest->getysize() - 1);
 }
 
-// Kirakja fizikaira lock es unlockkal (Ez most mindenkeppen 320x200-ba valt):
-/*void lassufizre( pic8* ppic, ddpal* ppal ) {
-    if( ppic->getxsize() != 320 || ppic->getysize() != 200 )
-        hiba( "lassufizre-ben ppic->getxsize != 320 || ppic->getysize != 200!" );
-
-    unsigned char** ppc = lockbackbuffer();
-    for( int y = 0; y < 200; y++ )
-        memcpy( ppc[y+120]+160, ppic->getptr( 199-y ), 320 );
-
-    unlockbackbuffer();
-    if( ppal )
-        ppal->set();
-} */
-
 // Egyenlore csak vizszintes es fuggoleges vonalak:
 void pic8::line(int x1, int y1, int x2, int y2, unsigned char szin) {
     // Sorrend:

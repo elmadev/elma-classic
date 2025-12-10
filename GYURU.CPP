@@ -385,7 +385,6 @@ static double balszog(vekt2* pa, vekt2 b, vekt2 c) {
         if (szog < 0.0000002) {
             // Szog tul hegyes, egyik pontjat arrebb rakjuk:
             static const double egytav = 0.0002;
-            double tav = egytav + egytav * s_random(1000) / 1000.0;
             vekt2 meroleges = *pa - b;
             meroleges = forgatas90fokkal(meroleges);
             meroleges.normal();

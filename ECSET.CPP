@@ -352,7 +352,6 @@ void ecset::textura2mutato(void) {
             hiba("9865fd");
         }
         while (fut) {
-            mdarab* kov = fut->pkov;
             int hozzaad = fut->xsize;
 
             int kepindex = (pixelek_t)fut->pixelek;
@@ -756,7 +755,6 @@ void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
     int x1 = (psp->r.x - origo.x) * Arany;
     int y1 = (-psp->r.y - origo.y) * Arany;
 
-    textura* pt = &Plgr->texturak[index_t];
     maszk* pm = &Plgr->maszkok[index_m];
 
     int tavolsag = psp->tavolsag;
@@ -1771,7 +1769,6 @@ void ecset::kitesz(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int 
     // int eglassitas = 100;
     int eglassitas = 2;
     int egdx = (Xe1 / eglassitas) % Plgr->egxmodulus;
-    int egdy = ye1 / eglassitas;
 
     // egetkeszit( Plgr->peg, Xe1, egdx, Plgr->egxmodulus );
 

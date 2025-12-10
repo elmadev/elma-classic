@@ -41,7 +41,6 @@ szakaszok::szakaszok(topol* ptop) {
         if (pgy->koveto) {
             continue;
         }
-        int elsopontszama = szam;
         for (int j = 0; j < pgy->pontszam; j++) {
             if (szam >= Szakaszmaxszam) {
                 hiba("szakaszok::szakaszok-ban z >= Szakaszmaxszam!");

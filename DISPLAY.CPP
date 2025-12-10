@@ -252,11 +252,8 @@ void vonalrajz(vekt2 p1, vekt2 p2, int szaggatott) {
         double m = (x2 - x1) / (y2 - y1);
         double x0 = x1 - m * y1;
 
-        int ykezd = y1 + 0.5;
         int yveg = y2 + 0.5;
-        if (forditott) {
-            ykezd++;
-        } else {
+        if (!forditott) {
             yveg--;
         }
         for (int y = y1 + 0.5; y <= yveg; y++) {

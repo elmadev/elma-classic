@@ -255,26 +255,13 @@ void replay(void) {
                 continue;
             }
             if (access_topol(Prec1->palyanev) != 0) {
-                int c = dialog320("Cannot find the lev file that corresponds",
-                                  "to the record file!", tmp, Prec1->palyanev);
-                // if( c == MK_ESC )
-                //	return;
+                dialog320("Cannot find the lev file that corresponds", "to the record file!", tmp,
+                          Prec1->palyanev);
             } else {
                 floadlevel_p(Prec1->palyanev);
                 if (Ptop->belyeg != belyeg) {
-
-                    ////////////
-                    /*char tmp1[10];
-                    sprintf( tmp1, "%d", belyeg );
-                    char tmp2[10];
-                    sprintf( tmp2, "%d", Ptop->belyeg );*/
-
-                    int c = dialog320("The level file has changed since the",
-                                      "saving of the record file!", tmp, Prec1->palyanev);
-                    // tmp1, tmp2 );
-                    // if( c == MK_ESC )
-                    //	return;
-
+                    dialog320("The level file has changed since the", "saving of the record file!",
+                              tmp, Prec1->palyanev);
                 } else {
                     replayjelenlegi(Prec1->palyanev);
                 }
@@ -289,15 +276,12 @@ static void demo(void) {
     char demonevek[14][14] = {"demor1.rec", "demor2.rec", "demor3.rec"};
 
     int elozodemo = -1;
-    int elozoelotti = -1;
 
     while (1) {
-        elozoelotti++;
         int demo = veletlen() % demoszam;
         while (demo == elozodemo) {
             demo = rand() % demoszam;
         }
-        elozoelotti = elozodemo;
         elozodemo = demo;
 
         kiirloading();

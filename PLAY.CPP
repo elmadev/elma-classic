@@ -774,7 +774,6 @@ static void playlevel(int level) {
         kiirloading();
         floadlevel_p(tmpnev);
 
-        int parreplay = 0;
         Prec1->erase(tmpnev);
         Prec2->erase(tmpnev);
         long ido = lejatszo(tmpnev);

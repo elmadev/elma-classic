@@ -55,7 +55,7 @@ static void kitoltgolyokat(void) {
 void initgolyo(void) {
     kitoltgolyokat();
 
-    int sikerultlefoglalni, i, j;
+    int sikerultlefoglalni;
     Legkozelebbiutkozesideje = -2;
     Pillanatnyiido = 0;
     if (Konstrualva) {

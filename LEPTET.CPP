@@ -144,8 +144,6 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
         szogigazit(&pmot->kor4.alfa);
     }
 
-    int crcido = most * 1000;
-
     vekt2 Fkerek2;
     vekt2 Ftest2;
     double Mtest2;

@@ -46,8 +46,6 @@ double ggutkozesideje(golyo* m1, golyo* m2) {
 }
 
 void ggutkozes(golyo* g1, golyo* g2, double t) {
-    double ero = abs(g1->v - g2->v);
-
     idoreigazit(g1, t);
     idoreigazit(g2, t);
     // Kiszamolja tomegkozeppont sebesseg vektorat (v):
@@ -92,8 +90,6 @@ void ggutkozes(golyo* g1, golyo* g2, double t) {
     vekt2 tangens = forgatas90fokkal(dr);
     double v1 = tangens * g1->v;
     double v2 = tangens * g2->v;
-    double tangenergia = m1 * v1 * v1 + m2 * v2 * v2 + theta1 * g1->omega * g1->omega +
-                         theta2 * g2->omega * g2->omega;
     double omega1 = g1->omega;
     double omega2 = g2->omega;
     double R1 = g1->sug;

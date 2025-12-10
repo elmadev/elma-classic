@@ -10,7 +10,6 @@ class ddpal {
 
   public:
     ddpal(unsigned char* tomb);
-    ~ddpal(void);
     void set(void);
 };
 

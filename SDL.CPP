@@ -109,6 +109,4 @@ ddpal::ddpal(unsigned char* tomb) {
     }
 }
 
-ddpal::~ddpal() {}
-
 void ddpal::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }

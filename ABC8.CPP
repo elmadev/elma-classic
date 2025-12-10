@@ -38,12 +38,12 @@ abc8::abc8(char* nev) {
     }
     char tmp[20];
     if (fread(tmp, 4, 1, h) != 1) {
-        hiba("Nem tudja olvasni abc-t!: ", nev);
+        hiba("Unable to read abc!: ", nev);
         qclose(h);
         return;
     }
     if (strcmp(tmp, "RA1") != 0) {
-        hiba("Nem ervenyes abc file elso negy byte alapjan!: ", nev);
+        hiba("Invalid abc file based on first four bytes!: ", nev);
         qclose(h);
         return;
     }

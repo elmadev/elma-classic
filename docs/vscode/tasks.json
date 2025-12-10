@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "meson: compile",
+            "type": "shell",
+            "command": "meson compile -C build",
+            "problemMatcher": [
+                "$msCompile",
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build the project with Meson",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "meson: clean",
+            "type": "shell",
+            "command": "meson compile -C build --clean",
+            "problemMatcher": [],
+            "detail": "Clean build artifacts"
+        }
+    ]
+}

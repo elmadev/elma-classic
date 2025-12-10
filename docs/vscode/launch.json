@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(macOS) Launch Elma",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/elma",
+            "args": [],
+            "cwd": "${workspaceFolder}/build",
+            "preLaunchTask": "meson: compile"
+        },
+        {
+            "name": "(Windows) Launch Elma",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/elma.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "meson: compile"
+        }
+    ]
+}

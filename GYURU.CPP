@@ -1,10 +1,5 @@
 #include "all.h"
 
-// Ide balszog tesz be akkor pontot, ha talal tul hegyes szoget:
-// Check hivja gyuru->pozitivkorjaras-on keresztul:
-int Vanhegyesszog = 0;
-vekt2 Rhegyesszog;
-
 gyuru::gyuru(void) {
     pontszam = 0;
     lefoglaltmaxpont = 10;

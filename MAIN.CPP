@@ -5,9 +5,7 @@
 
 void semmi(void) {}
 
-int Sajatugras = 0;       // (forditva mint regen) Ha igaz, akkor jo ugras (right-clockwise)
-int Otszoros = 0;         // Ha igaz, mindig otszor rakja ki palyat
-int Dupladuplabuffer = 0; // Ha igaz duplan huzza az idot (Win95)
+int Sajatugras = 0; // (forditva mint regen) Ha igaz, akkor jo ugras (right-clockwise)
 // Ha nem igaz, csak memoriaba ir es nem flip-pel:
 int Waitforretrace = 1; // Csak Windows-os w_v.cpp-ben allitodik
 
@@ -100,14 +98,6 @@ void mv_main(void) {
         for (int i = 0; i < memkell; i++) {
             delete tomb[i];
         }
-    }
-
-    if (access("otszor.inf", 0) == 0) {
-        Otszoros = 1;
-    }
-
-    if (access("ddbuffer.inf", 0) == 0) {
-        Dupladuplabuffer = 1;
     }
 
     // initadatok(); teljesben van mar ujabban

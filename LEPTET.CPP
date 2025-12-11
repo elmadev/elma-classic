@@ -36,8 +36,8 @@ static void erokszamitasa(motorst* pmot, kor* pkor, vekt2 i1, vekt2 j1, double k
         vekt2 rudegys = gumis * (1.0 / rudhossz);
         vekt2 rudegysmer = forgatas90fokkal(rudegys);
 
-        Fsugar = (gumi * rudegys) * Drsugar;
-        Ftang = (gumi * rudegysmer) * Drsugar;
+        Fsugar = (gumi * rudegys) * Dr;
+        Ftang = (gumi * rudegysmer) * Dr;
 
         *pFkerek = Fsugar * rudegys + Ftang * rudegysmer;
 

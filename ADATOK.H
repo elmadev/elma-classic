@@ -6,7 +6,7 @@ extern double Talppontegybeolvadasitav;
 extern double Ugroturelem;
 extern double Vegenvaras;
 
-extern double Drsugar, Drtang, Sr;
+extern double Dr, Sr;
 
 void initadatok(void);
 

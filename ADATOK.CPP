@@ -9,7 +9,7 @@ double Talppontegybeolvadasitav;
 double Ugroturelem;
 double Vegenvaras;
 
-double Drsugar, Drtang, Sr;
+double Dr, Sr;
 
 double Fejsugar;
 
@@ -102,9 +102,8 @@ void initadatok(void) {
     Ugroturelem = 0.4;
     Vegenvaras = 1.0;
 
-    Drsugar = 10000.0; // rudban fuggoleges modulus: F/l [N/m]
-    Drtang = 10000.0;  // rudban vizszintes modulus: F/l [N/m]
-    Sr = 1000.0;       // rudban mozgasi ellenallas: F/v [N*s/m]
+    Dr = 10000.0; // rudban fuggoleges modulus: F/l [N/m]
+    Sr = 1000.0;  // rudban mozgasi ellenallas: F/v [N*s/m]
 
     Fejsugar = 0.238; // 0.26;
 

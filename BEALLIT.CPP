@@ -319,7 +319,7 @@ void beallitvezeto(motorst* pmot, vekt2 gravitacio, vekt2 i, vekt2 j, double dt)
         rugoerohossz = 0.0000001;
     }
     vekt2 rugoeroegyseg = rugoeroirany * (1.0 / rugoerohossz);
-    double ero = rugoerohossz * Drsugar * 5.0;
+    double ero = rugoerohossz * Dr * 5.0;
     vekt2 Frugo = rugoeroegyseg * ero;
 
     // Surlodasi ero szamitas:

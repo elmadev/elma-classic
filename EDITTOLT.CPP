@@ -2088,7 +2088,7 @@ static void change_level_name(char* nev) {
         Pabc2->write_centered(
             Buffsima, (x2 + x1) / 2, 220,
             "Type in the name of the level and the designer and press ENTER (ESC to cancel)!");
-        int kezdes = 300 - Pabc1->len(nev) / 2;
+        int kezdes = (x2 + x1) / 2 - Pabc1->len(nev) / 2;
         Pabc2->write(Buffsima, kezdes, 250, nev);
         char tmp[LEVELNAMEHOSSZ + 10];
         strcpy(tmp, nev);

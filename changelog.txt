@@ -2,6 +2,7 @@
 * Fix bug causing increased level load time, where foreground grass was accidentally inefficiently calculated
 * Fix buffer overflow bug in internal editor's Save As dialog box
 * Fix bug where internal editor's Save As would sometimes overwrite old files without giving a warning
+* Level description in internal editor is properly centered
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

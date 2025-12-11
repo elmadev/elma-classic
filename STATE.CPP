@@ -135,8 +135,6 @@ state_s::state_s(const char* nev) {
     fclose(h);
 }
 
-void idothuz(int* pi) { *pi++; }
-
 void state_s::reloadidok(void) {
     char* nev = Statenev;
 
@@ -146,13 +144,9 @@ void state_s::reloadidok(void) {
     // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
     FILE* h = fopen(nev, "rb");
     while (!h) {
-        // Var egy kicsit:
-        int a = 0;
-        for (int i = 0; i < 10000; i++) {
-            idothuz(&a);
-        }
-
-        FILE* h = fopen(nev, "rb");
+        dialog320("The state.dat file cannot be opened!",
+                  "Please make sure state.dat is accessible,", "then press enter!");
+        h = fopen(nev, "rb");
     }
 
     int verzio = 0;

@@ -4,6 +4,7 @@
 * Fix bug where internal editor's Save As would sometimes overwrite old files without giving a warning
 * Level description in internal editor is properly centered
 * Fix bug where pictures named "aaccbbdd" could prevent tooltip from properly refreshing in internal editor
+* Show dialog if state.dat is inaccessible when updating top10 in an internal or merging state.dat
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

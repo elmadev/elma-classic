@@ -3,7 +3,6 @@
 extern int Single;
 extern int Tag; // Van-e fogocska
 // extern int Coop;
-// extern int Match;
 
 extern int Legkozment; // kiraj320 ebbol tudja, hogy snapshot-ot keszitsen
 

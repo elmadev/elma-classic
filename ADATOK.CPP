@@ -18,9 +18,6 @@ double Objektumsugar = 0.4;
 // Hajszalnyival kisebb kor.sugarnal, hogy kirajzolasnal ne logjon foldbe:
 double Kerekrajzsugar = 0.395;
 
-// Match-ben fej es kerek tavolsag vizsgalathoz:
-double Fejkerektavnegyzet = 1.0;
-
 double Kord2x, Kord2y, Kord4x, Kord4y,
     Kord5y; // Ez az utolso vezeto helye
 
@@ -110,9 +107,6 @@ void initadatok(void) {
     Sr = 1000.0;       // rudban mozgasi ellenallas: F/v [N*s/m]
 
     Fejsugar = 0.238; // 0.26;
-
-    Fejkerektavnegyzet = Pmot1->kor1.sugar + Pmot1->kor2.sugar;
-    Fejkerektavnegyzet = Fejkerektavnegyzet * Fejkerektavnegyzet;
 
     vekt2 vtmp = Pmot1->kor2.r - Pmot1->kor1.r;
     Kord2x = vtmp.x;

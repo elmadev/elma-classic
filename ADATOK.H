@@ -14,9 +14,6 @@ extern double Fejsugar;
 
 extern double Objektumsugar;
 
-// Match-ben fej es kerek tavolsag vizsgalathoz:
-extern double Fejkerektavnegyzet;
-
 // Hajszalnyival kisebb kor.sugarnal, hogy kirajzolasnal ne logjon foldbe:
 extern double Kerekrajzsugar;
 

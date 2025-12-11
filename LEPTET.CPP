@@ -298,16 +298,6 @@ int vizsgalat(motorst* pmot) {
     return 2;
 }
 
-int elsomegoltemasodikat(motorst* pmot1, motorst* pmot2) {
-    if (absnegyzet(pmot2->fejr - pmot1->kor2.r) < Fejkerektavnegyzet) {
-        return 1;
-    }
-    if (absnegyzet(pmot2->fejr - pmot1->kor4.r) < Fejkerektavnegyzet) {
-        return 1;
-    }
-    return 0;
-}
-
 static double Oszto = 1.0 / 1.0;
 
 static void surlodasverseny(motorst* pmot, vekt2 fgumi_v, vekt2 sebesseg_v) {

@@ -5,7 +5,6 @@ int Single = 1;
 // Van-e fogocska:
 int Tag = 0;
 // int Multi = 0;
-// int Match = 0;
 
 int Legkozment = 0;
 
@@ -904,27 +903,3 @@ long lejatszo_r(char* filenev, int showkepmarad) {
         l++;
     }
 }
-
-/*if( Match ) {
-    if( !meghalt1 )
-        meghalt1 = elsomegoltemasodikat( Pmot2, Pmot1 );
-    if( !meghalt2 )
-        meghalt2 = elsomegoltemasodikat( Pmot1, Pmot2 );
-    if( meghalt1 && meghalt2 )
-        if( int(eddig*100.0) % 2 )
-            meghalt1 = 0;
-        else
-            meghalt2 = 0;
-    if( meghalt1 || meghalt2 ) {
-        if( meghalt1 )
-            dialog320( "ESC", "B jatekos gyozott!" );
-        else
-            dialog320( "ESC", "A jatekos gyozott!" );
-        // Kilep:
-        // Motor hangjat kikapcsolja:
-        Mute = 1;
-        nullazhangot();
-        Ptop->kerekjolalljon();
-        return -1;
-    }
-}*/

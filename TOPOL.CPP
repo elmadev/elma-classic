@@ -1124,9 +1124,9 @@ void topol::loadkulso(const char* filenev) {
 
     if (verzio >= 8) {
         fread(fgnev, 1, 10, h);
-        lgrnev[10] = 0; // Ez csak biztonsagert
+        fgnev[9] = 0; // Ez csak biztonsagert
         fread(bgnev, 1, 10, h);
-        lgrnev[10] = 0; // Ez csak biztonsagert
+        fgnev[9] = 0; // Ez csak biztonsagert
     } else {
         strcpy(fgnev, "ground");
         strcpy(bgnev, "sky");
@@ -1368,9 +1368,9 @@ void topol::loadbelso(const char* filenev) {
 
     if (verzio >= 8) {
         fread(fgnev, 1, 10, h);
-        lgrnev[10] = 0; // Ez csak biztonsagert
+        fgnev[9] = 0; // Ez csak biztonsagert
         fread(bgnev, 1, 10, h);
-        lgrnev[10] = 0; // Ez csak biztonsagert
+        bgnev[9] = 0; // Ez csak biztonsagert
     } else {
         strcpy(fgnev, "ground");
         strcpy(bgnev, "sky");

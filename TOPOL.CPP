@@ -822,12 +822,8 @@ int nevanalizis(const char* nev) {
 
     if (sum <= Palyaszam) {
         return sum;
-    } else {
-        if (sum == 34) { // 33-ra is ra kell keresni
-            return sum;  // Shareware demo eseten
-        }
-        return 0;
     }
+    return 0;
 }
 
 // Ha letezik file, akkor 0-t ad vissza!:
@@ -854,7 +850,7 @@ void beallitlegjobbidot(const char* filenev, int single) {
     if (belsopalyaszam > 0) {
         belsopalyaszam--; // Mivel eggyel nagyobb tomb indexenel
                           // Belso palya:
-        if ((belsopalyaszam != 33) && (belsopalyaszam >= Palyaszam)) {
+        if (belsopalyaszam >= Palyaszam) {
             hiba("67467524");
         }
 

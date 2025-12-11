@@ -13,8 +13,6 @@ enum {
 enum { PLTIP_KEP = 100, PLTIP_TEXT, PLTIP_MINTA, PLTIP_OPTI };
 
 class piclist {
-    int beolvasegysort(FILE* h, int index);
-
   public:
     int kepszam;
     char nevek[(MAXPICLISTKEPSZAM + 10) * 10];
@@ -24,9 +22,7 @@ class piclist {
     int hatarolok[MAXPICLISTKEPSZAM + 10];
     int atlatszosagok[MAXPICLISTKEPSZAM + 10];
 
-    piclist(void);      // PICTURES.LST file-bol olvas
-    piclist(FILE* h);   // Binaris formatumbol
-    void save(FILE* h); // Binaris formatumba
+    piclist(FILE* h); // Binaris formatumbol
 
     int getnevindex(const char* nev); // vagy -1
 };

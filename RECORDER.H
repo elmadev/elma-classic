@@ -59,8 +59,8 @@ class recorder {
     void rewind(void);
     // Ez a ket fuggveny  meg ezt a ket globalis valtozot is
     // beveszi es allitja: Aafogo Kozelvannak:
-    int recall(motorst* pmot, double dt, hanginfo* phinfo);
-    void store(motorst* pmot, double dt, hanginfo* phinfo);
+    int recall(motorst* pmot, double ido, hanginfo* phinfo);
+    void store(motorst* pmot, double ido, hanginfo* phinfo);
 
     void addhang(double t, char wavindex, double hangero, int objszam);
     // Ha van hang, akkor igazzal ter vissza:

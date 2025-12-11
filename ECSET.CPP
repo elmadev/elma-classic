@@ -40,7 +40,7 @@ ecset* Pecsetview = NULL;
 
 static void hibanincsmem(void) {
     uzenet("You do not have enough memory to load this level!",
-           "Try to set the graphich detail to low at the options.");
+           "Try to set the graphic detail to low at the options.");
 }
 
 mdarab* ecset::newmdarab(void) {

@@ -328,7 +328,7 @@ void pic8::vizszegmens_look(int x, int y, int size, unsigned char* lookup) {
 void pic8::fuggszegmens_look(int x, int y, int size, unsigned char* lookup) {
 #ifdef PIC8TEST
     if (x < 0 || y < 0 || x >= xsize || y + size - 1 >= ysize) {
-        hiba("pic8::vizszegmens-ben x, y kilog!");
+        hiba("pic8::fuggszegmens-ben x, y kilog!");
     }
 #endif
     for (int i = 0; i < size; i++) {

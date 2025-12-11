@@ -751,7 +751,7 @@ lgrfile::lgrfile(char* lgrnev) {
     // Most csinalunk egy kis ellenorzest:
 
     if (texturaszam < 2) {
-        uzenet("There must be at lease two textures in LGR file!", lgrnev);
+        uzenet("There must be at least two textures in LGR file!", lgrnev);
     }
 
     // 1. motoros:

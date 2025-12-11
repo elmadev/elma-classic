@@ -1192,7 +1192,7 @@ void topol::loadkulso(char* filenev) {
 
         int spriteszam = spriteolvszam;
         if (spriteszam > MAXSPRITE) {
-            hiba("topol::topol-ban kerekszam > MAXSPRITE!: ");
+            hiba("topol::topol-ban spriteszam > MAXSPRITE!: ");
         }
         if (spriteszam < 0) {
             hiba("topol::topol-ban spriteszam < 0!");
@@ -1432,7 +1432,7 @@ void topol::loadbelso(char* filenev) {
 
         int spriteszam = spriteolvszam;
         if (spriteszam > MAXSPRITE) {
-            hiba("topol::topol-ban kerekszam > MAXSPRITE!: ");
+            hiba("topol::topol-ban spriteszam > MAXSPRITE!: ");
         }
         if (spriteszam < 0) {
             hiba("topol::topol-ban spriteszam < 0!");

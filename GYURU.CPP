@@ -73,7 +73,7 @@ void gyuru::osszrajz(void) {
 // k pont utan beszur egyet ugyanolyan koordokkal
 int gyuru::beszur(int k) {
     if (pontszam + 1 > MAXPONT) {
-        dialog("You cannot add more points to this GYURU!");
+        dialog("You cannot add more points to this polygon!");
         return 0;
     }
     if (k >= pontszam) {

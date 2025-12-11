@@ -129,13 +129,13 @@ static void filebair( float d1, float d2, float d3 ) {
     fclose( h );
 }*/
 
-int recorder::recall(motorst* pmot, double dt, hanginfo* phinfo) {
+int recorder::recall(motorst* pmot, double ido, hanginfo* phinfo) {
     if (betoltve <= 0) {
         hiba("recall-ban betoltve <= 0!");
     }
 
-    int index1 = Recorderszorzo * dt;
-    double suly2 = Recorderszorzo * dt - index1;
+    int index1 = Recorderszorzo * ido;
+    double suly2 = Recorderszorzo * ido - index1;
     if (suly2 < 0.0) {
         suly2 = 0.0;
     }

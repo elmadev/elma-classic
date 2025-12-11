@@ -7,10 +7,8 @@ class wav {
     signed short* tomb;
     unsigned size;
 
-    wav(unsigned sizepar);
     // maxamplitudo 0 es 1 kozott valtozik!:
     wav(const char* nev, double maxamplitudo, int start = -1, int ucsoutani = -1);
-    void save(const char* nev);
     // Manipulalas:
 
     // Elejere tesz egy loopot a vegebol:

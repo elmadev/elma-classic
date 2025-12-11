@@ -10,12 +10,6 @@ void wav::lefoglal(void) {
     }
 }
 
-wav::wav(unsigned sizepar) {
-    tomb = NULL;
-    size = sizepar;
-    lefoglal();
-}
-
 static void nevwavtest(const char* nev) {
     int i = strlen(nev) - 1;
     while (i > 0) {
@@ -140,19 +134,6 @@ wav::wav(const char* nev, double maxamplitudo, int start, int ucsoutani) {
     for (int i = 0; i < size; i++) {
         tomb[i] *= szorzo;
     }
-}
-
-void wav::save(const char* nev) {
-    nevwavtest(nev);
-    // Lemeri file hosszat:
-    FILE* h = fopen(nev, "wb");
-    if (!h) {
-        hiba("Nem tudta megnyitni file-t: ", nev);
-    }
-    if (fwrite(tomb, 1, size * 2, h) != size * 2) {
-        hiba("Nem sikerult irni wav-ot wav::save-ben!");
-    }
-    fclose(h);
 }
 
 // Elejere tesz egy loopot a vegebol, amit aztan le is vag:

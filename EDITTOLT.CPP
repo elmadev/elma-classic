@@ -77,7 +77,7 @@ static void boxbair(pic8* ppic, box abox, unsigned char szin, char* text, int al
             ppic->ppixel(x + hossz + i + 1, (abox.y1 + abox.y2) / 2 + 4, 0);
         }
     } else {
-        Pabc2->writekozep(ppic, (abox.x1 + abox.x2) / 2, (abox.y1 + abox.y2) / 2 + 5, text);
+        Pabc2->write_centered(ppic, (abox.x1 + abox.x2) / 2, (abox.y1 + abox.y2) / 2 + 5, text);
     }
 }
 
@@ -292,8 +292,8 @@ void tolt_open(void) {
             kirajzbox(Buffsima, boxle, Buttonszin, Dialogszelszin);
             boxbarajz(Buffsima, boxle, Dialogszelszin, 0);
             kirajzbox(Buffsima, boxcancel, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                              "CANCEL");
+            Pabc2->write_centered(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
+                                  "CANCEL");
 
             bltfront(Buffsima, x1, y1, x2, y2);
             pop();
@@ -494,10 +494,10 @@ void kivalasztkezdetit(void) {
             kirajzbox(Buffsima, boxle, Buttonszin, Dialogszelszin);
             boxbarajz(Buffsima, boxle, Dialogszelszin, 0);
             kirajzbox(Buffsima, boxcancel, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                              "CANCEL");
+            Pabc2->write_centered(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
+                                  "CANCEL");
             kirajzbox(Buffsima, boxnew, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxnew.x1 + boxnew.x2) / 2, boxnew.y1 + 15, "NEW");
+            Pabc2->write_centered(Buffsima, (boxnew.x1 + boxnew.x2) / 2, boxnew.y1 + 15, "NEW");
 
             bltfront(Buffsima, x1, y1, x2, y2);
             pop();
@@ -560,18 +560,18 @@ int tolt_save_as(int lokkolhato) {
     if (lokkolhato) {
         kirajzbox(Buffsima, boxsavelock, Buttonszin, Dialogszelszin);
     }
-    Pabc2->writekozep(
+    Pabc2->write_centered(
         Buffsima, (boxnagy.x2 + boxnagy.x1) / 2, 220,
         "Type in the file name and press ENTER or click on SAVE, or press ESC to cancel!");
     if (lokkolhato) {
-        Pabc2->writekozep(
+        Pabc2->write_centered(
             Buffsima, (boxnagy.x2 + boxnagy.x1) / 2, 320,
             "If you click on the SAVE LOCKED button, the saved file won't be modifiable anymore. ");
     }
-    Pabc2->writekozep(Buffsima, (boxsave.x2 + boxsave.x1) / 2, boxsave.y1 + 13, "SAVE");
+    Pabc2->write_centered(Buffsima, (boxsave.x2 + boxsave.x1) / 2, boxsave.y1 + 13, "SAVE");
     if (lokkolhato) {
-        Pabc2->writekozep(Buffsima, (boxsavelock.x2 + boxsavelock.x1) / 2, boxsavelock.y1 + 13,
-                          "SAVE LOCKED");
+        Pabc2->write_centered(Buffsima, (boxsavelock.x2 + boxsavelock.x1) / 2, boxsavelock.y1 + 13,
+                              "SAVE LOCKED");
     }
 
     bltfront(Buffsima, boxnagy.x1, boxnagy.y1, boxnagy.x2, boxnagy.y2);
@@ -1182,12 +1182,12 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
             kirajzbox(Buffsima, boxle, Buttonszin, Dialogszelszin);
             boxbarajz(Buffsima, boxle, Dialogszelszin, 0);
             kirajzbox(Buffsima, boxcancel, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                              "CANCEL");
+            Pabc2->write_centered(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
+                                  "CANCEL");
             if (cleares) {
                 kirajzbox(Buffsima, boxclear, Buttonszin, Dialogszelszin);
-                Pabc2->writekozep(Buffsima, (boxclear.x1 + boxclear.x2) / 2, boxclear.y1 + 15,
-                                  "CLEAR");
+                Pabc2->write_centered(Buffsima, (boxclear.x1 + boxclear.x2) / 2, boxclear.y1 + 15,
+                                      "CLEAR");
             }
 
             bltfront(Buffsima);
@@ -1327,14 +1327,14 @@ void tolt_pickasprite(void) {
             // Dialogus nagy teglalapja:
             kirajzbox(Buffsima, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
 
-            Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y1 + 20, "Choose picture");
+            Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y1 + 20, "Choose picture");
 
             // Most jonnek gombok:
             kirajzbox(Buffsima, boxok, Buttonszin, Dialogszelszin);
             kirajzbox(Buffsima, boxcancel, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
-            Pabc2->writekozep(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                              "CANCEL");
+            Pabc2->write_centered(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
+            Pabc2->write_centered(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
+                                  "CANCEL");
 
             // Most jonnek nevek:
             // Picture:
@@ -1532,15 +1532,15 @@ int tolt_picklgrfile(char* lgrnev) {
             kirajzbox(Buffsima, boxle, Buttonszin, Dialogszelszin);
             boxbarajz(Buffsima, boxle, Dialogszelszin, 0);
             kirajzbox(Buffsima, boxcancel, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                              "CANCEL");
+            Pabc2->write_centered(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
+                                  "CANCEL");
 
             // Kiirjuk eredeti file nevet:
             char tttmp[50];
             strcpy(tttmp, lgrnev);
             // strcat( tttmp, ".LGR" );
-            Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y2 - 36, "Original LGR file:");
-            Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y2 - 18, tttmp);
+            Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y2 - 36, "Original LGR file:");
+            Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y2 - 18, tttmp);
 
             bltfront(Buffsima, x1, y1, x2, y2);
             pop();
@@ -1702,16 +1702,16 @@ void setspritetav(sprite* psp) {
             // Most jonnek gombok:
             kirajzbox(Buffsima, boxok, Buttonszin, Dialogszelszin);
             kirajzbox(Buffsima, boxcancel, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
-            Pabc2->writekozep(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                              "CANCEL");
+            Pabc2->write_centered(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
+            Pabc2->write_centered(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
+                                  "CANCEL");
 
-            Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y1 + 15, "Set Picture Properties");
+            Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y1 + 15, "Set Picture Properties");
             if (psp->kepnev[0]) {
-                Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y1 + 45, psp->kepnev);
+                Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y1 + 45, psp->kepnev);
             } else {
-                Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y1 + 34, psp->texturanev);
-                Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y1 + 56, psp->maszknev);
+                Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y1 + 34, psp->texturanev);
+                Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y1 + 56, psp->maszknev);
             }
             Pabc2->write(Buffsima, x1 + 92, y1 + 76, "Distance");
             Pabc2->write(Buffsima, x1 + 172, y1 + 76, "Clipping");
@@ -1742,7 +1742,7 @@ void setspritetav(sprite* psp) {
             } else {
                 sprintf(tmp, "-");
             }
-            Pabc2->writekozep(Buffsima, x1 + 119, y1 + 100, tmp);
+            Pabc2->write_centered(Buffsima, x1 + 119, y1 + 100, tmp);
 
             // Hatarolas:
             strcpy(tmp, "U");
@@ -1755,14 +1755,14 @@ void setspritetav(sprite* psp) {
             if (defhatarol == HATAROL_S) {
                 strcpy(tmp, "S");
             }
-            Pabc2->writekozep(Buffsima, x1 + 198, y1 + 100, tmp);
+            Pabc2->write_centered(Buffsima, x1 + 198, y1 + 100, tmp);
 
             Pabc2->write(Buffsima, x1 + 12, y1 + 130, "Current:");
             // Tavolsag boxba:
             kirajzbox(Buffsima, boxtav, Feherszin, Dialogszelszin);
             sprintf(tmp, "%d", tavolsag);
             boxbair(Buffsima, boxtav, Feherszin, tmp);
-            Pabc2->writekozep(Buffsima, x1 + 119, boxtav.y2 + 14, "(1-999)");
+            Pabc2->write_centered(Buffsima, x1 + 119, boxtav.y2 + 14, "(1-999)");
             // Clipping boxba:
             kirajzbox(Buffsima, boxclipp, Feherszin, Dialogszelszin);
             strcpy(tmp, "U");
@@ -1773,7 +1773,7 @@ void setspritetav(sprite* psp) {
                 strcpy(tmp, "S");
             }
             boxbair(Buffsima, boxclipp, Feherszin, tmp);
-            Pabc2->writekozep(Buffsima, x1 + 198, boxclipp.y2 + 14, "(U, S, G)");
+            Pabc2->write_centered(Buffsima, x1 + 198, boxclipp.y2 + 14, "(U, S, G)");
 
             bltfront(Buffsima, x1, y1, x2, y2);
             pop();
@@ -1863,7 +1863,7 @@ void set_gyuru_attributes(gyuru* pgy) {
             push();
             kirajzbox(Buffsima, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
 
-            Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y1 + 15, "Set Polygon Properties");
+            Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y1 + 15, "Set Polygon Properties");
 
             // Most jonnek gombok:
             // Koveto vagy nem gomb:
@@ -1871,18 +1871,18 @@ void set_gyuru_attributes(gyuru* pgy) {
             Pabc2->write(Buffsima, szovegx1, boxkoveto.y1 + 15, "Grass polygon:");
             kirajzbox(Buffsima, boxkoveto, Feherszin, Dialogszelszin);
             if (koveto) {
-                Pabc2->writekozep(Buffsima, (boxkoveto.x1 + boxkoveto.x2) / 2, boxkoveto.y1 + 15,
-                                  "YES");
+                Pabc2->write_centered(Buffsima, (boxkoveto.x1 + boxkoveto.x2) / 2,
+                                      boxkoveto.y1 + 15, "YES");
             } else {
-                Pabc2->writekozep(Buffsima, (boxkoveto.x1 + boxkoveto.x2) / 2, boxkoveto.y1 + 15,
-                                  "NO");
+                Pabc2->write_centered(Buffsima, (boxkoveto.x1 + boxkoveto.x2) / 2,
+                                      boxkoveto.y1 + 15, "NO");
             }
 
             kirajzbox(Buffsima, boxok, Buttonszin, Dialogszelszin);
             kirajzbox(Buffsima, boxcancel, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
-            Pabc2->writekozep(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                              "CANCEL");
+            Pabc2->write_centered(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
+            Pabc2->write_centered(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
+                                  "CANCEL");
 
             bltfront(Buffsima, x1, y1, x2, y2);
             pop();
@@ -1920,15 +1920,16 @@ void set_kerek_tipus(char* fejlec, int* pkajatipus, int* pfoodsorszam) {
     // Kirajzoljuk, dialogust:
     push();
     kirajzbox(Buffsima, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
-    Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y1 + 20, fejlec);
+    Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y1 + 20, fejlec);
     kirajzbox(Buffsima, boxcancel, Buttonszin, Dialogszelszin);
-    Pabc2->writekozep(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15, "Cancel");
+    Pabc2->write_centered(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15, "Cancel");
     // Anim szam boxa:
     Pabc2->write(Buffsima, boxanimszam.x1 - 162, boxanimszam.y1 + 15, "Food anim number (1-9):");
     char tmp[20];
     sprintf(tmp, "%d", (int)(*pfoodsorszam + 1));
     kirajzbox(Buffsima, boxanimszam, Feherszin, Dialogszelszin);
-    Pabc2->writekozep(Buffsima, (boxanimszam.x1 + boxanimszam.x2) / 2, boxanimszam.y1 + 15, tmp);
+    Pabc2->write_centered(Buffsima, (boxanimszam.x1 + boxanimszam.x2) / 2, boxanimszam.y1 + 15,
+                          tmp);
 
     for (int i = 0; i < listaszam; i++) {
         kirajzbox(Buffsima, boxlista, Openlistaszin, Dialogszelszin);
@@ -1936,19 +1937,19 @@ void set_kerek_tipus(char* fejlec, int* pkajatipus, int* pfoodsorszam) {
         int ly = boxlista.y1 + 15;
         switch (i) {
         case 0:
-            Pabc2->writekozep(Buffsima, lx, ly, "Normal Food");
+            Pabc2->write_centered(Buffsima, lx, ly, "Normal Food");
             break;
         case 1:
-            Pabc2->writekozep(Buffsima, lx, ly, "Gravity Up");
+            Pabc2->write_centered(Buffsima, lx, ly, "Gravity Up");
             break;
         case 2:
-            Pabc2->writekozep(Buffsima, lx, ly, "Gravity Down");
+            Pabc2->write_centered(Buffsima, lx, ly, "Gravity Down");
             break;
         case 3:
-            Pabc2->writekozep(Buffsima, lx, ly, "Gravity Left");
+            Pabc2->write_centered(Buffsima, lx, ly, "Gravity Left");
             break;
         case 4:
-            Pabc2->writekozep(Buffsima, lx, ly, "Gravity Right");
+            Pabc2->write_centered(Buffsima, lx, ly, "Gravity Right");
             break;
         default:
             hiba("yuiwegfyjkweg");
@@ -1995,8 +1996,8 @@ void set_kerek_tipus(char* fejlec, int* pkajatipus, int* pfoodsorszam) {
                 // Berajzolunk egy vizszintes kurzort:
                 push(); // Leveszi egeret
                 kirajzbox(Buffsima, boxanimszam, Feherszin, Dialogszelszin);
-                Pabc2->writekozep(Buffsima, (boxanimszam.x1 + boxanimszam.x2) / 2,
-                                  boxanimszam.y1 + 18, "-");
+                Pabc2->write_centered(Buffsima, (boxanimszam.x1 + boxanimszam.x2) / 2,
+                                      boxanimszam.y1 + 18, "-");
                 bltfront(Buffsima, x1, y1, x2, y2);
 
                 mk_emptychar();
@@ -2078,7 +2079,7 @@ static void change_level_name(char* nev) {
         Buffsima->line(x1, y2, x2, y2, Save_as_szelszin);
         Buffsima->line(x1, y1, x1, y2, Save_as_szelszin);
         Buffsima->line(x2, y1, x2, y2, Save_as_szelszin);
-        Pabc2->writekozep(
+        Pabc2->write_centered(
             Buffsima, (x2 + x1) / 2, 220,
             "Type in the name of the level and the designer and press ENTER (ESC to cancel)!");
         int kezdes = 300 - Pabc1->len(nev) / 2;
@@ -2331,16 +2332,16 @@ void change_level_properties(void) {
             // Kirajzoljuk, mivel valtozott kep:
             kirajzbox(Buffsima, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
 
-            Pabc2->writekozep(Buffsima, (x1 + x2) / 2, y1 + 22, "Level properties");
+            Pabc2->write_centered(Buffsima, (x1 + x2) / 2, y1 + 22, "Level properties");
 
             // Most jonnek gombok:
             // OK:
             kirajzbox(Buffsima, boxok, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
+            Pabc2->write_centered(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
             // CANCEL:
             kirajzbox(Buffsima, boxcancel, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                              "CANCEL");
+            Pabc2->write_centered(Buffsima, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
+                                  "CANCEL");
 
             // Foreground sor:
             int szovegx = x1 + 10;
@@ -2442,7 +2443,7 @@ void setviewoptions(void) {
             // Most jonnek gombok:
             // OK:
             kirajzbox(Buffsima, boxok, Buttonszin, Dialogszelszin);
-            Pabc2->writekozep(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
+            Pabc2->write_centered(Buffsima, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
 
             Pabc2->write(Buffsima, szovx, boxpoligon.y1 + 15, "View Polygons");
             kirajzbox(Buffsima, boxpoligon, Feherszin, Dialogszelszin);

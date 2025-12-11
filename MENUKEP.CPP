@@ -31,7 +31,7 @@ void initmenukep1(void) {
     Kisnevsima = new pic8("szoveg1.pcx");  // retusal( Kisnevsima );
     Kisnevgolyo = new pic8("szoveg2.pcx"); // retusal( Kisnevgolyo );
     Pmenuabc = new abc8("menu.abc");
-    Pmenuabc->settav(2);
+    Pmenuabc->set_spacing(2);
 
     pic8* sisaktmp = new pic8("sisak.pcx");
     forditkepet(sisaktmp);
@@ -529,7 +529,7 @@ void grafikushiba(char* text1, char* text2, char* text3) {
     // Rairjuk szovegeket:
     for (int i = 0; i < sorszam; i++) {
         int y = 240 - 20 - sorszam * (40 / 2) + i * 40;
-        Pmenuabc->writekozep(Buffsima, 320, y, Hibasortomb[i]);
+        Pmenuabc->write_centered(Buffsima, 320, y, Hibasortomb[i]);
     }
     // Kirakjuk:
     bltfront(Buffsima);

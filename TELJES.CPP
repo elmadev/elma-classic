@@ -103,9 +103,9 @@ void teljes(void) {
 
     // Egy par beolvasas:
     Pabc1 = new abc8("kisbetu1.abc");
-    Pabc1->settav(1);
+    Pabc1->set_spacing(1);
     Pabc2 = new abc8("kisbetu2.abc");
-    Pabc2->settav(1);
+    Pabc2->set_spacing(1);
 
     // void menuproba( void );
     // menuproba();

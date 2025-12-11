@@ -6,15 +6,11 @@ motorst *Pmot1 = &Motorst1, *Pmot2 = &Motorst2;
 double Elszakadasisebhat, Belsosav, G;
 double Talppontegybeolvadasitav;
 
-double Ugrassebesseg1, Ugrassebesseg2;
 double Ugroturelem;
 double Vegenvaras;
 
-double Magassag = 2, Szelesseg = 0.1;
-
 double Drsugar, Drtang, Sr;
 
-vekt2 P_alap1, P_alap2, P_alap3, P_alap4, P_alap6;
 double Fejsugar;
 
 double Objektumsugar = 0.4;
@@ -22,12 +18,9 @@ double Objektumsugar = 0.4;
 // Hajszalnyival kisebb kor.sugarnal, hogy kirajzolasnal ne logjon foldbe:
 double Kerekrajzsugar = 0.395;
 
-double Ketmaxsugar, Spritemaxsugar;
-
 // Match-ben fej es kerek tavolsag vizsgalathoz:
 double Fejkerektavnegyzet = 1.0;
 
-double Fekegyutthato;
 double Kord2x, Kord2y, Kord4x, Kord4y,
     Kord5y; // Ez az utolso vezeto helye
 
@@ -102,16 +95,12 @@ void initadatok(void) {
     // Viewzoom = 0.28*Arany*0.5;
     Viewzoom = 0.42 * Arany * 0.5;
 
-    Fekegyutthato = 100.0;
-
     Elszakadasisebhat = 0.01;
     Belsosav = 0.005; // uj
     // Belsosav = 0.02; // regi
     G = 10.0; // nehezsegi gyorsulas: a [m/s^2]
     Talppontegybeolvadasitav = 0.1;
 
-    Ugrassebesseg1 = 5;
-    Ugrassebesseg2 = 5;
     // Ugroturelem = 0.2;
     Ugroturelem = 0.4;
     Vegenvaras = 1.0;
@@ -120,16 +109,8 @@ void initadatok(void) {
     Drtang = 10000.0;  // rudban vizszintes modulus: F/l [N/m]
     Sr = 1000.0;       // rudban mozgasi ellenallas: F/v [N*s/m]
 
-    // MCGA kirajzolasos:
-    P_alap1 = vekt2(0.2, 0.05);
-    P_alap2 = vekt2(-0.6, -0.04);
-    P_alap3 = vekt2(-0.05, 0.4);
-    P_alap4 = vekt2(-0.3, -0.5);
-    P_alap6 = vekt2(0.0, 0.6);
     Fejsugar = 0.238; // 0.26;
 
-    Spritemaxsugar = 0.5;
-    Ketmaxsugar = Spritemaxsugar + Pmot1->kor4.sugar;
     Fejkerektavnegyzet = Pmot1->kor1.sugar + Pmot1->kor2.sugar;
     Fejkerektavnegyzet = Fejkerektavnegyzet * Fejkerektavnegyzet;
 

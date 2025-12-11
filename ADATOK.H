@@ -3,7 +3,6 @@
 extern double Elszakadasisebhat, Belsosav, G;
 extern double Talppontegybeolvadasitav;
 
-extern double Ugrassebesseg1, Ugrassebesseg2;
 extern double Ugroturelem;
 extern double Vegenvaras;
 
@@ -11,15 +10,9 @@ extern double Drsugar, Drtang, Sr;
 
 void initadatok(void);
 
-extern double Magassag, Szelesseg;
-
-extern vekt2 P_alap1, P_alap2, P_alap3, P_alap4, P_alap6;
 extern double Fejsugar;
 
 extern double Objektumsugar;
-
-extern double Spritemaxsugar; // Targykereseshez!
-extern double Ketmaxsugar;    // Targykereseshez!
 
 // Match-ben fej es kerek tavolsag vizsgalathoz:
 extern double Fejkerektavnegyzet;
@@ -33,8 +26,6 @@ extern double Arany, Aranyrec;
 
 extern double Kord2x, Kord2y, Kord4x, Kord4y,
     Kord5y; // Ez az utolso vezeto helye
-
-extern double Fekegyutthato;
 
 #define OBJEKTUMSUGAR_I (20)
 

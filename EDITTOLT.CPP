@@ -709,7 +709,10 @@ int tolt_save_as(int lokkolhato) {
                 // Most mentunk:
                 // Eloallitjuk nevet:
                 strcat(nev, ".lev");
-                if (access(nev, 0) == 0) {
+                char tmpnev[40];
+                strcpy(tmpnev, "lev/");
+                strcat(tmpnev, nev);
+                if (access(tmpnev, 0) == 0) {
                     if (dialog("File exists, overwrite?", nev, "GOMBOK", "Yes", "No") == 1) {
                         return 0;
                     }
@@ -746,7 +749,10 @@ int tolt_save_as(int lokkolhato) {
                         "GOMBOK", "Yes", "No") == 1) {
                     return 0;
                 }
-                if (access(nev, 0) == 0) {
+                char tmpnev[40];
+                strcpy(tmpnev, "lev/");
+                strcat(tmpnev, nev);
+                if (access(tmpnev, 0) == 0) {
                     if (dialog("File exists, overwrite?", nev, "GOMBOK", "Yes", "No") == 1) {
                         return 0;
                     }

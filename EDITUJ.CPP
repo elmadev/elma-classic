@@ -362,7 +362,7 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
 
 void kikereknev(int tipus, int kajatipus, int foodsorszam) {
     // Belevaltoztatunk kispritenev() valtozojaba, hogy majd toroljon:
-    strcpy(Kepnevkint, "aaccbbdd");
+    strcpy(Kepnevkint, "aaccbbdde");
 
     if (!Pspritenevbuffer) {
         Pspritenevbuffer = new pic8(400, 17);

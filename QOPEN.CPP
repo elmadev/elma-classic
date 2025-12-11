@@ -6,7 +6,9 @@ static char Nagyfilenev[] = "elma.res";
 
 struct fileleiro {
     char nev[16];
-    long hossz, kezdet; // In Shareware the order of these two vars is inversed
+    // In Shareware the order of these two fields is reversed.
+    int hossz;
+    int kezdet;
 };
 
 static fileleiro* Leirotomb = NULL;

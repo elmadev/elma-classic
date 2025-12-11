@@ -470,7 +470,7 @@ void grafikushiba(char* text1, char* text2, char* text3) {
 
     int sorszam = 0;
     for (int i = 0; i < 3; i++) {
-        char* text = text1;
+        const char* text = text1;
         if (i == 1) {
             text = text2;
         }
@@ -502,18 +502,12 @@ void grafikushiba(char* text1, char* text2, char* text3) {
             }
             if (j <= 0) {
                 // Nem talalt szovegben space-t:
-                char c = text[MAXHIBASORHOSSZ];
-                text[MAXHIBASORHOSSZ] = 0;
-                strcpy(Hibasortomb[sorszam], text);
+                strncpy(Hibasortomb[sorszam], text, MAXHIBASORHOSSZ);
                 sorszam++;
-                text[MAXHIBASORHOSSZ] = c;
                 text += MAXHIBASORHOSSZ;
             } else {
-                char c = text[j];
-                text[j] = 0;
-                strcpy(Hibasortomb[sorszam], text);
+                strncpy(Hibasortomb[sorszam], text, j);
                 sorszam++;
-                text[j] = c;
                 text += j;
                 while (text[j] == ' ') {
                     text++;

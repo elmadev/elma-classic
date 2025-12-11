@@ -578,7 +578,7 @@ int tolt_save_as(int lokkolhato) {
     pop();
 
     mk_emptychar();
-    char nev[10] = "";
+    char nev[20] = "";
     int i = 0;
     int egerballevoltnyomva = 0;
     int egerjobblevoltnyomva = 0;
@@ -641,7 +641,7 @@ int tolt_save_as(int lokkolhato) {
                 // Torles:
                 int ikesebbnulla = 0;
                 if (i <= 0) {
-                    ikesebbnulla = 0;
+                    ikesebbnulla = 1;
                 }
                 if ((nev[0] == 0) || ikesebbnulla) {
                     continue;
@@ -711,7 +711,7 @@ int tolt_save_as(int lokkolhato) {
                 strcat(nev, ".lev");
                 if (access(nev, 0) == 0) {
                     if (dialog("File exists, overwrite?", nev, "GOMBOK", "Yes", "No") == 1) {
-                        continue;
+                        return 0;
                     }
                 }
                 Ptop->save(nev);

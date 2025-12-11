@@ -4,7 +4,7 @@ typedef pic8* ptrpic8;
 class abc8 {
   private:
     ptrpic8* ppsprite;
-    short* ytomb;
+    short* y_offset;
     int default_spacing;
 
   public:

@@ -10,7 +10,7 @@ enum {
     ATLAT_BOTTOMRIGHT
 };
 
-enum { PLTIP_KEP = 100, PLTIP_TEXT, PLTIP_MINTA, PLTIP_OPTI };
+enum { PLTIP_KEP = 100, PLTIP_TEXT, PLTIP_MINTA };
 
 class piclist {
   public:

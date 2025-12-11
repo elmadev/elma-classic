@@ -78,3 +78,13 @@ jobs:
 
       - name: Build
         run: meson compile -C build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: elma-${{ runner.os }}
+          path: |
+            build/elma
+            build/elma.exe
+          retention-days: 5
+          if-no-files-found: ignore

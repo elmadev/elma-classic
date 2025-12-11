@@ -387,15 +387,15 @@ sprite::sprite(FILE* h) {
     if (fread(kepnev, 1, 10, h) != 10) {
         hiba("Nemo sp!");
     }
-    kepnev[10] = 0; // Csak biztonsagert
+    kepnev[9] = 0; // Csak biztonsagert
     if (fread(texturanev, 1, 10, h) != 10) {
         hiba("Nemo sp!");
     }
-    texturanev[10] = 0; // Csak biztonsagert
+    texturanev[9] = 0; // Csak biztonsagert
     if (fread(maszknev, 1, 10, h) != 10) {
         hiba("Nemo sp!");
     }
-    maszknev[10] = 0; // Csak biztonsagert
+    maszknev[9] = 0; // Csak biztonsagert
 
     if (fread(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
         hiba("Nem olvas file-bol sprite::sprite-ban!");

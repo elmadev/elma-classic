@@ -112,7 +112,7 @@ abc8::~abc8(void) {
 static int SpaceWidth = 5;
 static int SpaceWidthMenu = 10;
 
-void abc8::write(pic8* pdest, int x, int y, char* text) {
+void abc8::write(pic8* dest, int x, int y, char* text) {
     if (!success) {
         hiba("abc8::write, pedig nem success!");
         return;
@@ -138,7 +138,7 @@ void abc8::write(pic8* pdest, int x, int y, char* text) {
                 continue;
             }
         }
-        blt8(pdest, ppsprite[index], x, y + y_offset[index]);
+        blt8(dest, ppsprite[index], x, y + y_offset[index]);
         // blt8( pdest, ppsprite[index], x, y );
         x += default_spacing + ppsprite[index]->getxsize();
 
@@ -182,7 +182,7 @@ int abc8::len(char* text) {
 
 void abc8::set_spacing(int spacing) { default_spacing = spacing; }
 
-void abc8::write_centered(pic8* pdest, int x, int y, char* text) {
+void abc8::write_centered(pic8* dest, int x, int y, char* text) {
     int hossz = len(text);
-    write(pdest, x - hossz / 2, y, text);
+    write(dest, x - hossz / 2, y, text);
 }

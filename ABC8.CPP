@@ -11,7 +11,6 @@ int torolfv(void) {
 }
 
 abc8::abc8(char* filename) {
-    success = 0;
     default_spacing = 0;
     ppsprite = NULL;
     y_offset = NULL;
@@ -88,7 +87,7 @@ abc8::abc8(char* filename) {
             return;
         }
     }
-    success = 1;
+
     qclose(h);
 }
 
@@ -113,11 +112,6 @@ static int SpaceWidth = 5;
 static int SpaceWidthMenu = 10;
 
 void abc8::write(pic8* dest, int x, int y, char* text) {
-    if (!success) {
-        hiba("abc8::write, pedig nem success!");
-        return;
-    }
-
     while (*text) {
         int index = (unsigned char)*text;
         if (index == ' ') {
@@ -147,11 +141,6 @@ void abc8::write(pic8* dest, int x, int y, char* text) {
 }
 
 int abc8::len(char* text) {
-    if (!success) {
-        hiba("abc8::len, pedig nem success!");
-        return 0;
-    }
-
     int width = 0;
     while (*text) {
         int index = (unsigned char)*text;

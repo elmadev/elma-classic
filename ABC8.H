@@ -8,7 +8,6 @@ class abc8 {
     int default_spacing;
 
   public:
-    int success;
     abc8(char* filename);
     ~abc8(void);
     void write(pic8* dest, int x, int y, char* text);

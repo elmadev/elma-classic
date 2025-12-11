@@ -9,8 +9,8 @@ extern int Palyaszam; // Ez fugg attol, hogy shareware, vagy regisztralt
 struct jatekos {
     char nev[JATEKOSNEVHOSSZ + 2];
     char skippedtomb[((MAXPALYASZAM / 4) + 1) * 4];
-    long sikerespalyakszama;
-    long jelenlegipalya; // -1 eseten external files
+    int sikerespalyakszama;
+    int jelenlegipalya; // -1 eseten external files
 };
 
 int getjatekosindex(char* nev);
@@ -20,8 +20,8 @@ int getjatekosindex(char* nev);
 typedef char jatekosnev_type[JATEKOSNEVHOSSZ + 1];
 
 struct palyaegyfeleidok {
-    long idokszama;
-    long idok[MAXIDOK];
+    int idokszama;
+    int idok[MAXIDOK];
     jatekosnev_type nevek1[MAXIDOK];
     jatekosnev_type nevek2[MAXIDOK];
 };
@@ -39,7 +39,7 @@ class state_s {
   public:
     palyaidok palyakidejei[MAXPALYASZAM];
     jatekos jatekosok[MAXJATEKOS];
-    long jatekosokszama;
+    int jatekosokszama;
     jatekosnev_type jatekosa, jatekosb;
 
     // Opciok:

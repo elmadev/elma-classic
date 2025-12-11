@@ -103,7 +103,6 @@ void initadatok(void) {
     Viewzoom = 0.42 * Arany * 0.5;
 
     Fekegyutthato = 100.0;
-    Kord2x = -0.1, Kord2y = -0.5, Kord4x = 0.5, Kord4y = -0.5;
 
     Elszakadasisebhat = 0.01;
     Belsosav = 0.005; // uj

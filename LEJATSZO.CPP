@@ -490,26 +490,6 @@ long lejatszo(char* filenev) {
 
                 Mute = 1;
                 nullazhangot();
-
-                ////////////////////////////////////////////
-                // Motor hangjat kikapcsolja:
-                /*
-                stopmotor( 1 );
-                stopmotor( 0 );
-
-                //while( vanmegwav() )
-                //	hang();
-
-                Mute = 1;
-                nullazhangot();
-                */
-                ////////////////////////////////////////////
-
-                // while( vanmegwav() )
-                //	hang( /*"Lej play 1"*/ );
-
-                Mute = 1;
-                nullazhangot();
                 if (megvanido) {
                     Ptop->kerekjolalljon();
                     berakrecbehosszat(Prec1);
@@ -732,8 +712,6 @@ static int Elozoshowkep1 = 1, Elozoshowkep2 = 1;
 
 // Termeszetes befejezes eseten 0-t ad vissza:
 long lejatszo_r(char* filenev, int showkepmarad) {
-    Kitoltestmegrak = 3; // kirajz meg 3x kirakja keretet
-
     // Jatekmod eldontese:
     Single = !Multirec;
     Tag = Prec1->gettag();

@@ -314,7 +314,6 @@ static void betolt(billmuttomb bmuttomb, int sorszam, char* szoveg, int* pbillko
 }
 
 static void gombotvalaszt(int rubrikaszam, billmuttomb bmuttomb, int sorszam) {
-    strcpy(Rubrikak_tab[sorszam], "_");
     valaszt2 val;
     val.kur = sorszam;
     val.egykepen = 10;

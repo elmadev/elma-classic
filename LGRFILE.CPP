@@ -82,7 +82,6 @@ void loadlgrfile(char* nev) {
         strcpy(Bentlgrnev, "DEFAULT");
 
         Ptop->nincslgrje = 1;
-        Valtozott = 1;
         if (access(lgrtmp, 0) != 0) {
             uzenet("Could not open file LGR\\DEFAULT.LGR!");
         }

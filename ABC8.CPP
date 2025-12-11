@@ -6,14 +6,6 @@ static int ErrorOnMissingCodepoint = 1;
 static int ErrorOnMissingCodepoint = 0;
 #endif
 
-int torolfv(void) {
-    if (fabs(Pmot1->kor2.omega) > 0.02) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
 abc8::abc8(char* filename) {
     default_spacing = 0;
     ppsprite = NULL;

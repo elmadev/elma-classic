@@ -54,6 +54,41 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
 - **Reconfigure**: `meson setup --reconfigure build`
 - **Full rebuild**: `meson setup --wipe build`
 
+### Windows
+
+If you don't have Visual Studio 2022 in your PATH, you must run meson within the Visual Studio terminal called `Developer Command Prompt for VS 2022`
+
+To add this terminal to Visual Studio Code, add the following to .vscode/settings.json:
+
+```
+{
+  "terminal.integrated.profiles.windows": {
+    "VsDevCmd 64-bit (2022)": {
+      "path": [
+        "${env:windir}\\Sysnative\\cmd.exe",
+        "${env:windir}\\System32\\cmd.exe"
+      ],
+      "args": [
+        "/k",
+        // Path below assumes a VS2022 Community install;
+        // update as appropriate if your IDE installation path
+        // is different, or if using the standalone build tools
+        "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat",
+        "-arch=x64",
+        "-host_arch=x64"
+      ],
+      "overrideName": true,
+      "icon": "terminal-cmd"
+    }
+  }
+}
+```
+
+When running the setup step of meson you will need to pass `--vsenv`, like so:
+   ```
+   meson setup build --vsenv
+   ```
+
 ---
 
 ## Code Formatting with clang-format

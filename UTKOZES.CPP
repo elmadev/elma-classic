@@ -34,26 +34,25 @@ int talppontkereses(vekt2 r, double sugar, vekt2* pt1, vekt2* pt2, vonal** ppv1,
     Pszak->felsorolasreset(r);
     int talppontszam = 0;
     vonal* pv = NULL;
-    // int vegignezett = 0; // tesztelesre!
+    // int vegignezett = 0; // for testing
     while ((pv = Pszak->getnext()) != NULL) {
         // vegignezett++;
         vekt2 t;
         if (gombszakasz(r, sugar, pv, &t)) {
             if (talppontszam == 2) {
-                hiba("Egyszerre kettonel tobb talppontszam is van");
+                hiba("More than two base points at once!");
             }
             if (talppontszam == 1) {
                 *pt2 = t;
                 *ppv2 = pv;
                 talppontszam++;
-                // Ellenorzes, hogy nincs-e tul kozel ketpont,
-                // ha ket pontrol van szo:
+                // in case of two points, check that they aren't too close
                 if (abs(*pt1 - *pt2) < Talppontegybeolvadasitav) {
-                    *pt1 = (*pt1 + *pt2) * 0.5; // atlagol
+                    *pt1 = (*pt1 + *pt2) * 0.5; // averages
                     talppontszam = 1;
                     *ppv2 = NULL;
                 } else {
-                    // Kettonel tobb talppont mar ugy sem lehet!
+                    // can't have more than 2 base points
                     return talppontszam;
                 }
             }

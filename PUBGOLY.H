@@ -10,11 +10,11 @@ typedef struct {
 
 void initgolyo(void);
 
-extern int Nincsfal; // Ha ez igaz, golyok kimehetnek falon kivulre
+extern int Nincsfal; // if true, balls can leave screen
 void leptetgolyo(double stept);
 // void ujraszamol( void );
 // void idoreigazitmindet( void );
 
-// Ezt init tolti ki, innen lehet kiolvasni hol vannak golyok:
+// filled by init, can read ball positions from here
 extern int Ngolyok;
 extern golyo* Golyok;

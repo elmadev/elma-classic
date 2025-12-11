@@ -2,11 +2,11 @@
 
 /*static egyszovsor Idoszovegek[4];
 
-// Igaz, ha ujra jatszik, hamis ha listat ker:
+// true if play again, false if asks for list
 static int afterplayext( char* filenev, long ido ) {
     int kurrens = 0;
     while( 1 ) {
-        // Ido feliratot keszitunk:
+        // create time text
         char idoszov1[30] = "", idoszov2[30] = "";
         if( ido < 0 ) {
             strcpy( idoszov1, "You Failed" );
@@ -26,7 +26,7 @@ static int afterplayext( char* filenev, long ido ) {
         Idoszovegek[1].x = 200;
         Idoszovegek[1].y = 134;
 
-        // Kiirjuk ha lockolt:
+        // display if locked
         if( Ptop->lezart ) {
             //Korny->pabc_afterplaymenu->write( Korny->picbuffer,
             //		9, 173, "Locked" );
@@ -36,7 +36,7 @@ static int afterplayext( char* filenev, long ido ) {
         }
 
         //Korny->pal_afterplaymenu->set();
-        // Valasztas:
+        // choose
         valaszt2 val;
         val.kur = kurrens;
         val.egykepen = 6;
@@ -55,7 +55,7 @@ static int afterplayext( char* filenev, long ido ) {
         strcpy( Rubrikak[2], "Save play" );
         strcpy( Rubrikak[3], "File list" );
 
-        // Idoszoveg helyere beirjuk ecset-ben levok lefoglaltak szamat:
+        // replace idoszoveg with number of allocated in ecset:
         //sprintf( Idoszovegek[0].text, "%d", Osszegszam );
 
         val.bead( 4 );
@@ -80,7 +80,7 @@ static int afterplayext( char* filenev, long ido ) {
             saveplay( belyeg ); // Save play
             continue;
         }
-        hiba( "Itt nem szabadna lennie (afterplayext)!" );
+        hiba( "Should not be here (afterplayext)!" );
     }
 } */
 
@@ -89,7 +89,7 @@ int abcbenelobb(char* text1, char* text2);
 static void abcberendez(int szam) {
     for (int i = 0; i < szam + 3; i++) {
         for (int j = 0; j < szam - 1; j++) {
-            // Ha j es j+1 edik elem forditva van visszacsereljuk oket:
+            // switch j-th and j+1-th element if they are in wrong order
             char* nev1 = Rubrikak[j];
             char* nev2 = Rubrikak[j + 1];
             if (abcbenelobb(nev2, nev1) > 0) {
@@ -103,9 +103,9 @@ static void abcberendez(int szam) {
     }
 }
 
-// Nincs h-ja, hanem prototype ki van irva play.cpp-ben:
+// no .h, but prototype is displayed in play.cpp
 void playextmenu(void) {
-    // Kiirjuk osszes lev file nevet ide:
+    // write all lev file names here
     finame fname;
     int done = fifirst("lev/*.lev", fname);
     int szam = 0;
@@ -129,7 +129,7 @@ void playextmenu(void) {
 
     abcberendez(szam);
 
-    int kezdo = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
+    int kezdo = 0; // if eddigi found, set kur
     for (int i = 0; i < szam; i++) {
         char tmp[50];
         strcpy(tmp, Rubrikak[i]);
@@ -139,7 +139,7 @@ void playextmenu(void) {
         }
     }
 
-    // Feltoltottuk neveket, jon valasztas:
+    // names are filled, now choose
     valaszt2 val;
     val.kur = kezdo;
     val.egykepen = LISTegykepen;
@@ -167,7 +167,7 @@ void playextmenu(void) {
 
         while (1) {
             kiirloading();
-            // Ha topologiailag hibas lev file (uzenetet load adja):
+            // if lev file with topology error (given by load)
             if (!floadlevel_p(filenev)) {
                 break;
             }
@@ -177,7 +177,7 @@ void playextmenu(void) {
             Pmenupal->set();
             char valasz[100] = "";
             idoelintezes(ido, valasz, 0, filenev);
-            // Igaz, ha ujra jatszik, hamis ha listat ker:
+            // true if play again, false if asks for list
             if (!afterplay(0, 0, valasz, filenev)) {
                 Prec1->erase(filenev);
                 Prec2->erase(filenev);

@@ -6,7 +6,7 @@ int skippelheto(int level) {
     int jatekosindex = getjatekosindex(State->jatekosa);
     jatekos* pjatekos = &State->jatekosok[jatekosindex];
     if (pjatekos->sikerespalyakszama != level) {
-        hiba("skippelheto-ben pjatekos->sikerespalyakszam != level!");
+        hiba("pjatekos->sikerespalyakszam != level in skippelheto!");
     }
     int eddigskippelt = 0;
     for (int i = 0; i < level; i++) {
@@ -21,7 +21,7 @@ int skippelheto(int level) {
 
     szoveglista szl;
     if (skippelheto) {
-        // Lehet meg skippelni!
+        // can skip more levs
         int x0 = 320;
         int y0 = 150;
         int dy = 50;
@@ -40,7 +40,7 @@ int skippelheto(int level) {
         //	"Press a key to continue!" );
         szl.addszoveg_kozep("Press a key to continue!", x0, y0 + 3 * dy);
     } else {
-        // Nem lehet mar skippelni!
+        // cannot skip more levs
         int x0 = 320;
         int y0 = 100;
         int dy = 50;
@@ -69,7 +69,7 @@ int skippelheto(int level) {
         szl.addszoveg_kozep("Press a key to continue!", x0, y0 + 6 * dy);
     }
 
-    // Kep kiteves:
+    // put picture
     mk_emptychar();
     while (1) {
         if (mk_kbhit()) {

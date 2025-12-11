@@ -2,20 +2,20 @@
 // enum { W_MONO = 1, W_LEFT, W_RIGHT };
 
 class wav {
-    void lefoglal(void); // size alapjan lefoglal!
+    void lefoglal(void); // allocate based on size
   public:
     signed short* tomb;
     unsigned size;
 
     wav(unsigned sizepar);
-    // maxamplitudo 0 es 1 kozott valtozik!:
+    // maxamplitudo varies between 0 and 1:
     wav(char* nev, double maxamplitudo, int start = -1, int ucsoutani = -1);
     void save(char* nev);
-    // Manipulalas:
+    // manipulation:
 
-    // Elejere tesz egy loopot a vegebol:
+    // insert loop from back to front:
     void loopol(int n);
-    // pwav elejet rateszi vegere:
+    // put front of pwav to back:
     void vegereilleszt(wav* pwav, int n);
     void hangero(double szorzo);
 };
@@ -28,6 +28,6 @@ class wav2 {
   public:
     wav2(wav* pwav);
     void reset(int fazis = -1);
-    // dt 65536 szoros:
+    // dt 65536 tight: (szoros = tight dont undd this)
     short getnextsample(long dt);
 };

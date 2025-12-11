@@ -1,11 +1,11 @@
 #include "all.h"
 #include "directinput_scancodes.h"
 
-int Palyaszam = 55; // Vizittel egyutt
+int Palyaszam = 55; // more levels included
 
 int getstatesoundon(void) { return State->soundon; }
 
-// Van ugyanilyen neven topol.cpp-ben is ket fv.:
+// two functions with the same name also in topol.cpp
 static void titkosread(void* mut, int hossz, FILE* h, char* nev) {
     if (fread(mut, 1, hossz, h) != hossz) {
         uzenet("Corrupt file, please delete it!", nev);
@@ -32,7 +32,7 @@ static void titkoswrite(void* mut, int hossz, FILE* h) {
         a = 31 * b + c;
     }
     if (fwrite(mut, 1, hossz, h) != hossz) {
-        hiba("Nem ment iras state file-ba!");
+        hiba("Could not write to state file!");
     }
     a = 23;
     b = 9782;
@@ -52,14 +52,14 @@ static int Checknumber_state_r = 123432221;
 static char Statenev[] = "state.dat";
 
 state_s::state_s(char* nev) {
-    // Beallitjuk default ertekeket:
+    // set default values
     memset(palyakidejei, 0, sizeof(palyakidejei));
     memset(jatekosok, 0, sizeof(jatekosok));
     jatekosokszama = 0;
     jatekosa[0] = 0;
     jatekosb[0] = 0;
     soundon = 1;
-    secondarybuffer = 0; // ha igaz, kompatibilis mod
+    secondarybuffer = 0; // if true, compatible mod(?)
     single = 1;
     tag = 0;
     minibike = 0;
@@ -74,21 +74,21 @@ state_s::state_s(char* nev) {
 
     resetcontrols();
 
-    // Beolvasas ha kell:
+    // read if necessary
     if (!nev) {
         nev = Statenev;
     }
 
     if (access(nev, 0) != 0) {
-        // Nem letezik state.dat:
+        // state.dat doesnt exist
         save();
         return;
     }
 
-    // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
+    // leave fopen here
     FILE* h = fopen(nev, "rb");
     if (!h) {
-        hiba("Nem nyilik state file!: ", nev);
+        hiba("Cannot open state file!: ", nev);
     }
 
     int verzio = 0;
@@ -143,10 +143,10 @@ void state_s::reloadidok(void) {
     // if( access( nev, 0 ) != 0 )
     //	return;
 
-    // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
+    // leave fopen here
     FILE* h = fopen(nev, "rb");
     while (!h) {
-        // Var egy kicsit:
+        // waits a bit
         int a = 0;
         for (int i = 0; i < 10000; i++) {
             idothuz(&a);
@@ -169,7 +169,7 @@ void state_s::reloadidok(void) {
 state_s::~state_s(void) {}
 
 void state_s::save(void) {
-    // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
+    // leave fopen here
     FILE* h = fopen(Statenev, "wb");
     if (!h) {
         uzenet("Could not open for write file!: ", Statenev);
@@ -205,7 +205,7 @@ void state_s::save(void) {
 
     long checknumber = Checknumber_state_r;
     if (fwrite(&checknumber, 1, sizeof(long), h) != sizeof(long)) {
-        hiba("Nem megy beolvasas state file-ba!: ", Statenev);
+        hiba("Cannot write into state file!: ", Statenev);
     }
 
     fclose(h);
@@ -228,14 +228,13 @@ static void exportegylevel(FILE* h, palyaegyfeleidok* pidok, int single) {
     }
 }
 
-// Ha nincs egy palyan ido, tiz percet szamol helyette:
-// Ez itt szazadmasodpercben van megadva:
+// if a level has missing time, count as 10 mins instead, here in centiseconds
 static int const Nincsmegpalyaido = 100 * 60 * 10;
 
 // Anonymous total times:
 void state_s::exportanonim(FILE* h, int single, char* text1, char* text2, char* text3) {
     int sum = 0;
-    for (int i = 0; i < Palyaszam - 1; i++) { // ucso palyat nem szamitjuk
+    for (int i = 0; i < Palyaszam - 1; i++) { // last lev not counted
         int levelsum = 100000000;
         // Single:
         palyaegyfeleidok* pidok = &palyakidejei[i].singleidok;
@@ -266,7 +265,7 @@ void state_s::exportanonim(FILE* h, int single, char* text1, char* text2, char* 
 
 void state_s::exportjatekossum(FILE* h, char* nev, int single) {
     int sum = 0;
-    for (int i = 0; i < Palyaszam - 1; i++) { // ucso palyat nem szamitjuk
+    for (int i = 0; i < Palyaszam - 1; i++) { // last lev not counted
         int levelsum = 100000000;
 
         // Single times:
@@ -274,7 +273,7 @@ void state_s::exportjatekossum(FILE* h, char* nev, int single) {
         for (int j = 0; j < pidok->idokszama; j++) {
             if( strcmp( nev, pidok->nevek1[j] ) == 0 /*||
 				(!single && strcmp( nev, pidok->nevek2[j] ) == 0)*/ ) {
-                // Megvan nev:
+                // nev is acquired:
                 levelsum = pidok->idok[j];
                 break;
             }
@@ -285,7 +284,7 @@ void state_s::exportjatekossum(FILE* h, char* nev, int single) {
             palyaegyfeleidok* pidok = &palyakidejei[i].multiidok;
             for (int j = 0; j < pidok->idokszama; j++) {
                 if (strcmp(nev, pidok->nevek1[j]) == 0 || strcmp(nev, pidok->nevek2[j]) == 0) {
-                    // Megvan nev:
+                    // nev is acquired
                     if (levelsum > pidok->idok[j]) {
                         levelsum = pidok->idok[j];
                     }
@@ -323,10 +322,10 @@ void state_s::export_(void) {
 
     fprintf(h, "\n");
 
-    // Single palyak:
+    // Single times
     fprintf(h, "Single player times:\n");
     fprintf(h, "\n");
-    for (int i = 0; i < Palyaszam - 1; i++) { // utolsot nem irjuk ki
+    for (int i = 0; i < Palyaszam - 1; i++) { // last not displayed
         fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
         palyaegyfeleidok* pidok = &palyakidejei[i].singleidok;
         exportegylevel(h, pidok, 1);
@@ -334,10 +333,10 @@ void state_s::export_(void) {
     }
 
     fprintf(h, "\n");
-    // Multiplayer palyak:
+    // Multiplayer times
     fprintf(h, "Multiplayer times:\n");
     fprintf(h, "\n");
-    for (int i = 0; i < Palyaszam - 1; i++) { // utolsot nem irjuk ki
+    for (int i = 0; i < Palyaszam - 1; i++) { // last not displayed
         fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
         palyaegyfeleidok* pidok = &palyakidejei[i].multiidok;
         exportegylevel(h, pidok, 0);
@@ -398,7 +397,7 @@ void state_s::resetcontrols(void) {
     opciok2.billtime = DIK_Y;
     opciok2.billshowkep = DIK_2;
 
-    // Kozos:
+    // joint
     billplussz = DIK_EQUALS;
     billminusz = DIK_MINUS;
     billsnap = DIK_I;
@@ -411,6 +410,6 @@ int getjatekosindex(char* nev) {
             return i;
         }
     }
-    hiba("getjatekosindex-ben nem talalja nevet!");
+    hiba("Cannot find name in getjatekosindex!");
     return 0;
 }

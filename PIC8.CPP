@@ -14,19 +14,19 @@ typedef unsigned char* puchar;
 public:
 */
 
-// Ha igaz, akkor lefoglalt kepek minden masodik sora paratlan cimen
-// kezdodik. LGR file beolvasas es betolthattereket alatt aktiv:
+// if true, every second row of allocated images starts on an even address
+// active during LGR file read and betolthattereket
 int Paratlankepsorok = 0;
 
 int pic8::lefoglal(long xsizep, long ysizep) {
-    // nem szabad hasznalni size-eket, hanem sizep-eket!
+    // size must not be used, only sizep
     if (sormuttomb || szegmuttomb) {
-        hiba("Bhiba pic8::lefoglalban!");
+        hiba("B-error in pic8::lefoglal!");
         return 0;
     }
     xsize = short(xsizep);
     ysize = short(ysizep);
-    // xsizep-ot 4-el oszthatova valtoztatjuk:
+    // make xsizep divisible by 4
     if (Paratlankepsorok) {
         xsizep++;
     }
@@ -34,12 +34,11 @@ int pic8::lefoglal(long xsizep, long ysizep) {
         xsizep += 4 - xsizep % 4;
     }
     if (xsizep <= 0 || ysizep <= 0) {
-        hiba("sizep tul pici pic8::lefoglalban!");
+        hiba("sizep too small in pic8::lefoglal!");
         return 0;
     }
-    long egyszegben = 0x0ff00l / long(xsizep); // Nehogy szegmens merete
-                                               // megkozelitse 65536-ot
-    // szegnum meg inkrementalva lesz a vegen, ha plussz is van!:
+    long egyszegben = 0x0ff00l / long(xsizep); // so that segment value doesn't approach 65536
+    // szegnum will be incremented at the end even with extra
     szegnum = unsigned(ysizep) / egyszegben;
     long pluszszegbensorok = ysizep - szegnum * egyszegben;
     int vanplussz = pluszszegbensorok != 0;
@@ -89,7 +88,7 @@ int pic8::lefoglal(long xsizep, long ysizep) {
     }
 
     for (int y = 0; y < ysizep; y++) {
-        memset(sormuttomb[y], 0, unsigned(xsizep)); // nullazunk
+        memset(sormuttomb[y], 0, unsigned(xsizep)); // set to zero
         if (Paratlankepsorok && (y % 2)) {
             sormuttomb[y]++;
         }
@@ -127,7 +126,7 @@ pic8::pic8(int xsizep, int ysizep) {
     success = lefoglal(xsizep, ysizep);
 }
 
-// Mar meglevo tombre epiti ra pic8-at, destruktor nem torli:
+// adds pic8 on top of an existing array, won't be deleted by destructor
 pic8::pic8(int xsizep, int ysizep, unsigned char** ppc) {
     success = 0;
     nemdestrukt = 1;
@@ -137,13 +136,13 @@ pic8::pic8(int xsizep, int ysizep, unsigned char** ppc) {
     sprite = NULL;
     spritehossz = NULL;
     if (xsizep == -12333 && ysizep == -12334) {
-        hiba("fizkep nemdestruktos pic8 konstruktorban!");
+        hiba("fizkep nondestruct in pic8 constructor!"); //duno correct term for this -a
         return;
     }
     xsize = short(xsizep);
     ysize = short(ysizep);
     if (!ppc) {
-        hiba("!ppc nemdestruktos pic8 konstruktorban!");
+        hiba("!ppc nondestruct in pic8 constructor!");
     }
     sormuttomb = ppc;
     success = 1;
@@ -157,7 +156,7 @@ pic8::pic8(char* nev, FILE* h) {
     fizkep = 0;
     sprite = NULL;
     spritehossz = NULL;
-    // Kiterjesztes megkeresese:
+    // find correct extension
     int i = strlen(nev) - 1;
     while (i >= 0) {
         if (nev[i] == '.') {
@@ -169,24 +168,24 @@ pic8::pic8(char* nev, FILE* h) {
                 pcxbeolvas(nev, h);
                 return;
             }
-            hiba("pic8 konstruktor nem ismeri kiterjesztest nevben!: ", nev);
+            hiba("pic8 constructor doesn't recognize extension!: ", nev);
             return;
         }
         i--;
     }
-    hiba("pic8 konstruktor nem talalt pontot nevben!: ", nev);
+    hiba("pic8 constructor cannot find '.'!: ", nev);
 }
 
 int pic8::save(char* nev, unsigned char* pal, FILE* h) {
     if (!success) {
-        hiba("pic8::save-ben nem success!");
+        hiba("pic8::save unsuccessful!");
         return 0;
     }
     if (fizkep) {
-        hiba("Fizikai kepernyore save hivasa!");
+        hiba("Call for physical screen save!");
         return 0;
     }
-    // Kiterjesztes megkeresese:
+    // find extension
     int i = 0;
     while (nev[i]) {
         if (nev[i] == '.') {
@@ -199,12 +198,12 @@ int pic8::save(char* nev, unsigned char* pal, FILE* h) {
             // if( strcmpi( nev+i, ".mix" ) == 0 ) {
             //   return mixsave( nev );
             // }
-            hiba("pic8::save-ben nem ismeri kiterjesztest nevben!: ", nev);
+            hiba("pic8::save doesn't recognize extension!: ", nev);
             return 0;
         }
         i++;
     }
-    hiba("pic8::save-ben nem talalt pontot nevben!: ", nev);
+    hiba("pic8::save cannot find '.'!: ", nev);
     return 0;
 }
 
@@ -215,7 +214,7 @@ int pic8::getysize(void) { return ysize; }
 void pic8::ppixel(int x, int y, unsigned char szin) {
 #ifdef PIC8TEST
     if (!success) {
-        hiba("pic8::ppixelben success = 0!");
+        hiba("success = 0 in pic8::ppixel!");
         return;
     }
 #endif
@@ -227,14 +226,14 @@ void pic8::ppixel(int x, int y, unsigned char szin) {
         sormuttomb[y][x] = szin;
         return;
     }
-    // Fizikai:
-    hiba("ppixel fizikaira!");
+    // physical
+    hiba("ppixel onto physical!");
 }
 
 unsigned char pic8::gpixel(int x, int y) {
 #ifdef PIC8TEST
     if (!success) {
-        hiba("pic8::ppixelben success = 0!");
+        hiba("success = 0 in pic8::ppixel!");
         return 0;
     }
 #endif
@@ -245,8 +244,8 @@ unsigned char pic8::gpixel(int x, int y) {
     if (!fizkep) {
         return sormuttomb[y][x];
     } else {
-        // Fizikai:
-        hiba("gpixel fizikaira!");
+        // physical
+        hiba("gpixel onto physical!");
         // return (unsigned char)gpixel_l( x, y );
         return 0;
     }
@@ -254,7 +253,7 @@ unsigned char pic8::gpixel(int x, int y) {
 
 #ifdef TEST
 
-// Egyebkent inline:
+// otherwise inline
 
 unsigned char* pic8::getptr(int y) {
 #ifdef PIC8TEST
@@ -263,15 +262,15 @@ unsigned char* pic8::getptr(int y) {
         return 0;
     }
     if (y < 0 || y >= ysize) {
-        hiba("pic8::getptr y kint van!");
+        hiba("pic8::getptr y outside!");
         return 0;
     }
 #endif
     if (!fizkep) {
         return sormuttomb[y];
     } else {
-        // Fizikai:
-        hiba("pic8::getptr meghivasa fizikai kepernyore!");
+        // physical
+        hiba("pic8::getptr called for physical screen!");
         return NULL;
     }
 }
@@ -282,7 +281,7 @@ void pic8::fillbox(unsigned char szin) { fillbox(0, 0, getxsize() - 1, getysize(
 
 void pic8::fillbox(int x1, int y1, int x2, int y2, unsigned char szin) {
     if (fizkep) {
-        hiba("pic8::fillbox meghivasa fizikai kepernyore!");
+        hiba("pic8::fillbox called for physical screen!");
     }
     if (x1 > x2) {
         int tmp = x1;
@@ -315,7 +314,7 @@ void pic8::fillbox(int x1, int y1, int x2, int y2, unsigned char szin) {
 void pic8::vizszegmens_look(int x, int y, int size, unsigned char* lookup) {
 #ifdef PIC8TEST
     if (x < 0 || y < 0 || x + size - 1 >= xsize || y >= ysize) {
-        hiba("pic8::vizszegmens-ben x, y kilog!");
+        hiba("x, y outside in pic8::vizszegmens!");
     }
 #endif
     unsigned char* psor = getptr(y);
@@ -328,7 +327,7 @@ void pic8::vizszegmens_look(int x, int y, int size, unsigned char* lookup) {
 void pic8::fuggszegmens_look(int x, int y, int size, unsigned char* lookup) {
 #ifdef PIC8TEST
     if (x < 0 || y < 0 || x >= xsize || y + size - 1 >= ysize) {
-        hiba("pic8::vizszegmens-ben x, y kilog!");
+        hiba("x, y outside in pic8::vizszegmens!");
     }
 #endif
     for (int i = 0; i < size; i++) {
@@ -352,20 +351,20 @@ void pic8::spritebeolvas(char* nev, FILE* h) {
         volth = 0;
         h = qopen(nev, "rb");
         if (!h) {
-            hiba("pic8 spritebeolvaso nem tudta megnyitni file-t!: ", nev);
+            hiba("pic8 sprite reader cannot open file!: ", nev);
             return;
         }
     }
     unsigned char c = 0;
     if (fread(&c, 1, 1, h) != 1) {
-        hiba("Nem tudott olvasni file-bol!: ", nev);
+        hiba("Cannot read from file!: ", nev);
         if (!volth) {
             qclose(h);
         }
         return;
     }
     if (c != 0x2d) {
-        hiba("SPRITE file elso karaktere nem 0x2d!: ", nev);
+        hiba("SPRITE file first character not 0x2d!: ", nev);
         if (!volth) {
             qclose(h);
         }
@@ -374,7 +373,7 @@ void pic8::spritebeolvas(char* nev, FILE* h) {
 
     unsigned short xsize_s = -1, ysize_s = -1;
     if (fread(&xsize_s, 2, 1, h) != 1 || fread(&ysize_s, 2, 1, h) != 1) {
-        hiba("Nem tudott olvasni SPRITE file-bol!: ", nev);
+        hiba("Cannot read from SPRITE file!: ", nev);
         if (!volth) {
             qclose(h);
         }
@@ -383,7 +382,7 @@ void pic8::spritebeolvas(char* nev, FILE* h) {
     xsize = xsize_s;
     ysize = ysize_s;
     if (xsize < 1 || ysize < 1) {
-        hiba("Meretek kicsik SPRITE file-ban!: ", nev);
+        hiba("Small sizes in SPRITE file!: ", nev);
         if (!volth) {
             qclose(h);
         }
@@ -394,9 +393,9 @@ void pic8::spritebeolvas(char* nev, FILE* h) {
     }
 
     for (int y = 0; y < ysize; y++) {
-        // Egy sor beolvasasa:
+        // read one line
         if (fread(sormuttomb[y], xsize, 1, h) != 1) {
-            hiba("Nem tudott olvasni SPRITE file-bol!: ", nev);
+            hiba("Cannot read from SPRITE file!: ", nev);
             if (!volth) {
                 qclose(h);
             }
@@ -404,17 +403,17 @@ void pic8::spritebeolvas(char* nev, FILE* h) {
         }
     }
 
-    // SPRITE reszek beolvasasa:
+    // read SPRITE parts
     char tmp[10] = "";
     if (fread(tmp, 7, 1, h) != 1) {
-        hiba("Nem tudott olvasni SPRITE file-bol!: ", nev);
+        hiba("Cannot read from SPRITE file!: ", nev);
         if (!volth) {
             qclose(h);
         }
         return;
     }
     if (strcmp(tmp, "SPRITE") != 0) {
-        hiba("Sprite kulcsszo nem stimmel SPRITE file-ban!: ", nev);
+        hiba("Sprite keyword wrong in SPRITE file!: ", nev);
         if (!volth) {
             qclose(h);
         }
@@ -423,14 +422,14 @@ void pic8::spritebeolvas(char* nev, FILE* h) {
 
     spritehossz = -1;
     if (fread(&spritehossz, 2, 1, h) != 1) {
-        hiba("Nem tudott olvasni SPRITE file-bol!: ", nev);
+        hiba("Cannot read from SPRITE file!: ", nev);
         if (!volth) {
             qclose(h);
         }
         return;
     }
     if (spritehossz < 1) {
-        hiba("Sprite hossza tul rovid SPRITE file-ban!: ", nev);
+        hiba("Sprite length too short in SPRITE file!: ", nev);
         if (!volth) {
             qclose(h);
         }
@@ -441,14 +440,14 @@ void pic8::spritebeolvas(char* nev, FILE* h) {
     // dummy( l );
     sprite = new unsigned char[spritehossz];
     if (!sprite) {
-        hiba("Nincs eleg hely SPRITE beolvasoban!: ", nev);
+        hiba("Not enough space in SPRITE reader!: ", nev);
         if (!volth) {
             qclose(h);
         }
         return;
     }
     if (fread(sprite, spritehossz, 1, h) != 1) {
-        hiba("Nem tudott olvasni SPRITE file-bol sprite-ot!: ", nev);
+        hiba("Cannot read sprite from SPRITE file!: ", nev);
         if (!volth) {
             qclose(h);
         }
@@ -466,13 +465,13 @@ int pic8::spritesave(char* nev, FILE* h) {
         volth = 0;
         h = fopen(nev, "wb");
         if (!h) {
-            hiba("pic8::spritesave-ben nem tudta megnyitni file-t!: ", nev);
+            hiba("pic8::spritesave cannot open file!: ", nev);
             return 0;
         }
     }
     unsigned char c = 0x2d;
     if (fwrite(&c, 1, 1, h) != 1 || fwrite(&xsize, 2, 1, h) != 1 || fwrite(&ysize, 2, 1, h) != 1) {
-        hiba("pic8::spritesave-ben nem tud irni file-ba!: ", nev);
+        hiba("pic8::spritesave cannot write to file!: ", nev);
         if (!volth) {
             fclose(h);
         }
@@ -480,9 +479,9 @@ int pic8::spritesave(char* nev, FILE* h) {
     }
 
     for (int y = 0; y < ysize; y++) {
-        // Egy sor kiirasa:
+        // write one line
         if (fwrite(sormuttomb[y], xsize, 1, h) != 1) {
-            hiba("Nem tudott irni SPRITE file-ba!: ", nev);
+            hiba("Cannot write to SPRITE file!: ", nev);
             if (!volth) {
                 fclose(h);
             }
@@ -490,10 +489,10 @@ int pic8::spritesave(char* nev, FILE* h) {
         }
     }
 
-    // Sprite resz kiirasa:
+    // write sprite part
     if (fwrite("SPRITE", 7, 1, h) != 1 || fwrite(&spritehossz, 2, 1, h) != 1 ||
         fwrite(sprite, spritehossz, 1, h) != 1) {
-        hiba("Nem tudott irni SPRITE file-ba!: ", nev);
+        hiba("Cannot write to SPRITE file!: ", nev);
         if (!volth) {
             fclose(h);
         }
@@ -516,7 +515,7 @@ struct pcxdescriptor {
 };
 
 void pic8::pcxbeolvas(char* nev, FILE* h) {
-    // Gany:
+    // slop
     success = 1;
 
     int zarando = 0;
@@ -524,23 +523,23 @@ void pic8::pcxbeolvas(char* nev, FILE* h) {
         zarando = 1;
         h = qopen(nev, "rb");
         if (!h) {
-            hiba("Nem nyilik PCX file!: ", nev);
+            hiba("Cannot open PCX file!: ", nev);
         }
     }
     pcxdescriptor desc;
     if (fread(&desc, sizeof(desc), 1, h) != 1) {
-        hiba("Nem olvas PCX file-bol!: ", nev);
+        hiba("Cannot read from PCX file!: ", nev);
     }
     if ((desc.VersionNum != 5) || (desc.ManufactId != 10) || (desc.EncodingTech != 1) ||
         (desc.BitsPerPlane != 8) || (desc.NumberOfBitPlanes != 1)) {
-        hiba("\nNem megfelelo PCX file header!", nev);
+        hiba("\nWrong PCX file header!", nev);
     }
     // if( !lefoglal( desc.Xmax-desc.Xmin+1, desc.Ymax-desc.Ymin+1 ) ) {
     if (!lefoglal(desc.Xmax - desc.Xmin + 1, desc.Ymax - desc.Ymin + 1)) {
         hiba("pcx !lefoglal!");
     }
     for (int y = 0; y < ysize; y++) {
-        // Egy sor beolvasasa:
+        // read one line
         short nnn = 0, ccc, iii;
 
         do {
@@ -548,7 +547,7 @@ void pic8::pcxbeolvas(char* nev, FILE* h) {
             long l = fread(&szin, 1, 1, h);
             ccc = szin;
             if (l != 1) {
-                hiba("\nNem tud olvasni PCX-ben", nev);
+                  hiba("Cannot read from PCX file!: ", nev);
             }
 
             if ((ccc & 0xc0) == 0xc0) {
@@ -556,7 +555,7 @@ void pic8::pcxbeolvas(char* nev, FILE* h) {
                 l = fread(&szin, 1, 1, h);
                 ccc = szin;
                 if (l != 1) {
-                    hiba("\nNem tud olvasni PCX-ben", nev);
+                       hiba("Cannot read from PCX file!: ", nev);
                 }
 
                 while (iii--) {
@@ -574,7 +573,7 @@ void pic8::pcxbeolvas(char* nev, FILE* h) {
         } while (nnn < desc.BytesPerScanLine);
     }
 
-    // success az elejen mar 1-re van allitva!
+    // success already set to 1 at the start
     if (zarando) {
         qclose(h);
     }
@@ -594,7 +593,7 @@ static int numberofrepeats(pic8* ppic, int x, int y, int xsize) {
 int pic8::pcxsave(char* nev, unsigned char* pal) {
     FILE* h = fopen(nev, "wb");
     if (!h) {
-        hiba("pcxsave-ben nem nyilik file!: ", nev);
+        hiba("pcxsave cannot open file!: ", nev);
         return 0;
     }
     pcxdescriptor desc;
@@ -612,7 +611,7 @@ int pic8::pcxsave(char* nev, unsigned char* pal) {
     desc.BytesPerScanLine = (unsigned short)xsize;
     desc.PaletteInf = 1;
     if (fwrite(&desc, sizeof(desc), 1, h) != 1) {
-        hiba("pcxsave-ben sikertelen iras!: ", nev);
+        hiba("pcxsave cannot write to file!: ", nev);
         fclose(h);
         return 0;
     }
@@ -626,13 +625,13 @@ int pic8::pcxsave(char* nev, unsigned char* pal) {
                 }
                 unsigned char controll = (unsigned char)(i + 192);
                 if (fwrite(&controll, 1, 1, h) != 1) {
-                    hiba("pcxsave-ben nem ir!: ", nev);
+                        hiba("pcxsave cannot write to file!: ", nev);
                     fclose(h);
                     return 0;
                 }
                 unsigned char szin = gpixel(x, y);
                 if (fwrite(&szin, 1, 1, h) != 1) {
-                    hiba("pcxsave-ben nem ir!: ", nev);
+                        hiba("pcxsave cannot write to file!: ", nev);
                     fclose(h);
                     return 0;
                 }
@@ -641,20 +640,20 @@ int pic8::pcxsave(char* nev, unsigned char* pal) {
                 unsigned char szin = gpixel(x, y);
                 if (szin < 64) {
                     if (fwrite(&szin, 1, 1, h) != 1) {
-                        hiba("pcxsave-ben nem ir!: ", nev);
+                        hiba("pcxsave cannot write to file!: ", nev);
                         fclose(h);
                         return 0;
                     }
                 } else {
                     unsigned char controll = 193;
                     if (fwrite(&controll, 1, 1, h) != 1) {
-                        hiba("pcxsave-ben nem ir!: ", nev);
+                        hiba("pcxsave cannot write to file!: ", nev);
                         fclose(h);
                         return 0;
                     }
                     szin = gpixel(x, y);
                     if (fwrite(&szin, 1, 1, h) != 1) {
-                        hiba("pcxsave-ben nem ir!: ", nev);
+                        hiba("pcxsave cannot write to file!: ", nev);
                         fclose(h);
                         return 0;
                     }
@@ -665,27 +664,27 @@ int pic8::pcxsave(char* nev, unsigned char* pal) {
     }
     unsigned char magikus = 0x0c;
     if (fwrite(&magikus, 1, 1, h) != 1) {
-        hiba("pcxsave-ben nem ir!: ", nev);
+        hiba("pcxsave cannot write to file!: ", nev);
         fclose(h);
         return 0;
     }
     if (pal) {
-        // Van paletta!:
+        // palette exists
         for (int i = 0; i < 768; i++) {
             unsigned char c = (unsigned char)(pal[i] << 2);
             if (fwrite(&c, 1, 1, h) != 1) {
-                hiba("pcxsave-ben nem ir!: ", nev);
+                hiba("pcxsave cannot write to file!: ", nev);
                 fclose(h);
                 return 0;
             }
         }
     } else {
-        // Nincs paletta megadva!
+        // no palette given
         for (int i = 0; i < 256; i++) {
             unsigned char c = (unsigned char)i;
             for (int j = 0; j < 3; j++) {
                 if (fwrite(&c, 1, 1, h) != 1) {
-                    hiba("pcxsave-ben nem ir!: ", nev);
+                    hiba("pcxsave cannot write to file!: ", nev);
                     fclose(h);
                     return 0;
                 }
@@ -701,20 +700,20 @@ int pic8::pcxsave(char* nev, unsigned char* pal) {
 void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
 #ifdef PIC8TEST
     if (y2 == -10000 && (x1 != -10000 || y1 != -10000 || x2 != -10000)) {
-        hiba("blt8 hivasa y2 == -10000 (default), de elotte nem mind!");
+        hiba("blt8 calls y2 == -10000 (default), but not all before!");
         return;
     }
     if (!pd || !ps) {
-        hiba("blt8 hivasa, dest vagy source NULL!");
+        hiba("blt8 call, dest or source NULL!");
         return;
     }
 #endif
 
-    // if( Debugblt ) idejott
-    //	hiba( "Itt van 17!" );
+    // if( Debugblt ) came here
+    //	hiba( "Here 17!" ); 
 
     if (pd->sprite) {
-        hiba("blt8 hivasa, de dest sprite!");
+        hiba("blt8 called, but dest sprite!");
         return;
     }
     if (x1 == -10000) {
@@ -722,7 +721,7 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
         x2 = ps->xsize - 1;
         y2 = ps->ysize - 1;
     } else {
-        // Sorrend beallitasa:
+        // set order
         if (x2 < x1) {
             int tmp = x1;
             x1 = x2;
@@ -734,8 +733,8 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
             y2 = tmp;
         }
     }
-    // Levagdosasa reszeknek x iranyban:
-    // Eloszor source kepnek megfeleloen:
+    // cut parts in x direction
+    // first according to source picture
     if (x1 < 0) {
         x += -x1;
         x1 = 0;
@@ -744,7 +743,7 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
         x -= x2 - (ps->xsize - 1);
         x2 = ps->xsize - 1;
     }
-    // Most destinacionak megfeleloen:
+    // now according to dest picture
     if (x < 0) {
         x1 += -x;
         x = 0;
@@ -756,8 +755,8 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
         return;
     }
 
-    // Levagdosasa reszeknek y iranyban:
-    // Eloszor source kepnek megfeleloen:
+    // cut parts in y direction
+    // first according to source picture
     if (y1 < 0) {
         y += -y1;
         y1 = 0;
@@ -766,7 +765,7 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
         y -= y2 - (ps->ysize - 1);
         y2 = ps->ysize - 1;
     }
-    // Most destinacionak megfeleloen:
+    // now according to dest picture
     if (y < 0) {
         y1 += -y;
         y = 0;
@@ -779,8 +778,8 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
     }
 
     if (ps->sprite) {
-        // sprite lejatszas:
-        // Itt vegig kell futni teljes sprite kepet es kozben vagni!
+        // play sprite
+        // need to go through whole sprite and cut
         unsigned buf = 0;
         unsigned char* buffer = ps->sprite;
         int desty = y - y1;
@@ -796,7 +795,7 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
                     if (ybentvan) {
                         if (sx < x1 || sx + buffer[buf] - 1 > x2) {
                             if (!(sx > x2 || sx + buffer[buf] - 1 < x1)) {
-                                // Kilog, de van bent resze:
+                                // excess, but has part inside
                                 int xkezd = sx;
                                 int xveg = sx + buffer[buf] - 1;
                                 if (xkezd < x1) {
@@ -817,7 +816,7 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
                                 }
                             }
                         } else {
-                            // Nem log ki:
+                            // no excess
                             if (pd->fizkep) {
                                 hiba("68464");
                             }
@@ -837,7 +836,7 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
                     break;
                 default:
 
-                    hiba("Sprite blt-ban default parancsertelmezoben!");
+                    hiba("Sprite in blt with default interpreter!");
                     return;
                 }
             }
@@ -847,27 +846,27 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
         return;
     }
 
-    // Most mar tuti jok koordok!
+    // now the coords are correct
     if (pd->fizkep) {
-        // Fizikai kepernyore iras:
+        // write to physical screen:
         hiba("0895t");
     }
     if (ps->fizkep) {
-        // Fizikai kepernyorol olvasas:
+        // read from physical screen
         hiba("8795t");
     }
-    // Memoria-memoria atvitel!
+    // memory-memory transfer
     int xmeret = x2 - x1 + 1;
     int dfy = y;
 
-    // if( Debugblt )	idejott
-    //	hiba( "Itt van 18!" );
+    // if( Debugblt )	came here
+    //	hiba( "Here 18!" );
 
     for (int fy = y1; fy <= y2; fy++) {
         memcpy(&pd->sormuttomb[dfy++][x], &ps->sormuttomb[fy][x1], xmeret);
     }
-    // if( Debugblt )
-    //	hiba( "Itt van 19!" ); idejott
+    // if( Debugblt )   came here
+    //	hiba( "Here 19!" );
 }
 
 /*void blt8fizrefejjelle( pic8* ps ) {
@@ -875,11 +874,11 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
     int fizysize = Pscr8->getysize();
     #ifdef PIC8TEST
         if( ps == Pscr8 ) {
-            hiba( "blt8fizrefejjelle hivasa, fizikai kepernyo parral!" );
+            hiba( "blt8fizrefejjelle called with physical screen param!" );
             return;
         }
         if( ps->sprite ) {
-            hiba( "blt8fizrefejjelle hivasa, sprite parral!" );
+            hiba( "blt8fizrefejjelle called with sprite param!" );
             return;
         }
         if( fizxsize != ps->getxsize() || fizysize != ps->getysize() ) {
@@ -893,32 +892,32 @@ void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2) {
 } */
 
 int pcxtopal(char* nev, unsigned char* pal) {
-    // Paletta beolvasasa:
+    // read palette
     FILE* h = qopen(nev, "rb");
     if (!h) {
-        hiba("pcxtopal-ban nem tudta megnyitni file-t!: ", nev);
+        hiba("pcxtopal cannot open file!: ", nev);
         return 0;
     }
     long l = -769;
     if (qseek(h, l, SEEK_END) != 0) {
-        hiba("Nem tud visszalepni palettahoz 768-at PCX-ben!: ", nev);
+        hiba("Cannot return by 768 to palette in PCX!: ", nev);
         qclose(h);
         return 0;
     }
     char c;
     l = fread(&c, 1, 1, h);
     if (l != 1) {
-        hiba("Nem tud olvasni PCX-ben!:", nev);
+        hiba("Cannot read from PCX!:", nev);
         qclose(h);
         return 0;
     }
     if (c != 0x0c) {
-        hiba("Nem 0x0C a paletta elotti byte PCX-ben!: ", nev);
+        hiba("Byte before palette in PCX not 0x0C!: ", nev);
         qclose(h);
         return 0;
     }
     if (fread(pal, 768, 1, h) != 1) {
-        hiba("Nem tud olvasni PCX-ben!: ", nev);
+        hiba("Cannot read from PCX!:", nev);
         qclose(h);
         return 0;
     }
@@ -933,17 +932,17 @@ int pcxtopal(char* nev, ddpal** ppddpal) {
     unsigned char pal[768];
     pcxtopal(nev, pal);
     if (strcmp(nev, "intro.pcx") == 0) {
-        // Egy kicsit gany, teljes.cpp-bol hivodik ilyen parameterrel.
+        // slightly sloppy, called with this param from teljes.cpp
         pal[0] = pal[1] = pal[2] = 0;
     }
     *ppddpal = new ddpal(pal);
     return 1;
 }
 void mintavetel8(pic8* pdest, pic8* psour, int x1, int y1, int x2, int y2) {
-// Ellenorzesek:
+// checks
 #ifdef PIC8TEST
     if (!pdest || !psour) {
-        hiba("mintavetel8-ban !pdest || !psour!");
+        hiba("!pdest || !psour in mintavetel8!");
     }
 #endif
 
@@ -960,7 +959,7 @@ void mintavetel8(pic8* pdest, pic8* psour, int x1, int y1, int x2, int y2) {
 
 #ifdef PIC8TEST
     if (x1 < 0 || y1 < 0 || x2 >= pdest->getxsize() || y2 >= pdest->getysize()) {
-        hiba("pic8::mintavetel8-ban x1 < 0 || y1 < 0 || x2 >= xsize || y2 >= ysize!");
+        hiba("x1 < 0 || y1 < 0 || x2 >= xsize || y2 >= ysize in pic8::mintavetel!");
     }
 #endif
 
@@ -984,9 +983,9 @@ void mintavetel8(pic8* pdest, pic8* psour) {
     mintavetel8(pdest, psour, 0, 0, pdest->getxsize() - 1, pdest->getysize() - 1);
 }
 
-// Egyenlore csak vizszintes es fuggoleges vonalak:
+// only vertical and horizontal lines for now
 void pic8::line(int x1, int y1, int x2, int y2, unsigned char szin) {
-    // Sorrend:
+    // order
     if (x2 < x1) {
         int tmp = x1;
         x1 = x2;
@@ -998,20 +997,20 @@ void pic8::line(int x1, int y1, int x2, int y2, unsigned char szin) {
         y2 = tmp;
     }
     if (x1 == x2) {
-        // Fuggoleges:
+        // vertical
         for (int y = y1; y <= y2; y++) {
             ppixel(x1, y, szin);
         }
         return;
     }
     if (y1 == y2) {
-        // Vizszintes:
+        // horizontal
         for (int x = x1; x <= x2; x++) {
             ppixel(x, y1, szin);
         }
         return;
     }
-    hiba("pic8::line egyenlore csak vizszintes es fuggoleges vonalakat tud!");
+    hiba("pic8::line can only handle vertical and horizontal lines for now!");
 }
 
 void pic8::keszitbelsot(int x1, int y1, int x2, int y2, pic8* ppic) {

@@ -2,15 +2,15 @@
 #define MAXJATEKOS (50)
 #define JATEKOSNEVHOSSZ (14)
 
-#define MAXPALYASZAM (90) // Ennyit soha nem er el
+#define MAXPALYASZAM (90) // this is never reached
 
-extern int Palyaszam; // Ez fugg attol, hogy shareware, vagy regisztralt
+extern int Palyaszam; // depends on if shareware or registered
 
 struct jatekos {
     char nev[JATEKOSNEVHOSSZ + 2];
     char skippedtomb[((MAXPALYASZAM / 4) + 1) * 4];
     long sikerespalyakszama;
-    long jelenlegipalya; // -1 eseten external files
+    long jelenlegipalya; // external file if -1
 };
 
 int getjatekosindex(char* nev);
@@ -42,22 +42,21 @@ class state_s {
     long jatekosokszama;
     jatekosnev_type jatekosa, jatekosb;
 
-    // Opciok:
+    // options
     int soundon;
     int secondarybuffer;
-    // Ehelyett Single valtozot kell figyelni, mivel rec visszajatszasnal
-    // lehet hogy mas kell legyen mint state-ben levo:
+    // should look at Single variable here because value might differ from state during replays
     int single;
-    // Itt pedig Tag valtozot kell figyelni:
+    // same with Tag variable
     int tag;
-    int minibike; // Ezt most meg csak nem is mentjuk
+    int minibike; // this is not saved
     int aplayerabike;
     int highquality;
 
     int animatedobjects;
     int animatedmenus;
 
-    // Billentyuk:
+    // keys
     jatekosopciok opciok1;
     jatekosopciok opciok2;
     int billplussz, billminusz;
@@ -78,4 +77,4 @@ class state_s {
     void resetcontrols(void);
 };
 
-extern state_s* State; // teljes.cpp-ben van inicializalva!
+extern state_s* State; // intialized in teljes.cpp

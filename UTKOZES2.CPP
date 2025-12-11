@@ -22,8 +22,7 @@ int utkozikesprite(vekt2 r, double sugar) {
         }
 
         if (pker->tipus == T_CEL && !Single && Tag) {
-            continue; // Flag Tag-ben nincsen cel
-        }
+            continue; // Flag Tag has no flower
 
         if (pker->rxint < objminx || pker->ryint < objminy || pker->rxint > objmaxx ||
             pker->ryint > objmaxy) {

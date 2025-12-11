@@ -15,7 +15,7 @@ extern rubrika Rubrikak_tab[MAXRUBRIKASZAM_TAB + 1];
 
 void initrubrikak(void);
 
-// Felhasznalja, Korny rubrikak-at es picbuffer-t!
+// uses Korny rubrikak and picbuffer
 class valaszt2 {
     friend void playextmenu(void);
 
@@ -28,23 +28,23 @@ class valaszt2 {
   public:
     int kur;
     int x0, y0, dy, egykepen;
-    int x0_tab; // Csak akkor erdekes, ha tabos igaz
-    int cimy;   // Ezt o maganak beallitja, de nehanyan atdefinialjak
+    int x0_tab; // only relevant if the one with "tab" is true
+    int cimy;   // this is set here, but can be redefined elsewhere
     int escelheto;
     char cim[100];
 
     valaszt2(void);
     ~valaszt2(void);
-    void bead(int szam, int tabos = 0); // Rubrikakat beveszi
-    // Visszaadja valasztott szamat, ESC eseten -1-et:
-    // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
+    void bead(int szam, int tabos = 0); // takes in rubrics
+    // returns the selected number (-1 in case of ESC)
+    // in case of tobbrajz, first render multiple times (Win95):
     int valassz(egyszovsor* preszovegek = NULL, int preszovegszam = 0, int csakkirajzol = 0);
 
     void kirajzol(void);
 };
 
-// RECidomenteshez kell (mainmenu.cpp-ben is):
-// Ha RECidokellhet-et beallitjuk, akkor RECidokellis-t beallitja
-// Ctrl+Alt+Enter eseten (elotte RECidokellis-t nullazni kell):
+// required for RECidomentes (also in mainmenu.cpp):
+// if RECidokellhet is set, then also set RECidokellis
+// in case of Ctrl+Alt+Enter (need to set RECidokellis to 0 beforehand):
 extern int RECidokellhet;
 extern int RECidokellis;

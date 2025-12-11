@@ -3,9 +3,9 @@
 state_s* State = NULL;
 
 void cheatplayer(void) {
-    // Egyetlen jatekosnak sem szabad lennie:
+    // can't have any players
     if (State->jatekosokszama != 0) {
-        hiba("cheatplayer-ben mar van valaki bejegyezve!");
+        hiba("Already has player in cheatplayer!");
     }
 
     State->jatekosokszama = 1;
@@ -21,7 +21,7 @@ void cheatplayer(void) {
     for (int i = 0; i < hanypalya; i++) {
         palyaegyfeleidok* pidok = &State->palyakidejei[i].singleidok;
         if (pidok->idokszama != 0) {
-            hiba("cheatplayer-ben bug!");
+            hiba("Bug in cheatplayer!");
         }
         pidok->idokszama = 1;
         pidok->idok[0] = 180000l;
@@ -55,13 +55,13 @@ void teljes(void) {
 
     initadatok();
 
-    // State->save(); // Itt lehet ures state.dat file-t csinalni
+    // State->save(); // can make empty state.dat here
 
-    // Itt lehet cheat playert eloallitani:
-    // Le kell elotte torolni state.dat-ot:
+    // can make cheat player here
+    // first clear state.dat
     // cheatplayer();
 
-    // Feltesszuk tile-ot kepre:
+    // put tile on picture
     /*pic8* tmpintro = new pic8( 640, 480 );
     pic8* tile = new pic8( "introtl.pcx" );
     int y = 0;
@@ -79,29 +79,29 @@ void teljes(void) {
     delete pintro; pintro = NULL;
     delete tile; tile = NULL;*/
 
-    // Ezt majd elso kiirloading szabaditja fel (menukep-ben van definialva):
+    // will be freed by first kiirloading (defined in menukep):
     Pintro = new pic8("intro.pcx");
-    // Itt most atirjuk verziot 1.1-re:
+    // reset version to 1.1
     // blt8( Pintro, Pintro, 343, 433, 520, 459, 530, 468 ); // a betu
     blt8(Pintro, Pintro, 321, 420, 297, 420, 315, 441);
     blt8(Pintro, Pintro, 321 + 15, 420, 297, 420, 315, 441);
     blt8(Pintro, Pintro, 321 + 15 + 16, 432, 88, 458, 98, 468);
     spriteosit(Pintro);
-    pic8* tmpintro = new pic8(640, 480); // ezt majd kesobb szabaditjuk fel
+    pic8* tmpintro = new pic8(640, 480); // will be freed later
     tmpintro->fillbox(254);
     blt8(tmpintro, Pintro);
 
     ddpal* pintropal = NULL;
-    // Gany, ezzel az egy nevvel pcxtopal(pic.cpp) elso harom byte-ot 0-azza:
+    // slop, with this one name pcxtopal(pic.cpp) first 3 bytes are zeroed
     pcxtopal("intro.pcx", &pintropal);
 
-    // Hatrebb tettem folyamatos kirakasra (Alt-Tab miatt):
+    // moved back for consistent output because of alt-tab
     pintropal->set();
     bltfront(tmpintro);
     delete pintropal;
     pintropal = NULL;
 
-    // Egy par beolvasas:
+    // a few reads
     Pabc1 = new abc8("kisbetu1.abc");
     Pabc1->settav(1);
     Pabc2 = new abc8("kisbetu2.abc");
@@ -115,7 +115,7 @@ void teljes(void) {
 
     seteditorpal();
 
-    // Eger:
+    // mouse:
     int mmx = 355;
     int mmy = 265;
     Moux = mmx;
@@ -124,10 +124,10 @@ void teljes(void) {
     Moux = mmx;
     Mouy = mmy;
 
-    // Csak hogy mindig menjen stopper:
+    // always have timer
     mv_startstopper();
 
-    // Intro keppel varunk, amig nem toltodik be minden:
+    // wait with intro screen until everything is loaded
     while (1) {
         if (mk_kbhit()) {
             mk_getextchar();
@@ -159,20 +159,20 @@ void teljes(void) {
 
     Pmenupal->set();
 
-    // Ez kell valaszt2-hoz:
+    // needed for valaszt2
     initrubrikak();
 
     // kiraklogot();
 
     if (State->jatekosokszama == 0) {
-        newjatekos(1, 0); // Innen nem jon vissza
+        newjatekos(1, 0); // won't return from here
     } else {
-        jatekosvalasztas(1, 0); // Innen nem jon vissza
+        jatekosvalasztas(1, 0); // won't return from here
     }
-    hiba("Ide nem kellett volna jonnie!");
+    hiba("Should not be here!");
 }
 
-/* Regi kilepes
+/* old exit
 void kilep( void ) {
     pic8* ppic = new pic8( "vegekep.pcx" );
     ddpal* pvegepal = NULL;
@@ -188,7 +188,7 @@ void kilep( void ) {
 } */
 
 void kilep(void) {
-    Nincsfal = 1; // golyok ezentul kimenek falon kivulre
+    Nincsfal = 1; // balls will go outside of screen
     szoveglista* pszovlist = new szoveglista;
     pszovlist->addszoveg_kozep("Thank you for registering the game!", 320, 220);
     pszovlist->addszoveg_kozep("Please do not distribute!", 320, 300);
@@ -209,10 +209,10 @@ void kilep(void) {
 static void mergeegyfele(palyaegyfeleidok* pst, palyaegyfeleidok* pmrg, int single) {
     int idokszama = pst->idokszama + pmrg->idokszama;
     int idok[MAXIDOK * 2];
-    int ujetomb[MAXIDOK * 2]; // Igaz, ha merge file-bol van ido
+    int ujetomb[MAXIDOK * 2]; // true if time is from merge file
     jatekosnev_type nevek1[MAXIDOK * 2];
     jatekosnev_type nevek2[MAXIDOK * 2];
-    // Feltoltjuk tablat:
+    // fill table
     for (int i = 0; i < pst->idokszama; i++) {
         idok[i] = pst->idok[i];
         ujetomb[i] = 0;
@@ -223,7 +223,7 @@ static void mergeegyfele(palyaegyfeleidok* pst, palyaegyfeleidok* pmrg, int sing
             strcpy(nevek2[i], pst->nevek2[i]);
         }
 
-        // Ezzel minden nem VJ32-es idot 50 percre allitom:
+        // set all VJ32 times to 50 mins
         // if( strcmp( nevek1[i], "VJ32" ) != 0 && strcmp( nevek2[i], "VJ32" ) )
         //	idok[i] = 300000;
     }
@@ -238,12 +238,12 @@ static void mergeegyfele(palyaegyfeleidok* pst, palyaegyfeleidok* pmrg, int sing
             strcpy(nevek2[idest], pmrg->nevek2[i]);
         }
     }
-    // Rendezzuk oket:
+    // sort times
     for (int i = 0; i < idokszama + 4; i++) {
         for (int j = 0; j < idokszama - 1; j++) {
-            // Megnezzuk hogy kell-e csere:
-            // Eloszor ido szamit, utana elso es masodik nev, majd
-            // az hogy merge.dat-bol van-e ido:
+            // check if switch is needed
+            // priority order: time, first name, second name, 
+            // and whether time is from merge.dat
 
             int cserelendo = 0;
             if (idok[j] > idok[j + 1]) {
@@ -251,20 +251,20 @@ static void mergeegyfele(palyaegyfeleidok* pst, palyaegyfeleidok* pmrg, int sing
             }
 
             if (idok[j] == idok[j + 1]) {
-                // Idejuk azonos:
+                // same time:
                 if (strcmp(nevek1[j], nevek1[j + 1]) == 0) {
                     if (strcmp(nevek2[j], nevek2[j + 1]) == 0) {
                         if (ujetomb[j] && !ujetomb[j + 1]) {
                             cserelendo = 1;
                         }
                     } else {
-                        // Elso nevig ugyanaz, masodik nev mar nem:
+                        // same up to second name
                         if (strcmp(nevek2[j], nevek2[j + 1]) > 0) {
                             cserelendo = 1;
                         }
                     }
                 } else {
-                    // Bar idejuk azonos, elso nev mar nem:
+                    // same time but not first name
                     if (strcmp(nevek1[j], nevek1[j + 1]) > 0) {
                         cserelendo = 1;
                     }
@@ -272,7 +272,7 @@ static void mergeegyfele(palyaegyfeleidok* pst, palyaegyfeleidok* pmrg, int sing
             }
 
             if (cserelendo) {
-                // Cserelni kell:
+                // switch
                 int tmp = idok[j];
                 idok[j] = idok[j + 1];
                 idok[j + 1] = tmp;
@@ -293,40 +293,40 @@ static void mergeegyfele(palyaegyfeleidok* pst, palyaegyfeleidok* pmrg, int sing
         }
     }
 
-    // Most egyforma idoket egy forma versenyzoktol kiszedjuk:
-    // (csak az uj idoket):
+    // delete same times from matching player:
+    // (new times only):
     for (int i = 0; i < idokszama + 2; i++) {
         for (int j = 0; j < idokszama - 1; j++) {
             if (idok[j] == idok[j + 1] && strcmp(nevek1[j], nevek1[j + 1]) == 0 &&
                 (single || strcmp(nevek2[j], nevek2[j + 1]) == 0) && ujetomb[j + 1]) {
 
-                // Kiszedjuk j+1 -ediket:
+                // delete j+1-th
                 for (int k = j + 1; k < idokszama - 1; k++) {
-                    // k+1 -ediket k -adikba tesszuk:
+                    // put k-th in k+1-th
                     idok[k] = idok[k + 1];
                     ujetomb[k] = ujetomb[k + 1];
                     strcpy(nevek1[k], nevek1[k + 1]);
                     strcpy(nevek2[k], nevek2[k + 1]);
                 }
                 idokszama--;
-                break; // csak biztonsagert
+                break; // security measure
             }
         }
     }
 
-    // Visszairjuk state.dat-ba:
+    // reset in state.dat
     if (idokszama > MAXIDOK) {
         idokszama = MAXIDOK;
     }
     pst->idokszama = idokszama;
 
-    // Biztonsagi nullazas:
+    // security zeroing
     for (int i = 0; i < MAXIDOK; i++) {
         pst->idok[i] = -1;
         *(pst->nevek1[i]) = 0;
         *(pst->nevek2[i]) = 0;
     }
-    // Masolas:
+    // copy
     for (int i = 0; i < idokszama; i++) {
         pst->idok[i] = idok[i];
         strcpy(pst->nevek1[i], nevek1[i]);
@@ -337,8 +337,7 @@ static void mergeegyfele(palyaegyfeleidok* pst, palyaegyfeleidok* pmrg, int sing
 static void mergestatedat(void) {
     char nev[20] = "merge.dat";
     if (access(nev, 0) != 0) {
-        return; // Nincsen merge file
-    }
+        return; // no merge file
 
     state_s* pmerge = new state_s(nev);
     if (!pmerge) {
@@ -347,7 +346,7 @@ static void mergestatedat(void) {
 
     State->reloadidok();
 
-    // Most osszefesuljuk besttime tablakat:
+    // merge besttime tables
     for (int i = 0; i < MAXPALYASZAM; i++) {
         mergeegyfele(&State->palyakidejei[i].singleidok, &pmerge->palyakidejei[i].singleidok, 1);
         mergeegyfele(&State->palyakidejei[i].multiidok, &pmerge->palyakidejei[i].multiidok, 0);
@@ -355,5 +354,5 @@ static void mergestatedat(void) {
 
     delete pmerge;
 
-    State->save(); // par sorral feljebb van reload
+    State->save(); // reload is a few lines above
 }

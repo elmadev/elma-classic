@@ -1,14 +1,14 @@
 #include "all.h"
 
 recorder *Prec1 = NULL, *Prec2 = NULL;
-int Multirec = 0; // Ha multiplayer, akkor ez igaz
+int Multirec = 0; // true if multiplayer
 
 #define MAGICNUMBER (4796277l)
 
 // #define Darabszam (10000u)
 // #define Hangdarabszam (3000u)
 
-// Friss kikomentezes:
+// fresh outcommenting
 // static const int Darabszam = 14370;
 // static const int Hangdarabszam = 3000;
 
@@ -42,7 +42,7 @@ recorder::recorder(void) {
 
     tag = 0;
 
-    // Ellenorzes:
+    // check
     long hossz = sizeof(float);
     if (hossz != 4) {
         hiba("float hossz != 4!");
@@ -81,8 +81,7 @@ recorder::recorder(void) {
 }
 
 recorder::~recorder(void) {
-    // Ez most nincs megcsinalva!
-}
+    // not done here
 
 void recorder::erase(char* palyanev_p) {
     if (strlen(palyanev_p) > 12) {
@@ -120,7 +119,7 @@ static double Surlszorzo = 250 / 2.0, Surlszorzo_rec = 1.0 / Surlszorzo;
 static void filebair( float d1, float d2, float d3 ) {
     FILE* h = fopen( "log.txt", "at" );
     if( !h )
-        hiba( "filebair-ban nem nyilik!" );
+        hiba( "Cannot open filebair!" );
 
     fprintf( h, "%d %f %f %f\n", Filebairsorszam, d1, d2, d3 );
 
@@ -131,7 +130,7 @@ static void filebair( float d1, float d2, float d3 ) {
 
 int recorder::recall(motorst* pmot, double dt, hanginfo* phinfo) {
     if (betoltve <= 0) {
-        hiba("recall-ban betoltve <= 0!");
+        hiba("betoltve <= 0 in recall!");
     }
 
     int index1 = Recorderszorzo * dt;
@@ -182,7 +181,7 @@ int recorder::recall(motorst* pmot, double dt, hanginfo* phinfo) {
         pmot->kor1.r.y + Korrszorzo_rec * (pvezry[index1] * suly1 + pvezry[index2] * suly2);
 
     if (index1 >= 2) {
-        // Motor:
+        // bike
         if (abs(pk1alfa[index1] - pk1alfa[index2]) > 9000) { // 1000
             // pmot->kor1.alfa = Alfaszorzo_16_rec * pk1alfa[index2];
             if (pk1alfa[index1] > pk1alfa[index2]) {
@@ -199,7 +198,7 @@ int recorder::recall(motorst* pmot, double dt, hanginfo* phinfo) {
                 Alfaszorzo_16_rec * (pk1alfa[index1] * suly1 + pk1alfa[index2] * suly2);
         }
 
-        // Elso kerek:
+        // front wheel
         if (abs(pk2alfa[index1] - pk2alfa[index2]) > 220) { // 50
             // pmot->kor2.alfa = Alfaszorzo_rec * pk2alfa[index2];
             if (pk2alfa[index1] > pk2alfa[index2]) {
@@ -214,7 +213,7 @@ int recorder::recall(motorst* pmot, double dt, hanginfo* phinfo) {
             pmot->kor2.alfa = Alfaszorzo_rec * (pk2alfa[index1] * suly1 + pk2alfa[index2] * suly2);
         }
 
-        // Hatso kerek:
+        // back wheel
         if (abs(pk4alfa[index1] - pk4alfa[index2]) > 220) {
             // pmot->kor4.alfa = Alfaszorzo_rec * pk4alfa[index2];
             if (pk4alfa[index1] > pk4alfa[index2]) {
@@ -245,7 +244,7 @@ int recorder::recall(motorst* pmot, double dt, hanginfo* phinfo) {
         char tmp[100];
         int tmpfreki = pfrekvencia[index1];
         sprintf( tmp, "f:%d, index1:%d", tmpfreki, index1 );
-        hiba( "Itt van eredmeny:", tmp );
+        hiba( "There is result here:", tmp );
     }*/
 
     phinfo->frekvencia = Frekvszorzo_rec * pfrekvencia[index1] + 1.0;
@@ -277,11 +276,11 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         vekt2 kor1r = (pmot->kor1.r - ucso_r) * ((legkozt - ucsot) / (ido - ucsot)) + ucso_r;
 
         if (legkozindex >= Darabszam) {
-            // betelt:
+            // full
             return;
         }
 
-        // Beirunk bejegyzesbe:
+        // write into bejegyzes
         int i = legkozindex;
         pk1rx[i] = kor1r.x;
         pk1ry[i] = kor1r.y;
@@ -292,7 +291,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         pvezrx[i] = (pmot->vezetor.x - pmot->kor1.r.x) * Korrszorzo;
         pvezry[i] = (pmot->vezetor.y - pmot->kor1.r.y) * Korrszorzo;
 
-        // Alfak:
+        // alphas
         double alfa1 = pmot->kor1.alfa;
         while (alfa1 <= 0) {
             alfa1 += K_2pi;
@@ -313,7 +312,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
             pk4alfa[i] = pmot->kor4.alfa * Alfaszorzo;
         }
 
-        // Belerakunk egy veletlen szamot felso negy bitbe:
+        // put random number into 4 highest bits
         double tmpb = pmot->kor4.alfa + i * 5.752364;
         memcpy(&pgazhatra[i], (&tmpb) + 4, 1);
         pgazhatra[i] = pgazhatra[i] & 0xf0;
@@ -374,10 +373,10 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         //int hatar = 2000;
         //if( pk2rx[i] > hatar || pk4rx[i] > hatar ||
         //	pk2ry[i] > hatar || pk4ry[i] > hatar )
-        //	uzenet( "Nagyobb 5000-nel!" );
+        //	uzenet( "Greater than 5000" );
         //if( pk2rx[i] < -hatar || pk4rx[i] < -hatar ||
         //	pk2ry[i] < -hatar || pk4ry[i] < -hatar )
-        //	uzenet( "Kisebb -5000-nel!" );
+        //	uzenet( "Less than -5000" );
 
         // Alfak:
         double alfa1 = pmot->kor1.alfa;
@@ -428,7 +427,7 @@ void recorder::addhang(double t, char wavindex, double hangero, int objszam) {
             double t2 = phangok[unsigned(hangbetoltve - 1)].t;
             sprintf(tmp, "t1: kulonbseg: %f\n", float(t - t2));
             hiba(tmp);
-            // hiba( "recorder::addhang-ban ido forditott sorrendben!" );
+            // hiba( "reverse time in recorder::addhang!" );
         }
     }
     phangok[unsigned(hangbetoltve)].t = t;
@@ -438,7 +437,7 @@ void recorder::addhang(double t, char wavindex, double hangero, int objszam) {
     hangbetoltve++;
 }
 
-// Ha van hang, akkor igazzal ter vissza:
+// returns true if sound is enabled
 int recorder::gethang(double t, char* pwavindex, double* phangero, int* pobjszam) {
     if (hangkov < hangbetoltve) {
         if (phangok[unsigned(hangkov)].t <= t) {
@@ -452,10 +451,10 @@ int recorder::gethang(double t, char* pwavindex, double* phangero, int* pobjszam
     return 0;
 }
 
-static void olvhiba(char* nev) { hiba("Nem sikerult olvasni recorded file-bol!: ", nev); }
+static void olvhiba(char* nev) { hiba( "Cannot read from recorded file!: ", nev ); }
 
-// demo eseten resource file-bol nyit:
-// belyeg-et adja vissza, vagy 0-at:
+// open from res file in case of demo
+// returns 0 or belyeg
 long recorder::load(char* nev, FILE* h, int demo) {
     int megvoltnyitva = 0;
     if (h) {
@@ -466,7 +465,7 @@ long recorder::load(char* nev, FILE* h, int demo) {
         if (demo) {
             h = qopen(nev, "rb");
             if (!h) {
-                hiba("Nem sikerult megnyitni recorded file-t!: ", nev);
+                hiba("Could not open recorded file!: ", nev);
             }
         } else {
             char tmpnev[40];
@@ -483,19 +482,19 @@ long recorder::load(char* nev, FILE* h, int demo) {
         olvhiba(nev);
     }
     if (betoltve <= 0) {
-        hiba("Nem stimmel betoltve recorded file-ban!: ", nev);
+        hiba("betoltve wrong in recorded file!: ", nev);
     }
 
     if (betoltve > Darabszam) {
-        hiba("recorder load-ban betoltve > Darabszam!");
+        hiba("betoltve > Darabszam in recorder load!");
     }
 
     long verzio = 0;
     if (fread(&verzio, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        hiba( "Cannot read from recorded file!: ", nev );
     }
 
-    // Ezt loadrecekben is igazitani kell:
+    // need to adjust in loadrec as well
     if (verzio < 131) {
         uzenet("Recorded file version is too old!", nev);
     }
@@ -504,13 +503,13 @@ long recorder::load(char* nev, FILE* h, int demo) {
         uzenet("Recorded file version is too new!", nev);
     }
 
-    int tmp = 0; // Multirec, de ezt mar elintezte loadrecek, aki ezt hivta
+    int tmp = 0; // Multirec, but loadrec already took care of this
     if (fread(&tmp, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        hiba( "Cannot read from recorded file!: ", nev );
     }
 
     if (fread(&tag, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        hiba( "Cannot read from recorded file!: ", nev );
     }
 
     long belyeg = 0;
@@ -560,7 +559,7 @@ long recorder::load(char* nev, FILE* h, int demo) {
     if (fread(pk4alfa, 1, hosszc, h) != hosszc) {
         olvhiba(nev);
     }
-    if (fread(pgazhatra, 1, hosszc, h) != hosszc) { // karakter
+    if (fread(pgazhatra, 1, hosszc, h) != hosszc) { // character
         olvhiba(nev);
     }
 
@@ -576,10 +575,10 @@ long recorder::load(char* nev, FILE* h, int demo) {
         olvhiba(nev);
     }
     if (hangbetoltve < 0) {
-        hiba("hangbetoltve nem stimmel loadban!");
+        hiba("hangbetoltve wrong in load!");
     }
     if (hangbetoltve > Hangdarabszam) {
-        hiba("rec load-ban hangbetoltve > Hangdarabszam!");
+        hiba("hangbetoltve > Hangdarabszam! in rec load");
     }
 
     /*static int elsoszam = 0;
@@ -612,28 +611,28 @@ long recorder::load(char* nev, FILE* h, int demo) {
     }
 
     // if( !jorechossza( this ) )
-    //	hiba( "recorder::load-ban !jorechossza( this )!" );
+    //	hiba( "!jorechossza( this ) in recorder::load!" );
     return belyeg;
 }
 
-/* 1.0 es 1.1 eseten ez volt:
+/* in 1.0 and 1.1
     h = fopen( nev, "wb" );
     if( !h )
-        hiba( "Nem sikerult megnyitni irasra recorded file-t!: ", nev );
+        hiba( "Cannot open recorded file for write!: ", nev );
 
     if( fwrite( &betoltve, 1, 4, h ) != 4 )
-        hiba( "Nem sikerult irni recorded file-ba!: ", nev );
+        hiba( "Cannot write into recorded file!: ", nev );
     if( fwrite( &level, 1, 4, h ) != 4 )
-        hiba( "Nem sikerult irni recorded file-ba!: ", nev );
+        hiba( "Cannot write into recorded file!: ", nev );
 
 
     long hossz = betoltve*sizeof( float );
 
     if( fwrite( pk1rx, 1, unsigned(hossz), h ) != hossz )
-        hiba( "Nem sikerult irni recorded file-ba!: ", nev );
+        hiba( "Cannot write into recorded file!: ", nev );
 */
 
-static void irhiba(char* nev) { hiba("Nem sikerult irni recorded file-ba!: ", nev); }
+static void irhiba(char* nev) { hiba( "Cannot write into recorded file!: ", nev ); }
 
 void recorder::save(char* nev, FILE* h, long belyeg, int tag_p) {
     tag = tag_p;
@@ -648,7 +647,7 @@ void recorder::save(char* nev, FILE* h, long belyeg, int tag_p) {
     }
 
     if (!h) {
-        // Itt meg kell hagyni fopen-t!:
+        // leave fopen here
         char tmpnev[40];
         sprintf(tmpnev, "rec/%s", nev);
         h = fopen(tmpnev, "wb");
@@ -661,14 +660,14 @@ void recorder::save(char* nev, FILE* h, long belyeg, int tag_p) {
         irhiba(nev);
     }
 
-    // Verzio csak 1.2-tol kezdodoen jon bele:
-    // Elozoleg itt level volt, ami biztos hogy kisebb volt 120-nal:
+    // Verzio is only here after ASC 1.2(?)
+    // previously it was level which is always less than 120
     long verzio = 131;
     if (fwrite(&verzio, 1, 4, h) != 4) {
         irhiba(nev);
     }
 
-    // Ezt loadrecekben is olvassa, ugyhogy ennek verzio utan kell maradnia:
+    // this is also read in loadrec, so it should stay after Verzio
     if (fwrite(&Multirec, 1, 4, h) != 4) {
         irhiba(nev);
     }
@@ -736,7 +735,7 @@ void recorder::save(char* nev, FILE* h, long belyeg, int tag_p) {
         irhiba(nev);
     }
 
-    // Hangok:
+    // sounds
     if (fwrite(&hangbetoltve, 1, 4, h) != 4) {
         irhiba(nev);
     }
@@ -755,9 +754,9 @@ void recorder::save(char* nev, FILE* h, long belyeg, int tag_p) {
     }
 }
 
-// demo eseten resource file-bol nyit:
+// open from res file in case of demo
 long loadrecek(char* nev, int demo) {
-    // Eloszor megvizsgaljuk, hogy multirec vagy nem:
+    // first check if multirec or not
     FILE* h;
     if (demo) {
         h = qopen(nev, "rb");
@@ -772,14 +771,14 @@ long loadrecek(char* nev, int demo) {
             uzenet("Could not open for reading record file!:", tmpnev);
         }
     }
-    int tmp = 0; // betoltve (bejegyzes darabszam)
+    int tmp = 0; // loaded (darabszam is recorded)
     if (fread(&tmp, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        hiba( "Cannot read from recorded file!: ", nev );
     }
 
     long verzio = 0;
     if (fread(&verzio, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        hiba( "Cannot read from recorded file!: ", nev );
     }
 
     if (verzio < 131) {
@@ -790,9 +789,9 @@ long loadrecek(char* nev, int demo) {
         uzenet("Recorded file version is too new!", nev);
     }
 
-    // Betoltjuk Multirec-et:
+    // load Multirec
     if (fread(&Multirec, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        hiba( "Cannot read from recorded file!: ", nev );
     }
 
     if (demo) {
@@ -801,7 +800,7 @@ long loadrecek(char* nev, int demo) {
         fclose(h);
     }
 
-    // Most jon tenyleges beolvasas:
+    // actual reading
     long belyeg = 0;
     if (Multirec) {
         FILE* h;
@@ -834,7 +833,7 @@ long loadrecek(char* nev, int demo) {
     return belyeg;
 }
 
-// belyeg-et adja vissza, vagy 0-at:
+// returns 0 or belyeg
 void saverecek(char* nev, long belyeg, int tag) {
     if (Multirec) {
         char tmpnev[40];
@@ -844,8 +843,7 @@ void saverecek(char* nev, long belyeg, int tag) {
             uzenet("Could not open for writing record file!: !: ", tmpnev);
         }
 
-        // Multirec alapjan tudjak, hogy mit kell rec file multirec
-        // rubrikajaba irni:
+        // multirec field is known from Multirec variable
         Prec1->save(nev, h, belyeg, tag);
         Prec2->save(nev, h, belyeg, tag);
 
@@ -855,7 +853,7 @@ void saverecek(char* nev, long belyeg, int tag) {
     }
 }
 
-// WAV GYUJTO:
+// WAV collector
 
 static int Begyujtve = 0;
 
@@ -876,7 +874,7 @@ void startwavegyujto(int wavazonosito, double hangero, int objszam) {
 
 void resetwavegyujto(void) { Begyujtve = 0; }
 
-// Igaz, ha van bent wav:
+// returns true if there is wav
 int getwavegyujto(int* pwavazonosito, double* phangero, int* pobjszam) {
     if (Begyujtve == 0) {
         return 0;

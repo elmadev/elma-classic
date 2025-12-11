@@ -48,7 +48,7 @@ void help(void) {
     }
 }
 
-// Egyben allithato:
+// can be set all at once
 void options(void) {
     int origsecondary = State->secondarybuffer;
 
@@ -82,7 +82,7 @@ void options(void) {
             }
         }
 
-        // Jatekos valasztas:
+        // choose player
         sprintf(Rubrikak[1 + vantagis], "Player A:");
         sprintf(Rubrikak_tab[1 + vantagis], State->jatekosa);
 
@@ -139,9 +139,9 @@ void options(void) {
         kurrens = val.valassz();
 
         if (kurrens < 0) {
-            // State->save_aaa(); majd programbol valo kilepeskor kiirjuk
+            // State->save_aaa(); then display at program exit
             if (origsecondary != State->secondarybuffer && Hangmarmegy) {
-                // Kiirunk egy dialogust, hogy ujra kell inditani ehhez:
+                // display dialog to indicate game reset needed
                 szoveglista szl;
                 szl.addszoveg_kozep("You modified the sound buffer", 320, 140);
                 szl.addszoveg_kozep("optimization! As you already", 320, 190);
@@ -211,7 +211,7 @@ void options(void) {
             customize();
         }
 
-        if (vantagis) { // Visszaalitjuk eredeti helyzetebe
+        if (vantagis) { // reset to default state
             kurrens += 1;
         }
     }

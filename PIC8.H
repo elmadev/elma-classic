@@ -1,11 +1,11 @@
 
-// Ezt nyugodtan ki lehet venni, ha nem jonnek hibauzenetek:
+// can be removed if no error messages
 #define PIC8TEST
 
 typedef unsigned char* puchar;
 
-// Ha igaz, akkor lefoglalt kepek minden masodik sora paratlan cimen
-// kezdodik. LGR file beolvasas es betolthattereket alatt aktiv:
+// if true, every second row of allocated images starts on an even address
+// active during LGR file read and betolthattereket
 extern int Paratlankepsorok;
 
 class pic8;
@@ -15,7 +15,7 @@ void blt8(pic8* pd, pic8* ps, int x = 0, int y = 0, int x1 = -10000, int y1 = -1
 
 class pic8 {
   public:
-    // Baratok:
+    // friend functions
     friend void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2);
     // friend void blt8fizrefejjelle( pic8* ps );
     friend void spriteosit(pic8* ppic, int szin);
@@ -23,7 +23,7 @@ class pic8 {
     friend void setmode8_l(int res);
 
   protected:
-    // Sajat:
+    // personal
     int fizkep;
     int nemdestrukt;
     int lefoglal(long xsize, long ysize);
@@ -32,25 +32,25 @@ class pic8 {
     void pcxbeolvas(char* nev, FILE* h = NULL);
     int pcxsave(char* nev, unsigned char* pal);
 
-  public: // Csak gany miatt public!
+  public: // only public because of slop
     int xsize, ysize;
     puchar* sormuttomb;
 
   private:
     puchar* szegmuttomb;
     long szegnum;
-    // Sprite reszek:
+    // sprite parts
     unsigned char* sprite;
     unsigned short spritehossz;
 
   public:
     int success;
     pic8(int xsize, int ysize);
-    // Mar meglevo tombre epiti ra pic8-at, destruktor nem torli:
+    // adds pic8 on top of an existing array, won't be deleted by destructor
     pic8(int xsize, int ysize, unsigned char** ppc);
     pic8(char* nev, FILE* h = NULL);
     ~pic8(void);
-    // VOX, SPR es PCX-et ismeri:
+    // VOX, SPR and PCX are recognized:
     int save(char* nev, unsigned char* pal = NULL, FILE* h = NULL);
     int getxsize(void);
     int getysize(void);
@@ -70,7 +70,7 @@ class pic8 {
     void keszitbelsot(int x1, int y1, int x2, int y2, pic8* ppic);
 };
 
-// Fizikai kepernyore mutat:
+// points to physical screen
 // extern pic8* Pscr8;
 
 class ddpal;

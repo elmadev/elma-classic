@@ -1,5 +1,5 @@
 
-#define MAXPONT (1000) // Ennyit csak akkor foglal le, ha kell
+#define MAXPONT (1000) // only allocate this many if required
 
 class topol;
 
@@ -10,10 +10,10 @@ class gyuru {
     int pontszam;
     vekt2* ponttomb;
 
-    // Koveto valtozok:
+    // tracking(?) variables:
     int koveto;
 
-    // Fuggvenyek:
+    // functions:
     gyuru(void);
     gyuru(FILE* h, int kovetos);
     ~gyuru(void);
@@ -23,17 +23,17 @@ class gyuru {
     void ujkoord(int k, double x, double y);
     void kirajz(int k, int fel, int szaggatott = 0);
     void osszrajz(void);
-    // Sikeres-e azt adja vissza:
-    int beszur(int k); // k pont utan beszur egyet ugyanolyan koordokkal
+    // returns true on success(?):
+    int beszur(int k); // after k points, insert another with matching coords
     void torol(int k);
     double legkozpont(double x, double y, int* pk);
     int metszesszam(vekt2 r1, vekt2 v1);
-    // Ez csak akkor tekinti metszesnek, ha nem csak eppen erintik egymast:
+    // this function doesn't consider intersections where the two vectors are barely touching(?)
     int metszeshely(vekt2 r1, vekt2 v1, int kihagy, vekt2* pmetszes);
-    // akkor ad igazat, ha korbejaraskor poligon belseje bal oldalon van;
+    // returns true if the inside of the polygon is on the left during iteration(?);
     int pozitivkorjaras(void);
     vekt2 sulypont(void);
-    // Beadott px1, stb-bol indul ki:
+    // based on received px1, etc:
     void getminmax(double* px1, double* py1, double* px2, double* py2);
     double belyegszamitas(void);
     void szetvalaszt(void);
@@ -49,15 +49,15 @@ enum { KT_NORMAL, KT_UP, KT_DOWN, KT_LEFT, KT_RIGHT };
 class kerek {
   public:
     vekt2 r;
-    int rxint, ryint;     // Kaja lejatszas kozbeni kirajzolasahoz
-    int rxint_v, ryint_v; // Ugyanez view-ra
+    int rxint, ryint;     // food for render while playing
+    int rxint_v, ryint_v; // same thing for viewing (replay?)
     int tipus;
-    int kajatipus; // Ha kaja, akkor lehet gravitacios is
+    int kajatipus; // grav, if food
     int foodsorszam;
-    int aktiv;          // Lejatszas soran ha kaja, megvan-e meg
-    unsigned char szin; // Csak lejatszasnal kell
-    int sinfazisint;    // 0-tol 999-ig mehet
-    double sinfazis;    // 0-tol 2Pi-ig megy
+    int aktiv;          // taken or not, if food while playing
+    unsigned char szin; // only during play
+    int sinfazisint;    // between 0-999
+    double sinfazis;    // between 0-2Pi
 
     kerek(double x, double y, int tipus);
     kerek(FILE* h, int verzio);
@@ -73,14 +73,14 @@ class kerek {
 
 class sprite {
   public:
-    // Ha nev nem ervenyes, akkor [0] == 0:
-    // Ha kepnev ervenyes, akkor masik kettonek uresnek kell lennie:
+    // if nev isn't valid, then [0] == 0:
+    // if kepnev is valid, then the other two must be empty:
     char kepnev[10];
     char texturanev[10];
     char maszknev[10];
     vekt2 r;
     double xsize, ysize;
-    // Ha override, akkor tavolsagot es hatarolast nem irja felul LGR alapjan:
+    // in case of 'override', distance and bordering aren't overridden based on LGR:
     int tavolsag;
     int hatarol; // 0, HATAROL_F, HATAROL_B
 
@@ -94,7 +94,7 @@ class sprite {
 #define MAXGYURU (300)
 
 typedef gyuru* ptrgyuru;
-#define LEVELNAMEHOSSZ (50) // 13-as verzioig (14) volt
+#define LEVELNAMEHOSSZ (50) // up to version 13 (14)
 
 class lgrfile;
 
@@ -104,7 +104,7 @@ class topol {
     friend int floadlevel_p(char* nev);
     friend void invalidate_ptop(void);
     friend void kiirdesceket(void);
-    friend void hakellmentbelleveket(void); // topol.cpp-ben
+    friend void hakellmentbelleveket(void); // in topol.cpp
 
     double belyegszamitas(int kellspriteis);
 
@@ -116,13 +116,13 @@ class topol {
     void loadbelso(char* filenev);
 
   public:
-    // Beolvasas utan ervenyes, csak rec file ellenorzesere hasznalando
+    // only valid after input, used for checking rec files
     long belyeg;
-    // loadlgrfile allitja 1-be, ha nincs meg lgr es default.lgr-t hasznal:
+    // set to 1 by loadlgrfile if lgr doesn't exist and default.lgr is used:
     int nincslgrje;
 
     int hibas, lezart;
-    ptrgyuru ptomb[MAXGYURU]; // Ez csak gany miatt public
+    ptrgyuru ptomb[MAXGYURU]; // only public because of slop
     kerek* kerektomb[MAXKEREK];
     sprite* spritetomb[MAXSPRITE];
     char levelname[LEVELNAMEHOSSZ + 1];
@@ -133,57 +133,57 @@ class topol {
     palyaidok idok;
     int idokhelye;
 
-    // Igazzal ter vissza, ha volt valtozas:
+    // returns true if there was change:
     int pic_selejtez(lgrfile* plgr);
     gyuru* legkozpont(double x, double y, int* pk, double* ptav = NULL, gyuru* kimarad = NULL);
     kerek* legkozkerek(double x, double y, double* ptav = NULL);
     sprite* legkozsprite(double x, double y, double* ptav = NULL);
-    // Ha saveidok hivja meg, csak akkor nem kell check:
+    // check is only not required when called by saveidok:
     void save(char* filenev, int nemkellcheck = 0);
-    // Csak eredetileg beolvasott filenev-vel szabad meghivni:
+    // should only be called with originally inputted filenev:
     void saveidok(char* filenev);
     void kirajzol(void);
-    // pgy levegoben van-e. Akkor folddarab:
+    // if pgy is airborne, then folddarab (piece of ground?):
     int levegoben(gyuru* pgy, vekt2* pr = NULL);
     void getminmax(double* px1, double* py1, double* px2, double* py2, int kerekkel);
 
-    // Kerekkel kapcsolatos dolgok:
-    // Motor helyzetet is o allitja be, kajaszamot adja vissza:
-    int setallaktiv(motorst* pmot); // eheto kerekeket aktivizalja
-    void killerekelore(void);       // kerekeket rendezi
-    void kitoltiszineket(void);     // Osszes kerek szinet bejegyzi
+    // wheel related stuff
+    // sets bike position, returns kajaszam (food number)
+    int setallaktiv(motorst* pmot); // activates 'kerek' objects which are food
+    void killerekelore(void);       // sorts 'kerek' objects
+    void kitoltiszineket(void);     // sets color of all 'kerek' objects
     kerek* getptrkerek(int index);
 
-    // Ha igaz, y negalva van (ez kell lejatszasnal):
+    // if true, y is negated (required during playing):
     int kerekekfejjellefele;
     void kereklefejjel(void);
     void kerekjolalljon(void);
 };
 
-// lejatszo.cpp-ben Falg Tag ennek alapjan teszi vissza motorost:
-extern vekt2 Kezdetihelydiff; // setallaktiv allitja be
+// biker in flag tag is put back by lejatszo.cpp based on this
+extern vekt2 Kezdetihelydiff; // is set by setallaktiv
 
-// Ha letezik file, akkor 0-t ad vissza!:
-// Ugyanugy viselkedik nevvel, mint topol konstruktora:
+// returns 0 if file exists
+// treats 'nev' the same as the constructor of 'topol'
 int access_topol(char* filenev);
 
 unsigned long getbelyeg(char* nev);
-// Igazzal ter vissza, ha megvan nev;
+// return true if 'nev' is found
 int getbelyegheznev(unsigned long belyeg, char* nev);
 
-// Csak external file-hoz:
-// Ha NULL, akkor valami baj volt vele:
-// char* getlevelname( char* nev ); mar nem hasznalt
+// only for external files
+// returns NULL if there were problems
+// char* getlevelname( char* nev ); no longer used
 
-// 0-tol kezdodnek:
+// starts from 0
 char* getleveldescription(int level);
 
-// Belso belyegszamitasokhoz kell:
+// required for internal 'belyeg' calculations
 /*unsigned long double2belyeg( double* px );
 unsigned long double2belyeg( long l );*/
 
 extern char Ezenlegjobbido[30];
-// Azt a nevet keri, amit topol::topol kap:
+// asks for the name received by topol::topol
 void beallitlegjobbidot(char* filenev, int single);
 
 int nevanalizis(char* nev);

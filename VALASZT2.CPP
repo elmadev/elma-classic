@@ -14,7 +14,7 @@ void initrubrikak(void) {
     if (Rubrikak) {
         hiba("98y5t4");
     }
-    // Megszamolja maximalis lev es rec file-okat:
+    // count the max amount of rec and lev files:
     int levszam = 0;
     finame fname;
     int done = fifirst("lev/*.lev", fname);
@@ -40,7 +40,7 @@ void initrubrikak(void) {
     // if( szam < MAXKEPSZAM )
     //	szam = MAXKEPSZAM;
 
-    // Megvan max szam:
+    // max szam is acquired
     szam += 220;
 
     if (szam > 40000) {
@@ -49,7 +49,7 @@ void initrubrikak(void) {
 
     Rubrikak = new rubrika[szam + 10];
     if (!Rubrikak) {
-        hiba("Nincs eleg memoria Rubrikak-at lefoglalni!");
+        hiba("Not enough memory to allocate for Rubrikak!");
     }
     Maxrubrikaszam = szam;
     if (Maxrubrikaszam < 200) {
@@ -63,7 +63,7 @@ valaszt2::valaszt2(void) {
     szam = 0;
     kur = x0 = y0 = dy = egykepen = escelheto = 0;
     cim[0] = 0;
-    // Ezt o maganak beallitja, de nehanyan atdefinialjak:
+    // this is set here, but can be redefined elsewhere
     cimy = 30;
     pszovlist = NULL;
 }
@@ -86,7 +86,7 @@ valaszt2::~valaszt2(void) {
     kur = x0 = y0 = dy = egykepen = escelheto = 0;
 }
 
-// Rubrikakat beveszi:
+// takes in rubrics
 void valaszt2::bead(int szam_p, int tabos_p) {
     if (rubrikak) {
         hiba("valaszt2::bead rubrikak!");
@@ -94,30 +94,30 @@ void valaszt2::bead(int szam_p, int tabos_p) {
     szam = szam_p;
     tabos = tabos_p;
     if (szam < 1 || szam > Maxrubrikaszam) {
-        hiba("valaszt2::bead nem jo szam!");
+        hiba("valaszt2::bead wrong number!");
     }
     if (tabos && szam > MAXRUBRIKASZAM_TAB) {
-        hiba("valaszt2::bead nem jo szam (tabos)!");
+        hiba("valaszt2::bead wrong number (tab)!");
     }
     rubrikak = new rubrika[szam];
     if (!rubrikak) {
-        hiba("memoria");
+        hiba("memory");
     }
     rubrikak_tab = NULL;
     if (tabos) {
         rubrikak_tab = new rubrika[szam];
         if (!rubrikak_tab) {
-            hiba("memoria");
+            hiba("memory");
         }
     }
     for (int i = 0; i < szam; i++) {
         if (strlen(Rubrikak[i]) > MAXRUBRIKAHOSSZ) {
-            hiba("valaszt2::bead tul hosszu string!:", Rubrikak[i]);
+            hiba("valaszt2::bead string too long!:", Rubrikak[i]);
         }
         strcpy(rubrikak[i], Rubrikak[i]);
         if (tabos) {
             if (strlen(Rubrikak_tab[i]) > MAXRUBRIKAHOSSZ) {
-                hiba("valaszt2::bead tul hosszu string (tab)!:", Rubrikak_tab[i]);
+                hiba("valaszt2::bead string too long (tab)!:", Rubrikak_tab[i]);
             }
             strcpy(rubrikak_tab[i], Rubrikak_tab[i]);
         }
@@ -127,11 +127,11 @@ void valaszt2::bead(int szam_p, int tabos_p) {
 int RECidokellhet = 0;
 int RECidokellis = 0;
 
-// Visszaadja valasztott szamat, ESC eseten -1-t:
-// tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
+// returns the selected number (-1 in case of ESC)
+// in case of tobbrajz, first render multiple times (Win95):
 int valaszt2::valassz(egyszovsor* preszovegek, int preszovegszam, int csakkirajzol) {
     if (szam < 1 || egykepen < 2) {
-        hiba("valaszt2::valassz nem jo elejen!");
+        hiba("valaszt2::valassz wrong at start!");
     }
 
     if (kur > szam - 1) {
@@ -161,7 +161,7 @@ int valaszt2::valassz(egyszovsor* preszovegek, int preszovegszam, int csakkirajz
                 return -1;
             }
             if (c == MK_ENTER) {
-                // RECidomenteshez kell (mainmenu.cpp-ben is):
+                // required for RECidomentes (also in mainmenu.cpp):
                 int controlaltnyomva(void);
                 if (RECidokellhet && controlaltnyomva()) {
                     RECidokellis = 1;
@@ -210,7 +210,7 @@ int valaszt2::valassz(egyszovsor* preszovegek, int preszovegszam, int csakkirajz
                     }
                 }
             }
-            // Volume allitas itt specialisan van elintezve:
+            // setting volume is handled here specially:
             /*if( (c == MK_LEFT || c == MK_RIGHT) &&
                 strcmp( rubrikak[kur], "Sound Volume:" ) == 0 &&
                 (kur == 3 || kur == 4) &&
@@ -230,15 +230,15 @@ int valaszt2::valassz(egyszovsor* preszovegek, int preszovegszam, int csakkirajz
         }
         if (valtozott) {
             valtozott = 0;
-            // Betaplalja kirajzba uj kepszoveget:
+            // feed new kepszoveg into kirajz:
             pszovlist->clear();
             for (int i = 0; i < preszovegszam; i++) {
                 if (strncmp(preszovegek[i].text, "*$$^&|@", 7) == 0) {
-                    // Kozepre kell tenni:
+                    // needs to be centered:
                     pszovlist->addszoveg_kozep(&preszovegek[i].text[7], preszovegek[i].x,
                                                preszovegek[i].y);
                 } else {
-                    // Nem kell kozepre tenni:
+                    // doesn't need to be centered:
                     pszovlist->addszoveg(preszovegek[i].text, preszovegek[i].x, preszovegek[i].y);
                 }
             }

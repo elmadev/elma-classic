@@ -5,13 +5,13 @@
 #define IDOEGYEDISZAM1 (6754362)
 #define IDOEGYEDISZAM2 (8674642)
 
-// Ertekeik kommentkent kint is vannak:
+// values are displayed as comments also
 
 #define BELYEGSZORZO (3247.764325643)
 
-// Ha define-olva van, save belso lev formatumban, .leb kiterjesztessel
-// ment mintha shareware lenne, plusz hakellmentbelleveket fuggveny
-// osszes levelt igy ki is menti:
+// if defined save with internal lev format, .leb extension
+// save as if shareware, as well as the function hakellmentbelleveket
+// all levels are saved like this:
 // #define BELSOTIR
 
 static char Levelnevek[MAXPALYASZAM + 2][14] = {
@@ -40,7 +40,7 @@ int Leveldescinited = 0;
 #define DESCNEVHOSSZ (30)
 char Leveldescek[(DESCNEVHOSSZ + 2) * MAXBEEPLEVELSZAM + 6];
 
-// Ki is lep:
+// also exits
 void kiirdesceket(void) {
     FILE* h = fopen("desclist.txt", "wt");
     if (!h) {
@@ -53,7 +53,7 @@ void kiirdesceket(void) {
             fprintf(h, "Itt nincs nev\n");
             continue;
         }
-        // Eloallitjuk QWQUU001 fele nevet:
+        // generate "QWQUU" names:
         char tmp[10];
         sprintf(tmp, "%d", i + 1);
         char nev[20];
@@ -68,7 +68,7 @@ void kiirdesceket(void) {
         strcat(nev, ".LEV");
 
         if (access_topol(nev) != 0) {
-            // Ez a topol file mar nem letezik:
+            // this topol file no longer exists
             nemolvastobbet = 1;
             fprintf(h, "Itt nincs nev\n");
             continue;
@@ -80,15 +80,16 @@ void kiirdesceket(void) {
     }
 
     fclose(h);
-    hiba("Kiirta desclist.txt-t!");
+    hiba("desclist.txt displayed!");
 }
 
-// Ezt topol friend-jekent deklaraljuk es m_v.cpp hivja minden indulasnal:
+// this is declared as friend of topol
+//and is called by m_v.cpp on every start(??:
 void hakellmentbelleveket(void) {
 #ifdef BELSOTIR
     finame fname;
     int done = fifirst("lev/*.lev", fname);
-    // Vegigmegyunk osszes lev file-on es kimentjuk oket belsokent:
+    // iterate through all lev files and save them as internal
     while (!done) {
         topol* ptop = new topol(fname);
         ptop->save(fname, 1);
@@ -99,7 +100,7 @@ void hakellmentbelleveket(void) {
 
     ficlose();
 
-    hiba("Kiirta lev fileokat belsokent!");
+    hiba("lev files displayed as internal!");
 #endif
 }
 
@@ -107,7 +108,7 @@ static char Sor[110];
 
 // Van ugyanilyen neven state.cpp-ben is ket fv.:
 
-// Sikerest adja vissza:
+// returns successful:
 static int titkosread(void* mut, int hossz, FILE* h) {
     if (fread(mut, 1, hossz, h) != hossz) {
         return 0;
@@ -124,7 +125,7 @@ static int titkosread(void* mut, int hossz, FILE* h) {
     return 1;
 }
 
-// Sikerest adja vissza:
+// returns successful:
 static int titkoswrite(void* mut, int hossz, FILE* h) {
     unsigned char* pc = (unsigned char*)mut;
     short a = 21, b = 9783, c = 3389;
@@ -154,7 +155,7 @@ char* getleveldescription(int level) {
         Leveldescinited = 1;
         FILE* h = qopen("desclist.txt", "rt");
         if (!h) {
-            kiirdesceket(); // ki is lep
+            kiirdesceket(); // also exits
         }
 
         for (int i = 0; i < MAXBEEPLEVELSZAM; i++) {
@@ -190,7 +191,7 @@ kerek::kerek(double x, double y, int tipusp) {
     r.x = x;
     r.y = y;
     tipus = tipusp;
-    kajatipus = 0; // Ra kell movolni hogy kaja lehessen
+    kajatipus = 0; // need to move on it to make it food
     foodsorszam = 0;
 }
 
@@ -209,12 +210,12 @@ void kerek::kirajzol(void) {
         vonalrajz(r + r1, r + r2, 0);
     }
 
-    // Kis jel kor kozepere:
+    // small sign on middle of circle
     double meret = 0.02;
     vonalrajz(r + vekt2(-meret, -meret), r + vekt2(meret, meret), 0);
     vonalrajz(r + vekt2(meret, -meret), r + vekt2(-meret, meret), 0);
 
-    // Beleirjuk betut korbe:
+    // draw letter inside circle
     if (tipus == T_CEL) {
         vonalrajz(r + vekt2(-0.15, 0.3), r + vekt2(-0.15, -0.3), 0);
         vonalrajz(r + vekt2(-0.15, 0.3), r + vekt2(0.15, 0.3), 0);
@@ -248,25 +249,25 @@ void kerek::kirajzol(void) {
 
 kerek::kerek(FILE* h, int verzio) {
     if (fread(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
-        hiba("Nem olvas file-bol kerek::kerek-ben!");
+        hiba("Cannot read from file in kerek::kerek!");
     }
     if (fread(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
-        hiba("Nem olvas file-bol kerek::kerek-ben!");
+        hiba("Cannot read from file in kerek::kerek!");
     }
     if (fread(&tipus, 1, sizeof(tipus), h) != sizeof(tipus)) {
-        hiba("Nem olvas file-bol kerek::kerek-ben!");
+        hiba("Cannot read from file in kerek::kerek!");
     }
 
     kajatipus = 0;
     if (verzio >= 9) {
         if (fread(&kajatipus, 1, 4, h) != 4) {
-            hiba("Nem olvas file-bol kerek::kerek-ben!");
+            hiba("Cannot read from file in kerek::kerek!");
         }
     }
     foodsorszam = 0;
     if (verzio >= 11) {
         if (fread(&foodsorszam, 1, 4, h) != 4) {
-            hiba("Nem olvas file-bol kerek::kerek-ben!");
+            hiba("Cannot read from file in kerek::kerek!");
         }
     }
     if (foodsorszam < 0 || foodsorszam > 8) {
@@ -276,19 +277,19 @@ kerek::kerek(FILE* h, int verzio) {
 
 void kerek::save(FILE* h) {
     if (fwrite(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
-        hiba("Nem ir file-ba kerek::save-ben!");
+        hiba("Cannot write to file in kerek::save!");
     }
     if (fwrite(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
-        hiba("Nem ir file-ba kerek::save-ben!");
+        hiba("Cannot write to file in kerek::save!");
     }
     if (fwrite(&tipus, 1, sizeof(tipus), h) != sizeof(tipus)) {
-        hiba("Nem ir file-ba kerek::save-ben!");
+        hiba("Cannot write to file in kerek::save!");
     }
     if (fwrite(&kajatipus, 1, 4, h) != 4) {
-        hiba("Nem ir file-ba kerek::save-ben!");
+        hiba("Cannot write to file in kerek::save!");
     }
     if (fwrite(&foodsorszam, 1, 4, h) != 4) {
-        hiba("Nem ir file-ba kerek::save-ben!");
+        hiba("Cannot write to file in kerek::save!");
     }
 }
 
@@ -322,19 +323,19 @@ sprite::sprite(double x, double y, char* kepnev_p, char* texturanev_p, char* mas
     tavolsag = 100;
     hatarol = 0;
 
-    // Default meret:
+    // Default size:
     xsize = Aranyrec * DEFAULTSIZE;
     ysize = Aranyrec * DEFAULTSIZE;
 
     if (kepnev[0] && (maszknev[0] || texturanev[0])) {
-        hiba("sp::sp-ban sok nev egy poligonban!");
+        hiba("Too many names per polygon in sp::sp!");
     }
     if (kepnev[0]) {
         int index = Plgr->getkepindex(kepnev);
         if (index < 0) {
             kepnev[0] = 0;
         } else {
-            // Megvan kep:
+            // kep is acquired:
             xsize = Plgr->kepek[index].xsize;
             ysize = Plgr->kepek[index].ysize;
             xsize *= Aranyrec;
@@ -343,7 +344,7 @@ sprite::sprite(double x, double y, char* kepnev_p, char* texturanev_p, char* mas
             hatarol = Plgr->kepek[index].hatarol;
         }
     } else {
-        // Nem kep sprite:
+        // not kep sprite:
         if (maszknev[0]) {
             int index = Plgr->getmaszkindex(maszknev);
             if (index < 0) {
@@ -378,33 +379,33 @@ void sprite::kirajzol(void) {
 sprite::sprite(FILE* h) {
     int meret = sizeof(tavolsag);
     if (meret != 4) {
-        hiba("sprite::sprite-ban sizeof( tavolsag ) != 4!");
+        hiba("sizeof( tavolsag ) != 4 in sprite::sprite!");
     }
 
     if (fread(kepnev, 1, 10, h) != 10) {
         hiba("Nemo sp!");
     }
-    kepnev[10] = 0; // Csak biztonsagert
+    kepnev[10] = 0; // security measure
     if (fread(texturanev, 1, 10, h) != 10) {
         hiba("Nemo sp!");
     }
-    texturanev[10] = 0; // Csak biztonsagert
+    texturanev[10] = 0; // security measure
     if (fread(maszknev, 1, 10, h) != 10) {
         hiba("Nemo sp!");
     }
-    maszknev[10] = 0; // Csak biztonsagert
+    maszknev[10] = 0; // security measure
 
     if (fread(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
-        hiba("Nem olvas file-bol sprite::sprite-ban!");
+        hiba("Cannot read from file in sprite::sprite!");
     }
     if (fread(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
-        hiba("Nem olvas file-bol sprite::sprite-ban!");
+        hiba("Cannot read from file in sprite::sprite!");
     }
     if (fread(&tavolsag, 1, sizeof(tavolsag), h) != sizeof(tavolsag)) {
-        hiba("Nem olvas file-bol sprite::sprite-ban!");
+        hiba("Cannot read from file in sprite::sprite!");
     }
     if (fread(&hatarol, 1, sizeof(hatarol), h) != sizeof(hatarol)) {
-        hiba("Nem olvas file-bol sprite::sprite-ban!");
+        hiba("Cannot read from file in sprite::sprite!");
     }
 }
 
@@ -532,45 +533,45 @@ topol::~topol(void) {
     }
 }
 
-// Igazzal ter vissza, ha volt valtozas:
+// return true if changed:
 int topol::pic_selejtez(lgrfile* plgr) {
-    // Most minden sprite-ot kitorol, ha nincs meg hozza LGR-file-ban
-    // kep, maszk, vagy textura nev:
+    // delete all sprites if they are not in LGR
+    // kep, maszk, or textura nev:
 
-    // Ezt lehetne hasznalni dialogushoz:
+    // can be used for dialogue:
     int volttorles = 0;
     for (int i = 0; i < MAXSPRITE; i++) {
         if (spritetomb[i]) {
             sprite* psp = spritetomb[i];
-            // Default meret:
+            // Default size:
             psp->xsize = Aranyrec * DEFAULTSIZE;
             psp->ysize = Aranyrec * DEFAULTSIZE;
 
             if (psp->kepnev[0] && (psp->maszknev[0] || psp->texturanev[0])) {
-                hiba("pic_selejtez-ben sok nev egy spriteban!");
+                hiba("Too many names per sprite in pic_selejtez!");
             }
             if (psp->kepnev[0]) {
                 int index = plgr->getkepindex(psp->kepnev);
                 if (index < 0) {
                     psp->kepnev[0] = 0;
-                    // Toroljuk:
+                    // delete
                     delete spritetomb[i];
                     spritetomb[i] = NULL;
                     volttorles = 1;
                     continue;
                 }
-                // Megvan kep:
+                // kep is acquired
                 psp->xsize = plgr->kepek[index].xsize;
                 psp->ysize = plgr->kepek[index].ysize;
                 psp->xsize *= Aranyrec;
                 psp->ysize *= Aranyrec;
             } else {
-                // Nem kep sprite:
+                // not kep sprite:
                 if (psp->maszknev[0]) {
                     int index = plgr->getmaszkindex(psp->maszknev);
                     if (index < 0) {
                         psp->maszknev[0] = 0;
-                        // Toroljuk:
+                        // delete
                         delete spritetomb[i];
                         spritetomb[i] = NULL;
                         volttorles = 1;
@@ -585,7 +586,7 @@ int topol::pic_selejtez(lgrfile* plgr) {
                     int index = plgr->gettexturaindex(psp->texturanev);
                     if (index < 0) {
                         psp->texturanev[0] = 0;
-                        // Toroljuk:
+                        // delete
                         delete spritetomb[i];
                         spritetomb[i] = NULL;
                         volttorles = 1;
@@ -595,13 +596,13 @@ int topol::pic_selejtez(lgrfile* plgr) {
         }
     }
 
-    // Most meg spritetomb elejere kompaktaljuk spriteokat:
+    // compactify sprites to front of spritetomb:
     int voltvaltozas = 1;
     while (voltvaltozas) {
         voltvaltozas = 0;
         for (int i = 0; i < MAXSPRITE - 1; i++) {
             if (!spritetomb[i] && spritetomb[i + 1]) {
-                // Kovetkezo mutatot ide hozzuk:
+                // get next pointer here
                 spritetomb[i] = spritetomb[i + 1];
                 spritetomb[i + 1] = NULL;
                 voltvaltozas = 1;
@@ -609,7 +610,7 @@ int topol::pic_selejtez(lgrfile* plgr) {
         }
     }
 
-    // Kiselejtezzuk es ha kell ujra is toltjuk fore es background neveket:
+    // select and refresh fgnev and bgnev
     if (strcmpi(Ptop->fgnev, Ptop->bgnev) == 0) {
         Ptop->bgnev[0] = 0;
     }
@@ -742,12 +743,12 @@ void topol::kirajzol(void) {
     for (int i = 0; i < MAXGYURU; i++) {
         if (ptomb[i]) {
             if (ptomb[i]->koveto) {
-                // Kovetok:
+                // Koveto objects:
                 if (Rajzolkoveto) {
                     ptomb[i]->osszrajz();
                 }
             } else {
-                // Normal poligonok:
+                // Normal poligon objects:
                 if (Rajzolpoligon) {
                     ptomb[i]->osszrajz();
                 }
@@ -768,10 +769,10 @@ void topol::kirajzol(void) {
     }
 }
 
-// Igaz, ha bent van:
+// return true if inside(?):
 int topol::levegoben(gyuru* pgy, vekt2* pr) {
     if ((pgy && pr) || (!pgy && !pr)) {
-        hiba("topol::levegoben-ben paramok nem stimmelnek!");
+        hiba("Wrong params in topol::levego!");
     }
 
     vekt2 r;
@@ -781,7 +782,7 @@ int topol::levegoben(gyuru* pgy, vekt2* pr) {
         r = *pr;
     }
     vekt2 v = vekt2(27654.475374565578, 37850.5364775);
-    // Vegigmegyunk az egeszen:
+    // iterate through everything
     int metszes = 0;
     for (int i = 0; i < MAXGYURU; i++) {
         if (ptomb[i] && !ptomb[i]->koveto && ptomb[i] != pgy) {
@@ -798,7 +799,7 @@ int topol::levegoben(gyuru* pgy, vekt2* pr) {
 int nevanalizis(char* nev) {
     char ctmp = nev[5];
     nev[5] = 0;
-    // (rekorder.cpp-ben is be van huzalozva ez a string:)
+    // (this string is also hardcoded in rekorder.cpp)
     if (strcmpi(nev, "QWQUU") != 0) {
         nev[5] = ctmp;
         return 0;
@@ -824,14 +825,14 @@ int nevanalizis(char* nev) {
     if (sum <= Palyaszam) {
         return sum;
     } else {
-        if (sum == 34) { // 33-ra is ra kell keresni
-            return sum;  // Shareware demo eseten
+        if (sum == 34) { // also search for 33
+            return sum;  // in case of shareware
         }
         return 0;
     }
 }
 
-// Ha letezik file, akkor 0-t ad vissza!:
+// return 0 if file exists
 int access_topol(char* filenev) {
     int belsopalyaszam = nevanalizis(filenev);
     if (belsopalyaszam > 0) {
@@ -844,7 +845,7 @@ int access_topol(char* filenev) {
 
 char Ezenlegjobbido[30] = "";
 
-// Azt a nevet keri, amit topol::topol kap:
+// asks for the name received by topol::topol
 void beallitlegjobbidot(char* filenev, int single) {
     if (strlen(filenev) > 20) {
         hiba("4534516");
@@ -853,15 +854,15 @@ void beallitlegjobbidot(char* filenev, int single) {
     int belsopalyaszam = nevanalizis(filenev);
     palyaidok* idok = NULL;
     if (belsopalyaszam > 0) {
-        belsopalyaszam--; // Mivel eggyel nagyobb tomb indexenel
-                          // Belso palya:
+        belsopalyaszam--; // because it's bigger than the index by one
+                          // internal lev
         if ((belsopalyaszam != 33) && (belsopalyaszam >= Palyaszam)) {
             hiba("67467524");
         }
 
         idok = &State->palyakidejei[belsopalyaszam];
     } else {
-        // Kulso palya:
+        // external lev
         if (!Ptop) {
             hiba("78236");
         }
@@ -882,8 +883,8 @@ void beallitlegjobbidot(char* filenev, int single) {
     }
 }
 
-// Elso palya indexe 1:
-static char* Lgrtabla[110] = {NULL, NULL}; // 1-es indexut figyeli hogy init-e
+// first level is indexed 1
+static char* Lgrtabla[110] = {NULL, NULL}; // looks for init of first index lev
 
 static char Szo[50] = "";
 
@@ -908,14 +909,14 @@ static void makelgrtabla(void) {
         strcpy(Lgrtabla[i], "default");
     }
 
-    // Most fel van toltve default ertekekkel, beolvassuk file-t:
+    // loaded with default values, open file:
     FILE* h = fopen("lgr/lgrlist.txt", "rt");
     if (!h) {
         return;
     }
 
     while (1) {
-        // Beolvasunk egy sort:
+        // read one row
         if (!fgets(Sor, 40, h)) {
             break;
         }
@@ -932,7 +933,7 @@ static void makelgrtabla(void) {
         }
         *strstr(Szo, ".lgr") = 0;
         char* szo = Szo;
-        // Levagjuk elejerol space-eket es tabokat:
+        // cut off spaces and tabs from front
         while ((*szo == ' ') || (*szo == 9)) {
             szo++;
         }
@@ -945,7 +946,7 @@ static void makelgrtabla(void) {
     fclose(h);
 }
 
-// QWQUU001 elso palya:
+// first lev is QWQUU001
 topol::topol(char* filenev_p) {
     if (!Lgrtabla[1]) {
         makelgrtabla();
@@ -965,25 +966,25 @@ topol::topol(char* filenev_p) {
         strcpy(filenev, Levelnevek[belsopalyaszam]);
     }
 
-    // Innentol kezdve ket kulon rutin fogja beolvasni kulso es belso file-okat
-    // a kulso beolvaso a jo, a belso beolvaso egy kicsit meg van valtoztatva
-    // es #define BELSOTIR eseten igy menti ki file-t topol.
+    // from here on, internals and externals are read by two different routines
+    // external reader is good, internal reader is a bit changed
+    // and this how file is saved by topol in case of #define BELSOTIR
 
-    // loadbelso beolvassa kerekek szamat is sok gyuru elott, mig kulso
-    // beolvassa sok gyurut es csak utana olvassa kerekek szamat es kerekeket
+    // loadbelso reads number of 'kerek' objects before 'gyuru' objects
+    // loadkulso reads 'gyuru' objects first
 
     if (kulso) {
         loadkulso(filenev);
     } else {
         loadbelso(filenev);
-        // Sajat tablabol vesszuk lgr neveket:
-        // #ifdef TEST 		Demo miatt most nem ellenorizzuk
+        // lgr names are read from personal table
+        // #ifdef TEST 		no check because of demo
         //	if( belsopalyaszam < 0 || belsopalyaszam > Palyaszam )
         //		hiba( "4i4fyuif" );
         // #endif
         char tmp[40];
         sprintf(tmp, "lgr/%s.lgr", Lgrtabla[belsopalyaszam]);
-        if (access(tmp, 0) == 0) { // Csak ha letezik file:
+        if (access(tmp, 0) == 0) { // only if file exists
             strcpy(lgrnev, Lgrtabla[belsopalyaszam]);
         }
     }
@@ -1016,22 +1017,22 @@ void topol::loadkulso(char* filenev) {
     sprintf(tmpnev, "lev/%s", filenev);
     h = fopen(tmpnev, "rb");
     if (!h) {
-        hiba("topol::topol-ban nem tudta nyitni file-t!: ", tmpnev);
+        hiba("cannot open file in topol::topol!: ", tmpnev);
     }
     /*////}
     else {
         h = qopen( filenev, "rb" );
         if( !h )
-            hiba( "topol::topol-ban nem tudta nyitni file-t!: ", filenev );
+            hiba("cannot open file in topol::topol!: ", tmpnev);
     } */////
 
-    // Verzio beolvasasa:
+    // read Verzio:
     char tmp[10] = "AAAAA";
     if (fread(tmp, 1, 5, h) != 5) {
-        hiba("Nem tudott olvasni txt file-bol!");
+        hiba("Cannot read from txt file!");
     }
     if (strncmp(tmp, "POT", 3) != 0) {
-        hiba("topol::topol( char* filenev )-ben nem stimmel eleje!");
+        hiba("topol::topol( char* filenev ) start is wrong!");
     }
 
     belyeg = 0;
@@ -1042,102 +1043,101 @@ void topol::loadkulso(char* filenev) {
         uzenet("Level file's version is too new!: ", filenev);
     }
 
-    // Most csak ezt a ket verziot tudja olvasni, de eleg kikommentezni
-    // hogy mindet olvassa:
+    // can only read these two verzio-s, but can be commented out to read all
     if (verzio != 6 && verzio != 14) {
         uzenet("Corrupt level file!: ", filenev);
     }
 
-    // verzio 6: 1.2-es verzio levele
-    // verzio 7: uj verzio
-    // verzio 8: uj verzio kovetovel es uj gyurukkel( maszk, texturanev)
-    // verzio 10: benne van idotabla is file vegen
-    // verzio 11: kerek-ben benne van foodsorszam ertek is
-    // verzio 12: uj koveto (csak koveto tenye van tarolva gyuru-ben)
-    // verzio 13: plusz 2 byte-ot beolvas meg belyeg elott
-    // verzio 14: LEVELNAME (14)-rol (50)-re emelkedik, nem seek-el 100-ra
+    // verzio 6: ASC 1.2 levels
+    // verzio 7: new Verzio
+    // verzio 8: new Verzio with 'koveto' and 'gyuru' objects ( maszk, texturanev)
+    // verzio 10: also has time table at the end of file
+    // verzio 11: has foodsorszam value in 'kerek'
+    // verzio 12: new koveto (just the fact of it(?) is stored in gyuru object)
+    // verzio 13: read 2 extra bytes before 'belyeg'
+    // verzio 14: LEVELNAME (14) increased to (50), doesn't seek 100
 
     int dummy;
     if (verzio >= 13) {
         if (fread(&dummy, 1, 2, h) != 2) {
-            hiba("Nem tudott olvasni lev file-bol!");
+            hiba("Cannot read from lev file!");
         }
     }
 
     // Belyeg:
     if (fread(&belyeg, 1, 4, h) != 4) {
-        hiba("Nem tudott olvasni lev file-bol!");
+        hiba("Cannot read from lev file!");
     }
 
     if (fread(&belyeg_d, 1, sizeof(belyeg_d), h) != sizeof(double)) {
-        hiba("Nem tudott olvasni lev file-bol double belyeget!");
+        hiba("Cannot read double belyeg from lev file!");
     }
 
-    // Beolvassuk hogy shareware-e:
+    // read whether it is shareware
     double sarvarertek;
     if (fread(&sarvarertek, 1, sizeof(sarvarertek), h) != sizeof(sarvarertek)) {
-        hiba("Nem tudott olvasni lev file-bol!");
+        hiba("Cannot read from lev file!");
     }
     if (sarvarertek + belyeg_d < 9786.0 || sarvarertek + belyeg_d > 36546.0) {
-        hiba("topol::topol-ban sarvarertek kivul esik tartomanyon!");
+        hiba("sarvarertek outside range in topol::topol!");
     }
 
     // Levels that can only be played in Registered would meet the condition: sarvarertek + belyeg_d
     // <= 20000.0
 
-    // Beolvassuk hogy hibas-e:
+    // read whether it has error
     double hibaertek;
     if (fread(&hibaertek, 1, sizeof(hibaertek), h) != sizeof(hibaertek)) {
-        hiba("Nem tudott olvasni lev file-bol!");
+        hiba("Cannot read from lev file!");
     }
     if (hibaertek + belyeg_d < 9786.0 || hibaertek + belyeg_d > 36546.0) {
-        hiba("topol::topol-ban hibaertek kivul esik tartomanyon!");
+        hiba("hibaertek outside range in topol::topol!");
     }
     if (hibaertek + belyeg_d > 20000.0) {
         hibas = 1;
     }
 
-    // Beolvassuk hogy lezart-e:
+    // read whether it is locked
     double lezartertek;
     if (fread(&lezartertek, 1, sizeof(lezartertek), h) != sizeof(lezartertek)) {
-        hiba("Nem tudott olvasni lev file-bol!");
+        hiba("Cannot read from lev file!");
     }
     if (lezartertek + belyeg_d < 9875.0 || lezartertek + belyeg_d > 32345.0) {
-        hiba("topol::topol-ban lezartertek kivul esik tartomanyon!");
+        hiba("lezartertek outside range in topol::topol!");
     }
     if (lezartertek + belyeg_d > 20000.0) {
         lezart = 1;
     }
 
-    // lezart = 0; // Ha ez nincs kikomentezve, unlockol minden file-t
+    // lezart = 0; // if not commented out, unlocks every lev
 
-    // Beolvassuk level nevet:
+    // read levname
     int tmpnamehossz = LEVELNAMEHOSSZ;
     if (verzio < 14) {
         tmpnamehossz = 14;
     }
     fread(levelname, 1, tmpnamehossz + 1, h);
-    levelname[tmpnamehossz] = 0; // Ez csak biztonsagert
+    levelname[tmpnamehossz] = 0; // security measure
 
-    // Beolvassuk lgr nevet:
+    // read lgr name
     if (verzio > 6) {
         fread(lgrnev, 1, 16, h);
-        lgrnev[15] = 0; // Ez csak biztonsagert
+        lgrnev[15] = 0; // security measure
     } else {
         strcpy(lgrnev, "default");
     }
 
     if (verzio >= 8) {
         fread(fgnev, 1, 10, h);
-        lgrnev[10] = 0; // Ez csak biztonsagert
+        lgrnev[10] = 0; // security measure
         fread(bgnev, 1, 10, h);
-        lgrnev[10] = 0; // Ez csak biztonsagert
+        lgrnev[10] = 0; // security measure
     } else {
         strcpy(fgnev, "ground");
         strcpy(bgnev, "sky");
     }
 
-    // Gyuruk szamat 100 byte utan kezdjuk:
+    // gyuru count starts after 100 bytes:
     if (verzio < 14) {
         ////if( kulso )
         fseek(h, 100, SEEK_SET);
@@ -1147,23 +1147,23 @@ void topol::loadkulso(char* filenev) {
 
     double gyuruolvszam = 0;
     if (fread(&gyuruolvszam, 1, sizeof(gyuruolvszam), h) != sizeof(gyuruolvszam)) {
-        hiba("topol::topol-ban nem tudta olvasni lebego gyuruszamot!");
+        hiba("Cannot read gyuru count float from topol::topol!");
     }
 
     int gyuruszam = gyuruolvszam;
     if (gyuruszam > MAXGYURU) {
-        hiba("topol::topol-ban gyuruszam > MAXGYURU!: ");
+        hiba("gyuruszam > MAXGYURU in topol::topol!: ");
     }
     if (gyuruszam <= 0) {
-        hiba("topol::topol-ban gyuruszam <= 0!");
+        hiba("gyuruszam <= 0 in topol::topol!");
     }
 
-    // Beolvassa sok gyurut:
+    // read many 'gyuru' objects
     for (int i = 0; i < gyuruszam; i++) {
         ptomb[i] = new gyuru(h, verzio);
     }
 
-    // Kerekek szama:
+    // number of 'kerek' objects
     double kerekolvszam = 0;
     if (fread(&kerekolvszam, 1, sizeof(kerekolvszam), h) != sizeof(kerekolvszam)) {
         hiba("topol::topol-ban nem tudta olvasni lebego kerekszamot!");
@@ -1178,24 +1178,24 @@ void topol::loadkulso(char* filenev) {
     }
 
     for (int i = 0; i < kerekszam; i++) {
-        // Beolvassa sok kereket:
+        // read many 'kerek'
         kerektomb[i] = new kerek(h, verzio);
     }
 
     if (verzio > 6) {
-        // Most van SPRITE beolvasas is:
-        // Kerekek szama:
+        // read sprites
+        // number of 'kerek' objects:
         double spriteolvszam = 0;
         if (fread(&spriteolvszam, 1, sizeof(spriteolvszam), h) != sizeof(spriteolvszam)) {
-            hiba("topol::topol-ban nem tudta olvasni lebego spriteszamot!");
+            hiba("Cannot read sprite count float in topol::topol!");
         }
 
         int spriteszam = spriteolvszam;
         if (spriteszam > MAXSPRITE) {
-            hiba("topol::topol-ban kerekszam > MAXSPRITE!: ");
+            hiba("kerekszam > MAXSPRITE! in topol::topol!: ");
         }
         if (spriteszam < 0) {
-            hiba("topol::topol-ban spriteszam < 0!");
+            hiba("spriteszam < 0 in topol::topol!");
         }
 
         if (verzio < 8 && spriteszam > 0) {
@@ -1203,15 +1203,15 @@ void topol::loadkulso(char* filenev) {
         }
 
         for (int i = 0; i < spriteszam; i++) {
-            // Beolvassa sok kereket:
+            // read many 'kerek'
             spritetomb[i] = new sprite(h);
         }
     }
 
-    // Ezekutan mar csak idotabla lehet!!!
+    // only time table after this
 
-    // Meg beolvassuk ido tablat is kulso file eseten:
-    // idokhelye es idok tartalma eddig 0:
+    // also read time table in case of external file:
+    // idokhelye and idok are 0 so far:
     ////if( kulso ) {
     idokhelye = ftell(h);
     if (idokhelye < 6) {
@@ -1236,14 +1236,14 @@ void topol::loadkulso(char* filenev) {
     ////else
     ////    qclose( h );
 
-    // Most megnezzuk, hogy belyeg stimmel-e:
+    // check if 'belyeg' matches
     double szamitottbelyeg = belyegszamitas(verzio > 6);
     if (fabs(szamitottbelyeg - belyeg_d) > 0.01) {
         uzenet("Corrupt .LEV file!: ", filenev);
     }
 }
 
-// Ezt ha ujra kell kepezni loadkulso atalakitasaval kell:
+// remake by modifying loadkulso if required
 void topol::loadbelso(char* filenev) {
     nincslgrje = 0;
     kerekekfejjellefele = 0;
@@ -1266,16 +1266,16 @@ void topol::loadbelso(char* filenev) {
     FILE* h = NULL;
     h = qopen(filenev, "rb");
     if (!h) {
-        hiba("topol::topol-ban nem tudta nyitni file-t!: ", filenev);
+        hiba("Cannot open file in topol::topol!: ", filenev);
     }
 
-    // Verzio beolvasasa:
+    // read Verzio
     char tmp[10] = "AAAAA";
     if (fread(tmp, 1, 5, h) != 5) {
-        hiba("Nem tudott olvasni txt file-bol!");
+        hiba("Cannot read from txt file!");
     }
     if (strncmp(tmp, "@@^!@", 3) != 0) {
-        hiba("topol::topol( char* filenev )-ben nem stimmel eleje!");
+        hiba("topol::topol( char* filenev ) start is wrong!");
     }
 
     belyeg = 0;
@@ -1288,154 +1288,154 @@ void topol::loadbelso(char* filenev) {
     if( verzio > 14 )
         uzenet( "Level file's version is too new!: ", filenev );
     */
-    int verzio = 14; // Mivel leb file-okat mindig igy mentjuk
+    int verzio = 14; // leb files are always saved like this
 
-    // verzio 6: 1.2-es verzio levele
-    // verzio 7: uj verzio
-    // verzio 8: uj verzio kovetovel es uj gyurukkel( maszk, texturanev)
-    // verzio 10: benne van idotabla is file vegen
-    // verzio 11: kerek-ben benne van foodsorszam ertek is
-    // verzio 12: uj koveto (csak koveto tenye van tarolva gyuru-ben)
-    // verzio 13: plusz 2 byte-ot beolvas meg belyeg elott
-    // verzio 14: LEVELNAME (14)-rol (50)-re emelkedik, nem seek-el 100-ra
+    // verzio 6: ASC 1.2 levels
+    // verzio 7: new Verzio
+    // verzio 8: new Verzio with 'koveto' and 'gyuru' objects ( maszk, texturanev)
+    // verzio 10: also has time table at the end of file
+    // verzio 11: has foodsorszam value in 'kerek'
+    // verzio 12: new koveto (just the fact of it(?) is stored in gyuru object)
+    // verzio 13: read 2 extra bytes before 'belyeg'
+    // verzio 14: LEVELNAME (14) increased to (50), doesn't seek 100
 
     int dummy;
     if (verzio >= 13) {
         if (fread(&dummy, 1, 2, h) != 2) {
-            hiba("Nem tudott olvasni lev file-bol!");
+            hiba("Cannot read from lev file!");
         }
     }
 
     // Belyeg:
     if (fread(&belyeg, 1, 4, h) != 4) {
-        hiba("Nem tudott olvasni lev file-bol!");
+        hiba("Cannot read from lev file!");
     }
 
     if (fread(&belyeg_d, 1, sizeof(belyeg_d), h) != sizeof(double)) {
-        hiba("Nem tudott olvasni lev file-bol double belyeget!");
+        hiba("Cannot read double belyeg from lev file!");
     }
 
-    // Beolvassuk hogy shareware-e:
+    // read whether it is shareware
     double sarvarertek;
     if (fread(&sarvarertek, 1, sizeof(sarvarertek), h) != sizeof(sarvarertek)) {
-        hiba("Nem tudott olvasni lev file-bol!");
+        hiba("Cannot read from lev file!");
     }
     if (sarvarertek + belyeg_d < 9786.0 || sarvarertek + belyeg_d > 36546.0) {
-        hiba("topol::topol-ban sarvarertek kivul esik tartomanyon!");
+        hiba("sarvarertek outside of range in topol::topol!");
     }
 
-    // Beolvassuk hogy hibas-e:
+    // read whether it has error
     double hibaertek;
     if (fread(&hibaertek, 1, sizeof(hibaertek), h) != sizeof(hibaertek)) {
-        hiba("Nem tudott olvasni lev file-bol!");
+        hiba("Cannot read from lev file!");
     }
     if (hibaertek + belyeg_d < 9786.0 || hibaertek + belyeg_d > 36546.0) {
-        hiba("topol::topol-ban hibaertek kivul esik tartomanyon!");
+        hiba("hibaertek outside of range in topol::topol!");
     }
     if (hibaertek + belyeg_d > 20000.0) {
         hibas = 1;
     }
 
-    // Beolvassuk hogy lezart-e:
+    // read whether it is locked
     double lezartertek;
     if (fread(&lezartertek, 1, sizeof(lezartertek), h) != sizeof(lezartertek)) {
-        hiba("Nem tudott olvasni lev file-bol!");
+        hiba("Cannot read from lev file!");
     }
     if (lezartertek + belyeg_d < 9875.0 || lezartertek + belyeg_d > 32345.0) {
-        hiba("topol::topol-ban lezartertek kivul esik tartomanyon!");
+        hiba("lezartertek outside of range in topol::topol!");
     }
     if (lezartertek + belyeg_d > 20000.0) {
         lezart = 1;
     }
 
     // if( lezart ) {
-    //  Ez csak debug-hoz:
-    //  dialog( "Le volt zarva!" );
+    //  only for debug:
+    //  dialog( "was locked" );
     //}
 
-    // lezart = 0; // Ha ez nincs kikomentezve, unlockol minden file-t
+    // lezart = 0; // if not commented out, unlock every lev
 
-    // Beolvassuk level nevet:
+    // read levname
     int tmpnamehossz = LEVELNAMEHOSSZ;
     if (verzio < 14) {
         tmpnamehossz = 14;
     }
     fread(levelname, 1, tmpnamehossz + 1, h);
-    levelname[tmpnamehossz] = 0; // Ez csak biztonsagert
+    levelname[tmpnamehossz] = 0; // security measure
 
-    // Beolvassuk lgr nevet:
+    // read lgr name
     if (verzio > 6) {
         fread(lgrnev, 1, 16, h);
-        lgrnev[15] = 0; // Ez csak biztonsagert
+        lgrnev[15] = 0; // security measure
     } else {
         strcpy(lgrnev, "default");
     }
 
     if (verzio >= 8) {
         fread(fgnev, 1, 10, h);
-        lgrnev[10] = 0; // Ez csak biztonsagert
+        lgrnev[10] = 0; // security measure
         fread(bgnev, 1, 10, h);
-        lgrnev[10] = 0; // Ez csak biztonsagert
+        lgrnev[10] = 0; // security measure
     } else {
         strcpy(fgnev, "ground");
         strcpy(bgnev, "sky");
     }
 
-    // Gyuruk szamat 100 byte utan kezdjuk:
+    // gyuru count starts after 100 bytes:
     if (verzio < 14) {
         qseek(h, 100, SEEK_SET);
     }
     double gyuruolvszam = 0;
     if (fread(&gyuruolvszam, 1, sizeof(gyuruolvszam), h) != sizeof(gyuruolvszam)) {
-        hiba("topol::topol-ban nem tudta olvasni lebego gyuruszamot!");
+        hiba("Cannot read gyuru count float in topol::topol!");
     }
 
     int gyuruszam = gyuruolvszam;
     if (gyuruszam > MAXGYURU) {
-        hiba("topol::topol-ban gyuruszam > MAXGYURU!: ");
+        hiba("gyuruszam > MAXGYURU in topol::topol!: ");
     }
     if (gyuruszam <= 0) {
-        hiba("topol::topol-ban gyuruszam <= 0!");
+        hiba("gyuruszam <= 0 in topol::topol!");
     }
 
-    // Kerekek szama:
+    // number of 'kerek' objects:
     double kerekolvszam = 0;
     if (fread(&kerekolvszam, 1, sizeof(kerekolvszam), h) != sizeof(kerekolvszam)) {
-        hiba("topol::topol-ban nem tudta olvasni lebego kerekszamot!");
+        hiba("Cannot read kerek count float in topol::topol!");
     }
 
     int kerekszam = kerekolvszam;
     if (kerekszam > MAXKEREK) {
-        hiba("topol::topol-ban kerekszam > MAXKEREK!: ");
+        hiba("kerekszam > MAXKEREK in topol::topol!: ");
     }
     if (kerekszam <= 0) {
-        hiba("topol::topol-ban kerekszam <= 0!");
+        hiba("kerekszam <= 0 in topol::topol!");
     }
 
-    // Beolvassa sok gyurut:
+    // read many 'gyuru' objects:
     for (int i = 0; i < gyuruszam; i++) {
         ptomb[i] = new gyuru(h, verzio);
     }
 
-    // Beolvassa sok kereket:
+    // read many 'kerek' objects:
     for (int i = 0; i < kerekszam; i++) {
         kerektomb[i] = new kerek(h, verzio);
     }
 
     if (verzio > 6) {
-        // Most van SPRITE beolvasas is:
-        // Kerekek szama:
+        // read sprites
+        // number of 'kerek' objects:
         double spriteolvszam = 0;
         if (fread(&spriteolvszam, 1, sizeof(spriteolvszam), h) != sizeof(spriteolvszam)) {
-            hiba("topol::topol-ban nem tudta olvasni lebego spriteszamot!");
+            hiba("Cannot read sprite count float in topol::topol!");
         }
 
         int spriteszam = spriteolvszam;
         if (spriteszam > MAXSPRITE) {
-            hiba("topol::topol-ban kerekszam > MAXSPRITE!: ");
+            hiba("kerekszam > MAXSPRITE in topol::topol!: ");
         }
         if (spriteszam < 0) {
-            hiba("topol::topol-ban spriteszam < 0!");
+            hiba("spriteszam < 0 in topol::topol!");
         }
 
         if (verzio < 8 && spriteszam > 0) {
@@ -1443,15 +1443,15 @@ void topol::loadbelso(char* filenev) {
         }
 
         for (int i = 0; i < spriteszam; i++) {
-            // Beolvassa sok kereket:
+            // read many 'kerek' objects:
             spritetomb[i] = new sprite(h);
         }
     }
 
-    // Ezekutan mar csak idotabla lehet, de mivel belso file, az sincs.
+    // no time table in internal levs
     qclose(h);
 
-    // Most megnezzuk, hogy belyeg stimmel-e:
+    // check if 'belyeg' matches
     double szamitottbelyeg = belyegszamitas(verzio > 6);
     if (fabs(szamitottbelyeg - belyeg_d) > 0.01) {
         uzenet("Corrupt .LEV file!: ", filenev);
@@ -1480,13 +1480,13 @@ void topol::save(char* filenev, int nemkellcheck) {
     // if( lezart )
     //   hiba( "topol::save-ben lezart!" );
 
-    Volttopsave = 1; // load.cpp-nek kell ez
+    Volttopsave = 1; // required by load.cpp
     if (kerekekfejjellefele) {
-        hiba("topol::save-ben kerekekfejjellefele!");
+        hiba("topol::save kerekekfejjellefele!");
     }
-    // Mivel ezzel meg valtoztathatunk polygonokon
-    // (polygon korbejaras megvaltoztatas, egymason fekvo pontok
-    // megszuntetese, tul hegyes szogek eltolasa), ezert ezt elore tesszuk:
+    // this can still change polygons
+    // (change of iteration, exclude overlapping points, translate acute angles)
+    // so it is put in front
     if (nemkellcheck) {
         hibas = 0;
     } else {
@@ -1513,7 +1513,7 @@ void topol::save(char* filenev, int nemkellcheck) {
 #endif
     FILE* h = fopen(tmpnev, "wb");
     if (!h) {
-        hiba("topol::save-ben nem tudta nyitni file-t!: ", tmpnev);
+        hiba("Cannot open file in topol::save! :", tmpnev);
     }
 
 #ifdef BELSOTIR
@@ -1522,59 +1522,59 @@ void topol::save(char* filenev, int nemkellcheck) {
     fwrite("POT14", 1, 5, h);
 #endif
 
-    // Kiszamitjuk es kiirjuk ketfele belyeget:
+    // calculate and display two types of 'belyeg'
     double belyeg_d = belyegszamitas(1);
     belyeg = longosit(belyeg_d);
 
-    fwrite(&belyeg, 1, 2, h); // Kiirunk ket tetszoleges byte-ot
+    fwrite(&belyeg, 1, 2, h); // display two bytes
 
     fwrite(&belyeg, 1, 4, h);
     fwrite(&belyeg_d, 1, sizeof(belyeg_d), h);
 
-    // Kiirjuk hogy sarvari-e:
+    // display if shareware
     // Shareware levels would meet the criteria sarvarertek + double(belyeg_l) > 20000.0
     // which originally was calculated as 20961.0 + s_random( 4982 ) - belyeg_d;
     double sarvarertek = 11877.0 + s_random(5871) - belyeg_d;
 
-// Regisztralt verzioju file-t is shareware-nek tunteti fol:
+// also display file from registered version as shareware
 #ifdef BELSOTIR
     sarvarertek = 20961.0 + s_random(4982) - belyeg_d;
 #endif
 
     fwrite(&sarvarertek, 1, sizeof(sarvarertek), h);
 
-    // Kiirjuk hogy hibas-e:
-    // Ha hibaertek + double(belyeg_l) > 20000.0, akkor hibas:
+    // display if has error
+    // if hibaertek + double(belyeg_l) > 20000.0, then has error:
     double hibaertek = 11877.0 + s_random(5871) - belyeg_d;
-    if (hibas) { // ezt mar elejen meghataroztuk
+    if (hibas) { // already determined at the start
         hibaertek = 20961.0 + s_random(4982) - belyeg_d;
     }
     fwrite(&hibaertek, 1, sizeof(hibaertek), h);
 
-    // Kiirjuk hogy lezart-e:
+    // display if locked
     double lezartertek = 12112.0 + s_random(6102) - belyeg_d;
     if (lezart) {
         lezartertek = 23090.0 + s_random(6310) - belyeg_d;
     }
     fwrite(&lezartertek, 1, sizeof(hibaertek), h);
 
-// Kiirjuk level nevet:
+// display levname
 #ifdef BELSOTIR
-    // leb-nel toroljuk nevet:
+    // delete levname if .leb
     for (int iiii = 0; iiii < LEVELNAMEHOSSZ; iiii++) {
         levelname[iiii] = 0;
     }
 #endif
     fwrite(levelname, 1, LEVELNAMEHOSSZ + 1, h);
 
-    // Kiirjuk level nevet:
+    // display levname
     fwrite(lgrnev, 1, 16, h);
-    // Kiirjuk hatter es eloter nevet:
+    // display background and foreground name
     fwrite(fgnev, 1, 10, h);
     fwrite(bgnev, 1, 10, h);
 
-    // Megszamoljuk gyuruket es kerekeket:
-    // fseek( h, 100, SEEK_SET ); 14-es verzio ota mar nem seek-el
+    // count 'gyuru' and 'kerek' objects
+    // fseek( h, 100, SEEK_SET ); no seek since Verzio 14
 
     int gyuruszam = 0;
     for (int i = 0; i < MAXGYURU; i++) {
@@ -1592,33 +1592,33 @@ void topol::save(char* filenev, int nemkellcheck) {
     }
     double kerekirtszam = kerekszam + 0.4643643;
 
-    // Kimentjuk gyuruk szamat elejetol kezdve 100 byte utan:
+    // save count of 'gyuru' objects after 100 bytes
     fwrite(&gyuruirtszam, 1, sizeof(gyuruirtszam), h);
 
-// Ha belso file-kent mentjuk, most megy kerekek szama:
+// if saved as internal file, add count of 'kerek' objects here
 #ifdef BELSOTIR
     fwrite(&kerekirtszam, 1, sizeof(kerekirtszam), h);
 #endif
 
-    // Kimentjuk sok gyurut:
+    // save many 'gyuru' objects
     for (int i = 0; i < MAXGYURU; i++) {
         if (ptomb[i]) {
             ptomb[i]->save(h, this);
         }
     }
 
-// Ha kulso file-kent mentjuk, most megy kerekek szama:
+// if saved as internal file, add count of 'kerek' objects here
 #ifndef BELSOTIR
     fwrite(&kerekirtszam, 1, sizeof(kerekirtszam), h);
 #endif
 
-    // Kimentjuk sok kereket:
+    // save many 'kerek' objects
     for (int i = 0; i < MAXKEREK; i++) {
         if (kerektomb[i]) {
             kerektomb[i]->save(h);
         }
     }
-    // Kimentjuk spriteokat:
+    // save sprites
     int spriteszam = 0;
     for (int i = 0; i < MAXSPRITE; i++) {
         if (spritetomb[i]) {
@@ -1633,7 +1633,7 @@ void topol::save(char* filenev, int nemkellcheck) {
         }
     }
 
-    // Kiirjuk ido tablat:
+    // display time table
     int tmpszo = IDOEGYEDISZAM1;
     fwrite(&tmpszo, 1, 4, h);
     titkoswrite(&idok, sizeof(idok), h);
@@ -1644,7 +1644,7 @@ void topol::save(char* filenev, int nemkellcheck) {
 
     if (hibas) {
 #ifdef BELSOTIR
-        hiba("#define BELSOTIR mellet hibas topol file mentes!:", filenev);
+        hiba("Wrong topol file saved with #define BELSOTIR:", filenev);
 #endif
         dialog("Though the level file was successfully saved, there are some errors in the design.",
                "You cannot play on this level until you correct these problems. To see what the",
@@ -1652,13 +1652,13 @@ void topol::save(char* filenev, int nemkellcheck) {
     }
 }
 
-// Csak eredetileg beolvasott filenev-vel szabad meghivni:
+// should only be called with originally inputted filenev:
 void topol::saveidok(char* filenev_p) {
-    if (idokhelye < 6) { // a 6-os talalomra ertek
+    if (idokhelye < 6) { // arbitrary value
         hiba("hjdvgyj");
     }
 
-    // Hozzacsapjuk nevhez LEV direktorit is:
+    // add lev directory to filenev
     char filenev[40];
     sprintf(filenev, "lev/%s", filenev_p);
 
@@ -1754,7 +1754,7 @@ double topol::belyegszamitas(int kellspriteis) {
     return BELYEGSZORZO * belyeg;
 }
 
-// Barmilyen hiba eseten 1-el ter vissza:
+// return 1 in case of any error
 unsigned long getbelyeg(char* nev) {
     char tmp[30];
     sprintf(tmp, "lev/%s", nev);
@@ -1776,13 +1776,13 @@ unsigned long getbelyeg(char* nev) {
     return l;
 }
 
-// Igazzal ter vissza, ha megvan nev;
+// return true if name acquired
 /*int getbelyegheznev( unsigned long belyeg, char* nev ) {
     find_t ffblk;
     int done = _dos_findfirst( "*.lev", _A_NORMAL, &ffblk );
     while( !done ) {
         if( getbelyeg( ffblk.name ) == belyeg ) {
-            // Megvan level file neve:
+            // filenev is acquired
             strcpy( nev, ffblk.name );
             return 1;
         }
@@ -1792,8 +1792,8 @@ unsigned long getbelyeg(char* nev) {
     return 0;
 } */
 
-// Csak external file-hoz:
-// Ha NULL, akkor valami baj volt vele:
+// only for external files
+// return NULL if has errors
 /*char* getlevelname( char* nev ) {
     static char levelnamebuffer[LEVELNAMEHOSSZ+4] = "";
 
@@ -1835,13 +1835,13 @@ unsigned long double2belyeg( long l ) {
     return double2belyeg( &x );
 } */
 
-// KEREKKEL kapcsolatos play elotti inicializalasok:
+// initializations related to 'kerek'
 
-// lejatszo.cpp-ben Falg Tag ennek alapjan teszi vissza motorost:
+// biker in flag tag is put back by lejatszo.cpp based on this
 vekt2 Kezdetihelydiff;
 
-// Motor helyzetet is o allitja be, kajaszamot adja vissza:
-// Eheto kerekeket aktivizalja:
+// sets bike position, returns kajaszam (food number)
+// activates 'kerek' objects which are food
 int topol::setallaktiv(motorst* pmot) {
     int kajaszam = 0;
     int voltkezdo = 0;
@@ -1857,7 +1857,7 @@ int topol::setallaktiv(motorst* pmot) {
             }
             if (pker->tipus == T_KEZDO) {
                 if (voltkezdo) {
-                    hiba("topol::setallaktiv-ban palyan ket kezdo is van!");
+                    hiba("Lev has two starts in topol::setallaktiv!");
                 }
                 voltkezdo = 1;
                 pker->aktiv = 0;
@@ -1871,12 +1871,12 @@ int topol::setallaktiv(motorst* pmot) {
         }
     }
     if (!voltkezdo) {
-        hiba("topol::setallaktiv-ban palyan nincs kezdo!");
+        hiba("No start in topol::setallaktiv!");
     }
     return kajaszam;
 }
 
-// Kerekeket rendezi:
+// sorts 'kerek' objects
 void topol::killerekelore(void) {
     int szam = 0;
     for (int i = 0; i < MAXKEREK; i++) {
@@ -1888,19 +1888,19 @@ void topol::killerekelore(void) {
     for (int i = 0; i < szam; i++) {
         kerek* pker = Ptop->kerektomb[i];
         if (!pker) {
-            hiba("topol::killerekelore-ben hezagos kerek tomb!");
+            hiba("Missing array elements in topol::killerekelore!");
         }
     }
 
     if (szam < 2) {
-        hiba("topol::killerekelore-ben szam < 2!");
+        hiba("szam < 2 in topol::killerekelore!");
     }
     for (int j = 0; j < szam + 4; j++) {
         for (int i = 0; i < szam - 1; i++) {
             int tipus1 = Ptop->kerektomb[i]->tipus;
             int tipus2 = Ptop->kerektomb[i + 1]->tipus;
 
-            // Sullyozzuk tipusokat hogy sorrendiseget lehessen megallapitani:
+            // types are weighted to make viable for sorting
             int tip1 = 10;
             if (tipus1 == T_HALALOS) {
                 tip1 = 1;
@@ -1924,7 +1924,7 @@ void topol::killerekelore(void) {
             }
 
             if (tip1 > tip2) {
-                // Cserelnunk kell:
+                // switch needed
                 kerek tmpker = *Ptop->kerektomb[i];
                 *Ptop->kerektomb[i] = *Ptop->kerektomb[i + 1];
                 *Ptop->kerektomb[i + 1] = tmpker;
@@ -1933,7 +1933,7 @@ void topol::killerekelore(void) {
     }
 }
 
-// Osszes kerek szinet bejegyzi:
+// sets color of all 'kerek' objects
 void topol::kitoltiszineket(void) {
     for (int i = 0; i < MAXKEREK; i++) {
         kerek* pker = Ptop->kerektomb[i];
@@ -1953,11 +1953,11 @@ void topol::kitoltiszineket(void) {
 
 kerek* topol::getptrkerek(int index) {
     if (index < 0 || index >= MAXKEREK) {
-        hiba("topol::getptrkerek-ben index < 0 || index >= MAXKEREK!");
+        hiba("index < 0 || index >= MAXKEREK! in topol::getptrkerek!");
     }
     kerek* pker = Ptop->kerektomb[index];
     if (!pker) {
-        hiba("topol::getptrkerek-ben !pker!");
+        hiba("!pker in topol::getptrkerek!");
     }
     return pker;
 }

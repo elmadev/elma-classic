@@ -21,7 +21,7 @@ static void titkosit(void) {
     short a = 23, b = 9982, c = 3391; // In Shareware, b is 9882
 
     if (!Leirotomb) {
-        hiba("titkosit-ban !Leirotomb!");
+        hiba("!Leirotomb in titkosit!");
     }
     int leiromeret = sizeof(fileleiro);
     for (int i = 0; i < FILESZAM; i++) {
@@ -39,7 +39,7 @@ static int Qopeninited = 0;
 
 void initqopen(void) {
     if (Qopeninited) {
-        hiba("initqopen tobbszor hivva!");
+        hiba("initqopen was called multiple times!");
     }
     Qopeninited = 1;
 
@@ -54,7 +54,7 @@ void initqopen(void) {
 
     Leirotomb = new fileleiro[FILESZAM];
     if (!Leirotomb) {
-        uzenet("initqopen-ben memory!");
+        uzenet("initqopen memory!");
     }
     FILE* h = fopen(Nagyfilenev, "rb");
     if (!h) {
@@ -62,7 +62,7 @@ void initqopen(void) {
     }
 
     if (fread(&Fileszam, 1, 4, h) != 4) {
-        hiba("initqopen-ben nem sikerult olvasni!");
+        hiba("Cannot read from initqopen!");
     }
     if (Fileszam <= 0 || Fileszam > FILESZAM) {
         hiba("Fileszam <= 0 || Fileszam > FILESZAM!");
@@ -70,19 +70,19 @@ void initqopen(void) {
 
     long hossz = sizeof(fileleiro[FILESZAM]);
     if (hossz > 64000l) {
-        hiba("Tul hosszu Leirotomb initqopen-ben!");
+        hiba("Leirotomb too large in initqopen!");
     }
     if (fread(Leirotomb, 1, unsigned(hossz), h) != hossz) {
-        hiba("initqopen-ben nem sikerult olvasni!");
+        hiba("Cannot read from initqopen!");
     }
     titkosit();
 
     long magicnumber = 0;
     if (fread(&magicnumber, 1, 4, h) != 4) {
-        hiba("initqopen-ben nem sikerult olvasni!");
+        hiba("Cannot read from initqopen!");
     }
     if (magicnumber != AZONNUMBER) {
-        hiba("initqopen-ben nem stimmel magicnumber!");
+        hiba("magicnumber wrong in initqopen!");
     }
 
     fclose(h);
@@ -96,13 +96,13 @@ static int Nyitva = 0;
 
 FILE* qopen(char* nev, char* paramok) {
     if (!Qopeninited) {
-        hiba("qopen initqopen nelkul!");
+        hiba("qopen without initqopen!");
     }
     if (Nyitva == MAXNYITVA) {
-        hiba("qopen-ben Nyitva == MAXNYITVA!");
+        hiba("Nyitva == MAXNYITVA in qopen!");
     }
     if (strcmp(paramok, "rb") != 0 && strcmp(paramok, "rt")) {
-        hiba("qopen-ben sem rb, sem rt!: ", nev);
+        hiba("No rb or rt in qopen!: ", nev);
     }
 
     if (Egybol) {
@@ -111,23 +111,23 @@ FILE* qopen(char* nev, char* paramok) {
                 Htomb[Nyitva] = fopen(Nagyfilenev, paramok);
                 Indextomb[Nyitva] = i;
                 if (!Htomb[Nyitva]) {
-                    hiba("Nem sikerult nagy tombot megnyitni!: ", Nagyfilenev);
+                    hiba("Cannot open large array!: ", Nagyfilenev);
                 }
                 if (fseek(Htomb[Nyitva], Leirotomb[i].kezdet, SEEK_SET) != 0) {
-                    hiba("Nem mukodik fseek qopen-ben!");
+                    hiba("fseek not working in qopen!");
                 }
 
                 Nyitva++;
                 return Htomb[Nyitva - 1];
             }
         }
-        hiba("qopen nem talalta meg nagyfileban file-t!: ", nev);
+        hiba("qopen cannot find file in nagyfile!: ", nev);
         return NULL;
     } else {
         Nyitva++;
         char tmp[30] = "..\\files\\";
         if (strlen(nev) > 12 || nev[0] == '.') {
-            hiba("Hibas nev qopen-ben!: ", nev);
+            hiba("Wrong name in qopen!: ", nev);
         }
         strcat(tmp, nev);
         return fopen(tmp, paramok);
@@ -136,10 +136,10 @@ FILE* qopen(char* nev, char* paramok) {
 
 void qclose(FILE* h) {
     if (!Qopeninited) {
-        hiba("qclose initqopen nelkul!");
+        hiba("qclose without initqopen!");
     }
     if (!Nyitva) {
-        hiba("qclose-ban !Nyitva!");
+        hiba("!Nyitva in qclose!");
     }
     if (Egybol) {
         for (int i = 0; i < Nyitva; i++) {
@@ -153,7 +153,7 @@ void qclose(FILE* h) {
                 return;
             }
         }
-        hiba("qclose nem talalta meg h-t!");
+        hiba("qclose cannot find h!");
     } else {
         Nyitva--;
         fclose(h);
@@ -179,7 +179,7 @@ int qseek(FILE* h, long offset, int whence) {
                 return fseek(Htomb[i], offset, SEEK_CUR);
             }
         }
-        hiba("qclose nem talalta meg h-t!");
+        hiba("qclose cannot find h!");
         return NULL;
     } else {
         return fseek(h, offset, whence);

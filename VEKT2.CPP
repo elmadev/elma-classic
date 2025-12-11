@@ -46,10 +46,10 @@ vekt2 forgatas90fokkal(vekt2 in) { return vekt2(-in.y, in.x); }
 
 vekt2 forgatasminusz90fokkal(vekt2 in) { return vekt2(in.y, -in.x); }
 
-// Sajat negyzetgyok:
+// personal square root function:
 double gyok(double a) {
     if (a < 0) {
-        hiba("Gyokvonas negativ szammal!");
+        hiba("Square root of negative number!");
         return 1;
     }
     double x1 = sqrt(a);
@@ -59,21 +59,20 @@ double gyok(double a) {
     return .5 * (x1 + a / x1);
 }
 
-// Az r1-bol indulo v1 vektor altal es az r2-bol indulo v2 altal
-// meghatarozott ket egyenes metszespontjanak visszaadasa:
-// Parhuzamosok eseten hiba( char* ); fv.-t hivja meg.
-// A keplet a kovetkezo: p = r2-v2*(n*(r2-r1))/(n*v2), ahol n meroleges v1-re.
+// returns the intersection point of lines
+// determined by the v1 vector with r1 origin and v2 vector with r2 origin
+// calls hiba( char* ) in case of parallel lines
+// the formula is as follows: p = r2-v2*(n*(r2-r1))/(n*v2), where n is perpendicular to v1
 vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     vekt2 n = forgatas90fokkal(v1);
     double nv2 = n * v2;
     if (fabs(nv2) < 0.00000001) {
-        // Ket parhuzamos egyenesrol van szo, visszaadjuk egyiknek a
-        // vegpontjat, ami masikon fekszik:
+        // we return one of two endpoints of the two parallel vectors
         if (v1 * v2 < 0) {
             r2 = r2 + v2;
-            v2 = Vekt2null - v2; // ezt mar felesleges, mivel mar nem hasznaljuk
+            v2 = Vekt2null - v2; // this will no longer be used
         }
-        // Most egyiranyba mutat v1 es v2:
+        // now v1 and v2 have the same orientation
         if ((r2 - r1) * v1 > 0) {
             return r2;
         } else {
@@ -87,36 +86,35 @@ vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     return r2 - v2 * (nr21 / nv2);
 }
 
-// Pont szakasztol valo tavolsagat szamolja ki:
-// (Szakasz hossza vsz hossza).
+// calculates the distance of a point from a line segment (vsz = length of segment) 
 double pontszakasztav(vekt2 rpont, vekt2 rsz, vekt2 vsz) {
     vekt2 rr = rpont - rsz;
     double skalered = vsz * rr;
     if (skalered <= 0) {
-        // Elso pont tavolsagat adja vissza:
+        // returns the distance of the first point:
         return abs(rr);
     }
     if (skalered >= vsz * vsz) {
-        // Masodik pont tavolsagat adja vissza:
+        // returns the distance of the second point
         return abs(rr - vsz);
     }
-    // Egyenestol valo tavolsagat adja vissza:
+    // returns the distance from the line
     vekt2 n = forgatas90fokkal(egys(vsz));
     return fabs(n * rr);
 }
 
-// Pont egyenestol valo tavolsagat szamolja ki:
+// calculates the distance of a point from a line
 double pontegyenestav(vekt2 rpont, vekt2 rsz, vekt2 vsz) {
     vekt2 rr = rpont - rsz;
     vekt2 n = forgatas90fokkal(egys(vsz));
     return fabs(n * rr);
 }
 
-// Visszaadja ket kor metszetet, r1-bol r2-be bal oldalon (Ganyolt):
+// returns the intersection of 2 circles, r1 and r2 on the left side (sloppy):
 vekt2 ketkormetszete(vekt2 r1, vekt2 r2, double l1, double l2) {
     vekt2 v = r2 - r1;
     double l = abs(v);
-    // Egy kis ganyolas:
+    // a bit of slop:
     if (l >= l1 + l2) {
         l = l1 + l2 - 0.000001;
     }
@@ -136,8 +134,8 @@ vekt2 ketkormetszete(vekt2 r1, vekt2 r2, double l1, double l2) {
     return r;
 }
 
-// Igaz, ha v1 altal meghatarozott egyenest metszi r2,v2,
-// vagyis ha v2 kezdo es vegpontja egyenes ket oldalan fekszik:
+// returns true if r2,v2 intersects the line defined by v1,
+// so if the origin and end points of v2 lie on different sides of the line
 static int ketoldalon(vekt2 v1, vekt2 r2, vekt2 v2) {
     vekt2 norm = forgatas90fokkal(v1);
     int elso = r2 * norm > 0;
@@ -148,9 +146,9 @@ static int ketoldalon(vekt2 v1, vekt2 r2, vekt2 v2) {
     return 0;
 }
 
-// Igaz, ha v1 altal meghatarozott egyenest metszi r2,v2,
-// vagyis ha v2 kezdo es vegpontja egyenes ket oldalan fekszik:
-// Ez csak akkor tekinti metszesnek, ha nem csak eppen erintik egymast:
+// returns true if r2,v2 intersects the line defined by v1,
+// so if the origin and end points of v2 lie on different sides of the line
+// this function doesn't consider intersections where the two vectors are barely touching(?)
 static int ketoldalon2(vekt2 v1, vekt2 r2, vekt2 v2) {
     static double kishatar = 0.0000000001;
     vekt2 norm = forgatas90fokkal(v1);
@@ -176,9 +174,9 @@ static int ketoldalon2(vekt2 v1, vekt2 r2, vekt2 v2) {
     return 0;
 }
 
-// Igaz, ha v1 altal meghatarozott egyenest metszi r2,v2,
-// vagyis ha v2 kezdo es vegpontja egyenes ket oldalan fekszik:
-// Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
+// returns true if r2,v2 intersects the line defined by v1,
+// so if the origin and end points of v2 lie on different sides of the line
+// this function is more lenient on intersections
 static int ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
     static double kishatar = 0.00000001;
     vekt2 norm = forgatas90fokkal(v1);
@@ -204,8 +202,7 @@ static int ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
     return 1;
 }
 
-// Igaz, ha az r1-bol indulo v1 vektor es az r2-bol indulo v2 vektor
-// metszi egymast:
+// returns true if v1 vector with r1 origin and v2 vector with r2 origin intersect
 int vektormetszes(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     if (ketoldalon(v1, r2 - r1, v2) && ketoldalon(v2, r1 - r2, v1)) {
         return 1;
@@ -213,9 +210,8 @@ int vektormetszes(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     return 0;
 }
 
-// Igaz, ha az r1-bol indulo v1 vektor es az r2-bol indulo v2 vektor
-// metszi egymast:
-// Ez csak akkor tekinti metszesnek, ha nem csak eppen erintik egymast:
+// returns true if v1 vector with r1 origin and v2 vector with r2 origin intersect
+// this function doesn't consider intersections where the two vectors are barely touching(?)
 int vektormetszes2(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     if (ketoldalon2(v1, r2 - r1, v2) && ketoldalon2(v2, r1 - r2, v1)) {
         return 1;
@@ -223,7 +219,7 @@ int vektormetszes2(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     return 0;
 }
 
-// Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
+// this function is more lenient on intersections
 int vektormetszes3(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     if (ketoldalon3(v1, r2 - r1, v2) && ketoldalon3(v2, r1 - r2, v1)) {
         return 1;
@@ -231,12 +227,12 @@ int vektormetszes3(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     return 0;
 }
 
-// Igazzal ter vissza, ha metszi kort egyenes:
-// Ket metszespont kozul a v iranyaba haladva az elsot adja vissza:
+// returns true if a line intersects a circle
+// of the two intersection points, it returns the first one when moving towards v:
 int egyeneskormetszes(vekt2 p1, vekt2 v, vekt2 r_kor, double sugar, vekt2* p) {
     vekt2 r = r_kor - p1;
     v.normal();
-    vekt2 k = v * (v * r); // p1-bol mutat egyenes legkozelebbi pontjaba
+    vekt2 k = v * (v * r); // from p1, it points towards the closest point on the line
     double tav = pontegyenestav(r_kor, p1, v);
     double gyokalatt = sugar * sugar - tav * tav;
     if (gyokalatt < 0.0) {

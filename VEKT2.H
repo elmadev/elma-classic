@@ -1,5 +1,5 @@
 
-// #define TEST eseten plusz teszteket vegez!
+// in case of #define TEST, do additional tests
 
 class vekt2 {
   public:
@@ -9,7 +9,7 @@ class vekt2 {
     vekt2 operator+(vekt2);
     vekt2 operator-(vekt2);
     double operator*(vekt2);
-    double operator%(vekt2); // Vektorialis szorzas.
+    double operator%(vekt2); // vectorial product
     void normal(void);
     void forgatas(double alfa);
 };
@@ -22,38 +22,36 @@ vekt2 egys(vekt2);
 vekt2 forgatas90fokkal(vekt2);
 vekt2 forgatasminusz90fokkal(vekt2);
 
-// Sajat negyzetgyok:
+// personal square root function:
 double gyok(double x);
 
-// KULONBOZO SZAMITASOK:
+// different calculations:
 
-// Az r1-bol indulo v1 vektor altal es az r2-bol indulo v2 altal
-// meghatarozott ket egyenes metszespontjanak visszaadasa:
-// Parhuzamosok eseten hiba( char* ); fv.-t hivja meg.
+// returns the intersection point of lines
+// determined by the v1 vector with r1 origin and v2 vector with r2 origin
+// calls hiba( char* ) in case of parallel lines
 vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
-// Pont szakasztol valo tavolsagat szamolja ki:
-// (Szakasz hossza vsz hossza).
+// calculates the distance of a point from a line segment (vsz = length of segment) 
 double pontszakasztav(vekt2 rpont, vekt2 rsz, vekt2 vsz);
-// Pont egyenestol valo tavolsagat szamolja ki:
+// calculates the distance of a point from a line
 double pontegyenestav(vekt2 rpont, vekt2 rsz, vekt2 vsz);
-// Visszaadja ket kor metszetet, r1-bol r2-be bal oldalon (Ganyolt):
+// returns the intersection of 2 circles, r1 and r2 on the left side (sloppy):
 vekt2 ketkormetszete(vekt2 r1, vekt2 r2, double l1, double l2);
 
-// Igaz, ha az r1-bol indulo v1 vektor es az r2-bol indulo v2 vektor
-// metszi egymast:
+// returns true if v1 vector with r1 origin and v2 vector with r2 origin intersect
 int vektormetszes(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
-// Ez csak akkor tekinti metszesnek, ha nem csak eppen erintik egymast:
+// this function doesn't consider intersections where the two vectors are barely touching(?)
 int vektormetszes2(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
-// Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
+// this function is more lenient on intersections
 int vektormetszes3(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
 
-// Igazzal ter vissza, ha metszi kort egyenes:
-// Ket metszespont kozul a v iranyaba haladva az elsot adja vissza:
+// returns true if a line intersects a circle
+// of the two intersection points, it returns the first one when moving towards v:
 int egyeneskormetszes(vekt2 r, vekt2 v, vekt2 r_kor, double sugar, vekt2* pmetszet);
 
 extern vekt2 Vekt2i, Vekt2j, Vekt2k, Vekt2null;
 extern double Pi;
 
-// Ezt meg kell irni hozza:
-// Uzenetet kuld peldaul 0-val valo osztas eseten (inverz matrix).
+// todo: write the following
+// send message when dividing by 0 (inverted matrices)
 // void hiba( char* message, char* text2 = NULL );

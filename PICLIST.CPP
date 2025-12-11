@@ -5,9 +5,9 @@ static char Plnev[] = "pictures.lst";
 static char Sor[210];
 static char Szo[210];
 
-// Visszaadja kovetkezo pos-t, ha nem volt szo, -1-et:
+// returns next pos or -1
 static int egyszobe(int pos) {
-    // Szo elejere all:
+    // go to start of word
     while (1) {
         if (!Sor[pos]) {
             return -1;
@@ -17,7 +17,7 @@ static int egyszobe(int pos) {
         }
         pos++;
     }
-    // Beolvassa szot:
+    // read word
     int szohossz = 0;
     while (1) {
         if (!Sor[pos] || Sor[pos] == ' ') {
@@ -34,7 +34,7 @@ static int egyszobe(int pos) {
 }
 
 int piclist::beolvasegysort(FILE* h, int index) {
-    // Nullaz:
+    // set to 0
     nevek[index * 10] = 0;
     tipusok[index] = 0;
     tavolsagok[index] = 0;
@@ -47,19 +47,19 @@ int piclist::beolvasegysort(FILE* h, int index) {
     if (!fgets(Sor, 205, h)) {
         return 0;
     }
-    // Leszedjuk sorvege jelet:
+    // cut endline
     if (strchr(Sor, '\n')) {
         *strchr(Sor, '\n') = 0;
     }
-    // Kiszedjuk TAB-okat:
+    // cut tabs
     while (strchr(Sor, 9)) {
         *strchr(Sor, 9) = ' ';
     }
 
-    // Bevesszuk kis kep nevet:
+    // insert small picture name
     int pos = egyszobe(0);
     if (pos < 0) {
-        return 0; // Ures sor
+        return 0; // empty row
     }
 
     if (strchr(Szo, '.')) {
@@ -70,7 +70,7 @@ int piclist::beolvasegysort(FILE* h, int index) {
     }
     strcpy(&nevek[index * 10], Szo);
 
-    // Bevesszuk tipust:
+    // insert type
     pos = egyszobe(pos);
     if (pos < 0) {
         uzenet("There is no type information in line:", Sor, hibatext);
@@ -98,7 +98,7 @@ int piclist::beolvasegysort(FILE* h, int index) {
     }
 
     if (tipusok[index] != PLTIP_MINTA) {
-        // Textura es kep eseten beolvassuk tavot es hatarolt:
+        // in case of texture and picture, read length and borders
         pos = egyszobe(pos);
         if (pos < 0) {
             uzenet("There is no picture distance in line:", Sor, hibatext);
@@ -114,7 +114,7 @@ int piclist::beolvasegysort(FILE* h, int index) {
         }
         tavolsagok[index] = tavolsag;
 
-        // Bevesszuk hatarolast:
+        // read borders
         pos = egyszobe(pos);
         if (pos < 0) {
             uzenet("There is no picture cutting information (F,B,U) in line:", Sor, hibatext);
@@ -136,14 +136,14 @@ int piclist::beolvasegysort(FILE* h, int index) {
         }
     }
 
-    // Atlatszosag beolvasasa:
+    // read transparency
     atlatszosagok[index] = ATLAT_TOPLEFT;
     pos = egyszobe(pos);
     if (pos < 0) {
         return 1;
     }
 
-    // Megnezzuk atlatszosagot:
+    // check transparency
     atlatszosagok[index] = -1;
     if (strcmpi(Szo, "tl") == 0) {
         atlatszosagok[index] = ATLAT_TOPLEFT;
@@ -204,9 +204,9 @@ piclist::piclist(void) {
     fclose(h);
 }
 
-// Binaris formatumbol:
+// from binary format
 piclist::piclist(FILE* h) {
-    // Elso verzio 1002
+    // first verzio 1002
     int verzio = 0;
     if (fread(&verzio, 1, 4, h) != 4) {
         uzenet("Cannot read pictures.lst information!");
@@ -234,7 +234,7 @@ piclist::piclist(FILE* h) {
     }
 }
 
-// Binaris formatumba:
+// to binary format
 void piclist::save(FILE* h) {
     int verzio = 1002;
     if (fwrite(&verzio, 1, 4, h) != 4) {

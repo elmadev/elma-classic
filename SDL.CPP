@@ -5,7 +5,7 @@ SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
 SDL_Surface* SDLSurfacePaletted;
 
-// Ha igaz, alulrol indul y (kirajz320 allitja igazba):
+//if true, y starts from below (set in kirajz320)
 int Locky0_alul = 0;
 
 int sdl_init() {
@@ -52,7 +52,7 @@ static int Bufflocked = 0;
 
 unsigned char** lockbackbuffer() {
     if (Bufflocked) {
-        hiba("lockbackbuffer-ben Bufflocked!");
+        hiba(" Bufflocked in lockbackbuffer!");
     }
     Bufflocked = 1;
 
@@ -76,7 +76,7 @@ unsigned char** lockbackbuffer() {
 
 void unlockbackbuffer(void) {
     if (!Bufflocked) {
-        hiba("unlockbackbuffer-ben !Bufflocked!");
+        hiba("!Bufflocked in unlockbackbuffer!");
     }
     Bufflocked = 0;
 
@@ -86,7 +86,7 @@ void unlockbackbuffer(void) {
 
 unsigned char** lockfrontbuffer(void) {
     if (Bufflocked) {
-        hiba("lockfrontbuffer-ben Bufflocked!");
+        hiba("Bufflocked in lockfrontbuffer!");
     }
 
     return lockbackbuffer();
@@ -94,7 +94,7 @@ unsigned char** lockfrontbuffer(void) {
 
 void unlockfrontbuffer(void) {
     if (!Bufflocked) {
-        hiba("unlockbackbuffer-ben !Bufflocked!");
+        hiba("!Bufflocked in unlockbackbuffer!");
     }
 
     unlockbackbuffer();

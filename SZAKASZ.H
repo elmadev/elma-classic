@@ -22,17 +22,17 @@ class szakaszok {
     int szam;
     int szakfuto;
 
-    // Terbeli kereseshez:
+    // for 3d search:
     pvonalnode* tertomb;
     int xdim, ydim;
     double cellameret;
     vekt2 origo;
-    vonalnode* nextnode; // getnext ez alapjan dolgozik!
+    vonalnode* nextnode; // this is the base for getnext
 
     void beindexelvonalat(vonal* pv, double maxtav);
     void bekot(int cellax, int cellay, vonal* pv);
 
-    // Terbeli kereseshez nodkezeles:
+    // node management for 3d search
     soknodecsomag* pelsocsomag;
     int csomagbanbetelt;
     vonalnode* getnewnode(void);
@@ -42,13 +42,13 @@ class szakaszok {
     szakaszok(topol* ptop);
     ~szakaszok(void);
 
-    // Terbeli fv.-ek:
-    // rendez-t csak egyszer szabad hivni!
+    // 3d functions
+    // rendez should only be called once
     void rendez(double maxtav);
     void felsorolasreset(vekt2 r);
     vonal* getnext(void);
 
-    // Osszes szakaszon vegigmennek:
+    // iterate all sections
     void felsorolasresetszak(void);
     vonal* getnextszak(void);
 

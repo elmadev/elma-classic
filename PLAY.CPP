@@ -50,7 +50,7 @@
     }
 }*/
 
-// Siker eseten igazzal ter vissza:
+// return true in case of success
 static int bevesznevet(char* nev) {
     szoveglista szovlist;
 
@@ -80,7 +80,7 @@ static int bevesznevet(char* nev) {
                 valtozott = 1;
             }
             if (c == MK_BACKSPACE) {
-                // <- (torles):
+                // <- (delete):
                 if (i > 0) {
                     i--;
                     nev[i] = 0;
@@ -111,8 +111,8 @@ static void konvoda(char* text) {
     int betuszam = 'z' - 'A' + 1;
     while (*text) {
         if (*text != 0x20) {
-            int sorszam = *text - 'A';        // sorszam legkisebb erteke 0
-            sorszam = betuszam - 1 - sorszam; // Megforditjuk sorrendet
+            int sorszam = *text - 'A';        // sorszam is at least 0
+            sorszam = betuszam - 1 - sorszam; // reverse order
             sorszam += Eltolas;
             sorszam %= betuszam;
             if (sorszam < 0 || sorszam >= betuszam) {
@@ -128,11 +128,11 @@ static void konvback(char* text) {
     int betuszam = 'z' - 'A' + 1;
     while (*text) {
         if (*text != 0x20) {
-            int sorszam = *text - 'A'; // sorszam legkisebb erteke 0
+            int sorszam = *text - 'A'; // sorszam is at least 0
             sorszam -= Eltolas;
             sorszam += betuszam * 2;
             sorszam %= betuszam;
-            sorszam = betuszam - 1 - sorszam; // Megforditjuk sorrendet
+            sorszam = betuszam - 1 - sorszam; // reverse order
             if (sorszam < 0 || sorszam >= betuszam) {
                 hiba("B508976!");
             }
@@ -176,10 +176,10 @@ void saveplay(long belyeg) {
         return;
     }
     if (strcmp(tmp, "memtocpy") == 0) {
-        // Itt most kiirja specialis uzenetet:
+        // display special message here
 
         // char* sor1 = "This is the executable code";
-        // char* sor2 = "of    ______ __________"; ket kisbetuvel
+        // char* sor2 = "of    ______ __________"; noncapitalized(?)
         // char* sor3 = "copyrighted in 1997"
         // char* sor4 = "by    Balazs Rozsa"
         // char* sor1 = "vbaW aW Vbe eRegUVih^e g[fe";
@@ -355,7 +355,7 @@ void saveplay(long belyeg) {
     saverecek(tmp, belyeg, State->tag);
 }
 
-// Idot beirja tablaba, ha kell:
+// write time into table if needed
 void idoelintezes(long ido, char* valasz, int level, char* filenev) {
     int extlev = 0;
     if (filenev) {
@@ -364,8 +364,8 @@ void idoelintezes(long ido, char* valasz, int level, char* filenev) {
 
     valasz[0] = 0;
     if (ido <= 0) {
-        // Nem fejeztek be:
-        // Azt jelzi valaszt2::valassz-nak, hogy kozepre tegye:
+        // failed to finish
+        // tells valaszt2::valassz to align in middle
         strcpy(valasz, "*$$^&|@You Failed to Finish!");
         if (MeghalteloszorAB == 1) {
             strcat(valasz, "    (A died first)");
@@ -376,7 +376,7 @@ void idoelintezes(long ido, char* valasz, int level, char* filenev) {
         return;
     }
 
-    // Befejeztek, kiirjuk idot:
+    // finish
 
     if (!extlev) {
         State->reloadidok();
@@ -394,7 +394,7 @@ void idoelintezes(long ido, char* valasz, int level, char* filenev) {
         }
     }
 
-    // Kivalasztjuk hogy single, vagy multiplayer idok-e:
+    // choose singleplayer or multiplayer times
     palyaidok* pketfeleido;
     if (extlev) {
         pketfeleido = &Ptop->idok;
@@ -411,9 +411,9 @@ void idoelintezes(long ido, char* valasz, int level, char* filenev) {
         return;
     }
 
-    // Felkerult tablara!
+    // time is written to table
     if (pidok->idokszama == 0) {
-        // Elso ido:
+        // first time
         pidok->idokszama = 1;
         pidok->idok[0] = ido;
         strcpy(pidok->nevek1[0], State->jatekosa);
@@ -424,22 +424,22 @@ void idoelintezes(long ido, char* valasz, int level, char* filenev) {
         }
         return;
     }
-    // Tablan van mar mas ido is:
-    // Uzenetek eldontese:
+    // table already has other times
+    // decide message
     int elozott = 0;
     if (pidok->idok[unsigned(pidok->idokszama - 1)] > ido) {
-        // Vkit leelozott:
+        // beat someone
         elozott = 1;
     }
     if (pidok->idok[0] > ido) {
-        // Legjobb ido!:
+        // best time:
         strcat(valasz, "     Best Time!");
     } else {
         if (elozott) {
             strcat(valasz, "     You Made the Top Ten");
         }
     }
-    // Beillesztjuk uj idot vegere!:
+    // insert new time to end:
     if (pidok->idokszama == MAXIDOK) {
         pidok->idok[MAXIDOK - 1] = ido;
         strcpy(pidok->nevek1[MAXIDOK - 1], State->jatekosa);
@@ -450,11 +450,11 @@ void idoelintezes(long ido, char* valasz, int level, char* filenev) {
         strcpy(pidok->nevek2[int(pidok->idokszama)], State->jatekosb);
         pidok->idokszama++;
     }
-    // Sorrendbe allitjuk idoket:
+    // sort times
     for (int i = 0; i < MAXIDOK + 1; i++) {
         for (int j = 0; j < pidok->idokszama - 1; j++) {
             if (pidok->idok[j] > pidok->idok[j + 1]) {
-                // Csere:
+                // switch
                 long tmp = pidok->idok[j];
                 pidok->idok[j] = pidok->idok[j + 1];
                 pidok->idok[j + 1] = tmp;
@@ -484,7 +484,7 @@ void replayprec(void) {
         Prec2->rewind();
         if (lejatszo_r(Prec1->palyanev, !elso)) {
             if (Ptop->kerekekfejjellefele) {
-                hiba("replayprec-ben Ptop->kerekekfejjellefel!");
+                hiba("Ptop->kerekekfejjellefel in replayprec!");
             }
             return;
         }
@@ -492,9 +492,10 @@ void replayprec(void) {
     }
 }
 
-// A jelenleg beolvasott palyan jatszik vissza:
-// Azt a nevet kerik, amit topol::topol kap:
-// Ezenlegjobbido beallitasahoz kell neki:
+// replays in current level
+// can only be used from replay in afterplay menu
+// asks for name received by topol::topol
+// needed to set ezenlegjobbido
 void replayjelenlegi(char* filenev) {
     int elso = 1;
     while (1) {
@@ -502,12 +503,12 @@ void replayjelenlegi(char* filenev) {
         Prec2->rewind();
         if (lejatszo_r(filenev, !elso)) {
             if (Ptop->kerekekfejjellefele) {
-                hiba("replayjelenlegi-ben Ptop->kerekekfejjellefel!");
+                hiba("Ptop->kerekekfejjellefel in replayjelenlegi!");
             }
             return;
         }
         if (Ptop->kerekekfejjellefele) {
-            hiba("replayjelenlegi-ben Ptop->kerekekfejjellefel!");
+            hiba("Ptop->kerekekfejjellefel in replayjelenlegi!");
         }
         elso = 0;
     }
@@ -516,7 +517,7 @@ void replayjelenlegi(char* filenev) {
 static egyszovsor Idoszovegek[14];
 
 // 0-ESC, 1-this level, 2-next level, 3-skip level
-// Ha filenev nem NULL, akkor external file:
+// if filenev is not NULL, then external file:
 int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
     int extlev = 0;
     if (filenev) {
@@ -528,7 +529,7 @@ int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
     int jatekosindex2 = getjatekosindex(State->jatekosb);
     jatekos* pjatekosb = &State->jatekosok[jatekosindex2];
 
-    // next, skip, kurrens beallitasa:
+    // set next, skip, current:
     int nextisvan = 0;
     int skipisvan = 0;
     int kurrens = 0;
@@ -540,7 +541,7 @@ int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
             skipisvan = 1;
         }
         kurrens = nextdefault;
-        // Ellenorzes:
+        // check
         if (nextdefault && !nextisvan) {
             hiba("nextdefault && !nextisvan!");
         }
@@ -595,7 +596,7 @@ int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
 
             int dx = 0;
             if (!tagisvan) {
-                dx = 100; // Ha nem kell fogoidot irni, mindent jobbra tolunk
+                dx = 100; // if no flag tag catch time(?) then shift to right
             }
 
             int ya = 380;
@@ -604,7 +605,7 @@ int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
             if (Pmenuabc->len(pjatekosa->nev) > 160 || Pmenuabc->len(pjatekosb->nev) > 160) {
                 hosszunevek = 1;
             }
-            // A jatekos:
+            // player A
             if (hosszunevek) {
                 sprintf(Idoszovegek[1].text, "Player A: %s", pjatekosa->nev);
             } else {
@@ -628,7 +629,7 @@ int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
                 Idoszovegek[3].y = 100;
             }
 
-            // B jatekos:
+            // player B
             if (hosszunevek) {
                 sprintf(Idoszovegek[4].text, "Player B: %s", pjatekosb->nev);
             } else {
@@ -661,7 +662,7 @@ int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
             }
         }
 
-        // Valasztas:
+        // choose
         valaszt2 val;
         // val.szam = 5+nextisvan+skipisvan;
         val.kur = kurrens;
@@ -698,12 +699,12 @@ int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
 
         val.bead(4 + nextisvan + skipisvan);
 
-        // Idoszoveg helyere beirjuk ecset-ben levok lefoglaltak szamat:
+        // replace idoszoveg with number of allocated in ecset:
         // sprintf( Idoszovegek[0].text, "%d", Osszegszam );
 
         int eredmeny = val.valassz(Idoszovegek, idoszovegszam);
         kurrens = eredmeny;
-        // eredmeny-t nextisvan esetere konvertalja:
+        // convert eredmeny to nextisvan case
         if (eredmeny > 0 && !nextisvan && !skipisvan) {
             eredmeny++;
         }
@@ -715,9 +716,9 @@ int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
             return 1;
         }
         if (eredmeny == 1) {
-            // Next, vagy skip:
+            // Next or skip:
             if (!nextisvan && !skipisvan) {
-                hiba("Itt nem kene lennie (!nextisvan && !skipisvan)!");
+                hiba("Should not be here (!nextisvan && !skipisvan)!");
             }
             if (nextisvan) {
                 return 2;
@@ -732,7 +733,7 @@ int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
             Pmenupal->set();
         }
         if (eredmeny == 3) {
-            if (level != Palyaszam - 1) { // Utolso palyat nem lehet menteni
+            if (level != Palyaszam - 1) { // last lev cannot be saved
                 saveplay(Ptop->belyeg);
             }
         }
@@ -754,7 +755,7 @@ void kiirloading(void) {
     szoveglista szovlist;
     szovlist.clear();
     szovlist.addszoveg_kozep("Loading", 320, 230);
-    szovlist.kirajzol(1); // Golyok nelkul
+    szovlist.kirajzol(1); // no balls
 }
 
 static void playlevel(int level) {
@@ -779,26 +780,26 @@ static void playlevel(int level) {
         long ido = lejatszo(tmpnev);
         Pmenupal->set();
         if (Ptop->kerekekfejjellefele) {
-            hiba("playlevel-ben Ptop->kerekekfejjellefel!");
+            hiba("Ptop->kerekekfejjellefel in playlevel!");
         }
         char valasz[100] = "";
         idoelintezes(ido, valasz, level, NULL);
 
         int ujpalya = 0;
         if (ido > 0) {
-            // Sikeres volt szint:
+            // level complete
             pjatekos->skippedtomb[level] = 0;
             if (pjatekos->sikerespalyakszama == level && Single) {
-                // Csak SINGLE jatek alatt novelheto sikerespalyakszama!!!
-                // Novelte eggyel sikeres palyak szamat:
+                // sikerespalyakszama can only be incremented in singleplayer
+                // increment number of completed levs
                 pjatekos->sikerespalyakszama++;
                 if (pjatekos->sikerespalyakszama < Palyaszam) {
                     ujpalya = 1;
                 } else {
-                    // Most eloszor sikeresen teljesitette utolso palyat:
+                    // first time completing last lev
                 }
             }
-            // idoelintezes ido > 0 es nem external eseten reload-olja:
+            // idoelintezes ido > 0 and reload in case of not external
             State->save();
         }
         int eredmeny = afterplay(level, ujpalya, valasz, NULL);
@@ -833,7 +834,7 @@ void play(void) {
         jatekos* pjatekos = &State->jatekosok[jatekosindex];
         int kirpalyszam = pjatekos->sikerespalyakszama + 1;
         if (!State->single) {
-            // Ha ketten jatszanak, akkor a nagyobb sikeru szamit:
+            // in case of two players, the one with more completed levs matters
             int jatekosindex2 = getjatekosindex(State->jatekosb);
             jatekos* pjatekos2 = &State->jatekosok[jatekosindex2];
             if (kirpalyszam < pjatekos2->sikerespalyakszama + 1) {
@@ -845,7 +846,7 @@ void play(void) {
             kirpalyszam = Palyaszam;
         }
 
-        // Valasztas:
+        // choose
         valaszt2 val;
         val.kur = int(pjatekos->jelenlegipalya) + 1;
         val.egykepen = LISTegykepen;
@@ -867,7 +868,7 @@ void play(void) {
                 // strcat( tmp, "Nincs level nev!" );
             }
             if (strlen(tmp) > MAXRUBRIKAHOSSZ - 5) {
-                hiba("play-ben! strlen( tmp ) > MAXRUBRIKAHOSSZ-5!");
+                hiba(" strlen( tmp ) > MAXRUBRIKAHOSSZ-5 in play!");
             }
             strcpy(Rubrikak[i + 1], tmp);
         }
@@ -880,13 +881,12 @@ void play(void) {
         }
 
         if (eredmeny == 0) {
-            // External file lejatszast valasztotta, ilyenkor ha visszajon
-            // folytatodik tovabb:
+            // external file was chosen, continue after return
             pjatekos->jelenlegipalya = -1;
             void playextmenu(void);
             playextmenu();
         } else {
-            // Egy normal level-t valasztott ki:
+            // normal lev was chosen
             playlevel(eredmeny - 1);
             // return;
         }

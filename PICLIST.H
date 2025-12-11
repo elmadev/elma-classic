@@ -19,14 +19,14 @@ class piclist {
     int kepszam;
     char nevek[(MAXPICLISTKEPSZAM + 10) * 10];
     int tipusok[MAXPICLISTKEPSZAM + 10];
-    // Ha igaz, border texturanak szamit es kellhet tetejere tenni foltot:
+    // if true, counts as border texture and needs to be appended
     int tavolsagok[MAXPICLISTKEPSZAM + 10];
     int hatarolok[MAXPICLISTKEPSZAM + 10];
     int atlatszosagok[MAXPICLISTKEPSZAM + 10];
 
-    piclist(void);      // PICTURES.LST file-bol olvas
-    piclist(FILE* h);   // Binaris formatumbol
-    void save(FILE* h); // Binaris formatumba
+    piclist(void);      // read from PICTURES.LST
+    piclist(FILE* h);   // from binary format
+    void save(FILE* h); // to binary format
 
-    int getnevindex(char* nev); // vagy -1
+    int getnevindex(char* nev); // or -1
 };

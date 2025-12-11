@@ -2,7 +2,7 @@
 typedef pic8* ptrpic8;
 
 class abc8 {
-  public: // ideiglenes
+  private:
     ptrpic8* ppsprite;
     short* ytomb;
     int tav;

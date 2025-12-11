@@ -11,8 +11,8 @@ class abc8 {
     int success;
     abc8(char* filename);
     ~abc8(void);
-    void write(pic8* pdest, int x, int y, char* text, int spacing = -1000);
-    void write_centered(pic8* pdest, int x, int y, char* text, int spacing = -1000);
-    int len(char* text, int spacing = -1000);
+    void write(pic8* pdest, int x, int y, char* text);
+    void write_centered(pic8* pdest, int x, int y, char* text);
+    int len(char* text);
     void set_spacing(int spacing);
 };

@@ -1,5 +1,9 @@
 project('elma', 'cpp', version: '1.4', default_options: ['cpp_std=c++20'])
 
+if get_option('buildtype') == 'debug'
+    add_project_arguments('-DDEBUG', language: 'cpp')
+endif
+
 elma_sources = files(
     'ABC8.CPP',
     'ADATOK.CPP',

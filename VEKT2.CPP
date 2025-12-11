@@ -1,7 +1,6 @@
 #include "all.h"
 
 vekt2 Vekt2i(1.0, 0.0), Vekt2j(0.0, 1.0), Vekt2null(0.0, 0.0);
-double Pi = 3.141592;
 
 vekt2 operator*(double x, vekt2 a) { return vekt2(a.x * x, a.y * x); }
 

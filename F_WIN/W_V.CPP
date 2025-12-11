@@ -1,8 +1,6 @@
 #include "w_all.h"
 #include <SDL_syswm.h>
 
-int Win_95 = 1;
-
 // ddinit setmode utan 1-be megy, hiba figyeli:
 int Margrafikus = 0;
 

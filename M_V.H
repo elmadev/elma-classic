@@ -1,7 +1,5 @@
 // m_v.h
 
-extern int Win_95;
-
 void mv_main(void); // Ennek nem szabad visszajonnie!
 // Ezt neha meg kell hivni!:
 void mv_check(/*char* hivta,*/ int nemkellnyomas = 0);

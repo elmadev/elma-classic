@@ -672,8 +672,6 @@ lgrfile::lgrfile(char* lgrnev) {
             char tmpnev[20];
             sprintf(tmpnev, "qfood%d.pcx", foodi + 1);
             if (strcmpi(nev, tmpnev) == 0) {
-                char uzenet_filenev[80];
-                sprintf(uzenet_filenev, "Picture name: %s. In LGR file: %s.", nev, lgrnev);
                 foodtomb[foodi] = new anim(ppic, tmpnev);
                 delete ppic;
                 ppic = NULL;

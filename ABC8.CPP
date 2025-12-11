@@ -1,6 +1,10 @@
 #include "all.h"
 
+#ifdef DEBUG
+static int ErrorOnMissingCodepoint = 1;
+#else
 static int ErrorOnMissingCodepoint = 0;
+#endif
 
 int torolfv(void) {
     if (fabs(Pmot1->kor2.omega) > 0.02) {

@@ -190,7 +190,6 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
         // Ujrarajzoljuk hatterkepeket:
         ervenyes = 1;
         int y = -47;
-        int paros = 0;
         int kezdox = 0;
         while (y < 480) {
             int x = kezdox;
@@ -198,7 +197,6 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
             while (x > 0) {
                 x -= Kisnevsima->getxsize();
             }
-            paros = !paros;
             while (x < 640) {
                 blt8(Buffsima, Kisnevsima, x, y);
                 blt8(Buffgolyo, Kisnevgolyo, x, y);
@@ -330,7 +328,6 @@ int szoveglista::kirajzolanim(double ido) {
 
         // Berajzoljuk hatterkepeket:
         int y = -47;
-        int paros = 0;
         int kezdox = 0;
         while (y < 480) {
             int x = kezdox;
@@ -338,7 +335,6 @@ int szoveglista::kirajzolanim(double ido) {
             while (x > 0) {
                 x -= Kisnevsima->getxsize();
             }
-            paros = !paros;
             while (x < 640) {
                 blt8(Buffsima, Kisnevsima, x, y);
                 blt8(Buffgolyo, Kisnevgolyo, x, y);

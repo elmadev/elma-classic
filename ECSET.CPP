@@ -1426,7 +1426,7 @@ void ecset::deletemdarabok(void) {
     }
 }
 
-static int Xe1, Xe2, Xe2plussz1;
+static int Xe1, Xe2;
 
 unsigned char *Foldsor = NULL, *Egsor = NULL;
 
@@ -1755,7 +1755,6 @@ void ecset::kitesz(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int 
     int ye1 = 0;
     getbalalso_int(balalso, &Xe1, &ye1);
     Xe2 = Xe1 + x2 - x1;
-    Xe2plussz1 = Xe2 + 1;
     int ye2 = ye1 + y2 - y1;
 
     if (Xe1 < 20 || Xe2 > maxx - 20 || ye1 < 20 || ye2 > sorszam - 20) {
@@ -1808,7 +1807,6 @@ void ecset::kiteszview(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, 
     int ye1 = 0;
     getbalalso_int(balalso, &Xe1, &ye1);
     Xe2 = Xe1 + x2 - x1 + 1;
-    Xe2plussz1 = Xe2 + 1;
     int ye2 = ye1 + y2 - y1 + 1;
 
     if (Xe1 < 20 || Xe2 > maxx - 20 || ye1 < 20 || ye2 > sorszam - 20) {

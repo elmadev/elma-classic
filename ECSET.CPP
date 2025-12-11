@@ -2034,6 +2034,7 @@ mdarab* mdbiter::getpmd(int x, int y) {
         if (y < 0 || y >= pecset->sorszam) {
             hiba("789eygrq");
         }
+        ybent = y;
         pmd = pecset->msorok[y];
         xposbent = pecset->kurxposok_A[y];
         if (xposbent > 10) {

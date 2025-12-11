@@ -2226,7 +2226,7 @@ void change_level_properties(void) {
             }
             if (c == MK_ENTER) {
                 if (strcmpi(Ptop->fgnev, fgnev) != 0 || strcmpi(Ptop->bgnev, bgnev) != 0 ||
-                    strcmpi(Ptop->levelname, levelname) != 0) {
+                    strcmp(Ptop->levelname, levelname) != 0) {
                     Valtozott = 1;
                 }
                 strcpy(Ptop->fgnev, fgnev);
@@ -2264,7 +2264,7 @@ void change_level_properties(void) {
             // Most nezzuk meg, hogy hova kattintott:
             if (boxban(ujx, ujy, boxok)) {
                 if (strcmpi(Ptop->fgnev, fgnev) != 0 || strcmpi(Ptop->bgnev, bgnev) != 0 ||
-                    strcmpi(Ptop->levelname, levelname) != 0) {
+                    strcmp(Ptop->levelname, levelname) != 0) {
                     Valtozott = 1;
                 }
                 strcpy(Ptop->fgnev, fgnev);

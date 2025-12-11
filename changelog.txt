@@ -3,6 +3,7 @@
 * Fix buffer overflow bug in internal editor's Save As dialog box
 * Fix bug where internal editor's Save As would sometimes overwrite old files without giving a warning
 * Level description in internal editor is properly centered
+* If only the case of the level description in internal editor is changed, level would not be marked as changed
 * Fix bug where pictures named "aaccbbdd" could prevent tooltip from properly refreshing in internal editor
 * Show dialog if state.dat is inaccessible when updating top10 in an internal or merging state.dat
 

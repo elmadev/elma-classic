@@ -26,7 +26,7 @@
 #include "abc8.h"
 
 #include "VEKT2.H"
-#include "ADATOK.H"
+#include "physics_init.h"
 #include "BEALLIT.H"
 #include "LEPTET.H"
 #include "UTKOZES.H"

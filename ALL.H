@@ -26,7 +26,6 @@
 #include "abc8.h"
 
 #include "vekt2.h"
-#include "kor.h"
 #include "adatok.h"
 #include "beallit.h"
 #include "leptet.h"

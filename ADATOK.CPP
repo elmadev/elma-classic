@@ -49,7 +49,6 @@ void initmotor(motorst* pmot) {
     pmot->kor1.inertia = 200.0 * 0.55 * 0.55;
     pmot->kor1.r = vekt2(2.75, 3.6);
     pmot->kor1.v = vekt2(0, 0);
-    // pmot->kor1.utoljaraleert = 0;
 
     // Kor2:
     strcpy(pmot->kor2.name, "Kerek elso");
@@ -60,7 +59,6 @@ void initmotor(motorst* pmot) {
     pmot->kor2.inertia = 0.32;
     pmot->kor2.r = vekt2(1.9, 3.0);
     pmot->kor2.v = vekt2(0, 0);
-    // pmot->kor2.utoljaraleert = 0;
 
     // Kor4:
     strcpy(pmot->kor4.name, "Kerek hatso");
@@ -71,7 +69,6 @@ void initmotor(motorst* pmot) {
     pmot->kor4.inertia = 0.32;
     pmot->kor4.r = vekt2(3.6, 3.0);
     pmot->kor4.v = vekt2(0, 0);
-    // pmot->kor4.utoljaraleert = 0;
 
     pmot->vezetor = vekt2(2.75, 4.04);
     pmot->vezetov = vekt2(0.0, 0.0);

@@ -123,15 +123,15 @@ static void kidoboz(vekt2 a, vekt2 b, pic8* ppic8, double szelesseg, kiskep* pk,
     dobozki(ppic8, pk, v, v2fel * 2.0, a);
 }
 
-// sugar meg nincs megszorozva:
+// radius meg nincs megszorozva:
 // Meg nem affin koordok:
-static void kidobozkerek(vekt2 r, double sugar, double alfa, pic8* ppicbuffer, kiskep* pk,
+static void kidobozkerek(vekt2 r, double radius, double rotation, pic8* ppicbuffer, kiskep* pk,
                          int tukor = 0) {
-    vekt2 vfel(cos(alfa) * sugar, sin(alfa) * sugar);
+    vekt2 vfel(cos(rotation) * radius, sin(rotation) * radius);
     if (tukor) {
-        kidoboz(r + vfel, r - vfel, ppicbuffer, sugar, pk, 0.0, 0.0, tukor);
+        kidoboz(r + vfel, r - vfel, ppicbuffer, radius, pk, 0.0, 0.0, tukor);
     } else {
-        kidoboz(r - vfel, r + vfel, ppicbuffer, sugar, pk, 0.0, 0.0, tukor);
+        kidoboz(r - vfel, r + vfel, ppicbuffer, radius, pk, 0.0, 0.0, tukor);
     }
 }
 
@@ -364,14 +364,14 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
 
     // Kerekek:
     if (elsokerekrogton) {
-        kidobozkerek(p_k1, Kerekrajzsugar, pmot->kor2.alfa, ppic, pmk->pkiskerek);
+        kidobozkerek(p_k1, Kerekrajzsugar, pmot->kor2.rotation, ppic, pmk->pkiskerek);
     }
     if (hatsokerekrogton) {
-        kidobozkerek(p_k2, Kerekrajzsugar, pmot->kor4.alfa, ppic, pmk->pkiskerek);
+        kidobozkerek(p_k2, Kerekrajzsugar, pmot->kor4.rotation, ppic, pmk->pkiskerek);
     }
 
     vekt2 kozep = pmot->kor1.r - sarok;
-    vekt2 jobbra = vekt2(cos(pmot->kor1.alfa), sin(pmot->kor1.alfa));
+    vekt2 jobbra = vekt2(cos(pmot->kor1.rotation), sin(pmot->kor1.rotation));
     vekt2 fel = forgatas90fokkal(jobbra);
 
     if (vanforgas) {
@@ -471,7 +471,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     if (pmot->hatra_f) {
         fejalfa = 0 - fejalfa;
     }
-    kidobozkerek(pmot->fejr - sarok, Fejsugar, pmot->kor1.alfa + fejalfa, ppic, pmk->pkisfej,
+    kidobozkerek(pmot->fejr - sarok, Fejsugar, pmot->kor1.rotation + fejalfa, ppic, pmk->pkisfej,
                  pmot->hatra_f);
 
     // Kar ket reszletben:
@@ -563,10 +563,10 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
             p_k2 = tmpv;
         }
         if (!elsokerekrogton) {
-            kidobozkerek(p_k1, pmot->kor2.sugar, pmot->kor2.alfa, ppic, pmk->pkiskerek);
+            kidobozkerek(p_k1, pmot->kor2.radius, pmot->kor2.rotation, ppic, pmk->pkiskerek);
         }
         if (!hatsokerekrogton) {
-            kidobozkerek(p_k2, pmot->kor4.sugar, pmot->kor4.alfa, ppic, pmk->pkiskerek);
+            kidobozkerek(p_k2, pmot->kor4.radius, pmot->kor4.rotation, ppic, pmk->pkiskerek);
         }
     }
 }

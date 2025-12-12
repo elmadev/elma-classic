@@ -14,7 +14,7 @@ extern double Fejsugar;
 
 extern double Objektumsugar;
 
-// Hajszalnyival kisebb kor.sugarnal, hogy kirajzolasnal ne logjon foldbe:
+// Hajszalnyival kisebb rigidbody.sugarnal, hogy kirajzolasnal ne logjon foldbe:
 extern double Kerekrajzsugar;
 
 // MCGA kirajzolasos:
@@ -29,7 +29,7 @@ extern double Kord2x, Kord2y, Kord4x, Kord4y,
 extern int Viewzoom;
 
 struct motorst {
-    kor kor1, kor2, kor4;
+    rigidbody kor1, kor2, kor4;
     vekt2 fejr; // kor1-bol Kor12Fejr fuggveny allitja elo (leptet.h)!
     int hatra_f;
     int hatra_h;

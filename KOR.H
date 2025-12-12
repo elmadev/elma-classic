@@ -1,9 +1,9 @@
 
 #define NEVHOSSZ (30)
 
-struct kor {
-    char nev[NEVHOSSZ];
-    double alfa, omega, sugar, m, theta;
+struct rigidbody {
+    char name[NEVHOSSZ];
+    double rotation, angular_velocity, radius, mass, inertia;
     vekt2 r, v;
     // int    utoljaraleert;
 };

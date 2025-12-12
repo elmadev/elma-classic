@@ -15,7 +15,7 @@ double Fejsugar;
 
 double Objektumsugar = 0.4;
 
-// Hajszalnyival kisebb kor.sugarnal, hogy kirajzolasnal ne logjon foldbe:
+// Hajszalnyival kisebb rigidbody.sugarnal, hogy kirajzolasnal ne logjon foldbe:
 double Kerekrajzsugar = 0.395;
 
 double Kord2x, Kord2y, Kord4x, Kord4y,
@@ -40,35 +40,35 @@ void initmotor(motorst* pmot) {
     // pmot->labalfa = 0.0; Bicigli
 
     // Kor1:
-    strcpy(pmot->kor1.nev, "Test elso");
-    pmot->kor1.alfa = 0.0;
-    pmot->kor1.omega = 0.0;
-    pmot->kor1.sugar = 0.3;
-    pmot->kor1.m = 200; // 100;
-    // theta = m * r*r;
-    pmot->kor1.theta = 200.0 * 0.55 * 0.55;
+    strcpy(pmot->kor1.name, "Test elso");
+    pmot->kor1.rotation = 0.0;
+    pmot->kor1.angular_velocity = 0.0;
+    pmot->kor1.radius = 0.3;
+    pmot->kor1.mass = 200; // 100;
+    // inertia = mass * r*r;
+    pmot->kor1.inertia = 200.0 * 0.55 * 0.55;
     pmot->kor1.r = vekt2(2.75, 3.6);
     pmot->kor1.v = vekt2(0, 0);
     // pmot->kor1.utoljaraleert = 0;
 
     // Kor2:
-    strcpy(pmot->kor2.nev, "Kerek elso");
-    pmot->kor2.alfa = 0.0; // 30
-    pmot->kor2.omega = 0.0;
-    pmot->kor2.sugar = 0.4;
-    pmot->kor2.m = 10;
-    pmot->kor2.theta = 0.32;
+    strcpy(pmot->kor2.name, "Kerek elso");
+    pmot->kor2.rotation = 0.0; // 30
+    pmot->kor2.angular_velocity = 0.0;
+    pmot->kor2.radius = 0.4;
+    pmot->kor2.mass = 10;
+    pmot->kor2.inertia = 0.32;
     pmot->kor2.r = vekt2(1.9, 3.0);
     pmot->kor2.v = vekt2(0, 0);
     // pmot->kor2.utoljaraleert = 0;
 
     // Kor4:
-    strcpy(pmot->kor4.nev, "Kerek hatso");
-    pmot->kor4.alfa = 0.0; // 40
-    pmot->kor4.omega = 0.0;
-    pmot->kor4.sugar = 0.4;
-    pmot->kor4.m = 10;
-    pmot->kor4.theta = 0.32;
+    strcpy(pmot->kor4.name, "Kerek hatso");
+    pmot->kor4.rotation = 0.0; // 40
+    pmot->kor4.angular_velocity = 0.0;
+    pmot->kor4.radius = 0.4;
+    pmot->kor4.mass = 10;
+    pmot->kor4.inertia = 0.32;
     pmot->kor4.r = vekt2(3.6, 3.0);
     pmot->kor4.v = vekt2(0, 0);
     // pmot->kor4.utoljaraleert = 0;

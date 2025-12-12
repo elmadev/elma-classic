@@ -225,12 +225,12 @@ void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
 static void vezeto_hatarolas(motorst* pmot, vekt2 i, vekt2 j) {
     // Konverzio i, j koordinata rendszerbe:
     double x, y;
-    if (pmot->hatra_f) {
-        x = i * (pmot->kor1.r - pmot->vezetor);
-        y = j * (pmot->vezetor - pmot->kor1.r);
+    if (pmot->flipped_bike) {
+        x = i * (pmot->bike.r - pmot->body_r);
+        y = j * (pmot->body_r - pmot->bike.r);
     } else {
-        x = i * (pmot->vezetor - pmot->kor1.r);
-        y = j * (pmot->vezetor - pmot->kor1.r);
+        x = i * (pmot->body_r - pmot->bike.r);
+        y = j * (pmot->body_r - pmot->bike.r);
     }
     vekt2 r(x, y);
 
@@ -281,10 +281,10 @@ static void vezeto_hatarolas(motorst* pmot, vekt2 i, vekt2 j) {
     // r = r + vekt2( -(0.06), (0.14) );
 
     // Konverzio i, j koordinata rendszerbol:
-    if (pmot->hatra_f) {
-        pmot->vezetor = j * r.y - i * r.x + pmot->kor1.r;
+    if (pmot->flipped_bike) {
+        pmot->body_r = j * r.y - i * r.x + pmot->bike.r;
     } else {
-        pmot->vezetor = i * r.x + j * r.y + pmot->kor1.r;
+        pmot->body_r = i * r.x + j * r.y + pmot->bike.r;
     }
 }
 
@@ -292,8 +292,8 @@ void beallitvezeto(motorst* pmot, vekt2 gravitacio, vekt2 i, vekt2 j, double dt)
     vezeto_hatarolas(pmot, i, j);
 
     // Rugoero szamitas:
-    vekt2 rugor = pmot->kor1.r + j * Kord5y;
-    vekt2 rugoeroirany = rugor - pmot->vezetor;
+    vekt2 rugor = pmot->bike.r + j * Kord5y;
+    vekt2 rugoeroirany = rugor - pmot->body_r;
     double rugoerohossz = abs(rugoeroirany);
     if (rugoerohossz < 0.0000001) {
         rugoerohossz = 0.0000001;
@@ -303,14 +303,14 @@ void beallitvezeto(motorst* pmot, vekt2 gravitacio, vekt2 i, vekt2 j, double dt)
     vekt2 Frugo = rugoeroegyseg * ero;
 
     // Surlodasi ero szamitas:
-    // Kiszamoljuk motor testenek sebesseget vezetor helyen:
-    vekt2 tangens = forgatas90fokkal(pmot->vezetor - pmot->kor1.r);
-    vekt2 motseb = tangens * pmot->kor1.angular_velocity + pmot->kor1.v;
-    vekt2 relv = pmot->vezetov - motseb;
+    // Kiszamoljuk motor testenek sebesseget body_r helyen:
+    vekt2 tangens = forgatas90fokkal(pmot->body_r - pmot->bike.r);
+    vekt2 motseb = tangens * pmot->bike.angular_velocity + pmot->bike.v;
+    vekt2 relv = pmot->body_v - motseb;
     vekt2 Fsurl = relv * Sr * 3.0;
 
-    vekt2 F = Frugo - Fsurl + gravitacio * pmot->kor1.mass * G;
-    vekt2 a = F * (1.0 / pmot->kor1.mass); // Egyenlore kerek tomegevel szamolunk
-    pmot->vezetov = pmot->vezetov + a * dt;
-    pmot->vezetor = pmot->vezetor + pmot->vezetov * dt;
+    vekt2 F = Frugo - Fsurl + gravitacio * pmot->bike.mass * G;
+    vekt2 a = F * (1.0 / pmot->bike.mass); // Egyenlore kerek tomegevel szamolunk
+    pmot->body_v = pmot->body_v + a * dt;
+    pmot->body_r = pmot->body_r + pmot->body_v * dt;
 }

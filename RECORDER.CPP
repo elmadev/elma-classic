@@ -184,58 +184,62 @@ int recorder::recall(motorst* pmot, double ido, hanginfo* phinfo) {
     if (index1 >= 2) {
         // Motor:
         if (abs(pk1alfa[index1] - pk1alfa[index2]) > 9000) { // 1000
-            // pmot->kor1.alfa = Alfaszorzo_16_rec * pk1alfa[index2];
+            // pmot->kor1.rotation = Alfaszorzo_16_rec * pk1alfa[index2];
             if (pk1alfa[index1] > pk1alfa[index2]) {
                 int fixedindex1 = pk1alfa[index1] - 10000;
-                pmot->kor1.alfa =
+                pmot->kor1.rotation =
                     Alfaszorzo_16_rec * (fixedindex1 * suly1 + pk1alfa[index2] * suly2);
             } else {
                 int fixedindex2 = pk1alfa[index2] - 10000;
-                pmot->kor1.alfa =
+                pmot->kor1.rotation =
                     Alfaszorzo_16_rec * (pk1alfa[index1] * suly1 * suly1 + fixedindex2 * suly2);
             }
         } else {
-            pmot->kor1.alfa =
+            pmot->kor1.rotation =
                 Alfaszorzo_16_rec * (pk1alfa[index1] * suly1 + pk1alfa[index2] * suly2);
         }
 
         // Elso kerek:
         if (abs(pk2alfa[index1] - pk2alfa[index2]) > 220) { // 50
-            // pmot->kor2.alfa = Alfaszorzo_rec * pk2alfa[index2];
+            // pmot->kor2.rotation = Alfaszorzo_rec * pk2alfa[index2];
             if (pk2alfa[index1] > pk2alfa[index2]) {
                 int fixedindex1 = pk2alfa[index1] - 250;
-                pmot->kor2.alfa = Alfaszorzo_rec * (fixedindex1 * suly1 + pk2alfa[index2] * suly2);
+                pmot->kor2.rotation =
+                    Alfaszorzo_rec * (fixedindex1 * suly1 + pk2alfa[index2] * suly2);
             } else {
                 int fixedindex2 = pk2alfa[index2] - 250;
-                pmot->kor2.alfa =
+                pmot->kor2.rotation =
                     Alfaszorzo_rec * (pk2alfa[index1] * suly1 * suly1 + fixedindex2 * suly2);
             }
         } else {
-            pmot->kor2.alfa = Alfaszorzo_rec * (pk2alfa[index1] * suly1 + pk2alfa[index2] * suly2);
+            pmot->kor2.rotation =
+                Alfaszorzo_rec * (pk2alfa[index1] * suly1 + pk2alfa[index2] * suly2);
         }
 
         // Hatso kerek:
         if (abs(pk4alfa[index1] - pk4alfa[index2]) > 220) {
-            // pmot->kor4.alfa = Alfaszorzo_rec * pk4alfa[index2];
+            // pmot->kor4.rotation = Alfaszorzo_rec * pk4alfa[index2];
             if (pk4alfa[index1] > pk4alfa[index2]) {
                 int fixedindex1 = pk4alfa[index1] - 250;
-                pmot->kor4.alfa = Alfaszorzo_rec * (fixedindex1 * suly1 + pk4alfa[index2] * suly2);
+                pmot->kor4.rotation =
+                    Alfaszorzo_rec * (fixedindex1 * suly1 + pk4alfa[index2] * suly2);
             } else {
                 int fixedindex2 = pk4alfa[index2] - 250;
-                pmot->kor4.alfa =
+                pmot->kor4.rotation =
                     Alfaszorzo_rec * (pk4alfa[index1] * suly1 * suly1 + fixedindex2 * suly2);
             }
         } else {
-            pmot->kor4.alfa = Alfaszorzo_rec * (pk4alfa[index1] * suly1 + pk4alfa[index2] * suly2);
+            pmot->kor4.rotation =
+                Alfaszorzo_rec * (pk4alfa[index1] * suly1 + pk4alfa[index2] * suly2);
         }
 
     } else {
-        pmot->kor1.alfa = Alfaszorzo_16_rec * pk1alfa[index2];
-        pmot->kor2.alfa = Alfaszorzo_rec * pk2alfa[index2];
-        pmot->kor4.alfa = Alfaszorzo_rec * pk4alfa[index2];
+        pmot->kor1.rotation = Alfaszorzo_16_rec * pk1alfa[index2];
+        pmot->kor2.rotation = Alfaszorzo_rec * pk2alfa[index2];
+        pmot->kor4.rotation = Alfaszorzo_rec * pk4alfa[index2];
     }
 
-    // filebair( index2, pk2alfa[index2], pmot->kor2.alfa );
+    // filebair( index2, pk2alfa[index2], pmot->kor2.rotation );
     phinfo->gaz = char(pgazhatra[index1] & 1);
     pmot->hatra_f = (pgazhatra[index1] & 2) >> 1;
     Aafogo = (pgazhatra[index1] & 4) >> 2;
@@ -293,7 +297,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         pvezry[i] = (pmot->vezetor.y - pmot->kor1.r.y) * Korrszorzo;
 
         // Alfak:
-        double alfa1 = pmot->kor1.alfa;
+        double alfa1 = pmot->kor1.rotation;
         while (alfa1 <= 0) {
             alfa1 += K_2pi;
         }
@@ -302,19 +306,19 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         }
         pk1alfa[i] = alfa1 * Alfaszorzo_16;
 
-        if (pmot->kor2.alfa <= 0) {
-            pk2alfa[i] = (pmot->kor2.alfa + K_2pi) * Alfaszorzo;
+        if (pmot->kor2.rotation <= 0) {
+            pk2alfa[i] = (pmot->kor2.rotation + K_2pi) * Alfaszorzo;
         } else {
-            pk2alfa[i] = pmot->kor2.alfa * Alfaszorzo;
+            pk2alfa[i] = pmot->kor2.rotation * Alfaszorzo;
         }
-        if (pmot->kor4.alfa <= 0) {
-            pk4alfa[i] = (pmot->kor4.alfa + K_2pi) * Alfaszorzo;
+        if (pmot->kor4.rotation <= 0) {
+            pk4alfa[i] = (pmot->kor4.rotation + K_2pi) * Alfaszorzo;
         } else {
-            pk4alfa[i] = pmot->kor4.alfa * Alfaszorzo;
+            pk4alfa[i] = pmot->kor4.rotation * Alfaszorzo;
         }
 
         // Belerakunk egy veletlen szamot felso negy bitbe:
-        double tmpb = pmot->kor4.alfa + i * 5.752364;
+        double tmpb = pmot->kor4.rotation + i * 5.752364;
         memcpy(&pgazhatra[i], (&tmpb) + 4, 1);
         pgazhatra[i] = pgazhatra[i] & 0xf0;
 
@@ -380,21 +384,21 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         //	uzenet( "Kisebb -5000-nel!" );
 
         // Alfak:
-        double alfa1 = pmot->kor1.alfa;
+        double alfa1 = pmot->kor1.rotation;
         while( alfa1 <= 0 )
             alfa1 += K_2pi;
         while( alfa1 > K_2pi )
             alfa1 -= K_2pi;
         pk1alfa[i] = alfa1*Alfaszorzo_16;
 
-        if( pmot->kor2.alfa <= 0 )
-            pk2alfa[i] = (pmot->kor2.alfa + K_2pi)*Alfaszorzo;
+        if( pmot->kor2.rotation <= 0 )
+            pk2alfa[i] = (pmot->kor2.rotation + K_2pi)*Alfaszorzo;
         else
-            pk2alfa[i] = pmot->kor2.alfa*Alfaszorzo;
-        if( pmot->kor4.alfa <= 0 )
-            pk4alfa[i] = (pmot->kor4.alfa + K_2pi)*Alfaszorzo;
+            pk2alfa[i] = pmot->kor2.rotation*Alfaszorzo;
+        if( pmot->kor4.rotation <= 0 )
+            pk4alfa[i] = (pmot->kor4.rotation + K_2pi)*Alfaszorzo;
         else
-            pk4alfa[i] = pmot->kor4.alfa*Alfaszorzo;
+            pk4alfa[i] = pmot->kor4.rotation*Alfaszorzo;
 
         if( phinfo->gaz )
             pgazhatra[i] = 1;

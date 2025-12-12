@@ -172,6 +172,6 @@ int abc8::len(const char* text) {
 void abc8::set_spacing(int new_spacing) { spacing = new_spacing; }
 
 void abc8::write_centered(pic8* dest, int x, int y, const char* text) {
-    int hossz = len(text);
-    write(dest, x - hossz / 2, y, text);
+    int width = len(text);
+    write(dest, x - width / 2, y, text);
 }

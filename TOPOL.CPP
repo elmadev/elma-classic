@@ -795,17 +795,13 @@ int topol::levegoben(gyuru* pgy, vekt2* pr) {
     }
 }
 
-int nevanalizis(char* nev) {
-    char ctmp = nev[5];
-    nev[5] = 0;
+int nevanalizis(const char* nev) {
     // (rekorder.cpp-ben is be van huzalozva ez a string:)
-    if (strcmpi(nev, "QWQUU") != 0) {
-        nev[5] = ctmp;
+    if (strnicmp(nev, "QWQUU", 5) != 0) {
         return 0;
     }
-    nev[5] = ctmp;
 
-    char* fut = &nev[5];
+    const char* fut = &nev[5];
     int sum = 0;
     for (int i = 0; i < 3; i++) {
         sum *= 10;

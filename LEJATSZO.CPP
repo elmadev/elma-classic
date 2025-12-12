@@ -303,7 +303,7 @@ int Aerintetteviragot = 0;
 int Masodikmenet = 0;
 
 // Idot adja vissza szazadmasodpercben:
-long lejatszo(char* filenev) {
+long lejatszo(const char* filenev) {
     // hiba( "Ezegyhosszusor,szetkellvagnibiztosanhibaEzegy hosszu sor, szet kell vagni biztosan!",
     //	"Ez egy masik hosszu sor, szet kell vagni biztosan!" );
 
@@ -707,7 +707,7 @@ static int replaymag(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, rec
 static int Elozoshowkep1 = 1, Elozoshowkep2 = 1;
 
 // Termeszetes befejezes eseten 0-t ad vissza:
-long lejatszo_r(char* filenev, int showkepmarad) {
+long lejatszo_r(const char* filenev, int showkepmarad) {
     // Jatekmod eldontese:
     Single = !Multirec;
     Tag = Prec1->gettag();

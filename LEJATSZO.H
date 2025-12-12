@@ -8,8 +8,8 @@ extern int Legkozment; // kiraj320 ebbol tudja, hogy snapshot-ot keszitsen
 
 // Azt a nevet kerik, amit topol::topol kap:
 // Ezenlegjobbido beallitasahoz kell nekik:
-long lejatszo(char* filenev);
-long lejatszo_r(char* filenev, int showkepmarad);
+long lejatszo(const char* filenev);
+long lejatszo_r(const char* filenev, int showkepmarad);
 
 struct baljobbvaltozok {
     int eddighatra;

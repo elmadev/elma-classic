@@ -62,22 +62,22 @@ class lgrfile {
     void beirtexturat(pic8* ppic, piclist* ppiclist, int index);
     void beirmaszkot(pic8* ppic, piclist* ppiclist, int index);
 
-    lgrfile(char* nev); // kiterj es ut nelkul
+    lgrfile(const char* nev); // kiterj es ut nelkul
     ~lgrfile(void);
 
     int csereljen(int i);
 
   public:
-    friend void loadlgrfile(char* nev); // Leiras alul
+    friend void loadlgrfile(const char* nev); // Leiras alul
     friend void tesztloadlgr(void);
 
     int kepszam;
     kep kepek[MAXKEPSZAM];
-    int getkepindex(char* nev); // vagy -1
+    int getkepindex(const char* nev); // vagy -1
 
     int maszkszam;
     maszk maszkok[MAXMASZKSZAM];
-    int getmaszkindex(char* nev); // vagy -1
+    int getmaszkindex(const char* nev); // vagy -1
 
     int texturaszam;
     textura texturak[MAXTEXTURASZAM];
@@ -131,7 +131,7 @@ class lgrfile {
 
 extern lgrfile* Plgr; // Az eppen bentlevo lgrfile-ra mutat
 // Ha nincs ilyen nevu file, akkor default-ot olvassa:
-void loadlgrfile(char* nev);
+void loadlgrfile(const char* nev);
 
 extern int Allandokepszam;
 // [stringek szama][egy string hossza]:

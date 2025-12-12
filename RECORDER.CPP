@@ -452,11 +452,11 @@ int recorder::gethang(double t, char* pwavindex, double* phangero, int* pobjszam
     return 0;
 }
 
-static void olvhiba(char* nev) { hiba("Nem sikerult olvasni recorded file-bol!: ", nev); }
+static void olvhiba(const char* nev) { hiba("Nem sikerult olvasni recorded file-bol!: ", nev); }
 
 // demo eseten resource file-bol nyit:
 // belyeg-et adja vissza, vagy 0-at:
-long recorder::load(char* nev, FILE* h, int demo) {
+long recorder::load(const char* nev, FILE* h, int demo) {
     int megvoltnyitva = 0;
     if (h) {
         megvoltnyitva = 1;
@@ -633,9 +633,9 @@ long recorder::load(char* nev, FILE* h, int demo) {
         hiba( "Nem sikerult irni recorded file-ba!: ", nev );
 */
 
-static void irhiba(char* nev) { hiba("Nem sikerult irni recorded file-ba!: ", nev); }
+static void irhiba(const char* nev) { hiba("Nem sikerult irni recorded file-ba!: ", nev); }
 
-void recorder::save(char* nev, FILE* h, long belyeg, int tag_p) {
+void recorder::save(const char* nev, FILE* h, long belyeg, int tag_p) {
     tag = tag_p;
 
     int megvoltnyitva = 0;
@@ -756,7 +756,7 @@ void recorder::save(char* nev, FILE* h, long belyeg, int tag_p) {
 }
 
 // demo eseten resource file-bol nyit:
-long loadrecek(char* nev, int demo) {
+long loadrecek(const char* nev, int demo) {
     // Eloszor megvizsgaljuk, hogy multirec vagy nem:
     FILE* h;
     if (demo) {
@@ -835,7 +835,7 @@ long loadrecek(char* nev, int demo) {
 }
 
 // belyeg-et adja vissza, vagy 0-at:
-void saverecek(char* nev, long belyeg, int tag) {
+void saverecek(const char* nev, long belyeg, int tag) {
     if (Multirec) {
         char tmpnev[40];
         sprintf(tmpnev, "rec/%s", nev);

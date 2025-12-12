@@ -112,8 +112,8 @@ class topol {
     // QWQUU001 elso palya:
     topol(const char* filenev);
     ~topol(void);
-    void loadkulso(char* filenev);
-    void loadbelso(char* filenev);
+    void loadkulso(const char* filenev);
+    void loadbelso(const char* filenev);
 
   public:
     // Beolvasas utan ervenyes, csak rec file ellenorzesere hasznalando
@@ -139,9 +139,9 @@ class topol {
     kerek* legkozkerek(double x, double y, double* ptav = NULL);
     sprite* legkozsprite(double x, double y, double* ptav = NULL);
     // Ha saveidok hivja meg, csak akkor nem kell check:
-    void save(char* filenev, int nemkellcheck = 0);
+    void save(const char* filenev, int nemkellcheck = 0);
     // Csak eredetileg beolvasott filenev-vel szabad meghivni:
-    void saveidok(char* filenev);
+    void saveidok(const char* filenev);
     void kirajzol(void);
     // pgy levegoben van-e. Akkor folddarab:
     int levegoben(gyuru* pgy, vekt2* pr = NULL);
@@ -165,7 +165,7 @@ extern vekt2 Kezdetihelydiff; // setallaktiv allitja be
 
 // Ha letezik file, akkor 0-t ad vissza!:
 // Ugyanugy viselkedik nevvel, mint topol konstruktora:
-int access_topol(char* filenev);
+int access_topol(const char* filenev);
 
 unsigned long getbelyeg(char* nev);
 // Igazzal ter vissza, ha megvan nev;
@@ -184,6 +184,6 @@ unsigned long double2belyeg( long l );*/
 
 extern char Ezenlegjobbido[30];
 // Azt a nevet keri, amit topol::topol kap:
-void beallitlegjobbidot(char* filenev, int single);
+void beallitlegjobbidot(const char* filenev, int single);
 
 int nevanalizis(const char* nev);

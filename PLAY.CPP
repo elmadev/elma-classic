@@ -356,7 +356,7 @@ void saveplay(long belyeg) {
 }
 
 // Idot beirja tablaba, ha kell:
-void idoelintezes(long ido, char* valasz, int level, char* filenev) {
+void idoelintezes(long ido, char* valasz, int level, const char* filenev) {
     int extlev = 0;
     if (filenev) {
         extlev = 1;
@@ -495,7 +495,7 @@ void replayprec(void) {
 // A jelenleg beolvasott palyan jatszik vissza:
 // Azt a nevet kerik, amit topol::topol kap:
 // Ezenlegjobbido beallitasahoz kell neki:
-void replayjelenlegi(char* filenev) {
+void replayjelenlegi(const char* filenev) {
     int elso = 1;
     while (1) {
         Prec1->rewind();
@@ -517,7 +517,7 @@ static egyszovsor Idoszovegek[14];
 
 // 0-ESC, 1-this level, 2-next level, 3-skip level
 // Ha filenev nem NULL, akkor external file:
-int afterplay(int level, int nextdefault, char* idoeredmeny, char* filenev) {
+int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* filenev) {
     int extlev = 0;
     if (filenev) {
         extlev = 1;

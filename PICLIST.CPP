@@ -260,7 +260,7 @@ void piclist::save(FILE* h) {
     }
 }
 
-int piclist::getnevindex(char* nev) {
+int piclist::getnevindex(const char* nev) {
     for (int i = 0; i < kepszam; i++) {
         if (strcmpi(&nevek[i * 10], nev) == 0) {
             return i;

@@ -73,6 +73,16 @@ o8/9
     376, 379, 634
 */
 
+#if defined(_WIN64) || !defined(_WIN32)
+int sdl_init(void);
+int main() {
+    sdl_init();
+
+    initqopen();
+}
+
+#endif
+
 void mv_main(void) {
     // new wav( "utodes.wav", 0.25 );
 

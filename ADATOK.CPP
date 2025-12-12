@@ -26,7 +26,7 @@ double MetersToPixels, PixelsToMeters;
 /* Eredeti szamitas play.cpp-bol:
 MetersToPixels = 100.0;
 MetersToPixels *= Displaysizex/320.0;
-MetersToPixels *= fakt;
+MetersToPixels *= zoom_factor;
 Aranyx = MetersToPixels*320.0/640.0;
 Aranyy = Aranyx*Displaysizey/Displaysizex*(640.0/480.0);*/
 
@@ -74,12 +74,12 @@ void init_physics_data(void) {
     init_motor(Motor1);
     init_motor(Motor2);
 
-    double fakt = 0.48; // 0.54; volt mar 28 is
+    double zoom_factor = 0.48; // 0.54; volt mar 28 is
     if (State->minibike) {
-        fakt = 0.30;
+        zoom_factor = 0.30;
     }
 
-    MetersToPixels = 100.0 * fakt;
+    MetersToPixels = 100.0 * zoom_factor;
     PixelsToMeters = 1.0 / MetersToPixels;
 
     // MinimapScaleFactor = 0.28*MetersToPixels*0.5;
@@ -133,13 +133,13 @@ void encode_framecount(recorder* prec) {
     if (prec->betoltve < 80) {
         return;
     }
-    unsigned int beirando = prec->betoltve;
+    unsigned int framecount = prec->betoltve;
     for (int i = 0; i < 32; i++) {
         prec->pgazhatra[40 + i] = prec->pgazhatra[40 + i] & 127;
-        if (beirando & 1) {
+        if (framecount & 1) {
             prec->pgazhatra[40 + i] += 128;
         }
-        beirando = beirando >> 1;
+        framecount = framecount >> 1;
     }
 }
 
@@ -148,13 +148,13 @@ void encode_framecount(recorder* prec) {
 /*int framecount_integrity( recorder* prec ) {
     if( prec->betoltve < 80 )
         return 1;
-    unsigned int szam = 0;
+    unsigned int framecount = 0;
     for( int i = 0; i < 32; i++ ) {
-        szam *= 2;
+        framecount *= 2;
         if( prec->pgazhatra[40+31-i] & 128 )
-            szam += 1;
+            framecount += 1;
     }
-    if( szam == prec->betoltve )
+    if( framecount == prec->betoltve )
         return 1;
     else
         return 0;

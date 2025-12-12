@@ -21,7 +21,7 @@ void ficlose(void) {}
 #else
 
 static int Fiben = 0;
-static long Fihandler = -1;
+static intptr_t Fihandler = -1;
 
 int fifirst(const char* minta, char* filenev) {
     if (Fiben || Fihandler != -1L) {

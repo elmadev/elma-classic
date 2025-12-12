@@ -1,4 +1,9 @@
 #include "all.h"
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <timeapi.h>
+#endif
 
 // szamitogep
 // monitor
@@ -72,6 +77,14 @@ n8/9
 o8/9
     376, 379, 634
 */
+
+static double Startido = 0;
+
+// 182*sec-et adja vissza idot tortresszel egyutt!
+// d_stoppe.cpp-ben vannak megvalositva:
+double mv_stopperido(void) { return timeGetTime() * 0.182 - Startido; }
+
+void mv_startstopper(void) { Startido = timeGetTime() * 0.182; }
 
 #if defined(_WIN64) || !defined(_WIN32)
 int sdl_init(void);

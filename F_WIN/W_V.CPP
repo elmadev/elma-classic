@@ -227,14 +227,6 @@ void mv_exit(char* text) {
     }
 }
 
-static double Startido = 0;
-
-// 182*sec-et adja vissza idot tortresszel egyutt!
-// d_stoppe.cpp-ben vannak megvalositva:
-double mv_stopperido(void) { return timeGetTime() * 0.182 - Startido; }
-
-void mv_startstopper(void) { Startido = timeGetTime() * 0.182; }
-
 static int Hibaban = 0;
 static char Tmphibatext[500];
 

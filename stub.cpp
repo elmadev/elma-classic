@@ -15,10 +15,6 @@ int s_random(int maximum) { return 0; }
 void setmou(int x, int y) {}
 void getmou(int* x, int* y) {}
 
-double mv_stopperido(void) { return 0; }
-
-void mv_startstopper(void) {}
-
 int getbutbmou(void) { return 0; }
 
 int getbutjmou(void) { return 0; }

@@ -134,7 +134,7 @@ void mv_check(int skip_key_update) {
 
 void fill_kb_state(char* buffer) {
     const unsigned char* state = SDL_GetKeyboardState(NULL);
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MaxKeycode; i++) {
         buffer[i] = state[windows_scancode_table[i]];
     }
 }

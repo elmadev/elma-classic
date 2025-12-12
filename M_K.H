@@ -1,5 +1,7 @@
 // m_k.h
 
+const static int MaxKeycode = 256;
+
 void fill_kb_state(char* buffer);
 
 int mk_getextchar(void);

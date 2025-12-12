@@ -28,6 +28,16 @@ extern double Kord2x, Kord2y, Kord4x, Kord4y,
 
 extern int Viewzoom;
 
+struct rigidbody {
+    double rotation;
+    double angular_velocity;
+    double radius;
+    double mass;
+    double inertia; // Moment of inertia
+    vekt2 r;
+    vekt2 v;
+};
+
 struct motorst {
     rigidbody kor1, kor2, kor4;
     vekt2 fejr; // kor1-bol Kor12Fejr fuggveny allitja elo (leptet.h)!

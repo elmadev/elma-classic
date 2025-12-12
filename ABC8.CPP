@@ -111,6 +111,7 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
     const char* error_text = text;
     while (*text) {
         int index = (unsigned char)*text;
+        // Space character is hardcoded
         if (index == ' ') {
             if (this == Pmenuabc) {
                 x += SpaceWidthMenu;
@@ -131,7 +132,6 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
             }
         }
         blt8(dest, ppsprite[index], x, y + y_offset[index]);
-        // blt8( pdest, ppsprite[index], x, y );
         x += spacing + ppsprite[index]->getxsize();
 
         text++;
@@ -143,6 +143,7 @@ int abc8::len(const char* text) {
     int width = 0;
     while (*text) {
         int index = (unsigned char)*text;
+        // Space character is hardcoded (slightly different to abc8::write)
         if (!ppsprite[index]) {
             if (index == ' ') {
                 if (this == Pmenuabc) {

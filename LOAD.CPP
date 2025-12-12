@@ -50,10 +50,10 @@ int floadlevel_p(const char* nev) {
             delete Pszak;
         }
         Pszak = new szakaszok(Ptop);
-        if (Fejsugar > Pmot1->kor2.sugar) {
+        if (Fejsugar > Pmot1->kor2.radius) {
             Pszak->rendez(Fejsugar);
         } else {
-            Pszak->rendez(Pmot1->kor2.sugar);
+            Pszak->rendez(Pmot1->kor2.radius);
         }
 
         betoltecseteket();

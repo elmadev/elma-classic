@@ -119,17 +119,20 @@ void encode_frame_count(recorder* rec) {
 }
 
 // Check that the framecount matches with the MSB of the flags
-/*int frame_count_integrity( recorder* rec ) {
-    if( rec->betoltve < 80 )
+int frame_count_integrity(recorder* rec) {
+    if (rec->betoltve < 80) {
         return 1;
-    unsigned int frame_count = 0;
-    for( int i = 0; i < 32; i++ ) {
-        frame_count *= 2;
-        if( rec->pgazhatra[40+31-i] & 128 )
-            frame_count += 1;
     }
-    if( frame_count == rec->betoltve )
+    unsigned int frame_count = 0;
+    for (int i = 0; i < 32; i++) {
+        frame_count *= 2;
+        if (rec->pgazhatra[40 + 31 - i] & 128) {
+            frame_count += 1;
+        }
+    }
+    if (frame_count == rec->betoltve) {
         return 1;
-    else
+    } else {
         return 0;
-} */
+    }
+}

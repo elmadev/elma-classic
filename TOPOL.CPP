@@ -164,6 +164,9 @@ const char* getleveldescription(int level) {
             if (strchr(Sor, '\n')) {
                 *strchr(Sor, '\n') = 0;
             }
+            if (strchr(Sor, '\r')) {
+                *strchr(Sor, '\r') = 0;
+            }
             if (strlen(Sor) > DESCNEVHOSSZ) {
                 hiba("tct86");
             }

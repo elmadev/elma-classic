@@ -1856,11 +1856,11 @@ int topol::setallaktiv(motorst* pmot) {
                 }
                 voltkezdo = 1;
                 pker->aktiv = 0;
-                Kezdetihelydiff = pker->r - pmot->kor2.r;
-                pmot->kor1.r = pmot->kor1.r + Kezdetihelydiff;
-                pmot->kor2.r = pmot->kor2.r + Kezdetihelydiff;
-                pmot->kor4.r = pmot->kor4.r + Kezdetihelydiff;
-                pmot->vezetor = pmot->vezetor + Kezdetihelydiff;
+                Kezdetihelydiff = pker->r - pmot->left_wheel.r;
+                pmot->bike.r = pmot->bike.r + Kezdetihelydiff;
+                pmot->left_wheel.r = pmot->left_wheel.r + Kezdetihelydiff;
+                pmot->right_wheel.r = pmot->right_wheel.r + Kezdetihelydiff;
+                pmot->body_r = pmot->body_r + Kezdetihelydiff;
                 // Fejr = Kor1.r;
             }
         }

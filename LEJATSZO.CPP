@@ -51,22 +51,22 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
         startwavegyujto(WAV_EVES, 0.99, -1);
         switch (Ptop->kerektomb[sorszam]->kajatipus) {
         case KT_UP:
-            pmot->gravirany = 0;
+            pmot->gravity_direction = 0;
             break;
         case KT_DOWN:
-            pmot->gravirany = 1;
+            pmot->gravity_direction = 1;
             break;
         case KT_LEFT:
-            pmot->gravirany = 2;
+            pmot->gravity_direction = 2;
             break;
         case KT_RIGHT:
-            pmot->gravirany = 3;
+            pmot->gravity_direction = 3;
             break;
         }
         return 2;
     }
     if (tipus == T_CEL) {
-        if (Pmot1->kajaszam + Pmot2->kajaszam >= Kajakell) {
+        if (Pmot1->apple_count + Pmot2->apple_count >= Kajakell) {
             return 1;
         }
     }
@@ -136,10 +136,10 @@ static void belsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
             void initmotor(motorst * pmot); // adatok.cpp-ben
             initmotor(pmot);
             // Kezdetihelydiff-et setallaktiv allitja be:
-            pmot->kor1.r = pmot->kor1.r + Kezdetihelydiff;
-            pmot->kor2.r = pmot->kor2.r + Kezdetihelydiff;
-            pmot->kor4.r = pmot->kor4.r + Kezdetihelydiff;
-            pmot->vezetor = pmot->vezetor + Kezdetihelydiff;
+            pmot->bike.r = pmot->bike.r + Kezdetihelydiff;
+            pmot->left_wheel.r = pmot->left_wheel.r + Kezdetihelydiff;
+            pmot->right_wheel.r = pmot->right_wheel.r + Kezdetihelydiff;
+            pmot->body_r = pmot->body_r + Kezdetihelydiff;
 
             // Valtozok inicializalasa:
             int showkep = pvalt->showkep;
@@ -165,10 +165,10 @@ static void belsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
     //  Berreges es nyikorgas:
     pvalt->inf.surlero = kiszamolsurlodast();
 
-    if (pmot->hatra_f) {
-        pvalt->inf.frekvencia = fabs(pmot->kor2.angular_velocity) * 0.025;
+    if (pmot->flipped_bike) {
+        pvalt->inf.frekvencia = fabs(pmot->left_wheel.angular_velocity) * 0.025;
     } else {
-        pvalt->inf.frekvencia = fabs(pmot->kor4.angular_velocity) * 0.025;
+        pvalt->inf.frekvencia = fabs(pmot->right_wheel.angular_velocity) * 0.025;
     }
     // Frekvenciat betesszuk 1.0-2.0 tartomanyba:
     if (pvalt->inf.frekvencia > 30.0) {
@@ -185,7 +185,7 @@ static void belsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
     int objszam;
     while (getwavegyujto(&wavazonosito, &hangero, &objszam)) {
         if (objszam >= 0) {
-            int eredmeny = spritefeldolgoz(objszam, &pmot->kajaszam, pmot);
+            int eredmeny = spritefeldolgoz(objszam, &pmot->apple_count, pmot);
             if (eredmeny == 0 || eredmeny == 1) {
                 if (eredmeny == 0) {
                     *pmeghalt = 1;
@@ -265,20 +265,20 @@ static void kulsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
     // Hatra fordulas elintezes:
     if (!meghalt) {
         if (!pvalt->hatranyomva && mk_getstate(popciok->billfordul)) {
-            pmot->hatra_f = !pmot->hatra_f;
+            pmot->flipped_bike = !pmot->flipped_bike;
             szamitfejr(pmot);
         }
         pvalt->hatranyomva = mk_getstate(popciok->billfordul);
     }
-    baljobbelintez(&pvalt->baljobbv_f, prec, eddig, pmot->hatra_f);
+    baljobbelintez(&pvalt->baljobbv_f, prec, eddig, pmot->flipped_bike);
 
     // Hatra elintezes:
-    if (pmot->gravirany == 0) { // UP
-        pmot->hatra_h = !pmot->hatra_f;
+    if (pmot->gravity_direction == 0) { // UP
+        pmot->flipped_camera = !pmot->flipped_bike;
     } else {
-        pmot->hatra_h = pmot->hatra_f;
+        pmot->flipped_camera = pmot->flipped_bike;
     }
-    baljobbelintez(&pvalt->baljobbv_h, NULL, eddig, pmot->hatra_h);
+    baljobbelintez(&pvalt->baljobbv_h, NULL, eddig, pmot->flipped_camera);
 
     // Kirajzolashoz kell:
     pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / Ugroturelem;
@@ -379,7 +379,7 @@ long lejatszo(const char* filenev) {
 
     fogocskareset();
 
-    Pmot1->kajaszam = Pmot2->kajaszam = 0;
+    Pmot1->apple_count = Pmot2->apple_count = 0;
     long l = 0;
     int mindjar = 1;
     while (1) {
@@ -681,14 +681,14 @@ static int replaymag(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, rec
     }
 
     // Hatra elintezes:
-    baljobbelintez(&pvalt->baljobbv_f, NULL, eddig, pmot->hatra_f);
+    baljobbelintez(&pvalt->baljobbv_f, NULL, eddig, pmot->flipped_bike);
 
-    if (pmot->gravirany == 0) { // UP
-        pmot->hatra_h = !pmot->hatra_f;
+    if (pmot->gravity_direction == 0) { // UP
+        pmot->flipped_camera = !pmot->flipped_bike;
     } else {
-        pmot->hatra_h = pmot->hatra_f;
+        pmot->flipped_camera = pmot->flipped_bike;
     }
-    baljobbelintez(&pvalt->baljobbv_h, NULL, eddig, pmot->hatra_h);
+    baljobbelintez(&pvalt->baljobbv_h, NULL, eddig, pmot->flipped_camera);
 
     // Kirajzolashoz kellenek:
     pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / Ugroturelem;
@@ -768,7 +768,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
     fogocskareset();
 
-    // Pmot1->kajaszam = Pmot2->kajaszam = 0;
+    // Pmot1->apple_count = Pmot2->apple_count = 0;
     long l = 0;
     int jar1 = 1, jar2 = 1;
     while (1) {

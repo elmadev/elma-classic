@@ -39,24 +39,24 @@ struct rigidbody {
 };
 
 struct motorst {
-    rigidbody kor1, kor2, kor4;
-    vekt2 fejr; // kor1-bol Kor12Fejr fuggveny allitja elo (leptet.h)!
-    int hatra_f;
-    int hatra_h;
-    int gravirany; // 1 a normalis (0:UP 1:DOWN 2:LEFT 3:RIGHT)
+    rigidbody bike, left_wheel, right_wheel;
+    vekt2 head_r; // bike-bol Kor12Fejr fuggveny allitja elo (leptet.h)!
+    int flipped_bike;
+    int flipped_camera;
+    int gravity_direction; // 1 a normalis (0:UP 1:DOWN 2:LEFT 3:RIGHT)
     // double labalfa; Bicigli
 
-    vekt2 vezetor, vezetov; // Motoros
+    vekt2 body_r, body_v; // Motoros
 
-    int kajaszam; // hanyat evett ez a motoros
+    int apple_count; // hanyat evett ez a motoros
 
     // Leptet ezeket is hasznalja:
-    int voltfek;
-    double dfek2, dfek4;
+    int prev_brake;
+    double left_wheel_brake_rotation, right_wheel_brake_rotation;
 
-    int ugrasban1, ugrasban2;
-    double ugras1kezd, ugras2kezd;
-    double kezdoomega1, kezdoomega2;
+    int volting_right, volting_left;
+    double right_volt_time, left_volt_time;
+    double angular_velocity_pre_right_volt, angular_velocity_pre_left_volt;
 };
 
 extern motorst *Pmot1, *Pmot2;

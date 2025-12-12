@@ -33,42 +33,42 @@ Aranyy = Aranyx*Displaysizey/Displaysizex*(640.0/480.0);*/
 int Viewzoom = 10;
 
 void initmotor(motorst* pmot) {
-    pmot->hatra_f = 0;
-    pmot->hatra_h = 0;
-    pmot->gravirany = 1;
-    pmot->voltfek = 0;
+    pmot->flipped_bike = 0;
+    pmot->flipped_camera = 0;
+    pmot->gravity_direction = 1;
+    pmot->prev_brake = 0;
     // pmot->labalfa = 0.0; Bicigli
 
     // Kor1:
-    pmot->kor1.rotation = 0.0;
-    pmot->kor1.angular_velocity = 0.0;
-    pmot->kor1.radius = 0.3;
-    pmot->kor1.mass = 200; // 100;
+    pmot->bike.rotation = 0.0;
+    pmot->bike.angular_velocity = 0.0;
+    pmot->bike.radius = 0.3;
+    pmot->bike.mass = 200; // 100;
     // inertia = mass * r*r;
-    pmot->kor1.inertia = 200.0 * 0.55 * 0.55;
-    pmot->kor1.r = vekt2(2.75, 3.6);
-    pmot->kor1.v = vekt2(0, 0);
+    pmot->bike.inertia = 200.0 * 0.55 * 0.55;
+    pmot->bike.r = vekt2(2.75, 3.6);
+    pmot->bike.v = vekt2(0, 0);
 
     // Kor2:
-    pmot->kor2.rotation = 0.0; // 30
-    pmot->kor2.angular_velocity = 0.0;
-    pmot->kor2.radius = 0.4;
-    pmot->kor2.mass = 10;
-    pmot->kor2.inertia = 0.32;
-    pmot->kor2.r = vekt2(1.9, 3.0);
-    pmot->kor2.v = vekt2(0, 0);
+    pmot->left_wheel.rotation = 0.0; // 30
+    pmot->left_wheel.angular_velocity = 0.0;
+    pmot->left_wheel.radius = 0.4;
+    pmot->left_wheel.mass = 10;
+    pmot->left_wheel.inertia = 0.32;
+    pmot->left_wheel.r = vekt2(1.9, 3.0);
+    pmot->left_wheel.v = vekt2(0, 0);
 
     // Kor4:
-    pmot->kor4.rotation = 0.0; // 40
-    pmot->kor4.angular_velocity = 0.0;
-    pmot->kor4.radius = 0.4;
-    pmot->kor4.mass = 10;
-    pmot->kor4.inertia = 0.32;
-    pmot->kor4.r = vekt2(3.6, 3.0);
-    pmot->kor4.v = vekt2(0, 0);
+    pmot->right_wheel.rotation = 0.0; // 40
+    pmot->right_wheel.angular_velocity = 0.0;
+    pmot->right_wheel.radius = 0.4;
+    pmot->right_wheel.mass = 10;
+    pmot->right_wheel.inertia = 0.32;
+    pmot->right_wheel.r = vekt2(3.6, 3.0);
+    pmot->right_wheel.v = vekt2(0, 0);
 
-    pmot->vezetor = vekt2(2.75, 4.04);
-    pmot->vezetov = vekt2(0.0, 0.0);
+    pmot->body_r = vekt2(2.75, 4.04);
+    pmot->body_v = vekt2(0.0, 0.0);
 }
 
 void initadatok(void) {
@@ -101,14 +101,14 @@ void initadatok(void) {
 
     Fejsugar = 0.238; // 0.26;
 
-    vekt2 vtmp = Pmot1->kor2.r - Pmot1->kor1.r;
+    vekt2 vtmp = Pmot1->left_wheel.r - Pmot1->bike.r;
     Kord2x = vtmp.x;
     Kord2y = vtmp.y;
-    vtmp = Pmot1->kor4.r - Pmot1->kor1.r;
+    vtmp = Pmot1->right_wheel.r - Pmot1->bike.r;
     Kord4x = vtmp.x;
     Kord4y = vtmp.y;
 
-    Kord5y = Pmot1->vezetor.y - Pmot1->kor1.r.y;
+    Kord5y = Pmot1->body_r.y - Pmot1->bike.r.y;
 }
 
 /*static double atmeretez( void ) {

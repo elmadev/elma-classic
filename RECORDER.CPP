@@ -166,82 +166,82 @@ int recorder::recall(motorst* pmot, double ido, hanginfo* phinfo) {
         index2 = betoltve - 1;
     }
 
-    pmot->kor1.r.x = pk1rx[index1] * suly1 + pk1rx[index2] * suly2;
-    pmot->kor1.r.y = pk1ry[index1] * suly1 + pk1ry[index2] * suly2;
-    pmot->kor2.r.x =
-        pmot->kor1.r.x + Korrszorzo_rec * (pk2rx[index1] * suly1 + pk2rx[index2] * suly2);
-    pmot->kor2.r.y =
-        pmot->kor1.r.y + Korrszorzo_rec * (pk2ry[index1] * suly1 + pk2ry[index2] * suly2);
-    pmot->kor4.r.x =
-        pmot->kor1.r.x + Korrszorzo_rec * (pk4rx[index1] * suly1 + pk4rx[index2] * suly2);
-    pmot->kor4.r.y =
-        pmot->kor1.r.y + Korrszorzo_rec * (pk4ry[index1] * suly1 + pk4ry[index2] * suly2);
-    pmot->vezetor.x =
-        pmot->kor1.r.x + Korrszorzo_rec * (pvezrx[index1] * suly1 + pvezrx[index2] * suly2);
-    pmot->vezetor.y =
-        pmot->kor1.r.y + Korrszorzo_rec * (pvezry[index1] * suly1 + pvezry[index2] * suly2);
+    pmot->bike.r.x = pk1rx[index1] * suly1 + pk1rx[index2] * suly2;
+    pmot->bike.r.y = pk1ry[index1] * suly1 + pk1ry[index2] * suly2;
+    pmot->left_wheel.r.x =
+        pmot->bike.r.x + Korrszorzo_rec * (pk2rx[index1] * suly1 + pk2rx[index2] * suly2);
+    pmot->left_wheel.r.y =
+        pmot->bike.r.y + Korrszorzo_rec * (pk2ry[index1] * suly1 + pk2ry[index2] * suly2);
+    pmot->right_wheel.r.x =
+        pmot->bike.r.x + Korrszorzo_rec * (pk4rx[index1] * suly1 + pk4rx[index2] * suly2);
+    pmot->right_wheel.r.y =
+        pmot->bike.r.y + Korrszorzo_rec * (pk4ry[index1] * suly1 + pk4ry[index2] * suly2);
+    pmot->body_r.x =
+        pmot->bike.r.x + Korrszorzo_rec * (pvezrx[index1] * suly1 + pvezrx[index2] * suly2);
+    pmot->body_r.y =
+        pmot->bike.r.y + Korrszorzo_rec * (pvezry[index1] * suly1 + pvezry[index2] * suly2);
 
     if (index1 >= 2) {
         // Motor:
         if (abs(pk1alfa[index1] - pk1alfa[index2]) > 9000) { // 1000
-            // pmot->kor1.rotation = Alfaszorzo_16_rec * pk1alfa[index2];
+            // pmot->bike.rotation = Alfaszorzo_16_rec * pk1alfa[index2];
             if (pk1alfa[index1] > pk1alfa[index2]) {
                 int fixedindex1 = pk1alfa[index1] - 10000;
-                pmot->kor1.rotation =
+                pmot->bike.rotation =
                     Alfaszorzo_16_rec * (fixedindex1 * suly1 + pk1alfa[index2] * suly2);
             } else {
                 int fixedindex2 = pk1alfa[index2] - 10000;
-                pmot->kor1.rotation =
+                pmot->bike.rotation =
                     Alfaszorzo_16_rec * (pk1alfa[index1] * suly1 * suly1 + fixedindex2 * suly2);
             }
         } else {
-            pmot->kor1.rotation =
+            pmot->bike.rotation =
                 Alfaszorzo_16_rec * (pk1alfa[index1] * suly1 + pk1alfa[index2] * suly2);
         }
 
         // Elso kerek:
         if (abs(pk2alfa[index1] - pk2alfa[index2]) > 220) { // 50
-            // pmot->kor2.rotation = Alfaszorzo_rec * pk2alfa[index2];
+            // pmot->left_wheel.rotation = Alfaszorzo_rec * pk2alfa[index2];
             if (pk2alfa[index1] > pk2alfa[index2]) {
                 int fixedindex1 = pk2alfa[index1] - 250;
-                pmot->kor2.rotation =
+                pmot->left_wheel.rotation =
                     Alfaszorzo_rec * (fixedindex1 * suly1 + pk2alfa[index2] * suly2);
             } else {
                 int fixedindex2 = pk2alfa[index2] - 250;
-                pmot->kor2.rotation =
+                pmot->left_wheel.rotation =
                     Alfaszorzo_rec * (pk2alfa[index1] * suly1 * suly1 + fixedindex2 * suly2);
             }
         } else {
-            pmot->kor2.rotation =
+            pmot->left_wheel.rotation =
                 Alfaszorzo_rec * (pk2alfa[index1] * suly1 + pk2alfa[index2] * suly2);
         }
 
         // Hatso kerek:
         if (abs(pk4alfa[index1] - pk4alfa[index2]) > 220) {
-            // pmot->kor4.rotation = Alfaszorzo_rec * pk4alfa[index2];
+            // pmot->right_wheel.rotation = Alfaszorzo_rec * pk4alfa[index2];
             if (pk4alfa[index1] > pk4alfa[index2]) {
                 int fixedindex1 = pk4alfa[index1] - 250;
-                pmot->kor4.rotation =
+                pmot->right_wheel.rotation =
                     Alfaszorzo_rec * (fixedindex1 * suly1 + pk4alfa[index2] * suly2);
             } else {
                 int fixedindex2 = pk4alfa[index2] - 250;
-                pmot->kor4.rotation =
+                pmot->right_wheel.rotation =
                     Alfaszorzo_rec * (pk4alfa[index1] * suly1 * suly1 + fixedindex2 * suly2);
             }
         } else {
-            pmot->kor4.rotation =
+            pmot->right_wheel.rotation =
                 Alfaszorzo_rec * (pk4alfa[index1] * suly1 + pk4alfa[index2] * suly2);
         }
 
     } else {
-        pmot->kor1.rotation = Alfaszorzo_16_rec * pk1alfa[index2];
-        pmot->kor2.rotation = Alfaszorzo_rec * pk2alfa[index2];
-        pmot->kor4.rotation = Alfaszorzo_rec * pk4alfa[index2];
+        pmot->bike.rotation = Alfaszorzo_16_rec * pk1alfa[index2];
+        pmot->left_wheel.rotation = Alfaszorzo_rec * pk2alfa[index2];
+        pmot->right_wheel.rotation = Alfaszorzo_rec * pk4alfa[index2];
     }
 
-    // filebair( index2, pk2alfa[index2], pmot->kor2.rotation );
+    // filebair( index2, pk2alfa[index2], pmot->left_wheel.rotation );
     phinfo->gaz = char(pgazhatra[index1] & 1);
-    pmot->hatra_f = (pgazhatra[index1] & 2) >> 1;
+    pmot->flipped_bike = (pgazhatra[index1] & 2) >> 1;
     Aafogo = (pgazhatra[index1] & 4) >> 2;
     Kozelvannak = (pgazhatra[index1] & 8) >> 3;
 
@@ -262,12 +262,12 @@ static const double Reclepesido = 1.0 / Recorderszorzo;
 
 void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
     if (!legkozindex) {
-        ucso_r = pmot->kor1.r;
+        ucso_r = pmot->bike.r;
         ucsot = -0.00000000001;
         legkozt = 0.0;
     }
     if (ido < legkozt) {
-        ucso_r = pmot->kor1.r;
+        ucso_r = pmot->bike.r;
         ucsot = ido;
         return;
     }
@@ -278,7 +278,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
             hiba("ido-ucsot == 0.0!");
         }
 #endif
-        vekt2 kor1r = (pmot->kor1.r - ucso_r) * ((legkozt - ucsot) / (ido - ucsot)) + ucso_r;
+        vekt2 kor1r = (pmot->bike.r - ucso_r) * ((legkozt - ucsot) / (ido - ucsot)) + ucso_r;
 
         if (legkozindex >= Darabszam) {
             // betelt:
@@ -289,15 +289,15 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         int i = legkozindex;
         pk1rx[i] = kor1r.x;
         pk1ry[i] = kor1r.y;
-        pk2rx[i] = (pmot->kor2.r.x - pmot->kor1.r.x) * Korrszorzo;
-        pk2ry[i] = (pmot->kor2.r.y - pmot->kor1.r.y) * Korrszorzo;
-        pk4rx[i] = (pmot->kor4.r.x - pmot->kor1.r.x) * Korrszorzo;
-        pk4ry[i] = (pmot->kor4.r.y - pmot->kor1.r.y) * Korrszorzo;
-        pvezrx[i] = (pmot->vezetor.x - pmot->kor1.r.x) * Korrszorzo;
-        pvezry[i] = (pmot->vezetor.y - pmot->kor1.r.y) * Korrszorzo;
+        pk2rx[i] = (pmot->left_wheel.r.x - pmot->bike.r.x) * Korrszorzo;
+        pk2ry[i] = (pmot->left_wheel.r.y - pmot->bike.r.y) * Korrszorzo;
+        pk4rx[i] = (pmot->right_wheel.r.x - pmot->bike.r.x) * Korrszorzo;
+        pk4ry[i] = (pmot->right_wheel.r.y - pmot->bike.r.y) * Korrszorzo;
+        pvezrx[i] = (pmot->body_r.x - pmot->bike.r.x) * Korrszorzo;
+        pvezry[i] = (pmot->body_r.y - pmot->bike.r.y) * Korrszorzo;
 
         // Alfak:
-        double alfa1 = pmot->kor1.rotation;
+        double alfa1 = pmot->bike.rotation;
         while (alfa1 <= 0) {
             alfa1 += K_2pi;
         }
@@ -306,15 +306,15 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         }
         pk1alfa[i] = alfa1 * Alfaszorzo_16;
 
-        if (pmot->kor2.rotation <= 0) {
-            pk2alfa[i] = (pmot->kor2.rotation + K_2pi) * Alfaszorzo;
+        if (pmot->left_wheel.rotation <= 0) {
+            pk2alfa[i] = (pmot->left_wheel.rotation + K_2pi) * Alfaszorzo;
         } else {
-            pk2alfa[i] = pmot->kor2.rotation * Alfaszorzo;
+            pk2alfa[i] = pmot->left_wheel.rotation * Alfaszorzo;
         }
-        if (pmot->kor4.rotation <= 0) {
-            pk4alfa[i] = (pmot->kor4.rotation + K_2pi) * Alfaszorzo;
+        if (pmot->right_wheel.rotation <= 0) {
+            pk4alfa[i] = (pmot->right_wheel.rotation + K_2pi) * Alfaszorzo;
         } else {
-            pk4alfa[i] = pmot->kor4.rotation * Alfaszorzo;
+            pk4alfa[i] = pmot->right_wheel.rotation * Alfaszorzo;
         }
 
         // Encode gibberish into the 4 MSB of the flags
@@ -325,7 +325,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         if (phinfo->gaz) {
             pgazhatra[i] += 1;
         }
-        if (pmot->hatra_f) {
+        if (pmot->flipped_bike) {
             pgazhatra[i] += 2;
         }
         if (Aafogo) {
@@ -346,7 +346,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         legkozindex++;
         legkozt += Reclepesido;
         if (ido < legkozt) {
-            ucso_r = pmot->kor1.r;
+            ucso_r = pmot->bike.r;
             ucsot = ido;
             betoltve = legkozindex;
             return;
@@ -365,14 +365,14 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         hiba( "recorder::store-ban index < betoltve-1!" );
 
     for( int i = betoltve; i <= index; i++ ) {
-        pk1rx[i] = pmot->kor1.r.x;
-        pk1ry[i] = pmot->kor1.r.y;
-        pk2rx[i] = (pmot->kor2.r.x-pmot->kor1.r.x)*Korrszorzo;
-        pk2ry[i] = (pmot->kor2.r.y-pmot->kor1.r.y)*Korrszorzo;
-        pk4rx[i] = (pmot->kor4.r.x-pmot->kor1.r.x)*Korrszorzo;
-        pk4ry[i] = (pmot->kor4.r.y-pmot->kor1.r.y)*Korrszorzo;
-        pvezrx[i] = (pmot->vezetor.x-pmot->kor1.r.x)*Korrszorzo;
-        pvezry[i] = (pmot->vezetor.y-pmot->kor1.r.y)*Korrszorzo;
+        pk1rx[i] = pmot->bike.r.x;
+        pk1ry[i] = pmot->bike.r.y;
+        pk2rx[i] = (pmot->left_wheel.r.x-pmot->bike.r.x)*Korrszorzo;
+        pk2ry[i] = (pmot->left_wheel.r.y-pmot->bike.r.y)*Korrszorzo;
+        pk4rx[i] = (pmot->right_wheel.r.x-pmot->bike.r.x)*Korrszorzo;
+        pk4ry[i] = (pmot->right_wheel.r.y-pmot->bike.r.y)*Korrszorzo;
+        pvezrx[i] = (pmot->body_r.x-pmot->bike.r.x)*Korrszorzo;
+        pvezry[i] = (pmot->body_r.y-pmot->bike.r.y)*Korrszorzo;
 
         // torlendo
         //int hatar = 2000;
@@ -384,21 +384,21 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         //	uzenet( "Kisebb -5000-nel!" );
 
         // Alfak:
-        double alfa1 = pmot->kor1.rotation;
+        double alfa1 = pmot->bike.rotation;
         while( alfa1 <= 0 )
             alfa1 += K_2pi;
         while( alfa1 > K_2pi )
             alfa1 -= K_2pi;
         pk1alfa[i] = alfa1*Alfaszorzo_16;
 
-        if( pmot->kor2.rotation <= 0 )
-            pk2alfa[i] = (pmot->kor2.rotation + K_2pi)*Alfaszorzo;
+        if( pmot->left_wheel.rotation <= 0 )
+            pk2alfa[i] = (pmot->left_wheel.rotation + K_2pi)*Alfaszorzo;
         else
-            pk2alfa[i] = pmot->kor2.rotation*Alfaszorzo;
-        if( pmot->kor4.rotation <= 0 )
-            pk4alfa[i] = (pmot->kor4.rotation + K_2pi)*Alfaszorzo;
+            pk2alfa[i] = pmot->left_wheel.rotation*Alfaszorzo;
+        if( pmot->right_wheel.rotation <= 0 )
+            pk4alfa[i] = (pmot->right_wheel.rotation + K_2pi)*Alfaszorzo;
         else
-            pk4alfa[i] = pmot->kor4.rotation*Alfaszorzo;
+            pk4alfa[i] = pmot->right_wheel.rotation*Alfaszorzo;
 
         if( phinfo->gaz )
             pgazhatra[i] = 1;

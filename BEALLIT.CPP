@@ -1,16 +1,16 @@
 #include "ALL.H"
 
-// Tudom hogy hiba Belsosav-ot adatok.cpp-ben 0.02-re venni, amikor peldaul
+// Tudom hogy hiba WheelDeformationLength-ot adatok.cpp-ben 0.02-re venni, amikor peldaul
 // 0.005 is jo lenne. Hiba tovabba biztostalppont regi verziojat hasznalni
 // uj helyett, de ezekkel nem ugyanugy viselkedne motor, mint regen.
 
 // Nem engedi vonalon+egykicsi tovabb kereket!:
 static void helyigazitas(rigidbody* pk, vekt2* pt) {
-    // Belsosav = 0.02; //adatok.cpp-ben van ez beallitva
+    // WheelDeformationLength = 0.02; //adatok.cpp-ben van ez beallitva
     double hossz = abs(pk->r - *pt);
     vekt2 n = (pk->r - *pt) * (1.0 / hossz);
-    if (hossz < pk->radius - Belsosav) {
-        pk->r = pk->r + n * (pk->radius - Belsosav - hossz);
+    if (hossz < pk->radius - WheelDeformationLength) {
+        pk->r = pk->r + n * (pk->radius - WheelDeformationLength - hossz);
     }
 }
 
@@ -21,7 +21,7 @@ static double Utodeshatar = 1.5;
 static int talppontigazitas(rigidbody* pk, vekt2* pt, vekt2 F) {
     double hossz = abs(pk->r - *pt);
     vekt2 n = (pk->r - *pt) * (1.0 / hossz);
-    if (n * pk->v > -Elszakadasisebhat && n * F > 0) {
+    if (n * pk->v > -GroundEscapeVelocity && n * F > 0) {
         // Nem talppont:
         return 0;
     }
@@ -292,14 +292,14 @@ void beallitvezeto(motorst* pmot, vekt2 gravitacio, vekt2 i, vekt2 j, double dt)
     vezeto_hatarolas(pmot, i, j);
 
     // Rugoero szamitas:
-    vekt2 rugor = pmot->bike.r + j * Kord5y;
+    vekt2 rugor = pmot->bike.r + j * BodyDY;
     vekt2 rugoeroirany = rugor - pmot->body_r;
     double rugoerohossz = abs(rugoeroirany);
     if (rugoerohossz < 0.0000001) {
         rugoerohossz = 0.0000001;
     }
     vekt2 rugoeroegyseg = rugoeroirany * (1.0 / rugoerohossz);
-    double ero = rugoerohossz * Dr * 5.0;
+    double ero = rugoerohossz * SpringTensionCoefficient * 5.0;
     vekt2 Frugo = rugoeroegyseg * ero;
 
     // Surlodasi ero szamitas:
@@ -307,9 +307,9 @@ void beallitvezeto(motorst* pmot, vekt2 gravitacio, vekt2 i, vekt2 j, double dt)
     vekt2 tangens = forgatas90fokkal(pmot->body_r - pmot->bike.r);
     vekt2 motseb = tangens * pmot->bike.angular_velocity + pmot->bike.v;
     vekt2 relv = pmot->body_v - motseb;
-    vekt2 Fsurl = relv * Sr * 3.0;
+    vekt2 Fsurl = relv * SpringResistanceCoefficient * 3.0;
 
-    vekt2 F = Frugo - Fsurl + gravitacio * pmot->bike.mass * G;
+    vekt2 F = Frugo - Fsurl + gravitacio * pmot->bike.mass * Gravity;
     vekt2 a = F * (1.0 / pmot->bike.mass); // Egyenlore kerek tomegevel szamolunk
     pmot->body_v = pmot->body_v + a * dt;
     pmot->body_r = pmot->body_r + pmot->body_v * dt;

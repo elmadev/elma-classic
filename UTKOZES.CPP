@@ -48,7 +48,7 @@ int talppontkereses(vekt2 r, double sugar, vekt2* pt1, vekt2* pt2, vonal** ppv1,
                 talppontszam++;
                 // Ellenorzes, hogy nincs-e tul kozel ketpont,
                 // ha ket pontrol van szo:
-                if (abs(*pt1 - *pt2) < Talppontegybeolvadasitav) {
+                if (abs(*pt1 - *pt2) < TwoPointDiscriminationDistance) {
                     *pt1 = (*pt1 + *pt2) * 0.5; // atlagol
                     talppontszam = 1;
                     *ppv2 = NULL;

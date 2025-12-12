@@ -130,7 +130,7 @@ void mv_main(void) {
         }
     }
 
-    // initadatok(); teljesben van mar ujabban
+    // init_physics_data(); teljesben van mar ujabban
 
     ugraseldontes();
 

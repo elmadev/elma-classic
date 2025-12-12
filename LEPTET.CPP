@@ -37,8 +37,8 @@ static void erokszamitasa(motorst* pmot, rigidbody* pkor, vekt2 i1, vekt2 j1, do
         vekt2 rudegys = gumis * (1.0 / rudhossz);
         vekt2 rudegysmer = forgatas90fokkal(rudegys);
 
-        Fsugar = (gumi * rudegys) * Dr;
-        Ftang = (gumi * rudegysmer) * Dr;
+        Fsugar = (gumi * rudegys) * SpringTensionCoefficient;
+        Ftang = (gumi * rudegysmer) * SpringTensionCoefficient;
 
         *pFkerek = Fsugar * rudegys + Ftang * rudegysmer;
 
@@ -59,8 +59,8 @@ static void erokszamitasa(motorst* pmot, rigidbody* pkor, vekt2 i1, vekt2 j1, do
     vekt2 korongrelv = (kotomer * pmot->bike.angular_velocity + pmot->bike.v) - pkor->v;
     double vlong = korongrelv * kotoe;
     double vtang = korongrelv * kotoemer;
-    vekt2 Fklong = (vlong * Sr) * kotoe;
-    vekt2 Fktang = (vtang * Sr) * kotoemer;
+    vekt2 Fklong = (vlong * SpringResistanceCoefficient) * kotoe;
+    vekt2 Fktang = (vtang * SpringResistanceCoefficient) * kotoemer;
 
     // Most jon kerek forgatonyomateka:
     vekt2 Ftestnyom = kotoemer * (*pMkerek * reckotol);
@@ -150,14 +150,14 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
     vekt2 Fkerek2;
     vekt2 Ftest2;
     double Mtest2;
-    erokszamitasa(pmot, &pmot->left_wheel, i1, j1, Kord2x, Kord2y, &Fkerek2, &Ftest2, &Mtest2,
-                  &Mkerek2);
+    erokszamitasa(pmot, &pmot->left_wheel, i1, j1, LeftWheelDX, LeftWheelDY, &Fkerek2, &Ftest2,
+                  &Mtest2, &Mkerek2);
 
     vekt2 Fkerek4;
     vekt2 Ftest4;
     double Mtest4;
-    erokszamitasa(pmot, &pmot->right_wheel, i1, j1, Kord4x, Kord4y, &Fkerek4, &Ftest4, &Mtest4,
-                  &Mkerek4);
+    erokszamitasa(pmot, &pmot->right_wheel, i1, j1, RightWheelDX, RightWheelDY, &Fkerek4, &Ftest4,
+                  &Mtest4, &Mkerek4);
 
     // Ugras elintezese:
     // Eloszor ugras befejezese, ha kell:
@@ -167,7 +167,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
     }
 
     if (pmot->volting_right &&
-        (ugrik1 || ugrik2 || most > pmot->right_volt_time + Ugroturelem * 0.25)) {
+        (ugrik1 || ugrik2 || most > pmot->right_volt_time + VoltDelay * 0.25)) {
         pmot->bike.angular_velocity += Loket;
         if (pmot->bike.angular_velocity > pmot->angular_velocity_pre_right_volt) {
             pmot->bike.angular_velocity = pmot->angular_velocity_pre_right_volt;
@@ -184,7 +184,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
         pmot->right_volt_time = -1.0;
     }
     if (pmot->volting_left &&
-        (ugrik1 || ugrik2 || most > pmot->left_volt_time + Ugroturelem * 0.25)) {
+        (ugrik1 || ugrik2 || most > pmot->left_volt_time + VoltDelay * 0.25)) {
         pmot->bike.angular_velocity -= Loket;
         if (pmot->bike.angular_velocity < pmot->angular_velocity_pre_left_volt) {
             pmot->bike.angular_velocity = pmot->angular_velocity_pre_left_volt;
@@ -230,40 +230,49 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
     }
 
     /*
-    beallit( &pmot->bike, Ftest2+Ftest4-Vekt2j*pmot->bike.mass*G,
+    beallit( &pmot->bike, Ftest2+Ftest4-Vekt2j*pmot->bike.mass*Gravity,
                     Mtest2+Mtest4, dt, 0 );
-    beallit( &pmot->left_wheel, Fkerek2-Vekt2j*pmot->left_wheel.mass*G, Mkerek2,      dt, 1 );
-    beallit( &pmot->right_wheel, Fkerek4-Vekt2j*pmot->right_wheel.mass*G, Mkerek4,      dt, 1 );
+    beallit( &pmot->left_wheel, Fkerek2-Vekt2j*pmot->left_wheel.mass*Gravity, Mkerek2,      dt, 1 );
+    beallit( &pmot->right_wheel, Fkerek4-Vekt2j*pmot->right_wheel.mass*Gravity, Mkerek4,      dt, 1
+    );
     */
 
     switch (pmot->gravity_direction) {
     case 1:                                                // Lefele:
         beallitvezeto(pmot, vekt2(0.0, -1.0), i1, j1, dt); // vezeto
-        beallit(&pmot->bike, Ftest2 + Ftest4 - Vekt2j * pmot->bike.mass * G, Mtest2 + Mtest4, dt,
-                0);
-        beallit(&pmot->left_wheel, Fkerek2 - Vekt2j * pmot->left_wheel.mass * G, Mkerek2, dt, 1);
-        beallit(&pmot->right_wheel, Fkerek4 - Vekt2j * pmot->right_wheel.mass * G, Mkerek4, dt, 1);
+        beallit(&pmot->bike, Ftest2 + Ftest4 - Vekt2j * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
+                dt, 0);
+        beallit(&pmot->left_wheel, Fkerek2 - Vekt2j * pmot->left_wheel.mass * Gravity, Mkerek2, dt,
+                1);
+        beallit(&pmot->right_wheel, Fkerek4 - Vekt2j * pmot->right_wheel.mass * Gravity, Mkerek4,
+                dt, 1);
         break;
     case 0:                                               // Felfele:
         beallitvezeto(pmot, vekt2(0.0, 1.0), i1, j1, dt); // vezeto
-        beallit(&pmot->bike, Ftest2 + Ftest4 + Vekt2j * pmot->bike.mass * G, Mtest2 + Mtest4, dt,
-                0);
-        beallit(&pmot->left_wheel, Fkerek2 + Vekt2j * pmot->left_wheel.mass * G, Mkerek2, dt, 1);
-        beallit(&pmot->right_wheel, Fkerek4 + Vekt2j * pmot->right_wheel.mass * G, Mkerek4, dt, 1);
+        beallit(&pmot->bike, Ftest2 + Ftest4 + Vekt2j * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
+                dt, 0);
+        beallit(&pmot->left_wheel, Fkerek2 + Vekt2j * pmot->left_wheel.mass * Gravity, Mkerek2, dt,
+                1);
+        beallit(&pmot->right_wheel, Fkerek4 + Vekt2j * pmot->right_wheel.mass * Gravity, Mkerek4,
+                dt, 1);
         break;
     case 2:                                                // Balra:
         beallitvezeto(pmot, vekt2(-1.0, 0.0), i1, j1, dt); // vezeto
-        beallit(&pmot->bike, Ftest2 + Ftest4 - Vekt2i * pmot->bike.mass * G, Mtest2 + Mtest4, dt,
-                0);
-        beallit(&pmot->left_wheel, Fkerek2 - Vekt2i * pmot->left_wheel.mass * G, Mkerek2, dt, 1);
-        beallit(&pmot->right_wheel, Fkerek4 - Vekt2i * pmot->right_wheel.mass * G, Mkerek4, dt, 1);
+        beallit(&pmot->bike, Ftest2 + Ftest4 - Vekt2i * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
+                dt, 0);
+        beallit(&pmot->left_wheel, Fkerek2 - Vekt2i * pmot->left_wheel.mass * Gravity, Mkerek2, dt,
+                1);
+        beallit(&pmot->right_wheel, Fkerek4 - Vekt2i * pmot->right_wheel.mass * Gravity, Mkerek4,
+                dt, 1);
         break;
     case 3:                                               // Jobbra:
         beallitvezeto(pmot, vekt2(1.0, 0.0), i1, j1, dt); // vezeto
-        beallit(&pmot->bike, Ftest2 + Ftest4 + Vekt2i * pmot->bike.mass * G, Mtest2 + Mtest4, dt,
-                0);
-        beallit(&pmot->left_wheel, Fkerek2 + Vekt2i * pmot->left_wheel.mass * G, Mkerek2, dt, 1);
-        beallit(&pmot->right_wheel, Fkerek4 + Vekt2i * pmot->right_wheel.mass * G, Mkerek4, dt, 1);
+        beallit(&pmot->bike, Ftest2 + Ftest4 + Vekt2i * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
+                dt, 0);
+        beallit(&pmot->left_wheel, Fkerek2 + Vekt2i * pmot->left_wheel.mass * Gravity, Mkerek2, dt,
+                1);
+        beallit(&pmot->right_wheel, Fkerek4 + Vekt2i * pmot->right_wheel.mass * Gravity, Mkerek4,
+                dt, 1);
         break;
     }
 
@@ -274,7 +283,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
 int vizsgalat(motorst* pmot) {
     vekt2 t1, t2;
     vonal *pv1, *pv2;
-    if (talppontkereses(pmot->head_r, Fejsugar, &t1, &t2, &pv1, &pv2)) {
+    if (talppontkereses(pmot->head_r, HeadRadius, &t1, &t2, &pv1, &pv2)) {
         return 0;
     }
 
@@ -285,7 +294,7 @@ int vizsgalat(motorst* pmot) {
         int sorszamtomb[3];
         sorszamtomb[0] = utkozikesprite(pmot->left_wheel.r, pmot->left_wheel.radius);
         sorszamtomb[1] = utkozikesprite(pmot->right_wheel.r, pmot->right_wheel.radius);
-        sorszamtomb[2] = utkozikesprite(pmot->head_r, Fejsugar);
+        sorszamtomb[2] = utkozikesprite(pmot->head_r, HeadRadius);
         for (int i = 0; i < 3; i++) {
             if (sorszamtomb[i] >= 0) {
                 startwavegyujto(0, 0.0, sorszamtomb[i]);

@@ -53,7 +53,7 @@ void teljes(void) {
 
     mergestatedat();
 
-    initadatok();
+    init_physics_data();
 
     // State->save(); // Itt lehet ures state.dat file-t csinalni
 

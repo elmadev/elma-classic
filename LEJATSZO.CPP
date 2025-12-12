@@ -66,7 +66,7 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
         return 2;
     }
     if (tipus == T_CEL) {
-        if (Pmot1->apple_count + Pmot2->apple_count >= Kajakell) {
+        if (Motor1->apple_count + Motor2->apple_count >= Kajakell) {
             return 1;
         }
     }
@@ -102,7 +102,7 @@ static void belsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
                       long* pmegvanido, int* pmeghalt, double eddig, double dt) {
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
-    if (eddig > pvalt->utolsougras + Ugroturelem) {
+    if (eddig > pvalt->utolsougras + VoltDelay) {
         if ((mk_getstate(popciok->billugras1) && Sajatugras) ||
             (mk_getstate(popciok->billugras2) && !Sajatugras)) {
             ugrik1 = 1;
@@ -133,8 +133,8 @@ static void belsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
         prec->store(pmot, eddig, &pvalt->inf);
         if (!Single && Tag) {
             // Flag Tag modban nem allnak meg, hanem visszamennek starthelyre:
-            void initmotor(motorst * pmot); // adatok.cpp-ben
-            initmotor(pmot);
+            void init_motor(motorst * motor); // adatok.cpp-ben
+            init_motor(pmot);
             // Kezdetihelydiff-et setallaktiv allitja be:
             pmot->bike.r = pmot->bike.r + Kezdetihelydiff;
             pmot->left_wheel.r = pmot->left_wheel.r + Kezdetihelydiff;
@@ -151,7 +151,7 @@ static void belsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
             pvalt->utolsougras = -100.0;
             pvalt->showkep = showkep;
 
-            if ((pmot == Pmot1 && Aafogo) || (pmot == Pmot2 && !Aafogo)) {
+            if ((pmot == Motor1 && Aafogo) || (pmot == Motor2 && !Aafogo)) {
                 // Nala volt zaszlo
                 Aafogo = !Aafogo;
             }
@@ -281,7 +281,7 @@ static void kulsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
     baljobbelintez(&pvalt->baljobbv_h, NULL, eddig, pmot->flipped_camera);
 
     // Kirajzolashoz kell:
-    pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / Ugroturelem;
+    pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / VoltDelay;
     if (pvalt->ugrasnagysag < 0) {
         pvalt->ugrasnagysag = 0;
     }
@@ -327,7 +327,7 @@ long lejatszo(const char* filenev) {
     }
 
     int palmegnincs = 1;
-    initadatok();
+    init_physics_data();
     if (!Ptop) {
         hiba("lejatszo-ban !Ptop!");
     }
@@ -335,8 +335,8 @@ long lejatszo(const char* filenev) {
     Ptop->kitoltiszineket();
     Ptop->killerekelore();
     // setallaktiv allitja be motor kezdeti helyzetet es fazisokat is!:
-    Kajakell = Ptop->setallaktiv(Pmot1);
-    Ptop->setallaktiv(Pmot2);
+    Kajakell = Ptop->setallaktiv(Motor1);
+    Ptop->setallaktiv(Motor2);
 
     // Eloszor keretet tobbszor kirakja kirajzol320:
     Kitoltestmegrak = Kitoltestmegrakkezd;
@@ -365,8 +365,8 @@ long lejatszo(const char* filenev) {
     int meghalt2 = 0;
     long megvanido1 = 0;
     long megvanido2 = 0;
-    resetleptet(Pmot1);
-    resetleptet(Pmot2);
+    resetleptet(Motor1);
+    resetleptet(Motor2);
 
     initsoundlejatszoban();
     Mute = 0;
@@ -379,7 +379,7 @@ long lejatszo(const char* filenev) {
 
     fogocskareset();
 
-    Pmot1->apple_count = Pmot2->apple_count = 0;
+    Motor1->apple_count = Motor2->apple_count = 0;
     long l = 0;
     int mindjar = 1;
     while (1) {
@@ -424,11 +424,13 @@ long lejatszo(const char* filenev) {
             }
 
             if (!meghalt1) {
-                belsoresz(Pmot1, &State->opciok1, &valt1, Prec1, &megvanido1, &meghalt1, eddig, dt);
+                belsoresz(Motor1, &State->opciok1, &valt1, Prec1, &megvanido1, &meghalt1, eddig,
+                          dt);
             }
 
             if (!Single && !meghalt2) {
-                belsoresz(Pmot2, &State->opciok2, &valt2, Prec2, &megvanido2, &meghalt2, eddig, dt);
+                belsoresz(Motor2, &State->opciok2, &valt2, Prec2, &megvanido2, &meghalt2, eddig,
+                          dt);
             }
 
             if (!(meghalt1 && meghalt2)) {
@@ -479,7 +481,7 @@ long lejatszo(const char* filenev) {
                 } else {
                     startwave(WAV_TORES, 0.999);
                 }
-                hangosdelay(Vegenvaras * 1000.0);
+                hangosdelay(LevelEndDelay * 1000.0);
 
                 stopmotor(1);
                 stopmotor(0);
@@ -488,13 +490,13 @@ long lejatszo(const char* filenev) {
                 nullazhangot();
                 if (megvanido) {
                     Ptop->kerekjolalljon();
-                    berakrecbehosszat(Prec1);
-                    berakrecbehosszat(Prec2);
+                    encode_frame_count(Prec1);
+                    encode_frame_count(Prec2);
                     return megvanido;
                 } else {
                     Ptop->kerekjolalljon();
-                    berakrecbehosszat(Prec1);
-                    berakrecbehosszat(Prec2);
+                    encode_frame_count(Prec1);
+                    encode_frame_count(Prec2);
                     return -1;
                 }
             }
@@ -516,11 +518,11 @@ long lejatszo(const char* filenev) {
             setmotor(0, valt2.inf.frekvencia, valt2.inf.gaz);
         }
 
-        kulsoresz(Pmot1, &State->opciok1, &valt1, Prec1, &Viewtime1, eddig, &valt2.showkep,
+        kulsoresz(Motor1, &State->opciok1, &valt1, Prec1, &Viewtime1, eddig, &valt2.showkep,
                   meghalt1);
 
         if (!Single) {
-            kulsoresz(Pmot2, &State->opciok2, &valt2, Prec2, &Viewtime2, eddig, &valt1.showkep,
+            kulsoresz(Motor2, &State->opciok2, &valt2, Prec2, &Viewtime2, eddig, &valt1.showkep,
                       meghalt2);
         }
 
@@ -580,8 +582,8 @@ long lejatszo(const char* filenev) {
                 fclose(h);
             }
             Ptop->kerekjolalljon();
-            berakrecbehosszat(Prec1);
-            berakrecbehosszat(Prec2);
+            encode_frame_count(Prec1);
+            encode_frame_count(Prec2);
             Masodikmenet = 1;
             return -1;
         }
@@ -691,7 +693,7 @@ static int replaymag(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, rec
     baljobbelintez(&pvalt->baljobbv_h, NULL, eddig, pmot->flipped_camera);
 
     // Kirajzolashoz kellenek:
-    pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / Ugroturelem;
+    pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / VoltDelay;
     if (pvalt->ugrasnagysag < 0) {
         pvalt->ugrasnagysag = 0;
     }
@@ -715,7 +717,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     beallitlegjobbidot(filenev, Single);
 
     int palmegnincs = 1;
-    initadatok();
+    init_physics_data();
     if (!Ptop) {
         hiba("lejatszo-ban !Ptop!");
     }
@@ -723,8 +725,8 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     Ptop->kitoltiszineket();
     Ptop->killerekelore();
     // setallaktiv allitja be motor kezdeti helyzetet is!:
-    Kajakell = Ptop->setallaktiv(Pmot1);
-    Ptop->setallaktiv(Pmot2);
+    Kajakell = Ptop->setallaktiv(Motor1);
+    Ptop->setallaktiv(Motor2);
 
     // Eloszor keretet tobbszor is kirakja kirajzol320:
     Kitoltestmegrak = Kitoltestmegrakkezd;
@@ -754,8 +756,8 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         valt2.showkep = 1;
     }
 
-    resetleptet(Pmot1);
-    resetleptet(Pmot2);
+    resetleptet(Motor1);
+    resetleptet(Motor2);
 
     initsoundlejatszoban();
     Mute = 0;
@@ -768,7 +770,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
     fogocskareset();
 
-    // Pmot1->apple_count = Pmot2->apple_count = 0;
+    // Motor1->apple_count = Motor2->apple_count = 0;
     long l = 0;
     int jar1 = 1, jar2 = 1;
     while (1) {
@@ -777,11 +779,11 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         double eddig = mv_stopperido() * 0.0024;
         // recall koordokat es Hatra-t is beallitja:
         int befejezte1 =
-            !replaymag(Pmot1, &State->opciok1, &valt1, Prec1, eddig, &Viewtime1, &valt2.showkep);
+            !replaymag(Motor1, &State->opciok1, &valt1, Prec1, eddig, &Viewtime1, &valt2.showkep);
 
         int befejezte2 = 0;
         if (!Single) {
-            befejezte2 = !replaymag(Pmot2, &State->opciok2, &valt2, Prec2, eddig, &Viewtime2,
+            befejezte2 = !replaymag(Motor2, &State->opciok2, &valt2, Prec2, eddig, &Viewtime2,
                                     &valt1.showkep);
         }
 
@@ -792,7 +794,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             stopmotor(1);
             stopmotor(0);
             setsurlodas(0);
-            hangosdelay(Vegenvaras * 400.0);
+            hangosdelay(LevelEndDelay * 400.0);
 
             // while( vanmegwav() )
             //	hang( /*"Lej replay 1"*/ );
@@ -883,7 +885,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             stopmotor(1);
             stopmotor(0);
             setsurlodas(0);
-            hangosdelay(Vegenvaras * 400.0);
+            hangosdelay(LevelEndDelay * 400.0);
 
             // while( vanmegwav() )
             //	hang( /*"Lej replay 1"*/ );

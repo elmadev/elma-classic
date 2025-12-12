@@ -613,7 +613,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
             Idoszovegek[1].x = 10 + dx;
             Idoszovegek[1].y = ya;
 
-            sprintf(Idoszovegek[2].text, "%d", Pmot1->apple_count);
+            sprintf(Idoszovegek[2].text, "%d", Motor1->apple_count);
             Idoszovegek[2].x = 380 + dx;
             Idoszovegek[2].y = ya;
 
@@ -637,7 +637,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
             Idoszovegek[4].x = 10 + dx;
             Idoszovegek[4].y = yb;
 
-            sprintf(Idoszovegek[5].text, "%d", Pmot2->apple_count);
+            sprintf(Idoszovegek[5].text, "%d", Motor2->apple_count);
             Idoszovegek[5].x = 380 + dx;
             Idoszovegek[5].y = yb;
 

@@ -1,113 +1,113 @@
 #include "ALL.H"
 
 motorst Motorst1, Motorst2; // Ez nem hasznalando
-motorst *Pmot1 = &Motorst1, *Pmot2 = &Motorst2;
+motorst *Motor1 = &Motorst1, *Motor2 = &Motorst2;
 
-double Elszakadasisebhat, Belsosav, G;
-double Talppontegybeolvadasitav;
+double GroundEscapeVelocity, WheelDeformationLength, Gravity;
+double TwoPointDiscriminationDistance;
 
-double Ugroturelem;
-double Vegenvaras;
+double VoltDelay;
+double LevelEndDelay;
 
-double Dr, Sr;
+double SpringTensionCoefficient, SpringResistanceCoefficient;
 
-double Fejsugar;
+double HeadRadius;
 
-double Objektumsugar = 0.4;
+double ObjectRadius = 0.4;
 
 // Hajszalnyival kisebb rigidbody.sugarnal, hogy kirajzolasnal ne logjon foldbe:
-double Kerekrajzsugar = 0.395;
+double WheelBackgroundRenderRadius = 0.395;
 
-double Kord2x, Kord2y, Kord4x, Kord4y,
-    Kord5y; // Ez az utolso vezeto helye
+double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY,
+    BodyDY; // Ez az utolso vezeto helye
 
-double Arany, Aranyrec;
+double MetersToPixels, PixelsToMeters;
 
 /* Eredeti szamitas play.cpp-bol:
-Arany = 100.0;
-Arany *= Displaysizex/320.0;
-Arany *= fakt;
-Aranyx = Arany*320.0/640.0;
+MetersToPixels = 100.0;
+MetersToPixels *= Displaysizex/320.0;
+MetersToPixels *= fakt;
+Aranyx = MetersToPixels*320.0/640.0;
 Aranyy = Aranyx*Displaysizey/Displaysizex*(640.0/480.0);*/
 
-int Viewzoom = 10;
+int MinimapScaleFactor = 10;
 
-void initmotor(motorst* pmot) {
-    pmot->flipped_bike = 0;
-    pmot->flipped_camera = 0;
-    pmot->gravity_direction = 1;
-    pmot->prev_brake = 0;
+void init_motor(motorst* motor) {
+    motor->flipped_bike = 0;
+    motor->flipped_camera = 0;
+    motor->gravity_direction = 1;
+    motor->prev_brake = 0;
 
     // Kor1:
-    pmot->bike.rotation = 0.0;
-    pmot->bike.angular_velocity = 0.0;
-    pmot->bike.radius = 0.3;
-    pmot->bike.mass = 200; // 100;
+    motor->bike.rotation = 0.0;
+    motor->bike.angular_velocity = 0.0;
+    motor->bike.radius = 0.3;
+    motor->bike.mass = 200; // 100;
     // inertia = mass * r*r;
-    pmot->bike.inertia = 200.0 * 0.55 * 0.55;
-    pmot->bike.r = vekt2(2.75, 3.6);
-    pmot->bike.v = vekt2(0, 0);
+    motor->bike.inertia = 200.0 * 0.55 * 0.55;
+    motor->bike.r = vekt2(2.75, 3.6);
+    motor->bike.v = vekt2(0, 0);
 
     // Kor2:
-    pmot->left_wheel.rotation = 0.0; // 30
-    pmot->left_wheel.angular_velocity = 0.0;
-    pmot->left_wheel.radius = 0.4;
-    pmot->left_wheel.mass = 10;
-    pmot->left_wheel.inertia = 0.32;
-    pmot->left_wheel.r = vekt2(1.9, 3.0);
-    pmot->left_wheel.v = vekt2(0, 0);
+    motor->left_wheel.rotation = 0.0; // 30
+    motor->left_wheel.angular_velocity = 0.0;
+    motor->left_wheel.radius = 0.4;
+    motor->left_wheel.mass = 10;
+    motor->left_wheel.inertia = 0.32;
+    motor->left_wheel.r = vekt2(1.9, 3.0);
+    motor->left_wheel.v = vekt2(0, 0);
 
     // Kor4:
-    pmot->right_wheel.rotation = 0.0; // 40
-    pmot->right_wheel.angular_velocity = 0.0;
-    pmot->right_wheel.radius = 0.4;
-    pmot->right_wheel.mass = 10;
-    pmot->right_wheel.inertia = 0.32;
-    pmot->right_wheel.r = vekt2(3.6, 3.0);
-    pmot->right_wheel.v = vekt2(0, 0);
+    motor->right_wheel.rotation = 0.0; // 40
+    motor->right_wheel.angular_velocity = 0.0;
+    motor->right_wheel.radius = 0.4;
+    motor->right_wheel.mass = 10;
+    motor->right_wheel.inertia = 0.32;
+    motor->right_wheel.r = vekt2(3.6, 3.0);
+    motor->right_wheel.v = vekt2(0, 0);
 
-    pmot->body_r = vekt2(2.75, 4.04);
-    pmot->body_v = vekt2(0.0, 0.0);
+    motor->body_r = vekt2(2.75, 4.04);
+    motor->body_v = vekt2(0.0, 0.0);
 }
 
-void initadatok(void) {
-    initmotor(Pmot1);
-    initmotor(Pmot2);
+void init_physics_data(void) {
+    init_motor(Motor1);
+    init_motor(Motor2);
 
     double fakt = 0.48; // 0.54; volt mar 28 is
     if (State->minibike) {
         fakt = 0.30;
     }
 
-    Arany = 100.0 * fakt;
-    Aranyrec = 1.0 / Arany;
+    MetersToPixels = 100.0 * fakt;
+    PixelsToMeters = 1.0 / MetersToPixels;
 
-    // Viewzoom = 0.28*Arany*0.5;
-    Viewzoom = 0.42 * Arany * 0.5;
+    // MinimapScaleFactor = 0.28*MetersToPixels*0.5;
+    MinimapScaleFactor = 0.42 * MetersToPixels * 0.5;
 
-    Elszakadasisebhat = 0.01;
-    Belsosav = 0.005; // uj
-    // Belsosav = 0.02; // regi
-    G = 10.0; // nehezsegi gyorsulas: a [m/s^2]
-    Talppontegybeolvadasitav = 0.1;
+    GroundEscapeVelocity = 0.01;
+    WheelDeformationLength = 0.005; // uj
+    // WheelDeformationLength = 0.02; // regi
+    Gravity = 10.0; // nehezsegi gyorsulas: a [m/s^2]
+    TwoPointDiscriminationDistance = 0.1;
 
-    // Ugroturelem = 0.2;
-    Ugroturelem = 0.4;
-    Vegenvaras = 1.0;
+    // VoltDelay = 0.2;
+    VoltDelay = 0.4;
+    LevelEndDelay = 1.0;
 
-    Dr = 10000.0; // rudban fuggoleges modulus: F/l [N/m]
-    Sr = 1000.0;  // rudban mozgasi ellenallas: F/v [N*s/m]
+    SpringTensionCoefficient = 10000.0;   // rudban fuggoleges modulus: F/l [N/m]
+    SpringResistanceCoefficient = 1000.0; // rudban mozgasi ellenallas: F/v [N*s/m]
 
-    Fejsugar = 0.238; // 0.26;
+    HeadRadius = 0.238; // 0.26;
 
-    vekt2 vtmp = Pmot1->left_wheel.r - Pmot1->bike.r;
-    Kord2x = vtmp.x;
-    Kord2y = vtmp.y;
-    vtmp = Pmot1->right_wheel.r - Pmot1->bike.r;
-    Kord4x = vtmp.x;
-    Kord4y = vtmp.y;
+    vekt2 vtmp = Motor1->left_wheel.r - Motor1->bike.r;
+    LeftWheelDX = vtmp.x;
+    LeftWheelDY = vtmp.y;
+    vtmp = Motor1->right_wheel.r - Motor1->bike.r;
+    RightWheelDX = vtmp.x;
+    RightWheelDY = vtmp.y;
 
-    Kord5y = Pmot1->body_r.y - Pmot1->bike.r.y;
+    BodyDY = Motor1->body_r.y - Motor1->bike.r.y;
 }
 
 /*static double atmeretez( void ) {
@@ -129,15 +129,15 @@ void initadatok(void) {
 
 // reorder.h-ban friend-kent vannak deklaralva mar:
 // pgazhatra-ba beepiti betoltvet:
-void berakrecbehosszat(recorder* prec) {
-    if (prec->betoltve < 80) {
+void encode_frame_count(recorder* rec) {
+    if (rec->betoltve < 80) {
         return;
     }
-    unsigned int beirando = prec->betoltve;
+    unsigned int beirando = rec->betoltve;
     for (int i = 0; i < 32; i++) {
-        prec->pgazhatra[40 + i] = prec->pgazhatra[40 + i] & 127;
+        rec->pgazhatra[40 + i] = rec->pgazhatra[40 + i] & 127;
         if (beirando & 1) {
-            prec->pgazhatra[40 + i] += 128;
+            rec->pgazhatra[40 + i] += 128;
         }
         beirando = beirando >> 1;
     }
@@ -145,16 +145,16 @@ void berakrecbehosszat(recorder* prec) {
 
 // pgazhatra alapjan ellenorzi hosszt:
 // Ezt vegleges verziobol kiszedjuk, mert ezt csak mi ellenorizzuk Csabival:
-/*int jorechossza( recorder* prec ) {
-    if( prec->betoltve < 80 )
+/*int frame_count_integrity( recorder* rec ) {
+    if( rec->betoltve < 80 )
         return 1;
     unsigned int szam = 0;
     for( int i = 0; i < 32; i++ ) {
         szam *= 2;
-        if( prec->pgazhatra[40+31-i] & 128 )
+        if( rec->pgazhatra[40+31-i] & 128 )
             szam += 1;
     }
-    if( szam == prec->betoltve )
+    if( szam == rec->betoltve )
         return 1;
     else
         return 0;

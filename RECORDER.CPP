@@ -615,8 +615,8 @@ long recorder::load(const char* nev, FILE* h, int demo) {
         }
     }
 
-    // if( !jorechossza( this ) )
-    //	hiba( "recorder::load-ban !jorechossza( this )!" );
+    // if( !frame_count_integrity( this ) )
+    //	hiba( "recorder::load-ban !frame_count_integrity( this )!" );
     return belyeg;
 }
 

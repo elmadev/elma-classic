@@ -43,10 +43,10 @@ static int feldolgvonalszakasz(gyuru* pgy, int p1, int p2, int* px0, int cur, in
         return cur;
     }
 
-    int x1 = (r1.x - porigo->x) * Arany;
-    double y1 = (-r1.y - porigo->y) * Arany; // Mivel forditva vannak:
-    int x2 = (r2.x - porigo->x) * Arany;
-    double y2 = (-r2.y - porigo->y) * Arany;
+    int x1 = (r1.x - porigo->x) * MetersToPixels;
+    double y1 = (-r1.y - porigo->y) * MetersToPixels; // Mivel forditva vannak:
+    int x2 = (r2.x - porigo->x) * MetersToPixels;
+    double y2 = (-r2.y - porigo->y) * MetersToPixels;
 
     if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0) {
         hiba("7yces");

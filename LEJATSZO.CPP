@@ -423,9 +423,6 @@ long lejatszo(char* filenev) {
                 dt = cel - eddig;
             }
 
-            // if( eddig > 2.0 ) // kb. 5 masodperc
-            //	semmi();
-
             if (!meghalt1) {
                 belsoresz(Pmot1, &State->opciok1, &valt1, Prec1, &megvanido1, &meghalt1, eddig, dt);
             }

@@ -121,10 +121,6 @@ void beallit(kor* pk, vekt2 F, double M, double dt, int kelltalppont) {
 #endif
     }
 
-    // if( talppontszam > 1 && pk->r.x < 14.0 &&
-    //	strcmp( pk->nev, "Kerek hatso" ) == 0 )
-    //	semmi();
-
     if (talppontszam > 0) {
         helyigazitas(pk, &t1);
     }
@@ -219,9 +215,6 @@ void beallit(kor* pk, vekt2 F, double M, double dt, int kelltalppont) {
         return;
     }
 
-    // if( Pnyomva && pk == &Pmot1->kor2 )
-    //	semmi();
-
     // Egy talppont korul fordul el kerek:
     double hossz = abs(pk->r - t1);
     vekt2 n = (pk->r - t1) * (1.0 / hossz);
@@ -306,9 +299,6 @@ static void vezeto_hatarolas(motorst* pmot, vekt2 i, vekt2 j) {
 }
 
 void beallitvezeto(motorst* pmot, vekt2 gravitacio, vekt2 i, vekt2 j, double dt) {
-    // if( pmot->hatra && j1.x > 0 )
-    //	semmi();
-
     vezeto_hatarolas(pmot, i, j);
 
     // Rugoero szamitas:

@@ -34,8 +34,6 @@ ecset* Pecsetview = NULL;
         i++;
         futo = futo->pkov;
     }
-
-    semmi();
 }*/
 
 static void hibanincsmem(void) {
@@ -343,9 +341,6 @@ void ecset::duplaeliminacio(void) {
 
 void ecset::textura2mutato(void) {
     for (int y = 0; y < sorszam; y++) {
-        if (y == 992) {
-            semmi();
-        }
         mdarab* fut = msorok[y];
         int xpos = kurxposok_A[y];
         if (xpos > 100) {
@@ -433,12 +428,6 @@ void ecset::mutatotlanit(void) {
     }
     int szammost = 0;
     for (int i = 0; i < sorszam; i++) {
-        if (i == 1000) {
-            semmi();
-        }
-        if (i == 7792) {
-            semmi();
-        }
         mdarab* futo = msorok[i];
         sorok[i] = &nagydarabtomb[szammost];
         curdarabok_A[i] = sorok[i];
@@ -1509,10 +1498,6 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
     // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
     // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
     while (xpos <= Xe2) {
-        if (ye == 1071 && xpos == 12020 /*12055*/) {
-            semmi();
-        }
-
         if (xpos + pda->xsize > Xe2) {
             // Ez az utolso darab, ki is loghat:
             if ((pixelek_t)pda->pixelek & PIXELMASZK) {

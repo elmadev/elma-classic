@@ -28,14 +28,6 @@ static void* Dummypvoid = NULL;
     }
 }*/
 
-int Nemkellint = 0;
-
-void semmitor(void) {
-    int i = 10;
-    i++;
-    Nemkellint++;
-}
-
 // WinMain allitja be ha iniicializalta DD-t es DI-t:
 static int Inicializalva = 0;
 
@@ -79,9 +71,6 @@ int main(int argc, char* argv[]) {
     initmenukep1();
 
     mv_check(/*"W_V init utan"*/);
-
-    // for( int i = 0; i < 500000000; i++ )
-    //	semmitor();
 
     // for( int i = 0; i < 2000000; i++ )
     //	mv_check();

@@ -3,8 +3,6 @@
 // szamitogep
 // monitor
 
-void semmi(void) {}
-
 int Sajatugras = 0; // (forditva mint regen) Ha igaz, akkor jo ugras (right-clockwise)
 // Ha nem igaz, csak memoriaba ir es nem flip-pel:
 int Waitforretrace = 1; // Csak Windows-os w_v.cpp-ben allitodik

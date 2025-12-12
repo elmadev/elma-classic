@@ -266,14 +266,6 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
         beallit(&pmot->right_wheel, Fkerek4 + Vekt2i * pmot->right_wheel.mass * G, Mkerek4, dt, 1);
         break;
     }
-    /* Bicigli
-    if( gaz ) {
-        static double attetel = 0.33;
-        if( pmot->hatra )
-            pmot->labalfa += pmot->left_wheel.angular_velocity*dt*attetel;
-        else
-            pmot->labalfa -= pmot->right_wheel.angular_velocity*dt*attetel;
-    } */
 
     szamitfejr(pmot);
 }

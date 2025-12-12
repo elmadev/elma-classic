@@ -37,7 +37,6 @@ void initmotor(motorst* pmot) {
     pmot->flipped_camera = 0;
     pmot->gravity_direction = 1;
     pmot->prev_brake = 0;
-    // pmot->labalfa = 0.0; Bicigli
 
     // Kor1:
     pmot->bike.rotation = 0.0;

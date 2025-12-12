@@ -44,7 +44,6 @@ struct motorst {
     int flipped_bike;
     int flipped_camera;
     int gravity_direction; // 1 a normalis (0:UP 1:DOWN 2:LEFT 3:RIGHT)
-    // double labalfa; Bicigli
 
     vekt2 body_r, body_v; // Motoros
 

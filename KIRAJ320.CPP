@@ -445,11 +445,6 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     vekt2 p_vall = p_vezeto + Mi * 47.0 + Mj * 65.0;
     vekt2 p_valltest = p_vezeto + Mi * 41.0 + Mj * 70.0;
     vekt2 p_labfej = Mi * (346.0 - Mx) + Mj * (My - 514.0) + Mr;
-    /* Bicigli:
-    p_labfej = p_labfej + 0.14*
-                    (jobbra * sin(pmot->labalfa) +
-                     fel * cos(pmot->labalfa) );
-    */
     vekt2 p_terd;
 
     double combhossz = 0.51;

@@ -3,7 +3,11 @@
 
 struct rigidbody {
     char name[NEVHOSSZ];
-    double rotation, angular_velocity, radius, mass, inertia;
-    vekt2 r, v;
-    // int    utoljaraleert;
+    double rotation;
+    double angular_velocity;
+    double radius;
+    double mass;
+    double inertia; // Moment of inertia
+    vekt2 r;
+    vekt2 v;
 };

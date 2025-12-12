@@ -192,11 +192,6 @@ void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
     // Figyeldigazitast = 0;
 
     // Talppontok most mar be vannak allitva!
-    /*if( talppontszam >= 1 )
-        pk->utoljaraleert = 1;
-    else
-        pk->utoljaraleert = 0;
-    */
     if (talppontszam == 0) {
         // Szabadon forog a levegoben:
         double beta = M / pk->inertia;

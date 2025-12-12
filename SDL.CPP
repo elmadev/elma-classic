@@ -110,3 +110,16 @@ ddpal::ddpal(unsigned char* tomb) {
 }
 
 void ddpal::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
+
+#if defined(_WIN64) || !defined(_WIN32)
+void mv_check(int unused) {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+            exit(0);
+            break;
+        }
+    }
+}
+#endif

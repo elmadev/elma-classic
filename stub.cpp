@@ -12,8 +12,6 @@ void hiba(const char* text1, const char* text2, const char* text3) {
 
 int s_random(int maximum) { return 0; }
 
-void mv_check(int unused) {}
-
 void setmou(int x, int y) {}
 void getmou(int* x, int* y) {}
 

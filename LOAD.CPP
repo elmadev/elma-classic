@@ -50,10 +50,10 @@ int floadlevel_p(const char* nev) {
             delete Pszak;
         }
         Pszak = new szakaszok(Ptop);
-        if (Fejsugar > Pmot1->left_wheel.radius) {
-            Pszak->rendez(Fejsugar);
+        if (HeadRadius > Motor1->left_wheel.radius) {
+            Pszak->rendez(HeadRadius);
         } else {
-            Pszak->rendez(Pmot1->left_wheel.radius);
+            Pszak->rendez(Motor1->left_wheel.radius);
         }
 
         betoltecseteket();

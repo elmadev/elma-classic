@@ -1,32 +1,32 @@
 
 
-extern double Elszakadasisebhat, Belsosav, G;
-extern double Talppontegybeolvadasitav;
+extern double GroundEscapeVelocity, WheelDeformationLength, Gravity;
+extern double TwoPointDiscriminationDistance;
 
-extern double Ugroturelem;
-extern double Vegenvaras;
+extern double VoltDelay;
+extern double LevelEndDelay;
 
-extern double Dr, Sr;
+extern double SpringTensionCoefficient, SpringResistanceCoefficient;
 
-void initadatok(void);
+void init_physics_data(void);
 
-extern double Fejsugar;
+extern double HeadRadius;
 
-extern double Objektumsugar;
+extern double ObjectRadius;
 
 // Hajszalnyival kisebb rigidbody.sugarnal, hogy kirajzolasnal ne logjon foldbe:
-extern double Kerekrajzsugar;
+extern double WheelBackgroundRenderRadius;
 
 // MCGA kirajzolasos:
 
-extern double Arany, Aranyrec;
+extern double MetersToPixels, PixelsToMeters;
 
-extern double Kord2x, Kord2y, Kord4x, Kord4y,
-    Kord5y; // Ez az utolso vezeto helye
+extern double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY,
+    BodyDY; // Ez az utolso vezeto helye
 
-#define OBJEKTUMSUGAR_I (20)
+#define OBJECT_PIXEL_RADIUS (20)
 
-extern int Viewzoom;
+extern int MinimapScaleFactor;
 
 struct rigidbody {
     double rotation;
@@ -58,11 +58,11 @@ struct motorst {
     double angular_velocity_pre_right_volt, angular_velocity_pre_left_volt;
 };
 
-extern motorst *Pmot1, *Pmot2;
+extern motorst *Motor1, *Motor2;
 
 // reorder.h-ban friend-kent mar deklaralva van:
 // pgazhatra-ba beepiti betoltvet:
 class recorder;
-void berakrecbehosszat(recorder* prec);
+void encode_frame_count(recorder* rec);
 // pgazhatra alapjan ellenorzi hosszt:
-int jorechossza(recorder* prec);
+int frame_count_integrity(recorder* rec);

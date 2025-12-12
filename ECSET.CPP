@@ -63,8 +63,8 @@ mdarab* ecset::newmdarab(void) {
 }
 
 static void meghelyez(double* pd) {
-    int pixel = *pd * Arany;
-    *pd = (pixel + 0.5) / Arany;
+    int pixel = *pd * MetersToPixels;
+    *pd = (pixel + 0.5) / MetersToPixels;
 }
 
 void ecset::getorigoandsize(void) {
@@ -111,30 +111,30 @@ void ecset::getorigoandsize(void) {
     if (view) {
         // VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW
         // x-re jol ra lehet hagyni, nem noveli memoria foglalast:
-        origo = vekt2(minx - 10000 / Arany, miny - 4000 / Arany);
-        xsizedb = (maxx + 10000 / Arany) - origo.x;
-        ysizedb = (maxy + 4000 / Arany) - origo.y;
+        origo = vekt2(minx - 10000 / MetersToPixels, miny - 4000 / MetersToPixels);
+        xsizedb = (maxx + 10000 / MetersToPixels) - origo.x;
+        ysizedb = (maxy + 4000 / MetersToPixels) - origo.y;
     } else {
         // x-re jol ra lehet hagyni, nem noveli memoria foglalast:
-        origo = vekt2(minx - 10000 / Arany, miny - 1000 / Arany);
+        origo = vekt2(minx - 10000 / MetersToPixels, miny - 1000 / MetersToPixels);
         // Beallitjuk ugy, hogy mindig pixel felezo helyen legyen origo:
         meghelyez(&origo.x);
         meghelyez(&origo.y);
 
-        xsizedb = (maxx + 10000 / Arany) - origo.x;
-        ysizedb = (maxy + 1000 / Arany) - origo.y;
+        xsizedb = (maxx + 10000 / MetersToPixels) - origo.x;
+        ysizedb = (maxy + 1000 / MetersToPixels) - origo.y;
     }
 }
 
 void ecset::addszakasz(vonal* psz) {
     vekt2 r, v;
     r = psz->r - origo;
-    r.x *= Arany;
-    r.y *= Arany;
-    v.x = psz->v.x * Arany;
-    v.y = psz->v.y * Arany;
+    r.x *= MetersToPixels;
+    r.y *= MetersToPixels;
+    v.x = psz->v.x * MetersToPixels;
+    v.y = psz->v.y * MetersToPixels;
     if (view) {
-        double szorzo = 1.0 / Viewzoom;
+        double szorzo = 1.0 / MinimapScaleFactor;
         r.x *= szorzo;
         r.y *= szorzo;
         v.x *= szorzo;
@@ -450,11 +450,11 @@ void ecset::kitoltfoodkoordokat(void) {
             continue;
         }
         if (view) {
-            pker->rxint_v = (pker->r.x - origo.x) * Arany / Viewzoom;
-            pker->ryint_v = (-pker->r.y - origo.y) * Arany / Viewzoom;
+            pker->rxint_v = (pker->r.x - origo.x) * MetersToPixels / MinimapScaleFactor;
+            pker->ryint_v = (-pker->r.y - origo.y) * MetersToPixels / MinimapScaleFactor;
         } else {
-            pker->rxint = (pker->r.x - origo.x) * Arany - OBJEKTUMSUGAR_I;
-            pker->ryint = (-pker->r.y - origo.y) * Arany - OBJEKTUMSUGAR_I;
+            pker->rxint = (pker->r.x - origo.x) * MetersToPixels - OBJECT_PIXEL_RADIUS;
+            pker->ryint = (-pker->r.y - origo.y) * MetersToPixels - OBJECT_PIXEL_RADIUS;
         }
     }
 }
@@ -741,8 +741,8 @@ int teliszam(int x, int xsize, unsigned char* sor, unsigned char lyuk) {
 // addspriteok hivja:
 void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
     // Egy kep berakasa:
-    int x1 = (psp->r.x - origo.x) * Arany;
-    int y1 = (-psp->r.y - origo.y) * Arany;
+    int x1 = (psp->r.x - origo.x) * MetersToPixels;
+    int y1 = (-psp->r.y - origo.y) * MetersToPixels;
 
     maszk* pm = &Plgr->maszkok[index_m];
 
@@ -821,8 +821,8 @@ void ecset::addspriteok(int fazis) {
         kep* pkep = &Plgr->kepek[index];
 
         // Egy kep berakasa:
-        int x1 = (psp->r.x - origo.x) * Arany;
-        int y1 = (-psp->r.y - origo.y) * Arany;
+        int x1 = (psp->r.x - origo.x) * MetersToPixels;
+        int y1 = (-psp->r.y - origo.y) * MetersToPixels;
 
         int ujtavolsag = psp->tavolsag;
 
@@ -1164,8 +1164,8 @@ void ecset::addobjektumok(void) {
                 mut = Plgr->viewkiller;
                 ujtavolsag = 499;
             }
-            int x1 = (pk->r.x - origo.x) * (Arany / Viewzoom);
-            int y1 = (-pk->r.y - origo.y) * (Arany / Viewzoom);
+            int x1 = (pk->r.x - origo.x) * (MetersToPixels / MinimapScaleFactor);
+            int y1 = (-pk->r.y - origo.y) * (MetersToPixels / MinimapScaleFactor);
             // Kirakja kis 3x3-as gyurut:
             addbytesor(mut, ujtavolsag, x1 - 1, x1 + 1, y1 - 1, FAZIS_NEMFOLDEG);
             addbytesor(mut, ujtavolsag, x1 - 1, x1 - 1, y1, FAZIS_NEMFOLDEG);
@@ -1177,10 +1177,10 @@ void ecset::addobjektumok(void) {
 
         /* Ez a resz csak nagy objektumokhoz kellene, de most csak view-val
            foglalkozunk:
-        int x1 = (pk->r.x-origo.x)*Arany;
-        int y1 = (-pk->r.y-origo.y)*Arany;
-        x1 -= OBJEKTUMSUGAR_I;
-        y1 += OBJEKTUMSUGAR_I;
+        int x1 = (pk->r.x-origo.x)*MetersToPixels;
+        int y1 = (-pk->r.y-origo.y)*MetersToPixels;
+        x1 -= OBJECT_PIXEL_RADIUS;
+        y1 += OBJECT_PIXEL_RADIUS;
 
         pic8* ppic = Plgr->pexit;
         int ujtavolsag = 498;
@@ -1274,11 +1274,11 @@ ecset::ecset(int view_p) {
 
     if (view) {
         // VIEW VIEW VIEW:
-        maxx = xsizedb * (Arany / Viewzoom);
-        sorszam = ysizedb * (Arany / Viewzoom);
+        maxx = xsizedb * (MetersToPixels / MinimapScaleFactor);
+        sorszam = ysizedb * (MetersToPixels / MinimapScaleFactor);
     } else {
-        maxx = xsizedb * Arany;
-        sorszam = ysizedb * Arany;
+        maxx = xsizedb * MetersToPixels;
+        sorszam = ysizedb * MetersToPixels;
     }
 
     if (sorszam - 10 > MAXECSETSOR) {
@@ -1676,11 +1676,11 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
 void ecset::getbalalso_int(vekt2 balalso, int* px, int* py) {
     vekt2 relat = balalso - origo;
     if (view) {
-        *px = relat.x * (Arany / Viewzoom); // Ecset egesz koordinatak
-        *py = relat.y * (Arany / Viewzoom); // Ecset egesz koordinatak
+        *px = relat.x * (MetersToPixels / MinimapScaleFactor); // Ecset egesz koordinatak
+        *py = relat.y * (MetersToPixels / MinimapScaleFactor); // Ecset egesz koordinatak
     } else {
-        *px = relat.x * Arany; // Ecset egesz koordinatak
-        *py = relat.y * Arany; // Ecset egesz koordinatak
+        *px = relat.x * MetersToPixels; // Ecset egesz koordinatak
+        *py = relat.y * MetersToPixels; // Ecset egesz koordinatak
     }
 }
 

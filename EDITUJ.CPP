@@ -143,8 +143,8 @@ static void egeretrajzolja(void) {
         vekt2 r = konv( Moux, Mouy );
         double x1 = r.x;
         double y1 = r.y;
-        double x2 = x1+640.0/Arany;
-        double y2 = y1+480.0/Arany;
+        double x2 = x1+640.0/MetersToPixels;
+        double y2 = y1+480.0/MetersToPixels;
         vonalrajz( vekt2( x1, y1 ), vekt2( x1, y2 ), 0 );
         vonalrajz( vekt2( x1, y2 ), vekt2( x2, y2 ), 0 );
         vonalrajz( vekt2( x2, y2 ), vekt2( x2, y1 ), 0 );

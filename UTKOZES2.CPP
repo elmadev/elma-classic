@@ -31,7 +31,7 @@ int utkozikesprite(vekt2 r, double sugar) {
         }
 
         vekt2 diff = r - pker->r;
-        double maxtav = sugar + Objektumsugar;
+        double maxtav = sugar + ObjectRadius;
         if (diff.x * diff.x + diff.y * diff.y < maxtav * maxtav) {
             return i;
         }

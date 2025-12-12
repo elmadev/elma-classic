@@ -32,19 +32,19 @@ static double Fogonagytavnegyzet = 1.44; // 1.2 a negyzeten
 void fogocska(double t) {
     if (Kozelvannak) {
         // Eddig kozel voltak:
-        if (!kozelvan(&Pmot1->left_wheel.r, &Pmot2->left_wheel.r, Fogonagytavnegyzet) &&
-            !kozelvan(&Pmot1->left_wheel.r, &Pmot2->right_wheel.r, Fogonagytavnegyzet) &&
-            !kozelvan(&Pmot1->right_wheel.r, &Pmot2->left_wheel.r, Fogonagytavnegyzet) &&
-            !kozelvan(&Pmot1->right_wheel.r, &Pmot2->right_wheel.r, Fogonagytavnegyzet)) {
+        if (!kozelvan(&Motor1->left_wheel.r, &Motor2->left_wheel.r, Fogonagytavnegyzet) &&
+            !kozelvan(&Motor1->left_wheel.r, &Motor2->right_wheel.r, Fogonagytavnegyzet) &&
+            !kozelvan(&Motor1->right_wheel.r, &Motor2->left_wheel.r, Fogonagytavnegyzet) &&
+            !kozelvan(&Motor1->right_wheel.r, &Motor2->right_wheel.r, Fogonagytavnegyzet)) {
             // Most mar elegendoen tavol vannak:
             Kozelvannak = 0;
         }
     } else {
         // Eddig tavol voltak:
-        if (kozelvan(&Pmot1->left_wheel.r, &Pmot2->left_wheel.r, Fogokistavnegyzet) ||
-            kozelvan(&Pmot1->left_wheel.r, &Pmot2->right_wheel.r, Fogokistavnegyzet) ||
-            kozelvan(&Pmot1->right_wheel.r, &Pmot2->left_wheel.r, Fogokistavnegyzet) ||
-            kozelvan(&Pmot1->right_wheel.r, &Pmot2->right_wheel.r, Fogokistavnegyzet)) {
+        if (kozelvan(&Motor1->left_wheel.r, &Motor2->left_wheel.r, Fogokistavnegyzet) ||
+            kozelvan(&Motor1->left_wheel.r, &Motor2->right_wheel.r, Fogokistavnegyzet) ||
+            kozelvan(&Motor1->right_wheel.r, &Motor2->left_wheel.r, Fogokistavnegyzet) ||
+            kozelvan(&Motor1->right_wheel.r, &Motor2->right_wheel.r, Fogokistavnegyzet)) {
             // Megerintettek egymast:
             Kozelvannak = 1;
             Aafogo = !Aafogo;

@@ -79,6 +79,12 @@ int main() {
     sdl_init();
 
     initqopen();
+
+    void initmenukep1(void);
+    void initmenukep2(void);
+    initmenukep1();
+    initmenukep2();
+    mv_main();
 }
 
 #endif

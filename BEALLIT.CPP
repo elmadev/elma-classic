@@ -6,7 +6,6 @@
 
 // Nem engedi vonalon+egykicsi tovabb kereket!:
 static void helyigazitas(rigidbody* pk, vekt2* pt) {
-    // WheelDeformationLength = 0.02; //adatok.cpp-ben van ez beallitva
     double hossz = abs(pk->r - *pt);
     vekt2 n = (pk->r - *pt) * (1.0 / hossz);
     if (hossz < pk->radius - WheelDeformationLength) {

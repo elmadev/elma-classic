@@ -1,6 +1,6 @@
 #include "ALL.H"
 
-// Tudom hogy hiba WheelDeformationLength-ot adatok.cpp-ben 0.02-re venni, amikor peldaul
+// Tudom hogy hiba WheelDeformationLength-ot physics_init.cpp-ben 0.02-re venni, amikor peldaul
 // 0.005 is jo lenne. Hiba tovabba biztostalppont regi verziojat hasznalni
 // uj helyett, de ezekkel nem ugyanugy viselkedne motor, mint regen.
 

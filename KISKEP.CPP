@@ -3,9 +3,7 @@
 kiskep::kiskep(char* pic8nev, pic8* ppic) {
     tomb = NULL;
     if (!ppic) {
-        {
-            ppic = new pic8(pic8nev);
-        }
+        ppic = new pic8(pic8nev);
     }
 
     lyuk = ppic->gpixel(0, 0);

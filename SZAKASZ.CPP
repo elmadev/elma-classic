@@ -76,9 +76,7 @@ szakaszok::~szakaszok(void) {
 
 vonalnode* szakaszok::getnewnode(void) {
     if (!pelsocsomag) {
-        {
-            pelsocsomag = new soknodecsomag;
-        }
+        pelsocsomag = new soknodecsomag;
         if (!pelsocsomag) {
             uzenet("memory!");
         }
@@ -90,9 +88,7 @@ vonalnode* szakaszok::getnewnode(void) {
         curcsomag = curcsomag->nextcsomag;
     }
     if (csomagbanbetelt == CSOMAGBANNODESZAM) {
-        {
-            curcsomag->nextcsomag = new soknodecsomag;
-        }
+        curcsomag->nextcsomag = new soknodecsomag;
         curcsomag = curcsomag->nextcsomag;
         if (!curcsomag) {
             uzenet("memory!");

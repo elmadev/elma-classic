@@ -13,7 +13,7 @@ struct jatekos {
     int jelenlegipalya; // -1 eseten external files
 };
 
-int getjatekosindex(char* nev);
+int getjatekosindex(const char* nev);
 
 #define MAXIDOK (10)
 
@@ -66,13 +66,13 @@ class state_s {
     char editfilenev[20];
     char playextfilenev[20];
 
-    state_s(char* nev = NULL);
+    state_s(const char* nev = NULL);
     ~state_s(void);
 
     void reloadidok(void);
 
     void save(void);
-    void exportjatekossum(FILE* h, char* nev, int single);
+    void exportjatekossum(FILE* h, const char* nev, int single);
     void exportanonim(FILE* h, int single, const char* text1, const char* text2, const char* text3);
     void export_(void);
     void resetcontrols(void);

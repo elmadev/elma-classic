@@ -84,7 +84,7 @@ static int afterplayext( char* filenev, long ido ) {
     }
 } */
 
-int abcbenelobb(char* text1, char* text2);
+int abcbenelobb(const char* text1, const char* text2);
 
 static void abcberendez(int szam) {
     for (int i = 0; i < szam + 3; i++) {

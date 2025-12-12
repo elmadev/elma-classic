@@ -53,7 +53,7 @@ void ido2string(long l, char* text, int hosszu) {
     strcat(text, tmp);
 }
 
-void elemibesttimes(palyaegyfeleidok* pidok, char* fejlec, int single) {
+void elemibesttimes(palyaegyfeleidok* pidok, const char* fejlec, int single) {
     if (pidok->idokszama == 0) {
         return;
     }

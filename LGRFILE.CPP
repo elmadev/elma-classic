@@ -29,7 +29,7 @@ kisbox KisboxC = {146, 141, 273, 264};
 kisbox KisboxD = {272, 181, 353, 244};
 
 // Ha nincs ilyen nevu file, akkor default-ot olvassa:
-void loadlgrfile(char* nev) {
+void loadlgrfile(const char* nev) {
     // tesztloadlgr();
     // hiba( "A" );
 
@@ -434,7 +434,7 @@ static unsigned char* makenegalttomb(unsigned char* pal) {
     return lookuptomb;
 }
 
-lgrfile::lgrfile(char* lgrnev) {
+lgrfile::lgrfile(const char* lgrnev) {
     Paratlankepsorok = 1;
 
     // Lenullaz mindent:
@@ -1123,7 +1123,7 @@ void lgrfile::betolthattereket(void) {
 }
 
 // Ha nincs ilye nevu, akkor -1-et ad vissza
-int lgrfile::getkepindex(char* nev) {
+int lgrfile::getkepindex(const char* nev) {
     if (!nev[0]) {
         return -1;
     }
@@ -1136,7 +1136,7 @@ int lgrfile::getkepindex(char* nev) {
 }
 
 // Ha nincs ilye nevu, akkor -1-et ad vissza
-int lgrfile::getmaszkindex(char* nev) {
+int lgrfile::getmaszkindex(const char* nev) {
     if (!nev[0]) {
         return -1;
     }

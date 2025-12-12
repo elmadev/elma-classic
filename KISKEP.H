@@ -9,6 +9,6 @@ class kiskep {
     int xsize, ysize;
     long hossz;
     // Ha megadjuk ppic-t, akkor azt o deleteli:
-    kiskep(char* pic8nev, pic8* ppic = NULL);
+    kiskep(const char* pic8nev, pic8* ppic = NULL);
     ~kiskep(void);
 };

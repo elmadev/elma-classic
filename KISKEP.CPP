@@ -1,6 +1,6 @@
 #include "all.h"
 
-kiskep::kiskep(char* pic8nev, pic8* ppic) {
+kiskep::kiskep(const char* pic8nev, pic8* ppic) {
     tomb = NULL;
     if (!ppic) {
         ppic = new pic8(pic8nev);

@@ -828,7 +828,7 @@ int nevanalizis(const char* nev) {
 }
 
 // Ha letezik file, akkor 0-t ad vissza!:
-int access_topol(char* filenev) {
+int access_topol(const char* filenev) {
     int belsopalyaszam = nevanalizis(filenev);
     if (belsopalyaszam > 0) {
         return 0;
@@ -841,7 +841,7 @@ int access_topol(char* filenev) {
 char Ezenlegjobbido[30] = "";
 
 // Azt a nevet keri, amit topol::topol kap:
-void beallitlegjobbidot(char* filenev, int single) {
+void beallitlegjobbidot(const char* filenev, int single) {
     if (strlen(filenev) > 20) {
         hiba("4534516");
     }
@@ -985,7 +985,7 @@ topol::topol(const char* filenev_p) {
     }
 }
 
-void topol::loadkulso(char* filenev) {
+void topol::loadkulso(const char* filenev) {
     ////int kulso = 1;
 
     nincslgrje = 0;
@@ -1240,7 +1240,7 @@ void topol::loadkulso(char* filenev) {
 }
 
 // Ezt ha ujra kell kepezni loadkulso atalakitasaval kell:
-void topol::loadbelso(char* filenev) {
+void topol::loadbelso(const char* filenev) {
     nincslgrje = 0;
     kerekekfejjellefele = 0;
     hibas = 0;
@@ -1471,7 +1471,7 @@ static long longosit(double belyeg) {
     return belyeg_l;
 }
 
-void topol::save(char* filenev, int nemkellcheck) {
+void topol::save(const char* filenev, int nemkellcheck) {
     memset(&idok, 0, sizeof(idok));
     // if( lezart )
     //   hiba( "topol::save-ben lezart!" );
@@ -1649,7 +1649,7 @@ void topol::save(char* filenev, int nemkellcheck) {
 }
 
 // Csak eredetileg beolvasott filenev-vel szabad meghivni:
-void topol::saveidok(char* filenev_p) {
+void topol::saveidok(const char* filenev_p) {
     if (idokhelye < 6) { // a 6-os talalomra ertek
         hiba("hjdvgyj");
     }

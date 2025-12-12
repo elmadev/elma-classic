@@ -12,14 +12,14 @@ struct egyhang {
     float hangero;
 };
 
-long loadrecek(char* nev, int demo);
-void saverecek(char* nev, long belyeg, int tag);
+long loadrecek(const char* nev, int demo);
+void saverecek(const char* nev, long belyeg, int tag);
 
 class recorder {
     // demo eseten resource file-bol nyit:
     // belyeg-et adja vissza, vagy 0-at:
-    friend long loadrecek(char* nev, int demo);
-    friend void saverecek(char* nev, long belyeg, int tag);
+    friend long loadrecek(const char* nev, int demo);
+    friend void saverecek(const char* nev, long belyeg, int tag);
     // pgazhatra-ba beepitik es ellenorzik betoltvet:
     friend void berakrecbehosszat(recorder* prec);
     friend int jorechossza(recorder* prec);
@@ -47,8 +47,8 @@ class recorder {
     int tag;
     // demo eseten resource file-bol nyit:
     // belyeg-et adja vissza, vagy 0-at:
-    long load(char* nev, FILE* h, int demo);
-    void save(char* nev, FILE* h, long belyeg, int tag);
+    long load(const char* nev, FILE* h, int demo);
+    void save(const char* nev, FILE* h, long belyeg, int tag);
 
   public:
     char palyanev[16];

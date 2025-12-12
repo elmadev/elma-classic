@@ -27,7 +27,7 @@
 } */
 
 // Ha text1 elobb van abc-ben, igazzal ter vissza:
-int abcbenelobb(char* text1, char* text2) {
+int abcbenelobb(const char* text1, const char* text2) {
     // Elso betunel bebillennek ha csak kis/nagy-ban ter el:
     int elobbnagy1 = 0;
     int elobbnagy2 = 0;

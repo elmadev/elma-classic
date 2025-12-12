@@ -13,7 +13,7 @@ static void abcberendez(int nevszam) {
             // Ha j es j+1 edik elem forditva van visszacsereljuk oket:
             char* nev1 = &Soknev[j * 10];
             char* nev2 = &Soknev[(j + 1) * 10];
-            int abcbenelobb(char* text1, char* text2);
+            int abcbenelobb(const char* text1, const char* text2);
             if (abcbenelobb(nev2, nev1)) {
                 // if( strcmp( nev1, nev2 ) > 0 ) {
                 //  Csere:
@@ -26,7 +26,7 @@ static void abcberendez(int nevszam) {
     }
 }
 
-static void betolt(char* nev) {
+static void betolt(const char* nev) {
     if (!Ptop) {
         hiba("uoiwfiufre");
     }

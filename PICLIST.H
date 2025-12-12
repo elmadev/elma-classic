@@ -28,5 +28,5 @@ class piclist {
     piclist(FILE* h);   // Binaris formatumbol
     void save(FILE* h); // Binaris formatumba
 
-    int getnevindex(char* nev); // vagy -1
+    int getnevindex(const char* nev); // vagy -1
 };

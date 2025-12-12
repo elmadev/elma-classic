@@ -128,7 +128,7 @@ static void kiegydigit(int c, int x, int y) {
     }
 }
 
-static void kiegyszam(char* time, int x, int y) {
+static void kiegyszam(const char* time, int x, int y) {
     kiegydigit(time[0], x, y);
     x += Digdx;
     kiegydigit(time[1], x, y);
@@ -144,7 +144,8 @@ static void kiegyszam(char* time, int x, int y) {
     kiegydigit(time[7], x, y);
 }
 
-void kidigit(char* time1, double fogoido, double time2d, pic8* ppic8, int kepxsize, int kepysize) {
+void kidigit(const char* time1, double fogoido, double time2d, pic8* ppic8, int kepxsize,
+             int kepysize) {
 
     Ppic8 = ppic8;
     Lookup = Plgr->idonegtomb;

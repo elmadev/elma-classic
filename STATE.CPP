@@ -6,7 +6,7 @@ int Palyaszam = 55; // Vizittel egyutt
 int getstatesoundon(void) { return State->soundon; }
 
 // Van ugyanilyen neven topol.cpp-ben is ket fv.:
-static void titkosread(void* mut, int hossz, FILE* h, char* nev) {
+static void titkosread(void* mut, int hossz, FILE* h, const char* nev) {
     if (fread(mut, 1, hossz, h) != hossz) {
         uzenet("Corrupt file, please delete it!", nev);
     }
@@ -51,7 +51,7 @@ static int Checknumber_state_r = 123432221;
 
 static char Statenev[] = "state.dat";
 
-state_s::state_s(char* nev) {
+state_s::state_s(const char* nev) {
     // Beallitjuk default ertekeket:
     memset(palyakidejei, 0, sizeof(palyakidejei));
     memset(jatekosok, 0, sizeof(jatekosok));
@@ -265,7 +265,7 @@ void state_s::exportanonim(FILE* h, int single, const char* text1, const char* t
     fprintf(h, "\n\n");
 }
 
-void state_s::exportjatekossum(FILE* h, char* nev, int single) {
+void state_s::exportjatekossum(FILE* h, const char* nev, int single) {
     int sum = 0;
     for (int i = 0; i < Palyaszam - 1; i++) { // ucso palyat nem szamitjuk
         int levelsum = 100000000;
@@ -405,7 +405,7 @@ void state_s::resetcontrols(void) {
     billsnap = DIK_I;
 }
 
-int getjatekosindex(char* nev) {
+int getjatekosindex(const char* nev) {
     for (int i = 0; i < MAXJATEKOS; i++) {
         jatekos* pjatekos = &State->jatekosok[i];
         if (strcmp(pjatekos->nev, nev) == 0) {

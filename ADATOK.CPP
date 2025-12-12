@@ -40,7 +40,6 @@ void initmotor(motorst* pmot) {
     // pmot->labalfa = 0.0; Bicigli
 
     // Kor1:
-    strcpy(pmot->kor1.name, "Test elso");
     pmot->kor1.rotation = 0.0;
     pmot->kor1.angular_velocity = 0.0;
     pmot->kor1.radius = 0.3;
@@ -51,7 +50,6 @@ void initmotor(motorst* pmot) {
     pmot->kor1.v = vekt2(0, 0);
 
     // Kor2:
-    strcpy(pmot->kor2.name, "Kerek elso");
     pmot->kor2.rotation = 0.0; // 30
     pmot->kor2.angular_velocity = 0.0;
     pmot->kor2.radius = 0.4;
@@ -61,7 +59,6 @@ void initmotor(motorst* pmot) {
     pmot->kor2.v = vekt2(0, 0);
 
     // Kor4:
-    strcpy(pmot->kor4.name, "Kerek hatso");
     pmot->kor4.rotation = 0.0; // 40
     pmot->kor4.angular_velocity = 0.0;
     pmot->kor4.radius = 0.4;

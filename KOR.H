@@ -1,8 +1,5 @@
 
-#define NEVHOSSZ (30)
-
 struct rigidbody {
-    char name[NEVHOSSZ];
     double rotation;
     double angular_velocity;
     double radius;

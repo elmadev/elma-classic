@@ -169,9 +169,6 @@ void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
             }
         }
     }
-    // if( pk->r.x < 14.0 &&
-    //	strcmp( pk->name, "Kerek hatso" ) == 0 )
-    //	Figyeldigazitast = 1;
 
     if (talppontszam == 2) {
         if (!talppontigazitas(pk, &t2, F)) {
@@ -188,8 +185,6 @@ void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
             }
         }
     }
-
-    // Figyeldigazitast = 0;
 
     // Talppontok most mar be vannak allitva!
     if (talppontszam == 0) {

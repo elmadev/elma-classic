@@ -1,9 +1,9 @@
 #include "all.h"
 
 #ifdef DEBUG
-static int ErrorOnMissingCodepoint = 1;
+static bool ErrorOnMissingCodepoint = true;
 #else
-static int ErrorOnMissingCodepoint = 0;
+static bool ErrorOnMissingCodepoint = false;
 #endif
 
 abc8::abc8(const char* filename) {
@@ -108,6 +108,7 @@ static int SpaceWidth = 5;
 static int SpaceWidthMenu = 10;
 
 void abc8::write(pic8* dest, int x, int y, const char* text) {
+    const char* error_text = text;
     while (*text) {
         int index = (unsigned char)*text;
         if (index == ' ') {
@@ -121,7 +122,8 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
         }
         if (!ppsprite[index]) {
             if (ErrorOnMissingCodepoint) {
-                hiba("Missing codepoint in abc8!");
+                ErrorOnMissingCodepoint = false;
+                hiba("Missing codepoint in abc8!", error_text);
                 return;
             } else {
                 text++;
@@ -137,6 +139,7 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
 }
 
 int abc8::len(const char* text) {
+    const char* error_text = text;
     int width = 0;
     while (*text) {
         int index = (unsigned char)*text;
@@ -151,7 +154,8 @@ int abc8::len(const char* text) {
                 continue;
             }
             if (ErrorOnMissingCodepoint) {
-                hiba("Missing codepoint in abc8!");
+                ErrorOnMissingCodepoint = false;
+                hiba("Missing codepoint in abc8!", error_text);
                 return 0;
             } else {
                 text++;

@@ -4,49 +4,50 @@
 // static int Maxkod = 500;
 // static int* Tomb = NULL;
 
-static int Buffsize = 30;
-static int* Buffer = NULL;
-static char* Buffer1 = NULL;
-static char* Buffer2 = NULL;
-static int Elsojon = 1;
-static int Charszam = 0;
-static int* Konvtomb = NULL;
+static int KeyBufferSize = 30;
+static int* KeyBuffer = NULL;
+static int KeyBufferCount = 0;
+
+static char* KeyState1 = NULL;
+static char* KeyState2 = NULL;
+static int UseKeyState2 = 1;
+static int* DIKToAscii = NULL;
+
+static void init_dik_to_ascii(void);
 
 void mk_init(void) {
-    if (Buffer) {
-        hiba("mk_init-ben Buffer != NULL!");
+    if (KeyBuffer) {
+        hiba("mk_init() called twice!");
     }
 
-    // Lefoglaljuk buffereket:
-    Buffer1 = new char[256];
-    Buffer2 = new char[256];
-    if (!Buffer1 || !Buffer2) {
-        hiba("memory mk_init-ben!");
+    KeyState1 = new char[256];
+    KeyState2 = new char[256];
+    if (!KeyState1 || !KeyState2) {
+        hiba("KeyState allocation failed in mk_init!()");
     }
     for (int i = 0; i < 256; i++) {
-        Buffer1[i] = Buffer2[i] = 0;
+        KeyState1[i] = KeyState2[i] = 0;
     }
 
-    Buffer = new int[Buffsize];
-    if (!Buffer) {
-        hiba("memory mk_init-ben!");
+    KeyBuffer = new int[KeyBufferSize];
+    if (!KeyBuffer) {
+        hiba("KeyBuffer allocation failed in mk_init!()");
     }
-    Charszam = 0;
-    Elsojon = 1;
+    KeyBufferCount = 0;
+    UseKeyState2 = 1;
 
-    void initwkonvtomb(void);
-    initwkonvtomb();
+    init_dik_to_ascii();
 }
 
 int mk_getextchar(void) {
     while (1) {
         mv_check(/*"W_k mk_getext"*/);
-        if (Charszam > 0) {
-            int c = Buffer[0];
-            for (int i = 0; i < Charszam - 1; i++) {
-                Buffer[i] = Buffer[i + 1];
+        if (KeyBufferCount > 0) {
+            int c = KeyBuffer[0];
+            for (int i = 0; i < KeyBufferCount - 1; i++) {
+                KeyBuffer[i] = KeyBuffer[i + 1];
             }
-            Charszam--;
+            KeyBufferCount--;
             return c;
         }
     }
@@ -54,147 +55,142 @@ int mk_getextchar(void) {
 
 void mk_emptychar(void) {
     mv_check(/*"W_k mk_empty"*/);
-    Charszam = 0;
+    KeyBufferCount = 0;
 }
 
 int mk_kbhit(void) {
     mv_check(/*"W_k mk_kbh"*/);
-    if (Charszam > 0) {
+    if (KeyBufferCount > 0) {
         return 1;
     } else {
         return 0;
     }
 }
 
-int mk_getstate(int kod) {
-    if (kod < 0 || kod > 256) {
-        hiba("mk_getstate-ben kod nem ismert!");
+int mk_getstate(int code) {
+    if (code < 0 || code > 256) {
+        hiba("code out of range in mk_getstate()!");
         return 0;
     }
-    if (Elsojon) {
-        return Buffer2[kod];
+    if (UseKeyState2) {
+        return KeyState2[code];
     } else {
-        return Buffer1[kod];
+        return KeyState1[code];
     }
 }
 
-// Kovetkezo billentyu fuggvenyek nem publikusak:
 void mkw_getDIstate(void) {
-    if (!Buffer) {
-        hiba("mkw_getDIstate-ben !Buffer!");
+    if (!KeyBuffer) {
+        hiba("Buffer is NULL in mkw_getDIstate()");
     }
 
-    if (Elsojon) {
-        fill_kb_state(Buffer1);
+    if (UseKeyState2) {
+        fill_kb_state(KeyState1);
     } else {
-        fill_kb_state(Buffer2);
+        fill_kb_state(KeyState2);
     }
-    Elsojon = !Elsojon;
+    UseKeyState2 = !UseKeyState2;
 }
 
-// Ezt csak egyszer szabad meghivni minden mkw_getDIstate utan:
 void mkw_setkeydown(void) {
-    char *buff1 = NULL, *buff2 = NULL; // buff2 az ujabb
-    if (Elsojon) {
-        buff1 = Buffer1;
-        buff2 = Buffer2;
+    const char* prev = NULL;
+    const char* current = NULL;
+    if (UseKeyState2) {
+        prev = KeyState1;
+        current = KeyState2;
     } else {
-        buff1 = Buffer2;
-        buff2 = Buffer1;
+        prev = KeyState2;
+        current = KeyState1;
     }
     for (int i = 0; i < 256; i++) {
-        if (!buff1[i] && buff2[i]) {
-            // Ez a billentyu lenyomodott:
-            if (Konvtomb[i]) {
-                if (Charszam < Buffsize) {
-                    if (Konvtomb[i] >= 'a' && Konvtomb[i] <= 'z' &&
-                        (buff2[DIK_LSHIFT] || buff2[DIK_RSHIFT])) {
-                        // Nagybetu:
-                        Buffer[Charszam] = Konvtomb[i] + 'A' - 'a';
+        if (!prev[i] && current[i]) {
+            if (DIKToAscii[i]) {
+                if (KeyBufferCount < KeyBufferSize) {
+                    if (DIKToAscii[i] >= 'a' && DIKToAscii[i] <= 'z' &&
+                        (current[DIK_LSHIFT] || current[DIK_RSHIFT])) {
+                        KeyBuffer[KeyBufferCount] = DIKToAscii[i] + 'A' - 'a';
                     } else {
-                        // Kisbetu:
-                        Buffer[Charszam] = Konvtomb[i];
+                        KeyBuffer[KeyBufferCount] = DIKToAscii[i];
                     }
-                    Charszam++;
+                    KeyBufferCount++;
                 }
             }
         }
     }
 }
 
-void initwkonvtomb(void) {
-    Konvtomb = new int[260];
+static void init_dik_to_ascii(void) {
+    DIKToAscii = new int[260];
     for (int i = 0; i < 256; i++) {
-        Konvtomb[i] = 0;
+        DIKToAscii[i] = 0;
     }
     // Most beirjuk billentyuket:
-    Konvtomb[DIK_1] = '1';
-    Konvtomb[DIK_2] = '2';
-    Konvtomb[DIK_3] = '3';
-    Konvtomb[DIK_4] = '4';
-    Konvtomb[DIK_5] = '5';
-    Konvtomb[DIK_6] = '6';
-    Konvtomb[DIK_7] = '7';
-    Konvtomb[DIK_8] = '8';
-    Konvtomb[DIK_9] = '9';
-    Konvtomb[DIK_0] = '0';
+    DIKToAscii[DIK_1] = '1';
+    DIKToAscii[DIK_2] = '2';
+    DIKToAscii[DIK_3] = '3';
+    DIKToAscii[DIK_4] = '4';
+    DIKToAscii[DIK_5] = '5';
+    DIKToAscii[DIK_6] = '6';
+    DIKToAscii[DIK_7] = '7';
+    DIKToAscii[DIK_8] = '8';
+    DIKToAscii[DIK_9] = '9';
+    DIKToAscii[DIK_0] = '0';
 
-    Konvtomb[DIK_A] = 'a';
-    Konvtomb[DIK_B] = 'b';
-    Konvtomb[DIK_C] = 'c';
-    Konvtomb[DIK_D] = 'd';
-    Konvtomb[DIK_E] = 'e';
-    Konvtomb[DIK_F] = 'f';
-    Konvtomb[DIK_G] = 'g';
-    Konvtomb[DIK_H] = 'h';
-    Konvtomb[DIK_I] = 'i';
-    Konvtomb[DIK_J] = 'j';
-    Konvtomb[DIK_K] = 'k';
-    Konvtomb[DIK_L] = 'l';
-    Konvtomb[DIK_M] = 'm';
-    Konvtomb[DIK_N] = 'n';
-    Konvtomb[DIK_O] = 'o';
-    Konvtomb[DIK_P] = 'p';
-    Konvtomb[DIK_Q] = 'q';
-    Konvtomb[DIK_R] = 'r';
-    Konvtomb[DIK_S] = 's';
-    Konvtomb[DIK_T] = 't';
-    Konvtomb[DIK_U] = 'u';
-    Konvtomb[DIK_V] = 'v';
-    Konvtomb[DIK_W] = 'w';
-    Konvtomb[DIK_X] = 'x';
-    Konvtomb[DIK_Y] = 'y';
-    Konvtomb[DIK_Z] = 'z';
+    DIKToAscii[DIK_A] = 'a';
+    DIKToAscii[DIK_B] = 'b';
+    DIKToAscii[DIK_C] = 'c';
+    DIKToAscii[DIK_D] = 'd';
+    DIKToAscii[DIK_E] = 'e';
+    DIKToAscii[DIK_F] = 'f';
+    DIKToAscii[DIK_G] = 'g';
+    DIKToAscii[DIK_H] = 'h';
+    DIKToAscii[DIK_I] = 'i';
+    DIKToAscii[DIK_J] = 'j';
+    DIKToAscii[DIK_K] = 'k';
+    DIKToAscii[DIK_L] = 'l';
+    DIKToAscii[DIK_M] = 'm';
+    DIKToAscii[DIK_N] = 'n';
+    DIKToAscii[DIK_O] = 'o';
+    DIKToAscii[DIK_P] = 'p';
+    DIKToAscii[DIK_Q] = 'q';
+    DIKToAscii[DIK_R] = 'r';
+    DIKToAscii[DIK_S] = 's';
+    DIKToAscii[DIK_T] = 't';
+    DIKToAscii[DIK_U] = 'u';
+    DIKToAscii[DIK_V] = 'v';
+    DIKToAscii[DIK_W] = 'w';
+    DIKToAscii[DIK_X] = 'x';
+    DIKToAscii[DIK_Y] = 'y';
+    DIKToAscii[DIK_Z] = 'z';
 
-    Konvtomb[DIK_SPACE] = ' ';
-    Konvtomb[DIK_MINUS] = '-';
-    Konvtomb[DIK_SUBTRACT] = '-';
-    Konvtomb[DIK_PERIOD] = '.';
+    DIKToAscii[DIK_SPACE] = ' ';
+    DIKToAscii[DIK_MINUS] = '-';
+    DIKToAscii[DIK_SUBTRACT] = '-';
+    DIKToAscii[DIK_PERIOD] = '.';
 
-    Konvtomb[DIK_ESCAPE] = MK_ESC;
-    Konvtomb[DIK_RETURN] = MK_ENTER;
-    Konvtomb[DIK_NUMPADENTER] = MK_ENTER;
-    Konvtomb[DIK_UP] = MK_UP;
-    Konvtomb[DIK_NUMPAD8] = MK_UP;
-    Konvtomb[DIK_DOWN] = MK_DOWN;
-    Konvtomb[DIK_NUMPAD2] = MK_DOWN;
-    Konvtomb[DIK_LEFT] = MK_LEFT;
-    Konvtomb[DIK_NUMPAD4] = MK_LEFT;
-    Konvtomb[DIK_RIGHT] = MK_RIGHT;
-    Konvtomb[DIK_NUMPAD6] = MK_RIGHT;
-    Konvtomb[DIK_PRIOR] = MK_PGUP;
-    Konvtomb[DIK_NUMPAD9] = MK_PGUP;
-    Konvtomb[DIK_NEXT] = MK_PGDOWN;
-    Konvtomb[DIK_NUMPAD3] = MK_PGDOWN;
-    Konvtomb[DIK_DELETE] = MK_DEL;
-    Konvtomb[DIK_DECIMAL] = MK_DEL;
-    Konvtomb[DIK_BACK] = MK_BACKSPACE;
+    DIKToAscii[DIK_ESCAPE] = MK_ESC;
+    DIKToAscii[DIK_RETURN] = MK_ENTER;
+    DIKToAscii[DIK_NUMPADENTER] = MK_ENTER;
+    DIKToAscii[DIK_UP] = MK_UP;
+    DIKToAscii[DIK_NUMPAD8] = MK_UP;
+    DIKToAscii[DIK_DOWN] = MK_DOWN;
+    DIKToAscii[DIK_NUMPAD2] = MK_DOWN;
+    DIKToAscii[DIK_LEFT] = MK_LEFT;
+    DIKToAscii[DIK_NUMPAD4] = MK_LEFT;
+    DIKToAscii[DIK_RIGHT] = MK_RIGHT;
+    DIKToAscii[DIK_NUMPAD6] = MK_RIGHT;
+    DIKToAscii[DIK_PRIOR] = MK_PGUP;
+    DIKToAscii[DIK_NUMPAD9] = MK_PGUP;
+    DIKToAscii[DIK_NEXT] = MK_PGDOWN;
+    DIKToAscii[DIK_NUMPAD3] = MK_PGDOWN;
+    DIKToAscii[DIK_DELETE] = MK_DEL;
+    DIKToAscii[DIK_DECIMAL] = MK_DEL;
+    DIKToAscii[DIK_BACK] = MK_BACKSPACE;
 
-    // Sound Volume allitas miatt:
-    Konvtomb[DIK_MINUS] = MK_LEFT;
-    Konvtomb[DIK_SUBTRACT] = MK_LEFT;
-    Konvtomb[DIK_EQUALS] = MK_RIGHT;
-    Konvtomb[DIK_ADD] = MK_RIGHT;
+    DIKToAscii[DIK_MINUS] = MK_LEFT;
+    DIKToAscii[DIK_SUBTRACT] = MK_LEFT;
+    DIKToAscii[DIK_EQUALS] = MK_RIGHT;
+    DIKToAscii[DIK_ADD] = MK_RIGHT;
 }
 
 // valaszt2-ben meg van irve DOS-os verziohoz:

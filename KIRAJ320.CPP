@@ -69,9 +69,9 @@ void beallitmereteket(int splitscreen) {
     Hatary2 = Cysize - 3.0;
 
     // Motoros kepernyo mely reszen helyezkedik el:
-    Mo_bal = (640 / Arany) * 0.15;
-    Mo_dx = Cxsize / Arany - 2.0 * Mo_bal;
-    Mo_y = Cysize / Arany / 2.0;
+    Mo_bal = (640 / MetersToPixels) * 0.15;
+    Mo_dx = Cxsize / MetersToPixels - 2.0 * Mo_bal;
+    Mo_y = Cysize / MetersToPixels / 2.0;
 
     Viewxsize = 140 * sqrt(double(Cysize) / 480.0); // 200
     Viewysize = 70 * sqrt(double(Cysize) / 480.0);  // 80
@@ -114,24 +114,24 @@ static void kidoboz(vekt2 a, vekt2 b, pic8* ppic8, double szelesseg, kiskep* pk,
     }
     a = a - v2fel;
 
-    a.x *= Arany;
-    a.y *= Arany;
-    v.x *= Arany;
-    v.y *= Arany;
-    v2fel.x *= Arany;
-    v2fel.y *= Arany;
+    a.x *= MetersToPixels;
+    a.y *= MetersToPixels;
+    v.x *= MetersToPixels;
+    v.y *= MetersToPixels;
+    v2fel.x *= MetersToPixels;
+    v2fel.y *= MetersToPixels;
     dobozki(ppic8, pk, v, v2fel * 2.0, a);
 }
 
-// sugar meg nincs megszorozva:
+// radius meg nincs megszorozva:
 // Meg nem affin koordok:
-static void kidobozkerek(vekt2 r, double sugar, double alfa, pic8* ppicbuffer, kiskep* pk,
+static void kidobozkerek(vekt2 r, double radius, double rotation, pic8* ppicbuffer, kiskep* pk,
                          int tukor = 0) {
-    vekt2 vfel(cos(alfa) * sugar, sin(alfa) * sugar);
+    vekt2 vfel(cos(rotation) * radius, sin(rotation) * radius);
     if (tukor) {
-        kidoboz(r + vfel, r - vfel, ppicbuffer, sugar, pk, 0.0, 0.0, tukor);
+        kidoboz(r + vfel, r - vfel, ppicbuffer, radius, pk, 0.0, 0.0, tukor);
     } else {
-        kidoboz(r - vfel, r + vfel, ppicbuffer, sugar, pk, 0.0, 0.0, tukor);
+        kidoboz(r - vfel, r + vfel, ppicbuffer, radius, pk, 0.0, 0.0, tukor);
     }
 }
 
@@ -189,8 +189,8 @@ static void felhokfel( int x, int y, pic8* ppicbuffer, pic8* pfelho,
 
 static void kiview(int ajatekos, pic8* ppic, double baljobb, vekt2 motorkozep, motorst* pmot2) {
 
-    double Viewxsize_d = Viewxsize * Viewzoom * Aranyrec;
-    double Viewysize_d = Viewysize * Viewzoom * Aranyrec;
+    double Viewxsize_d = Viewxsize * MinimapScaleFactor * PixelsToMeters;
+    double Viewysize_d = Viewysize * MinimapScaleFactor * PixelsToMeters;
 
     double szeltoltav = 0.2; // 20%
     double atfuthossz = 1.0 - 2.0 * szeltoltav;
@@ -250,17 +250,17 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vekt2 motorkozep, m
 
     // Most kirajzoljuk masik (hatso) motorost:
     if (pmot2) {
-        vekt2 sarokrel = pmot2->kor1.r - sarok;
-        int mx = sarokrel.x * Arany / Viewzoom + vx1;
-        int my = sarokrel.y * Arany / Viewzoom + vy1;
+        vekt2 sarokrel = pmot2->bike.r - sarok;
+        int mx = sarokrel.x * MetersToPixels / MinimapScaleFactor + vx1;
+        int my = sarokrel.y * MetersToPixels / MinimapScaleFactor + vy1;
         if (mx >= vx1 && mx <= vx2 && my >= vy1 && my <= vy2) {
             kigyuru(ppic, mx, my, viewindex2);
         }
     }
 
     // Most kirajzoljuk elso motorost:
-    int mx = sarokbolkozepre.x * Arany / Viewzoom;
-    int my = sarokbolkozepre.y * Arany / Viewzoom;
+    int mx = sarokbolkozepre.x * MetersToPixels / MinimapScaleFactor;
+    int my = sarokbolkozepre.y * MetersToPixels / MinimapScaleFactor;
     kigyuru(ppic, vx1 + mx, vy1 + my, viewindex1);
 
     // Kirajzoljuk keretet:
@@ -348,14 +348,14 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
         forgas = -cos(forgas * K_pi);
     }
 
-    vekt2 p_k1 = (pmot->kor2.r - sarok);
-    vekt2 p_k2 = (pmot->kor4.r - sarok);
+    vekt2 p_k1 = (pmot->left_wheel.r - sarok);
+    vekt2 p_k2 = (pmot->right_wheel.r - sarok);
 
     int elsokerekrogton = 1;
     int hatsokerekrogton = 1;
 
     if (vanforgas) {
-        if ((forgas > 0.0 && !pmot->hatra_f) || (forgas <= 0.0 && pmot->hatra_f)) {
+        if ((forgas > 0.0 && !pmot->flipped_bike) || (forgas <= 0.0 && pmot->flipped_bike)) {
             elsokerekrogton = 0;
         } else {
             hatsokerekrogton = 0;
@@ -364,22 +364,24 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
 
     // Kerekek:
     if (elsokerekrogton) {
-        kidobozkerek(p_k1, Kerekrajzsugar, pmot->kor2.alfa, ppic, pmk->pkiskerek);
+        kidobozkerek(p_k1, WheelBackgroundRenderRadius, pmot->left_wheel.rotation, ppic,
+                     pmk->pkiskerek);
     }
     if (hatsokerekrogton) {
-        kidobozkerek(p_k2, Kerekrajzsugar, pmot->kor4.alfa, ppic, pmk->pkiskerek);
+        kidobozkerek(p_k2, WheelBackgroundRenderRadius, pmot->right_wheel.rotation, ppic,
+                     pmk->pkiskerek);
     }
 
-    vekt2 kozep = pmot->kor1.r - sarok;
-    vekt2 jobbra = vekt2(cos(pmot->kor1.alfa), sin(pmot->kor1.alfa));
+    vekt2 kozep = pmot->bike.r - sarok;
+    vekt2 jobbra = vekt2(cos(pmot->bike.rotation), sin(pmot->bike.rotation));
     vekt2 fel = forgatas90fokkal(jobbra);
 
     if (vanforgas) {
         Affinitas = 1;
-        setaffinitas(kozep, jobbra, forgas, Arany, Arany);
+        setaffinitas(kozep, jobbra, forgas, MetersToPixels, MetersToPixels);
     }
 
-    if (pmot->hatra_f) {
+    if (pmot->flipped_bike) {
         jobbra = Vekt2null - jobbra;
         vekt2 tmpv = p_k1;
         p_k1 = p_k2;
@@ -391,14 +393,14 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     double mmeret = 0.0045;
     Mi = jobbra * (mmeret * cos(malfa)) + fel * (mmeret * sin(malfa));
     Mj = forgatas90fokkal(Mi);
-    if (pmot->hatra_f) {
+    if (pmot->flipped_bike) {
         Mj = Vekt2null - Mj;
     }
     Mr = kozep;
-    // Most Arany-t betesszuk Mi, Mj, Mr-be:
-    Miar = Mi * Arany;
-    Mjar = Mj * Arany;
-    Mrar = Mr * Arany;
+    // Most MetersToPixels-t betesszuk Mi, Mj, Mr-be:
+    Miar = Mi * MetersToPixels;
+    Mjar = Mj * MetersToPixels;
+    Mrar = Mr * MetersToPixels;
 
     // Elso felfuggesztes:
     vekt2 p_fogantyu = Mi * (365.0 - Mx) + Mj * (My - 292.0) + Mr; // Uj
@@ -430,7 +432,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     // 361 jobb hajszalnyit
     vekt2 zaszloteto = zaszlotalp + (Mi * 356.0 + Mj * 500.0) * 0.2;
     if (flages) {
-        kidoboz(zaszlotalp, zaszloteto, ppic, 0.2, Plgr->pkiszaszlo, 0.0, 0.0, pmot->hatra_f);
+        kidoboz(zaszlotalp, zaszloteto, ppic, 0.2, Plgr->pkiszaszlo, 0.0, 0.0, pmot->flipped_bike);
     }
 
     // Motor teste:
@@ -440,16 +442,11 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     kitag(ppic, pmk->pkisd, &KisboxD);
 
     // Mozgo test:
-    vekt2 p_vezeto = (pmot->vezetor - sarok); // Vezeto
+    vekt2 p_vezeto = (pmot->body_r - sarok); // Vezeto
     vekt2 p_csipo = p_vezeto + Mi * 75.0 + Mj * (-47.0);
     vekt2 p_vall = p_vezeto + Mi * 47.0 + Mj * 65.0;
     vekt2 p_valltest = p_vezeto + Mi * 41.0 + Mj * 70.0;
     vekt2 p_labfej = Mi * (346.0 - Mx) + Mj * (My - 514.0) + Mr;
-    /* Bicigli:
-    p_labfej = p_labfej + 0.14*
-                    (jobbra * sin(pmot->labalfa) +
-                     fel * cos(pmot->labalfa) );
-    */
     vekt2 p_terd;
 
     double combhossz = 0.51;
@@ -459,7 +456,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     double labszarhossz = 0.56;
     */
 
-    if (pmot->hatra_f) {
+    if (pmot->flipped_bike) {
         p_terd = ketkormetszete(p_csipo, p_labfej, combhossz, labszarhossz);
     } else {
         p_terd = ketkormetszete(p_labfej, p_csipo, labszarhossz, combhossz);
@@ -468,11 +465,11 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     // Fej:
     // double fejalfa = 0.20;
     double fejalfa = 0.0;
-    if (pmot->hatra_f) {
+    if (pmot->flipped_bike) {
         fejalfa = 0 - fejalfa;
     }
-    kidobozkerek(pmot->fejr - sarok, Fejsugar, pmot->kor1.alfa + fejalfa, ppic, pmk->pkisfej,
-                 pmot->hatra_f);
+    kidobozkerek(pmot->head_r - sarok, HeadRadius, pmot->bike.rotation + fejalfa, ppic,
+                 pmk->pkisfej, pmot->flipped_bike);
 
     // Kar ket reszletben:
     vekt2 p_kezfej = p_fogantyu;
@@ -482,7 +479,8 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     if (ugrasnagysag > 0.0001) {
         ugrasnagysag = 1.0 - ugrasnagysag;
         int fellendit = 1; // kar kiteresenek iranya
-        if ((pvalt->ugras1volt && !pmot->hatra_f) || (!pvalt->ugras1volt && pmot->hatra_f)) { // XOR
+        if ((pvalt->ugras1volt && !pmot->flipped_bike) ||
+            (!pvalt->ugras1volt && pmot->flipped_bike)) { // XOR
             fellendit = 0;
         }
         // alfa es hosszit kiszamolasa:
@@ -521,7 +519,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
         }
         // alfa es hosszit alapjan p_kezfej forgatasa es nyujtasa vall korul:
         vekt2 kar = p_kezfej - p_vall;
-        if (!pmot->hatra_f) {
+        if (!pmot->flipped_bike) {
             kar.forgatas(-alfa);
         } else {
             kar.forgatas(alfa);
@@ -533,40 +531,42 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     double alkarhossz = 0.308 * 1.05;
     double felkarhossz = 0.328 * 1.05;
     vekt2 p_konyok;
-    if (pmot->hatra_f) {
+    if (pmot->flipped_bike) {
         p_konyok = ketkormetszete(p_kezfej, p_vall, alkarhossz, felkarhossz);
     } else {
         p_konyok = ketkormetszete(p_vall, p_kezfej, felkarhossz, alkarhossz);
     }
 
     // Lab:
-    kidoboz(p_terd, p_csipo, ppic, 0.14, pmk->pkiscomb, 0.03, 0.1, pmot->hatra_f);
+    kidoboz(p_terd, p_csipo, ppic, 0.14, pmk->pkiscomb, 0.03, 0.1, pmot->flipped_bike);
 
-    kidoboz(p_labfej, p_terd, ppic, 0.21, pmk->pkislabszar, 0.03, 0.03, pmot->hatra_f);
+    kidoboz(p_labfej, p_terd, ppic, 0.21, pmk->pkislabszar, 0.03, 0.03, pmot->flipped_bike);
 
     // Vezeto:
-    kidoboz(p_csipo, p_valltest, ppic, 0.2, pmk->pkisvezeto, 0.1, 0.05, pmot->hatra_f);
+    kidoboz(p_csipo, p_valltest, ppic, 0.2, pmk->pkisvezeto, 0.1, 0.05, pmot->flipped_bike);
 
     // Kez:
-    kidoboz(p_konyok, p_vall, ppic, 0.11, pmk->pkisfelkar, 0.08, 0.1, !pmot->hatra_f);
+    kidoboz(p_konyok, p_vall, ppic, 0.11, pmk->pkisfelkar, 0.08, 0.1, !pmot->flipped_bike);
 
-    kidoboz(p_kezfej, p_konyok, ppic, 0.076, pmk->pkisalkar, 0.08, 0.1, pmot->hatra_f);
+    kidoboz(p_kezfej, p_konyok, ppic, 0.076, pmk->pkisalkar, 0.08, 0.1, pmot->flipped_bike);
 
     Affinitas = 0;
 
     // Kerekek:
     if (!elsokerekrogton || !hatsokerekrogton) {
-        if (pmot->hatra_f) {
+        if (pmot->flipped_bike) {
             // Visszacserelem kerekek koordjait:
             vekt2 tmpv = p_k1;
             p_k1 = p_k2;
             p_k2 = tmpv;
         }
         if (!elsokerekrogton) {
-            kidobozkerek(p_k1, pmot->kor2.sugar, pmot->kor2.alfa, ppic, pmk->pkiskerek);
+            kidobozkerek(p_k1, pmot->left_wheel.radius, pmot->left_wheel.rotation, ppic,
+                         pmk->pkiskerek);
         }
         if (!hatsokerekrogton) {
-            kidobozkerek(p_k2, pmot->kor4.sugar, pmot->kor4.alfa, ppic, pmk->pkiskerek);
+            kidobozkerek(p_k2, pmot->right_wheel.radius, pmot->right_wheel.rotation, ppic,
+                         pmk->pkiskerek);
         }
     }
 }
@@ -575,7 +575,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
                              int viewki, int timeki, motorst* pmot2, valtozok* pvalt2) {
 
     // Kiszamoljuk kepernyo bal also sarkat:
-    vekt2 motorkozep = pmot->kor1.r;
+    vekt2 motorkozep = pmot->bike.r;
 
     vekt2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
 
@@ -587,8 +587,8 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
     int balalsox, balalsoy;
     Pecsetalso->getbalalso_int(sarok, &balalsox, &balalsoy);
-    int objminx = balalsox - 2 * OBJEKTUMSUGAR_I - 2;
-    int objminy = balalsoy - 2 * OBJEKTUMSUGAR_I - 2;
+    int objminx = balalsox - 2 * OBJECT_PIXEL_RADIUS - 2;
+    int objminy = balalsoy - 2 * OBJECT_PIXEL_RADIUS - 2;
     int objmaxx = balalsox + 640;
     int objmaxy = balalsoy + 480;
     for (int i = 0; i < MAXKEREK; i++) {
@@ -655,9 +655,9 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
 
     if (!Single) {
         // Hatso motoros kirajzolasa:
-        vekt2 kozep(sarok.x + 320.0 * Aranyrec, sarok.y + 240.0 * Aranyrec);
-        double tav = abs(pmot2->kor1.r - kozep);
-        if (tav < 540.0 * Aranyrec) {
+        vekt2 kozep(sarok.x + 320.0 * PixelsToMeters, sarok.y + 240.0 * PixelsToMeters);
+        double tav = abs(pmot2->bike.r - kozep);
+        if (tav < 540.0 * PixelsToMeters) {
             kibike(!ajatekos, ppic, t, sarok, pmot2, pvalt2, pmkepek2);
         }
     }
@@ -762,18 +762,18 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
         // 1. Jatekos:
         Bpic->keszitbelsot(Cx1, Cy1, Cx2, Cy2, npic);
 
-        kirakegyjatekost(1, Bpic, t, Pmot1, pvalt1, viewki1, timeki1, Pmot2, pvalt2);
+        kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2);
 
         // 2. Jatekos:
         Bpic->keszitbelsot(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
 
-        kirakegyjatekost(0, Bpic, t, Pmot2, pvalt2, viewki2, timeki2, Pmot1, pvalt1);
+        kirakegyjatekost(0, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1);
     } else {
         Bpic->keszitbelsot(Cx1, Cy1, Cx2, Cy2, npic);
         if (fulljatekosA) {
-            kirakegyjatekost(1, Bpic, t, Pmot1, pvalt1, viewki1, timeki1, Pmot2, pvalt2);
+            kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2);
         } else {
-            kirakegyjatekost(0, Bpic, t, Pmot2, pvalt2, viewki2, timeki2, Pmot1, pvalt1);
+            kirakegyjatekost(0, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1);
         }
     }
 

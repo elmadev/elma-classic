@@ -323,8 +323,8 @@ sprite::sprite(double x, double y, char* kepnev_p, char* texturanev_p, char* mas
     hatarol = 0;
 
     // Default meret:
-    xsize = Aranyrec * DEFAULTSIZE;
-    ysize = Aranyrec * DEFAULTSIZE;
+    xsize = PixelsToMeters * DEFAULTSIZE;
+    ysize = PixelsToMeters * DEFAULTSIZE;
 
     if (kepnev[0] && (maszknev[0] || texturanev[0])) {
         hiba("sp::sp-ban sok nev egy poligonban!");
@@ -337,8 +337,8 @@ sprite::sprite(double x, double y, char* kepnev_p, char* texturanev_p, char* mas
             // Megvan kep:
             xsize = Plgr->kepek[index].xsize;
             ysize = Plgr->kepek[index].ysize;
-            xsize *= Aranyrec;
-            ysize *= Aranyrec;
+            xsize *= PixelsToMeters;
+            ysize *= PixelsToMeters;
             tavolsag = Plgr->kepek[index].tavolsag;
             hatarol = Plgr->kepek[index].hatarol;
         }
@@ -351,8 +351,8 @@ sprite::sprite(double x, double y, char* kepnev_p, char* texturanev_p, char* mas
             } else {
                 xsize = Plgr->maszkok[index].xsize;
                 ysize = Plgr->maszkok[index].ysize;
-                xsize *= Aranyrec;
-                ysize *= Aranyrec;
+                xsize *= PixelsToMeters;
+                ysize *= PixelsToMeters;
             }
         }
         if (texturanev[0]) {
@@ -543,8 +543,8 @@ int topol::pic_selejtez(lgrfile* plgr) {
         if (spritetomb[i]) {
             sprite* psp = spritetomb[i];
             // Default meret:
-            psp->xsize = Aranyrec * DEFAULTSIZE;
-            psp->ysize = Aranyrec * DEFAULTSIZE;
+            psp->xsize = PixelsToMeters * DEFAULTSIZE;
+            psp->ysize = PixelsToMeters * DEFAULTSIZE;
 
             if (psp->kepnev[0] && (psp->maszknev[0] || psp->texturanev[0])) {
                 hiba("pic_selejtez-ben sok nev egy spriteban!");
@@ -562,8 +562,8 @@ int topol::pic_selejtez(lgrfile* plgr) {
                 // Megvan kep:
                 psp->xsize = plgr->kepek[index].xsize;
                 psp->ysize = plgr->kepek[index].ysize;
-                psp->xsize *= Aranyrec;
-                psp->ysize *= Aranyrec;
+                psp->xsize *= PixelsToMeters;
+                psp->ysize *= PixelsToMeters;
             } else {
                 // Nem kep sprite:
                 if (psp->maszknev[0]) {
@@ -577,8 +577,8 @@ int topol::pic_selejtez(lgrfile* plgr) {
                     } else {
                         psp->xsize = plgr->maszkok[index].xsize;
                         psp->ysize = plgr->maszkok[index].ysize;
-                        psp->xsize *= Aranyrec;
-                        psp->ysize *= Aranyrec;
+                        psp->xsize *= PixelsToMeters;
+                        psp->ysize *= PixelsToMeters;
                     }
                 }
                 if (psp->texturanev[0]) {
@@ -1857,11 +1857,11 @@ int topol::setallaktiv(motorst* pmot) {
                 }
                 voltkezdo = 1;
                 pker->aktiv = 0;
-                Kezdetihelydiff = pker->r - pmot->kor2.r;
-                pmot->kor1.r = pmot->kor1.r + Kezdetihelydiff;
-                pmot->kor2.r = pmot->kor2.r + Kezdetihelydiff;
-                pmot->kor4.r = pmot->kor4.r + Kezdetihelydiff;
-                pmot->vezetor = pmot->vezetor + Kezdetihelydiff;
+                Kezdetihelydiff = pker->r - pmot->left_wheel.r;
+                pmot->bike.r = pmot->bike.r + Kezdetihelydiff;
+                pmot->left_wheel.r = pmot->left_wheel.r + Kezdetihelydiff;
+                pmot->right_wheel.r = pmot->right_wheel.r + Kezdetihelydiff;
+                pmot->body_r = pmot->body_r + Kezdetihelydiff;
                 // Fejr = Kor1.r;
             }
         }

@@ -103,23 +103,6 @@ void init_physics_data(void) {
     BodyDY = Motor1->body_r.y - Motor1->bike.r.y;
 }
 
-/*static double atmeretez( void ) {
-    FILE* h = fopen( "size.inf", "rt" );
-    if( !h )
-        return 1.0;
-    long meret = 1000;
-    if( fscanf( h, "%ld", &meret ) != 1 ) {
-        fclose( h );
-        return 1.0;
-    }
-    fclose( h );
-    if( meret < 100 )
-        meret = 100;
-    if( meret > 10000 )
-        meret = 10000;
-    return (double)meret/1000.0;
-} */
-
 // Encode framecount into MSB of the flags
 void encode_frame_count(recorder* rec) {
     if (rec->betoltve < 80) {

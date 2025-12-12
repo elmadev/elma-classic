@@ -186,4 +186,4 @@ extern char Ezenlegjobbido[30];
 // Azt a nevet keri, amit topol::topol kap:
 void beallitlegjobbidot(char* filenev, int single);
 
-int nevanalizis(char* nev);
+int nevanalizis(const char* nev);

@@ -1,5 +1,7 @@
 // m_k.h
 
+void fill_kb_state(char* buffer);
+
 int mk_getextchar(void);
 void mk_emptychar(void);
 int mk_kbhit(void);

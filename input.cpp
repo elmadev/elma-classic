@@ -1,12 +1,13 @@
-#include "w_all.h"
+#include "ALL.H"
+#include "directinput_scancodes.h"
 
 // static int Maxkod = 500;
 // static int* Tomb = NULL;
 
 static int Buffsize = 30;
 static int* Buffer = NULL;
-static BYTE* Buffer1 = NULL;
-static BYTE* Buffer2 = NULL;
+static char* Buffer1 = NULL;
+static char* Buffer2 = NULL;
 static int Elsojon = 1;
 static int Charszam = 0;
 static int* Konvtomb = NULL;
@@ -17,8 +18,8 @@ void mk_init(void) {
     }
 
     // Lefoglaljuk buffereket:
-    Buffer1 = new BYTE[256];
-    Buffer2 = new BYTE[256];
+    Buffer1 = new char[256];
+    Buffer2 = new char[256];
     if (!Buffer1 || !Buffer2) {
         hiba("memory mk_init-ben!");
     }
@@ -84,16 +85,16 @@ void mkw_getDIstate(void) {
     }
 
     if (Elsojon) {
-        refreshDI(Buffer1);
+        fill_kb_state(Buffer1);
     } else {
-        refreshDI(Buffer2);
+        fill_kb_state(Buffer2);
     }
     Elsojon = !Elsojon;
 }
 
 // Ezt csak egyszer szabad meghivni minden mkw_getDIstate utan:
 void mkw_setkeydown(void) {
-    BYTE *buff1 = NULL, *buff2 = NULL; // buff2 az ujabb
+    char *buff1 = NULL, *buff2 = NULL; // buff2 az ujabb
     if (Elsojon) {
         buff1 = Buffer1;
         buff2 = Buffer2;

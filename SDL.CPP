@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include <SDL.h>
+#include "scancodes_windows.h"
 
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
@@ -112,7 +113,7 @@ ddpal::ddpal(unsigned char* tomb) {
 void ddpal::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
 
 #if defined(_WIN64) || !defined(_WIN32)
-void mv_check(int unused) {
+void mv_check(int skip_key_update) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -121,5 +122,19 @@ void mv_check(int unused) {
             break;
         }
     }
+
+    void mkw_getDIstate();
+    mkw_getDIstate();
+    if (!skip_key_update) {
+        void mkw_setkeydown();
+        mkw_setkeydown();
+    }
 }
 #endif
+
+void fill_kb_state(char* buffer) {
+    const unsigned char* state = SDL_GetKeyboardState(NULL);
+    for (int i = 0; i < 256; i++) {
+        buffer[i] = state[windows_scancode_table[i]];
+    }
+}

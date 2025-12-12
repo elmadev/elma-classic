@@ -57,7 +57,6 @@ int main(int argc, char* argv[]) {
         uzenet("You need DirectDraw 3.0 or later installed to run this game!");
     }
 
-    initDI();
     mk_init();
 
     // Ezeket atraktam lejatszoba:
@@ -162,7 +161,6 @@ static long FAR PASCAL WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
         if (Menubollepettki || (!Aktiv && !(Editorban_dialnak && Valtozott))) {
 
             if (!Menubollepettki && Inicializalva) {
-                releaseDI();
             }
             DestroyWindow(hWnd);
         }
@@ -216,7 +214,6 @@ static long FAR PASCAL WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 void mv_exit(char* text) {
     // PostQuitMessage( 0 );
     // mv_check();
-    releaseDI();
     // MessageBox( NULL, text, "Message", MB_OK | MB_ICONINFORMATION);
     Menubollepettki = 1;
     SendMessage(GhWnd, WM_CLOSE, 0, 0);

@@ -60,6 +60,7 @@ elma_sources = files(
     'UTKOZES2.CPP',
     'VALASZT2.CPP',
     'VEKT2.CPP',
+    'input.cpp',
 )
 
 link_args = []
@@ -73,9 +74,7 @@ if cpp.get_id() == 'msvc'
         win_subsystem = 'windows'
         needs_stub = false
         elma_sources += files(
-            'F_WIN/W_DI.CPP',
             'F_WIN/W_HHIGH.CPP',
-            'F_WIN/W_K.CPP',
             'F_WIN/W_SOUND2.CPP',
             'F_WIN/W_V.CPP',
             'H_WAV.CPP',
@@ -84,8 +83,6 @@ if cpp.get_id() == 'msvc'
         link_args += [
             '/ENTRY:mainCRTStartup',
             'winmm.lib',
-            meson.project_source_root() + '/dxinc/dinput.lib',
-            meson.project_source_root() + '/dxinc/dxguid.lib',
             meson.project_source_root() + '/dxinc/dsound.lib',
         ]
     endif

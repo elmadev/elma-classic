@@ -5,7 +5,7 @@ if get_option('buildtype') == 'debug'
 endif
 
 elma_sources = files(
-    'ABC8.CPP',
+    'abc8.cpp',
     'ADATOK.CPP',
     'ANIM.CPP',
     'BEALLIT.CPP',

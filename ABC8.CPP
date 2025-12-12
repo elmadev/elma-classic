@@ -7,7 +7,7 @@ static bool ErrorOnMissingCodepoint = false;
 #endif
 
 abc8::abc8(const char* filename) {
-    default_spacing = 0;
+    spacing = 0;
     ppsprite = NULL;
     y_offset = NULL;
     ppsprite = new ptrpic8[256];
@@ -132,7 +132,7 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
         }
         blt8(dest, ppsprite[index], x, y + y_offset[index]);
         // blt8( pdest, ppsprite[index], x, y );
-        x += default_spacing + ppsprite[index]->getxsize();
+        x += spacing + ppsprite[index]->getxsize();
 
         text++;
     }
@@ -162,14 +162,14 @@ int abc8::len(const char* text) {
                 continue;
             }
         }
-        width += default_spacing + ppsprite[index]->getxsize();
+        width += spacing + ppsprite[index]->getxsize();
 
         text++;
     }
     return width;
 }
 
-void abc8::set_spacing(int spacing) { default_spacing = spacing; }
+void abc8::set_spacing(int new_spacing) { spacing = new_spacing; }
 
 void abc8::write_centered(pic8* dest, int x, int y, const char* text) {
     int hossz = len(text);

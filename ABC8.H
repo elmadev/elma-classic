@@ -5,7 +5,7 @@ class abc8 {
   private:
     ptrpic8* ppsprite;
     short* y_offset;
-    int default_spacing;
+    int spacing;
 
   public:
     abc8(const char* filename);
@@ -13,5 +13,5 @@ class abc8 {
     void write(pic8* dest, int x, int y, const char* text);
     void write_centered(pic8* dest, int x, int y, const char* text);
     int len(const char* text);
-    void set_spacing(int spacing);
+    void set_spacing(int new_spacing);
 };

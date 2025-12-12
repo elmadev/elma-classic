@@ -166,9 +166,9 @@ static void belsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
     pvalt->inf.surlero = kiszamolsurlodast();
 
     if (pmot->hatra_f) {
-        pvalt->inf.frekvencia = fabs(pmot->kor2.omega) * 0.025;
+        pvalt->inf.frekvencia = fabs(pmot->kor2.angular_velocity) * 0.025;
     } else {
-        pvalt->inf.frekvencia = fabs(pmot->kor4.omega) * 0.025;
+        pvalt->inf.frekvencia = fabs(pmot->kor4.angular_velocity) * 0.025;
     }
     // Frekvenciat betesszuk 1.0-2.0 tartomanyba:
     if (pvalt->inf.frekvencia > 30.0) {

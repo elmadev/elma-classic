@@ -1,9 +1,13 @@
 #include "ALL.H"
 
-motorst Motorst1, Motorst2; // Ez nem hasznalando
+motorst Motorst1, Motorst2;
 motorst *Motor1 = &Motorst1, *Motor2 = &Motorst2;
 
+// Perpendicular velocity required to detach wheel from ground.
+// Amount by which the wheel is sunk into the ground
 double GroundEscapeVelocity, WheelDeformationLength, Gravity;
+
+// Minimum distance between two vertices to be considered separate points
 double TwoPointDiscriminationDistance;
 
 double VoltDelay;
@@ -15,20 +19,13 @@ double HeadRadius;
 
 double ObjectRadius = 0.4;
 
-// Hajszalnyival kisebb rigidbody.sugarnal, hogy kirajzolasnal ne logjon foldbe:
+// Render size of the wheel when not turning, in meters, to avoid the wheel appearing to be inside
+// the ground
 double WheelBackgroundRenderRadius = 0.395;
 
-double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY,
-    BodyDY; // Ez az utolso vezeto helye
+double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY, BodyDY;
 
 double MetersToPixels, PixelsToMeters;
-
-/* Eredeti szamitas play.cpp-bol:
-MetersToPixels = 100.0;
-MetersToPixels *= Displaysizex/320.0;
-MetersToPixels *= zoom_factor;
-Aranyx = MetersToPixels*320.0/640.0;
-Aranyy = Aranyx*Displaysizey/Displaysizex*(640.0/480.0);*/
 
 int MinimapScaleFactor = 10;
 
@@ -38,18 +35,17 @@ void init_motor(motorst* motor) {
     motor->gravity_direction = 1;
     motor->prev_brake = 0;
 
-    // Kor1:
     motor->bike.rotation = 0.0;
     motor->bike.angular_velocity = 0.0;
     motor->bike.radius = 0.3;
-    motor->bike.mass = 200; // 100;
-    // inertia = mass * r*r;
+    motor->bike.mass = 200;
+    // inertia = mass * radius * radius
+    // although radius = 0.55 is used instead of 0.3, as set above.
     motor->bike.inertia = 200.0 * 0.55 * 0.55;
     motor->bike.r = vekt2(2.75, 3.6);
     motor->bike.v = vekt2(0, 0);
 
-    // Kor2:
-    motor->left_wheel.rotation = 0.0; // 30
+    motor->left_wheel.rotation = 0.0;
     motor->left_wheel.angular_velocity = 0.0;
     motor->left_wheel.radius = 0.4;
     motor->left_wheel.mass = 10;
@@ -57,8 +53,7 @@ void init_motor(motorst* motor) {
     motor->left_wheel.r = vekt2(1.9, 3.0);
     motor->left_wheel.v = vekt2(0, 0);
 
-    // Kor4:
-    motor->right_wheel.rotation = 0.0; // 40
+    motor->right_wheel.rotation = 0.0;
     motor->right_wheel.angular_velocity = 0.0;
     motor->right_wheel.radius = 0.4;
     motor->right_wheel.mass = 10;
@@ -74,7 +69,7 @@ void init_physics_data(void) {
     init_motor(Motor1);
     init_motor(Motor2);
 
-    double zoom_factor = 0.48; // 0.54; volt mar 28 is
+    double zoom_factor = 0.48;
     if (State->minibike) {
         zoom_factor = 0.30;
     }
@@ -82,24 +77,22 @@ void init_physics_data(void) {
     MetersToPixels = 100.0 * zoom_factor;
     PixelsToMeters = 1.0 / MetersToPixels;
 
-    // MinimapScaleFactor = 0.28*MetersToPixels*0.5;
     MinimapScaleFactor = 0.42 * MetersToPixels * 0.5;
 
-    GroundEscapeVelocity = 0.01;
-    WheelDeformationLength = 0.005; // uj
-    // WheelDeformationLength = 0.02; // regi
-    Gravity = 10.0; // nehezsegi gyorsulas: a [m/s^2]
-    TwoPointDiscriminationDistance = 0.1;
+    GroundEscapeVelocity = 0.01;          // m/s
+    WheelDeformationLength = 0.005;       // m
+    Gravity = 10.0;                       // m/s^2
+    TwoPointDiscriminationDistance = 0.1; // m
 
-    // VoltDelay = 0.2;
     VoltDelay = 0.4;
     LevelEndDelay = 1.0;
 
-    SpringTensionCoefficient = 10000.0;   // rudban fuggoleges modulus: F/l [N/m]
-    SpringResistanceCoefficient = 1000.0; // rudban mozgasi ellenallas: F/v [N*s/m]
+    SpringTensionCoefficient = 10000.0;   // N/m
+    SpringResistanceCoefficient = 1000.0; // N/(m/s)
 
-    HeadRadius = 0.238; // 0.26;
+    HeadRadius = 0.238; // m
 
+    // Relative positions
     vekt2 vtmp = Motor1->left_wheel.r - Motor1->bike.r;
     LeftWheelDX = vtmp.x;
     LeftWheelDY = vtmp.y;
@@ -127,8 +120,7 @@ void init_physics_data(void) {
     return (double)meret/1000.0;
 } */
 
-// reorder.h-ban friend-kent vannak deklaralva mar:
-// pgazhatra-ba beepiti betoltvet:
+// Encode framecount into MSB of the flags
 void encode_frame_count(recorder* rec) {
     if (rec->betoltve < 80) {
         return;
@@ -143,8 +135,7 @@ void encode_frame_count(recorder* rec) {
     }
 }
 
-// pgazhatra alapjan ellenorzi hosszt:
-// Ezt vegleges verziobol kiszedjuk, mert ezt csak mi ellenorizzuk Csabival:
+// Check that the framecount matches with the MSB of the flags
 /*int frame_count_integrity( recorder* rec ) {
     if( rec->betoltve < 80 )
         return 1;

@@ -14,15 +14,11 @@ extern double HeadRadius;
 
 extern double ObjectRadius;
 
-// Hajszalnyival kisebb rigidbody.sugarnal, hogy kirajzolasnal ne logjon foldbe:
 extern double WheelBackgroundRenderRadius;
-
-// MCGA kirajzolasos:
 
 extern double MetersToPixels, PixelsToMeters;
 
-extern double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY,
-    BodyDY; // Ez az utolso vezeto helye
+extern double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY, BodyDY;
 
 #define OBJECT_PIXEL_RADIUS (20)
 
@@ -40,16 +36,15 @@ struct rigidbody {
 
 struct motorst {
     rigidbody bike, left_wheel, right_wheel;
-    vekt2 head_r; // bike-bol Kor12Fejr fuggveny allitja elo (leptet.h)!
+    vekt2 head_r;
     int flipped_bike;
     int flipped_camera;
-    int gravity_direction; // 1 a normalis (0:UP 1:DOWN 2:LEFT 3:RIGHT)
+    int gravity_direction; // (0:UP 1:DOWN 2:LEFT 3:RIGHT)
 
-    vekt2 body_r, body_v; // Motoros
+    vekt2 body_r, body_v;
 
-    int apple_count; // hanyat evett ez a motoros
+    int apple_count;
 
-    // Leptet ezeket is hasznalja:
     int prev_brake;
     double left_wheel_brake_rotation, right_wheel_brake_rotation;
 
@@ -60,9 +55,6 @@ struct motorst {
 
 extern motorst *Motor1, *Motor2;
 
-// reorder.h-ban friend-kent mar deklaralva van:
-// pgazhatra-ba beepiti betoltvet:
 class recorder;
 void encode_frame_count(recorder* rec);
-// pgazhatra alapjan ellenorzi hosszt:
 int frame_count_integrity(recorder* rec);

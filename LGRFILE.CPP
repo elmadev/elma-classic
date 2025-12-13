@@ -127,10 +127,10 @@ void lgrfile::chopbiker(pic8* pbiker, motkepek* pkepek) {
 static pic8* kepetbovitvizszint(textura* pt) {
     int cellasize = pt->origxsize;
     int szorzo = 1;
-    while (cellasize * szorzo < 640) {
+    while (cellasize * szorzo < SCREEN_WIDTH) {
         szorzo++;
     }
-    szorzo++; // Igy mar legalabb egy keppel szelesebb 640-nel
+    szorzo++; // Igy mar legalabb egy keppel szelesebb SCREEN_WIDTH-nel
     pic8* ppic = new pic8(cellasize * szorzo, pt->ppic->getysize());
     for (int i = 0; i < szorzo; i++) {
         blt8(ppic, pt->ppic, i * cellasize, 0);
@@ -859,7 +859,7 @@ lgrfile::lgrfile(const char* lgrnev) {
     // ecsetben mutato fog hivatkozni rajuk (max 3 egymas utan):
     viewexit[2] = viewexit[1] = viewexit[0];
     viewkiller[2] = viewkiller[1] = viewkiller[0];
-    for (int i = 1; i < 640; i++) {
+    for (int i = 1; i < SCREEN_WIDTH; i++) {
         viewfoldsor[i] = viewfoldsor[0];
         viewegsor[i] = viewegsor[0];
     }

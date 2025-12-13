@@ -26,7 +26,7 @@ void csokkentkepmeret(void) {
 
 // Kirajzolando terulet nagysaga:
 static int Cx1 = 0, Cy1 = 0, Cx2 = 639, Cy2 = 479, Cy1Bplayer = 0, Cy2Bplayer = 0;
-int Cxsize = 640, Cysize = 480;
+int Cxsize = SCREEN_WIDTH, Cysize = SCREEN_HEIGHT;
 
 // Motoros kepernyo mely reszen helyezkedik el:
 static double Mo_y = 0.0, Mo_bal = 0.0, Mo_dx = 0.0;
@@ -40,10 +40,10 @@ static int Viewxorig, Viewxtolas;
 void beallitmereteket(int splitscreen) {
     Cy1Bplayer = 100, Cy2Bplayer = 200;
 
-    Cxsize = 640 * (Kepmeret * 1.001);
-    Cysize = 480 * (Kepmeret * 1.001);
-    Cx1 = (640 - Cxsize) / 2;
-    Cy1 = (480 - Cysize) / 2;
+    Cxsize = SCREEN_WIDTH * (Kepmeret * 1.001);
+    Cysize = SCREEN_HEIGHT * (Kepmeret * 1.001);
+    Cx1 = (SCREEN_WIDTH - Cxsize) / 2;
+    Cy1 = (SCREEN_HEIGHT - Cysize) / 2;
     Cx2 = Cx1 + Cxsize - 1;
     Cy2 = Cy1 + Cysize - 1;
     if (splitscreen) {
@@ -54,11 +54,11 @@ void beallitmereteket(int splitscreen) {
         Cy2Bplayer = 233;
     }
 #ifdef TEST
-    if (Cx2 >= 640) {
-        hiba("beallitmereteket Cx2 >= 640!");
+    if (Cx2 >= SCREEN_WIDTH) {
+        hiba("beallitmereteket Cx2 >= SCREEN_WIDTH!");
     }
-    if (Cy2 >= 480) {
-        hiba("beallitmereteket Cy2 >= 480!");
+    if (Cy2 >= SCREEN_HEIGHT) {
+        hiba("beallitmereteket Cy2 >= SCREEN_HEIGHT!");
     }
 #endif
 
@@ -69,12 +69,12 @@ void beallitmereteket(int splitscreen) {
     Hatary2 = Cysize - 3.0;
 
     // Motoros kepernyo mely reszen helyezkedik el:
-    Mo_bal = (640 / Arany) * 0.15;
+    Mo_bal = (SCREEN_WIDTH / Arany) * 0.15;
     Mo_dx = Cxsize / Arany - 2.0 * Mo_bal;
     Mo_y = Cysize / Arany / 2.0;
 
-    Viewxsize = 140 * sqrt(double(Cysize) / 480.0); // 200
-    Viewysize = 70 * sqrt(double(Cysize) / 480.0);  // 80
+    Viewxsize = 140 * sqrt(double(Cysize) / double(SCREEN_HEIGHT)); // 200
+    Viewysize = 70 * sqrt(double(Cysize) / double(SCREEN_HEIGHT));  // 80
     Viewxorig = 40 * (Kepmeret - 0.6) / 0.4;
     Viewxtolas = Cxsize - 2 * Viewxorig - Viewxsize;
 }
@@ -303,9 +303,9 @@ static void menteshakell(pic8* ppic) {
 
 static void kitolthatteret(pic8* ppic) {
     int y = 0;
-    while (y < 480) {
+    while (y < SCREEN_HEIGHT) {
         int x = 0;
-        while (x < 640) {
+        while (x < SCREEN_WIDTH) {
             // hiba( "Itt van 14!" ); idejott
             // hiba( tmp ); (16) kiirja koordokat szepen
 
@@ -589,8 +589,8 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     Pecsetalso->getbalalso_int(sarok, &balalsox, &balalsoy);
     int objminx = balalsox - 2 * OBJEKTUMSUGAR_I - 2;
     int objminy = balalsoy - 2 * OBJEKTUMSUGAR_I - 2;
-    int objmaxx = balalsox + 640;
-    int objmaxy = balalsoy + 480;
+    int objmaxx = balalsox + SCREEN_WIDTH;
+    int objmaxy = balalsoy + SCREEN_HEIGHT;
     for (int i = 0; i < MAXKEREK; i++) {
         kerek* pker = Ptop->kerektomb[i];
         if (!pker) {
@@ -742,7 +742,7 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
     Locky0_alul = 0;
 
     if (!Bpic) {
-        Bpic = new pic8(10, 480);
+        Bpic = new pic8(10, SCREEN_HEIGHT);
     }
 
     // hiba( "Itt van 11!" ); idejott

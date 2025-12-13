@@ -437,7 +437,7 @@ int szoveglista::kirajzolanim(double ido) {
         sisakframe = Psisak->getframebyindex(25);
     }
 
-    blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7 - 479 + frame);
+    blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7 - (SCREEN_HEIGHT - 1) + frame);
 
     blt8(Tmpbuffer, Pintro, 0, frame);
     // blt8( Tmpbuffer, Pintro, framex, 0, 0, 0, 639, 206 );

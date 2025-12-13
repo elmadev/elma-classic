@@ -158,7 +158,7 @@ void kidigit(const char* time1, double fogoido, double time2d, pic8* ppic8, int 
 
     int xtav = 28 * kepmeretx;
     int x = xtav;
-    int y = 420 * kepmerety;
+    int y = (SCREEN_HEIGHT - 60) * kepmerety;
 
     Vonalvizhossz = 10 * kepmerety, Vonalfugghossz = 16 * kepmerety;
 

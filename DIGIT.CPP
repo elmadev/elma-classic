@@ -150,15 +150,15 @@ void kidigit(const char* time1, double fogoido, double time2d, pic8* ppic8, int 
     Ppic8 = ppic8;
     Lookup = Plgr->idonegtomb;
 
-    double kepmeretx = kepxsize / double(SCREEN_WIDTH);
-    double kepmerety = kepysize / double(SCREEN_HEIGHT);
+    double kepmeretx = kepxsize / 640.0;
+    double kepmerety = kepysize / 480.0;
 
     // unsigned char szin1 = Plgr->idoszin1;
     // unsigned char szin2 = Plgr->idoszin2;
 
     int xtav = 28 * kepmeretx;
     int x = xtav;
-    int y = (SCREEN_HEIGHT - 60) * kepmerety;
+    int y = 420 * kepmerety;
 
     Vonalvizhossz = 10 * kepmerety, Vonalfugghossz = 16 * kepmerety;
 

@@ -2,6 +2,7 @@ project('elma', 'cpp', version: '1.4', default_options: ['cpp_std=c++20'])
 
 if get_option('buildtype') == 'debug'
     add_project_arguments('-DDEBUG', language: 'cpp')
+    add_project_arguments('/fsanitize=address', language: 'cpp')
 endif
 
 elma_sources = files(

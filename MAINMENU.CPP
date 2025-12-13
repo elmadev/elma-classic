@@ -82,21 +82,18 @@ int abcbenelobb(const char* text1, const char* text2) {
 
 static int Megnemrand = 1;
 
-int veletlen(void) {
+static unsigned int veletlen(void) {
     // Veletlenszeru lejatszas:
     if (Megnemrand) {
         Megnemrand = 0;
         srand((unsigned)clock());
     }
 
-    int sum = 0;
-    for (int i = 0; i < 100; i++) {
-        sum += rand();
+    unsigned int result = 0;
+    for (int i = 0; i < 4; i++) {
+        result = (result << 8) | (rand() & 0xFF);
     }
-    while (sum < 0) {
-        sum *= 3;
-    }
-    return sum;
+    return result;
 }
 
 void replay(void) {
@@ -187,7 +184,7 @@ void replay(void) {
             while (1) {
                 int pl = veletlen() % (szamuk - 1);
                 while ((pl == elozopl && szamuk > 2) || (pl == elozoelottipl && szamuk > 3)) {
-                    pl = rand() % (szamuk - 1);
+                    pl = veletlen() % (szamuk - 1);
                 }
                 elozoelottipl = elozopl;
                 elozopl = pl;
@@ -280,7 +277,7 @@ static void demo(void) {
     while (1) {
         int demo = veletlen() % demoszam;
         while (demo == elozodemo) {
-            demo = rand() % demoszam;
+            demo = veletlen() % demoszam;
         }
         elozodemo = demo;
 

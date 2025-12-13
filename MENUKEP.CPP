@@ -26,8 +26,8 @@ void initmenukep1(void) {
     if (Buffsima) {
         hiba("initmenukep1-ben Buffsima!");
     }
-    Buffsima = new pic8(640, 480);
-    Buffgolyo = new pic8(640, 480);
+    Buffsima = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
+    Buffgolyo = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     Kisnevsima = new pic8("szoveg1.pcx");  // retusal( Kisnevsima );
     Kisnevgolyo = new pic8("szoveg2.pcx"); // retusal( Kisnevgolyo );
     Pmenuabc = new abc8("menu.abc");
@@ -107,9 +107,9 @@ static unsigned char* Hattersor = NULL;
 
 static void kirajzgolyo(vekt2 g, double r, pic8* forras) {
     if (!Zoldsor) {
-        Zoldsor = new unsigned char[640];
-        Hattersor = new unsigned char[640];
-        for (int i = 0; i < 640; i++) {
+        Zoldsor = new unsigned char[SCREEN_WIDTH];
+        Hattersor = new unsigned char[SCREEN_WIDTH];
+        for (int i = 0; i < SCREEN_WIDTH; i++) {
             Zoldsor[i] = 248;
             Hattersor[i] = Introhatter;
         }
@@ -125,7 +125,7 @@ static void kirajzgolyo(vekt2 g, double r, pic8* forras) {
     double yo = g.y;
     int y = yo - r;
     while (y < yo + r) {
-        if (y < 0 || y >= 480) {
+        if (y < 0 || y >= SCREEN_HEIGHT) {
             y++;
             continue;
         }
@@ -179,7 +179,7 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
                            pic8* rarakkep4) {
     // Kirakjuk hatteret:
     if (!Tmpbuffer) { // Ideiglenes
-        Tmpbuffer = new pic8(640, 480);
+        Tmpbuffer = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
     if (Kezdoanimjon && !Pintro) {
@@ -191,13 +191,13 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
         ervenyes = 1;
         int y = -47;
         int kezdox = 0;
-        while (y < 480) {
+        while (y < SCREEN_HEIGHT) {
             int x = kezdox;
             kezdox += 110;
             while (x > 0) {
                 x -= Kisnevsima->getxsize();
             }
-            while (x < 640) {
+            while (x < SCREEN_WIDTH) {
                 blt8(Buffsima, Kisnevsima, x, y);
                 blt8(Buffgolyo, Kisnevgolyo, x, y);
                 x += Kisnevsima->getxsize();
@@ -329,13 +329,13 @@ int szoveglista::kirajzolanim(double ido) {
         // Berajzoljuk hatterkepeket:
         int y = -47;
         int kezdox = 0;
-        while (y < 480) {
+        while (y < SCREEN_HEIGHT) {
             int x = kezdox;
             kezdox += 110;
             while (x > 0) {
                 x -= Kisnevsima->getxsize();
             }
-            while (x < 640) {
+            while (x < SCREEN_WIDTH) {
                 blt8(Buffsima, Kisnevsima, x, y);
                 blt8(Buffgolyo, Kisnevgolyo, x, y);
                 x += Kisnevsima->getxsize();
@@ -394,7 +394,7 @@ int szoveglista::kirajzolanim(double ido) {
 
     frame -= 480;*/
 
-    if (frame >= 480) {
+    if (frame >= SCREEN_HEIGHT) {
         Scrolly1 = 0;
         return 0;
     }
@@ -403,10 +403,10 @@ int szoveglista::kirajzolanim(double ido) {
     // blt8( Tmpbuffer, Buffsima );
 
     Tmpbuffer->fillbox(Introhatter);
-    blt8(Tmpbuffer, Buffsima, 0, 480 - frame);
+    blt8(Tmpbuffer, Buffsima, 0, SCREEN_HEIGHT - frame);
 
-    Scrolly1 = 480 - frame;
-    double yeltolas = frame - 480.0;
+    Scrolly1 = SCREEN_HEIGHT - frame;
+    double yeltolas = frame - double(SCREEN_HEIGHT);
     for (int i = 0; i < Ngolyok; i++) {
         if (!State->animatedmenus) {
             break;
@@ -426,7 +426,7 @@ int szoveglista::kirajzolanim(double ido) {
 
     // Rairjuk szovegeket:
     for (int i = 0; i < elemszam; i++) {
-        Pmenuabc->write(Tmpbuffer, sorok[i].x, sorok[i].y + frame - 480, sorok[i].text);
+        Pmenuabc->write(Tmpbuffer, sorok[i].x, sorok[i].y + frame - SCREEN_HEIGHT, sorok[i].text);
     }
 
     // Rarakjuk sisakot:
@@ -437,7 +437,7 @@ int szoveglista::kirajzolanim(double ido) {
         sisakframe = Psisak->getframebyindex(25);
     }
 
-    blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7 - 479 + frame);
+    blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7 - (SCREEN_HEIGHT - 1) + frame);
 
     blt8(Tmpbuffer, Pintro, 0, frame);
     // blt8( Tmpbuffer, Pintro, framex, 0, 0, 0, 639, 206 );
@@ -455,13 +455,13 @@ void grafikushiba(const char* text1, const char* text2, const char* text3) {
     // Kirajzoljuk hatteret Buffsima-ba:
     int y = 0;
     int paros = 0;
-    while (y < 480) {
+    while (y < SCREEN_HEIGHT) {
         int x = 0;
         if (paros) {
             x -= Kisnevsima->getxsize() / 2;
         }
         paros = !paros;
-        while (x < 640) {
+        while (x < SCREEN_WIDTH) {
             blt8(Buffsima, Kisnevsima, x, y);
             x += Kisnevsima->getxsize();
         }

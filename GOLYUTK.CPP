@@ -151,8 +151,8 @@ void ggutkozes(golyo* g1, golyo* g2, double t) {
     //	hiba( "elteresnergia > 0.0!" );
 }
 
-static int Balszel = 0, Jobbszel = 640;
-static int Alsoszel = 0, Felsoszel = 480;
+static int Balszel = 0, Jobbszel = SCREEN_WIDTH;
+static int Alsoszel = 0, Felsoszel = SCREEN_HEIGHT;
 
 double goutkozesideje(golyo* m, int old) {
     if (Nincsfal) {

@@ -391,7 +391,9 @@ void mainmenu(void) {
 
         if (eredmeny == 6) {
             Editorban_dialnak = 1;
+            hide_cursor();
             editor();
+            show_cursor();
             Editorban_dialnak = 0;
             Pmenupal->set();
         }

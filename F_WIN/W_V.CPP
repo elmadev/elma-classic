@@ -315,24 +315,3 @@ void uzenet(const char* text1, const char* text2, const char* text3) {
 }
 
 int s_random(int maximum) { return rand() % maximum; }
-
-// MOUSE:
-void getmou(int* px, int* py) {
-    POINT pt;
-    GetCursorPos(&pt);
-
-    *px = pt.x;
-    *py = pt.y;
-}
-
-void setmou(int x, int y) { SetCursorPos(x, y); }
-
-int getbutbmou(void) {
-    mv_check(/*"W_V getbutbmuo-ban"*/);
-    return Lmouselent;
-}
-
-int getbutjmou(void) {
-    mv_check(/*"W_V getbutjmuo-ban"*/);
-    return Rmouselent;
-}

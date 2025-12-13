@@ -12,13 +12,6 @@ void hiba(const char* text1, const char* text2, const char* text3) {
 
 int s_random(int maximum) { return 0; }
 
-void setmou(int x, int y) {}
-void getmou(int* x, int* y) {}
-
-int getbutbmou(void) { return 0; }
-
-int getbutjmou(void) { return 0; }
-
 int Billint = 0;
 
 void initdsound(int secondaryeloir) {}

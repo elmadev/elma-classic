@@ -10,6 +10,8 @@ void getmou(int* px, int* py);
 void setmou(int x, int y);
 int getbutbmou(void);
 int getbutjmou(void);
+void show_cursor();
+void hide_cursor();
 
 // 182*sec-et adja vissza idot tortresszel egyutt!
 // d_stoppe.cpp-ben vannak megvalositva:

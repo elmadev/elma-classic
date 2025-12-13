@@ -305,7 +305,7 @@ void ecset::foldmutatocsere(void) {
             hiba("ecset::foldmutatocsere xpos > 100!");
         }
         while (fut) {
-            if ((pixelek_t)fut->pixelek == PX_FOLD && fut->xsize < 640) {
+            if ((pixelek_t)fut->pixelek == PX_FOLD && fut->xsize < SCREEN_WIDTH) {
                 int x = xpos % Plgr->foldxmodulus;
                 int y = i % Plgr->pfold->getysize();
                 fut->pixelek = Plgr->pfold->getptr(y) + x;
@@ -1021,7 +1021,7 @@ void ecset::kiegykovetokep(koveto* pkov, int index, int xo, int yo, int fazis) {
         }
     }
 
-    if (xsize > 640 || ysize > 480) {
+    if (xsize > SCREEN_WIDTH || ysize > SCREEN_HEIGHT) {
 #ifdef TEST
         hiba("7yfg4");
 #endif

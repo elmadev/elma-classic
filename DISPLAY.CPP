@@ -5,8 +5,8 @@ int Vonalcsakeditbe = 0; // vonalrajzolashoz
 int Savx = 107;
 int Savy = 36;
 
-static int Fxsize = 640;
-static int Fysize = 480;
+static int Fxsize = SCREEN_WIDTH;
+static int Fysize = SCREEN_HEIGHT;
 
 // static double Maxxmeret = 150.0;
 static double Maxxmeret = 170.0;

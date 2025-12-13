@@ -317,9 +317,9 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
             pk4alfa[i] = pmot->kor4.rotation * Alfaszorzo;
         }
 
-        // Belerakunk egy veletlen szamot felso negy bitbe:
-        double tmpb = pmot->kor4.rotation + i * 5.752364;
-        memcpy(&pgazhatra[i], (&tmpb) + 4, 1);
+        // Encode gibberish into the 4 MSB of the flags
+        // Due to a bug, the gibberish is accidentally sourced from the y value of the bike
+        memcpy(&pgazhatra[i], &kor1r.y, 1);
         pgazhatra[i] = pgazhatra[i] & 0xf0;
 
         if (phinfo->gaz) {

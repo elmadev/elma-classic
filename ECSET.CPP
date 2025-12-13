@@ -305,7 +305,7 @@ void ecset::foldmutatocsere(void) {
             hiba("ecset::foldmutatocsere xpos > 100!");
         }
         while (fut) {
-            if ((pixelek_t)fut->pixelek == PX_FOLD && fut->xsize < 640) {
+            if ((pixelek_t)fut->pixelek == PX_FOLD && fut->xsize < SCREEN_WIDTH) {
                 int x = xpos % Plgr->foldxmodulus;
                 int y = i % Plgr->pfold->getysize();
                 fut->pixelek = Plgr->pfold->getptr(y) + x;

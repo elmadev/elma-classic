@@ -16,8 +16,8 @@ pic8* lockbackbuffer_pic() {
 
     if (!Lockbuff) {
         Lockbuff = new pic8(10, 10);
-        Lockbuff->xsize = 640;
-        Lockbuff->ysize = 480;
+        Lockbuff->xsize = SCREEN_WIDTH;
+        Lockbuff->ysize = SCREEN_HEIGHT;
         Lockbuff->sormuttomb = NULL;
     }
 
@@ -26,7 +26,7 @@ pic8* lockbackbuffer_pic() {
         return Lockbuff;
     } else {
         if (!Pmindigfpic) {
-            Pmindigfpic = new pic8(640, 480);
+            Pmindigfpic = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
         }
         return Pmindigfpic;
     }
@@ -54,8 +54,8 @@ void lockfrontbuffer_pic(void) {
 
     if (!Lockbuff) {
         Lockbuff = new pic8(10, 10);
-        Lockbuff->xsize = 640;
-        Lockbuff->ysize = 480;
+        Lockbuff->xsize = SCREEN_WIDTH;
+        Lockbuff->ysize = SCREEN_HEIGHT;
         Lockbuff->sormuttomb = NULL;
     }
 

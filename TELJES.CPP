@@ -87,7 +87,7 @@ void teljes(void) {
     blt8(Pintro, Pintro, 321 + 15, 420, 297, 420, 315, 441);
     blt8(Pintro, Pintro, 321 + 15 + 16, 432, 88, 458, 98, 468);
     spriteosit(Pintro);
-    pic8* tmpintro = new pic8(640, 480); // ezt majd kesobb szabaditjuk fel
+    pic8* tmpintro = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT); // ezt majd kesobb szabaditjuk fel
     tmpintro->fillbox(254);
     blt8(tmpintro, Pintro);
 

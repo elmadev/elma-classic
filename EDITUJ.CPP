@@ -128,7 +128,7 @@ static int Egerkint = 0;
 int Moux = 0, Mouy = 0, Kozelvan = 0;
 
 static void elintezegymousepixelt(int x, int y) {
-    if (x < 0 || y < 0 || x > 639 || y > 479) {
+    if (x < 0 || y < 0 || x > (SCREEN_WIDTH - 1) || y > (SCREEN_HEIGHT - 1)) {
         return;
     }
     unsigned char szin = Buffsima->gpixel(x, y);
@@ -205,7 +205,7 @@ void toolhelp(const char* text) {
         }
         strcpy(Toolhelpszoveg, text);
     }
-    int x1 = 1, y1 = 18, x2 = 638, y2 = Savy - 2;
+    int x1 = 1, y1 = 18, x2 = SCREEN_WIDTH - 2, y2 = Savy - 2;
     Buffsima->fillbox(x1, y1, x2, y2, Hatterindex);
     Pabc1->write(Buffsima, 10, y1 + 12, Toolhelpszoveg);
     bltfront(Buffsima, x1, y1, x2, y2);
@@ -253,15 +253,15 @@ static char Menuszovegek[23][15] = { // Masodik egy string hossza
 int Tool = T_MOVE;
 
 static void editbe_balmenu(void) {
-    Buffsima->fillbox(0, 0, 639, 479, Menuszin);
+    Buffsima->fillbox(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menuszin);
     // Eloszor is egy nagy keret:
-    Buffsima->line(0, 0, 639, 0, Menulineszin);
-    Buffsima->line(0, 479, 639, 479, Menulineszin);
-    Buffsima->line(0, 0, 0, 479, Menulineszin);
-    Buffsima->line(639, 0, 639, 479, Menulineszin);
+    Buffsima->line(0, 0, SCREEN_WIDTH - 1, 0, Menulineszin);
+    Buffsima->line(0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
+    Buffsima->line(0, 0, 0, SCREEN_HEIGHT - 1, Menulineszin);
+    Buffsima->line(SCREEN_WIDTH - 1, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
     // Meg ket belso vonal:
-    Buffsima->line(0, Savy - 1, 639, Savy - 1, Menulineszin);
-    Buffsima->line(Savx - 1, Savy, Savx - 1, 479, Menulineszin);
+    Buffsima->line(0, Savy - 1, SCREEN_WIDTH - 1, Savy - 1, Menulineszin);
+    Buffsima->line(Savx - 1, Savy, Savx - 1, SCREEN_HEIGHT - 1, Menulineszin);
     for (int i = 0; i < Menuszam; i++) {
         // x1... stb a belso reszt jelenti:
         int x1 = 1;
@@ -424,8 +424,8 @@ static void ujrarajzol(int egesz) {
         editbe_balmenu();
     }
 
-    Buffsima->fillbox(Savx, Savy, 638, 478, Hatterindex);
-    Buffsima->fillbox(1, 1, 638, Savy - 2, Hatterindex);
+    Buffsima->fillbox(Savx, Savy, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2, Hatterindex);
+    Buffsima->fillbox(1, 1, SCREEN_WIDTH - 2, Savy - 2, Hatterindex);
     // Kiirjuk file nevet:
     Pabc1->write(Buffsima, 6, 15, "File:");
     strupr(State->editfilenev);

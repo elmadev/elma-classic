@@ -1018,7 +1018,7 @@ void pic8::keszitbelsot(int x1, int y1, int x2, int y2, pic8* ppic) {
     xsize = x2 - x1 + 1;
     ysize = y2 - y1 + 1;
 #ifdef TEST
-    if (x1 < 0 || x2 >= 640 || y1 < 0 || y2 >= 480) {
+    if (x1 < 0 || x2 >= SCREEN_WIDTH || y1 < 0 || y2 >= SCREEN_HEIGHT) {
         hiba("pic8::keszitbelsot!");
     }
 #endif

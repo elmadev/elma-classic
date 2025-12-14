@@ -182,20 +182,6 @@ void startwave(int wavazonosito, double hangero) {
     hiba("Wavszam szerint meg van csat, de nincs!");
 }
 
-int vanmegwav(void) {
-    mv_check();
-    extern int Mostvoltegynemcurpos;
-    if (Mute || !State->sound_on || Mostvoltegynemcurpos) {
-        // Mostvoltegynemcurpos = 0;
-        return 0;
-    }
-    if (Hangenabled && Wavszam > 0) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
 // hangero meg van szorozva 65536-tal:
 static void wavadd(short* buff, short* tomb, long size, unsigned long hangero) {
     for (unsigned long i = 0; i < size; i++) {

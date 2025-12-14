@@ -1,15 +1,18 @@
 #ifndef PHYSICS_INIT_H
 #define PHYSICS_INIT_H
 
-extern double GroundEscapeVelocity, WheelDeformationLength, Gravity;
+extern double GroundEscapeVelocity;
+extern double WheelDeformationLength;
+
+extern double Gravity;
+
 extern double TwoPointDiscriminationDistance;
 
 extern double VoltDelay;
 extern double LevelEndDelay;
 
-extern double SpringTensionCoefficient, SpringResistanceCoefficient;
-
-void init_physics_data(void);
+extern double SpringTensionCoefficient;
+extern double SpringResistanceCoefficient;
 
 extern double HeadRadius;
 
@@ -36,28 +39,38 @@ struct rigidbody {
 };
 
 struct motorst {
-    rigidbody bike, left_wheel, right_wheel;
+    rigidbody bike;
+    rigidbody left_wheel;
+    rigidbody right_wheel;
     vekt2 head_r;
     int flipped_bike;
     int flipped_camera;
     int gravity_direction; // (0:UP 1:DOWN 2:LEFT 3:RIGHT)
 
-    vekt2 body_r, body_v;
+    vekt2 body_r;
+    vekt2 body_v;
 
     int apple_count;
 
     int prev_brake;
-    double left_wheel_brake_rotation, right_wheel_brake_rotation;
+    double left_wheel_brake_rotation;
+    double right_wheel_brake_rotation;
 
-    int volting_right, volting_left;
-    double right_volt_time, left_volt_time;
-    double angular_velocity_pre_right_volt, angular_velocity_pre_left_volt;
+    int volting_right;
+    int volting_left;
+    double right_volt_time;
+    double left_volt_time;
+    double angular_velocity_pre_right_volt;
+    double angular_velocity_pre_left_volt;
 };
 
 extern motorst *Motor1, *Motor2;
 
+void init_physics_data();
+void init_motor(motorst* motor);
+
 class recorder;
 void encode_frame_count(recorder* rec);
-int frame_count_integrity(recorder* rec);
+bool frame_count_integrity(recorder* rec);
 
 #endif

@@ -133,7 +133,6 @@ static void belsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
         prec->store(pmot, eddig, &pvalt->inf);
         if (!Single && Tag) {
             // Flag Tag modban nem allnak meg, hanem visszamennek starthelyre:
-            void init_motor(motorst * motor); // physics_init.cpp-ben
             init_motor(pmot);
             // Kezdetihelydiff-et setallaktiv allitja be:
             pmot->bike.r = pmot->bike.r + Kezdetihelydiff;

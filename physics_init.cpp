@@ -1,11 +1,15 @@
 #include "ALL.H"
 
-motorst Motorst1, Motorst2;
-motorst *Motor1 = &Motorst1, *Motor2 = &Motorst2;
+static motorst Motorst1;
+static motorst Motorst2;
+motorst* Motor1 = &Motorst1;
+motorst* Motor2 = &Motorst2;
 
 // Perpendicular velocity required to detach wheel from ground.
+double GroundEscapeVelocity;
 // Amount by which the wheel is sunk into the ground
-double GroundEscapeVelocity, WheelDeformationLength, Gravity;
+double WheelDeformationLength;
+double Gravity;
 
 // Minimum distance between two vertices to be considered separate points
 double TwoPointDiscriminationDistance;
@@ -13,7 +17,8 @@ double TwoPointDiscriminationDistance;
 double VoltDelay;
 double LevelEndDelay;
 
-double SpringTensionCoefficient, SpringResistanceCoefficient;
+double SpringTensionCoefficient;
+double SpringResistanceCoefficient;
 
 double HeadRadius;
 
@@ -23,9 +28,14 @@ double ObjectRadius = 0.4;
 // the ground
 double WheelBackgroundRenderRadius = 0.395;
 
-double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY, BodyDY;
+double LeftWheelDX;
+double LeftWheelDY;
+double RightWheelDX;
+double RightWheelDY;
+double BodyDY;
 
-double MetersToPixels, PixelsToMeters;
+double MetersToPixels;
+double PixelsToMeters;
 
 int MinimapScaleFactor = 10;
 
@@ -77,7 +87,7 @@ void init_physics_data(void) {
     MetersToPixels = 100.0 * zoom_factor;
     PixelsToMeters = 1.0 / MetersToPixels;
 
-    MinimapScaleFactor = 0.42 * MetersToPixels * 0.5;
+    MinimapScaleFactor = (int)(0.42 * MetersToPixels * 0.5);
 
     GroundEscapeVelocity = 0.01;          // m/s
     WheelDeformationLength = 0.005;       // m
@@ -119,20 +129,16 @@ void encode_frame_count(recorder* rec) {
 }
 
 // Check that the framecount matches with the MSB of the flags
-int frame_count_integrity(recorder* rec) {
+bool frame_count_integrity(recorder* rec) {
     if (rec->betoltve < 80) {
-        return 1;
+        return true;
     }
     unsigned int frame_count = 0;
     for (int i = 0; i < 32; i++) {
-        frame_count *= 2;
+        frame_count <<= 1;
         if (rec->pgazhatra[40 + 31 - i] & 128) {
             frame_count += 1;
         }
     }
-    if (frame_count == rec->betoltve) {
-        return 1;
-    } else {
-        return 0;
-    }
+    return frame_count == rec->betoltve;
 }

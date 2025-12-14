@@ -23,8 +23,8 @@ class recorder {
     friend long loadrecek(const char* nev, int demo);
     friend void saverecek(const char* nev, long belyeg, int tag);
     // pgazhatra-ba beepitik es ellenorzik betoltvet:
-    friend void encode_frame_count(recorder* prec);
-    friend int frame_count_integrity(recorder* prec);
+    friend void encode_frame_count(recorder* rec);
+    friend bool frame_count_integrity(recorder* rec);
     friend void replay(void); // Hogy betolthoz hozzaferjen
 
     float *pk1rx, *pk1ry;

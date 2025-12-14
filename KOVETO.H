@@ -1,4 +1,5 @@
-
+#ifndef KOVETO_H
+#define KOVETO_H
 
 #define MAXKOVETOKEPSZAM (100)
 
@@ -21,3 +22,5 @@ int makevonal(gyuru* pgy, int* ytomb, int* phossz, int* px0, int maxhely, vekt2*
 void makekoveto(void);
 
 void tesztkoveto(void);
+
+#endif

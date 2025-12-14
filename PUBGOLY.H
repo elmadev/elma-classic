@@ -1,3 +1,5 @@
+#ifndef PUBGOLY_H
+#define PUBGOLY_H
 
 typedef struct {
     vekt2 r,
@@ -18,3 +20,5 @@ void leptetgolyo(double stept);
 // Ezt init tolti ki, innen lehet kiolvasni hol vannak golyok:
 extern int Ngolyok;
 extern golyo* Golyok;
+
+#endif

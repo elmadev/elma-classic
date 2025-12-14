@@ -1,4 +1,5 @@
-
+#ifndef EDITTOLT_H
+#define EDITTOLT_H
 
 void tolt_open(void);
 // Ha sikeresen mentettek, akkor igazak:
@@ -26,3 +27,5 @@ extern int Rajzolkoveto;
 extern int Rajzolkepek;
 
 void setviewoptions(void);
+
+#endif

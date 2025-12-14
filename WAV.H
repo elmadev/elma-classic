@@ -1,3 +1,5 @@
+#ifndef WAV_H
+#define WAV_H
 
 // enum { W_MONO = 1, W_LEFT, W_RIGHT };
 
@@ -29,3 +31,5 @@ class wav2 {
     // dt 65536 szoros:
     short getnextsample(long dt);
 };
+
+#endif

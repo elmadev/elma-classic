@@ -1,3 +1,5 @@
+#ifndef EDITTOOL_H
+#define EDITTOOL_H
 
 void alaphelp(void); // O figyeli ki a tool
 
@@ -34,3 +36,5 @@ extern int Zoomfogva; // Ha ez igaz, akkor nem szabad gombokat nyomkodni
 void t_zoomin_nyomva(int x, int y);
 void t_zoomin_esc(void);
 void t_zoomin_mmove(int x, int y);
+
+#endif

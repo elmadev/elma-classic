@@ -1,3 +1,5 @@
+#ifndef DIGIT_H
+#define DIGIT_H
 
 // extern int Digitxsize, Digitysize;
 
@@ -5,3 +7,5 @@ void kidigit(const char* time1, double fogoido, double time2d, pic8* ppic, int k
              int ykepysize);
 
 extern const double Idod2lszorzo;
+
+#endif

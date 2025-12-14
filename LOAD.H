@@ -1,3 +1,5 @@
+#ifndef LOAD_H
+#define LOAD_H
 
 extern int Volttopsave;
 
@@ -19,3 +21,5 @@ int floadlevel_e(const char* nev, int forceload = 0);
 void invalidate_ptop(void);
 
 void dialogselejtez(void);
+
+#endif

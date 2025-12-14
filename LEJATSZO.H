@@ -1,3 +1,5 @@
+#ifndef LEJATSZO_H
+#define LEJATSZO_H
 
 // Jatek modja ket fele lehet:
 extern int Single;
@@ -45,3 +47,5 @@ extern int MeghalteloszorAB;
 
 // Ha sikeres szint, ide teszi be hogy ki ment ki:
 extern int Aerintetteviragot;
+
+#endif

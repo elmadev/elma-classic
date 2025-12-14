@@ -1,3 +1,5 @@
+#ifndef MENUKEP_H
+#define MENUKEP_H
 
 // Ezt mv_main elott meghivja es grafikus hibakiirashoz
 // kell beolvasni peldaul abc-t es hatteret (teljes.cpp-ben):
@@ -42,3 +44,5 @@ class szoveglista {
 
 // Teljes olvassa be es elso kiirloading szabaditja fel:
 extern pic8* Pintro;
+
+#endif

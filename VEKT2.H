@@ -1,3 +1,5 @@
+#ifndef VEKT2_H
+#define VEKT2_H
 
 // #define TEST eseten plusz teszteket vegez!
 
@@ -56,3 +58,5 @@ extern vekt2 Vekt2i, Vekt2j, Vekt2k, Vekt2null;
 // Ezt meg kell irni hozza:
 // Uzenetet kuld peldaul 0-val valo osztas eseten (inverz matrix).
 // void hiba( char* message, char* text2 = NULL );
+
+#endif

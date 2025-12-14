@@ -1,3 +1,5 @@
+#ifndef SZAKASZ_H
+#define SZAKASZ_H
 
 struct vonal;
 
@@ -62,3 +64,5 @@ struct vonal {
 };
 
 extern szakaszok* Pszak;
+
+#endif

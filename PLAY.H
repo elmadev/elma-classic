@@ -1,3 +1,5 @@
+#ifndef PLAY_H
+#define PLAY_H
 
 void play(void);
 
@@ -22,3 +24,5 @@ void idoelintezes(long ido, char* valasz, int level, const char* filenev);
 int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* filenev);
 
 void kiirloading(void);
+
+#endif

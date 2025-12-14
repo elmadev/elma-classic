@@ -1,4 +1,5 @@
-// m_k.h
+#ifndef M_K_H
+#define M_K_H
 
 const static int MaxKeycode = 256;
 
@@ -19,3 +20,5 @@ int mk_getstate(int kod);
 #define MK_PGDOWN (406)
 #define MK_DEL (407)
 #define MK_BACKSPACE (408)
+
+#endif

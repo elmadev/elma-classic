@@ -1,3 +1,5 @@
+#ifndef ECSET_H
+#define ECSET_H
 
 class ecset;
 struct mdarab;
@@ -123,3 +125,5 @@ int teliszam(int x, int xsize, unsigned char* sor, unsigned char lyuk);
 
 // betoltecseteket ide osszegzi osszes lefoglalt szakaszt:
 extern int Osszegszam;
+
+#endif

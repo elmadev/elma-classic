@@ -1,3 +1,5 @@
+#ifndef ABC8_H
+#define ABC8_H
 
 typedef pic8* ptrpic8;
 
@@ -15,3 +17,5 @@ class abc8 {
     int len(const char* text);
     void set_spacing(int new_spacing);
 };
+
+#endif

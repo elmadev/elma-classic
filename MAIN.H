@@ -1,3 +1,6 @@
+#ifndef MAIN_H
+#define MAIN_H
+
 extern int Billint; // Billentyuzet interraptos!
 
 extern int Sajatugras; // Ha 1, akkor left->pozitiv forgas
@@ -7,3 +10,5 @@ extern int Waitforretrace; // Csak Windows-os w_v.cpp-ben allitodik
 
 void inkremental(void);
 extern long Inkremens;
+
+#endif

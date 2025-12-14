@@ -1,3 +1,6 @@
+#ifndef KOZOS_H
+#define KOZOS_H
+
 #ifndef _WIN32
 #include <sys/time.h>
 #endif
@@ -37,4 +40,6 @@ static inline long long timeGetTime() {
     gettimeofday(&tv, NULL);
     return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
+#endif
+
 #endif

@@ -1,3 +1,6 @@
+#ifndef EDITUJ_H
+#define EDITUJ_H
+
 // Uj integralt editor h-ja:
 
 extern topol* Ptop;
@@ -56,3 +59,5 @@ void toolhelp(const char* text = NULL);
 
 void kispritenev(const char* kepnev, const char* texturanev, const char* maszknev, int tav,
                  int hatarol);
+
+#endif

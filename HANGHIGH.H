@@ -1,3 +1,5 @@
+#ifndef HANGHIGH_H
+#define HANGHIGH_H
 
 enum {
     WAV_UTODES = 1,
@@ -35,3 +37,5 @@ void startwave(int wavazonosito, double hangero);
 int vanmegwav(void);
 
 void hangosdelay(long t);
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef RECORDER_H
+#define RECORDER_H
 
 struct hanginfo {
     double frekvencia;
@@ -79,3 +81,5 @@ void startwavegyujto(int wavazonosito, double hangero, int objszam);
 void resetwavegyujto(void);
 // Igaz, ha van bent wav:
 int getwavegyujto(int* pwavazonosito, double* phangero, int* pobjszam);
+
+#endif

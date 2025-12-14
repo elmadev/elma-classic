@@ -1,3 +1,5 @@
+#ifndef PIC8_H
+#define PIC8_H
 
 // Ezt nyugodtan ki lehet venni, ha nem jonnek hibauzenetek:
 #define PIC8TEST
@@ -81,3 +83,5 @@ int pcxtopal(const char* nev, ddpal** ppddpal);
 
 void mintavetel8(pic8* pdest, pic8* psour, int x1, int y1, int x2, int y2);
 void mintavetel8(pic8* pdest, pic8* psour);
+
+#endif

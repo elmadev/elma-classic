@@ -1,3 +1,5 @@
+#ifndef VALASZT2_H
+#define VALASZT2_H
 
 extern const int LISTegykepen;
 extern const int LISTx0;
@@ -48,3 +50,5 @@ class valaszt2 {
 // Ctrl+Alt+Enter eseten (elotte RECidokellis-t nullazni kell):
 extern int RECidokellhet;
 extern int RECidokellis;
+
+#endif

@@ -1,4 +1,5 @@
-// m_v.h
+#ifndef M_V_H
+#define M_V_H
 
 void mv_main(void); // Ennek nem szabad visszajonnie!
 // Ezt neha meg kell hivni!:
@@ -24,3 +25,5 @@ void hiba(const char* text1, const char* text2 = NULL, const char* text3 = NULL)
 void uzenet(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
 
 int s_random(int); // Ugyanaz mint random, de az nincs WATCOM-ban
+
+#endif

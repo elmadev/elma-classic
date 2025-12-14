@@ -1,3 +1,5 @@
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
 // int koordinatak mindig kepernyo bal-felso sarkahoz vannak viszonyitva,
 // tehat le kell takarni Sav-okat.
@@ -27,3 +29,5 @@ void vonalrajz(vekt2 p1, vekt2 p2, int szaggatott);
 
 extern int Savx;
 extern int Savy;
+
+#endif

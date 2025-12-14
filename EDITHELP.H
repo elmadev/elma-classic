@@ -1,3 +1,5 @@
+#ifndef EDITHELP_H
+#define EDITHELP_H
 
 void edithelp(void);
 
@@ -23,3 +25,5 @@ void menuhelp_create_killer(void);
 void menuhelp_delete_object(void);
 void menuhelp_create_sprite(void);
 void menuhelp_delete_sprite(void);
+
+#endif

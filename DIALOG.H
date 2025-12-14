@@ -1,3 +1,5 @@
+#ifndef DIALOG_H
+#define DIALOG_H
 
 // Ez igaz, ha editorban van vezerles:
 extern int Editorban_dialnak;
@@ -25,3 +27,5 @@ int boxban(int x, int y, box boxa);
 void kirajzbox(pic8* ppic, int x1, int y1, int x2, int y2, unsigned char felulet,
                unsigned char szele);
 void kirajzbox(pic8* ppic, box boxa, unsigned char felulet, unsigned char szele);
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef KISKEP_H
+#define KISKEP_H
 
 // Egy szegmensben tarolja kepeket, maximalis meretei 256-nal kissebbek, es
 // sorok pont 256 byte-onkent kovetkeznek!
@@ -12,3 +14,5 @@ class kiskep {
     kiskep(const char* pic8nev, pic8* ppic = NULL);
     ~kiskep(void);
 };
+
+#endif

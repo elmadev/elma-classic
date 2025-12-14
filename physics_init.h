@@ -1,4 +1,5 @@
-
+#ifndef PHYSICS_INIT_H
+#define PHYSICS_INIT_H
 
 extern double GroundEscapeVelocity, WheelDeformationLength, Gravity;
 extern double TwoPointDiscriminationDistance;
@@ -58,3 +59,5 @@ extern motorst *Motor1, *Motor2;
 class recorder;
 void encode_frame_count(recorder* rec);
 int frame_count_integrity(recorder* rec);
+
+#endif

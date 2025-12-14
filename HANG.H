@@ -1,3 +1,5 @@
+#ifndef HANG_H
+#define HANG_H
 
 // 0-nem kell hang, 1 8bit mono, 2 16bit mono:
 int starthang(unsigned buffsize);
@@ -15,3 +17,5 @@ void setvolume(double hangero);
 
 // Ezt meg kell irni hozza:
 void callbackhang(short* sbuff, unsigned char* cbuff);
+
+#endif

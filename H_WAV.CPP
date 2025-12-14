@@ -28,19 +28,19 @@ static void nevwavtest(const char* nev) {
 
 struct wavheader {
     char riff[4];
-    long hossz1;
+    int hossz1;
     char wave[4];
     // format:
     char fmt[4];
-    long miez1;
+    int miez1;
     short mod;     // 1 -> 8bit uncompressed
     short channel; // 1 -> mono, 2 -> stereo
     unsigned short frekvencia;
     short miez2, miez3, miez4;
-    long nemkene;
+    int nemkene;
     // audio data:
     char data[4];
-    long hossz;
+    int hossz;
 };
 
 wav::wav(const char* nev, double maxamplitudo, int start, int ucsoutani) {

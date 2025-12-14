@@ -535,7 +535,7 @@ void CustomMixer(void* buffer1, int byteszam1, void* buffer2, int byteszam2, int
     }
 }
 
-void hangosdelay(long t) {
+void hangosdelay(int t) {
     // 182*sec-et adja vissza idot tortresszel egyutt!
     double kezdo = mv_stopperido();
     while (mv_stopperido() / 182.0 < kezdo / 182.0 + t / 1000.0) {

@@ -36,6 +36,6 @@ void setsurlodas(double ero);
 void startwave(int wavazonosito, double hangero);
 int vanmegwav(void);
 
-void hangosdelay(long t);
+void hangosdelay(int t);
 
 #endif

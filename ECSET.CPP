@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 typedef uintptr_t pixelek_t;
 

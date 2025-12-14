@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 // Tudom hogy hiba Belsosav-ot adatok.cpp-ben 0.02-re venni, amikor peldaul
 // 0.005 is jo lenne. Hiba tovabba biztostalppont regi verziojat hasznalni

@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 static int Maxnevhossz = 8; // Ez kisebb kell hogy legyen JATEKOSNEVHOSSZ-nal!
 

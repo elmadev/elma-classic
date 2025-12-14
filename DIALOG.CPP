@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 // Ez igaz, ha editorban van vezerles:
 int Editorban_dialnak = 0;

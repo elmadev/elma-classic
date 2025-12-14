@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 void wav::lefoglal(void) {
     if (size > 1000000) {

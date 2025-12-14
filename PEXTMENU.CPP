@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 /*static egyszovsor Idoszovegek[4];
 

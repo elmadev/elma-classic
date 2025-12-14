@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 int Aafogo = 0, Kozelvannak = 0;
 int Aleszfogo = 1; // Legkozelebbi jateknal

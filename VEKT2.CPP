@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 vekt2 Vekt2i(1.0, 0.0), Vekt2j(0.0, 1.0), Vekt2null(0.0, 0.0);
 

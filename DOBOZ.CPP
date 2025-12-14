@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 // Affinitassal kapcsolatos dolgok:
 int Affinitas = 0;

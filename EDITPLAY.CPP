@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 void editplay(void) {
     invalidateegesz();

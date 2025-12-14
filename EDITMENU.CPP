@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 // igaz, ha kilep
 int menu_exit(void) {

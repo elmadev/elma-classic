@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 // Jatek modja ket fele lehet:
 int Single = 1;

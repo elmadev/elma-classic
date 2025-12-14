@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 #include "directinput_scancodes.h"
 
 int Palyaszam = 55; // Vizittel egyutt

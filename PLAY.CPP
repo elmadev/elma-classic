@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 /*static void betuki( int oszlop, char c ) {
     int x = 50+oszlop*19;

@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 // H_, H_HIGH, H_WAV, H_TULMIN
 

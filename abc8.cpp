@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 #ifdef DEBUG
 static bool ErrorOnMissingCodepoint = true;

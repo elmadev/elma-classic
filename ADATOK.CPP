@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 motorst Motorst1, Motorst2; // Ez nem hasznalando
 motorst *Pmot1 = &Motorst1, *Pmot2 = &Motorst2;

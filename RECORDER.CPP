@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 recorder *Prec1 = NULL, *Prec2 = NULL;
 int Multirec = 0; // Ha multiplayer, akkor ez igaz

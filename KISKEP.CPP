@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 kiskep::kiskep(const char* pic8nev, pic8* ppic) {
     tomb = NULL;

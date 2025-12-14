@@ -435,7 +435,7 @@ void callbackhang(short* sbuff, int buffsize) {
     }
 
     memset(sbuff, 0, buffsize * 2);
-    if (Mute) {
+    if (Mute || !State->sound_on) {
         // Nem kell hang:
         if (Wavszam > 0) {
             Wavszam = 0;

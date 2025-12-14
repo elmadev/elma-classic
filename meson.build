@@ -32,6 +32,7 @@ elma_sources = files(
     'GOLYOK.CPP',
     'GOLYUTK.CPP',
     'GYURU.CPP',
+    'H_WAV.CPP',
     'JATEKOS.CPP',
     'KIRAJ320.CPP',
     'KISKEP.CPP',
@@ -62,6 +63,7 @@ elma_sources = files(
     'UTKOZES2.CPP',
     'VALASZT2.CPP',
     'VEKT2.CPP',
+    'hhigh.cpp',
     'input.cpp',
 )
 
@@ -76,16 +78,12 @@ if cpp.get_id() == 'msvc'
         win_subsystem = 'windows'
         needs_stub = false
         elma_sources += files(
-            'F_WIN/W_HHIGH.CPP',
-            'F_WIN/W_SOUND2.CPP',
             'F_WIN/W_V.CPP',
-            'H_WAV.CPP',
             'dxinc/getdxver.CPP',
         )
         link_args += [
             '/ENTRY:mainCRTStartup',
             'winmm.lib',
-            meson.project_source_root() + '/dxinc/dsound.lib',
         ]
     endif
 else
@@ -93,7 +91,7 @@ else
 endif
 
 if needs_stub
-    elma_sources += files('H_DUMMY.CPP', 'stub.cpp')
+    elma_sources += files('stub.cpp')
 endif
 
 sdl2_dep = dependency('sdl2',

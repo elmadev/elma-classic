@@ -16,6 +16,6 @@ void nullazhangot(void);
 void setvolume(double hangero);
 
 // Ezt meg kell irni hozza:
-void callbackhang(short* sbuff, unsigned char* cbuff);
+void callbackhang(short* sbuff, int buffsize);
 
 #endif

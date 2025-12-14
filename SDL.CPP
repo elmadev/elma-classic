@@ -173,3 +173,46 @@ int getbutjmou(void) {
     mv_check();
     return RightMouseDown;
 }
+
+static SDL_AudioDeviceID SDLAudioDevice;
+static bool SoundInitialized = false;
+
+static void audio_callback(void* udata, Uint8* stream, int len) {
+    callbackhang((short*)stream, len / 2);
+}
+
+void initdsound(int unused) {
+    if (SoundInitialized) {
+        hiba("78egry78yt7");
+    }
+    SoundInitialized = true;
+    if (!Hangenabled) {
+        hiba("7868t68t");
+    }
+    Hangenabled = 0;
+
+    SDL_AudioSpec desired_spec;
+    memset(&desired_spec, 0, sizeof(desired_spec));
+    desired_spec.callback = audio_callback;
+    desired_spec.freq = 11025;
+    desired_spec.channels = 1;
+    desired_spec.samples = 512;
+    desired_spec.format = AUDIO_S16LSB;
+
+    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
+        hiba("Failed to initialize audio subsystem", SDL_GetError());
+    }
+    SDL_AudioSpec obtained_spec;
+    SDLAudioDevice = SDL_OpenAudioDevice(NULL, 0, &desired_spec, &obtained_spec, 0);
+    if (SDLAudioDevice == 0) {
+        hiba("Failed to open audio device", SDL_GetError());
+    }
+    if (obtained_spec.format != desired_spec.format) {
+        hiba("Failed to get correct audio format");
+    }
+    SDL_PauseAudioDevice(SDLAudioDevice, 0);
+    Hangenabled = 1;
+}
+
+void hang() {}
+void nullazhangot() {}

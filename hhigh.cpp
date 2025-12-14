@@ -1,4 +1,4 @@
-#include "..\all.h"
+#include "ALL.H"
 
 int Hangenabled = 0;
 
@@ -472,65 +472,6 @@ void callbackhang(short* sbuff, int buffsize) {
             }
             wavadd(sbuff, &Pwavok[i]->tomb[Kovhang[i]], darab, Hangerok[i]);
             Kovhang[i] += darab;
-        }
-    }
-}
-
-// Ezt direct sound hivja:
-void CustomMixer(void* buffer1, int byteszam1, void* buffer2, int byteszam2, int bitmod16) {
-    if (Mute || !State->sound_on) {
-        int nullabyte = 0;
-        if (bitmod16) {
-            nullabyte = 0;
-        } else {
-            nullabyte = 128;
-        }
-
-        if (buffer1) {
-            memset(buffer1, nullabyte, byteszam1);
-        }
-        if (buffer2) {
-            memset(buffer2, nullabyte, byteszam2);
-        }
-        return;
-    }
-
-    if (bitmod16) {
-        // 16 bites hang buffer:
-        if (buffer2) {
-            // Most pont korulfordulasi hataran van buffernek:
-            // Ideiglenes bufferbe masoljuk:
-            callbackhang(Buffer16bit, (byteszam1 + byteszam2) / 2);
-            memcpy(buffer1, Buffer16bit, byteszam1);
-            memcpy(buffer2, &Buffer16bit[byteszam1 / 2], byteszam2);
-        } else {
-            // Most siman egy bufferbe dolgozik:
-            callbackhang((short*)buffer1, byteszam1 / 2);
-        }
-    } else {
-        // 8 bites  8 bites  8 bites  8 bites  8 bites:
-        if (buffer2) {
-            // Ket reszletbol tesszuk ossze:
-            int osszbyte = byteszam1 + byteszam2;
-            callbackhang(Buffer16bit, osszbyte);
-            // Most 8 bitesre konvertaljuk:
-            unsigned char* tmp8bit = (unsigned char*)Buffer16bit;
-            for (int i = 0; i < osszbyte; i++) {
-                tmp8bit[i] = (unsigned char)((Buffer16bit[i] >> 8) + 128);
-            }
-            // Most bemasoljuk vegleges bufferekbe:
-            memcpy(buffer1, tmp8bit, byteszam1);
-            memcpy(buffer2, &tmp8bit[byteszam1], byteszam2);
-        } else {
-            // Egy reszletbol all buffer:
-            callbackhang(Buffer16bit, byteszam1);
-            // Most 8 bitesre konvertaljuk:
-            unsigned char* tmp8bit = (unsigned char*)Buffer16bit;
-            for (int i = 0; i < byteszam1; i++) {
-                tmp8bit[i] = (unsigned char)((Buffer16bit[i] >> 8) + 128);
-            }
-            // Most bemasoljuk vegleges bufferekbe:
-            memcpy(buffer1, Buffer16bit, byteszam1);
         }
     }
 }

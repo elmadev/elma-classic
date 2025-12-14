@@ -2,7 +2,8 @@
 #define ANIM_H
 
 #define MAXANIMFRAME (1000)
-extern const int Animsize;
+
+constexpr int ANIM_WIDTH = 40;
 
 class anim {
   public:

@@ -111,13 +111,13 @@ void recorder::encode_frame_count() {
     if (betoltve < 80) {
         return;
     }
-    unsigned int frame_count = betoltve;
+    unsigned int encoded_value = betoltve;
     for (int i = 0; i < 32; i++) {
-        pgazhatra[40 + i] = pgazhatra[40 + i] & 127;
-        if (frame_count & 1) {
-            pgazhatra[40 + i] += 128;
+        pgazhatra[40 + i] = pgazhatra[40 + i] & 0x7F;
+        if (encoded_value & 1) {
+            pgazhatra[40 + i] += 0x80;
         }
-        frame_count = frame_count >> 1;
+        encoded_value = encoded_value >> 1;
     }
 }
 
@@ -126,14 +126,14 @@ bool recorder::frame_count_integrity() {
     if (betoltve < 80) {
         return true;
     }
-    unsigned int frame_count = 0;
+    unsigned int encoded_value = 0;
     for (int i = 0; i < 32; i++) {
-        frame_count *= 2;
-        if (pgazhatra[40 + 31 - i] & 128) {
-            frame_count += 1;
+        encoded_value <<= 1;
+        if (pgazhatra[40 + 31 - i] & 0x80) {
+            encoded_value += 1;
         }
     }
-    return frame_count == betoltve;
+    return encoded_value == betoltve;
 }
 
 static double Korrszorzo = 1000.0, Korrszorzo_rec = 1.0 / Korrszorzo;

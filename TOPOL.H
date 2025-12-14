@@ -1,3 +1,5 @@
+#ifndef TOPOL_H
+#define TOPOL_H
 
 #define MAXPONT (1000) // Ennyit csak akkor foglal le, ha kell
 
@@ -187,3 +189,5 @@ extern char Ezenlegjobbido[30];
 void beallitlegjobbidot(const char* filenev, int single);
 
 int nevanalizis(const char* nev);
+
+#endif

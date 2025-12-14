@@ -1,3 +1,5 @@
+#ifndef STATE_H
+#define STATE_H
 
 #define MAXJATEKOS (50)
 #define JATEKOSNEVHOSSZ (14)
@@ -79,3 +81,5 @@ class state_s {
 };
 
 extern state_s* State; // teljes.cpp-ben van inicializalva!
+
+#endif

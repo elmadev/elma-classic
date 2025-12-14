@@ -1,3 +1,5 @@
+#ifndef LEPTET_H
+#define LEPTET_H
 
 void resetleptet(motorst* pmot);
 void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1, int ugrik2);
@@ -9,3 +11,5 @@ void szamitfejr(motorst* pmot);
 int vizsgalat(motorst* pmot);
 
 double kiszamolsurlodast(void);
+
+#endif

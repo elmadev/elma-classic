@@ -1,3 +1,5 @@
+#ifndef ANIM_H
+#define ANIM_H
 
 #define MAXANIMFRAME (1000)
 extern const int Animsize;
@@ -16,3 +18,5 @@ class anim {
     // Menu sisakjanal egy kis piros vonalat odahuz fole:
     void korrigal(void);
 };
+
+#endif

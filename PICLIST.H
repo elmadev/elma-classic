@@ -1,3 +1,5 @@
+#ifndef PICLIST_H
+#define PICLIST_H
 
 #define MAXPICLISTKEPSZAM (3000)
 
@@ -26,3 +28,5 @@ class piclist {
 
     int getnevindex(const char* nev); // vagy -1
 };
+
+#endif

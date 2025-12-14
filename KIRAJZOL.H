@@ -1,3 +1,5 @@
+#ifndef KIRAJZOL_H
+#define KIRAJZOL_H
 
 extern int Voltkilogas; // Csak tesztelesre
 
@@ -18,3 +20,5 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
                  int viewki2, int timeki2);
 
 void forditkepet(pic8* ppic);
+
+#endif

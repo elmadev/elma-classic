@@ -1,3 +1,5 @@
+#ifndef LGRFILE_H
+#define LGRFILE_H
 
 enum { ME_URES, ME_TELI, ME_SOREMELES };
 
@@ -149,3 +151,5 @@ struct kisbox {
 };
 
 extern kisbox KisboxA, KisboxB, KisboxC, KisboxD;
+
+#endif

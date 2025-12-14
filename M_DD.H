@@ -1,4 +1,6 @@
-// m_dd.h
+#ifndef M_DD_H
+#define M_DD_H
+
 #include <SDL_pixels.h>
 
 class pic8;
@@ -21,3 +23,5 @@ void unlockbackbuffer(void); // Ki is teszi
 
 unsigned char** lockfrontbuffer(void);
 void unlockfrontbuffer(void);
+
+#endif

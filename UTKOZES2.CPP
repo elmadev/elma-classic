@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 int utkozikesprite(vekt2 r, double sugar) {
     int balalsox, balalsoy;

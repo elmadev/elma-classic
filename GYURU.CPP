@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 gyuru::gyuru(void) {
     pontszam = 0;

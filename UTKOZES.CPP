@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 static int gombszakasz(vekt2 r, double sugar, vonal* pv, vekt2* pt) {
     vekt2 rel = r - pv->r;

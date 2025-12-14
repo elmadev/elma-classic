@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
 

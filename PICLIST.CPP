@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 // Binaris formatumbol:
 piclist::piclist(FILE* h) {

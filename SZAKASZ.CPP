@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 static int Szakaszmaxszam = 5130;
 

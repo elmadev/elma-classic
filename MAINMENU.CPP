@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 /*void showinstruct( void ) {
     blt8( Korny->picbuffer, Korny->ppic_help );

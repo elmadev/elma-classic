@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 static void surlodasverseny(motorst* pmot, vekt2 fgumi, vekt2 sebesseg);
 

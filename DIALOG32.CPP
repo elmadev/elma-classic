@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 #define MAXSOR32 (6)
 

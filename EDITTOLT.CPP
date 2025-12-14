@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 static const unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;
 

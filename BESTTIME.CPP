@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 void ido2string(long l, char* text, int hosszu) {
     if (l < 0) {

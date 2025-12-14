@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 #define MAXBUFFER (20000u)
 static int Maxegybefuggo = 255;

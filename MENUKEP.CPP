@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 pic8* Buffsima = NULL;
 pic8* Buffgolyo = NULL;

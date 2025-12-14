@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 double Hosszuido = 500000000.0;
 

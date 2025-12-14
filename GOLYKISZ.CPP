@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 double megkeresidot(int* xlegjobb, int* ylegjobb) {
     double eddigilegjobbt = Hosszuido;

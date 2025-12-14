@@ -88,10 +88,6 @@ if cpp.get_id() == 'msvc'
     endif
 else
     cpp_args = ['-Wno-deprecated-declarations']
-
-    if cpp.get_id() == 'clang'
-        cpp_args += ['-Wno-nonportable-include-path']
-    endif
 endif
 
 if needs_stub

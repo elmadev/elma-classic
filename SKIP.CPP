@@ -1,4 +1,4 @@
-#include "all.h"
+#include "ALL.H"
 
 int skippelheto(int level) {
     int maxskippelheto = 5;

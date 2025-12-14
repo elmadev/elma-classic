@@ -24,8 +24,6 @@ extern double MetersToPixels, PixelsToMeters;
 
 extern double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY, BodyDY;
 
-#define OBJECT_PIXEL_RADIUS (20)
-
 extern int MinimapScaleFactor;
 
 struct rigidbody {

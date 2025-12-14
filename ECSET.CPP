@@ -453,8 +453,8 @@ void ecset::kitoltfoodkoordokat(void) {
             pker->rxint_v = (pker->r.x - origo.x) * MetersToPixels / MinimapScaleFactor;
             pker->ryint_v = (-pker->r.y - origo.y) * MetersToPixels / MinimapScaleFactor;
         } else {
-            pker->rxint = (pker->r.x - origo.x) * MetersToPixels - OBJECT_PIXEL_RADIUS;
-            pker->ryint = (-pker->r.y - origo.y) * MetersToPixels - OBJECT_PIXEL_RADIUS;
+            pker->rxint = (pker->r.x - origo.x) * MetersToPixels - ANIM_WIDTH / 2;
+            pker->ryint = (-pker->r.y - origo.y) * MetersToPixels - ANIM_WIDTH / 2;
         }
     }
 }
@@ -1179,8 +1179,8 @@ void ecset::addobjektumok(void) {
            foglalkozunk:
         int x1 = (pk->r.x-origo.x)*MetersToPixels;
         int y1 = (-pk->r.y-origo.y)*MetersToPixels;
-        x1 -= OBJECT_PIXEL_RADIUS;
-        y1 += OBJECT_PIXEL_RADIUS;
+        x1 -= ANIM_WIDTH/2;
+        y1 += ANIM_WIDTH/2;
 
         pic8* ppic = Plgr->pexit;
         int ujtavolsag = 498;

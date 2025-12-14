@@ -589,8 +589,8 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
     int balalsox, balalsoy;
     Pecsetalso->getbalalso_int(sarok, &balalsox, &balalsoy);
-    int objminx = balalsox - 2 * OBJECT_PIXEL_RADIUS - 2;
-    int objminy = balalsoy - 2 * OBJECT_PIXEL_RADIUS - 2;
+    int objminx = balalsox - ANIM_WIDTH - 2;
+    int objminy = balalsoy - ANIM_WIDTH - 2;
     int objmaxx = balalsox + SCREEN_WIDTH;
     int objmaxy = balalsoy + SCREEN_HEIGHT;
     for (int i = 0; i < MAXKEREK; i++) {

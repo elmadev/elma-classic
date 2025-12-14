@@ -69,8 +69,4 @@ extern motorst *Motor1, *Motor2;
 void init_physics_data();
 void init_motor(motorst* motor);
 
-class recorder;
-void encode_frame_count(recorder* rec);
-bool frame_count_integrity(recorder* rec);
-
 #endif

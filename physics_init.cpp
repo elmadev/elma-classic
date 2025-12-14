@@ -112,33 +112,3 @@ void init_physics_data(void) {
 
     BodyDY = Motor1->body_r.y - Motor1->bike.r.y;
 }
-
-// Encode framecount into MSB of the flags
-void encode_frame_count(recorder* rec) {
-    if (rec->betoltve < 80) {
-        return;
-    }
-    unsigned int frame_count = rec->betoltve;
-    for (int i = 0; i < 32; i++) {
-        rec->pgazhatra[40 + i] = rec->pgazhatra[40 + i] & 127;
-        if (frame_count & 1) {
-            rec->pgazhatra[40 + i] += 128;
-        }
-        frame_count = frame_count >> 1;
-    }
-}
-
-// Check that the framecount matches with the MSB of the flags
-bool frame_count_integrity(recorder* rec) {
-    if (rec->betoltve < 80) {
-        return true;
-    }
-    unsigned int frame_count = 0;
-    for (int i = 0; i < 32; i++) {
-        frame_count <<= 1;
-        if (rec->pgazhatra[40 + 31 - i] & 128) {
-            frame_count += 1;
-        }
-    }
-    return frame_count == rec->betoltve;
-}

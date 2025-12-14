@@ -106,6 +106,36 @@ int recorder::gettag(void) { return tag; }
 
 void recorder::settag(int tag_p) { tag = tag_p; }
 
+// Encode framecount into MSB of the flags
+void recorder::encode_frame_count() {
+    if (betoltve < 80) {
+        return;
+    }
+    unsigned int frame_count = betoltve;
+    for (int i = 0; i < 32; i++) {
+        pgazhatra[40 + i] = pgazhatra[40 + i] & 127;
+        if (frame_count & 1) {
+            pgazhatra[40 + i] += 128;
+        }
+        frame_count = frame_count >> 1;
+    }
+}
+
+// Check that the framecount matches with the MSB of the flags
+bool recorder::frame_count_integrity() {
+    if (betoltve < 80) {
+        return true;
+    }
+    unsigned int frame_count = 0;
+    for (int i = 0; i < 32; i++) {
+        frame_count *= 2;
+        if (pgazhatra[40 + 31 - i] & 128) {
+            frame_count += 1;
+        }
+    }
+    return frame_count == betoltve;
+}
+
 static double Korrszorzo = 1000.0, Korrszorzo_rec = 1.0 / Korrszorzo;
 static double Alfaszorzo = 250 / (2.0 * K_pi), Alfaszorzo_rec = 1.0 / Alfaszorzo;
 static double Alfaszorzo_16 = 10000 / (2.0 * K_pi), Alfaszorzo_16_rec = 1.0 / Alfaszorzo_16;

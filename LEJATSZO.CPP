@@ -489,13 +489,13 @@ long lejatszo(const char* filenev) {
                 nullazhangot();
                 if (megvanido) {
                     Ptop->kerekjolalljon();
-                    encode_frame_count(Prec1);
-                    encode_frame_count(Prec2);
+                    Prec1->encode_frame_count();
+                    Prec2->encode_frame_count();
                     return megvanido;
                 } else {
                     Ptop->kerekjolalljon();
-                    encode_frame_count(Prec1);
-                    encode_frame_count(Prec2);
+                    Prec1->encode_frame_count();
+                    Prec2->encode_frame_count();
                     return -1;
                 }
             }
@@ -581,8 +581,8 @@ long lejatszo(const char* filenev) {
                 fclose(h);
             }
             Ptop->kerekjolalljon();
-            encode_frame_count(Prec1);
-            encode_frame_count(Prec2);
+            Prec1->encode_frame_count();
+            Prec2->encode_frame_count();
             Masodikmenet = 1;
             return -1;
         }

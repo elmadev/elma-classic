@@ -4,6 +4,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "qopen.h"
+#include <algorithm>
 #include <cstring>
 
 void pic8::allocate(int w, int h) {
@@ -78,6 +79,20 @@ pic8::pic8(const char* filename, FILE* h) {
         i--;
     }
     internal_error("pic8 could not find file extension: ", filename);
+}
+
+pic8* pic8::scale(pic8* src, double scale) {
+    if (scale == 1.0) {
+        return src;
+    }
+
+    const int scaled_width = std::max((int)(src->get_width() * scale), 1);
+    const int scaled_height = std::max((int)(src->get_height() * scale), 1);
+
+    pic8* scaled = new pic8(scaled_width, scaled_height);
+    blit_scale8(scaled, src);
+    delete src;
+    return scaled;
 }
 
 bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {

@@ -74,6 +74,17 @@ pic8::pic8(const char* filename, FILE* h) {
     hiba("pic8 could not find file extension: ", filename);
 }
 
+pic8* pic8::scale(pic8* src, double scale) {
+    if (scale == 1.0) {
+        return src;
+    }
+
+    pic8* scaled = new pic8(src->get_width() * scale, src->get_height() * scale);
+    blit_scale8(scaled, src);
+    delete src;
+    return scaled;
+}
+
 bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
     int i = 0;
     while (filename[i]) {

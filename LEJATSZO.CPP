@@ -51,16 +51,16 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
         startwavegyujto(WAV_EVES, 0.99, -1);
         switch (Ptop->kerektomb[sorszam]->kajatipus) {
         case KT_UP:
-            pmot->gravity_direction = 0;
+            pmot->gravity_direction = MotorGravity::Up;
             break;
         case KT_DOWN:
-            pmot->gravity_direction = 1;
+            pmot->gravity_direction = MotorGravity::Down;
             break;
         case KT_LEFT:
-            pmot->gravity_direction = 2;
+            pmot->gravity_direction = MotorGravity::Left;
             break;
         case KT_RIGHT:
-            pmot->gravity_direction = 3;
+            pmot->gravity_direction = MotorGravity::Right;
             break;
         }
         return 2;
@@ -272,7 +272,7 @@ static void kulsoresz(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, re
     baljobbelintez(&pvalt->baljobbv_f, prec, eddig, pmot->flipped_bike);
 
     // Hatra elintezes:
-    if (pmot->gravity_direction == 0) { // UP
+    if (pmot->gravity_direction == MotorGravity::Up) {
         pmot->flipped_camera = !pmot->flipped_bike;
     } else {
         pmot->flipped_camera = pmot->flipped_bike;
@@ -684,7 +684,7 @@ static int replaymag(motorst* pmot, jatekosopciok* popciok, valtozok* pvalt, rec
     // Hatra elintezes:
     baljobbelintez(&pvalt->baljobbv_f, NULL, eddig, pmot->flipped_bike);
 
-    if (pmot->gravity_direction == 0) { // UP
+    if (pmot->gravity_direction == MotorGravity::Up) {
         pmot->flipped_camera = !pmot->flipped_bike;
     } else {
         pmot->flipped_camera = pmot->flipped_bike;

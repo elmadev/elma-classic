@@ -48,11 +48,11 @@ void beallitmereteket(int splitscreen) {
     Cx2 = Cx1 + Cxsize - 1;
     Cy2 = Cy1 + Cysize - 1;
     if (splitscreen) {
-        Cysize = 234;
-        Cy1 = 246; // Mivel kep fejjel lefele van, forditva vannak koordok
-        Cy2 = 479; // Vagyis A player van felul, B pedig lent
+        Cysize = SCREEN_HEIGHT / 2 - 6;
+        Cy1 = SCREEN_HEIGHT / 2 + 6; // Mivel kep fejjel lefele van, forditva vannak koordok
+        Cy2 = SCREEN_HEIGHT - 1;     // Vagyis A player van felul, B pedig lent
         Cy1Bplayer = 0;
-        Cy2Bplayer = 233;
+        Cy2Bplayer = SCREEN_HEIGHT / 2 - 7;
     }
 #ifdef TEST
     if (Cx2 >= SCREEN_WIDTH) {

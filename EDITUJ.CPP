@@ -205,7 +205,7 @@ void toolhelp(const char* text) {
         }
         strcpy(Toolhelpszoveg, text);
     }
-    int x1 = 1, y1 = 18, x2 = 638, y2 = Savy - 2;
+    int x1 = 1, y1 = 18, x2 = SCREEN_WIDTH - 2, y2 = Savy - 2;
     Buffsima->fillbox(x1, y1, x2, y2, Hatterindex);
     Pabc1->write(Buffsima, 10, y1 + 12, Toolhelpszoveg);
     bltfront(Buffsima, x1, y1, x2, y2);

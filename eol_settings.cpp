@@ -1,5 +1,7 @@
 #include "eol_settings.h"
+#include "LGRFILE.H"
 #include "main.h"
+#include "physics_init.h"
 #include <fstream>
 #define JSON_DIAGNOSTICS 1
 #include <nlohmann/json.hpp>
@@ -20,7 +22,24 @@ eol_settings::eol_settings() {
     center_camera = false;
     center_map = false;
     map_alignment = MapAlignment::None;
+    zoom_ = 1.0;
+    zoom_textures_ = false;
     renderer = RendererType::Software;
+}
+
+void eol_settings::set_zoom(double z) {
+    if (z != zoom_) {
+        zoom_ = (z < MIN_ZOOM) ? MIN_ZOOM : (z > MAX_ZOOM ? MAX_ZOOM : z);
+
+        set_zoom_factor();
+        invalidate_lgr_cache();
+    }
+}
+
+void eol_settings::set_zoom_textures(bool zoom_textures) {
+    zoom_textures_ = zoom_textures;
+
+    invalidate_lgr_cache();
 }
 
 void to_json(json& j, const MapAlignment& m) {

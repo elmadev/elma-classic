@@ -656,9 +656,10 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
 
     if (!Single) {
         // Hatso motoros kirajzolasa:
-        vekt2 kozep(sarok.x + 320.0 * PixelsToMeters, sarok.y + 240.0 * PixelsToMeters);
+        vekt2 kozep(sarok.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
+                    sarok.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
         double tav = abs(pmot2->bike.r - kozep);
-        if (tav < 540.0 * PixelsToMeters) {
+        if (tav < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters) {
             kibike(!ajatekos, ppic, t, sarok, pmot2, pvalt2, pmkepek2);
         }
     }

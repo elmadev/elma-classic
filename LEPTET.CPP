@@ -238,7 +238,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
     */
 
     switch (pmot->gravity_direction) {
-    case 1:                                                // Lefele:
+    case MotorGravity::Down:
         beallitvezeto(pmot, vekt2(0.0, -1.0), i1, j1, dt); // vezeto
         beallit(&pmot->bike, Ftest2 + Ftest4 - Vekt2j * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
                 dt, 0);
@@ -247,7 +247,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
         beallit(&pmot->right_wheel, Fkerek4 - Vekt2j * pmot->right_wheel.mass * Gravity, Mkerek4,
                 dt, 1);
         break;
-    case 0:                                               // Felfele:
+    case MotorGravity::Up:
         beallitvezeto(pmot, vekt2(0.0, 1.0), i1, j1, dt); // vezeto
         beallit(&pmot->bike, Ftest2 + Ftest4 + Vekt2j * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
                 dt, 0);
@@ -256,7 +256,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
         beallit(&pmot->right_wheel, Fkerek4 + Vekt2j * pmot->right_wheel.mass * Gravity, Mkerek4,
                 dt, 1);
         break;
-    case 2:                                                // Balra:
+    case MotorGravity::Left:
         beallitvezeto(pmot, vekt2(-1.0, 0.0), i1, j1, dt); // vezeto
         beallit(&pmot->bike, Ftest2 + Ftest4 - Vekt2i * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
                 dt, 0);
@@ -265,7 +265,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
         beallit(&pmot->right_wheel, Fkerek4 - Vekt2i * pmot->right_wheel.mass * Gravity, Mkerek4,
                 dt, 1);
         break;
-    case 3:                                               // Jobbra:
+    case MotorGravity::Right:
         beallitvezeto(pmot, vekt2(1.0, 0.0), i1, j1, dt); // vezeto
         beallit(&pmot->bike, Ftest2 + Ftest4 + Vekt2i * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
                 dt, 0);

@@ -26,6 +26,13 @@ extern double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY, BodyDY;
 
 extern int MinimapScaleFactor;
 
+enum class MotorGravity {
+    Up = 0,
+    Down = 1,
+    Left = 2,
+    Right = 3,
+};
+
 struct rigidbody {
     double rotation;
     double angular_velocity;
@@ -43,7 +50,7 @@ struct motorst {
     vekt2 head_r;
     int flipped_bike;
     int flipped_camera;
-    int gravity_direction; // (0:UP 1:DOWN 2:LEFT 3:RIGHT)
+    MotorGravity gravity_direction;
 
     vekt2 body_r;
     vekt2 body_v;

@@ -62,7 +62,6 @@ state_s::state_s(const char* nev) {
     secondarybuffer = 0; // ha igaz, kompatibilis mod
     single = 1;
     tag = 0;
-    minibike = 0;
     aplayerabike = 1;
     highquality = 1;
 

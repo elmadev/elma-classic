@@ -52,7 +52,6 @@ class state_s {
     int single;
     // Itt pedig Tag valtozot kell figyelni:
     int tag;
-    int minibike; // Ezt most meg csak nem is mentjuk
     int aplayerabike;
     int highquality;
 

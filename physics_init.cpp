@@ -80,10 +80,6 @@ void init_physics_data(void) {
     init_motor(Motor2);
 
     double zoom_factor = 0.48;
-    if (State->minibike) {
-        zoom_factor = 0.30;
-    }
-
     MetersToPixels = 100.0 * zoom_factor;
     PixelsToMeters = 1.0 / MetersToPixels;
 

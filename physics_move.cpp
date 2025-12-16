@@ -77,7 +77,7 @@ rigidbody buf_pk;
 vekt2 buf_F;
 double buf_M, buf_dt;*/
 
-void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
+void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, int do_collision) {
 
     /*int betoltkezd = 0;
     if( betoltkezd ) {
@@ -96,8 +96,8 @@ void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
     int talppontszam = 0;
     vekt2 t1, t2;
     vonal *pv1 = NULL, *pv2 = NULL;
-    if (kelltalppont) {
-        talppontszam = talppontkereses(pk->r, pk->radius, &t1, &t2, &pv1, &pv2);
+    if (do_collision) {
+        talppontszam = talppontkereses(rb->r, rb->radius, &t1, &t2, &pv1, &pv2);
 // Egy kis ellenorzes:
 #ifdef TEST
         switch (talppontszam) {
@@ -121,10 +121,10 @@ void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
     }
 
     if (talppontszam > 0) {
-        helyigazitas(pk, &t1);
+        helyigazitas(rb, &t1);
     }
     if (talppontszam > 1) {
-        helyigazitas(pk, &t2);
+        helyigazitas(rb, &t2);
     }
 
     // Csak tanulmanyozasra:
@@ -141,12 +141,12 @@ void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
     // talppontbol.
     // Csak egy bizonyos sebesseg felett csinaljuk, hogy
     // Allo helyzetben ne forogjon magatol kerek:
-    if (talppontszam == 2 && abs(pk->v) > 1.0) {
-        if (!biztostalppont_uj(t1, t2, pk, F, M)) {
+    if (talppontszam == 2 && abs(rb->v) > 1.0) {
+        if (!biztostalppont_uj(t1, t2, rb, force, torque)) {
             talppontszam = 1;
             t1 = t2;
         } else {
-            if (!biztostalppont_uj(t2, t1, pk, F, M)) {
+            if (!biztostalppont_uj(t2, t1, rb, force, torque)) {
                 talppontszam = 1;
             }
         }
@@ -158,24 +158,24 @@ void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
     // De csak kis sebessegeknel csinalja, mert eloszor egy
     // menetben megvarja amig 2 talppont lenullazza
     // sebesseget:
-    if (talppontszam == 2 && abs(pk->v) < 1.0) {
-        if (!biztostalppont_regi(t1, t2, pk, F, M)) {
+    if (talppontszam == 2 && abs(rb->v) < 1.0) {
+        if (!biztostalppont_regi(t1, t2, rb, force, torque)) {
             talppontszam = 1;
             t1 = t2;
         } else {
-            if (!biztostalppont_regi(t2, t1, pk, F, M)) {
+            if (!biztostalppont_regi(t2, t1, rb, force, torque)) {
                 talppontszam = 1;
             }
         }
     }
 
     if (talppontszam == 2) {
-        if (!talppontigazitas(pk, &t2, F)) {
+        if (!talppontigazitas(rb, &t2, force)) {
             talppontszam = 1;
         }
     }
     if (talppontszam >= 1) {
-        if (!talppontigazitas(pk, &t1, F)) {
+        if (!talppontigazitas(rb, &t1, force)) {
             if (talppontszam == 2) {
                 talppontszam = 1;
                 t1 = t2;
@@ -188,36 +188,36 @@ void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont) {
     // Talppontok most mar be vannak allitva!
     if (talppontszam == 0) {
         // Szabadon forog a levegoben:
-        double beta = M / pk->inertia;
-        pk->angular_velocity += beta * dt;
-        pk->rotation += pk->angular_velocity * dt;
-        vekt2 a = F * (1.0 / pk->mass);
-        pk->v = pk->v + a * dt;
-        pk->r = pk->r + pk->v * dt;
+        double beta = torque / rb->inertia;
+        rb->angular_velocity += beta * dt;
+        rb->rotation += rb->angular_velocity * dt;
+        vekt2 a = force * (1.0 / rb->mass);
+        rb->v = rb->v + a * dt;
+        rb->r = rb->r + rb->v * dt;
         return;
     }
     if (talppontszam == 2) {
         // Kerek meg van fogva:
-        pk->v = Vekt2null;
-        pk->angular_velocity = 0;
+        rb->v = Vekt2null;
+        rb->angular_velocity = 0;
         // Voltosszemosas = 20; //kirajz-ban egy kis teglalaot rajzol ki
         return;
     }
 
     // Egy talppont korul fordul el kerek:
-    double hossz = abs(pk->r - t1);
-    vekt2 n = (pk->r - t1) * (1.0 / hossz);
+    double hossz = abs(rb->r - t1);
+    vekt2 n = (rb->r - t1) * (1.0 / hossz);
     vekt2 n90 = forgatas90fokkal(n);
-    pk->angular_velocity = pk->v * n90 * (1.0 / pk->radius);
-    M += F * n90 * pk->radius; // M-hez hozzajon meg ero is, mivel talpponthoz
-                               // vonatkoztatjuk!
-    double thetaszelso = pk->inertia + pk->mass * hossz * hossz;
-    double beta = M / thetaszelso;
+    rb->angular_velocity = rb->v * n90 * (1.0 / rb->radius);
+    torque += force * n90 * rb->radius; // M-hez hozzajon meg ero is, mivel talpponthoz
+                                        // vonatkoztatjuk!
+    double thetaszelso = rb->inertia + rb->mass * hossz * hossz;
+    double beta = torque / thetaszelso;
 
-    pk->angular_velocity += beta * dt;
-    pk->rotation += pk->angular_velocity * dt;
-    pk->v = pk->angular_velocity * pk->radius * n90;
-    pk->r = pk->r + pk->v * dt;
+    rb->angular_velocity += beta * dt;
+    rb->rotation += rb->angular_velocity * dt;
+    rb->v = rb->angular_velocity * rb->radius * n90;
+    rb->r = rb->r + rb->v * dt;
     return;
 }
 
@@ -287,12 +287,12 @@ static void vezeto_hatarolas(motorst* pmot, vekt2 i, vekt2 j) {
     }
 }
 
-void beallitvezeto(motorst* pmot, vekt2 gravitacio, vekt2 i, vekt2 j, double dt) {
-    vezeto_hatarolas(pmot, i, j);
+void body_movement(motorst* mot, vekt2 gravity, vekt2 i, vekt2 j, double dt) {
+    vezeto_hatarolas(mot, i, j);
 
     // Rugoero szamitas:
-    vekt2 rugor = pmot->bike.r + j * BodyDY;
-    vekt2 rugoeroirany = rugor - pmot->body_r;
+    vekt2 rugor = mot->bike.r + j * BodyDY;
+    vekt2 rugoeroirany = rugor - mot->body_r;
     double rugoerohossz = abs(rugoeroirany);
     if (rugoerohossz < 0.0000001) {
         rugoerohossz = 0.0000001;
@@ -303,13 +303,13 @@ void beallitvezeto(motorst* pmot, vekt2 gravitacio, vekt2 i, vekt2 j, double dt)
 
     // Surlodasi ero szamitas:
     // Kiszamoljuk motor testenek sebesseget body_r helyen:
-    vekt2 tangens = forgatas90fokkal(pmot->body_r - pmot->bike.r);
-    vekt2 motseb = tangens * pmot->bike.angular_velocity + pmot->bike.v;
-    vekt2 relv = pmot->body_v - motseb;
+    vekt2 tangens = forgatas90fokkal(mot->body_r - mot->bike.r);
+    vekt2 motseb = tangens * mot->bike.angular_velocity + mot->bike.v;
+    vekt2 relv = mot->body_v - motseb;
     vekt2 Fsurl = relv * SpringResistanceCoefficient * 3.0;
 
-    vekt2 F = Frugo - Fsurl + gravitacio * pmot->bike.mass * Gravity;
-    vekt2 a = F * (1.0 / pmot->bike.mass); // Egyenlore kerek tomegevel szamolunk
-    pmot->body_v = pmot->body_v + a * dt;
-    pmot->body_r = pmot->body_r + pmot->body_v * dt;
+    vekt2 F = Frugo - Fsurl + gravity * mot->bike.mass * Gravity;
+    vekt2 a = F * (1.0 / mot->bike.mass); // Egyenlore kerek tomegevel szamolunk
+    mot->body_v = mot->body_v + a * dt;
+    mot->body_r = mot->body_r + mot->body_v * dt;
 }

@@ -1,8 +1,8 @@
 #ifndef PHYSICS_MOVE_H
 #define PHYSICS_MOVE_H
 
-void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont);
+void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, int do_collision);
 
-void beallitvezeto(motorst* pmot, vekt2 gravitacio, vekt2 i, vekt2 j, double dt);
+void body_movement(motorst* mot, vekt2 gravity, vekt2 i, vekt2 j, double dt);
 
 #endif

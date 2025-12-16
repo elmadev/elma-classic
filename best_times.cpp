@@ -171,34 +171,19 @@ void menu_best_times_choose_level(bool single) {
             tten = &State->palyakidejei[i].multiidok;
         }
 
-        // Check if anyone has completed the level
-        bool has_time = true;
-        if (tten->idokszama == 0) {
-            has_time = false;
-        }
-
-        // Write one or two player names
-        char player_text[50];
-        strcpy(player_text, tten->nevek1[0]);
-        if (!single) {
-            strcat(player_text, "  ");
-            strcat(player_text, tten->nevek2[0]);
-        }
-
-        // "1 Warm Up "
+        // "1 Warm Up"
         itoa(i + 1, Rubrikak[i], 10);
         strcat(Rubrikak[i], " ");
         strcat(Rubrikak[i], getleveldescription(i));
-        strcat(Rubrikak[i], " ");
-        // Pad with spaces to a length of 184
-        while (Pmenuabc->len(Rubrikak[i]) < 184) {
-            strcat(Rubrikak[i], " ");
-        }
+
         // Best player, if exists
-        if (has_time) {
-            strcpy(Rubrikak_tab[i], player_text);
-        } else {
-            strcpy(Rubrikak_tab[i], "-");
+        strcpy(Rubrikak_tab[i], "-");
+        if (tten->idokszama > 0) {
+            strcpy(Rubrikak_tab[i], tten->nevek1[0]);
+            if (!single) {
+                strcat(Rubrikak_tab[i], "  ");
+                strcat(Rubrikak_tab[i], tten->nevek2[0]);
+            }
         }
     }
 

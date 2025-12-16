@@ -24,7 +24,7 @@
 
 #include "MAIN.H"
 #include "PIC8.H"
-#include "ANIM.H"
+#include "anim.h"
 
 #include "abc8.h"
 

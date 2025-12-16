@@ -1,66 +1,66 @@
 #include "ALL.H"
 
-anim::anim(pic8* nagykep, const char* uzenet_filenev) {
-    frameszam = 0;
-    for (int i = 0; i < MAXANIMFRAME; i++) {
-        ppictomb[i] = NULL;
+anim::anim(pic8* source_sheet, const char* error_filename) {
+    frame_count = 0;
+    for (int i = 0; i < ANIM_MAX_FRAMES; i++) {
+        frames[i] = NULL;
     }
 
-    if (nagykep->getxsize() % ANIM_WIDTH) {
+    if (source_sheet->getxsize() % ANIM_WIDTH) {
         char tmp[80];
         sprintf(tmp, "Picture xsize must be a multiply of %d!", ANIM_WIDTH);
-        uzenet(tmp, uzenet_filenev);
+        uzenet(tmp, error_filename);
     }
-    frameszam = nagykep->getxsize() / ANIM_WIDTH;
-    if (frameszam < 0) {
+    frame_count = source_sheet->getxsize() / ANIM_WIDTH;
+    if (frame_count < 0) {
         hiba("uiuiotb");
     }
-    if (frameszam > MAXANIMFRAME) {
+    if (frame_count > ANIM_MAX_FRAMES) {
         char tmp[80];
-        sprintf(tmp, "Too many frames in picture! Max frame is %d!", (int)MAXANIMFRAME);
-        uzenet(tmp, uzenet_filenev);
+        sprintf(tmp, "Too many frames in picture! Max frame is %d!", (int)ANIM_MAX_FRAMES);
+        uzenet(tmp, error_filename);
     }
 
-    for (int i = 0; i < frameszam; i++) {
-        ppictomb[i] = new pic8(ANIM_WIDTH, ANIM_WIDTH);
-        blt8(ppictomb[i], nagykep, -ANIM_WIDTH * i, 0);
-        forditkepet(ppictomb[i]);
-        spriteosit(ppictomb[i], nagykep->gpixel(0, 0));
+    for (int i = 0; i < frame_count; i++) {
+        frames[i] = new pic8(ANIM_WIDTH, ANIM_WIDTH);
+        blt8(frames[i], source_sheet, -ANIM_WIDTH * i, 0);
+        forditkepet(frames[i]);
+        spriteosit(frames[i], source_sheet->gpixel(0, 0));
     }
 }
 
 anim::~anim(void) {
-    frameszam = 0;
-    for (int i = 0; i < MAXANIMFRAME; i++) {
-        if (ppictomb[i]) {
-            delete ppictomb[i];
-            ppictomb[i] = NULL;
+    frame_count = 0;
+    for (int i = 0; i < ANIM_MAX_FRAMES; i++) {
+        if (frames[i]) {
+            delete frames[i];
+            frames[i] = NULL;
         }
     }
 }
 
 static const double Egyframeido = 0.014;
 
-pic8* anim::getframe(double ido) {
-    int sorszam = ido / Egyframeido;
-    int i = sorszam % frameszam;
-    return ppictomb[i];
+pic8* anim::get_frame_by_time(double time) {
+    int sorszam = time / Egyframeido;
+    int i = sorszam % frame_count;
+    return frames[i];
 }
 
-pic8* anim::getframebyindex(int index) {
-    if (index < 0 || index >= frameszam) {
+pic8* anim::get_frame_by_index(int index) {
+    if (index < 0 || index >= frame_count) {
         hiba("678673");
     }
-    return ppictomb[index];
+    return frames[index];
 }
 
 // Menu sisakjanal egy kis piros vonalat odahuz fole:
-void anim::korrigal(void) {
-    for (int i = 0; i < frameszam; i++) {
+void anim::make_helmet_top(void) {
+    for (int i = 0; i < frame_count; i++) {
         pic8* ujpic = new pic8(ANIM_WIDTH, ANIM_WIDTH + 1);
-        unsigned char atlatszo = ppictomb[i]->gpixel(0, 0);
+        unsigned char atlatszo = frames[i]->gpixel(0, 0);
         ujpic->fillbox(atlatszo);
-        blt8(ujpic, ppictomb[i], 0, 1);
+        blt8(ujpic, frames[i], 0, 1);
         // Most behuzzuk vonalat balrol jobb szelig:
         for (int x = 0; x < ANIM_WIDTH; x++) {
             if (ujpic->gpixel(x, 1) != atlatszo) {
@@ -80,7 +80,7 @@ void anim::korrigal(void) {
             }
         }
         spriteosit(ujpic, ujpic->gpixel(0, 0));
-        delete ppictomb[i];
-        ppictomb[i] = ujpic;
+        delete frames[i];
+        frames[i] = ujpic;
     }
 }

@@ -614,15 +614,15 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         if (State->animatedobjects) {
             switch (pker->tipus) {
             case T_KAJA:
-                pobjpic = Plgr->foodtomb[pker->foodsorszam % Plgr->foodszam]->getframe(t);
+                pobjpic = Plgr->foodtomb[pker->foodsorszam % Plgr->foodszam]->get_frame_by_time(t);
                 dy = 5 * sin(t * 15.5 + pker->sinfazis);
                 break;
             case T_CEL:
-                pobjpic = Plgr->pexit->getframe(t);
+                pobjpic = Plgr->pexit->get_frame_by_time(t);
                 dy = 5 * sin(t * 15.5 + pker->sinfazis);
                 break;
             case T_HALALOS:
-                pobjpic = Plgr->pkiller->getframe(t);
+                pobjpic = Plgr->pkiller->get_frame_by_time(t);
                 break;
             default:
                 hiba("HIBA6751353");
@@ -631,13 +631,13 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             // Elso frame-et adja vissza mindig:
             switch (pker->tipus) {
             case T_KAJA:
-                pobjpic = Plgr->foodtomb[pker->foodsorszam % Plgr->foodszam]->getframebyindex(0);
+                pobjpic = Plgr->foodtomb[pker->foodsorszam % Plgr->foodszam]->get_frame_by_index(0);
                 break;
             case T_CEL:
-                pobjpic = Plgr->pexit->getframebyindex(0);
+                pobjpic = Plgr->pexit->get_frame_by_index(0);
                 break;
             case T_HALALOS:
-                pobjpic = Plgr->pkiller->getframebyindex(0);
+                pobjpic = Plgr->pkiller->get_frame_by_index(0);
                 break;
             default:
                 hiba("6754783");

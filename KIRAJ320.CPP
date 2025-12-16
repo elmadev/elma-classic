@@ -786,30 +786,6 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
     // for( int i = 0; i < Ucsosurlodas; i++ )
     //	npic->ppixel( i, 100, 0 );
 
-    /*extern int Voltosszemosas;
-    if( Voltosszemosas ) {
-        for( int i = 0; i < 10; i++ )
-            for( int j = 0; j < 10; j++ )
-                npic->ppixel( 100+i, 100+j, 0 );
-        Voltosszemosas--;
-    }
-
-    extern int Konvex;
-    if( Konvex ) {
-        for( int i = 0; i < 10; i++ )
-            for( int j = 0; j < 10; j++ )
-                npic->ppixel( 100+i, 400+j, 0 );
-        Konvex--;
-    }
-
-    extern int Konkav;
-    if( Konkav ) {
-        for( int i = 0; i < 10; i++ )
-            for( int j = 0; j < 10; j++ )
-                npic->ppixel( 100+i, 300+j, 0 );
-        Konkav--;
-    }*/
-
     hang(/*"unlock elott"*/);
 
     Locky0_alul = 1;

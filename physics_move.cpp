@@ -83,13 +83,6 @@ static int valid_anchor_points_new(vekt2 point1, vekt2 point2, rigidbody* rb, ve
     }
 }
 
-/*int Voltosszemosas = 0;
-
-int Konvex = 0;
-int Konkav = 0;*/
-
-/*int Pnyomva = 0;*/
-
 // Handle wheel/bike movement
 // do_collision = true if solid object (i.e. wheels and not bike)
 void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, int do_collision) {
@@ -128,14 +121,6 @@ void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, in
     if (anchor_point_count > 1) {
         move_wheel_out_of_ground(rb, &point2);
     }
-
-    // Csak tanulmanyozasra:
-    /*if( anchor_point_count > 1 ) {
-        double tav = abs( point1-point2 );
-        if( tav < 1.0 )
-            //hiba( "tav < 1.0!" );
-            Voltosszemosas = 1;
-    } */
 
     // If we have two points of collision, check whether the wheel is stuck in the corner
     // When the wheel is moving fast, try to discard one of the collision points if you are moving
@@ -199,7 +184,6 @@ void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, in
     if (anchor_point_count == 2) {
         rb->v = Vekt2null;
         rb->angular_velocity = 0;
-        // Voltosszemosas = 20;
         return;
     }
 

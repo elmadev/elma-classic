@@ -536,8 +536,6 @@ long lejatszo(const char* filenev) {
         // Egy par kozos toggle:
         // Plusz elintezes:
         if (!plussznyomva && mk_getstate(State->billplussz)) {
-            // extern int Pnyomva;
-            // Pnyomva = 1;
             novelkepmeret();
         }
         plussznyomva = mk_getstate(State->billplussz);

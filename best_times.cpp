@@ -1,7 +1,7 @@
 #include "ALL.H"
 
 // Format time as 00:00:00 (or 00:00:00:00 if hours are allowed)
-void centiseconds_to_string(long time, char* text, int show_hours) {
+void centiseconds_to_string(long time, char* text, bool show_hours) {
     // Calculate time
     if (time < 0) {
         hiba("centiseconds_to_string time < 0!");
@@ -62,16 +62,16 @@ void centiseconds_to_string(long time, char* text, int show_hours) {
 // PlayerAName               00:14:00 (Single)
 // PlayerAName  PlayerBName  00:14:00 (Multi)
 // LongPlayerAName LongPlaye 00:14:00 (truncated)
-void render_topten(palyaegyfeleidok* tten, const char* header, int single) {
+static void render_topten(palyaegyfeleidok* tten, const char* header, int single) {
     if (tten->idokszama == 0) {
         return;
     }
 
     szoveglista men;
-
     men.addszoveg_kozep(header, 320, 37);
 
-    int player_x, time_x;
+    int player_x;
+    int time_x;
     if (single) {
         player_x = 120;
         time_x = 360;
@@ -98,7 +98,7 @@ void render_topten(palyaegyfeleidok* tten, const char* header, int single) {
     }
 
     mk_emptychar();
-    while (1) {
+    while (true) {
         if (mk_kbhit()) {
             int c = mk_getextchar();
             if (c == MK_ESC || c == MK_ENTER) {
@@ -110,7 +110,7 @@ void render_topten(palyaegyfeleidok* tten, const char* header, int single) {
 }
 
 // Render the internal best times list
-void menu_internal_topten(int level, int single) {
+void menu_internal_topten(int level, bool single) {
     char header[100];
     itoa(level + 1, header, 10);
     strcat(header, ": ");
@@ -125,7 +125,7 @@ void menu_internal_topten(int level, int single) {
 }
 
 // Render the external best times list
-void menu_external_topten(topol* top, int single) {
+void menu_external_topten(topol* top, bool single) {
     if (single) {
         render_topten(&top->idok.singleidok, top->levelname, single);
     } else {
@@ -135,7 +135,7 @@ void menu_external_topten(topol* top, int single) {
 
 // Main Menu Best Times
 // Show a list of unlocked internals so that can you view the best times
-void menu_best_times_choose_level(int single) {
+void menu_best_times_choose_level(bool single) {
     // Find the last level anyone has unlocked
     int visible_levels = 0;
     for (int i = 0; i < State->jatekosokszama; i++) {
@@ -172,9 +172,9 @@ void menu_best_times_choose_level(int single) {
         }
 
         // Check if anyone has completed the level
-        int has_time = 1;
+        bool has_time = true;
         if (tten->idokszama == 0) {
-            has_time = 0;
+            has_time = false;
         }
 
         // Write one or two player names
@@ -203,18 +203,16 @@ void menu_best_times_choose_level(int single) {
     }
 
     nav.bead(visible_levels, 1);
-    while (1) {
+    while (true) {
         int choice = nav.valassz();
-
         if (choice < 0) {
             return;
         }
-
         menu_internal_topten(choice, single);
     }
 }
 
-void menu_best_times(void) {
+void menu_best_times() {
     valaszt2 nav;
     if (State->single) {
         nav.kur = 0;
@@ -232,16 +230,15 @@ void menu_best_times(void) {
     strcpy(Rubrikak[1], "Multi Player Times");
 
     nav.bead(2);
-    while (1) {
+    while (true) {
         int choice = nav.valassz();
-
         if (choice < 0) {
             return;
         }
         if (choice == 0) {
-            menu_best_times_choose_level(1);
+            menu_best_times_choose_level(true);
         } else {
-            menu_best_times_choose_level(0);
+            menu_best_times_choose_level(false);
         }
     }
 }

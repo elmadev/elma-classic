@@ -38,7 +38,7 @@ void initmenukep1(void) {
     Psisak = new anim(sisaktmp, "sisak.pcx");
     delete sisaktmp;
     sisaktmp = NULL;
-    Psisak->korrigal();
+    Psisak->make_helmet_top();
 
     initgolyo();
 }
@@ -300,9 +300,9 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
     if (!nemkellgolyo) {
         pic8* sisakframe = NULL;
         if (State->animatedmenus) {
-            sisakframe = Psisak->getframe(ujido * 0.0024);
+            sisakframe = Psisak->get_frame_by_time(ujido * 0.0024);
         } else {
-            sisakframe = Psisak->getframebyindex(25);
+            sisakframe = Psisak->get_frame_by_index(25);
         }
 
         blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
@@ -372,7 +372,7 @@ int szoveglista::kirajzolanim(double ido) {
         }
 
         pic8* sisakframe = NULL;
-        sisakframe = Psisak->getframebyindex(25);
+        sisakframe = Psisak->get_frame_by_index(25);
         blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
         blt8(Tmpbuffer, Pintro, 0, 0);
         // Idaig tartott minden elem kirakasa egyszer
@@ -432,9 +432,9 @@ int szoveglista::kirajzolanim(double ido) {
     // Rarakjuk sisakot:
     pic8* sisakframe = NULL;
     if (State->animatedmenus) {
-        sisakframe = Psisak->getframe(ido * 0.0024);
+        sisakframe = Psisak->get_frame_by_time(ido * 0.0024);
     } else {
-        sisakframe = Psisak->getframebyindex(25);
+        sisakframe = Psisak->get_frame_by_index(25);
     }
 
     blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7 - (SCREEN_HEIGHT - 1) + frame);
@@ -602,9 +602,9 @@ void menuproba(void) {
     if( !nemkellgolyo ) {
         pic8* sisakframe = NULL;
         if( State->animatedmenus )
-            sisakframe = Psisak->getframe( ujido*0.0024 );
+            sisakframe = Psisak->get_frame_by_time( ujido*0.0024 );
         else
-            sisakframe = Psisak->getframebyindex( 25 );
+            sisakframe = Psisak->get_frame_by_index( 25 );
 
         blt8( Tmpbuffer, sisakframe, sisakx-20, sisaky-7 );
     }

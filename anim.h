@@ -1,23 +1,23 @@
 #ifndef ANIM_H
 #define ANIM_H
 
-#define MAXANIMFRAME (1000)
+#define ANIM_MAX_FRAMES (1000)
 
 constexpr int ANIM_WIDTH = 40;
 
 class anim {
   public:
-    int frameszam;
-    pic8* ppictomb[MAXANIMFRAME];
+    int frame_count;
+    pic8* frames[ANIM_MAX_FRAMES];
 
     // Meg is forditja kepet:
-    anim(pic8* nagykep, const char* uzenet_filenev);
+    anim(pic8* source_sheet, const char* error_filename);
     ~anim(void);
-    pic8* getframe(double ido);
-    pic8* getframebyindex(int index);
+    pic8* get_frame_by_time(double time);
+    pic8* get_frame_by_index(int index);
 
     // Menu sisakjanal egy kis piros vonalat odahuz fole:
-    void korrigal(void);
+    void make_helmet_top(void);
 };
 
 #endif

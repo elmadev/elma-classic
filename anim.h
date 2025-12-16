@@ -10,13 +10,11 @@ class anim {
     int frame_count;
     pic8* frames[ANIM_MAX_FRAMES];
 
-    // Meg is forditja kepet:
     anim(pic8* source_sheet, const char* error_filename);
     ~anim(void);
     pic8* get_frame_by_time(double time);
     pic8* get_frame_by_index(int index);
 
-    // Menu sisakjanal egy kis piros vonalat odahuz fole:
     void make_helmet_top(void);
 };
 

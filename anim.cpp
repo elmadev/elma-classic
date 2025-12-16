@@ -6,6 +6,7 @@ anim::anim(pic8* source_sheet, const char* error_filename) {
         frames[i] = NULL;
     }
 
+    // Get total number of animation frames
     if (source_sheet->getxsize() % ANIM_WIDTH) {
         char tmp[80];
         sprintf(tmp, "Picture xsize must be a multiple of %d!", ANIM_WIDTH);
@@ -21,6 +22,7 @@ anim::anim(pic8* source_sheet, const char* error_filename) {
         uzenet(tmp, error_filename);
     }
 
+    // Split the source picture into individual frames
     for (int i = 0; i < frame_count; i++) {
         frames[i] = new pic8(ANIM_WIDTH, ANIM_WIDTH);
         blt8(frames[i], source_sheet, -ANIM_WIDTH * i, 0);
@@ -41,6 +43,8 @@ anim::~anim(void) {
 
 static const double FrameTimestep = 0.014;
 
+// Input time is milliseconds*0.182*0.0024
+// Therefore framerate is 31.2 fps?
 pic8* anim::get_frame_by_time(double time) {
     int step = time / FrameTimestep;
     int i = step % frame_count;
@@ -54,14 +58,19 @@ pic8* anim::get_frame_by_index(int index) {
     return frames[index];
 }
 
-// Menu sisakjanal egy kis piros vonalat odahuz fole:
+// The red helmet is actually 41 pixels high, but the class only makes 40x40 images.
+// Let's add the top row of the helmet to each frame
 void anim::make_helmet_top(void) {
     for (int i = 0; i < frame_count; i++) {
+        // Paste the old picture into a new pic of 40x41
         pic8* new_frame = new pic8(ANIM_WIDTH, ANIM_WIDTH + 1);
         unsigned char transparency = frames[i]->gpixel(0, 0);
         new_frame->fillbox(transparency);
         blt8(new_frame, frames[i], 0, 1);
-        // Most behuzzuk vonalat balrol jobb szelig:
+
+        // Find the first solid pixel in row 1 located at (x1, 1)
+        // Get the color at (x1 + 3, 1)
+        // Copy this color in row 0 from x1 + 4 to the right border
         for (int x1 = 0; x1 < ANIM_WIDTH; x1++) {
             if (new_frame->gpixel(x1, 1) != transparency) {
                 for (int x2 = x1 + 4; x2 < ANIM_WIDTH; x2++) {
@@ -70,7 +79,7 @@ void anim::make_helmet_top(void) {
                 break;
             }
         }
-        // Most behuzunk atlatszot jobbrol jobb szelig:
+        // Lastly, trim 3 pixels off the right side of row 0
         for (int x1 = ANIM_WIDTH - 1; x1 > 0; x1--) {
             if (new_frame->gpixel(x1, 1) != transparency) {
                 for (int x2 = x1 - 3; x2 < ANIM_WIDTH; x2++) {
@@ -79,7 +88,10 @@ void anim::make_helmet_top(void) {
                 break;
             }
         }
+
+        // Regenerate transparency data
         spriteosit(new_frame, new_frame->gpixel(0, 0));
+
         delete frames[i];
         frames[i] = new_frame;
     }

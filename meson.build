@@ -1,4 +1,4 @@
-project('elma', 'cpp', version: '1.4', default_options: ['cpp_std=c++20'])
+project('elma', 'cpp', version: '1.4', meson_version: '>=1.2.0', default_options: ['cpp_std=c++20'])
 
 if get_option('buildtype') == 'debug'
     add_project_arguments('-DDEBUG', language: 'cpp')

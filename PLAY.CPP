@@ -383,7 +383,7 @@ void idoelintezes(long ido, char* valasz, int level, const char* filenev) {
     }
 
     char tmp[10];
-    ido2string(ido, tmp);
+    centiseconds_to_string(ido, tmp);
     if (Single) {
         sprintf(valasz, "*$$^&|@%s", tmp);
     } else {
@@ -619,7 +619,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
 
             if (tagisvan) {
                 long longido = Afogoido * Idod2lszorzo;
-                ido2string(longido, Idoszovegek[3].text);
+                centiseconds_to_string(longido, Idoszovegek[3].text);
                 Idoszovegek[3].x = 440 + dx;
                 Idoszovegek[3].y = ya;
             } else {
@@ -643,7 +643,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
 
             if (tagisvan) {
                 long longido = Bfogoido * Idod2lszorzo;
-                ido2string(longido, Idoszovegek[6].text);
+                centiseconds_to_string(longido, Idoszovegek[6].text);
                 Idoszovegek[6].x = 440 + dx;
                 Idoszovegek[6].y = yb;
             }
@@ -738,9 +738,9 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         }
         if (eredmeny == 4) {
             if (extlev) {
-                besttimes(Ptop, Single);
+                menu_external_topten(Ptop, Single);
             } else {
-                levelbesttimes(level, Single);
+                menu_internal_topten(level, Single);
             }
         }
     }

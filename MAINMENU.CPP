@@ -245,7 +245,7 @@ void replay(void) {
                 }
 
                 char idostr[25];
-                ido2string(ido, idostr);
+                centiseconds_to_string(ido, idostr);
                 strcat(idostr, "    +- 0.01 sec");
                 dialog320(tmp, "The time of this replay file is:", idostr);
                 RECidokellis = 0;
@@ -383,7 +383,7 @@ void mainmenu(void) {
         }
 
         if (eredmeny == 5) {
-            besttimes();
+            menu_best_times();
         }
 
         if (eredmeny == 6) {

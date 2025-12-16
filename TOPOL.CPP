@@ -871,7 +871,7 @@ void beallitlegjobbidot(const char* filenev, int single) {
     }
 
     if (egyfeleidok->idokszama > 0) {
-        ido2string(egyfeleidok->idok[0], Ezenlegjobbido);
+        centiseconds_to_string(egyfeleidok->idok[0], Ezenlegjobbido);
     } else {
         Ezenlegjobbido[0] = 0;
     }

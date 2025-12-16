@@ -14,7 +14,7 @@ static int afterplayext( char* filenev, long ido ) {
         }
         else {
             strcpy( idoszov1, "Your time:" );
-            ido2string( ido, idoszov2 );
+            centiseconds_to_string( ido, idoszov2 );
         }
 
         //Korny->pabc_afterplaymenu->write( Korny->picbuffer, 200, 104, idoszov1 );

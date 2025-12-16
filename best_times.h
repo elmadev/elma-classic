@@ -1,9 +1,9 @@
 #ifndef BEST_TIMES_H
 #define BEST_TIMES_H
 
-void levelbesttimes(int level, int single);
-void besttimes(topol* ptop, int single);
-void besttimes(void);
-void ido2string(long l, char* text, int hosszu = 0);
+void menu_internal_topten(int level, int single);
+void menu_external_topten(topol* top, int single);
+void menu_best_times(void);
+void centiseconds_to_string(long time, char* text, int show_hours = 0);
 
 #endif

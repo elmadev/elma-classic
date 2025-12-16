@@ -172,7 +172,7 @@ void kidigit(const char* time1, double fogoido, double time2d, pic8* ppic8, int 
 
     long l2 = time2d * Idod2lszorzo;
     char time2[20];
-    ido2string(l2, time2);
+    centiseconds_to_string(l2, time2);
 
     // Elso:
     int xelso = x;
@@ -192,7 +192,7 @@ void kidigit(const char* time1, double fogoido, double time2d, pic8* ppic8, int 
     if (fogoido >= 0) {
         long lf = fogoido * Idod2lszorzo;
         char fogo[20];
-        ido2string(lf, fogo);
+        centiseconds_to_string(lf, fogo);
         kiegyszam(fogo, (xelso + x) >> 1, y);
     }
 }

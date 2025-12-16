@@ -1,19 +1,19 @@
 #include "ALL.H"
 
-void ido2string(long l, char* text, int hosszu) {
-    if (l < 0) {
-        hiba("ido2string-ben ido < 0!");
+void centiseconds_to_string(long time, char* text, int show_hours) {
+    if (time < 0) {
+        hiba("centiseconds_to_string-ben ido < 0!");
     }
-    int szazad = int(l % 100);
-    l /= 100;
-    int masodperc = int(l % 60);
-    l /= 60;
-    int perc = int(l % 60);
-    l /= 60;
+    int szazad = int(time % 100);
+    time /= 100;
+    int masodperc = int(time % 60);
+    time /= 60;
+    int perc = int(time % 60);
+    time /= 60;
     int ora = 0;
-    if (l) {
-        if (hosszu) {
-            ora = l;
+    if (time) {
+        if (show_hours) {
+            ora = time;
         } else {
             szazad = 99;
             masodperc = 59;
@@ -84,7 +84,7 @@ void elemibesttimes(palyaegyfeleidok* pidok, const char* fejlec, int single) {
 
         szl.addszoveg(szoveg, x1, 110 + i * (SM + 19));
         char tmp[30];
-        ido2string(pidok->idok[i], tmp);
+        centiseconds_to_string(pidok->idok[i], tmp);
         szl.addszoveg(tmp, x2, 110 + i * (SM + 19));
     }
 
@@ -100,7 +100,7 @@ void elemibesttimes(palyaegyfeleidok* pidok, const char* fejlec, int single) {
     }
 }
 
-void levelbesttimes(int level, int single) {
+void menu_internal_topten(int level, int single) {
     char fejlec[100];
     itoa(level + 1, fejlec, 10);
     strcat(fejlec, ": ");
@@ -114,11 +114,11 @@ void levelbesttimes(int level, int single) {
     elemibesttimes(pidok, fejlec, single);
 }
 
-void besttimes(topol* ptop, int single) {
+void menu_external_topten(topol* top, int single) {
     if (single) {
-        elemibesttimes(&ptop->idok.singleidok, ptop->levelname, single);
+        elemibesttimes(&top->idok.singleidok, top->levelname, single);
     } else {
-        elemibesttimes(&ptop->idok.multiidok, ptop->levelname, single);
+        elemibesttimes(&top->idok.multiidok, top->levelname, single);
     }
 }
 
@@ -132,7 +132,7 @@ void besttimes_egytipus(int single) {
     /*if( palyaszam == 0 )
         return;
     if( palyaszam == 1 ) {
-        levelbesttimes( 0, single );
+        menu_internal_topten( 0, single );
         return;
     } */
 
@@ -190,7 +190,7 @@ void besttimes_egytipus(int single) {
         /*strcat( Korny->rubrikak[i], " " );
         // Legjobb idok kiirasa: Sajnos most nem fer ki:
         char tmp[30];
-        ido2string( pidok->idok[0], tmp );
+        centiseconds_to_string( pidok->idok[0], tmp );
         strcat( Korny->rubrikak[i], tmp );
         */
     }
@@ -203,11 +203,11 @@ void besttimes_egytipus(int single) {
             return;
         }
 
-        levelbesttimes(eredmeny, single);
+        menu_internal_topten(eredmeny, single);
     }
 }
 
-void besttimes(void) {
+void menu_best_times(void) {
     valaszt2 val;
     if (State->single) {
         val.kur = 0;

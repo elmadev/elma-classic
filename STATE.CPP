@@ -207,7 +207,7 @@ void state_s::save(void) {
 static void exportegylevel(FILE* h, palyaegyfeleidok* pidok, int single) {
     for (int i = 0; i < pidok->idokszama; i++) {
         char idostr[40];
-        ido2string(pidok->idok[i], idostr, 1);
+        centiseconds_to_string(pidok->idok[i], idostr, 1);
         fprintf(h, "    ");
         fprintf(h, idostr);
         for (int k = 0; k < (12 - strlen(idostr)); k++) {
@@ -253,7 +253,7 @@ void state_s::exportanonim(FILE* h, int single, const char* text1, const char* t
     fprintf(h, "%s\n%s\n%s\n", text1, text2, text3);
 
     char idostr[40];
-    ido2string(sum, idostr, 1);
+    centiseconds_to_string(sum, idostr, 1);
     fprintf(h, idostr);
     fprintf(h, "\n\n");
 }
@@ -295,7 +295,7 @@ void state_s::exportjatekossum(FILE* h, const char* nev, int single) {
         }
     }
     char idostr[40];
-    ido2string(sum, idostr, 1);
+    centiseconds_to_string(sum, idostr, 1);
     fprintf(h, idostr);
     for (int k = 0; k < (12 - strlen(idostr)); k++) {
         fprintf(h, " ");

@@ -30,7 +30,7 @@
 
 #include "VEKT2.H"
 #include "physics_init.h"
-#include "BEALLIT.H"
+#include "physics_move.h"
 #include "LEPTET.H"
 #include "UTKOZES.H"
 #include "FOGOCSKA.H"

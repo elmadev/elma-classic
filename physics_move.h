@@ -1,5 +1,5 @@
-#ifndef BEALLIT_H
-#define BEALLIT_H
+#ifndef PHYSICS_MOVE_H
+#define PHYSICS_MOVE_H
 
 void beallit(rigidbody* pk, vekt2 F, double M, double dt, int kelltalppont);
 

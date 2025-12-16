@@ -9,7 +9,7 @@ elma_sources = files(
     'physics_init.cpp',
     'anim.cpp',
     'physics_move.cpp',
-    'BESTTIME.CPP',
+    'best_times.cpp',
     'CUSTOM.CPP',
     'DIALOG.CPP',
     'DIALOG32.CPP',

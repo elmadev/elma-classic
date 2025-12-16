@@ -61,7 +61,7 @@
 #include "MAINMENU.H"
 #include "PLAY.H"
 #include "SKIP.H"
-#include "BESTTIME.H"
+#include "best_times.h"
 
 #include "QOPEN.H"
 

@@ -1,5 +1,5 @@
-#ifndef BESTTIME_H
-#define BESTTIME_H
+#ifndef BEST_TIMES_H
+#define BEST_TIMES_H
 
 void levelbesttimes(int level, int single);
 void besttimes(topol* ptop, int single);

@@ -231,48 +231,49 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
 
     /*
     rigidbody_movement( &pmot->bike, Ftest2+Ftest4-Vekt2j*pmot->bike.mass*Gravity,
-                    Mtest2+Mtest4, dt, 0 );
-    rigidbody_movement( &pmot->left_wheel, Fkerek2-Vekt2j*pmot->left_wheel.mass*Gravity, Mkerek2,      dt, 1 );
-    rigidbody_movement( &pmot->right_wheel, Fkerek4-Vekt2j*pmot->right_wheel.mass*Gravity, Mkerek4,      dt, 1
+                    Mtest2+Mtest4, dt, false );
+    rigidbody_movement( &pmot->left_wheel, Fkerek2-Vekt2j*pmot->left_wheel.mass*Gravity, Mkerek2,
+    dt, true ); rigidbody_movement( &pmot->right_wheel,
+    Fkerek4-Vekt2j*pmot->right_wheel.mass*Gravity, Mkerek4,      dt, true
     );
     */
 
     switch (pmot->gravity_direction) {
     case MotorGravity::Down:
         body_movement(pmot, vekt2(0.0, -1.0), i1, j1, dt); // vezeto
-        rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 - Vekt2j * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
-                dt, 0);
-        rigidbody_movement(&pmot->left_wheel, Fkerek2 - Vekt2j * pmot->left_wheel.mass * Gravity, Mkerek2, dt,
-                1);
-        rigidbody_movement(&pmot->right_wheel, Fkerek4 - Vekt2j * pmot->right_wheel.mass * Gravity, Mkerek4,
-                dt, 1);
+        rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 - Vekt2j * pmot->bike.mass * Gravity,
+                           Mtest2 + Mtest4, dt, false);
+        rigidbody_movement(&pmot->left_wheel, Fkerek2 - Vekt2j * pmot->left_wheel.mass * Gravity,
+                           Mkerek2, dt, true);
+        rigidbody_movement(&pmot->right_wheel, Fkerek4 - Vekt2j * pmot->right_wheel.mass * Gravity,
+                           Mkerek4, dt, true);
         break;
     case MotorGravity::Up:
         body_movement(pmot, vekt2(0.0, 1.0), i1, j1, dt); // vezeto
-        rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 + Vekt2j * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
-                dt, 0);
-        rigidbody_movement(&pmot->left_wheel, Fkerek2 + Vekt2j * pmot->left_wheel.mass * Gravity, Mkerek2, dt,
-                1);
-        rigidbody_movement(&pmot->right_wheel, Fkerek4 + Vekt2j * pmot->right_wheel.mass * Gravity, Mkerek4,
-                dt, 1);
+        rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 + Vekt2j * pmot->bike.mass * Gravity,
+                           Mtest2 + Mtest4, dt, false);
+        rigidbody_movement(&pmot->left_wheel, Fkerek2 + Vekt2j * pmot->left_wheel.mass * Gravity,
+                           Mkerek2, dt, true);
+        rigidbody_movement(&pmot->right_wheel, Fkerek4 + Vekt2j * pmot->right_wheel.mass * Gravity,
+                           Mkerek4, dt, true);
         break;
     case MotorGravity::Left:
         body_movement(pmot, vekt2(-1.0, 0.0), i1, j1, dt); // vezeto
-        rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 - Vekt2i * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
-                dt, 0);
-        rigidbody_movement(&pmot->left_wheel, Fkerek2 - Vekt2i * pmot->left_wheel.mass * Gravity, Mkerek2, dt,
-                1);
-        rigidbody_movement(&pmot->right_wheel, Fkerek4 - Vekt2i * pmot->right_wheel.mass * Gravity, Mkerek4,
-                dt, 1);
+        rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 - Vekt2i * pmot->bike.mass * Gravity,
+                           Mtest2 + Mtest4, dt, false);
+        rigidbody_movement(&pmot->left_wheel, Fkerek2 - Vekt2i * pmot->left_wheel.mass * Gravity,
+                           Mkerek2, dt, true);
+        rigidbody_movement(&pmot->right_wheel, Fkerek4 - Vekt2i * pmot->right_wheel.mass * Gravity,
+                           Mkerek4, dt, true);
         break;
     case MotorGravity::Right:
         body_movement(pmot, vekt2(1.0, 0.0), i1, j1, dt); // vezeto
-        rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 + Vekt2i * pmot->bike.mass * Gravity, Mtest2 + Mtest4,
-                dt, 0);
-        rigidbody_movement(&pmot->left_wheel, Fkerek2 + Vekt2i * pmot->left_wheel.mass * Gravity, Mkerek2, dt,
-                1);
-        rigidbody_movement(&pmot->right_wheel, Fkerek4 + Vekt2i * pmot->right_wheel.mass * Gravity, Mkerek4,
-                dt, 1);
+        rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 + Vekt2i * pmot->bike.mass * Gravity,
+                           Mtest2 + Mtest4, dt, false);
+        rigidbody_movement(&pmot->left_wheel, Fkerek2 + Vekt2i * pmot->left_wheel.mass * Gravity,
+                           Mkerek2, dt, true);
+        rigidbody_movement(&pmot->right_wheel, Fkerek4 + Vekt2i * pmot->right_wheel.mass * Gravity,
+                           Mkerek4, dt, true);
         break;
     }
 

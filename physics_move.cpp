@@ -10,17 +10,17 @@ static void move_wheel_out_of_ground(rigidbody* rb, vekt2* point) {
 }
 
 // Minimum speed loss to trigger a bump sound effect
-static double BumpThreshold = 1.5;
+static const double BumpThreshold = 1.5;
 
 // Handle collision between a wheel and one anchor point
-// Return 1 if there is collision, or 0 if no collision
+// Return true if there is collision
 // Delete all of the velocity towards the point and keep velocity perpendicular to the point
-static int simulate_anchor_point_collision(rigidbody* rb, vekt2* point, vekt2 force) {
-    // Return 0 if no collision
+static bool simulate_anchor_point_collision(rigidbody* rb, vekt2* point, vekt2 force) {
+    // Return false if no collision
     double length = abs(rb->r - *point);
     vekt2 n = (rb->r - *point) * (1.0 / length);
     if (n * rb->v > -GroundEscapeVelocity && n * force > 0) {
-        return 0;
+        return false;
     }
     // Remove the velocity component that is parallel to the axis between wheel and point
     vekt2 deleted_velocity = n * rb->v * n;
@@ -34,7 +34,7 @@ static int simulate_anchor_point_collision(rigidbody* rb, vekt2* point, vekt2 fo
         }
         startwavegyujto(WAV_UTODES, bump_magnitude, -1);
     }
-    return 1;
+    return true;
 }
 
 // Check to see whether the wheel is stuck
@@ -44,8 +44,8 @@ static int simulate_anchor_point_collision(rigidbody* rb, vekt2* point, vekt2 fo
 // If the wheel is pushed towards point1, return 1 (stuck wheel).
 // The reason why this causes stuck in Across is we ignore existing velocity and only consider
 // acceleration/torque
-static int valid_anchor_points_old(vekt2 point1, vekt2 point2, rigidbody* rb, vekt2 force,
-                                   double torque) {
+static bool valid_anchor_points_old(vekt2 point1, vekt2 point2, rigidbody* rb, vekt2 force,
+                                    double torque) {
     // Get the unit vectors
     double length = abs(rb->r - point2);
     vekt2 n = (rb->r - point2) * (1.0 / length);
@@ -55,18 +55,13 @@ static int valid_anchor_points_old(vekt2 point1, vekt2 point2, rigidbody* rb, ve
     // torque)
     double total_torque = torque + length * n90 * force;
     // Check if torque is in same direction as point1 or not
-    if ((point1 - point2) * n90 * total_torque < 0) {
-        return 0;
-    } else {
-        return 1;
-    }
+    return !((point1 - point2) * n90 * total_torque < 0);
 }
 
 // Check to see whether the wheel is stuck, Elma-exclusive
 // Assuming that the wheel hits point point2
 // Assuming that the wheel is rolling on point2, does the wheel slide towards point1 or away?
-static int valid_anchor_points_new(vekt2 point1, vekt2 point2, rigidbody* rb, vekt2 force,
-                                   double torque) {
+static bool valid_anchor_points_new(vekt2 point1, vekt2 point2, rigidbody* rb) {
     // Get the unit vectors
     double length = abs(rb->r - point2);
     vekt2 n = (rb->r - point2) * (1.0 / length);
@@ -76,19 +71,17 @@ static int valid_anchor_points_new(vekt2 point1, vekt2 point2, rigidbody* rb, ve
     // The units here don't really match (m/s + rad/s) so it's kind of flawed
     double speed_direction = rb->angular_velocity + length * n90 * rb->v;
     // Check if the velocity is in the same direction as point1
-    if ((point1 - point2) * n90 * speed_direction < 0) {
-        return 0;
-    } else {
-        return 1;
-    }
+    return !((point1 - point2) * n90 * speed_direction < 0);
 }
 
 // Handle wheel/bike movement
 // do_collision = true if solid object (i.e. wheels and not bike)
-void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, int do_collision) {
+void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, bool do_collision) {
     int anchor_point_count = 0;
-    vekt2 point1, point2;
-    vonal *line1 = NULL, *line2 = NULL;
+    vekt2 point1;
+    vekt2 point2;
+    vonal* line1 = nullptr;
+    vonal* line2 = nullptr;
 
     // Get up to two points of collision between wheel and polygons
     if (do_collision) {
@@ -127,11 +120,11 @@ void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, in
     // away from it
     if (anchor_point_count == 2 && abs(rb->v) > 1.0) {
         // Elma-exclusive bike-stuck fixes:
-        if (!valid_anchor_points_new(point1, point2, rb, force, torque)) {
+        if (!valid_anchor_points_new(point1, point2, rb)) {
             anchor_point_count = 1;
             point1 = point2;
         } else {
-            if (!valid_anchor_points_new(point2, point1, rb, force, torque)) {
+            if (!valid_anchor_points_new(point2, point1, rb)) {
                 anchor_point_count = 1;
             }
         }
@@ -209,7 +202,6 @@ void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, in
     // Calculate linear velocity and position based on a rolling wheel
     rb->v = rb->angular_velocity * rb->radius * n90;
     rb->r = rb->r + rb->v * dt;
-    return;
 }
 
 // Teleport the body to be within the specified boundaries
@@ -227,10 +219,10 @@ static void body_boundaries(motorst* mot, vekt2 i, vekt2 j) {
     vekt2 body_r(body_x, body_y);
 
     // Restrict bottom with a diagonal line
-    static vekt2 LINE_POINT(-0.35, 0.13);
-    static vekt2 LINE_SLOPE(0.14 - (-0.35), 0.36 - (0.13));
-    static vekt2 LINE_SLOPE_ORTHO(-LINE_SLOPE.y, LINE_SLOPE.x);
-    static vekt2 LINE_SLOPE_ORTHO_UNIT = egys(LINE_SLOPE_ORTHO);
+    static const vekt2 LINE_POINT(-0.35, 0.13);
+    static const vekt2 LINE_SLOPE(0.14 - (-0.35), 0.36 - (0.13));
+    static const vekt2 LINE_SLOPE_ORTHO(-LINE_SLOPE.y, LINE_SLOPE.x);
+    static const vekt2 LINE_SLOPE_ORTHO_UNIT = egys(LINE_SLOPE_ORTHO);
     if ((body_r - LINE_POINT) * LINE_SLOPE_ORTHO_UNIT < 0.0) {
         double distance = (body_r - LINE_POINT) * LINE_SLOPE_ORTHO_UNIT;
         body_r = body_r - LINE_SLOPE_ORTHO_UNIT * distance;

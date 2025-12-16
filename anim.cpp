@@ -8,12 +8,12 @@ anim::anim(pic8* source_sheet, const char* error_filename) {
 
     if (source_sheet->getxsize() % ANIM_WIDTH) {
         char tmp[80];
-        sprintf(tmp, "Picture xsize must be a multiply of %d!", ANIM_WIDTH);
+        sprintf(tmp, "Picture xsize must be a multiple of %d!", ANIM_WIDTH);
         uzenet(tmp, error_filename);
     }
     frame_count = source_sheet->getxsize() / ANIM_WIDTH;
     if (frame_count < 0) {
-        hiba("uiuiotb");
+        hiba("anim::anim frame_count < 0");
     }
     if (frame_count > ANIM_MAX_FRAMES) {
         char tmp[80];
@@ -39,17 +39,17 @@ anim::~anim(void) {
     }
 }
 
-static const double Egyframeido = 0.014;
+static const double FrameTimestep = 0.014;
 
 pic8* anim::get_frame_by_time(double time) {
-    int sorszam = time / Egyframeido;
-    int i = sorszam % frame_count;
+    int step = time / FrameTimestep;
+    int i = step % frame_count;
     return frames[i];
 }
 
 pic8* anim::get_frame_by_index(int index) {
     if (index < 0 || index >= frame_count) {
-        hiba("678673");
+        hiba("get_frame_by_index out of range");
     }
     return frames[index];
 }
@@ -57,30 +57,30 @@ pic8* anim::get_frame_by_index(int index) {
 // Menu sisakjanal egy kis piros vonalat odahuz fole:
 void anim::make_helmet_top(void) {
     for (int i = 0; i < frame_count; i++) {
-        pic8* ujpic = new pic8(ANIM_WIDTH, ANIM_WIDTH + 1);
-        unsigned char atlatszo = frames[i]->gpixel(0, 0);
-        ujpic->fillbox(atlatszo);
-        blt8(ujpic, frames[i], 0, 1);
+        pic8* new_frame = new pic8(ANIM_WIDTH, ANIM_WIDTH + 1);
+        unsigned char transparency = frames[i]->gpixel(0, 0);
+        new_frame->fillbox(transparency);
+        blt8(new_frame, frames[i], 0, 1);
         // Most behuzzuk vonalat balrol jobb szelig:
-        for (int x = 0; x < ANIM_WIDTH; x++) {
-            if (ujpic->gpixel(x, 1) != atlatszo) {
-                for (int j = x + 4; j < ANIM_WIDTH; j++) {
-                    ujpic->ppixel(j, 0, ujpic->gpixel(x + 3, 1));
+        for (int x1 = 0; x1 < ANIM_WIDTH; x1++) {
+            if (new_frame->gpixel(x1, 1) != transparency) {
+                for (int x2 = x1 + 4; x2 < ANIM_WIDTH; x2++) {
+                    new_frame->ppixel(x2, 0, new_frame->gpixel(x1 + 3, 1));
                 }
                 break;
             }
         }
         // Most behuzunk atlatszot jobbrol jobb szelig:
-        for (int x = ANIM_WIDTH - 1; x > 0; x--) {
-            if (ujpic->gpixel(x, 1) != atlatszo) {
-                for (int j = x - 3; j < ANIM_WIDTH; j++) {
-                    ujpic->ppixel(j, 0, atlatszo);
+        for (int x1 = ANIM_WIDTH - 1; x1 > 0; x1--) {
+            if (new_frame->gpixel(x1, 1) != transparency) {
+                for (int x2 = x1 - 3; x2 < ANIM_WIDTH; x2++) {
+                    new_frame->ppixel(x2, 0, transparency);
                 }
                 break;
             }
         }
-        spriteosit(ujpic, ujpic->gpixel(0, 0));
+        spriteosit(new_frame, new_frame->gpixel(0, 0));
         delete frames[i];
-        frames[i] = ujpic;
+        frames[i] = new_frame;
     }
 }

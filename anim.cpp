@@ -3,7 +3,7 @@
 anim::anim(pic8* source_sheet, const char* error_filename) {
     frame_count = 0;
     for (int i = 0; i < ANIM_MAX_FRAMES; i++) {
-        frames[i] = NULL;
+        frames[i] = nullptr;
     }
 
     // Get total number of animation frames
@@ -18,7 +18,7 @@ anim::anim(pic8* source_sheet, const char* error_filename) {
     }
     if (frame_count > ANIM_MAX_FRAMES) {
         char tmp[80];
-        sprintf(tmp, "Too many frames in picture! Max frame is %d!", (int)ANIM_MAX_FRAMES);
+        sprintf(tmp, "Too many frames in picture! Max frame is %d!", ANIM_MAX_FRAMES);
         uzenet(tmp, error_filename);
     }
 
@@ -31,12 +31,12 @@ anim::anim(pic8* source_sheet, const char* error_filename) {
     }
 }
 
-anim::~anim(void) {
+anim::~anim() {
     frame_count = 0;
     for (int i = 0; i < ANIM_MAX_FRAMES; i++) {
         if (frames[i]) {
             delete frames[i];
-            frames[i] = NULL;
+            frames[i] = nullptr;
         }
     }
 }
@@ -60,7 +60,7 @@ pic8* anim::get_frame_by_index(int index) {
 
 // The red helmet is actually 41 pixels high, but the class only makes 40x40 images.
 // Let's add the top row of the helmet to each frame
-void anim::make_helmet_top(void) {
+void anim::make_helmet_top() {
     for (int i = 0; i < frame_count; i++) {
         // Paste the old picture into a new pic of 40x41
         pic8* new_frame = new pic8(ANIM_WIDTH, ANIM_WIDTH + 1);

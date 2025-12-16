@@ -2,90 +2,90 @@
 
 void centiseconds_to_string(long time, char* text, int show_hours) {
     if (time < 0) {
-        hiba("centiseconds_to_string-ben ido < 0!");
+        hiba("centiseconds_to_string time < 0!");
     }
-    int szazad = int(time % 100);
+    int centiseconds = int(time % 100);
     time /= 100;
-    int masodperc = int(time % 60);
+    int seconds = int(time % 60);
     time /= 60;
-    int perc = int(time % 60);
+    int minutes = int(time % 60);
     time /= 60;
-    int ora = 0;
+    int hours = 0;
     if (time) {
         if (show_hours) {
-            ora = time;
+            hours = time;
         } else {
-            szazad = 99;
-            masodperc = 59;
-            perc = 59;
+            centiseconds = 99;
+            seconds = 59;
+            minutes = 59;
         }
     }
     text[0] = 0;
     char tmp[30];
-    if (ora) {
-        // ora:
-        itoa(ora, tmp, 10);
+    if (hours) {
+        // hours:
+        itoa(hours, tmp, 10);
         if (!tmp[1]) {
             strcat(text, "0");
         }
         strcat(text, tmp);
         strcat(text, ":");
     }
-    // perc:
-    itoa(perc, tmp, 10);
+    // minutes:
+    itoa(minutes, tmp, 10);
     if (!tmp[1]) {
         strcat(text, "0");
     }
     strcat(text, tmp);
     strcat(text, ":");
-    // masodperc:
-    itoa(masodperc, tmp, 10);
+    // seconds:
+    itoa(seconds, tmp, 10);
     if (!tmp[1]) {
         strcat(text, "0");
     }
     strcat(text, tmp);
     strcat(text, ":");
-    // szazad:
-    itoa(szazad, tmp, 10);
+    // centiseconds:
+    itoa(centiseconds, tmp, 10);
     if (!tmp[1]) {
         strcat(text, "0");
     }
     strcat(text, tmp);
 }
 
-void elemibesttimes(palyaegyfeleidok* pidok, const char* fejlec, int single) {
-    if (pidok->idokszama == 0) {
+void render_topten(palyaegyfeleidok* tten, const char* header, int single) {
+    if (tten->idokszama == 0) {
         return;
     }
 
-    szoveglista szl;
+    szoveglista men;
 
-    szl.addszoveg_kozep(fejlec, 320, 37);
+    men.addszoveg_kozep(header, 320, 37);
 
-    int x1, x2;
+    int player_x, time_x;
     if (single) {
-        x1 = 120;
-        x2 = 360;
+        player_x = 120;
+        time_x = 360;
     } else {
-        x1 = 80;
-        x2 = 400;
+        player_x = 80;
+        time_x = 400;
     }
-    for (int i = 0; i < pidok->idokszama; i++) {
-        char szoveg[50];
-        strcpy(szoveg, pidok->nevek1[i]);
+    for (int i = 0; i < tten->idokszama; i++) {
+        char player_text[50];
+        strcpy(player_text, tten->nevek1[i]);
         if (!single) {
-            strcat(szoveg, "  ");
-            strcat(szoveg, pidok->nevek2[i]);
+            strcat(player_text, "  ");
+            strcat(player_text, tten->nevek2[i]);
         }
         // Levagjuk hogy ne loghasson ki:
-        while (Pmenuabc->len(szoveg) > x2 - x1 - 4) {
-            szoveg[strlen(szoveg) - 1] = 0;
+        while (Pmenuabc->len(player_text) > time_x - player_x - 4) {
+            player_text[strlen(player_text) - 1] = 0;
         }
 
-        szl.addszoveg(szoveg, x1, 110 + i * (SM + 19));
-        char tmp[30];
-        centiseconds_to_string(pidok->idok[i], tmp);
-        szl.addszoveg(tmp, x2, 110 + i * (SM + 19));
+        men.addszoveg(player_text, player_x, 110 + i * (SM + 19));
+        char time_text[30];
+        centiseconds_to_string(tten->idok[i], time_text);
+        men.addszoveg(time_text, time_x, 110 + i * (SM + 19));
     }
 
     mk_emptychar();
@@ -96,79 +96,79 @@ void elemibesttimes(palyaegyfeleidok* pidok, const char* fejlec, int single) {
                 return;
             }
         }
-        szl.kirajzol();
+        men.kirajzol();
     }
 }
 
 void menu_internal_topten(int level, int single) {
-    char fejlec[100];
-    itoa(level + 1, fejlec, 10);
-    strcat(fejlec, ": ");
-    strcat(fejlec, getleveldescription(level));
+    char header[100];
+    itoa(level + 1, header, 10);
+    strcat(header, ": ");
+    strcat(header, getleveldescription(level));
 
-    palyaegyfeleidok* pidok = &State->palyakidejei[level].singleidok;
+    palyaegyfeleidok* tten = &State->palyakidejei[level].singleidok;
     if (!single) {
-        pidok = &State->palyakidejei[level].multiidok;
+        tten = &State->palyakidejei[level].multiidok;
     }
 
-    elemibesttimes(pidok, fejlec, single);
+    render_topten(tten, header, single);
 }
 
 void menu_external_topten(topol* top, int single) {
     if (single) {
-        elemibesttimes(&top->idok.singleidok, top->levelname, single);
+        render_topten(&top->idok.singleidok, top->levelname, single);
     } else {
-        elemibesttimes(&top->idok.multiidok, top->levelname, single);
+        render_topten(&top->idok.multiidok, top->levelname, single);
     }
 }
 
-void besttimes_egytipus(int single) {
-    int palyaszam = 0;
+void menu_best_times_choose_level(int single) {
+    int visible_levels = 0;
     for (int i = 0; i < State->jatekosokszama; i++) {
-        if (State->jatekosok[i].sikerespalyakszama > palyaszam) {
-            palyaszam = int(State->jatekosok[i].sikerespalyakszama);
+        if (State->jatekosok[i].sikerespalyakszama > visible_levels) {
+            visible_levels = int(State->jatekosok[i].sikerespalyakszama);
         }
     }
-    /*if( palyaszam == 0 )
+    /*if( visible_levels == 0 )
         return;
-    if( palyaszam == 1 ) {
+    if( visible_levels == 1 ) {
         menu_internal_topten( 0, single );
         return;
     } */
 
-    palyaszam++; // Mivel utolso nem sikeres palya is szamit
-    if (palyaszam >= Palyaszam) {
-        palyaszam = Palyaszam - 1; // mivel utolso palya nem rendes palya
+    visible_levels++; // Mivel utolso nem sikeres palya is szamit
+    if (visible_levels >= Palyaszam) {
+        visible_levels = Palyaszam - 1; // mivel utolso palya nem rendes palya
     }
 
-    valaszt2 val;
-    val.kur = 0;
-    val.egykepen = LISTegykepen;
-    val.x0 = 61;
-    val.x0_tab = 380;
-    val.y0 = LISTy0;
-    val.dy = LISTdy;
-    val.escelheto = 1;
+    valaszt2 nav;
+    nav.kur = 0;
+    nav.egykepen = LISTegykepen;
+    nav.x0 = 61;
+    nav.x0_tab = 380;
+    nav.y0 = LISTy0;
+    nav.dy = LISTdy;
+    nav.escelheto = 1;
     if (single) {
-        strcpy(val.cim, "Single Player Best Times");
+        strcpy(nav.cim, "Single Player Best Times");
     } else {
-        strcpy(val.cim, "Multi Player Best Times");
+        strcpy(nav.cim, "Multi Player Best Times");
     }
 
-    for (int i = 0; i < palyaszam; i++) {
-        palyaegyfeleidok* pidok = &State->palyakidejei[i].singleidok;
+    for (int i = 0; i < visible_levels; i++) {
+        palyaegyfeleidok* tten = &State->palyakidejei[i].singleidok;
         if (!single) {
-            pidok = &State->palyakidejei[i].multiidok;
+            tten = &State->palyakidejei[i].multiidok;
         }
-        int vanido = 1;
-        if (pidok->idokszama == 0) {
-            vanido = 0;
+        int has_time = 1;
+        if (tten->idokszama == 0) {
+            has_time = 0;
         }
-        char jatekosnev[50];
-        strcpy(jatekosnev, pidok->nevek1[0]);
+        char player_text[50];
+        strcpy(player_text, tten->nevek1[0]);
         if (!single) {
-            strcat(jatekosnev, "  ");
-            strcat(jatekosnev, pidok->nevek2[0]);
+            strcat(player_text, "  ");
+            strcat(player_text, tten->nevek2[0]);
         }
         // Sorszam 1-tol:
         itoa(i + 1, Rubrikak[i], 10);
@@ -181,8 +181,8 @@ void besttimes_egytipus(int single) {
             strcat(Rubrikak[i], " ");
         }
         // Jatekos neve:
-        if (vanido) {
-            strcpy(Rubrikak_tab[i], jatekosnev);
+        if (has_time) {
+            strcpy(Rubrikak_tab[i], player_text);
         } else {
             strcpy(Rubrikak_tab[i], "-");
         }
@@ -190,51 +190,51 @@ void besttimes_egytipus(int single) {
         /*strcat( Korny->rubrikak[i], " " );
         // Legjobb idok kiirasa: Sajnos most nem fer ki:
         char tmp[30];
-        centiseconds_to_string( pidok->idok[0], tmp );
+        centiseconds_to_string( tten->idok[0], tmp );
         strcat( Korny->rubrikak[i], tmp );
         */
     }
 
-    val.bead(palyaszam, 1);
+    nav.bead(visible_levels, 1);
     while (1) {
-        int eredmeny = val.valassz();
+        int choice = nav.valassz();
 
-        if (eredmeny < 0) {
+        if (choice < 0) {
             return;
         }
 
-        menu_internal_topten(eredmeny, single);
+        menu_internal_topten(choice, single);
     }
 }
 
 void menu_best_times(void) {
-    valaszt2 val;
+    valaszt2 nav;
     if (State->single) {
-        val.kur = 0;
+        nav.kur = 0;
     } else {
-        val.kur = 1;
+        nav.kur = 1;
     }
-    val.egykepen = 6;
-    val.x0 = 170;
-    val.y0 = 190;
-    val.dy = 50;
-    val.escelheto = 1;
-    strcpy(val.cim, "Best Times");
+    nav.egykepen = 6;
+    nav.x0 = 170;
+    nav.y0 = 190;
+    nav.dy = 50;
+    nav.escelheto = 1;
+    strcpy(nav.cim, "Best Times");
 
     strcpy(Rubrikak[0], "Single Player Times");
     strcpy(Rubrikak[1], "Multi Player Times");
 
-    val.bead(2);
+    nav.bead(2);
     while (1) {
-        int eredmeny = val.valassz();
+        int choice = nav.valassz();
 
-        if (eredmeny < 0) {
+        if (choice < 0) {
             return;
         }
-        if (eredmeny == 0) {
-            besttimes_egytipus(1);
+        if (choice == 0) {
+            menu_best_times_choose_level(1);
         } else {
-            besttimes_egytipus(0);
+            menu_best_times_choose_level(0);
         }
     }
 }

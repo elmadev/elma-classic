@@ -7,7 +7,7 @@ endif
 elma_sources = files(
     'abc8.cpp',
     'physics_init.cpp',
-    'ANIM.CPP',
+    'anim.cpp',
     'BEALLIT.CPP',
     'BESTTIME.CPP',
     'CUSTOM.CPP',

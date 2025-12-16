@@ -1,6 +1,8 @@
 #include "ALL.H"
 
+// Format time as 00:00:00 (or 00:00:00:00 if hours are allowed)
 void centiseconds_to_string(long time, char* text, int show_hours) {
+    // Calculate time
     if (time < 0) {
         hiba("centiseconds_to_string time < 0!");
     }
@@ -15,15 +17,17 @@ void centiseconds_to_string(long time, char* text, int show_hours) {
         if (show_hours) {
             hours = time;
         } else {
+            // Cap to 59:59:99 if hours disallowed
             centiseconds = 99;
             seconds = 59;
             minutes = 59;
         }
     }
+    // Write time
     text[0] = 0;
     char tmp[30];
+    // hours
     if (hours) {
-        // hours:
         itoa(hours, tmp, 10);
         if (!tmp[1]) {
             strcat(text, "0");
@@ -31,21 +35,21 @@ void centiseconds_to_string(long time, char* text, int show_hours) {
         strcat(text, tmp);
         strcat(text, ":");
     }
-    // minutes:
+    // minutes
     itoa(minutes, tmp, 10);
     if (!tmp[1]) {
         strcat(text, "0");
     }
     strcat(text, tmp);
     strcat(text, ":");
-    // seconds:
+    // seconds
     itoa(seconds, tmp, 10);
     if (!tmp[1]) {
         strcat(text, "0");
     }
     strcat(text, tmp);
     strcat(text, ":");
-    // centiseconds:
+    // centiseconds
     itoa(centiseconds, tmp, 10);
     if (!tmp[1]) {
         strcat(text, "0");
@@ -53,6 +57,11 @@ void centiseconds_to_string(long time, char* text, int show_hours) {
     strcat(text, tmp);
 }
 
+// Render the best times list (both internal and external)
+// Some examples:
+// PlayerAName               00:14:00 (Single)
+// PlayerAName  PlayerBName  00:14:00 (Multi)
+// LongPlayerAName LongPlaye 00:14:00 (truncated)
 void render_topten(palyaegyfeleidok* tten, const char* header, int single) {
     if (tten->idokszama == 0) {
         return;
@@ -77,7 +86,7 @@ void render_topten(palyaegyfeleidok* tten, const char* header, int single) {
             strcat(player_text, "  ");
             strcat(player_text, tten->nevek2[i]);
         }
-        // Levagjuk hogy ne loghasson ki:
+        // Truncate the player names so it doesn't overlap with the times
         while (Pmenuabc->len(player_text) > time_x - player_x - 4) {
             player_text[strlen(player_text) - 1] = 0;
         }
@@ -100,6 +109,7 @@ void render_topten(palyaegyfeleidok* tten, const char* header, int single) {
     }
 }
 
+// Render the internal best times list
 void menu_internal_topten(int level, int single) {
     char header[100];
     itoa(level + 1, header, 10);
@@ -114,6 +124,7 @@ void menu_internal_topten(int level, int single) {
     render_topten(tten, header, single);
 }
 
+// Render the external best times list
 void menu_external_topten(topol* top, int single) {
     if (single) {
         render_topten(&top->idok.singleidok, top->levelname, single);
@@ -122,23 +133,21 @@ void menu_external_topten(topol* top, int single) {
     }
 }
 
+// Main Menu Best Times
+// Show a list of unlocked internals so that can you view the best times
 void menu_best_times_choose_level(int single) {
+    // Find the last level anyone has unlocked
     int visible_levels = 0;
     for (int i = 0; i < State->jatekosokszama; i++) {
         if (State->jatekosok[i].sikerespalyakszama > visible_levels) {
             visible_levels = int(State->jatekosok[i].sikerespalyakszama);
         }
     }
-    /*if( visible_levels == 0 )
-        return;
-    if( visible_levels == 1 ) {
-        menu_internal_topten( 0, single );
-        return;
-    } */
-
-    visible_levels++; // Mivel utolso nem sikeres palya is szamit
+    // Also show the last uncompleted level
+    visible_levels++;
+    // Disallow "More Levels"
     if (visible_levels >= Palyaszam) {
-        visible_levels = Palyaszam - 1; // mivel utolso palya nem rendes palya
+        visible_levels = Palyaszam - 1;
     }
 
     valaszt2 nav;
@@ -155,44 +164,42 @@ void menu_best_times_choose_level(int single) {
         strcpy(nav.cim, "Multi Player Best Times");
     }
 
+    // Draw "1 Warm Up         bestplayer"
     for (int i = 0; i < visible_levels; i++) {
         palyaegyfeleidok* tten = &State->palyakidejei[i].singleidok;
         if (!single) {
             tten = &State->palyakidejei[i].multiidok;
         }
+
+        // Check if anyone has completed the level
         int has_time = 1;
         if (tten->idokszama == 0) {
             has_time = 0;
         }
+
+        // Write one or two player names
         char player_text[50];
         strcpy(player_text, tten->nevek1[0]);
         if (!single) {
             strcat(player_text, "  ");
             strcat(player_text, tten->nevek2[0]);
         }
-        // Sorszam 1-tol:
+
+        // "1 Warm Up "
         itoa(i + 1, Rubrikak[i], 10);
         strcat(Rubrikak[i], " ");
-        // Level neve:
         strcat(Rubrikak[i], getleveldescription(i));
-        // strcat( Rubrikak[i], "Nincs meg nev." );
         strcat(Rubrikak[i], " ");
+        // Pad with spaces to a length of 184
         while (Pmenuabc->len(Rubrikak[i]) < 184) {
             strcat(Rubrikak[i], " ");
         }
-        // Jatekos neve:
+        // Best player, if exists
         if (has_time) {
             strcpy(Rubrikak_tab[i], player_text);
         } else {
             strcpy(Rubrikak_tab[i], "-");
         }
-
-        /*strcat( Korny->rubrikak[i], " " );
-        // Legjobb idok kiirasa: Sajnos most nem fer ki:
-        char tmp[30];
-        centiseconds_to_string( tten->idok[0], tmp );
-        strcat( Korny->rubrikak[i], tmp );
-        */
     }
 
     nav.bead(visible_levels, 1);

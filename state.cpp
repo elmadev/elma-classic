@@ -374,13 +374,13 @@ void state::reset_keys() {
     key_screenshot = DIK_I;
 }
 
-int get_player_index(const char* player_name) {
+player* state::get_player(const char* player_name) {
     for (int i = 0; i < MAX_PLAYERS; i++) {
         player* cur_player = &State->players[i];
         if (strcmp(cur_player->name, player_name) == 0) {
-            return i;
+            return cur_player;
         }
     }
-    hiba("get_player_index cannot find name!");
-    return 0;
+    hiba("get_player cannot find name!");
+    return nullptr;
 }

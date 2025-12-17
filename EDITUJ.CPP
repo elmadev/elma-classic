@@ -106,8 +106,7 @@ void seteditorpal(void) {
 }
 
 static int hanypalyavanmeg(void) {
-    int jatekosindex = get_player_index(State->player1);
-    player* pjatekos = &State->players[jatekosindex];
+    player* pjatekos = State->get_player(State->player1);
     int skippelt = 0;
     for (int i = 0; i < pjatekos->levels_completed; i++) {
         if (pjatekos->skipped[i]) {

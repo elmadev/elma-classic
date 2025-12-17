@@ -523,10 +523,8 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         extlev = 1;
     }
 
-    int jatekosindex1 = get_player_index(State->player1);
-    player* pjatekosa = &State->players[jatekosindex1];
-    int jatekosindex2 = get_player_index(State->player2);
-    player* pjatekosb = &State->players[jatekosindex2];
+    player* pjatekosa = State->get_player(State->player1);
+    player* pjatekosb = State->get_player(State->player2);
 
     // next, skip, kurrens beallitasa:
     int nextisvan = 0;
@@ -758,8 +756,7 @@ void kiirloading(void) {
 }
 
 static void playlevel(int level) {
-    int jatekosindex = get_player_index(State->player1);
-    player* pjatekos = &State->players[jatekosindex];
+    player* pjatekos = State->get_player(State->player1);
     while (1) {
         char tmpnev[20];
         if (level + 1 < 10) {
@@ -829,13 +826,11 @@ static void playlevel(int level) {
 
 void play(void) {
     while (1) {
-        int jatekosindex = get_player_index(State->player1);
-        player* pjatekos = &State->players[jatekosindex];
+        player* pjatekos = State->get_player(State->player1);
         int kirpalyszam = pjatekos->levels_completed + 1;
         if (!State->single) {
             // Ha ketten jatszanak, akkor a nagyobb sikeru szamit:
-            int jatekosindex2 = get_player_index(State->player2);
-            player* pjatekos2 = &State->players[jatekosindex2];
+            player* pjatekos2 = State->get_player(State->player2);
             if (kirpalyszam < pjatekos2->levels_completed + 1) {
                 kirpalyszam = pjatekos2->levels_completed + 1;
             }

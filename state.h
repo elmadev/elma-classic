@@ -16,8 +16,6 @@ struct player {
     int selected_level; // -1 if selected external files
 };
 
-int get_player_index(const char* player_name);
-
 typedef char player_name[MAX_PLAYERNAME_LENGTH + 1];
 
 struct topten {
@@ -82,6 +80,7 @@ class state {
   public:
     void write_stats();
     void reset_keys();
+    player* get_player(const char* player_name);
 };
 
 extern state* State;

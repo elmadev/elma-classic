@@ -3,8 +3,7 @@
 int skippelheto(int level) {
     int maxskippelheto = 5;
 
-    int jatekosindex = get_player_index(State->player1);
-    player* pjatekos = &State->players[jatekosindex];
+    player* pjatekos = State->get_player(State->player1);
     if (pjatekos->levels_completed != level) {
         hiba("skippelheto-ben pjatekos->sikerespalyakszam != level!");
     }

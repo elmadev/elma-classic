@@ -145,8 +145,6 @@ void state::reload_toptens() {
     fclose(h);
 }
 
-state::~state() {}
-
 void state::save() {
     FILE* h = fopen(STATE_FILENAME, "wb");
     if (!h) {

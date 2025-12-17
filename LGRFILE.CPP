@@ -565,6 +565,7 @@ lgrfile::lgrfile(const char* lgrnev) {
         if (strcmpi(nev, "q1body.pcx") == 0) {
             // kiskep konstructor delete-eli ppic-t:
             mkepek1.pkisvezeto = new kiskep(NULL, ppic);
+            mkepek1.alt_shirt = kiskep::from_bmp("bmp/shirt.bmp");
             continue;
         }
         if (strcmpi(nev, "q1thigh.pcx") == 0) {

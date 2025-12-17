@@ -355,7 +355,7 @@ int Voltkilogas = 0;
 #endif
 
 static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmot, valtozok* pvalt,
-                   motkepek* pmk) {
+                   motkepek* pmk, kiskep* shirt) {
 
     // Mivel ezeket fv megvaltoztatja:
     double ugrasnagysag = pvalt->ugrasnagysag;
@@ -570,7 +570,8 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     kidoboz(p_labfej, p_terd, ppic, 0.21, pmk->pkislabszar, 0.03, 0.03, pmot->flipped_bike);
 
     // Vezeto:
-    kidoboz(p_csipo, p_valltest, ppic, 0.2, pmk->pkisvezeto, 0.1, 0.05, pmot->flipped_bike);
+    kidoboz(p_csipo, p_valltest, ppic, 0.2, shirt ? shirt : pmk->pkisvezeto, 0.1, 0.05,
+            pmot->flipped_bike);
 
     // Kez:
     kidoboz(p_konyok, p_vall, ppic, 0.11, pmk->pkisfelkar, 0.08, 0.1, !pmot->flipped_bike);
@@ -688,13 +689,13 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
                     sarok.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
         double tav = (pmot2->bike.r - kozep).length();
         if (tav < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters) {
-            kibike(!ajatekos, ppic, t, sarok, pmot2, pvalt2, pmkepek2);
+            kibike(!ajatekos, ppic, t, sarok, pmot2, pvalt2, pmkepek2, nullptr);
         }
     }
 
     // Motoros kirajzolasa:
     pic8* xxxx = new pic8(ppic->get_width(), ppic->get_height()); // pic8::copy(ppic);
-    kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1);
+    kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1, pmkepek1->alt_shirt);
 
     if (!EolSettings->pictures_in_background) {
         // Felso ecset kitevese:

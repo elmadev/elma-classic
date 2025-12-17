@@ -12,6 +12,8 @@ class kiskep {
     long hossz;
     // Ha megadjuk ppic-t, akkor azt o deleteli:
     kiskep(const char* pic8nev, pic8* ppic = NULL);
+    kiskep(int xsize, int ysize);
+    static kiskep* from_bmp(const char* filename);
     ~kiskep(void);
 };
 

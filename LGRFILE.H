@@ -51,6 +51,7 @@ struct motkepek {
     kiskep* pkisalkar;
     kiskep* pkisfelkar;
     kiskep* pkisfej;
+    kiskep* alt_shirt;
 };
 
 #define MAXKOVETOK (20)

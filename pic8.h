@@ -6,10 +6,6 @@
 
 typedef unsigned char* puchar;
 
-// Ha igaz, akkor lefoglalt kepek minden masodik sora paratlan cimen
-// kezdodik. LGR file beolvasas es betolthattereket alatt aktiv:
-extern int Paratlankepsorok;
-
 class pic8;
 
 void blit8(pic8* dest, pic8* source, int x = 0, int y = 0, int x1 = -10000, int y1 = -10000,

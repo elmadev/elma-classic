@@ -2,10 +2,6 @@
 
 typedef unsigned char* puchar;
 
-// Ha igaz, akkor lefoglalt kepek minden masodik sora paratlan cimen
-// kezdodik. LGR file beolvasas es betolthattereket alatt aktiv:
-int Paratlankepsorok = 0;
-
 int pic8::allocate(long w, long h) {
     // nem szabad hasznalni size-eket, hanem sizep-eket!
     if (rows || szegmuttomb) {
@@ -14,10 +10,6 @@ int pic8::allocate(long w, long h) {
     }
     width = short(w);
     height = short(h);
-    // width-ot 4-el oszthatova valtoztatjuk:
-    if (Paratlankepsorok) {
-        w++;
-    }
     if (w % 4) {
         w += 4 - w % 4;
     }
@@ -78,9 +70,6 @@ int pic8::allocate(long w, long h) {
 
     for (int y = 0; y < h; y++) {
         memset(rows[y], 0, unsigned(w)); // nullazunk
-        if (Paratlankepsorok && (y % 2)) {
-            rows[y]++;
-        }
     }
 
     return 1;

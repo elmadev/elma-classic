@@ -400,12 +400,7 @@ long lejatszo(const char* filenev) {
         // mv_check( "Lej torlendo, ciklus kezdodik" );
 
         mv_check(/*"Lej 112"*/); // Billentyut itt olvassuk be
-        int hangfuto = 1;
         while (eddig <= cel - 0.000001) {
-            if ((hangfuto++) % 10 == 0) {
-                hang(/*"hangfuto 10-nel tart"*/);
-            }
-
             // char tmp[10];
             // sprintf( tmp, "Gaz kodja: %d", (int)State->keys1.gas );
             // uzenet( tmp );
@@ -483,7 +478,6 @@ long lejatszo(const char* filenev) {
                 stopmotor(0);
 
                 Mute = 1;
-                nullazhangot();
                 if (megvanido) {
                     Ptop->kerekjolalljon();
                     Prec1->encode_frame_count();
@@ -555,12 +549,7 @@ long lejatszo(const char* filenev) {
             stopmotor(1);
             stopmotor(0);
 
-            // while( vanmegwav() )
-            //	hang();
-
             Mute = 1;
-
-            nullazhangot();
 
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;
@@ -790,11 +779,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             setsurlodas(0);
             hangosdelay(LevelEndDelay * 400.0);
 
-            // while( vanmegwav() )
-            //	hang( /*"Lej replay 1"*/ );
-
             Mute = 1;
-            nullazhangot();
             Ptop->kerekjolalljon();
 
             Elozoshowkep1 = valt1.showkep;
@@ -881,11 +866,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             setsurlodas(0);
             hangosdelay(LevelEndDelay * 400.0);
 
-            // while( vanmegwav() )
-            //	hang( /*"Lej replay 1"*/ );
-
             Mute = 1;
-            nullazhangot();
 
             Ptop->kerekjolalljon();
 

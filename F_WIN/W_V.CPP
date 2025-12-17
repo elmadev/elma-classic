@@ -119,8 +119,6 @@ int main(int argc, char* argv[]) {
 }
 
 void mv_check(/*char* hivta,*/ int nemkellnyomas) {
-    void hang(void /*char* hivta*/);
-    hang(/*hivta*/);
     int elso = 1; // Hogy meg !Gameloop eseten is bejojjon:
     while (elso || !Aktiv) {
         elso = 0;

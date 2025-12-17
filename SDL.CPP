@@ -213,6 +213,3 @@ void initdsound(int unused) {
     SDL_PauseAudioDevice(SDLAudioDevice, 0);
     Hangenabled = 1;
 }
-
-void hang() {}
-void nullazhangot() {}

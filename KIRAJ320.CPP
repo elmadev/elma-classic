@@ -584,8 +584,6 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     // ppic->fillbox( 100 );
     Pecsetalso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
 
-    hang(/*"Ecsetalso utan"*/);
-
     // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
     int balalsox, balalsoy;
     Pecsetalso->getbalalso_int(sarok, &balalsox, &balalsoy);
@@ -785,8 +783,6 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
 
     // for( int i = 0; i < Ucsosurlodas; i++ )
     //	npic->ppixel( i, 100, 0 );
-
-    hang(/*"unlock elott"*/);
 
     Locky0_alul = 1;
     unlockbackbuffer_pic();

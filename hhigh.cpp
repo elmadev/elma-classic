@@ -481,6 +481,5 @@ void hangosdelay(int t) {
     double kezdo = mv_stopperido();
     while (mv_stopperido() / 182.0 < kezdo / 182.0 + t / 1000.0) {
         mv_check(/*"w_hhigh hangosdelay"*/);
-        // hang(); ez most benne van mv_check-ben
     }
 }

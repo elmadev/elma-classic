@@ -185,8 +185,7 @@ void startwave(int wavazonosito, double hangero) {
 int vanmegwav(void) {
     mv_check();
     extern int Mostvoltegynemcurpos;
-    int getstatesoundon(void);
-    if (Mute || !getstatesoundon() || Mostvoltegynemcurpos) {
+    if (Mute || !State->sound_on || Mostvoltegynemcurpos) {
         // Mostvoltegynemcurpos = 0;
         return 0;
     }
@@ -493,8 +492,7 @@ void callbackhang(short* sbuff, int buffsize) {
 
 // Ezt direct sound hivja:
 void CustomMixer(void* buffer1, int byteszam1, void* buffer2, int byteszam2, int bitmod16) {
-    int getstatesoundon(void);
-    if (Mute || !getstatesoundon()) {
+    if (Mute || !State->sound_on) {
         int nullabyte = 0;
         if (bitmod16) {
             nullabyte = 0;

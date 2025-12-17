@@ -361,7 +361,7 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vekt2 u, vekt2 v, vekt2 r) {
                     xkiskep += invix;
                     ykiskep += inviy;
                 }
-                unsigned char* cim = ppic8->getptr(ybal);
+                unsigned char* cim = ppic8->get_row(ybal);
                 cim += xbal;
                 int xhossz = Cxsize - xbal;
                 egysor(lyuk, short(x2 - xbal + 1), cim, pkiskep->tomb, xkiskep, ykiskep, invix,
@@ -411,7 +411,7 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vekt2 u, vekt2 v, vekt2 r) {
                     xkiskep += invix;
                     ykiskep += inviy;
                 }
-                unsigned char* cim = ppic8->getptr(ybal);
+                unsigned char* cim = ppic8->get_row(ybal);
                 cim += xbal;
                 egysor(lyuk, short(x2 - x1 + 1), cim, pkiskep->tomb, xkiskep, ykiskep, invix,
                        inviy);

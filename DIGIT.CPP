@@ -14,37 +14,36 @@ static unsigned char* Lookup = NULL;
 const double Idod2lszorzo = 100.0 / (182.0 * 0.0024);
 
 static void kikettospont(int x, int y) {
-    Ppic8->vizszegmens_look(x + Ketpx, y + Ketpy1, 2, Lookup);
-    Ppic8->vizszegmens_look(x + Ketpx, y + Ketpy1 + 1, 2, Lookup);
+    Ppic8->horizontal_line(x + Ketpx, y + Ketpy1, 2, Lookup);
+    Ppic8->horizontal_line(x + Ketpx, y + Ketpy1 + 1, 2, Lookup);
 
-    Ppic8->vizszegmens_look(x + Ketpx, y + Ketpy2, 2, Lookup);
-    Ppic8->vizszegmens_look(x + Ketpx, y + Ketpy2 + 1, 2, Lookup);
+    Ppic8->horizontal_line(x + Ketpx, y + Ketpy2, 2, Lookup);
+    Ppic8->horizontal_line(x + Ketpx, y + Ketpy2 + 1, 2, Lookup);
 }
 
 static void kiszegmens(int szam, int x, int y) {
     switch (szam) {
     case 0:
-        Ppic8->fuggszegmens_look(x, y + 1, Vonalfugghossz, Lookup);
+        Ppic8->vertical_line(x, y + 1, Vonalfugghossz, Lookup);
         break;
     case 1:
-        Ppic8->fuggszegmens_look(x + Vonalvizhossz + 1, y + 1, Vonalfugghossz, Lookup);
+        Ppic8->vertical_line(x + Vonalvizhossz + 1, y + 1, Vonalfugghossz, Lookup);
         break;
     case 2:
-        Ppic8->fuggszegmens_look(x, y + Vonalfugghossz + 2, Vonalfugghossz, Lookup);
+        Ppic8->vertical_line(x, y + Vonalfugghossz + 2, Vonalfugghossz, Lookup);
         break;
     case 3:
-        Ppic8->fuggszegmens_look(x + Vonalvizhossz + 1, y + Vonalfugghossz + 2, Vonalfugghossz,
-                                 Lookup);
+        Ppic8->vertical_line(x + Vonalvizhossz + 1, y + Vonalfugghossz + 2, Vonalfugghossz, Lookup);
         break;
     case 4:
-        Ppic8->vizszegmens_look(x + 1, y, Vonalvizhossz, Lookup);
+        Ppic8->horizontal_line(x + 1, y, Vonalvizhossz, Lookup);
         break;
     case 5:
-        Ppic8->vizszegmens_look(x + 1, y + Vonalfugghossz + 1, Vonalvizhossz, Lookup);
+        Ppic8->horizontal_line(x + 1, y + Vonalfugghossz + 1, Vonalvizhossz, Lookup);
         break;
     case 6:
-        Ppic8->vizszegmens_look(x + 1, y + Vonalfugghossz + Vonalfugghossz + 2, Vonalvizhossz,
-                                Lookup);
+        Ppic8->horizontal_line(x + 1, y + Vonalfugghossz + Vonalfugghossz + 2, Vonalvizhossz,
+                               Lookup);
         break;
     default:
         hiba("kiszegmens-ben szegmens out of range!");

@@ -11,8 +11,8 @@ ddpal* Pmenupal = NULL;
 unsigned char Menupaltomb[768];
 
 /*void retusal( pic8* ppic ) {
-    int xsize = ppic->getxsize();
-    int ysize = ppic->getysize();
+    int xsize = ppic->get_width();
+    int ysize = ppic->get_height();
     for( int y = 0; y < ysize; y++ ) {
         for( int x = 0; x < xsize; x++ ) {
             unsigned szin = ppic->gpixel( x, y );
@@ -47,8 +47,8 @@ void initmenukep2(void) {
     if (Pmenupal) {
         hiba("initmenukep2-ben Pmenupal!");
     }
-    pcxtopal("intro.pcx", &Pmenupal); // O new-ik egy ddpal-t
-    pcxtopal("intro.pcx", Menupaltomb);
+    get_pcx_pal("intro.pcx", &Pmenupal); // O new-ik egy ddpal-t
+    get_pcx_pal("intro.pcx", Menupaltomb);
 }
 
 szoveglista::szoveglista(void) {
@@ -154,7 +154,7 @@ static void kirajzgolyo(vekt2 g, double r, pic8* forras) {
             y++;
             continue;
         }
-        unsigned char* dest = Tmpbuffer->getptr(y) + x1;
+        unsigned char* dest = Tmpbuffer->get_row(y) + x1;
         unsigned char* source;
         if (y < Scrolly1) {
             if (forras == Buffgolyo) {
@@ -163,7 +163,7 @@ static void kirajzgolyo(vekt2 g, double r, pic8* forras) {
                 source = Hattersor;
             }
         } else {
-            source = forras->getptr(y) + x1;
+            source = forras->get_row(y) + x1;
         }
         memcpy(dest, source, x2 - x1 + 1);
 
@@ -195,14 +195,14 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
             int x = kezdox;
             kezdox += 110;
             while (x > 0) {
-                x -= Kisnevsima->getxsize();
+                x -= Kisnevsima->get_width();
             }
             while (x < SCREEN_WIDTH) {
-                blt8(Buffsima, Kisnevsima, x, y);
-                blt8(Buffgolyo, Kisnevgolyo, x, y);
-                x += Kisnevsima->getxsize();
+                blit8(Buffsima, Kisnevsima, x, y);
+                blit8(Buffgolyo, Kisnevgolyo, x, y);
+                x += Kisnevsima->get_width();
             }
-            y += Kisnevsima->getysize();
+            y += Kisnevsima->get_height();
         }
 
         // Menu lemezre mentese:
@@ -211,15 +211,15 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
 
         // Rairjuk szovegeket vagy kepet:
         if (rarakkep4) {
-            blt8(Buffsima, rarakkep1);
-            blt8(Buffsima, rarakkep2, 0, 120);
-            blt8(Buffsima, rarakkep3, 0, 240);
-            blt8(Buffsima, rarakkep4, 0, 360);
+            blit8(Buffsima, rarakkep1);
+            blit8(Buffsima, rarakkep2, 0, 120);
+            blit8(Buffsima, rarakkep3, 0, 240);
+            blit8(Buffsima, rarakkep4, 0, 360);
 
-            blt8(Buffgolyo, rarakkep1);
-            blt8(Buffgolyo, rarakkep2, 0, 120);
-            blt8(Buffgolyo, rarakkep3, 0, 240);
-            blt8(Buffgolyo, rarakkep4, 0, 360);
+            blit8(Buffgolyo, rarakkep1);
+            blit8(Buffgolyo, rarakkep2, 0, 120);
+            blit8(Buffgolyo, rarakkep3, 0, 240);
+            blit8(Buffgolyo, rarakkep4, 0, 360);
         } else {
             for (int i = 0; i < elemszam; i++) {
                 Pmenuabc->write(Buffsima, sorok[i].x, sorok[i].y, sorok[i].text);
@@ -236,8 +236,8 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
 
             pic8* ppiclogo = new pic8( "intro.pcx" );
             spriteosit( ppiclogo );
-            blt8( Buffsima, ppiclogo );
-            blt8( Buffgolyo, ppiclogo );
+            blit8( Buffsima, ppiclogo );
+            blit8( Buffgolyo, ppiclogo );
             delete ppiclogo; ppiclogo = NULL;
         } */
     }
@@ -283,7 +283,7 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
 
     leptetgolyo(dt); // 12.0 volt regebben
 
-    blt8(Tmpbuffer, Buffsima);
+    blit8(Tmpbuffer, Buffsima);
 
     for (int i = 0; i < Ngolyok; i++) {
         if (nemkellgolyo || !State->animated_menus) {
@@ -305,7 +305,7 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
             sisakframe = Psisak->get_frame_by_index(25);
         }
 
-        blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
+        blit8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
     }
 
     // Tmpbuffer->save( "kezdszov.pcx", Menupaltomb );
@@ -333,19 +333,19 @@ int szoveglista::kirajzolanim(double ido) {
             int x = kezdox;
             kezdox += 110;
             while (x > 0) {
-                x -= Kisnevsima->getxsize();
+                x -= Kisnevsima->get_width();
             }
             while (x < SCREEN_WIDTH) {
-                blt8(Buffsima, Kisnevsima, x, y);
-                blt8(Buffgolyo, Kisnevgolyo, x, y);
-                x += Kisnevsima->getxsize();
+                blit8(Buffsima, Kisnevsima, x, y);
+                blit8(Buffgolyo, Kisnevgolyo, x, y);
+                x += Kisnevsima->get_width();
             }
-            y += Kisnevsima->getysize();
+            y += Kisnevsima->get_height();
         }
         // Most egyszer kirakunk minden elemet kepre hogy
         // ne akadjon meg elso lejatszas kozben:
-        Tmpbuffer->fillbox(Introhatter);
-        blt8(Tmpbuffer, Buffsima, 0, 0);
+        Tmpbuffer->fill_box(Introhatter);
+        blit8(Tmpbuffer, Buffsima, 0, 0);
 
         Scrolly1 = 0;
         double yeltolas = 0.0;
@@ -373,8 +373,8 @@ int szoveglista::kirajzolanim(double ido) {
 
         pic8* sisakframe = NULL;
         sisakframe = Psisak->get_frame_by_index(25);
-        blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
-        blt8(Tmpbuffer, Pintro, 0, 0);
+        blit8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
+        blit8(Tmpbuffer, Pintro, 0, 0);
         // Idaig tartott minden elem kirakasa egyszer
     }
 
@@ -385,9 +385,9 @@ int szoveglista::kirajzolanim(double ido) {
 
     /*if( frame < 480 ) {
         // Kirakjuk legordulo hatteret:
-        Tmpbuffer->fillbox( Introhatter );
-        blt8( Tmpbuffer, Buffsima, 0, frame-480 );
-        blt8( Tmpbuffer, Pintro );
+        Tmpbuffer->fill_box( Introhatter );
+        blit8( Tmpbuffer, Buffsima, 0, frame-480 );
+        blit8( Tmpbuffer, Pintro );
         bltfront( Tmpbuffer );
         return 1;
     }
@@ -400,10 +400,10 @@ int szoveglista::kirajzolanim(double ido) {
     }
 
     // Most mar masodik animaciot rajzoljuk:
-    // blt8( Tmpbuffer, Buffsima );
+    // blit8( Tmpbuffer, Buffsima );
 
-    Tmpbuffer->fillbox(Introhatter);
-    blt8(Tmpbuffer, Buffsima, 0, SCREEN_HEIGHT - frame);
+    Tmpbuffer->fill_box(Introhatter);
+    blit8(Tmpbuffer, Buffsima, 0, SCREEN_HEIGHT - frame);
 
     Scrolly1 = SCREEN_HEIGHT - frame;
     double yeltolas = frame - double(SCREEN_HEIGHT);
@@ -437,11 +437,11 @@ int szoveglista::kirajzolanim(double ido) {
         sisakframe = Psisak->get_frame_by_index(25);
     }
 
-    blt8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7 - (SCREEN_HEIGHT - 1) + frame);
+    blit8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7 - (SCREEN_HEIGHT - 1) + frame);
 
-    blt8(Tmpbuffer, Pintro, 0, frame);
-    // blt8( Tmpbuffer, Pintro, framex, 0, 0, 0, 639, 206 );
-    // blt8( Tmpbuffer, Pintro, -framex, 206, 0, 206, 639, 479 );
+    blit8(Tmpbuffer, Pintro, 0, frame);
+    // blit8( Tmpbuffer, Pintro, framex, 0, 0, 0, 639, 206 );
+    // blit8( Tmpbuffer, Pintro, -framex, 206, 0, 206, 639, 479 );
     bltfront(Tmpbuffer);
     return 1;
 }
@@ -458,14 +458,14 @@ void grafikushiba(const char* text1, const char* text2, const char* text3) {
     while (y < SCREEN_HEIGHT) {
         int x = 0;
         if (paros) {
-            x -= Kisnevsima->getxsize() / 2;
+            x -= Kisnevsima->get_width() / 2;
         }
         paros = !paros;
         while (x < SCREEN_WIDTH) {
-            blt8(Buffsima, Kisnevsima, x, y);
-            x += Kisnevsima->getxsize();
+            blit8(Buffsima, Kisnevsima, x, y);
+            x += Kisnevsima->get_width();
         }
-        y += Kisnevsima->getysize();
+        y += Kisnevsima->get_height();
     }
 
     int sorszam = 0;
@@ -550,14 +550,14 @@ void menuproba(void) {
         while( y < 480 ) {
             int x = 0;
             if( paros )
-                x -= Kisnevsima->getxsize()/2;
+                x -= Kisnevsima->get_width()/2;
             paros = !paros;
             while( x < 640 ) {
-                blt8( Buffsima, Kisnevsima, x, y );
-                blt8( Buffgolyo, Kisnevgolyo, x, y );
-                x += Kisnevsima->getxsize();
+                blit8( Buffsima, Kisnevsima, x, y );
+                blit8( Buffgolyo, Kisnevgolyo, x, y );
+                x += Kisnevsima->get_width();
             }
-            y += Kisnevsima->getysize();
+            y += Kisnevsima->get_height();
         }
         // Rairjuk szovegeket:
         for( int i = 0; i < elemszam; i++ ) {
@@ -584,7 +584,7 @@ void menuproba(void) {
     if( !Tmpbuffer ) // Ideiglenes
         Tmpbuffer = new pic8( 640, 480 );
 
-    blt8( Tmpbuffer, Buffsima );
+    blit8( Tmpbuffer, Buffsima );
 
     for( int i = 0; i < Ngolyok; i++ ) {
         if( nemkellgolyo || !State->animated_menus )
@@ -606,7 +606,7 @@ void menuproba(void) {
         else
             sisakframe = Psisak->get_frame_by_index( 25 );
 
-        blt8( Tmpbuffer, sisakframe, sisakx-20, sisaky-7 );
+        blit8( Tmpbuffer, sisakframe, sisakx-20, sisaky-7 );
     }
 
     bltfront( Tmpbuffer );

@@ -1,7 +1,7 @@
 #include "ALL.H"
 
 /*void showinstruct( void ) {
-    blt8( Korny->picbuffer, Korny->ppic_help );
+    blit8( Korny->picbuffer, Korny->ppic_help );
 
     int x1 = 160;
     int yo = 4;

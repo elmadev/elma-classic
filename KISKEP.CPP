@@ -8,8 +8,8 @@ kiskep::kiskep(const char* pic8nev, pic8* ppic) {
 
     lyuk = ppic->gpixel(0, 0);
 
-    xsize = ppic->getxsize();
-    ysize = ppic->getysize();
+    xsize = ppic->get_width();
+    ysize = ppic->get_height();
     if (xsize > 255 || ysize > 255) {
         hiba("kiskepben size > 255!");
     }

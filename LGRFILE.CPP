@@ -53,8 +53,8 @@ void loadlgrfile(const char* nev) {
         strcat(nevtmp, ".LGR");
 
         // Kiirunk egy uzenetet:
-        blt8(Buffgolyo, Buffsima);
-        Buffsima->fillbox(Hatterindex);
+        blit8(Buffgolyo, Buffsima);
+        Buffsima->fill_box(Hatterindex);
         bltfront(Buffsima);
         if (!Editorban_dialnak) {
             Pal_editor->set();
@@ -67,7 +67,7 @@ void loadlgrfile(const char* nev) {
         if (!Editorban_dialnak) {
             Pmenupal->set();
         }
-        blt8(Buffsima, Buffgolyo);
+        blit8(Buffsima, Buffgolyo);
         bltfront(Buffsima);
 
         // (Ptop->lgrnev lehet egy mutato nev-vel)
@@ -99,12 +99,12 @@ void loadlgrfile(const char* nev) {
 static void chopdarab(pic8* pbiker, kiskep** ppkiskep, kisbox* pbox) {
     // kivag nagy.tga a.tga 272 275 347 334
     /*pic8* ppic = new pic8( 347 - 272 + 1, 334 - 275 + 1 );
-    blt8( ppic, pbiker, -(272-260), -(275-260) );
+    blit8( ppic, pbiker, -(272-260), -(275-260) );
     pkepek->pkisa = new kiskep( NULL, ppic ); // ppic-et ez deleteli is
     */ // Eddig a regi volt
 
     pic8* ppic = new pic8(pbox->x2 - pbox->x1 + 1, pbox->y2 - pbox->y1 + 1);
-    blt8(ppic, pbiker, -pbox->x1, -pbox->y1);
+    blit8(ppic, pbiker, -pbox->x1, -pbox->y1);
     *ppkiskep = new kiskep(NULL, ppic); // ppic-et ez deleteli is
 }
 
@@ -131,9 +131,9 @@ static pic8* kepetbovitvizszint(textura* pt) {
         szorzo++;
     }
     szorzo++; // Igy mar legalabb egy keppel szelesebb SCREEN_WIDTH-nel
-    pic8* ppic = new pic8(cellasize * szorzo, pt->ppic->getysize());
+    pic8* ppic = new pic8(cellasize * szorzo, pt->ppic->get_height());
     for (int i = 0; i < szorzo; i++) {
-        blt8(ppic, pt->ppic, i * cellasize, 0);
+        blit8(ppic, pt->ppic, i * cellasize, 0);
     }
     return ppic;
 }
@@ -172,11 +172,11 @@ static int getatlatszosag(int tipus, pic8* ppic) {
     case ATLAT_TOPLEFT:
         return ppic->gpixel(0, 0);
     case ATLAT_TOPRIGHT:
-        return ppic->gpixel(ppic->getxsize() - 1, 0);
+        return ppic->gpixel(ppic->get_width() - 1, 0);
     case ATLAT_BOTTOMLEFT:
-        return ppic->gpixel(0, ppic->getysize() - 1);
+        return ppic->gpixel(0, ppic->get_height() - 1);
     case ATLAT_BOTTOMRIGHT:
-        return ppic->gpixel(ppic->getxsize() - 1, ppic->getysize() - 1);
+        return ppic->gpixel(ppic->get_width() - 1, ppic->get_height() - 1);
     }
     hiba("getatlatszosag");
     return -1;
@@ -198,8 +198,8 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
     pkep->hatarol = ppiclist->hatarolok[index];
 
     // Beetetjuk kepadatokat:
-    pkep->xsize = ppic->getxsize();
-    pkep->ysize = ppic->getysize();
+    pkep->xsize = ppic->get_width();
+    pkep->ysize = ppic->get_height();
 
     if (pkep->xsize > 60000) {
         uzenet("Picture xsize is too big!", pkep->nev);
@@ -220,7 +220,7 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
     int i = 0;
     for (int y = 0; y < pkep->ysize; y++) {
         // Egy sor elintezese:
-        unsigned char* sor = ppic->getptr(y);
+        unsigned char* sor = ppic->get_row(y);
         if (i > PICTOMBMERET) {
             uzenet("Picture is too big in lgr file! Picture name:", pkep->nev);
         }
@@ -318,8 +318,8 @@ void lgrfile::beirmaszkot(pic8* ppic, piclist* ppiclist, int index) {
     maszk* pm = &maszkok[maszkszam];
 
     strcpy(pm->nev, &ppiclist->nevek[index * 10]);
-    pm->xsize = ppic->getxsize();
-    pm->ysize = ppic->getysize();
+    pm->xsize = ppic->get_width();
+    pm->ysize = ppic->get_height();
 
     // Most beeszi adatokat:
     int i = 0;
@@ -328,7 +328,7 @@ void lgrfile::beirmaszkot(pic8* ppic, piclist* ppiclist, int index) {
         // Van atlatszosag:
         for (int y = 0; y < pm->ysize; y++) {
             // Kep egy soranak elintezese:
-            unsigned char* sor = ppic->getptr(y);
+            unsigned char* sor = ppic->get_row(y);
 
             // Atugorja elso ures pixeleket:
             int x = uresszam(0, pm->xsize, sor, (unsigned char)atlatszo);
@@ -870,19 +870,19 @@ lgrfile::lgrfile(const char* lgrnev) {
         if (!pt->ppic) {
             hiba("iuo4gt");
         }
-        pt->origxsize = pt->ppic->getxsize();
+        pt->origxsize = pt->ppic->get_width();
         int minxmintasize = 600;
-        if (pt->ppic->getxsize() >= minxmintasize) {
+        if (pt->ppic->get_width() >= minxmintasize) {
             continue;
         }
         // Kep tul kicsi, kibovitjuk vizszintes iranyban:
         int szorzo = 1;
-        while (szorzo * pt->ppic->getxsize() < minxmintasize) {
+        while (szorzo * pt->ppic->get_width() < minxmintasize) {
             szorzo++;
         }
-        pic8* pbovitett = new pic8(szorzo * pt->ppic->getxsize(), pt->ppic->getysize());
+        pic8* pbovitett = new pic8(szorzo * pt->ppic->get_width(), pt->ppic->get_height());
         for (int k = 0; k < szorzo; k++) {
-            blt8(pbovitett, pt->ppic, k * pt->ppic->getxsize(), 0);
+            blit8(pbovitett, pt->ppic, k * pt->ppic->get_width(), 0);
         }
         delete pt->ppic;
         pt->ppic = pbovitett;

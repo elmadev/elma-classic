@@ -9,7 +9,7 @@ unsigned char Buttonszin = 8;
 
 void kirajzbox(pic8* ppic, int x1, int y1, int x2, int y2, unsigned char felulet,
                unsigned char szele) {
-    ppic->fillbox(x1, y1, x2, y2, felulet);
+    ppic->fill_box(x1, y1, x2, y2, felulet);
     ppic->line(x1, y1, x2, y1, szele);
     ppic->line(x1, y2, x2, y2, szele);
     ppic->line(x1, y1, x1, y2, szele);

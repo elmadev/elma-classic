@@ -398,7 +398,7 @@ static void surlodaselintezes(short* sbuff, int buffsize) {
         }
     }
     int hatar = Surlerokell*320;
-    blt8( Pscr8, Ppic8, hatar, 100 ); */
+    blit8( Pscr8, Ppic8, hatar, 100 ); */
 
     if (Surlerokell < 0.1 && Surleromost < 0.1) {
         Surleromost = 0.0;

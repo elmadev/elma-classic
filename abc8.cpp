@@ -131,8 +131,8 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
                 continue;
             }
         }
-        blt8(dest, ppsprite[index], x, y + y_offset[index]);
-        x += spacing + ppsprite[index]->getxsize();
+        blit8(dest, ppsprite[index], x, y + y_offset[index]);
+        x += spacing + ppsprite[index]->get_width();
 
         text++;
     }
@@ -163,7 +163,7 @@ int abc8::len(const char* text) {
                 continue;
             }
         }
-        width += spacing + ppsprite[index]->getxsize();
+        width += spacing + ppsprite[index]->get_width();
 
         text++;
     }

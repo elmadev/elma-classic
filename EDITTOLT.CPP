@@ -68,7 +68,7 @@ static void igazit(int* pkur, int* pfelso, int nevszam, int helyszam) {
 }
 
 static void boxbair(pic8* ppic, box abox, unsigned char szin, const char* text, int alahuzas = 0) {
-    ppic->fillbox(abox.x1 + 1, abox.y1 + 1, abox.x2 - 1, abox.y2 - 1, szin);
+    ppic->fill_box(abox.x1 + 1, abox.y1 + 1, abox.x2 - 1, abox.y2 - 1, szin);
     if (alahuzas) {
         int hossz = Pabc2->len(text);
         int x = (abox.x1 + abox.x2) / 2 - hossz / 2 - 3;
@@ -82,7 +82,7 @@ static void boxbair(pic8* ppic, box abox, unsigned char szin, const char* text, 
 }
 
 static void boxbair_balra(pic8* ppic, box abox, unsigned char szin, const char* text) {
-    ppic->fillbox(abox.x1 + 1, abox.y1 + 1, abox.x2 - 1, abox.y2 - 1, szin);
+    ppic->fill_box(abox.x1 + 1, abox.y1 + 1, abox.x2 - 1, abox.y2 - 1, szin);
     Pabc2->write(ppic, abox.x1 + 2, (abox.y1 + abox.y2) / 2 + 5, text);
 }
 
@@ -281,8 +281,8 @@ void tolt_open(void) {
             for (int i = 0; i < helyszam && i < nevszam; i++) {
                 if (i + felso == kur) {
                     // Ez most kurens nev:
-                    Buffsima->fillbox(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                      Openlistainvszin);
+                    Buffsima->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
+                                       Openlistainvszin);
                 }
                 Pabc2->write(Buffsima, lx1 + 3, ly1 + 15 + i * dy, &Soknev[(i + felso) * 10]);
             }
@@ -483,8 +483,8 @@ void kivalasztkezdetit(void) {
             for (int i = 0; i < helyszam && i < nevszam; i++) {
                 if (i + felso == kur) {
                     // Ez most kurens nev:
-                    Buffsima->fillbox(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                      Openlistainvszin);
+                    Buffsima->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
+                                       Openlistainvszin);
                 }
                 Pabc2->write(Buffsima, lx1 + 3, ly1 + 15 + i * dy, &Soknev[(i + felso) * 10]);
             }
@@ -591,7 +591,7 @@ int tolt_save_as(int lokkolhato) {
             int ey1 = boxnagy.y1 + 30;
             int ex2 = boxnagy.x2 - 100;
             int ey2 = boxnagy.y1 + 55;
-            Buffsima->fillbox(ex1, ey1, ex2, ey2, Dialogszin);
+            Buffsima->fill_box(ex1, ey1, ex2, ey2, Dialogszin);
             Pabc2->write(Buffsima, 290, 250, nev);
             char tmp[40];
             strcpy(tmp, nev);
@@ -796,19 +796,19 @@ static void makeszinkonvtomb(unsigned char* pal) {
 
 // Szimpla
 static void vegyesblt(pic8* dest, kep* pkep, int x0, int y0) {
-    if (x0 < 0 || y0 < 0 || x0 >= dest->getxsize() || y0 >= dest->getysize()) {
+    if (x0 < 0 || y0 < 0 || x0 >= dest->get_width() || y0 >= dest->get_height()) {
         hiba("7r79yffuew");
     }
 
     int xsize = pkep->xsize;
     int ysize = pkep->ysize;
     int xtullog = 0;
-    if (x0 + xsize > dest->getxsize()) {
-        xsize = dest->getxsize() - x0;
+    if (x0 + xsize > dest->get_width()) {
+        xsize = dest->get_width() - x0;
         xtullog = 1;
     }
-    if (y0 + ysize > dest->getysize()) {
-        ysize = dest->getysize() - y0;
+    if (y0 + ysize > dest->get_height()) {
+        ysize = dest->get_height() - y0;
     }
     // Most xsize es ysize mindenkeppen benne van teljesen kepben:
 
@@ -816,7 +816,7 @@ static void vegyesblt(pic8* dest, kep* pkep, int x0, int y0) {
     unsigned char* tomb = pkep->adatok;
     for (int y = y0; y < y0 + ysize; y++) {
         // Egy sor elintezese:
-        unsigned char* dsor = dest->getptr(y) + x0;
+        unsigned char* dsor = dest->get_row(y) + x0;
 
         int x = 0;
         while (1) {
@@ -855,22 +855,22 @@ static void vegyesblt(pic8* dest, kep* pkep, int x0, int y0) {
 
 // Maszkos:
 static void vegyesblt(pic8* dest, textura* pt, maszk* pm, int x0, int y0) {
-    if (x0 < 0 || y0 < 0 || x0 >= dest->getxsize() || y0 >= dest->getysize()) {
+    if (x0 < 0 || y0 < 0 || x0 >= dest->get_width() || y0 >= dest->get_height()) {
         hiba("7r79yffuew");
     }
 
     pic8* source = pt->ppic;
 
     int maxysize = pm->ysize;
-    if (y0 + maxysize > dest->getysize()) {
-        maxysize = dest->getysize() - y0;
+    if (y0 + maxysize > dest->get_height()) {
+        maxysize = dest->get_height() - y0;
     }
     // Most xsize es ysize mindenkeppen benne van teljesen kepben:
     int i = 0;
-    int picxsize = source->getxsize();
+    int picxsize = source->get_width();
     for (int y = y0; y < y0 + maxysize; y++) {
-        unsigned char* dsor = dest->getptr(y) + x0;
-        unsigned char* ssor = source->getptr((y - y0) % source->getysize());
+        unsigned char* dsor = dest->get_row(y) + x0;
+        unsigned char* ssor = source->get_row((y - y0) % source->get_height());
         int sx = 0;
         int abszx = x0;
         // Maszkos eljaras:
@@ -983,7 +983,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     int buffervaltozottx = 0;
     int buffervaltozotty = 0;
     push();
-    blt8(Buffgolyo, Buffsima);
+    blit8(Buffgolyo, Buffsima);
     // Buffgolyo->save( "golyo.pcx" );
     // hiba( "golyo mentve!" );
     pop();
@@ -1094,7 +1094,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
 
             push();
 
-            blt8(Buffsima, Buffgolyo, 0, 0, 0, 0, buffervaltozottx, buffervaltozotty);
+            blit8(Buffsima, Buffgolyo, 0, 0, 0, 0, buffervaltozottx, buffervaltozotty);
 
             if (kepnev[0] && (texturanev[0] || maszknev[0])) {
                 hiba("iugriurg");
@@ -1136,8 +1136,8 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
             for (int i = 0; i < helyszam && i + felso < nevszam; i++) {
                 if (i + felso == kur) {
                     // Ez most kurens nev:
-                    Buffsima->fillbox(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                      Openlistainvszin);
+                    Buffsima->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
+                                       Openlistainvszin);
                 }
                 // Kiirjuk nevet:
                 if (tipus == 1) {
@@ -1290,7 +1290,7 @@ void tolt_pickasprite(void) {
                 // Kepnevet akarja valtoztatni:
                 pickanev(kepnev, uresnev, uresnev, 1);
                 push();
-                blt8(Buffsima, Buffgolyo);
+                blit8(Buffsima, Buffgolyo);
                 bltfront(Buffsima);
                 pop();
                 if (kepnev[0]) {
@@ -1302,7 +1302,7 @@ void tolt_pickasprite(void) {
                 // Texturanevet akarja valtoztatni:
                 pickanev(uresnev, texturanev, maszknev, 2);
                 push();
-                blt8(Buffsima, Buffgolyo);
+                blit8(Buffsima, Buffgolyo);
                 bltfront(Buffsima);
                 pop();
                 if (texturanev[0]) {
@@ -1314,7 +1314,7 @@ void tolt_pickasprite(void) {
                 // Maszknevet akarja valtoztatni:
                 pickanev(uresnev, texturanev, maszknev, 3);
                 push();
-                blt8(Buffsima, Buffgolyo);
+                blit8(Buffsima, Buffgolyo);
                 bltfront(Buffsima);
                 pop();
                 if (maszknev[0]) {
@@ -1373,7 +1373,7 @@ void tolt_pickasprite(void) {
 
 int tolt_picklgrfile(char* lgrnev) {
     invalidateegesz();
-    blt8(Buffgolyo, Buffsima);
+    blit8(Buffgolyo, Buffsima);
     if (!Soknev) {
         Soknev = new char[Maxnev * 10 + 100];
         if (!Soknev) {
@@ -1527,8 +1527,8 @@ int tolt_picklgrfile(char* lgrnev) {
             for (int i = 0; i < helyszam && i < nevszam; i++) {
                 if (i + felso == kur) {
                     // Ez most kurens nev:
-                    Buffsima->fillbox(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                      Openlistainvszin);
+                    Buffsima->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
+                                       Openlistainvszin);
                 }
                 Pabc2->write(Buffsima, lx1 + 3, ly1 + 15 + i * dy, &Soknev[(i + felso) * 10]);
             }
@@ -2067,7 +2067,7 @@ static void change_level_name(char* nev) {
 
     push(); // Itt levesszuk egeret es nem is tesszuk vissza vegeig:
 
-    blt8(Buffgolyo, Buffsima);
+    blit8(Buffgolyo, Buffsima);
 
     invalidateegesz();
     // Itt most be kell olvasnunk egy nevet:
@@ -2080,7 +2080,7 @@ static void change_level_name(char* nev) {
     int i = 0;
     while (1) {
         // Kiir:
-        Buffsima->fillbox(x1, y1, x2, y2, Save_as_box_szin);
+        Buffsima->fill_box(x1, y1, x2, y2, Save_as_box_szin);
         Buffsima->line(x1, y1, x2, y1, Save_as_szelszin);
         Buffsima->line(x1, y2, x2, y2, Save_as_szelszin);
         Buffsima->line(x1, y1, x1, y2, Save_as_szelszin);
@@ -2289,7 +2289,7 @@ void change_level_properties(void) {
                 char uresnev[10] = "";
                 pickanev(uresnev, fgnev, uresnev, 2, 0);
                 push();
-                blt8(Buffsima, Buffgolyo);
+                blit8(Buffsima, Buffgolyo);
                 bltfront(Buffsima);
                 pop();
                 invalid = 1;
@@ -2299,7 +2299,7 @@ void change_level_properties(void) {
                 char uresnev[10] = "";
                 pickanev(uresnev, bgnev, uresnev, 2, 0);
                 push();
-                blt8(Buffsima, Buffgolyo);
+                blit8(Buffsima, Buffgolyo);
                 bltfront(Buffsima);
                 pop();
                 invalid = 1;
@@ -2308,7 +2308,7 @@ void change_level_properties(void) {
                 // Palya nevet akarja valtoztatni:
                 change_level_name(levelname);
                 push();
-                blt8(Buffsima, Buffgolyo);
+                blit8(Buffsima, Buffgolyo);
                 bltfront(Buffsima);
                 pop();
                 invalid = 1;
@@ -2320,7 +2320,7 @@ void change_level_properties(void) {
                     strcpy(lgrnev, belgrnev);
                 }
                 push();
-                blt8(Buffsima, Buffgolyo);
+                blit8(Buffsima, Buffgolyo);
                 bltfront(Buffsima);
                 pop();
                 invalid = 1;

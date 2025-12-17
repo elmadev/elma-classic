@@ -6,7 +6,7 @@ static int Maxegybefuggo = 255;
 // Visszaadja hany db pixel kell szinu, max sor vegeig:
 static int kellszinudb(pic8* ppic, int x, int y, unsigned char szin) {
     int darab = 0;
-    while (x < ppic->getxsize() && ppic->gpixel(x, y) != szin && darab < Maxegybefuggo) {
+    while (x < ppic->get_width() && ppic->gpixel(x, y) != szin && darab < Maxegybefuggo) {
         x++;
         darab++;
     }
@@ -16,7 +16,7 @@ static int kellszinudb(pic8* ppic, int x, int y, unsigned char szin) {
 // Visszaadja hany db pixel nem kell szinu, max sor vegeig:
 static int nemkellszinudb(pic8* ppic, int x, int y, unsigned char szin) {
     int darab = 0;
-    while (x < ppic->getxsize() && ppic->gpixel(x, y) == szin && darab < Maxegybefuggo) {
+    while (x < ppic->get_width() && ppic->gpixel(x, y) == szin && darab < Maxegybefuggo) {
         x++;
         darab++;
     }
@@ -31,8 +31,8 @@ unsigned char* spriteadat8(pic8* ppic, unsigned char szin, unsigned short* pspri
         uzenet("spriteadat8-ban memory!");
         return NULL;
     }
-    int xsize = ppic->getxsize();
-    int ysize = ppic->getysize();
+    int xsize = ppic->get_width();
+    int ysize = ppic->get_height();
     unsigned buf = 0;
     for (int y = 0; y < ysize; y++) {
         // Egy sor feldolgozasa:
@@ -76,8 +76,8 @@ unsigned char* spriteadat8(pic8* ppic, unsigned char szin, unsigned short* pspri
     return jobuffer;
 }
 
-void spriteosit(pic8* ppic, int szin) {
-    ppic->sprite = spriteadat8(ppic, szin, &ppic->spritehossz);
+void spriteosit(pic8* ppic, int index) {
+    ppic->transparency_data = spriteadat8(ppic, index, &ppic->transparency_data_length);
 }
 
 void spriteosit(pic8* ppic) { spriteosit(ppic, ppic->gpixel(0, 0)); }

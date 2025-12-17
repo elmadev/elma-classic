@@ -16,13 +16,13 @@ pic8* lockbackbuffer_pic() {
 
     if (!Lockbuff) {
         Lockbuff = new pic8(10, 10);
-        Lockbuff->xsize = SCREEN_WIDTH;
-        Lockbuff->ysize = SCREEN_HEIGHT;
-        Lockbuff->sormuttomb = NULL;
+        Lockbuff->width = SCREEN_WIDTH;
+        Lockbuff->height = SCREEN_HEIGHT;
+        Lockbuff->rows = NULL;
     }
 
     if (Waitforretrace) {
-        Lockbuff->sormuttomb = lockbackbuffer();
+        Lockbuff->rows = lockbackbuffer();
         return Lockbuff;
     } else {
         if (!Pmindigfpic) {
@@ -40,7 +40,7 @@ void unlockbackbuffer_pic(void) {
 
     if (Waitforretrace) {
         unlockbackbuffer();
-        Lockbuff->sormuttomb = NULL;
+        Lockbuff->rows = NULL;
     } else {
         bltfront(Pmindigfpic);
     }
@@ -54,12 +54,12 @@ void lockfrontbuffer_pic(void) {
 
     if (!Lockbuff) {
         Lockbuff = new pic8(10, 10);
-        Lockbuff->xsize = SCREEN_WIDTH;
-        Lockbuff->ysize = SCREEN_HEIGHT;
-        Lockbuff->sormuttomb = NULL;
+        Lockbuff->width = SCREEN_WIDTH;
+        Lockbuff->height = SCREEN_HEIGHT;
+        Lockbuff->rows = NULL;
     }
 
-    Lockbuff->sormuttomb = lockfrontbuffer();
+    Lockbuff->rows = lockfrontbuffer();
 }
 
 void unlockfrontbuffer_pic(void) {
@@ -79,11 +79,11 @@ void ppixelfront(int x, int y, unsigned char szin) {
 
 void bltfront(pic8* ppic) {
     lockfrontbuffer_pic();
-    blt8(Lockbuff, ppic);
+    blit8(Lockbuff, ppic);
     unlockfrontbuffer_pic();
 }
 void bltfront(pic8* ppic, int x1, int y1, int x2, int y2) {
     lockfrontbuffer_pic();
-    blt8(Lockbuff, ppic, x1, y1, x1, y1, x2, y2);
+    blit8(Lockbuff, ppic, x1, y1, x1, y1, x2, y2);
     unlockfrontbuffer_pic();
 }

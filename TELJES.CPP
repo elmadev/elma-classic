@@ -68,32 +68,32 @@ void teljes(void) {
     while( y < 480 ) {
         int x = 0;
         while( x < 640 ) {
-            blt8( tmpintro, tile, x, y );
-            x += tile->getxsize();
+            blit8( tmpintro, tile, x, y );
+            x += tile->get_width();
         }
-        y += tile->getysize();
+        y += tile->get_height();
     }
     pic8* pintro = new pic8( "intro.pcx" );
     spriteosit( pintro );
-    blt8( tmpintro, pintro );
+    blit8( tmpintro, pintro );
     delete pintro; pintro = NULL;
     delete tile; tile = NULL;*/
 
     // Ezt majd elso kiirloading szabaditja fel (menukep-ben van definialva):
     Pintro = new pic8("intro.pcx");
     // Itt most atirjuk verziot 1.1-re:
-    // blt8( Pintro, Pintro, 343, 433, 520, 459, 530, 468 ); // a betu
-    blt8(Pintro, Pintro, 321, 420, 297, 420, 315, 441);
-    blt8(Pintro, Pintro, 321 + 15, 420, 297, 420, 315, 441);
-    blt8(Pintro, Pintro, 321 + 15 + 16, 432, 88, 458, 98, 468);
+    // blit8( Pintro, Pintro, 343, 433, 520, 459, 530, 468 ); // a betu
+    blit8(Pintro, Pintro, 321, 420, 297, 420, 315, 441);
+    blit8(Pintro, Pintro, 321 + 15, 420, 297, 420, 315, 441);
+    blit8(Pintro, Pintro, 321 + 15 + 16, 432, 88, 458, 98, 468);
     spriteosit(Pintro);
     pic8* tmpintro = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT); // ezt majd kesobb szabaditjuk fel
-    tmpintro->fillbox(254);
-    blt8(tmpintro, Pintro);
+    tmpintro->fill_box(254);
+    blit8(tmpintro, Pintro);
 
     ddpal* pintropal = NULL;
-    // Gany, ezzel az egy nevvel pcxtopal(pic.cpp) elso harom byte-ot 0-azza:
-    pcxtopal("intro.pcx", &pintropal);
+    // Gany, ezzel az egy nevvel get_pcx_pal(pic.cpp) elso harom byte-ot 0-azza:
+    get_pcx_pal("intro.pcx", &pintropal);
 
     // Hatrebb tettem folyamatos kirakasra (Alt-Tab miatt):
     pintropal->set();
@@ -142,18 +142,18 @@ void teljes(void) {
     tmpintro = new pic8( "torol.pcx" );
     mk_getextchar();
     for( int i = 1; i < 480; i += 5  ) {
-        pbuffer->fillbox( 254 );
-        //blt8( pbuffer, tmpintro, 0, -240+i, 0, 0, 639, 239 );
-        //blt8( pbuffer, tmpintro, 0, 479-i, 0, 240, 639, 479 );
-        blt8( pbuffer, tmpintro, 0, -480+i );
-        blt8( pbuffer, pintro );
+        pbuffer->fill_box( 254 );
+        //blit8( pbuffer, tmpintro, 0, -240+i, 0, 0, 639, 239 );
+        //blit8( pbuffer, tmpintro, 0, 479-i, 0, 240, 639, 479 );
+        blit8( pbuffer, tmpintro, 0, -480+i );
+        blit8( pbuffer, pintro );
         bltfront( pbuffer );
     }
     for( i = 0; i < 480; i += 5  ) {
-        blt8( pbuffer, tmpintro );
-        //blt8( pbuffer, pintro1, i, 0 );
-        //blt8( pbuffer, pintro2, -i, 204 );
-        blt8( pbuffer, pintro, 0, i );
+        blit8( pbuffer, tmpintro );
+        //blit8( pbuffer, pintro1, i, 0 );
+        //blit8( pbuffer, pintro2, -i, 204 );
+        blit8( pbuffer, pintro, 0, i );
         bltfront( pbuffer );
     } */
 
@@ -176,7 +176,7 @@ void teljes(void) {
 void kilep( void ) {
     pic8* ppic = new pic8( "vegekep.pcx" );
     ddpal* pvegepal = NULL;
-    pcxtopal( "vegekep.pcx", &pvegepal );
+    get_pcx_pal( "vegekep.pcx", &pvegepal );
     pvegepal->set();
     bltfront( ppic );
     while( 1 ) {

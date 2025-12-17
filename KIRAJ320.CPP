@@ -82,11 +82,11 @@ void beallitmereteket(int splitscreen) {
 }
 
 void forditkepet(pic8* ppic) {
-    for (int y1 = 0; y1 < ppic->getysize() / 2; y1++) {
-        int y2 = ppic->getysize() - 1 - y1;
-        unsigned char* sora = ppic->getptr(y1);
-        unsigned char* sorb = ppic->getptr(y2);
-        int xsize = ppic->getxsize();
+    for (int y1 = 0; y1 < ppic->get_height() / 2; y1++) {
+        int y2 = ppic->get_height() - 1 - y1;
+        unsigned char* sora = ppic->get_row(y1);
+        unsigned char* sorb = ppic->get_row(y2);
+        int xsize = ppic->get_width();
         for (int x = 0; x < xsize; x++) {
             unsigned char tmp = sora[x];
             sora[x] = sorb[x];
@@ -151,15 +151,15 @@ static void kitag(pic8* ppic8, kiskep* pk, kisbox* pb) {
 
 static void kigyuru(pic8* ppic8, int x, int y, unsigned char szin) {
 #ifdef TEST
-    if (x < 1 || x >= ppic8->getxsize() - 1 || y < 1 || y >= ppic8->getysize() - 1) {
+    if (x < 1 || x >= ppic8->get_width() - 1 || y < 1 || y >= ppic8->get_height() - 1) {
         hiba("kigyuru-ben x, vagy y lelog!");
     }
 #endif
-    unsigned char* sor = ppic8->getptr(y - 1);
+    unsigned char* sor = ppic8->get_row(y - 1);
     sor[x - 1] = szin;
     sor[x] = szin;
     sor[x + 1] = szin;
-    sor = ppic8->getptr(y + 1);
+    sor = ppic8->get_row(y + 1);
     sor[x - 1] = szin;
     sor[x] = szin;
     sor[x + 1] = szin;
@@ -173,15 +173,15 @@ static void felhokfel( int x, int y, pic8* ppicbuffer, pic8* pfelho,
     int kerx = -x*lassit;
     int kery = -y*lassit;
     // Vegigmegy kepernyon:
-    int kerxsize = pfelho->getxsize();
+    int kerxsize = pfelho->get_width();
     kerx %= kerxsize;
     kerx -= kerxsize; // Lehet, hogy enelkul is negativ?
     while( kerx < Displaysizex ) {
-        int kerysize = pfelho->getysize();
+        int kerysize = pfelho->get_height();
         kery %= kerysize;
         kery -= kerysize; // Lehet, hogy enelkul is negativ?
         while( kery < Displaysizey ) {
-            blt8( ppicbuffer, pfelho, kerx, kery );
+            blit8( ppicbuffer, pfelho, kerx, kery );
 
             kery += kerysize;
         }
@@ -274,9 +274,9 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vekt2 motorkozep, m
         ppic->ppixel(vx1, y, Plgr->keretindex);
         ppic->ppixel(vx2, y, Plgr->keretindex);
     }
-    unsigned char* sor = ppic->getptr(vy1) + vx1 + 1;
+    unsigned char* sor = ppic->get_row(vy1) + vx1 + 1;
     memset(sor, Plgr->keretindex, Viewxsize);
-    sor = ppic->getptr(vy2) + vx1 + 1;
+    sor = ppic->get_row(vy2) + vx1 + 1;
     memset(sor, Plgr->keretindex, Viewxsize);
 }
 
@@ -313,15 +313,15 @@ static void kitolthatteret(pic8* ppic) {
 
             // extern int Debugblt;
             // Debugblt = 1;
-            blt8(ppic, Plgr->pkimarad, x, y);
+            blit8(ppic, Plgr->pkimarad, x, y);
             // Debugblt = 0;
             //  hiba( "Itt van 20!" ); idejott
-            x += Plgr->pkimarad->getxsize();
+            x += Plgr->pkimarad->get_width();
 
             // hiba( tmp ); (21) kiirja x-et 207-nek
         }
         // hiba( "Itt van 15!" );
-        y += Plgr->pkimarad->getysize();
+        y += Plgr->pkimarad->get_height();
     }
 }
 
@@ -581,7 +581,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
 
     vekt2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
 
-    // ppic->fillbox( 100 );
+    // ppic->fill_box( 100 );
     Pecsetalso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
 
     hang(/*"Ecsetalso utan"*/);
@@ -644,7 +644,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             }
         }
 
-        blt8(ppic, pobjpic, pker->rxint - balalsox, pker->ryint - balalsoy + dy);
+        blit8(ppic, pobjpic, pker->rxint - balalsox, pker->ryint - balalsoy + dy);
     }
 
     // Motorosok kirajzolasa:
@@ -763,16 +763,16 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
 
     if (splitscreen) {
         // 1. Jatekos:
-        Bpic->keszitbelsot(Cx1, Cy1, Cx2, Cy2, npic);
+        Bpic->subview(Cx1, Cy1, Cx2, Cy2, npic);
 
         kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2);
 
         // 2. Jatekos:
-        Bpic->keszitbelsot(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
+        Bpic->subview(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
 
         kirakegyjatekost(0, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1);
     } else {
-        Bpic->keszitbelsot(Cx1, Cy1, Cx2, Cy2, npic);
+        Bpic->subview(Cx1, Cy1, Cx2, Cy2, npic);
         if (fulljatekosA) {
             kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2);
         } else {

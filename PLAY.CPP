@@ -3,7 +3,7 @@
 /*static void betuki( int oszlop, char c ) {
     int x = 50+oszlop*19;
     int y = 6*SM + 8;
-    blt8( Korny->picbuffer, Korny->ppic_saveplay, x, y, x, y, x+19, y+30 );
+    blit8( Korny->picbuffer, Korny->ppic_saveplay, x, y, x, y, x+19, y+30 );
     if( c == '_' ) {
         c = '-';
         y += 11;
@@ -143,7 +143,7 @@ static void konvback(char* text) {
 }
 
 /*static void gratulacio( void ) {
-    blt8( Korny->picbuffer, Korny->ppic_fomenu );
+    blit8( Korny->picbuffer, Korny->ppic_fomenu );
 
     int x1 = 160;
     int yo = 4;

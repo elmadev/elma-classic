@@ -7,12 +7,12 @@ anim::anim(pic8* source_sheet, const char* error_filename) {
     }
 
     // Get total number of animation frames
-    if (source_sheet->getxsize() % ANIM_WIDTH) {
+    if (source_sheet->get_width() % ANIM_WIDTH) {
         char tmp[80];
         sprintf(tmp, "Picture xsize must be a multiple of %d!", ANIM_WIDTH);
         uzenet(tmp, error_filename);
     }
-    frame_count = source_sheet->getxsize() / ANIM_WIDTH;
+    frame_count = source_sheet->get_width() / ANIM_WIDTH;
     if (frame_count < 0) {
         hiba("anim::anim frame_count < 0");
     }
@@ -25,7 +25,7 @@ anim::anim(pic8* source_sheet, const char* error_filename) {
     // Split the source picture into individual frames
     for (int i = 0; i < frame_count; i++) {
         frames[i] = new pic8(ANIM_WIDTH, ANIM_WIDTH);
-        blt8(frames[i], source_sheet, -ANIM_WIDTH * i, 0);
+        blit8(frames[i], source_sheet, -ANIM_WIDTH * i, 0);
         forditkepet(frames[i]);
         spriteosit(frames[i], source_sheet->gpixel(0, 0));
     }
@@ -65,8 +65,8 @@ void anim::make_helmet_top() {
         // Paste the old picture into a new pic of 40x41
         pic8* new_frame = new pic8(ANIM_WIDTH, ANIM_WIDTH + 1);
         unsigned char transparency = frames[i]->gpixel(0, 0);
-        new_frame->fillbox(transparency);
-        blt8(new_frame, frames[i], 0, 1);
+        new_frame->fill_box(transparency);
+        blit8(new_frame, frames[i], 0, 1);
 
         // Find the first solid pixel in row 1 located at (x1, 1)
         // Get the color at (x1 + 3, 1)

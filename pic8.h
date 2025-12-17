@@ -12,15 +12,15 @@ extern int Paratlankepsorok;
 
 class pic8;
 
-void blt8(pic8* pd, pic8* ps, int x = 0, int y = 0, int x1 = -10000, int y1 = -10000,
-          int x2 = -10000, int y2 = -10000);
+void blit8(pic8* dest, pic8* source, int x = 0, int y = 0, int x1 = -10000, int y1 = -10000,
+           int x2 = -10000, int y2 = -10000);
 
 class pic8 {
   public:
     // Baratok:
-    friend void blt8(pic8* pd, pic8* ps, int x, int y, int x1, int y1, int x2, int y2);
+    friend void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2);
     // friend void blt8fizrefejjelle( pic8* ps );
-    friend void spriteosit(pic8* ppic, int szin);
+    friend void spriteosit(pic8* ppic, int index);
     friend void spriteosit(pic8* ppic);
     friend void setmode8_l(int res);
 
@@ -28,48 +28,48 @@ class pic8 {
     // Sajat:
     int fizkep;
     int nemdestrukt;
-    int lefoglal(long xsize, long ysize);
-    void spritebeolvas(const char* nev, FILE* h);
-    int spritesave(const char* nev, FILE* h);
-    void pcxbeolvas(const char* nev, FILE* h = NULL);
-    int pcxsave(const char* nev, unsigned char* pal);
+    int allocate(long w, long h);
+    void spr_open(const char* filename, FILE* h);
+    int spr_save(const char* filename, FILE* h);
+    void pcx_open(const char* filename, FILE* h = NULL);
+    int pcx_save(const char* filename, unsigned char* pal);
 
   public: // Csak gany miatt public!
-    int xsize, ysize;
-    puchar* sormuttomb;
+    int width, height;
+    puchar* rows;
 
   private:
     puchar* szegmuttomb;
     long szegnum;
     // Sprite reszek:
-    unsigned char* sprite;
-    unsigned short spritehossz;
+    unsigned char* transparency_data;
+    unsigned short transparency_data_length;
 
   public:
     int success;
-    pic8(int xsize, int ysize);
+    pic8(int w, int h);
     // Mar meglevo tombre epiti ra pic8-at, destruktor nem torli:
     pic8(int xsize, int ysize, unsigned char** ppc);
-    pic8(const char* nev, FILE* h = NULL);
+    pic8(const char* filename, FILE* h = NULL);
     ~pic8(void);
     // VOX, SPR es PCX-et ismeri:
-    int save(const char* nev, unsigned char* pal = NULL, FILE* h = NULL);
-    int getxsize(void);
-    int getysize(void);
-    void ppixel(int x, int y, unsigned char szin);
+    int save(const char* filename, unsigned char* pal = NULL, FILE* h = NULL);
+    int get_width(void);
+    int get_height(void);
+    void ppixel(int x, int y, unsigned char index);
     unsigned char gpixel(int x, int y);
 #ifdef TEST
-    unsigned char* getptr(int y);
+    unsigned char* get_row(int y);
 #else
-    unsigned char* getptr(int y) { return sormuttomb[y]; }
+    unsigned char* get_row(int y) { return rows[y]; }
 #endif
-    void fillbox(int x1, int y1, int x2, int y2, unsigned char szin);
-    void fillbox(unsigned char szin);
-    void line(int x1, int y1, int x2, int y2, unsigned char szin);
-    void fuggszegmens_look(int x, int y, int size, unsigned char* lookup);
-    void vizszegmens_look(int x, int y, int size, unsigned char* lookup);
+    void fill_box(int x1, int y1, int x2, int y2, unsigned char index);
+    void fill_box(unsigned char index);
+    void line(int x1, int y1, int x2, int y2, unsigned char index);
+    void vertical_line(int x, int y, int size, unsigned char* lookup);
+    void horizontal_line(int x, int y, int size, unsigned char* lookup);
 
-    void keszitbelsot(int x1, int y1, int x2, int y2, pic8* ppic);
+    void subview(int x1, int y1, int x2, int y2, pic8* source);
 };
 
 // Fizikai kepernyore mutat:
@@ -78,10 +78,10 @@ class pic8 {
 class ddpal;
 
 unsigned char* spriteadat8(pic8* pmask, unsigned char szin, unsigned short* pspritehossz);
-int pcxtopal(const char* nev, unsigned char* pal);
-int pcxtopal(const char* nev, ddpal** ppddpal);
+int get_pcx_pal(const char* filename, unsigned char* pal);
+int get_pcx_pal(const char* filename, ddpal** sdl_pal);
 
-void mintavetel8(pic8* pdest, pic8* psour, int x1, int y1, int x2, int y2);
-void mintavetel8(pic8* pdest, pic8* psour);
+void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2);
+void blit_scale8(pic8* dest, pic8* source);
 
 #endif

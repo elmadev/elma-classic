@@ -307,9 +307,9 @@ void ecset::foldmutatocsere(void) {
         while (fut) {
             if ((pixelek_t)fut->pixelek == PX_FOLD && fut->xsize < SCREEN_WIDTH) {
                 int x = xpos % Plgr->foldxmodulus;
-                int y = i % Plgr->pfold->getysize();
-                fut->pixelek = Plgr->pfold->getptr(y) + x;
-                // fut->pixelek = Plgr->pfold->getptr( 0 ); igy latszik
+                int y = i % Plgr->pfold->get_height();
+                fut->pixelek = Plgr->pfold->get_row(y) + x;
+                // fut->pixelek = Plgr->pfold->get_row( 0 ); igy latszik
             }
 
             xpos += fut->xsize;
@@ -378,12 +378,12 @@ void ecset::textura2mutato(void) {
 
                     x %= pt->origxsize;
                     int size = megvan;
-                    if (x + size > ppic->getxsize()) {
-                        size = ppic->getxsize() - x;
+                    if (x + size > ppic->get_width()) {
+                        size = ppic->get_width() - x;
                     }
 
                     fut->xsize = size;
-                    fut->pixelek = ppic->getptr(y % ppic->getysize()) + x;
+                    fut->pixelek = ppic->get_row(y % ppic->get_height()) + x;
                     if (((pixelek_t)fut->pixelek & PIXELMASZK) == 0) {
                         uzenet("Memory address is less than 2048 (723)!");
                     }
@@ -921,8 +921,8 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
     }
 
     pic8* ppic = pkov->pkeptomb[index];
-    int xsize = ppic->getxsize();
-    int ysize = ppic->getysize();
+    int xsize = ppic->get_width();
+    int ysize = ppic->get_height();
     unsigned char atlatszo = ppic->gpixel(0, 0);
 
     // Toroljuk seged kepet:
@@ -957,7 +957,7 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
     // Beadjuk textura darabokat ecset-be:
     for (int y = 0; y < ysize; y++) {
         int x = 0;
-        unsigned char* sor = Buffsima->getptr(ysize - 1 - y);
+        unsigned char* sor = Buffsima->get_row(ysize - 1 - y);
         while (x < xsize) {
             x += getatlaatszoszam(sor, x, xsize, 0);
             if (x >= xsize) {
@@ -993,8 +993,8 @@ void ecset::kiegykovetokep(koveto* pkov, int index, int xo, int yo, int fazis) {
     int tavolsag = 600;
 
     pic8* ppic = pkov->pkeptomb[index];
-    int xsize = ppic->getxsize();
-    int ysize = ppic->getysize();
+    int xsize = ppic->get_width();
+    int ysize = ppic->get_height();
     unsigned char atlatszo = ppic->gpixel(0, 0);
 
     // Kiszamoljuk kep tetejenek helyet:
@@ -1006,7 +1006,7 @@ void ecset::kiegykovetokep(koveto* pkov, int index, int xo, int yo, int fazis) {
 
     for (int y = 0; y < ysize; y++) {
         int x = 0;
-        unsigned char* sor = ppic->getptr(ysize - 1 - y);
+        unsigned char* sor = ppic->get_row(ysize - 1 - y);
         while (x < xsize) {
             x += getatlaatszoszam(sor, x, xsize, atlatszo);
             if (x >= xsize) {
@@ -1054,7 +1054,7 @@ void ecset::kikovetokepek(koveto* pkov, int* ytomb, int hossz, int x0, int fazis
         int joindex = -1;
         int jody = 0;
         for (int i = 0; i < pkov->kepszam; i++) {
-            int dy = pkov->pkeptomb[i]->getysize();
+            int dy = pkov->pkeptomb[i]->get_height();
             if (dy < 2 * Keltolas + 1) {
                 char tmp[60];
                 sprintf(tmp, "picture's y size is less than %d!", 2 * Keltolas + 1);
@@ -1065,7 +1065,7 @@ void ecset::kikovetokepek(koveto* pkov, int* ytomb, int hossz, int x0, int fazis
                 dy = -dy;
             }
 
-            int ujx = curx + pkov->pkeptomb[i]->getxsize();
+            int ujx = curx + pkov->pkeptomb[i]->get_width();
             int vonaly;
             if (ujx >= x0 + hossz) {
                 vonaly = ytomb[hossz - 1];
@@ -1089,7 +1089,7 @@ void ecset::kikovetokepek(koveto* pkov, int* ytomb, int hossz, int x0, int fazis
 
         kiegykovetokep(pkov, joindex, curx, cury, fazis);
 
-        curx += pkov->pkeptomb[joindex]->getxsize();
+        curx += pkov->pkeptomb[joindex]->get_width();
         cury += jody;
     }
 }
@@ -1189,8 +1189,8 @@ void ecset::addobjektumok(void) {
             ujtavolsag = 499;
         }
 
-        int xsize = ppic->getxsize();
-        int ysize = ppic->getysize();
+        int xsize = ppic->get_width();
+        int ysize = ppic->get_height();
 
         if( x1 < 120 || x1+xsize >= maxx-50 )
             return;
@@ -1199,7 +1199,7 @@ void ecset::addobjektumok(void) {
         unsigned char atlatszo = ppic->gpixel( 0, 0 );
         for( int y = 0; y < ysize; y++ ) {
             // Kep egy soranak elintezese:
-            unsigned char* sor = ppic->getptr( ysize - 1 - y );
+            unsigned char* sor = ppic->get_row( ysize - 1 - y );
             if( ((int)sor & PIXELMASZK) == 0 )
                 uzenet( "Memory address is less than 2048 (654)!" );
 
@@ -1692,8 +1692,8 @@ static pic8* Felho2 = NULL;
 static void egetkeszit( pic8* peg, int xhely, int xkezd, int xmodulus ) {
     if( Elsoegkeszit ) {
         Elsoegkeszit = 0;
-        Pegbuffer = new pic8( peg->getxsize(), peg->getysize() );
-        blt8( Pegbuffer, peg );
+        Pegbuffer = new pic8( peg->get_width(), peg->get_height() );
+        blit8( Pegbuffer, peg );
 
         Felho = new pic8( "felho.pcx" );
         forditkepet( Felho );
@@ -1705,7 +1705,7 @@ static void egetkeszit( pic8* peg, int xhely, int xkezd, int xmodulus ) {
     }
 
     // Resetaljuk eget:
-    blt8( peg, Pegbuffer );
+    blit8( peg, Pegbuffer );
 
     // Felho2:
     double lassitas = 2.5;
@@ -1715,9 +1715,9 @@ static void egetkeszit( pic8* peg, int xhely, int xkezd, int xmodulus ) {
         dx += modulus;
     dx -= modulus;
     int x = xkezd+dx;
-    blt8( peg, Felho2, x, -80 );
+    blit8( peg, Felho2, x, -80 );
     x += modulus;
-    blt8( peg, Felho2, x, -80 );
+    blit8( peg, Felho2, x, -80 );
 
     // Felho1:
     lassitas = 1.5;
@@ -1727,9 +1727,9 @@ static void egetkeszit( pic8* peg, int xhely, int xkezd, int xmodulus ) {
         dx += modulus;
     dx -= modulus;
     x = xkezd+dx;
-    blt8( peg, Felho, x, 0 );
+    blit8( peg, Felho, x, 0 );
     x += modulus;
-    blt8( peg, Felho, x, 0 );
+    blit8( peg, Felho, x, 0 );
 } */
 
 void ecset::kitesz(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int x2, int y2) {
@@ -1746,8 +1746,8 @@ void ecset::kitesz(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int 
         hiba("ecset::kitesz Xe1 < 20 || Xe2 > maxx-20 || ye1 < 20 || ye2 > sorszam-20!");
     }
 
-    int foldymodulus = Plgr->pfold->getysize();
-    int egymodulus = Plgr->peg->getysize();
+    int foldymodulus = Plgr->pfold->get_height();
+    int egymodulus = Plgr->peg->get_height();
 
     int folddx = Xe1 % Plgr->foldxmodulus;
     // int eglassitas = 100;
@@ -1760,22 +1760,22 @@ void ecset::kitesz(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int 
     if (ajatekos) {
         for (int y = y1; y <= y2; y++) {
             int ye = y + yadd;
-            Foldsor = Plgr->pfold->getptr(ye % foldymodulus) + folddx;
+            Foldsor = Plgr->pfold->get_row(ye % foldymodulus) + folddx;
             // Eg fol-le is scrollozodik:
-            // Egsor = Plgr->peg->getptr( (y-y1+egdy) % egymodulus ) + egdx;
+            // Egsor = Plgr->peg->get_row( (y-y1+egdy) % egymodulus ) + egdx;
 
             // Eg fol-le nem scrollozodik:
-            Egsor = Plgr->peg->getptr((y - y1) % egymodulus) + egdx;
-            kiegysor_A(ppic->getptr(y) + x1, ye);
+            Egsor = Plgr->peg->get_row((y - y1) % egymodulus) + egdx;
+            kiegysor_A(ppic->get_row(y) + x1, ye);
         }
     } else {
         for (int y = y1; y <= y2; y++) {
             int ye = y + yadd;
-            Foldsor = Plgr->pfold->getptr(ye % foldymodulus) + folddx;
-            // Egsor = Plgr->peg->getptr( (ye+egdy) % egymodulus ) +
+            Foldsor = Plgr->pfold->get_row(ye % foldymodulus) + folddx;
+            // Egsor = Plgr->peg->get_row( (ye+egdy) % egymodulus ) +
             //				egdx;
-            Egsor = Plgr->peg->getptr((y - y1) % egymodulus) + egdx;
-            kiegysor_B(ppic->getptr(y) + x1, ye);
+            Egsor = Plgr->peg->get_row((y - y1) % egymodulus) + egdx;
+            kiegysor_B(ppic->get_row(y) + x1, ye);
         }
     }
 }
@@ -1802,12 +1802,12 @@ void ecset::kiteszview(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, 
     if (ajatekos) {
         for (int y = y1; y <= y2; y++) {
             int ye = y + yadd;
-            kiegysor_A(ppic->getptr(y) + x1, ye);
+            kiegysor_A(ppic->get_row(y) + x1, ye);
         }
     } else {
         for (int y = y1; y <= y2; y++) {
             int ye = y + yadd;
-            kiegysor_B(ppic->getptr(y) + x1, ye);
+            kiegysor_B(ppic->get_row(y) + x1, ye);
         }
     }
 }

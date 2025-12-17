@@ -205,7 +205,7 @@ void toolhelp(const char* text) {
         strcpy(Toolhelpszoveg, text);
     }
     int x1 = 1, y1 = 18, x2 = SCREEN_WIDTH - 2, y2 = Savy - 2;
-    Buffsima->fillbox(x1, y1, x2, y2, Hatterindex);
+    Buffsima->fill_box(x1, y1, x2, y2, Hatterindex);
     Pabc1->write(Buffsima, 10, y1 + 12, Toolhelpszoveg);
     bltfront(Buffsima, x1, y1, x2, y2);
 }
@@ -252,7 +252,7 @@ static char Menuszovegek[23][15] = { // Masodik egy string hossza
 int Tool = T_MOVE;
 
 static void editbe_balmenu(void) {
-    Buffsima->fillbox(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menuszin);
+    Buffsima->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menuszin);
     // Eloszor is egy nagy keret:
     Buffsima->line(0, 0, SCREEN_WIDTH - 1, 0, Menulineszin);
     Buffsima->line(0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
@@ -268,7 +268,7 @@ static void editbe_balmenu(void) {
         int x2 = Savx - 2;
         int y2 = Savy + (i + 1) * Menudy - 1;
         if (i == Elsotool + Tool) {
-            Buffsima->fillbox(x1, y1, x2, y2, Menu_nyomottszin);
+            Buffsima->fill_box(x1, y1, x2, y2, Menu_nyomottszin);
         }
         Buffsima->line(x1, y2 + 1, x2, y2 + 1, Menulineszin);
         Pabc1->write(Buffsima, 5, Savy + i * Menudy + 14, Menuszovegek[i]);
@@ -315,8 +315,8 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
         Pspritenevbuffer = new pic8(400, 17);
     }
 
-    Pspritenevbuffer->fillbox(Hatterindex);
-    // Pspritenevbuffer->fillbox( 70 );
+    Pspritenevbuffer->fill_box(Hatterindex);
+    // Pspritenevbuffer->fill_box( 70 );
 
     if (kepnev[0] && (texturanev[0] || maszknev[0])) {
         hiba("89hukjk");
@@ -355,7 +355,7 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
         Pabc2->write(Pspritenevbuffer, 164, 14, tmp);
     }
 
-    blt8(Buffsima, Pspritenevbuffer, 226, 2);
+    blit8(Buffsima, Pspritenevbuffer, 226, 2);
     bltfront(Buffsima, 226, 2, 540, 30);
 }
 
@@ -367,8 +367,8 @@ void kikereknev(int tipus, int kajatipus, int foodsorszam) {
         Pspritenevbuffer = new pic8(400, 17);
     }
 
-    Pspritenevbuffer->fillbox(Hatterindex);
-    // Pspritenevbuffer->fillbox( 70 );
+    Pspritenevbuffer->fill_box(Hatterindex);
+    // Pspritenevbuffer->fill_box( 70 );
 
     Pabc1->write(Pspritenevbuffer, 0, 14, "Object:");
     char tmp[50];
@@ -410,7 +410,7 @@ void kikereknev(int tipus, int kajatipus, int foodsorszam) {
 
     Pabc2->write(Pspritenevbuffer, 50, 14, tmp);
 
-    blt8(Buffsima, Pspritenevbuffer, 226, 2);
+    blit8(Buffsima, Pspritenevbuffer, 226, 2);
     bltfront(Buffsima, 226, 2, 540, 30);
 }
 
@@ -423,8 +423,8 @@ static void ujrarajzol(int egesz) {
         editbe_balmenu();
     }
 
-    Buffsima->fillbox(Savx, Savy, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2, Hatterindex);
-    Buffsima->fillbox(1, 1, SCREEN_WIDTH - 2, Savy - 2, Hatterindex);
+    Buffsima->fill_box(Savx, Savy, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2, Hatterindex);
+    Buffsima->fill_box(1, 1, SCREEN_WIDTH - 2, Savy - 2, Hatterindex);
     // Kiirjuk file nevet:
     Pabc1->write(Buffsima, 6, 15, "File:");
     strupr(State->editor_filename);

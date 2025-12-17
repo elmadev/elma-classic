@@ -289,7 +289,7 @@ void state::write_stats() {
     fprintf(h, "ELMA.EXE program. If you modify this file, you will loose the\n");
     fprintf(h, "changes next time you run the game. This is only an output file, the\n");
     fprintf(h, "best times are stored in the STATE.DAT binary file.\n");
-    fprintf(h, "Registered version 1.0\n");
+    fprintf(h, "Registered version " ELMA_VERSION "\n");
     fprintf(h, "\n");
 
     // Singleplayer times:

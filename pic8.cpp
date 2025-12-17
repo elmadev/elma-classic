@@ -87,9 +87,6 @@ int pic8::allocate(long w, long h) {
 }
 
 pic8::~pic8(void) {
-    if (nemdestrukt) {
-        return;
-    }
     if (rows) {
         delete rows;
     }
@@ -106,7 +103,6 @@ pic8::~pic8(void) {
 
 pic8::pic8(int w, int h) {
     success = 0;
-    nemdestrukt = 0;
     rows = NULL;
     szegmuttomb = NULL;
     transparency_data = NULL;
@@ -114,29 +110,7 @@ pic8::pic8(int w, int h) {
     success = allocate(w, h);
 }
 
-// Mar meglevo tombre epiti ra pic8-at, destruktor nem torli:
-pic8::pic8(int xsizep, int ysizep, unsigned char** ppc) {
-    success = 0;
-    nemdestrukt = 1;
-    rows = NULL;
-    szegmuttomb = NULL;
-    transparency_data = NULL;
-    transparency_data_length = NULL;
-    if (xsizep == -12333 && ysizep == -12334) {
-        hiba("fizkep nemdestruktos pic8 konstruktorban!");
-        return;
-    }
-    width = short(xsizep);
-    height = short(ysizep);
-    if (!ppc) {
-        hiba("!ppc nemdestruktos pic8 konstruktorban!");
-    }
-    rows = ppc;
-    success = 1;
-}
-
 pic8::pic8(const char* filename, FILE* h) {
-    nemdestrukt = 0;
     success = 0;
     rows = NULL;
     szegmuttomb = NULL;

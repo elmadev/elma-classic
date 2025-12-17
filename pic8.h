@@ -24,7 +24,6 @@ class pic8 {
 
   protected:
     // Sajat:
-    int nemdestrukt;
     int allocate(long w, long h);
     void spr_open(const char* filename, FILE* h);
     int spr_save(const char* filename, FILE* h);
@@ -45,8 +44,6 @@ class pic8 {
   public:
     int success;
     pic8(int w, int h);
-    // Mar meglevo tombre epiti ra pic8-at, destruktor nem torli:
-    pic8(int xsize, int ysize, unsigned char** ppc);
     pic8(const char* filename, FILE* h = NULL);
     ~pic8(void);
     // VOX, SPR es PCX-et ismeri:

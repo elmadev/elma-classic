@@ -10,26 +10,23 @@ void blit8(pic8* dest, pic8* source, int x = 0, int y = 0, int x1 = -10000, int 
 
 class pic8 {
   public:
-    // Baratok:
     friend void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2);
     friend void spriteosit(pic8* ppic, int index);
     friend void spriteosit(pic8* ppic);
 
   protected:
-    // Sajat:
     void allocate(long w, long h);
     void spr_open(const char* filename, FILE* h);
     int spr_save(const char* filename, FILE* h);
     void pcx_open(const char* filename, FILE* h = NULL);
     int pcx_save(const char* filename, unsigned char* pal);
 
-  public: // Csak gany miatt public!
+  public:
     int width, height;
     puchar* rows;
 
   private:
     unsigned char* pixels;
-    // Sprite reszek:
     unsigned char* transparency_data;
     unsigned short transparency_data_length;
 
@@ -37,7 +34,6 @@ class pic8 {
     pic8(int w, int h);
     pic8(const char* filename, FILE* h = NULL);
     ~pic8(void);
-    // VOX, SPR es PCX-et ismeri:
     int save(const char* filename, unsigned char* pal = NULL, FILE* h = NULL);
     int get_width(void);
     int get_height(void);

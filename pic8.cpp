@@ -3,7 +3,6 @@
 typedef unsigned char* puchar;
 
 void pic8::allocate(long w, long h) {
-    // nem szabad hasznalni size-eket, hanem sizep-eket!
     if (rows || pixels) {
         hiba("pic8 already allocated!");
         return;
@@ -43,6 +42,7 @@ pic8::~pic8(void) {
     }
 }
 
+// Initialize a blank picture
 pic8::pic8(int w, int h) {
     rows = NULL;
     pixels = NULL;
@@ -51,12 +51,12 @@ pic8::pic8(int w, int h) {
     allocate(w, h);
 }
 
+// Initialize a picture from filename or file
 pic8::pic8(const char* filename, FILE* h) {
     rows = NULL;
     pixels = NULL;
     transparency_data = NULL;
     transparency_data_length = NULL;
-    // Kiterjesztes megkeresese:
     int i = strlen(filename) - 1;
     while (i >= 0) {
         if (filename[i] == '.') {
@@ -77,7 +77,6 @@ pic8::pic8(const char* filename, FILE* h) {
 }
 
 int pic8::save(const char* filename, unsigned char* pal, FILE* h) {
-    // Kiterjesztes megkeresese:
     int i = 0;
     while (filename[i]) {
         if (filename[i] == '.') {
@@ -87,9 +86,6 @@ int pic8::save(const char* filename, unsigned char* pal, FILE* h) {
             if (strcmpi(filename + i, ".pcx") == 0) {
                 return pcx_save(filename, pal);
             }
-            // if( strcmpi( filename+i, ".mix" ) == 0 ) {
-            //   return mixsave( filename );
-            // }
             hiba("pic8::save unknown file extension: ", filename);
             return 0;
         }
@@ -119,8 +115,6 @@ unsigned char pic8::gpixel(int x, int y) {
 }
 
 #ifdef DEBUG
-
-// Egyebkent inline:
 
 unsigned char* pic8::get_row(int y) {
 #ifdef DEBUG
@@ -167,6 +161,7 @@ void pic8::fill_box(int x1, int y1, int x2, int y2, unsigned char index) {
     }
 }
 
+// Draw horizontal line for the ingame timer, using the provided palette map
 void pic8::horizontal_line(int x, int y, int size, unsigned char* lookup) {
 #ifdef DEBUG
     if (x < 0 || y < 0 || x + size - 1 >= width || y >= height) {
@@ -177,9 +172,9 @@ void pic8::horizontal_line(int x, int y, int size, unsigned char* lookup) {
     for (int i = 0; i < size; i++) {
         row[x + i] = lookup[row[x + i]];
     }
-    // memset( &row[x], szin, size );
 }
 
+// Draw vertical line for the ingame timer, using the provided palette map
 void pic8::vertical_line(int x, int y, int size, unsigned char* lookup) {
 #ifdef DEBUG
     if (x < 0 || y < 0 || x >= width || y + size - 1 >= height) {
@@ -190,17 +185,19 @@ void pic8::vertical_line(int x, int y, int size, unsigned char* lookup) {
         unsigned char* row = get_row(y + i);
         row[x] = lookup[row[x]];
     }
-
-    // for( int i = 0; i < size; i++ )
-    //	ppixel( x, y+i, szin );
 }
 
-// SPRITE:
-
-/*static void dummy( long l ) {
-    l++;
-} */
-
+// Read a .spr file
+// char Header[1] == 0x2D
+// short width
+// short height
+// unsigned char raw_palette_data[xsize*ysize]
+// char spriteheader[7] == "SPRITE"
+// short transparency_data_length
+// unsigned char transparency_data[transparency_data_length] (sprite transparency data)
+// Transparency data:
+//       ['K', length] -> the next length pixels are solid
+//       ['N', length] -> the next length pixels are transparent
 void pic8::spr_open(const char* filename, FILE* h) {
     int h_provided = 1;
     if (!h) {
@@ -247,7 +244,6 @@ void pic8::spr_open(const char* filename, FILE* h) {
     allocate(width, height);
 
     for (int y = 0; y < height; y++) {
-        // Egy sor beolvasasa:
         if (fread(rows[y], width, 1, h) != 1) {
             hiba("Error reading sprite file: ", filename);
             if (!h_provided) {
@@ -256,8 +252,7 @@ void pic8::spr_open(const char* filename, FILE* h) {
             return;
         }
     }
-
-    // SPRITE reszek beolvasasa:
+    // Transparency data header
     char tmp[10] = "";
     if (fread(tmp, 7, 1, h) != 1) {
         hiba("Error reading sprite file: ", filename);
@@ -273,7 +268,7 @@ void pic8::spr_open(const char* filename, FILE* h) {
         }
         return;
     }
-
+    // Transparency data
     transparency_data_length = -1;
     if (fread(&transparency_data_length, 2, 1, h) != 1) {
         hiba("Error reading sprite file: ", filename);
@@ -290,8 +285,6 @@ void pic8::spr_open(const char* filename, FILE* h) {
         return;
     }
 
-    // long l = farcoreleft();
-    // dummy( l );
     transparency_data = new unsigned char[transparency_data_length];
     if (!transparency_data) {
         hiba("Could not allocate memory for sprite file: ", filename);
@@ -330,9 +323,7 @@ int pic8::spr_save(const char* filename, FILE* h) {
         }
         return 0;
     }
-
     for (int y = 0; y < height; y++) {
-        // Egy sor kiirasa:
         if (fwrite(rows[y], width, 1, h) != 1) {
             hiba("pic8::spr_save failed to write to file: ", filename);
             if (!h_provided) {
@@ -341,8 +332,6 @@ int pic8::spr_save(const char* filename, FILE* h) {
             return 0;
         }
     }
-
-    // Sprite resz kiirasa:
     if (fwrite("SPRITE", 7, 1, h) != 1 || fwrite(&transparency_data_length, 2, 1, h) != 1 ||
         fwrite(transparency_data, transparency_data_length, 1, h) != 1) {
         hiba("pic8::spr_save failed to write to file: ", filename);
@@ -357,7 +346,6 @@ int pic8::spr_save(const char* filename, FILE* h) {
     return 1;
 }
 
-// PCX:
 struct pcxdescriptor {
     unsigned char ManufactId, VersionNum, EncodingTech, BitsPerPlane;
     short Xmin, Ymin, Xmax, Ymax;
@@ -376,6 +364,8 @@ void pic8::pcx_open(const char* filename, FILE* h) {
             hiba("Failed to open PCX file!: ", filename);
         }
     }
+
+    // Header
     pcxdescriptor desc;
     if (fread(&desc, sizeof(desc), 1, h) != 1) {
         hiba("Failed to read PCX file: ", filename);
@@ -385,8 +375,8 @@ void pic8::pcx_open(const char* filename, FILE* h) {
         hiba("PCX file header invalid or not supported: ", filename);
     }
     allocate(desc.Xmax - desc.Xmin + 1, desc.Ymax - desc.Ymin + 1);
+    // Pixel data
     for (int y = 0; y < height; y++) {
-        // Egy sor beolvasasa:
         short nnn = 0, ccc, iii;
 
         do {
@@ -425,6 +415,7 @@ void pic8::pcx_open(const char* filename, FILE* h) {
     }
 }
 
+// Get the number of times the same pixel palette ID repeats, stopping at end of scanline
 static int pcx_count_repeats(pic8* ppic, int x, int y, int width) {
     unsigned char index = ppic->gpixel(x, y);
     x++;
@@ -436,12 +427,15 @@ static int pcx_count_repeats(pic8* ppic, int x, int y, int width) {
     return repeats;
 }
 
+// Strictly respects pcx convention: Only compresses palette IDs 0-63 instead of 0-191
+// Does not enforce the width to be an even number however
 int pic8::pcx_save(const char* filename, unsigned char* pal) {
     FILE* h = fopen(filename, "wb");
     if (!h) {
         hiba("pcx_save failed to open file: ", filename);
         return 0;
     }
+    // Header
     pcxdescriptor desc;
     desc.ManufactId = 10;
     desc.VersionNum = 5;
@@ -461,6 +455,7 @@ int pic8::pcx_save(const char* filename, unsigned char* pal) {
         fclose(h);
         return 0;
     }
+    // Pixel data
     for (int y = 0; y < height; y++) {
         int x = 0;
         while (x < width) {
@@ -508,6 +503,7 @@ int pic8::pcx_save(const char* filename, unsigned char* pal) {
             }
         }
     }
+    // Palette
     unsigned char palette_header = 0x0c;
     if (fwrite(&palette_header, 1, 1, h) != 1) {
         hiba("pcx_save failed to write to file: ", filename);
@@ -515,7 +511,6 @@ int pic8::pcx_save(const char* filename, unsigned char* pal) {
         return 0;
     }
     if (pal) {
-        // Van paletta!:
         for (int i = 0; i < 768; i++) {
             unsigned char c = (unsigned char)(pal[i] << 2);
             if (fwrite(&c, 1, 1, h) != 1) {
@@ -525,7 +520,7 @@ int pic8::pcx_save(const char* filename, unsigned char* pal) {
             }
         }
     } else {
-        // Nincs paletta megadva!
+        // Use a dummy greyscale palette if none provided
         for (int i = 0; i < 256; i++) {
             unsigned char c = (unsigned char)i;
             for (int j = 0; j < 3; j++) {
@@ -542,7 +537,7 @@ int pic8::pcx_save(const char* filename, unsigned char* pal) {
     return 1;
 }
 
-// int Debugblt = 0;
+// Paste source (x1, y1, x2, y2) into dest at (x, y)
 void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2) {
 #ifdef DEBUG
     if (y2 == -10000 && (x1 != -10000 || y1 != -10000 || x2 != -10000)) {
@@ -555,9 +550,6 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
     }
 #endif
 
-    // if( Debugblt ) idejott
-    //	hiba( "Itt van 17!" );
-
     if (dest->transparency_data) {
         hiba("blit8 destination has transparency_data!");
         return;
@@ -567,7 +559,6 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
         x2 = source->width - 1;
         y2 = source->height - 1;
     } else {
-        // Sorrend beallitasa:
         if (x2 < x1) {
             int tmp = x1;
             x1 = x2;
@@ -579,8 +570,7 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
             y2 = tmp;
         }
     }
-    // Levagdosasa reszeknek x iranyban:
-    // Eloszor source kepnek megfeleloen:
+    // x - Make sure we don't grab pixels that are out of range of source picture
     if (x1 < 0) {
         x += -x1;
         x1 = 0;
@@ -589,7 +579,7 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
         x -= x2 - (source->width - 1);
         x2 = source->width - 1;
     }
-    // Most destinacionak megfeleloen:
+    // x - Make sure we don't grab pixels that are out of range of destination picture
     if (x < 0) {
         x1 += -x;
         x = 0;
@@ -601,8 +591,7 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
         return;
     }
 
-    // Levagdosasa reszeknek y iranyban:
-    // Eloszor source kepnek megfeleloen:
+    // y - Make sure we don't grab pixels that are out of range of source picture
     if (y1 < 0) {
         y += -y1;
         y1 = 0;
@@ -611,7 +600,7 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
         y -= y2 - (source->height - 1);
         y2 = source->height - 1;
     }
-    // Most destinacionak megfeleloen:
+    // y - Make sure we don't grab pixels that are out of range of destination picture
     if (y < 0) {
         y1 += -y;
         y = 0;
@@ -624,8 +613,7 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
     }
 
     if (source->transparency_data) {
-        // sprite lejatszas:
-        // Itt vegig kell futni teljes sprite kepet es kozben vagni!
+        // Skip transparent pixels of source image
         unsigned buf = 0;
         unsigned char* buffer = source->transparency_data;
         int desty = y - y1;
@@ -641,7 +629,6 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
                     if (y_in_range) {
                         if (sx < x1 || sx + buffer[buf] - 1 > x2) {
                             if (!(sx > x2 || sx + buffer[buf] - 1 < x1)) {
-                                // Kilog, de van bent resze:
                                 int xstart = sx;
                                 int xend = sx + buffer[buf] - 1;
                                 if (xstart < x1) {
@@ -675,23 +662,16 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
         return;
     }
 
-    // Most mar tuti jok koordok!
-    // Memoria-memoria atvitel!
+    // No transparent pixels, just copy everything
     int length = x2 - x1 + 1;
     int dfy = y;
-
-    // if( Debugblt )	idejott
-    //	hiba( "Itt van 18!" );
 
     for (int fy = y1; fy <= y2; fy++) {
         memcpy(&dest->rows[dfy++][x], &source->rows[fy][x1], length);
     }
-    // if( Debugblt )
-    //	hiba( "Itt van 19!" ); idejott
 }
 
 int get_pcx_pal(const char* filename, unsigned char* pal) {
-    // Paletta beolvasasa:
     FILE* h = qopen(filename, "rb");
     if (!h) {
         hiba("get_pcx_pal failed to open file: ", filename);
@@ -730,15 +710,16 @@ int get_pcx_pal(const char* filename, unsigned char* pal) {
 int get_pcx_pal(const char* filename, ddpal** sdl_pal) {
     unsigned char pal[768];
     get_pcx_pal(filename, pal);
+    // Hardcoded modification to the menu palette:
     if (strcmp(filename, "intro.pcx") == 0) {
-        // Egy kicsit gany, teljes.cpp-bol hivodik ilyen parameterrel.
         pal[0] = pal[1] = pal[2] = 0;
     }
     *sdl_pal = new ddpal(pal);
     return 1;
 }
+
+// Copy entire source into the (x1, y1, x2, y2) coordinates of dest
 void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2) {
-// Ellenorzesek:
 #ifdef DEBUG
     if (!dest || !source) {
         hiba("blit_scale8 !dest || !source!");
@@ -778,13 +759,13 @@ void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2) {
     }
 }
 
+// Copy entire source and resize and paste into entire dest
 void blit_scale8(pic8* dest, pic8* source) {
     blit_scale8(dest, source, 0, 0, dest->get_width() - 1, dest->get_height() - 1);
 }
 
-// Egyenlore csak vizszintes es fuggoleges vonalak:
+// Only horizontal and vertical lines can be drawn
 void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
-    // Sorrend:
     if (x2 < x1) {
         int tmp = x1;
         x1 = x2;
@@ -796,14 +777,12 @@ void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
         y2 = tmp;
     }
     if (x1 == x2) {
-        // Fuggoleges:
         for (int y = y1; y <= y2; y++) {
             ppixel(x1, y, index);
         }
         return;
     }
     if (y1 == y2) {
-        // Vizszintes:
         for (int x = x1; x <= x2; x++) {
             ppixel(x, y1, index);
         }
@@ -812,6 +791,7 @@ void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
     hiba("pic8::line diagonal lines not implemented!");
 }
 
+// Make this picture point by reference of a subview of the source picture
 void pic8::subview(int x1, int y1, int x2, int y2, pic8* source) {
     width = x2 - x1 + 1;
     height = y2 - y1 + 1;

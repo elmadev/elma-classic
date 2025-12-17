@@ -70,7 +70,7 @@ static int feldolgvonalszakasz(gyuru* pgy, int p1, int p2, int* px0, int cur, in
     }
 
     if (cur < x1 - 1) {
-#ifdef TEST
+#ifdef DEBUG
         hiba("o96ytuyg");
 #endif
         return cur;

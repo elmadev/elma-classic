@@ -1,8 +1,6 @@
 #ifndef VEKT2_H
 #define VEKT2_H
 
-// #define TEST eseten plusz teszteket vegez!
-
 class vekt2 {
   public:
     double x, y;

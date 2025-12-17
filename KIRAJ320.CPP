@@ -55,7 +55,7 @@ void beallitmereteket(int splitscreen) {
         Cy1Bplayer = 0;
         Cy2Bplayer = (SCREEN_HEIGHT / 2) - 7;
     }
-#ifdef TEST
+#ifdef DEBUG
     if (Cx2 >= SCREEN_WIDTH) {
         hiba("beallitmereteket Cx2 >= SCREEN_WIDTH!");
     }
@@ -150,7 +150,7 @@ static void kitag(pic8* ppic8, kiskep* pk, kisbox* pb) {
 }
 
 static void kigyuru(pic8* ppic8, int x, int y, unsigned char szin) {
-#ifdef TEST
+#ifdef DEBUG
     if (x < 1 || x >= ppic8->get_width() - 1 || y < 1 || y >= ppic8->get_height() - 1) {
         hiba("kigyuru-ben x, vagy y lelog!");
     }
@@ -325,7 +325,7 @@ static void kitolthatteret(pic8* ppic) {
     }
 }
 
-#ifdef TEST
+#ifdef DEBUG
 int Voltkilogas = 0;
 #endif
 

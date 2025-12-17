@@ -86,7 +86,7 @@ void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, bo
     // Get up to two points of collision between wheel and polygons
     if (do_collision) {
         anchor_point_count = talppontkereses(rb->r, rb->radius, &point1, &point2, &line1, &line2);
-#ifdef TEST
+#ifdef DEBUG
         switch (anchor_point_count) {
         case 0:
             if (line1 || line2) {

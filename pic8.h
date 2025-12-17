@@ -1,9 +1,6 @@
 #ifndef PIC8_H
 #define PIC8_H
 
-// Ezt nyugodtan ki lehet venni, ha nem jonnek hibauzenetek:
-#define PIC8TEST
-
 typedef unsigned char* puchar;
 
 class pic8;
@@ -47,7 +44,7 @@ class pic8 {
     int get_height(void);
     void ppixel(int x, int y, unsigned char index);
     unsigned char gpixel(int x, int y);
-#ifdef TEST
+#ifdef DEBUG
     unsigned char* get_row(int y);
 #else
     unsigned char* get_row(int y) { return rows[y]; }

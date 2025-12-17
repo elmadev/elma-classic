@@ -972,7 +972,7 @@ topol::topol(const char* filenev_p) {
     } else {
         loadbelso(filenev);
         // Sajat tablabol vesszuk lgr neveket:
-        // #ifdef TEST 		Demo miatt most nem ellenorizzuk
+        // #ifdef DEBUG 		Demo miatt most nem ellenorizzuk
         //	if( belsopalyaszam < 0 || belsopalyaszam > INTERNAL_LEVEL_COUNT )
         //		hiba( "4i4fyuif" );
         // #endif

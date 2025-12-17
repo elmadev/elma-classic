@@ -112,7 +112,7 @@ void szakaszok::deleteallnodes(void) {
 
 // Egy cellaba bekoti vonalat, ha meg nincs benne es rajta van tablan:
 void szakaszok::bekot(int cellax, int cellay, vonal* pv) {
-#ifdef TEST
+#ifdef DEBUG
     if (cellax < 0 || cellay < 0) {
         hiba("cellax < 0 || cellay < 0!");
     }
@@ -191,7 +191,7 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
         }
         y1 -= maxtav;
         y2 += maxtav;
-#ifdef TEST
+#ifdef DEBUG
         if (y1 > y2) {
             hiba("Bug!");
         }
@@ -343,7 +343,7 @@ vonal* szakaszok::getnext(void) {
     if (!nextnode) {
         return NULL;
     }
-#ifdef TEST
+#ifdef DEBUG
     if (!nextnode->pvonal) {
         hiba("szakaszok::getnext-ben !nextnode->pvonal");
     }

@@ -129,7 +129,7 @@ double gyuru::legkozpont(double x, double y, int* pk) {
 }
 
 int gyuru::metszesszam(vekt2 r1, vekt2 v1) {
-#ifdef TEST
+#ifdef DEBUG
     if (koveto) {
         hiba("89yy");
     }
@@ -159,7 +159,7 @@ int gyuru::metszesszam(vekt2 r1, vekt2 v1) {
 }
 
 int gyuru::metszeshely(vekt2 r1, vekt2 v1, int kihagy, vekt2* phely) {
-#ifdef TEST
+#ifdef DEBUG
     if (koveto) {
         hiba("0i9p9");
     }
@@ -413,7 +413,7 @@ void gyuru::szetvalaszt(void) {
 
 // akkor ad igazat, ha korbejaraskor poligon belseje bal oldalon van;
 int gyuru::pozitivkorjaras(void) {
-#ifdef TEST
+#ifdef DEBUG
     if (koveto) {
         hiba("d6f65");
     }

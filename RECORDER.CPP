@@ -303,7 +303,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
     }
 
     while (1) {
-#ifdef TEST
+#ifdef DEBUG
         if (ido - ucsot == 0.0) {
             hiba("ido-ucsot == 0.0!");
         }

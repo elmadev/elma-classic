@@ -353,7 +353,7 @@ void ecset::textura2mutato(void) {
             if (((kepindex & PIXELMASZK) == 0) && (kepindex >= 10)) {
                 kepindex -= 10;
 // Itt van maszk, le kell cserelni:
-#ifdef TEST
+#ifdef DEBUG
                 if (kepindex >= Plgr->texturaszam) {
                     hiba("ecset::maszkokkitoltese kepindex >= Plgr->kepszam!");
                 }
@@ -1022,7 +1022,7 @@ void ecset::kiegykovetokep(koveto* pkov, int index, int xo, int yo, int fazis) {
     }
 
     if (xsize > 640 || ysize > 480) {
-#ifdef TEST
+#ifdef DEBUG
         hiba("7yfg4");
 #endif
         return;
@@ -1033,7 +1033,7 @@ void ecset::kiegykovetokep(koveto* pkov, int index, int xo, int yo, int fazis) {
 }
 
 void ecset::kikovetokepek(koveto* pkov, int* ytomb, int hossz, int x0, int fazis) {
-#ifdef TEST
+#ifdef DEBUG
     if (hossz < 1) {
         hiba("dd387d3e");
     }
@@ -1457,7 +1457,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
                 memcpy(pc, Foldsor, ujpdaxsize - ures);
             } else {
-#ifdef TEST
+#ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
                     hiba("(pixelek_t)pda->pixelek != PX_URES iueghyreg!");
                 }
@@ -1480,7 +1480,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
                 memcpy(pc, Foldsor, size);
             } else {
-#ifdef TEST
+#ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
                     hiba("(pixelek_t)pda->pixelek != PX_URES iygvfrgiyvr!");
                 }
@@ -1513,7 +1513,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
                 memcpy(pc, Foldsor + (xpos - Xe1), Xe2 - xpos + 1);
                 return;
             }
-#ifdef TEST
+#ifdef DEBUG
             if ((pixelek_t)pda->pixelek != PX_URES) {
                 hiba("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
             }
@@ -1531,7 +1531,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
                 if ((pixelek_t)pda->pixelek == PX_FOLD) {
                     memcpy(pc, Foldsor + (xpos - Xe1), pda->xsize);
                 } else {
-#ifdef TEST
+#ifdef DEBUG
                     if ((pixelek_t)pda->pixelek != PX_URES) {
                         hiba("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
                     }
@@ -1584,7 +1584,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
                 memcpy(pc, Foldsor, ujpdaxsize - ures);
             } else {
-#ifdef TEST
+#ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
                     hiba("(pixelek_t)pda->pixelek != PX_URES iueghyreg!");
                 }
@@ -1607,7 +1607,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
                 memcpy(pc, Foldsor, size);
             } else {
-#ifdef TEST
+#ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
                     hiba("(pixelek_t)pda->pixelek != PX_URES iygvfrgiyvr!");
                 }
@@ -1640,7 +1640,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
                 memcpy(pc, Foldsor + (xpos - Xe1), Xe2 - xpos + 1);
                 return;
             }
-#ifdef TEST
+#ifdef DEBUG
             if ((pixelek_t)pda->pixelek != PX_URES) {
                 hiba("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
             }
@@ -1658,7 +1658,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
                 if ((pixelek_t)pda->pixelek == PX_FOLD) {
                     memcpy(pc, Foldsor + (xpos - Xe1), pda->xsize);
                 } else {
-#ifdef TEST
+#ifdef DEBUG
                     if ((pixelek_t)pda->pixelek != PX_URES) {
                         hiba("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
                     }
@@ -1890,7 +1890,7 @@ void ecset::foltoz(void) {
             if (((kepindex & PIXELMASZK) == 0) && (kepindex >= 10)) {
                 kepindex -= 10;
 // Itt van maszk, le kell cserelni:
-#ifdef TEST
+#ifdef DEBUG
                 if (kepindex >= Plgr->texturaszam) {
                     hiba("egryiegr");
                 }

@@ -20,8 +20,6 @@
 
 // #include	<graph.h>
 
-// #define TEST
-
 #include "MAIN.H"
 #include "pic8.h"
 #include "anim.h"

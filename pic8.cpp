@@ -165,12 +165,12 @@ unsigned char pic8::gpixel(int x, int y) {
     return rows[y][x];
 }
 
-#ifdef TEST
+#ifdef DEBUG
 
 // Egyebkent inline:
 
 unsigned char* pic8::get_row(int y) {
-#ifdef PIC8TEST
+#ifdef DEBUG
     if (y < 0 || y >= height) {
         hiba("pic8::get_row y out of bounds!");
         return 0;
@@ -215,7 +215,7 @@ void pic8::fill_box(int x1, int y1, int x2, int y2, unsigned char index) {
 }
 
 void pic8::horizontal_line(int x, int y, int size, unsigned char* lookup) {
-#ifdef PIC8TEST
+#ifdef DEBUG
     if (x < 0 || y < 0 || x + size - 1 >= width || y >= height) {
         hiba("pic8::horizontal_line x/y out of range!");
     }
@@ -228,7 +228,7 @@ void pic8::horizontal_line(int x, int y, int size, unsigned char* lookup) {
 }
 
 void pic8::vertical_line(int x, int y, int size, unsigned char* lookup) {
-#ifdef PIC8TEST
+#ifdef DEBUG
     if (x < 0 || y < 0 || x >= width || y + size - 1 >= height) {
         hiba("pic8::vertical_line x/y out of range!");
     }
@@ -591,7 +591,7 @@ int pic8::pcx_save(const char* filename, unsigned char* pal) {
 
 // int Debugblt = 0;
 void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2) {
-#ifdef PIC8TEST
+#ifdef DEBUG
     if (y2 == -10000 && (x1 != -10000 || y1 != -10000 || x2 != -10000)) {
         hiba("blit8 y2 == PIC8_BLIT_ALL, but x1/y1/x2 are not!");
         return;
@@ -786,7 +786,7 @@ int get_pcx_pal(const char* filename, ddpal** sdl_pal) {
 }
 void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2) {
 // Ellenorzesek:
-#ifdef PIC8TEST
+#ifdef DEBUG
     if (!dest || !source) {
         hiba("blit_scale8 !dest || !source!");
     }
@@ -803,7 +803,7 @@ void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2) {
         y2 = tmp;
     }
 
-#ifdef PIC8TEST
+#ifdef DEBUG
     if (x1 < 0 || y1 < 0 || x2 >= dest->get_width() || y2 >= dest->get_height()) {
         hiba("pic8::blit_scale x1 < 0 || y1 < 0 || x2 >= width || y2 >= height!");
     }
@@ -862,7 +862,7 @@ void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
 void pic8::subview(int x1, int y1, int x2, int y2, pic8* source) {
     width = x2 - x1 + 1;
     height = y2 - y1 + 1;
-#ifdef TEST
+#ifdef DEBUG
     if (x1 < 0 || x2 >= SCREEN_WIDTH || y1 < 0 || y2 >= SCREEN_HEIGHT) {
         hiba("pic8::subview!");
     }

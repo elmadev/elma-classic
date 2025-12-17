@@ -1,11 +1,10 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
 
-int INTERNAL_LEVEL_COUNT = 55; // Vizittel egyutt
+int INTERNAL_LEVEL_COUNT = 55;
 
 int getstatesoundon(void) { return State->sound_on; }
 
-// Van ugyanilyen neven topol.cpp-ben is ket fv.:
 static void read_encrypted(void* buffer, int length, FILE* h, const char* error_filename) {
     if (fread(buffer, 1, length, h) != length) {
         uzenet("Corrupt file, please delete it!", error_filename);
@@ -52,14 +51,13 @@ static int STATE_MAGICNUMBER_REGISTERED = 123432221;
 static char STATE_FILENAME[] = "state.dat";
 
 state::state(const char* filename) {
-    // Beallitjuk default ertekeket:
     memset(toptens, 0, sizeof(toptens));
     memset(players, 0, sizeof(players));
     player_count = 0;
     player1[0] = 0;
     player2[0] = 0;
     sound_on = 1;
-    compatibility_mode = 0; // ha igaz, kompatibilis mod
+    compatibility_mode = 0;
     single = 1;
     flag_tag = 0;
     player1_bike1 = 1;
@@ -73,18 +71,16 @@ state::state(const char* filename) {
 
     reset_keys();
 
-    // Beolvasas ha kell:
     if (!filename) {
         filename = STATE_FILENAME;
     }
 
+    // Recreate state.dat if it doesn't exist (or cannot access...?)
     if (access(filename, 0) != 0) {
-        // Nem letezik state.dat:
         save();
         return;
     }
 
-    // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
     FILE* h = fopen(filename, "rb");
     if (!h) {
         hiba("Cannot open state file!: ", filename);
@@ -122,7 +118,6 @@ state::state(const char* filename) {
     read_encrypted(&editor_filename[0], 20, h, filename);
     read_encrypted(&external_filename[0], 20, h, filename);
 
-    // Magic number:
     int magic_number = 0;
     if (fread(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
         uzenet("Corrupt file, please rename it!", filename);
@@ -135,13 +130,10 @@ state::state(const char* filename) {
     fclose(h);
 }
 
+// Reload top-ten data from top ten. I'm not entirely sure why it is necessary
 void state::reload_toptens(void) {
     char* filename = STATE_FILENAME;
 
-    // if( access( filename, 0 ) != 0 )
-    //	return;
-
-    // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
     FILE* h = fopen(filename, "rb");
     while (!h) {
         dialog320("The state.dat file cannot be opened!",
@@ -163,7 +155,6 @@ void state::reload_toptens(void) {
 state::~state(void) {}
 
 void state::save(void) {
-    // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
     FILE* h = fopen(STATE_FILENAME, "wb");
     if (!h) {
         uzenet("Could not open for write file!: ", STATE_FILENAME);
@@ -222,23 +213,22 @@ static void write_stats_topten(FILE* h, topten* tten, int single) {
     }
 }
 
-// Ha nincs egy palyan ido, tiz percet szamol helyette:
-// Ez itt szazadmasodpercben van megadva:
+// Default time if uncompleted level: 10 minutes
 static int const STATS_MAX_TIME = 100 * 60 * 10;
 
-// Anonymous total times:
+// Print total time of all players combined
 void state::write_stats_anonymous_total_time(FILE* h, int single, const char* text1,
                                              const char* text2, const char* text3) {
     int total_time = 0;
-    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) { // ucso palyat nem szamitjuk
+    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
         int best_time = 100000000;
-        // Single:
+        // Both single and multi can take the single best time
         topten* tten_single = &toptens[i].single;
         if (tten_single->times_count > 0) {
             best_time = tten_single->times[0];
         }
         if (!single) {
-            // Multiplayer:
+            // Only multi can take the multi best time
             topten* tten_multi = &toptens[i].multi;
             if (tten_multi->times_count > 0 && best_time > tten_multi->times[0]) {
                 best_time = tten_multi->times[0];
@@ -259,29 +249,27 @@ void state::write_stats_anonymous_total_time(FILE* h, int single, const char* te
     fprintf(h, "\n\n");
 }
 
+// Print total time of one player
 void state::write_stats_player_total_time(FILE* h, const char* player_name, int single) {
     int total_time = 0;
-    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) { // ucso palyat nem szamitjuk
+    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
         int best_time = 100000000;
 
-        // Single times:
+        // Both single and multi can take the single best time
         topten* tten_single = &toptens[i].single;
         for (int j = 0; j < tten_single->times_count; j++) {
-            if( strcmp( player_name, tten_single->names1[j] ) == 0 /*||
-				(!single && strcmp( player_name, tten_single->names2[j] ) == 0)*/ ) {
-                // Megvan nev:
+            if (strcmp(player_name, tten_single->names1[j]) == 0) {
                 best_time = tten_single->times[j];
                 break;
             }
         }
 
         if (!single) {
-            // Multi player times:
+            // Only multi can take the multi best time
             topten* tten_multi = &toptens[i].multi;
             for (int j = 0; j < tten_multi->times_count; j++) {
                 if (strcmp(player_name, tten_multi->names1[j]) == 0 ||
                     strcmp(player_name, tten_multi->names2[j]) == 0) {
-                    // Megvan nev:
                     if (best_time > tten_multi->times[j]) {
                         best_time = tten_multi->times[j];
                     }
@@ -299,12 +287,14 @@ void state::write_stats_player_total_time(FILE* h, const char* player_name, int 
     char time_text[40];
     centiseconds_to_string(total_time, time_text, true);
     fprintf(h, time_text);
+    // Alignment
     for (int alignment = 0; alignment < (12 - strlen(time_text)); alignment++) {
         fprintf(h, " ");
     }
     fprintf(h, "%s\n", player_name);
 }
 
+// Write stats.txt
 void state::write_stats(void) {
     FILE* h = fopen("stats.txt", "wt");
     if (!h) {
@@ -319,10 +309,10 @@ void state::write_stats(void) {
 
     fprintf(h, "\n");
 
-    // Single palyak:
+    // Singleplayer times:
     fprintf(h, "Single player times:\n");
     fprintf(h, "\n");
-    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) { // utolsot nem irjuk ki
+    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
         fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
         topten* tten = &toptens[i].single;
         write_stats_topten(h, tten, 1);
@@ -330,10 +320,10 @@ void state::write_stats(void) {
     }
 
     fprintf(h, "\n");
-    // Multiplayer palyak:
+    // Multiplayer times:
     fprintf(h, "Multiplayer times:\n");
     fprintf(h, "\n");
-    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) { // utolsot nem irjuk ki
+    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
         fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
         topten* tten = &toptens[i].multi;
         write_stats_topten(h, tten, 0);
@@ -396,7 +386,6 @@ void state::reset_keys(void) {
     keys2.toggle_timer = DIK_Y;
     keys2.toggle_visibility = DIK_2;
 
-    // Kozos:
     key_increase_screen_size = DIK_EQUALS;
     key_decrease_screen_size = DIK_MINUS;
     key_screenshot = DIK_I;

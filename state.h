@@ -4,15 +4,15 @@
 #define MAX_PLAYERS (50)
 #define MAX_PLAYERNAME_LENGTH (14)
 
-#define STATE_LEVEL_COUNT (90) // Ennyit soha nem er el
+#define STATE_LEVEL_COUNT (90)
 
-extern int INTERNAL_LEVEL_COUNT; // Ez fugg attol, hogy shareware, vagy regisztralt
+extern int INTERNAL_LEVEL_COUNT;
 
 struct player {
     char name[MAX_PLAYERNAME_LENGTH + 2];
     char skipped[((STATE_LEVEL_COUNT / 4) + 1) * 4];
     int levels_completed;
-    int selected_level; // -1 eseten external files
+    int selected_level; // -1 if selected external files
 };
 
 int get_player_index(const char* player_name);
@@ -44,21 +44,16 @@ class state {
     int player_count;
     player_name player1, player2;
 
-    // Opciok:
     int sound_on;
     int compatibility_mode;
-    // Ehelyett Single valtozot kell figyelni, mivel rec visszajatszasnal
-    // lehet hogy mas kell legyen mint state-ben levo:
     int single;
-    // Itt pedig Tag valtozot kell figyelni:
     int flag_tag;
-    int player1_bike1;
+    int player1_bike1; // 1 if player 1 uses Q1BIKE
     int high_quality;
 
     int animated_objects;
     int animated_menus;
 
-    // Billentyuk:
     player_keys keys1;
     player_keys keys2;
     int key_increase_screen_size, key_decrease_screen_size;
@@ -80,6 +75,6 @@ class state {
     void reset_keys(void);
 };
 
-extern state* State; // teljes.cpp-ben van inicializalva!
+extern state* State;
 
 #endif

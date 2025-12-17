@@ -8,9 +8,9 @@ static const int STATE_MAGICNUMBER_REGISTERED = 123432221;
 
 static const char STATE_FILENAME[] = "state.dat";
 
-static void read_encrypted(void* buffer, int length, FILE* h, const char* error_filename) {
+static void read_encrypted(void* buffer, int length, FILE* h, const char* filename) {
     if (fread(buffer, 1, length, h) != length) {
-        uzenet("Corrupt file, please delete it!", error_filename);
+        uzenet("Corrupt file, please delete it!", filename);
     }
     unsigned char* pc = (unsigned char*)buffer;
     short a = 23;

@@ -2,11 +2,11 @@
 
 typedef unsigned char* puchar;
 
-int pic8::allocate(long w, long h) {
+void pic8::allocate(long w, long h) {
     // nem szabad hasznalni size-eket, hanem sizep-eket!
     if (rows || szegmuttomb) {
         hiba("pic8 already allocated!");
-        return 0;
+        return;
     }
     width = short(w);
     height = short(h);
@@ -15,7 +15,7 @@ int pic8::allocate(long w, long h) {
     }
     if (w <= 0 || h <= 0) {
         hiba("pic8 invalid width/height!");
-        return 0;
+        return;
     }
     long egyszegben = 0x0ff00l / long(w); // Nehogy szegmens merete
                                           // megkozelitse 65536-ot
@@ -31,7 +31,7 @@ int pic8::allocate(long w, long h) {
     }
     if (!rows || !szegmuttomb) {
         uzenet("pic8::alloc memory!");
-        return 0;
+        return;
     }
     for (int i = 0; i < h; i++) {
         rows[i] = NULL;
@@ -46,7 +46,7 @@ int pic8::allocate(long w, long h) {
         szegmuttomb[i] = new unsigned char[unsigned(egyszegben * w)];
         if (!szegmuttomb[i]) {
             uzenet("pic8::alloc memory!");
-            return 0;
+            return;
         }
         for (int j = 0; j < egyszegben; j++) {
             rows[unsigned(i * egyszegben + j)] = &szegmuttomb[i][unsigned(j * w)];
@@ -56,7 +56,7 @@ int pic8::allocate(long w, long h) {
         szegmuttomb[unsigned(szegnum)] = new unsigned char[unsigned(pluszszegbensorok * w)];
         if (!szegmuttomb[unsigned(szegnum)]) {
             uzenet("pic8::alloc memory!");
-            return 0;
+            return;
         }
         for (int j = 0; j < pluszszegbensorok; j++) {
             rows[unsigned(szegnum * egyszegben + j)] =
@@ -72,7 +72,7 @@ int pic8::allocate(long w, long h) {
         memset(rows[y], 0, unsigned(w)); // nullazunk
     }
 
-    return 1;
+    return;
 }
 
 pic8::~pic8(void) {
@@ -91,16 +91,14 @@ pic8::~pic8(void) {
 }
 
 pic8::pic8(int w, int h) {
-    success = 0;
     rows = NULL;
     szegmuttomb = NULL;
     transparency_data = NULL;
     transparency_data_length = NULL;
-    success = allocate(w, h);
+    allocate(w, h);
 }
 
 pic8::pic8(const char* filename, FILE* h) {
-    success = 0;
     rows = NULL;
     szegmuttomb = NULL;
     transparency_data = NULL;
@@ -126,10 +124,6 @@ pic8::pic8(const char* filename, FILE* h) {
 }
 
 int pic8::save(const char* filename, unsigned char* pal, FILE* h) {
-    if (!success) {
-        hiba("pic8::save-ben nem success!");
-        return 0;
-    }
     // Kiterjesztes megkeresese:
     int i = 0;
     while (filename[i]) {
@@ -157,12 +151,6 @@ int pic8::get_width(void) { return width; }
 int pic8::get_height(void) { return height; }
 
 void pic8::ppixel(int x, int y, unsigned char index) {
-#ifdef PIC8TEST
-    if (!success) {
-        hiba("pic8::ppixelben success = 0!");
-        return;
-    }
-#endif
     if (x < 0 || x >= width || y < 0 || y >= height) {
         return;
     }
@@ -171,12 +159,6 @@ void pic8::ppixel(int x, int y, unsigned char index) {
 }
 
 unsigned char pic8::gpixel(int x, int y) {
-#ifdef PIC8TEST
-    if (!success) {
-        hiba("pic8::ppixelben success = 0!");
-        return 0;
-    }
-#endif
     if (x < 0 || x >= width || y < 0 || y >= height) {
         return 0;
     }
@@ -189,10 +171,6 @@ unsigned char pic8::gpixel(int x, int y) {
 
 unsigned char* pic8::get_row(int y) {
 #ifdef PIC8TEST
-    if (!success) {
-        hiba("pic8::get_row success = 0!");
-        return 0;
-    }
     if (y < 0 || y >= height) {
         hiba("pic8::get_row y out of bounds!");
         return 0;
@@ -313,9 +291,7 @@ void pic8::spr_open(const char* filename, FILE* h) {
         }
         return;
     }
-    if (!allocate(width, height)) {
-        return;
-    }
+    allocate(width, height);
 
     for (int y = 0; y < height; y++) {
         // Egy sor beolvasasa:
@@ -381,7 +357,6 @@ void pic8::spr_open(const char* filename, FILE* h) {
     if (!h_provided) {
         qclose(h);
     }
-    success = 1;
 }
 
 int pic8::spr_save(const char* filename, FILE* h) {
@@ -440,9 +415,6 @@ struct pcxdescriptor {
 };
 
 void pic8::pcx_open(const char* filename, FILE* h) {
-    // Gany:
-    success = 1;
-
     int h_not_provided = 0;
     if (!h) {
         h_not_provided = 1;
@@ -459,10 +431,7 @@ void pic8::pcx_open(const char* filename, FILE* h) {
         (desc.BitsPerPlane != 8) || (desc.NumberOfBitPlanes != 1)) {
         hiba("PCX file header invalid or not supported: ", filename);
     }
-    // if( !allocate( desc.Xmax-desc.Xmin+1, desc.Ymax-desc.Ymin+1 ) ) {
-    if (!allocate(desc.Xmax - desc.Xmin + 1, desc.Ymax - desc.Ymin + 1)) {
-        hiba("pcx !allocate!");
-    }
+    allocate(desc.Xmax - desc.Xmin + 1, desc.Ymax - desc.Ymin + 1);
     for (int y = 0; y < height; y++) {
         // Egy sor beolvasasa:
         short nnn = 0, ccc, iii;
@@ -498,7 +467,6 @@ void pic8::pcx_open(const char* filename, FILE* h) {
         } while (nnn < desc.BytesPerScanLine);
     }
 
-    // success az elejen mar 1-re van allitva!
     if (h_not_provided) {
         qclose(h);
     }

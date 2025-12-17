@@ -435,8 +435,6 @@ static unsigned char* makenegalttomb(unsigned char* pal) {
 }
 
 lgrfile::lgrfile(const char* lgrnev) {
-    Paratlankepsorok = 1;
-
     // Lenullaz mindent:
     kepszam = 0;
     maszkszam = 0;
@@ -974,8 +972,6 @@ lgrfile::lgrfile(const char* lgrnev) {
         // uzenet( "Picture not found in LGR file!: ", "qgrass.pcx", lgrtmp );
         vanfu = 0;
     }
-
-    Paratlankepsorok = 0;
 }
 
 static void deletemkepekstruct(motkepek* pk) {
@@ -1079,8 +1075,6 @@ lgrfile::~lgrfile(void) {
 
 // Ezt betoltecseteket hivja (Ptop-bol szedi kep neveket):
 void lgrfile::betolthattereket(void) {
-    Paratlankepsorok = 1;
-
     if (!Ptop->fgnev[0] || !Ptop->bgnev[0]) {
         hiba("ydsgyhi");
     }
@@ -1118,8 +1112,6 @@ void lgrfile::betolthattereket(void) {
         foldxmodulus = pt->origxsize;
         pfold = kepetbovitvizszint(pt);
     }
-
-    Paratlankepsorok = 0;
 }
 
 // Ha nincs ilye nevu, akkor -1-et ad vissza

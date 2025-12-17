@@ -23,7 +23,7 @@
 // #define TEST
 
 #include "MAIN.H"
-#include "PIC8.H"
+#include "pic8.h"
 #include "anim.h"
 
 #include "abc8.h"

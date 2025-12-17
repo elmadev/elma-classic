@@ -273,14 +273,12 @@ void state::write_stats_player_total_time(FILE* h, const char* player_name, bool
     char time_text[40];
     centiseconds_to_string(total_time, time_text, true);
     fprintf(h, time_text);
-    // Alignment
     for (int alignment = 0; alignment < (12 - strlen(time_text)); alignment++) {
         fprintf(h, " ");
     }
     fprintf(h, "%s\n", player_name);
 }
 
-// Write stats.txt
 void state::write_stats() {
     FILE* h = fopen("stats.txt", "wt");
     if (!h) {

@@ -2,6 +2,7 @@
 
 ## Minor Features
 * Translate error messages to English
+* Improve picture loading speed by allocating all needed memory at once instead of allocating in blocks of 64 KB (DOS-era restriction)
 
 ## Minor Bug Fixes
 * Foreground grass was accidentally inefficiently calculated, causing increased load time

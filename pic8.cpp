@@ -4,7 +4,7 @@ typedef unsigned char* puchar;
 
 void pic8::allocate(long w, long h) {
     // nem szabad hasznalni size-eket, hanem sizep-eket!
-    if (rows || szegmuttomb) {
+    if (rows || pixels) {
         hiba("pic8 already allocated!");
         return;
     }
@@ -17,74 +17,27 @@ void pic8::allocate(long w, long h) {
         hiba("pic8 invalid width/height!");
         return;
     }
-    long egyszegben = 0x0ff00l / long(w); // Nehogy szegmens merete
-                                          // megkozelitse 65536-ot
-    // szegnum meg inkrementalva lesz a vegen, ha plussz is van!:
-    szegnum = unsigned(h) / egyszegben;
-    long pluszszegbensorok = h - szegnum * egyszegben;
-    int vanplussz = pluszszegbensorok != 0;
-    rows = new puchar[unsigned(h)];
-    if (vanplussz) {
-        szegmuttomb = new puchar[unsigned(szegnum + 1)];
-    } else {
-        szegmuttomb = new puchar[unsigned(szegnum)];
-    }
-    if (!rows || !szegmuttomb) {
+    // Allocate pixels and rows
+    pixels = new unsigned char[w * h];
+    rows = new puchar[(unsigned int)(h)];
+    if (!rows || !pixels) {
         uzenet("pic8::alloc memory!");
         return;
     }
+    memset(pixels, 0, sizeof(unsigned char) * w * h);
+    // Map the pixel array to the array of rows
     for (int i = 0; i < h; i++) {
-        rows[i] = NULL;
+        rows[i] = pixels + i * w;
     }
-    for (int i = 0; i < szegnum; i++) {
-        szegmuttomb[i] = NULL;
-    }
-    if (vanplussz) {
-        szegmuttomb[unsigned(szegnum)] = NULL;
-    }
-    for (int i = 0; i < szegnum; i++) {
-        szegmuttomb[i] = new unsigned char[unsigned(egyszegben * w)];
-        if (!szegmuttomb[i]) {
-            uzenet("pic8::alloc memory!");
-            return;
-        }
-        for (int j = 0; j < egyszegben; j++) {
-            rows[unsigned(i * egyszegben + j)] = &szegmuttomb[i][unsigned(j * w)];
-        }
-    }
-    if (vanplussz) {
-        szegmuttomb[unsigned(szegnum)] = new unsigned char[unsigned(pluszszegbensorok * w)];
-        if (!szegmuttomb[unsigned(szegnum)]) {
-            uzenet("pic8::alloc memory!");
-            return;
-        }
-        for (int j = 0; j < pluszszegbensorok; j++) {
-            rows[unsigned(szegnum * egyszegben + j)] =
-                &szegmuttomb[unsigned(szegnum)][unsigned(j * w)];
-        }
-    }
-
-    if (vanplussz) {
-        szegnum++;
-    }
-
-    for (int y = 0; y < h; y++) {
-        memset(rows[y], 0, unsigned(w)); // nullazunk
-    }
-
-    return;
 }
 
 pic8::~pic8(void) {
     if (rows) {
         delete rows;
     }
-    if (szegmuttomb) {
-        for (int i = 0; i < szegnum; i++) {
-            delete szegmuttomb[i];
-        }
+    if (pixels) {
+        delete pixels;
     }
-    delete szegmuttomb;
     if (transparency_data) {
         delete transparency_data;
     }
@@ -92,7 +45,7 @@ pic8::~pic8(void) {
 
 pic8::pic8(int w, int h) {
     rows = NULL;
-    szegmuttomb = NULL;
+    pixels = NULL;
     transparency_data = NULL;
     transparency_data_length = NULL;
     allocate(w, h);
@@ -100,7 +53,7 @@ pic8::pic8(int w, int h) {
 
 pic8::pic8(const char* filename, FILE* h) {
     rows = NULL;
-    szegmuttomb = NULL;
+    pixels = NULL;
     transparency_data = NULL;
     transparency_data_length = NULL;
     // Kiterjesztes megkeresese:

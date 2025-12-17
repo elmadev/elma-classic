@@ -28,8 +28,7 @@ class pic8 {
     puchar* rows;
 
   private:
-    puchar* szegmuttomb;
-    long szegnum;
+    unsigned char* pixels;
     // Sprite reszek:
     unsigned char* transparency_data;
     unsigned short transparency_data_length;

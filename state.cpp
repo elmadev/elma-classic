@@ -122,7 +122,7 @@ state::state(const char* filename) {
     fclose(h);
 }
 
-// Reload top-ten data from top ten. I'm not entirely sure why it is necessary
+// Reload top-ten data from top ten. Not clear why this is necessary.
 void state::reload_toptens() {
     const char* filename = STATE_FILENAME;
     FILE* h = fopen(filename, "rb");

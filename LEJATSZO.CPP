@@ -22,8 +22,6 @@ static void initsoundlejatszoban(void) {
 
         Mute = 1;
         starthanghigh();
-        void initdsound(int);
-        initdsound(State->compatibility_mode);
     }
 }
 

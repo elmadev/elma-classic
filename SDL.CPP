@@ -181,15 +181,11 @@ static void audio_callback(void* udata, Uint8* stream, int len) {
     callbackhang((short*)stream, len / 2);
 }
 
-void initdsound(int unused) {
+void init_sound() {
     if (SoundInitialized) {
         hiba("78egry78yt7");
     }
     SoundInitialized = true;
-    if (!Hangenabled) {
-        hiba("7868t68t");
-    }
-    Hangenabled = 0;
 
     SDL_AudioSpec desired_spec;
     memset(&desired_spec, 0, sizeof(desired_spec));
@@ -210,6 +206,6 @@ void initdsound(int unused) {
     if (obtained_spec.format != desired_spec.format) {
         hiba("Failed to get correct audio format");
     }
-    SDL_PauseAudioDevice(SDLAudioDevice, 0);
     Hangenabled = 1;
+    SDL_PauseAudioDevice(SDLAudioDevice, 0);
 }

@@ -70,7 +70,6 @@ class state {
     char external_filename[20];
 
     state(const char* filename = nullptr);
-    ~state();
 
     void reload_toptens();
     void save();

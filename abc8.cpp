@@ -78,10 +78,6 @@ abc8::abc8(const char* filename) {
             return;
         }
         ppsprite[c] = new pic8(".spr", h);
-        if (!ppsprite[c]->success) {
-            hiba("Nem tudta beolvasni SPRITE-ot abc file-bol!: ", filename);
-            return;
-        }
     }
 
     qclose(h);

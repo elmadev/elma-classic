@@ -20,7 +20,7 @@ class pic8 {
 
   protected:
     // Sajat:
-    int allocate(long w, long h);
+    void allocate(long w, long h);
     void spr_open(const char* filename, FILE* h);
     int spr_save(const char* filename, FILE* h);
     void pcx_open(const char* filename, FILE* h = NULL);
@@ -38,7 +38,6 @@ class pic8 {
     unsigned short transparency_data_length;
 
   public:
-    int success;
     pic8(int w, int h);
     pic8(const char* filename, FILE* h = NULL);
     ~pic8(void);

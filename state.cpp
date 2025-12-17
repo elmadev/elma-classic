@@ -3,6 +3,11 @@
 
 static const int STATE_VERSION = 200;
 
+static const int STATE_MAGICNUMBER_SHAREWARE = 123432112;
+static const int STATE_MAGICNUMBER_REGISTERED = 123432221;
+
+static const char STATE_FILENAME[] = "state.dat";
+
 static void read_encrypted(void* buffer, int length, FILE* h, const char* error_filename) {
     if (fread(buffer, 1, length, h) != length) {
         uzenet("Corrupt file, please delete it!", error_filename);
@@ -46,11 +51,6 @@ static void write_encrypted(void* buffer, int length, FILE* h) {
         a = 31 * b + c;
     }
 }
-
-static const int STATE_MAGICNUMBER_SHAREWARE = 123432112;
-static const int STATE_MAGICNUMBER_REGISTERED = 123432221;
-
-static const char STATE_FILENAME[] = "state.dat";
 
 state::state(const char* filename) {
     memset(toptens, 0, sizeof(toptens));

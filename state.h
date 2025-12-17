@@ -68,19 +68,16 @@ class state {
     char external_filename[20];
 
     state(const char* filename = nullptr);
-
     void reload_toptens();
     void save();
+    void write_stats();
+    void reset_keys();
+    player* get_player(const char* player_name);
 
   private:
     void write_stats_player_total_time(FILE* h, const char* player_name, bool single);
     void write_stats_anonymous_total_time(FILE* h, bool single, const char* text1,
                                           const char* text2, const char* text3);
-
-  public:
-    void write_stats();
-    void reset_keys();
-    player* get_player(const char* player_name);
 };
 
 extern state* State;

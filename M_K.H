@@ -1,6 +1,8 @@
 #ifndef M_K_H
 #define M_K_H
 
+typedef int DIK_Code;
+
 const static int MaxKeycode = 256;
 
 void fill_kb_state(char* buffer);

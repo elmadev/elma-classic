@@ -1,12 +1,13 @@
 #ifndef STATE_H
 #define STATE_H
 
-#define MAX_PLAYERS (50)
-#define MAX_PLAYERNAME_LENGTH (14)
+#include "M_K.H"
 
-#define STATE_LEVEL_COUNT (90)
-
-extern int INTERNAL_LEVEL_COUNT;
+constexpr int MAX_PLAYERS = 50;
+constexpr int MAX_PLAYERNAME_LENGTH = 14;
+constexpr int STATE_LEVEL_COUNT = 90;
+constexpr int INTERNAL_LEVEL_COUNT = 55;
+constexpr int MAX_TIMES = 10;
 
 struct player {
     char name[MAX_PLAYERNAME_LENGTH + 2];
@@ -16,8 +17,6 @@ struct player {
 };
 
 int get_player_index(const char* player_name);
-
-#define MAX_TIMES (10)
 
 typedef char player_name[MAX_PLAYERNAME_LENGTH + 1];
 
@@ -29,12 +28,19 @@ struct topten {
 };
 
 struct topten_set {
-    topten single, multi;
+    topten single;
+    topten multi;
 };
 
 struct player_keys {
-    int gas, brake, right_volt, left_volt, turn;
-    int toggle_minimap, toggle_timer, toggle_visibility;
+    DIK_Code gas;
+    DIK_Code brake;
+    DIK_Code right_volt;
+    DIK_Code left_volt;
+    DIK_Code turn;
+    DIK_Code toggle_minimap;
+    DIK_Code toggle_timer;
+    DIK_Code toggle_visibility; // Toggle Player
 };
 
 class state {
@@ -42,7 +48,8 @@ class state {
     topten_set toptens[STATE_LEVEL_COUNT];
     player players[MAX_PLAYERS];
     int player_count;
-    player_name player1, player2;
+    player_name player1;
+    player_name player2;
 
     int sound_on;
     int compatibility_mode;
@@ -50,29 +57,32 @@ class state {
     int flag_tag;
     int player1_bike1; // 1 if player 1 uses Q1BIKE
     int high_quality;
-
     int animated_objects;
     int animated_menus;
 
     player_keys keys1;
     player_keys keys2;
-    int key_increase_screen_size, key_decrease_screen_size;
-    int key_screenshot;
+    DIK_Code key_increase_screen_size;
+    DIK_Code key_decrease_screen_size;
+    DIK_Code key_screenshot;
 
     char editor_filename[20];
     char external_filename[20];
 
-    state(const char* filename = NULL);
-    ~state(void);
+    state(const char* filename = nullptr);
+    ~state();
 
-    void reload_toptens(void);
+    void reload_toptens();
+    void save();
 
-    void save(void);
-    void write_stats_player_total_time(FILE* h, const char* player_name, int single);
-    void write_stats_anonymous_total_time(FILE* h, int single, const char* text1, const char* text2,
-                                          const char* text3);
-    void write_stats(void);
-    void reset_keys(void);
+  private:
+    void write_stats_player_total_time(FILE* h, const char* player_name, bool single);
+    void write_stats_anonymous_total_time(FILE* h, bool single, const char* text1,
+                                          const char* text2, const char* text3);
+
+  public:
+    void write_stats();
+    void reset_keys();
 };
 
 extern state* State;

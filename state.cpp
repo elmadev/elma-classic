@@ -1,16 +1,18 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
 
-int INTERNAL_LEVEL_COUNT = 55;
+static const int STATE_VERSION = 200;
 
-int getstatesoundon(void) { return State->sound_on; }
+int getstatesoundon() { return State->sound_on; }
 
 static void read_encrypted(void* buffer, int length, FILE* h, const char* error_filename) {
     if (fread(buffer, 1, length, h) != length) {
         uzenet("Corrupt file, please delete it!", error_filename);
     }
     unsigned char* pc = (unsigned char*)buffer;
-    short a = 23, b = 9782, c = 3391;
+    short a = 23;
+    short b = 9782;
+    short c = 3391;
 
     for (int i = 0; i < length; i++) {
         pc[i] ^= a;
@@ -22,7 +24,9 @@ static void read_encrypted(void* buffer, int length, FILE* h, const char* error_
 
 static void write_encrypted(void* buffer, int length, FILE* h) {
     unsigned char* pc = (unsigned char*)buffer;
-    short a = 23, b = 9782, c = 3391;
+    short a = 23;
+    short b = 9782;
+    short c = 3391;
 
     for (int i = 0; i < length; i++) {
         pc[i] ^= a;
@@ -45,10 +49,10 @@ static void write_encrypted(void* buffer, int length, FILE* h) {
     }
 }
 
-static int STATE_MAGICNUMBER_SHAREWARE = 123432112;
-static int STATE_MAGICNUMBER_REGISTERED = 123432221;
+static const int STATE_MAGICNUMBER_SHAREWARE = 123432112;
+static const int STATE_MAGICNUMBER_REGISTERED = 123432221;
 
-static char STATE_FILENAME[] = "state.dat";
+static const char STATE_FILENAME[] = "state.dat";
 
 state::state(const char* filename) {
     memset(toptens, 0, sizeof(toptens));
@@ -62,13 +66,10 @@ state::state(const char* filename) {
     flag_tag = 0;
     player1_bike1 = 1;
     high_quality = 1;
-
     animated_objects = 1;
     animated_menus = 1;
-
     editor_filename[0] = 0;
     external_filename[0] = 0;
-
     reset_keys();
 
     if (!filename) {
@@ -87,36 +88,30 @@ state::state(const char* filename) {
     }
 
     int version = 0;
-    read_encrypted(&version, 4, h, filename);
-    if (version != 200) {
+    read_encrypted(&version, sizeof(version), h, filename);
+    if (version != STATE_VERSION) {
         uzenet("File version is incorrect!", "Please rename it!", filename);
     }
-
     read_encrypted(toptens, sizeof(toptens), h, filename);
     read_encrypted(players, sizeof(players), h, filename);
-    read_encrypted(&player_count, sizeof(int), h, filename);
+    read_encrypted(&player_count, sizeof(player_count), h, filename);
     read_encrypted(player1, sizeof(player1), h, filename);
     read_encrypted(player2, sizeof(player2), h, filename);
-
-    read_encrypted(&sound_on, 4, h, filename);
-    read_encrypted(&compatibility_mode, 4, h, filename);
-
-    read_encrypted(&single, sizeof(int), h, filename);
-    read_encrypted(&flag_tag, sizeof(int), h, filename);
-    read_encrypted(&player1_bike1, sizeof(int), h, filename);
-    read_encrypted(&high_quality, sizeof(int), h, filename);
-
-    read_encrypted(&animated_objects, sizeof(int), h, filename);
-    read_encrypted(&animated_menus, sizeof(int), h, filename);
-
+    read_encrypted(&sound_on, sizeof(sound_on), h, filename);
+    read_encrypted(&compatibility_mode, sizeof(compatibility_mode), h, filename);
+    read_encrypted(&single, sizeof(single), h, filename);
+    read_encrypted(&flag_tag, sizeof(flag_tag), h, filename);
+    read_encrypted(&player1_bike1, sizeof(player1_bike1), h, filename);
+    read_encrypted(&high_quality, sizeof(high_quality), h, filename);
+    read_encrypted(&animated_objects, sizeof(animated_objects), h, filename);
+    read_encrypted(&animated_menus, sizeof(animated_menus), h, filename);
     read_encrypted(&keys1, sizeof(keys1), h, filename);
     read_encrypted(&keys2, sizeof(keys2), h, filename);
     read_encrypted(&key_increase_screen_size, sizeof(key_increase_screen_size), h, filename);
     read_encrypted(&key_decrease_screen_size, sizeof(key_decrease_screen_size), h, filename);
     read_encrypted(&key_screenshot, sizeof(key_decrease_screen_size), h, filename);
-
-    read_encrypted(&editor_filename[0], 20, h, filename);
-    read_encrypted(&external_filename[0], 20, h, filename);
+    read_encrypted(&editor_filename, sizeof(editor_filename), h, filename);
+    read_encrypted(&external_filename, sizeof(external_filename), h, filename);
 
     int magic_number = 0;
     if (fread(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
@@ -126,14 +121,12 @@ state::state(const char* filename) {
         magic_number != STATE_MAGICNUMBER_REGISTERED) {
         uzenet("Corrupt file, please rename it!", filename);
     }
-
     fclose(h);
 }
 
 // Reload top-ten data from top ten. I'm not entirely sure why it is necessary
-void state::reload_toptens(void) {
-    char* filename = STATE_FILENAME;
-
+void state::reload_toptens() {
+    const char* filename = STATE_FILENAME;
     FILE* h = fopen(filename, "rb");
     while (!h) {
         dialog320("The state.dat file cannot be opened!",
@@ -143,7 +136,7 @@ void state::reload_toptens(void) {
 
     int version = 0;
     read_encrypted(&version, 4, h, filename);
-    if (version != 200) {
+    if (version != STATE_VERSION) {
         uzenet("File version is incorrect!", "Please rename it!", filename);
     }
 
@@ -152,41 +145,36 @@ void state::reload_toptens(void) {
     fclose(h);
 }
 
-state::~state(void) {}
+state::~state() {}
 
-void state::save(void) {
+void state::save() {
     FILE* h = fopen(STATE_FILENAME, "wb");
     if (!h) {
         uzenet("Could not open for write file!: ", STATE_FILENAME);
     }
 
-    int version = 200;
-    write_encrypted(&version, 4, h);
+    int version = STATE_VERSION;
+    write_encrypted(&version, sizeof(version), h);
     write_encrypted(toptens, sizeof(toptens), h);
     write_encrypted(players, sizeof(players), h);
-    write_encrypted(&player_count, sizeof(int), h);
+    write_encrypted(&player_count, sizeof(player_count), h);
     write_encrypted(player1, sizeof(player1), h);
     write_encrypted(player2, sizeof(player2), h);
-
-    write_encrypted(&sound_on, 4, h);
-    write_encrypted(&compatibility_mode, 4, h);
-
-    write_encrypted(&single, sizeof(int), h);
-    write_encrypted(&flag_tag, sizeof(int), h);
-    write_encrypted(&player1_bike1, sizeof(int), h);
-    write_encrypted(&high_quality, sizeof(int), h);
-
-    write_encrypted(&animated_objects, sizeof(int), h);
-    write_encrypted(&animated_menus, sizeof(int), h);
-
+    write_encrypted(&sound_on, sizeof(sound_on), h);
+    write_encrypted(&compatibility_mode, sizeof(compatibility_mode), h);
+    write_encrypted(&single, sizeof(single), h);
+    write_encrypted(&flag_tag, sizeof(flag_tag), h);
+    write_encrypted(&player1_bike1, sizeof(player1_bike1), h);
+    write_encrypted(&high_quality, sizeof(high_quality), h);
+    write_encrypted(&animated_objects, sizeof(animated_objects), h);
+    write_encrypted(&animated_menus, sizeof(animated_menus), h);
     write_encrypted(&keys1, sizeof(keys1), h);
     write_encrypted(&keys2, sizeof(keys2), h);
     write_encrypted(&key_increase_screen_size, sizeof(key_increase_screen_size), h);
     write_encrypted(&key_decrease_screen_size, sizeof(key_decrease_screen_size), h);
     write_encrypted(&key_screenshot, sizeof(key_decrease_screen_size), h);
-
-    write_encrypted(&editor_filename[0], 20, h);
-    write_encrypted(&external_filename[0], 20, h);
+    write_encrypted(&editor_filename, sizeof(editor_filename), h);
+    write_encrypted(&external_filename, sizeof(external_filename), h);
 
     int magic_number = STATE_MAGICNUMBER_REGISTERED;
     if (fwrite(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
@@ -196,15 +184,17 @@ void state::save(void) {
     fclose(h);
 }
 
-static void write_stats_topten(FILE* h, topten* tten, int single) {
+static void write_stats_topten(FILE* h, topten* tten, bool single) {
     for (int i = 0; i < tten->times_count; i++) {
         char time_text[40];
         centiseconds_to_string(tten->times[i], time_text, true);
         fprintf(h, "    ");
         fprintf(h, time_text);
+
         for (int alignment = 0; alignment < (12 - strlen(time_text)); alignment++) {
             fprintf(h, " ");
         }
+
         fprintf(h, tten->names1[i]);
         if (!single) {
             fprintf(h, ", %s", tten->names2[i]);
@@ -214,10 +204,10 @@ static void write_stats_topten(FILE* h, topten* tten, int single) {
 }
 
 // Default time if uncompleted level: 10 minutes
-static int const STATS_MAX_TIME = 100 * 60 * 10;
+static const int STATS_MAX_TIME = 100 * 60 * 10;
 
 // Print total time of all players combined
-void state::write_stats_anonymous_total_time(FILE* h, int single, const char* text1,
+void state::write_stats_anonymous_total_time(FILE* h, bool single, const char* text1,
                                              const char* text2, const char* text3) {
     int total_time = 0;
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
@@ -250,7 +240,7 @@ void state::write_stats_anonymous_total_time(FILE* h, int single, const char* te
 }
 
 // Print total time of one player
-void state::write_stats_player_total_time(FILE* h, const char* player_name, int single) {
+void state::write_stats_player_total_time(FILE* h, const char* player_name, bool single) {
     int total_time = 0;
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
         int best_time = 100000000;
@@ -295,7 +285,7 @@ void state::write_stats_player_total_time(FILE* h, const char* player_name, int 
 }
 
 // Write stats.txt
-void state::write_stats(void) {
+void state::write_stats() {
     FILE* h = fopen("stats.txt", "wt");
     if (!h) {
         uzenet("Could not open STATS.TXT for writing!");
@@ -306,7 +296,6 @@ void state::write_stats(void) {
     fprintf(h, "changes next time you run the game. This is only an output file, the\n");
     fprintf(h, "best times are stored in the STATE.DAT binary file.\n");
     fprintf(h, "Registered version 1.0\n");
-
     fprintf(h, "\n");
 
     // Singleplayer times:
@@ -315,18 +304,18 @@ void state::write_stats(void) {
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
         fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
         topten* tten = &toptens[i].single;
-        write_stats_topten(h, tten, 1);
+        write_stats_topten(h, tten, true);
         fprintf(h, "\n");
     }
-
     fprintf(h, "\n");
+
     // Multiplayer times:
     fprintf(h, "Multiplayer times:\n");
     fprintf(h, "\n");
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
         fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
         topten* tten = &toptens[i].multi;
-        write_stats_topten(h, tten, 0);
+        write_stats_topten(h, tten, false);
         fprintf(h, "\n");
     }
 
@@ -336,7 +325,7 @@ void state::write_stats(void) {
     fprintf(h, "will add ten minutes to the total time.\n");
 
     for (int i = 0; i < player_count; i++) {
-        write_stats_player_total_time(h, State->players[i].name, 1);
+        write_stats_player_total_time(h, State->players[i].name, true);
     }
     fprintf(h, "\n");
 
@@ -347,27 +336,25 @@ void state::write_stats(void) {
     fprintf(h, "players.\n");
     fprintf(h, "If a player doesn't have such a time for a level, this will add ten\n");
     fprintf(h, "minutes to the total time.\n");
-
     for (int i = 0; i < player_count; i++) {
-        write_stats_player_total_time(h, State->players[i].name, 0);
+        write_stats_player_total_time(h, State->players[i].name, false);
     }
     fprintf(h, "\n");
 
     // Anonymous total times:
     write_stats_anonymous_total_time(
-        h, 1, "The following is the anonymous total time of the best single player",
+        h, true, "The following is the anonymous total time of the best single player",
         "times. If there is no single player time for a level, this will",
         "add ten minutes to the total time.");
-
     write_stats_anonymous_total_time(
-        h, 0, "The following is the anonymous combined total time of the best",
+        h, false, "The following is the anonymous combined total time of the best",
         "single or multiplayer times. If there is no single or multiplayer",
         "time for a level, this will add ten minutes to the total time.");
 
     fclose(h);
 }
 
-void state::reset_keys(void) {
+void state::reset_keys() {
     keys1.gas = DIK_UP;
     keys1.brake = DIK_DOWN;
     keys1.right_volt = DIK_RIGHT;

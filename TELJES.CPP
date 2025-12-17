@@ -101,6 +101,8 @@ void teljes(void) {
     delete pintropal;
     pintropal = NULL;
 
+    init_sound();
+
     // Egy par beolvasas:
     Pabc1 = new abc8("kisbetu1.abc");
     Pabc1->set_spacing(1);

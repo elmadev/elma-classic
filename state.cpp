@@ -6,14 +6,14 @@ int INTERNAL_LEVEL_COUNT = 55; // Vizittel egyutt
 int getstatesoundon(void) { return State->sound_on; }
 
 // Van ugyanilyen neven topol.cpp-ben is ket fv.:
-static void titkosread(void* mut, int hossz, FILE* h, const char* nev) {
-    if (fread(mut, 1, hossz, h) != hossz) {
-        uzenet("Corrupt file, please delete it!", nev);
+static void read_encrypted(void* buffer, int length, FILE* h, const char* error_filename) {
+    if (fread(buffer, 1, length, h) != length) {
+        uzenet("Corrupt file, please delete it!", error_filename);
     }
-    unsigned char* pc = (unsigned char*)mut;
+    unsigned char* pc = (unsigned char*)buffer;
     short a = 23, b = 9782, c = 3391;
 
-    for (int i = 0; i < hossz; i++) {
+    for (int i = 0; i < length; i++) {
         pc[i] ^= a;
         a %= c;
         b += a * c;
@@ -21,24 +21,24 @@ static void titkosread(void* mut, int hossz, FILE* h, const char* nev) {
     }
 }
 
-static void titkoswrite(void* mut, int hossz, FILE* h) {
-    unsigned char* pc = (unsigned char*)mut;
+static void write_encrypted(void* buffer, int length, FILE* h) {
+    unsigned char* pc = (unsigned char*)buffer;
     short a = 23, b = 9782, c = 3391;
 
-    for (int i = 0; i < hossz; i++) {
+    for (int i = 0; i < length; i++) {
         pc[i] ^= a;
         a %= c;
         b += a * c;
         a = 31 * b + c;
     }
-    if (fwrite(mut, 1, hossz, h) != hossz) {
-        hiba("Nem ment iras state file-ba!");
+    if (fwrite(buffer, 1, length, h) != length) {
+        hiba("Unable to write to state.dat file!");
     }
     a = 23;
     b = 9782;
     c = 3391;
 
-    for (int i = 0; i < hossz; i++) {
+    for (int i = 0; i < length; i++) {
         pc[i] ^= a;
         a %= c;
         b += a * c;
@@ -46,10 +46,10 @@ static void titkoswrite(void* mut, int hossz, FILE* h) {
     }
 }
 
-static int Checknumber_state_s = 123432112;
-static int Checknumber_state_r = 123432221;
+static int STATE_MAGICNUMBER_SHAREWARE = 123432112;
+static int STATE_MAGICNUMBER_REGISTERED = 123432221;
 
-static char Statenev[] = "state.dat";
+static char STATE_FILENAME[] = "state.dat";
 
 state::state(const char* filename) {
     // Beallitjuk default ertekeket:
@@ -75,7 +75,7 @@ state::state(const char* filename) {
 
     // Beolvasas ha kell:
     if (!filename) {
-        filename = Statenev;
+        filename = STATE_FILENAME;
     }
 
     if (access(filename, 0) != 0) {
@@ -87,47 +87,48 @@ state::state(const char* filename) {
     // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
     FILE* h = fopen(filename, "rb");
     if (!h) {
-        hiba("Nem nyilik state file!: ", filename);
+        hiba("Cannot open state file!: ", filename);
     }
 
-    int verzio = 0;
-    titkosread(&verzio, 4, h, filename);
-    if (verzio != 200) {
+    int version = 0;
+    read_encrypted(&version, 4, h, filename);
+    if (version != 200) {
         uzenet("File version is incorrect!", "Please rename it!", filename);
     }
 
-    titkosread(toptens, sizeof(toptens), h, filename);
-    titkosread(players, sizeof(players), h, filename);
-    titkosread(&player_count, sizeof(int), h, filename);
-    titkosread(player1, sizeof(player1), h, filename);
-    titkosread(player2, sizeof(player2), h, filename);
+    read_encrypted(toptens, sizeof(toptens), h, filename);
+    read_encrypted(players, sizeof(players), h, filename);
+    read_encrypted(&player_count, sizeof(int), h, filename);
+    read_encrypted(player1, sizeof(player1), h, filename);
+    read_encrypted(player2, sizeof(player2), h, filename);
 
-    titkosread(&sound_on, 4, h, filename);
-    titkosread(&compatibility_mode, 4, h, filename);
+    read_encrypted(&sound_on, 4, h, filename);
+    read_encrypted(&compatibility_mode, 4, h, filename);
 
-    titkosread(&single, sizeof(int), h, filename);
-    titkosread(&flag_tag, sizeof(int), h, filename);
-    titkosread(&player1_bike1, sizeof(int), h, filename);
-    titkosread(&high_quality, sizeof(int), h, filename);
+    read_encrypted(&single, sizeof(int), h, filename);
+    read_encrypted(&flag_tag, sizeof(int), h, filename);
+    read_encrypted(&player1_bike1, sizeof(int), h, filename);
+    read_encrypted(&high_quality, sizeof(int), h, filename);
 
-    titkosread(&animated_objects, sizeof(int), h, filename);
-    titkosread(&animated_menus, sizeof(int), h, filename);
+    read_encrypted(&animated_objects, sizeof(int), h, filename);
+    read_encrypted(&animated_menus, sizeof(int), h, filename);
 
-    titkosread(&keys1, sizeof(keys1), h, filename);
-    titkosread(&keys2, sizeof(keys2), h, filename);
-    titkosread(&key_increase_screen_size, sizeof(key_increase_screen_size), h, filename);
-    titkosread(&key_decrease_screen_size, sizeof(key_decrease_screen_size), h, filename);
-    titkosread(&key_screenshot, sizeof(key_decrease_screen_size), h, filename);
+    read_encrypted(&keys1, sizeof(keys1), h, filename);
+    read_encrypted(&keys2, sizeof(keys2), h, filename);
+    read_encrypted(&key_increase_screen_size, sizeof(key_increase_screen_size), h, filename);
+    read_encrypted(&key_decrease_screen_size, sizeof(key_decrease_screen_size), h, filename);
+    read_encrypted(&key_screenshot, sizeof(key_decrease_screen_size), h, filename);
 
-    titkosread(&editor_filename[0], 20, h, filename);
-    titkosread(&external_filename[0], 20, h, filename);
+    read_encrypted(&editor_filename[0], 20, h, filename);
+    read_encrypted(&external_filename[0], 20, h, filename);
 
     // Magic number:
-    int checknumber = 0;
-    if (fread(&checknumber, 1, sizeof(checknumber), h) != sizeof(checknumber)) {
+    int magic_number = 0;
+    if (fread(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
         uzenet("Corrupt file, please rename it!", filename);
     }
-    if (checknumber != Checknumber_state_s && checknumber != Checknumber_state_r) {
+    if (magic_number != STATE_MAGICNUMBER_SHAREWARE &&
+        magic_number != STATE_MAGICNUMBER_REGISTERED) {
         uzenet("Corrupt file, please rename it!", filename);
     }
 
@@ -135,26 +136,26 @@ state::state(const char* filename) {
 }
 
 void state::reload_toptens(void) {
-    char* nev = Statenev;
+    char* filename = STATE_FILENAME;
 
-    // if( access( nev, 0 ) != 0 )
+    // if( access( filename, 0 ) != 0 )
     //	return;
 
     // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
-    FILE* h = fopen(nev, "rb");
+    FILE* h = fopen(filename, "rb");
     while (!h) {
         dialog320("The state.dat file cannot be opened!",
                   "Please make sure state.dat is accessible,", "then press enter!");
-        h = fopen(nev, "rb");
+        h = fopen(filename, "rb");
     }
 
-    int verzio = 0;
-    titkosread(&verzio, 4, h, nev);
-    if (verzio != 200) {
-        uzenet("File version is incorrect!", "Please rename it!", nev);
+    int version = 0;
+    read_encrypted(&version, 4, h, filename);
+    if (version != 200) {
+        uzenet("File version is incorrect!", "Please rename it!", filename);
     }
 
-    titkosread(toptens, sizeof(toptens), h, nev);
+    read_encrypted(toptens, sizeof(toptens), h, filename);
 
     fclose(h);
 }
@@ -163,59 +164,59 @@ state::~state(void) {}
 
 void state::save(void) {
     // Itt hagyni kell fopen-t!!!!!!!!!!!!!!!!!!!!:
-    FILE* h = fopen(Statenev, "wb");
+    FILE* h = fopen(STATE_FILENAME, "wb");
     if (!h) {
-        uzenet("Could not open for write file!: ", Statenev);
+        uzenet("Could not open for write file!: ", STATE_FILENAME);
     }
 
-    int verzio = 200;
-    titkoswrite(&verzio, 4, h);
-    titkoswrite(toptens, sizeof(toptens), h);
-    titkoswrite(players, sizeof(players), h);
-    titkoswrite(&player_count, sizeof(int), h);
-    titkoswrite(player1, sizeof(player1), h);
-    titkoswrite(player2, sizeof(player2), h);
+    int version = 200;
+    write_encrypted(&version, 4, h);
+    write_encrypted(toptens, sizeof(toptens), h);
+    write_encrypted(players, sizeof(players), h);
+    write_encrypted(&player_count, sizeof(int), h);
+    write_encrypted(player1, sizeof(player1), h);
+    write_encrypted(player2, sizeof(player2), h);
 
-    titkoswrite(&sound_on, 4, h);
-    titkoswrite(&compatibility_mode, 4, h);
+    write_encrypted(&sound_on, 4, h);
+    write_encrypted(&compatibility_mode, 4, h);
 
-    titkoswrite(&single, sizeof(int), h);
-    titkoswrite(&flag_tag, sizeof(int), h);
-    titkoswrite(&player1_bike1, sizeof(int), h);
-    titkoswrite(&high_quality, sizeof(int), h);
+    write_encrypted(&single, sizeof(int), h);
+    write_encrypted(&flag_tag, sizeof(int), h);
+    write_encrypted(&player1_bike1, sizeof(int), h);
+    write_encrypted(&high_quality, sizeof(int), h);
 
-    titkoswrite(&animated_objects, sizeof(int), h);
-    titkoswrite(&animated_menus, sizeof(int), h);
+    write_encrypted(&animated_objects, sizeof(int), h);
+    write_encrypted(&animated_menus, sizeof(int), h);
 
-    titkoswrite(&keys1, sizeof(keys1), h);
-    titkoswrite(&keys2, sizeof(keys2), h);
-    titkoswrite(&key_increase_screen_size, sizeof(key_increase_screen_size), h);
-    titkoswrite(&key_decrease_screen_size, sizeof(key_decrease_screen_size), h);
-    titkoswrite(&key_screenshot, sizeof(key_decrease_screen_size), h);
+    write_encrypted(&keys1, sizeof(keys1), h);
+    write_encrypted(&keys2, sizeof(keys2), h);
+    write_encrypted(&key_increase_screen_size, sizeof(key_increase_screen_size), h);
+    write_encrypted(&key_decrease_screen_size, sizeof(key_decrease_screen_size), h);
+    write_encrypted(&key_screenshot, sizeof(key_decrease_screen_size), h);
 
-    titkoswrite(&editor_filename[0], 20, h);
-    titkoswrite(&external_filename[0], 20, h);
+    write_encrypted(&editor_filename[0], 20, h);
+    write_encrypted(&external_filename[0], 20, h);
 
-    int checknumber = Checknumber_state_r;
-    if (fwrite(&checknumber, 1, sizeof(checknumber), h) != sizeof(checknumber)) {
-        hiba("Nem megy beolvasas state file-ba!: ", Statenev);
+    int magic_number = STATE_MAGICNUMBER_REGISTERED;
+    if (fwrite(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
+        hiba("Cannot write to state file: ", STATE_FILENAME);
     }
 
     fclose(h);
 }
 
-static void exportegylevel(FILE* h, topten* pidok, int single) {
-    for (int i = 0; i < pidok->times_count; i++) {
-        char idostr[40];
-        centiseconds_to_string(pidok->times[i], idostr, true);
+static void write_stats_topten(FILE* h, topten* tten, int single) {
+    for (int i = 0; i < tten->times_count; i++) {
+        char time_text[40];
+        centiseconds_to_string(tten->times[i], time_text, true);
         fprintf(h, "    ");
-        fprintf(h, idostr);
-        for (int k = 0; k < (12 - strlen(idostr)); k++) {
+        fprintf(h, time_text);
+        for (int alignment = 0; alignment < (12 - strlen(time_text)); alignment++) {
             fprintf(h, " ");
         }
-        fprintf(h, pidok->names1[i]);
+        fprintf(h, tten->names1[i]);
         if (!single) {
-            fprintf(h, ", %s", pidok->names2[i]);
+            fprintf(h, ", %s", tten->names2[i]);
         }
         fprintf(h, "\n");
     }
@@ -223,82 +224,82 @@ static void exportegylevel(FILE* h, topten* pidok, int single) {
 
 // Ha nincs egy palyan ido, tiz percet szamol helyette:
 // Ez itt szazadmasodpercben van megadva:
-static int const Nincsmegpalyaido = 100 * 60 * 10;
+static int const STATS_MAX_TIME = 100 * 60 * 10;
 
 // Anonymous total times:
 void state::write_stats_anonymous_total_time(FILE* h, int single, const char* text1,
                                              const char* text2, const char* text3) {
-    int sum = 0;
+    int total_time = 0;
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) { // ucso palyat nem szamitjuk
-        int levelsum = 100000000;
+        int best_time = 100000000;
         // Single:
-        topten* pidok = &toptens[i].single;
-        if (pidok->times_count > 0) {
-            levelsum = pidok->times[0];
+        topten* tten_single = &toptens[i].single;
+        if (tten_single->times_count > 0) {
+            best_time = tten_single->times[0];
         }
         if (!single) {
             // Multiplayer:
-            topten* pidok = &toptens[i].multi;
-            if (pidok->times_count > 0 && levelsum > pidok->times[0]) {
-                levelsum = pidok->times[0];
+            topten* tten_multi = &toptens[i].multi;
+            if (tten_multi->times_count > 0 && best_time > tten_multi->times[0]) {
+                best_time = tten_multi->times[0];
             }
         }
-        if (levelsum >= Nincsmegpalyaido) {
-            sum += Nincsmegpalyaido;
+        if (best_time >= STATS_MAX_TIME) {
+            total_time += STATS_MAX_TIME;
         } else {
-            sum += levelsum;
+            total_time += best_time;
         }
     }
 
     fprintf(h, "%s\n%s\n%s\n", text1, text2, text3);
 
-    char idostr[40];
-    centiseconds_to_string(sum, idostr, true);
-    fprintf(h, idostr);
+    char time_text[40];
+    centiseconds_to_string(total_time, time_text, true);
+    fprintf(h, time_text);
     fprintf(h, "\n\n");
 }
 
 void state::write_stats_player_total_time(FILE* h, const char* player_name, int single) {
-    int sum = 0;
+    int total_time = 0;
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) { // ucso palyat nem szamitjuk
-        int levelsum = 100000000;
+        int best_time = 100000000;
 
         // Single times:
-        topten* pidok = &toptens[i].single;
-        for (int j = 0; j < pidok->times_count; j++) {
-            if( strcmp( player_name, pidok->names1[j] ) == 0 /*||
-				(!single && strcmp( player_name, pidok->names2[j] ) == 0)*/ ) {
+        topten* tten_single = &toptens[i].single;
+        for (int j = 0; j < tten_single->times_count; j++) {
+            if( strcmp( player_name, tten_single->names1[j] ) == 0 /*||
+				(!single && strcmp( player_name, tten_single->names2[j] ) == 0)*/ ) {
                 // Megvan nev:
-                levelsum = pidok->times[j];
+                best_time = tten_single->times[j];
                 break;
             }
         }
 
         if (!single) {
             // Multi player times:
-            topten* pidok = &toptens[i].multi;
-            for (int j = 0; j < pidok->times_count; j++) {
-                if (strcmp(player_name, pidok->names1[j]) == 0 ||
-                    strcmp(player_name, pidok->names2[j]) == 0) {
+            topten* tten_multi = &toptens[i].multi;
+            for (int j = 0; j < tten_multi->times_count; j++) {
+                if (strcmp(player_name, tten_multi->names1[j]) == 0 ||
+                    strcmp(player_name, tten_multi->names2[j]) == 0) {
                     // Megvan nev:
-                    if (levelsum > pidok->times[j]) {
-                        levelsum = pidok->times[j];
+                    if (best_time > tten_multi->times[j]) {
+                        best_time = tten_multi->times[j];
                     }
                     break;
                 }
             }
         }
 
-        if (levelsum >= Nincsmegpalyaido) {
-            sum += Nincsmegpalyaido;
+        if (best_time >= STATS_MAX_TIME) {
+            total_time += STATS_MAX_TIME;
         } else {
-            sum += levelsum;
+            total_time += best_time;
         }
     }
-    char idostr[40];
-    centiseconds_to_string(sum, idostr, true);
-    fprintf(h, idostr);
-    for (int k = 0; k < (12 - strlen(idostr)); k++) {
+    char time_text[40];
+    centiseconds_to_string(total_time, time_text, true);
+    fprintf(h, time_text);
+    for (int alignment = 0; alignment < (12 - strlen(time_text)); alignment++) {
         fprintf(h, " ");
     }
     fprintf(h, "%s\n", player_name);
@@ -323,8 +324,8 @@ void state::write_stats(void) {
     fprintf(h, "\n");
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) { // utolsot nem irjuk ki
         fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
-        topten* pidok = &toptens[i].single;
-        exportegylevel(h, pidok, 1);
+        topten* tten = &toptens[i].single;
+        write_stats_topten(h, tten, 1);
         fprintf(h, "\n");
     }
 
@@ -334,8 +335,8 @@ void state::write_stats(void) {
     fprintf(h, "\n");
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) { // utolsot nem irjuk ki
         fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
-        topten* pidok = &toptens[i].multi;
-        exportegylevel(h, pidok, 0);
+        topten* tten = &toptens[i].multi;
+        write_stats_topten(h, tten, 0);
         fprintf(h, "\n");
     }
 
@@ -403,11 +404,11 @@ void state::reset_keys(void) {
 
 int get_player_index(const char* player_name) {
     for (int i = 0; i < MAX_PLAYERS; i++) {
-        player* pjatekos = &State->players[i];
-        if (strcmp(pjatekos->name, player_name) == 0) {
+        player* cur_player = &State->players[i];
+        if (strcmp(cur_player->name, player_name) == 0) {
             return i;
         }
     }
-    hiba("get_player_index-ben nem talalja nevet!");
+    hiba("get_player_index cannot find name!");
     return 0;
 }

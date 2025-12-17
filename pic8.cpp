@@ -109,7 +109,6 @@ pic8::pic8(int w, int h) {
     nemdestrukt = 0;
     rows = NULL;
     szegmuttomb = NULL;
-    fizkep = 0;
     transparency_data = NULL;
     transparency_data_length = NULL;
     success = allocate(w, h);
@@ -121,7 +120,6 @@ pic8::pic8(int xsizep, int ysizep, unsigned char** ppc) {
     nemdestrukt = 1;
     rows = NULL;
     szegmuttomb = NULL;
-    fizkep = 0;
     transparency_data = NULL;
     transparency_data_length = NULL;
     if (xsizep == -12333 && ysizep == -12334) {
@@ -142,7 +140,6 @@ pic8::pic8(const char* filename, FILE* h) {
     success = 0;
     rows = NULL;
     szegmuttomb = NULL;
-    fizkep = 0;
     transparency_data = NULL;
     transparency_data_length = NULL;
     // Kiterjesztes megkeresese:
@@ -168,10 +165,6 @@ pic8::pic8(const char* filename, FILE* h) {
 int pic8::save(const char* filename, unsigned char* pal, FILE* h) {
     if (!success) {
         hiba("pic8::save-ben nem success!");
-        return 0;
-    }
-    if (fizkep) {
-        hiba("Fizikai kepernyore save hivasa!");
         return 0;
     }
     // Kiterjesztes megkeresese:
@@ -210,13 +203,8 @@ void pic8::ppixel(int x, int y, unsigned char index) {
     if (x < 0 || x >= width || y < 0 || y >= height) {
         return;
     }
-
-    if (!fizkep) {
-        rows[y][x] = index;
-        return;
-    }
-    // Fizikai:
-    hiba("ppixel fizikaira!");
+    rows[y][x] = index;
+    return;
 }
 
 unsigned char pic8::gpixel(int x, int y) {
@@ -229,15 +217,7 @@ unsigned char pic8::gpixel(int x, int y) {
     if (x < 0 || x >= width || y < 0 || y >= height) {
         return 0;
     }
-
-    if (!fizkep) {
-        return rows[y][x];
-    } else {
-        // Fizikai:
-        hiba("gpixel fizikaira!");
-        // return (unsigned char)gpixel_l( x, y );
-        return 0;
-    }
+    return rows[y][x];
 }
 
 #ifdef TEST
@@ -255,13 +235,7 @@ unsigned char* pic8::get_row(int y) {
         return 0;
     }
 #endif
-    if (!fizkep) {
-        return rows[y];
-    } else {
-        // Fizikai:
-        hiba("pic8::get_row meghivasa fizikai kepernyore!");
-        return NULL;
-    }
+    return rows[y];
 }
 
 #endif
@@ -271,9 +245,6 @@ void pic8::fill_box(unsigned char index) {
 }
 
 void pic8::fill_box(int x1, int y1, int x2, int y2, unsigned char index) {
-    if (fizkep) {
-        hiba("pic8::fill_box meghivasa fizikai kepernyore!");
-    }
     if (x1 > x2) {
         int tmp = x1;
         x1 = x2;
@@ -795,29 +766,12 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
                                 if (xend > x2) {
                                     xend = x2;
                                 }
-                                if (dest->fizkep) {
-                                    hiba("t4ruh5t");
-                                }
-                                // putline8_l( x+xkezd-x1, desty,
-                                //&source->rows[sy][xkezd],
-                                // xveg-xkezd+1 );
-                                else {
-                                    memcpy(&dest->rows[desty][x + xstart - x1],
-                                           &source->rows[sy][xstart], xend - xstart + 1);
-                                }
+                                memcpy(&dest->rows[desty][x + xstart - x1],
+                                       &source->rows[sy][xstart], xend - xstart + 1);
                             }
                         } else {
-                            // Nem log ki:
-                            if (dest->fizkep) {
-                                hiba("68464");
-                            }
-                            // putline8_l( x+sx-x1, desty,
-                            //&source->rows[sy][sx],
-                            // buffer[buf] );
-                            else {
-                                memcpy(&dest->rows[desty][x + sx - x1], &source->rows[sy][sx],
-                                       buffer[buf]);
-                            }
+                            memcpy(&dest->rows[desty][x + sx - x1], &source->rows[sy][sx],
+                                   buffer[buf]);
                         }
                     }
                     sx += buffer[buf++];
@@ -838,14 +792,6 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
     }
 
     // Most mar tuti jok koordok!
-    if (dest->fizkep) {
-        // Fizikai kepernyore iras:
-        hiba("0895t");
-    }
-    if (source->fizkep) {
-        // Fizikai kepernyorol olvasas:
-        hiba("8795t");
-    }
     // Memoria-memoria atvitel!
     int length = x2 - x1 + 1;
     int dfy = y;
@@ -859,28 +805,6 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
     // if( Debugblt )
     //	hiba( "Itt van 19!" ); idejott
 }
-
-/*void blt8fizrefejjelle( pic8* ps ) {
-    int fizxsize = Pscr8->get_width();
-    int fizysize = Pscr8->get_height();
-    #ifdef PIC8TEST
-        if( ps == Pscr8 ) {
-            hiba( "blt8fizrefejjelle hivasa, fizikai kepernyo parral!" );
-            return;
-        }
-        if( ps->transparency_data ) {
-            hiba( "blt8fizrefejjelle hivasa, sprite parral!" );
-            return;
-        }
-        if( fizxsize != ps->get_width() || fizysize != ps->get_height() ) {
-            hiba( "blt8fizrefejjelle: par size != fizikai size!" );
-            return;
-        }
-    #endif
-    for( int y = 0; y < fizysize; y++ ) {
-        putbytes_l( 0, y, ps->rows[fizysize-y-1], fizxsize );
-    }
-} */
 
 int get_pcx_pal(const char* filename, unsigned char* pal) {
     // Paletta beolvasasa:

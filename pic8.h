@@ -19,14 +19,11 @@ class pic8 {
   public:
     // Baratok:
     friend void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2);
-    // friend void blt8fizrefejjelle( pic8* ps );
     friend void spriteosit(pic8* ppic, int index);
     friend void spriteosit(pic8* ppic);
-    friend void setmode8_l(int res);
 
   protected:
     // Sajat:
-    int fizkep;
     int nemdestrukt;
     int allocate(long w, long h);
     void spr_open(const char* filename, FILE* h);
@@ -71,9 +68,6 @@ class pic8 {
 
     void subview(int x1, int y1, int x2, int y2, pic8* source);
 };
-
-// Fizikai kepernyore mutat:
-// extern pic8* Pscr8;
 
 class ddpal;
 

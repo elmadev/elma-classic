@@ -16,4 +16,6 @@ double getenergia(void);
 // Minden sebesseget es forgasit megszoroz ezzel:
 void szorozmindet(double szorzo);
 
+extern int Nincsfal; // Ha ez igaz, golyok kimehetnek falon kivulre
+
 #endif

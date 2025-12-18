@@ -92,7 +92,6 @@
 #include "VALASZT2.H"
 #include "DIALOG32.H"
 
-#include "PUBGOLY.H"
 #include "GOLYOK.H"
 #include "GOLYKISZ.H"
 #include "GOLYUTK.H"

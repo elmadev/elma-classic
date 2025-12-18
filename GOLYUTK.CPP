@@ -1,6 +1,6 @@
 #include "ALL.H"
 
-int WallsDisabled = 0;
+bool WallsDisabled = false;
 
 static int Balls3D = 0;
 
@@ -24,7 +24,7 @@ static void synchronize_keyframes(ball* ball1, ball* ball2) {
 }
 
 // Update ball keyframe time to current time
-void update_keyframe(ball* ball, double time) {
+static void update_keyframe(ball* ball, double time) {
     ball->keyframe_r = ball->keyframe_r + ((time - ball->keyframe_time) * ball->v);
     ball->keyframe_rotation =
         ball->keyframe_rotation + ((time - ball->keyframe_time) * ball->angular_velocity);
@@ -33,9 +33,6 @@ void update_keyframe(ball* ball, double time) {
 
 // Get collision time between two balls
 double ball_ball_collision_time(ball* ball1, ball* ball2) {
-    vekt2 r, v;
-    double a, b, c, discriminant, t;
-
     synchronize_keyframes(ball1, ball2);
 
     // clang-format off
@@ -50,25 +47,26 @@ double ball_ball_collision_time(ball* ball1, ball* ball2) {
     // One last caveat: r is ball2 - ball1 instead of ball1 - ball2
     // To compensate for this mistake, we multiply b by -2.0 instead of 2.0
     // clang-format on
-    v = ball1->v - ball2->v;
-    r = ball2->keyframe_r - ball1->keyframe_r;
-    a = v.x * v.x + v.y * v.y;
+    vekt2 v = ball1->v - ball2->v;
+    vekt2 r = ball2->keyframe_r - ball1->keyframe_r;
+    double a = v.x * v.x + v.y * v.y;
     if (a == 0) {
         // No relative movement, so no collision
-        return (NO_COLLISION_TIME);
+        return NO_COLLISION_TIME;
     }
-    b = (-2) * (v.x * r.x + v.y * r.y);
+    double b = (-2) * (v.x * r.x + v.y * r.y);
     if (b >= 0) {
         // Balls moving away from each other, so no collision
-        return (NO_COLLISION_TIME);
+        return NO_COLLISION_TIME;
     }
-    c = r.x * r.x + r.y * r.y - (ball1->radius + ball2->radius) * (ball1->radius + ball2->radius);
-    discriminant = b * b - 4 * a * c;
+    double c =
+        r.x * r.x + r.y * r.y - (ball1->radius + ball2->radius) * (ball1->radius + ball2->radius);
+    double discriminant = b * b - 4 * a * c;
     if (discriminant <= 0) {
         // Balls will miss each other and not collide
-        return (NO_COLLISION_TIME);
+        return NO_COLLISION_TIME;
     }
-    t = (-b - gyok(discriminant)) / (2 * a);
+    double t = (-b - gyok(discriminant)) / (2 * a);
     return (t + ball1->keyframe_time);
 }
 
@@ -135,7 +133,6 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
     double tangential_impulse =
         (vtang2 - vtang1 - angular_v1 * rad1 - angular_v2 * rad2) /
         (1 / mass1 + 1 / mass2 + rad1 * rad1 / inertia1 + rad1 * rad1 / inertia1);
-
     tangential_impulse /= 2.0;
 
     // Update angular velocities
@@ -150,8 +147,8 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
     int interation = 0;
     double step = 1.0;
     double adjust = 0.5;
-    int increase_energy = 1;
-    while (1) {
+    bool increase_energy = true;
+    while (true) {
         // Keep adjusting velocity by a factor of "step" until we achieve conservation of energy
         interation++;
         vekt2 new_v1 = ball1->v + tangential_impulse / mass1 * collision_plane - vperp1 * step;
@@ -164,7 +161,7 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
         if (increase_energy) {
             // Step 1: We initially increase velocity until we have too much energy
             if (new_energy > initial_energy) {
-                increase_energy = 0;
+                increase_energy = false;
             } else {
                 step *= 2.0;
                 adjust *= 2.0;
@@ -190,8 +187,10 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
     }
 }
 
-static int WallLeft = 0, WallRight = SCREEN_WIDTH;
-static int WallTop = 0, WallBottom = SCREEN_HEIGHT;
+static const int WallLeft = 0;
+static const int WallRight = SCREEN_WIDTH;
+static const int WallTop = 0;
+static const int WallBottom = SCREEN_HEIGHT;
 
 // Get collision time between a ball and wall
 double ball_wall_collision_time(ball* ball, int wall) {
@@ -232,7 +231,7 @@ double ball_wall_collision_time(ball* ball, int wall) {
         }
         return ball->keyframe_time - ((ball->keyframe_r.x - WallLeft - ball->radius) / ball->v.x);
     }
-    return (NO_COLLISION_TIME);
+    return NO_COLLISION_TIME;
 }
 
 // Simulate a collision between a ball and wall

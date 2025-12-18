@@ -9,8 +9,6 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time);
 double ball_wall_collision_time(ball* ball, int wall);
 void simulate_ball_wall_collision(ball* ball, int wall, double time);
 
-void update_keyframe(ball* m, double t);
-
-extern int WallsDisabled;
+extern bool WallsDisabled;
 
 #endif

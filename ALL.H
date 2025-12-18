@@ -93,9 +93,9 @@
 #include "VALASZT2.H"
 #include "DIALOG32.H"
 
-#include "GOLYOK.H"
-#include "GOLYKISZ.H"
-#include "GOLYUTK.H"
+#include "ball.h"
+#include "ball_handler.h"
+#include "ball_collision.h"
 
 #include "M_DD.H"
 #include "M_K.H"

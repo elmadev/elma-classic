@@ -1,5 +1,5 @@
-#ifndef GOLYUTK_H
-#define GOLYUTK_H
+#ifndef BALL_COLLISION_H
+#define BALL_COLLISION_H
 
 enum class WallId {
     Top = 0,

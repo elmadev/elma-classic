@@ -1,5 +1,5 @@
-#ifndef GOLYOK_H
-#define GOLYOK_H
+#ifndef BALL_H
+#define BALL_H
 
 constexpr double UNKNOWN_COLLISION_TIME = -2.0;
 constexpr double NO_COLLISION_TIME = 500000000.0;

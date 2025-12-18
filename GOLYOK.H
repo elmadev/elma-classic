@@ -12,8 +12,6 @@ typedef struct {
 
 void balls_init(void);
 void balls_simulate(double dt);
-// void ujraszamol( void );
-// void idoreigazitmindet( void );
 
 extern int BallCount;
 extern ball* Balls;

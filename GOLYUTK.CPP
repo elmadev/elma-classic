@@ -217,32 +217,3 @@ void goutkozes(ball* m, int old, double t) {
     // double ero = dsvabs( &m->v );
     // GG_go_utkozes( ero );
 }
-
-// Visszaadja osszenergiat:
-/*double getenergia( void ) {
-    double sum = 0.0;
-    for( int i = 0; i < Ngolyok; i++ ) {
-        golyo* g1 = &Golyok[i];
-        double m;
-        double theta;
-        if( Balls3D ) {
-            m = g1->sug*g1->sug*g1->sug;
-            theta = 0.4*m*g1->sug*g1->sug; // Gomb
-        }
-        else {
-            m = g1->sug*g1->sug;
-            theta = 0.5*m*g1->sug*g1->sug;
-        }
-        sum += m*g1->v*g1->v + theta*g1->omega*g1->omega;
-    }
-    return sum;
-} */
-
-// Minden sebesseget es forgasit megszoroz ezzel:
-/*void szorozmindet( double szorzo ) {
-    for( int i = 0; i < Ngolyok; i++ ) {
-        golyo* g1 = &Golyok[i];
-        g1->v = g1->v * szorzo;
-        g1->omega = g1->omega * szorzo;
-    }
-} */

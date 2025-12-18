@@ -1,11 +1,11 @@
 #include "ALL.H"
 
-double megkeresidot(int* xlegjobb, int* ylegjobb) {
+double next_collision_time(int* collider1, int* collider2) {
     double eddigilegjobbt = NO_COLLISION_TIME;
     int x, y;
 
-    *xlegjobb = 0;
-    *ylegjobb = 1;
+    *collider1 = 0;
+    *collider2 = 1;
 
     for (x = 0; x < BallCount; x++) {
         // Golyo-Golyo:
@@ -15,8 +15,8 @@ double megkeresidot(int* xlegjobb, int* ylegjobb) {
             }
             if (CollisionTimeGrid[x][y] < eddigilegjobbt) {
                 eddigilegjobbt = CollisionTimeGrid[x][y];
-                *xlegjobb = x;
-                *ylegjobb = y;
+                *collider1 = x;
+                *collider2 = y;
             }
         }
         // Golyo-Oldal:
@@ -26,38 +26,38 @@ double megkeresidot(int* xlegjobb, int* ylegjobb) {
             }
             if (CollisionTimeGrid[x][y] < eddigilegjobbt) {
                 eddigilegjobbt = CollisionTimeGrid[x][y];
-                *xlegjobb = x;
-                *ylegjobb = y;
+                *collider1 = x;
+                *collider2 = y;
             }
         }
     }
-    return CollisionTimeGrid[*xlegjobb][*ylegjobb];
+    return CollisionTimeGrid[*collider1][*collider2];
 }
 
-void utkoztet(int x, int y) {
+void simulate_collision(int collider1, int collider2) {
     int i;
 
     // Golyo-Golyo:
-    if (y < BallCount) {
-        ggutkozes(&Balls[x], &Balls[y], CollisionTimeGrid[x][y]);
+    if (collider2 < BallCount) {
+        ggutkozes(&Balls[collider1], &Balls[collider2], CollisionTimeGrid[collider1][collider2]);
         // Oszlopokat es sorokat ervenytelenit:
         for (i = 0; i < BallCount + 4; i++) {
-            CollisionTimeGrid[x][i] = -2;
-            CollisionTimeGrid[y][i] = -2;
+            CollisionTimeGrid[collider1][i] = -2;
+            CollisionTimeGrid[collider2][i] = -2;
             if (i < BallCount) {
-                CollisionTimeGrid[i][x] = -2;
-                CollisionTimeGrid[i][y] = -2;
+                CollisionTimeGrid[i][collider1] = -2;
+                CollisionTimeGrid[i][collider2] = -2;
             }
         }
         return;
     }
     // Golyo-Oldal:
-    goutkozes(&Balls[x], y - BallCount, CollisionTimeGrid[x][y]);
+    goutkozes(&Balls[collider1], collider2 - BallCount, CollisionTimeGrid[collider1][collider2]);
     // Oszlopot ervenytelenit:
     for (i = 0; i < BallCount + 4; i++) {
-        CollisionTimeGrid[x][i] = -2;
+        CollisionTimeGrid[collider1][i] = -2;
         if (i < BallCount) {
-            CollisionTimeGrid[i][x] = -2;
+            CollisionTimeGrid[i][collider1] = -2;
         }
     }
 }

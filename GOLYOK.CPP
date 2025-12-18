@@ -137,12 +137,12 @@ void balls_simulate(double dt) {
     while (!done) {
         // Update all the collision times and get the next collision time
         int collider1, collider2;
-        NextCollisionTime = megkeresidot(&collider1, &collider2);
+        NextCollisionTime = next_collision_time(&collider1, &collider2);
         // Handle one collision
         if (NextCollisionTime > dt) {
             done = 1;
         } else {
-            utkoztet(collider1, collider2);
+            simulate_collision(collider1, collider2);
         }
     }
     // Update keyframe position time of all the balls to the current time

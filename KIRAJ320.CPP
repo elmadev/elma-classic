@@ -72,7 +72,7 @@ void beallitmereteket(int splitscreen) {
     Hatary2 = Cysize - 3.0;
 
     // Motoros kepernyo mely reszen helyezkedik el:
-    Mo_bal = (SCREEN_WIDTH / MetersToPixels) * 0.15;
+    Mo_bal = (SCREEN_WIDTH / MetersToPixels) * (EolSettings->center_camera ? 0.50 : 0.15);
     Mo_dx = Cxsize / MetersToPixels - 2.0 * Mo_bal;
     Mo_y = Cysize / MetersToPixels / 2.0;
 

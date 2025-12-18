@@ -424,10 +424,6 @@ static void surlodaselintezes(short* sbuff, int buffsize) {
     Surleromost = ((double)eromost) / 65536.0;
 }
 
-// 16 bites buffer:
-#define MAX16BUFFER (4200)
-static short Buffer16bit[MAX16BUFFER];
-
 // buffsize valojaban minta szam, vagyis = 2*byteszam:
 void callbackhang(short* sbuff, int buffsize) {
     if (!Hangenabled) {

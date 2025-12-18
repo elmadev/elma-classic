@@ -604,6 +604,9 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     // Kiszamoljuk kepernyo bal also sarkat:
     vect2 motorkozep = pmot->bike.r;
 
+    // vekt2 sarok(motorkozep.x - (Mo_bal + ((0.5) * Mo_dx)), motorkozep.y - Mo_y);
+    // double camera_offset = centre_camera ? 0.5 : pvalt->baljobbv_h.baljobb;
+    // vekt2 sarok(motorkozep.x - (Mo_bal + (camera_offset * Mo_dx)), motorkozep.y - Mo_y);
     vect2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
 
     // ppic->fill_box( 100 );

@@ -6,14 +6,14 @@ double Maxgolyoseb = 0;
 
 int BallCount = 0;
 ball* Balls = NULL;
-int Konstrualva = 0;
+int BallsInitialized = 0;
 double** CollisionTimeGrid = NULL;
 
-static double Legkozelebbiutkozesideje = -2, Pillanatnyiido = 0;
+static double NextCollisionTime = -2, ElapsedTimeSinceKeyframe = 0;
 
 typedef double* duplaramutato;
 
-static void kitoltgolyokat(void) {
+static void create_balls(void) {
     BallCount = 9;
     Balls = new ball[BallCount];
     // Nullazas:
@@ -42,37 +42,37 @@ static void kitoltgolyokat(void) {
 
     // Beallitjuk kezdeti sebesseget:
     srand(time(NULL));
-    double alfa = s_random(1000);
-    alfa *= K_pip2 / 1000.0;
-    alfa *= 0.999;
-    alfa += 0.0005;
+    double angle = s_random(1000);
+    angle *= K_pip2 / 1000.0;
+    angle *= 0.999;
+    angle += 0.0005;
 
-    Balls[0].v.x = -sin(alfa);
-    Balls[0].v.y = -cos(alfa);
+    Balls[0].v.x = -sin(angle);
+    Balls[0].v.y = -cos(angle);
 }
 
 // Siker eseten igazzal ter vissza:
 void balls_init(void) {
-    kitoltgolyokat();
+    create_balls();
 
-    int sikerultlefoglalni;
-    Legkozelebbiutkozesideje = -2;
-    Pillanatnyiido = 0;
-    if (Konstrualva) {
-        hiba("Nem destrualtad golyokat!");
+    int allocation_success;
+    NextCollisionTime = -2;
+    ElapsedTimeSinceKeyframe = 0;
+    if (BallsInitialized) {
+        hiba("Balls already initialized!");
     }
-    sikerultlefoglalni = 1;
+    allocation_success = 1;
     CollisionTimeGrid = new duplaramutato[BallCount + 4];
     if (!CollisionTimeGrid) {
-        sikerultlefoglalni = 0;
+        allocation_success = 0;
     }
-    if (sikerultlefoglalni) {
+    if (allocation_success) {
         for (int i = 0; i < BallCount + 4; i++) {
             CollisionTimeGrid[i] = NULL;
         }
     }
-    if (sikerultlefoglalni) {
-        for (int i = 0; i < BallCount + 4 && sikerultlefoglalni; i++) {
+    if (allocation_success) {
+        for (int i = 0; i < BallCount + 4 && allocation_success; i++) {
             CollisionTimeGrid[i] = new double[BallCount + 4];
             if (CollisionTimeGrid[i]) {
                 for (int j = 0; j < BallCount + 4; j++) {
@@ -80,11 +80,11 @@ void balls_init(void) {
                 }
             }
             if (!CollisionTimeGrid[i]) {
-                sikerultlefoglalni = 0;
+                allocation_success = 0;
             }
         }
     }
-    if (!sikerultlefoglalni) {
+    if (!allocation_success) {
         if (CollisionTimeGrid) {
             for (int i = 0; i < BallCount + 4; i++) {
                 if (CollisionTimeGrid[i]) {
@@ -97,33 +97,33 @@ void balls_init(void) {
         hiba("Out of memory!");
     }
 
-    Konstrualva = 1;
+    BallsInitialized = 1;
 }
 
 /*void destrual( void ) {
     int i;
 
-    if( Konstrualva ) {
+    if( BallsInitialized ) {
         for( i = 0; i < BallCount; i ++ )
             delete CollisionTimeGrid[i];
         delete CollisionTimeGrid;
         CollisionTimeGrid = NULL;
-        Konstrualva = 0;
+        BallsInitialized = 0;
     }
 } */
 
-static double Kezdoszamlalo = 0.0;
+static double FirstTimeDelay = 0.0;
 
 void balls_simulate(double dt) {
-    if (Kezdoszamlalo < 1.0 /*400.0*/) {
-        Kezdoszamlalo += dt;
+    if (FirstTimeDelay < 1.0 /*400.0*/) {
+        FirstTimeDelay += dt;
         dt = 0.00000000001;
     }
 
     // dt *= 2.0;
 
-    if (!Konstrualva) {
-        hiba("Nem konstrualtad golyokat!");
+    if (!BallsInitialized) {
+        hiba("balls_simulate - balls not initialized!");
         return;
     }
 
@@ -144,30 +144,30 @@ void balls_simulate(double dt) {
 
     // Most jon az a resz, ami biztositja, hogy ha nincs utkozes ne kelljen
     // sokat szamolni (Egyszeruen kihagyja hatso reszt):
-    if (Legkozelebbiutkozesideje > -1 && Legkozelebbiutkozesideje > Pillanatnyiido + dt) {
-        Pillanatnyiido += dt;
+    if (NextCollisionTime > -1 && NextCollisionTime > ElapsedTimeSinceKeyframe + dt) {
+        ElapsedTimeSinceKeyframe += dt;
         for (int i = 0; i < BallCount; i++) {
-            Balls[i].current_r = Balls[i].keyframe_r + (Pillanatnyiido * Balls[i].v);
+            Balls[i].current_r = Balls[i].keyframe_r + (ElapsedTimeSinceKeyframe * Balls[i].v);
             Balls[i].current_rotation =
-                Balls[i].keyframe_rotation + (Pillanatnyiido * Balls[i].angular_velocity);
+                Balls[i].keyframe_rotation + (ElapsedTimeSinceKeyframe * Balls[i].angular_velocity);
         }
         return;
     }
 
-    dt += Pillanatnyiido;
+    dt += ElapsedTimeSinceKeyframe;
 
     int done = 0;
     while (!done) {
-        int x, y;
-        Legkozelebbiutkozesideje = megkeresidot(&x, &y);
-        // if( Legkozelebbiutkozesideje > NO_COLLISION_TIME-1.0 ) {
+        int collider1, collider2;
+        NextCollisionTime = megkeresidot(&collider1, &collider2);
+        // if( NextCollisionTime > NO_COLLISION_TIME-1.0 ) {
         //	Maxgolyoseb = 0;
         //	return;
         // }
-        if (Legkozelebbiutkozesideje > dt) {
+        if (NextCollisionTime > dt) {
             done = 1;
         } else {
-            utkoztet(x, y);
+            utkoztet(collider1, collider2);
         }
     }
     // dt idore igazit minden golyot es lenullazza idejet:
@@ -187,8 +187,8 @@ void balls_simulate(double dt) {
             CollisionTimeGrid[i][j] -= dt;
         }
     }
-    Pillanatnyiido = 0;
-    Legkozelebbiutkozesideje -= dt;
+    ElapsedTimeSinceKeyframe = 0;
+    NextCollisionTime -= dt;
 }
 
 /*void ujraszamol( void ) {

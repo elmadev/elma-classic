@@ -16,7 +16,6 @@ typedef double* duplaramutato;
 static void create_balls(void) {
     BallCount = 9;
     Balls = new ball[BallCount];
-    // Nullazas:
     for (int x = 0; x < 3; x++) {
         for (int y = 0; y < 3; y++) {
             int i = y * 3 + x;
@@ -40,7 +39,7 @@ static void create_balls(void) {
         }
     }
 
-    // Beallitjuk kezdeti sebesseget:
+    // Choose a random starting angle for the top-left ball
     srand(time(NULL));
     double angle = s_random(1000);
     angle *= K_pip2 / 1000.0;
@@ -51,10 +50,13 @@ static void create_balls(void) {
     Balls[0].v.y = -cos(angle);
 }
 
-// Siker eseten igazzal ter vissza:
+// Initialize the balls and collision system
 void balls_init(void) {
     create_balls();
 
+    // Create collision grid
+    // Allocate a 2D grid of width and height BallCount+4
+    // The last 4 elements represent the 4 walls
     int allocation_success;
     NextCollisionTime = -2;
     ElapsedTimeSinceKeyframe = 0;
@@ -100,50 +102,22 @@ void balls_init(void) {
     BallsInitialized = 1;
 }
 
-/*void destrual( void ) {
-    int i;
-
-    if( BallsInitialized ) {
-        for( i = 0; i < BallCount; i ++ )
-            delete CollisionTimeGrid[i];
-        delete CollisionTimeGrid;
-        CollisionTimeGrid = NULL;
-        BallsInitialized = 0;
-    }
-} */
-
 static double FirstTimeDelay = 0.0;
 
+// Update ball positions
 void balls_simulate(double dt) {
-    if (FirstTimeDelay < 1.0 /*400.0*/) {
+    // A minimal time delay before we actually start the ball animation.
+    // This amount of time is inconsequential - it used to be 400.0
+    if (FirstTimeDelay < 1.0) {
         FirstTimeDelay += dt;
         dt = 0.00000000001;
     }
-
-    // dt *= 2.0;
-
     if (!BallsInitialized) {
         hiba("balls_simulate - balls not initialized!");
         return;
     }
 
-    // Kiszamoljuk osszenergiat:
-    /*double sum = 0.0;
-    for( int i = 0; i < BallCount; i++ )
-        sum += Balls[i].v.x*Balls[i].v.x + Balls[i].v.y*Balls[i].v.y;
-
-    sum = sqrt( sum );
-    // Korrigaljuk energiat:
-    dt /= sum;*/
-
-    // Atmasolja mostani r-t regi r-be:
-    // for( int i = 0; i < BallCount; i++ ) {
-    //	Balls[i].relozo.x = Balls[i].current_r.x;
-    //	Balls[i].relozo.y = Balls[i].current_r.y;
-    //}
-
-    // Most jon az a resz, ami biztositja, hogy ha nincs utkozes ne kelljen
-    // sokat szamolni (Egyszeruen kihagyja hatso reszt):
+    // If no collision occurs during dt, then just update position
     if (NextCollisionTime > -1 && NextCollisionTime > ElapsedTimeSinceKeyframe + dt) {
         ElapsedTimeSinceKeyframe += dt;
         for (int i = 0; i < BallCount; i++) {
@@ -154,26 +128,25 @@ void balls_simulate(double dt) {
         return;
     }
 
+    // At least one collision will occur during dt
+    // Or alternatively, some collision times are unknown
     dt += ElapsedTimeSinceKeyframe;
 
+    // Handle all the collisions
     int done = 0;
     while (!done) {
+        // Update all the collision times and get the next collision time
         int collider1, collider2;
         NextCollisionTime = megkeresidot(&collider1, &collider2);
-        // if( NextCollisionTime > NO_COLLISION_TIME-1.0 ) {
-        //	Maxgolyoseb = 0;
-        //	return;
-        // }
+        // Handle one collision
         if (NextCollisionTime > dt) {
             done = 1;
         } else {
             utkoztet(collider1, collider2);
         }
     }
-    // dt idore igazit minden golyot es lenullazza idejet:
+    // Update keyframe position time of all the balls to the current time
     for (int i = 0; i < BallCount; i++) {
-        // dsvlet( &Balls[i].keyframe_r, dsvossz( &Balls[i].keyframe_r,
-        //					dsvmul( dt-Balls[i].t, &Balls[i].v ) ) );
         Balls[i].keyframe_r = Balls[i].keyframe_r + ((dt - Balls[i].keyframe_time) * Balls[i].v);
         Balls[i].current_r = Balls[i].keyframe_r;
         Balls[i].keyframe_rotation = Balls[i].keyframe_rotation +
@@ -181,12 +154,14 @@ void balls_simulate(double dt) {
         Balls[i].current_rotation = Balls[i].keyframe_rotation;
         Balls[i].keyframe_time = 0;
     }
-    // CollisionTimeGrid tablaban mindenbol kivon dt idot:
+    // Update collision time to be relative to current time, skipping unused parts of the grid
     for (int i = 0; i < BallCount; i++) {
         for (int j = i + 1; j < BallCount + 4; j++) {
             CollisionTimeGrid[i][j] -= dt;
         }
     }
+
+    // Reset keyframe time to current time
     ElapsedTimeSinceKeyframe = 0;
     NextCollisionTime -= dt;
 }

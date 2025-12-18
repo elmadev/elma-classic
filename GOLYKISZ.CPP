@@ -1,33 +1,33 @@
 #include "ALL.H"
 
 double next_collision_time(int* collider1, int* collider2) {
-    double eddigilegjobbt = NO_COLLISION_TIME;
-    int x, y;
+    double next_collision_time = NO_COLLISION_TIME;
+    int i, j;
 
     *collider1 = 0;
     *collider2 = 1;
 
-    for (x = 0; x < BallCount; x++) {
+    for (i = 0; i < BallCount; i++) {
         // Golyo-Golyo:
-        for (y = x + 1; y < BallCount; y++) {
-            if (CollisionTimeGrid[x][y] < -1) {
-                CollisionTimeGrid[x][y] = ggutkozesideje(&Balls[x], &Balls[y]);
+        for (j = i + 1; j < BallCount; j++) {
+            if (CollisionTimeGrid[i][j] < -1) {
+                CollisionTimeGrid[i][j] = ggutkozesideje(&Balls[i], &Balls[j]);
             }
-            if (CollisionTimeGrid[x][y] < eddigilegjobbt) {
-                eddigilegjobbt = CollisionTimeGrid[x][y];
-                *collider1 = x;
-                *collider2 = y;
+            if (CollisionTimeGrid[i][j] < next_collision_time) {
+                next_collision_time = CollisionTimeGrid[i][j];
+                *collider1 = i;
+                *collider2 = j;
             }
         }
         // Golyo-Oldal:
-        for (y = BallCount; y < BallCount + 4; y++) {
-            if (CollisionTimeGrid[x][y] < -1) {
-                CollisionTimeGrid[x][y] = goutkozesideje(&Balls[x], y - BallCount);
+        for (j = BallCount; j < BallCount + 4; j++) {
+            if (CollisionTimeGrid[i][j] < -1) {
+                CollisionTimeGrid[i][j] = goutkozesideje(&Balls[i], j - BallCount);
             }
-            if (CollisionTimeGrid[x][y] < eddigilegjobbt) {
-                eddigilegjobbt = CollisionTimeGrid[x][y];
-                *collider1 = x;
-                *collider2 = y;
+            if (CollisionTimeGrid[i][j] < next_collision_time) {
+                next_collision_time = CollisionTimeGrid[i][j];
+                *collider1 = i;
+                *collider2 = j;
             }
         }
     }

@@ -4,30 +4,35 @@ int WallsDisabled = 0;
 
 static int Balls3D = 0; // Ha igaz, akkor tomegek 3d aranyuak
 
-static void osszeigazit(ball* m1, ball* m2) {
-    if (m1->keyframe_time < m2->keyframe_time) {
-        m1->keyframe_r = m1->keyframe_r + ((m2->keyframe_time - m1->keyframe_time) * m1->v);
-        m1->keyframe_rotation = m1->keyframe_rotation +
-                                ((m2->keyframe_time - m1->keyframe_time) * m1->angular_velocity);
-        m1->keyframe_time = m2->keyframe_time;
+static void synchronize_keyframes(ball* ball1, ball* ball2) {
+    if (ball1->keyframe_time < ball2->keyframe_time) {
+        ball1->keyframe_r =
+            ball1->keyframe_r + ((ball2->keyframe_time - ball1->keyframe_time) * ball1->v);
+        ball1->keyframe_rotation =
+            ball1->keyframe_rotation +
+            ((ball2->keyframe_time - ball1->keyframe_time) * ball1->angular_velocity);
+        ball1->keyframe_time = ball2->keyframe_time;
     } else {
-        m2->keyframe_r = m2->keyframe_r + ((m1->keyframe_time - m2->keyframe_time) * m2->v);
-        m2->keyframe_rotation = m2->keyframe_rotation +
-                                ((m1->keyframe_time - m2->keyframe_time) * m2->angular_velocity);
-        m2->keyframe_time = m1->keyframe_time;
+        ball2->keyframe_r =
+            ball2->keyframe_r + ((ball1->keyframe_time - ball2->keyframe_time) * ball2->v);
+        ball2->keyframe_rotation =
+            ball2->keyframe_rotation +
+            ((ball1->keyframe_time - ball2->keyframe_time) * ball2->angular_velocity);
+        ball2->keyframe_time = ball1->keyframe_time;
     }
 }
-void idoreigazit(ball* m, double t) {
-    m->keyframe_r = m->keyframe_r + ((t - m->keyframe_time) * m->v);
-    m->keyframe_rotation = m->keyframe_rotation + ((t - m->keyframe_time) * m->angular_velocity);
-    m->keyframe_time = t;
+void update_keyframe(ball* ball, double time) {
+    ball->keyframe_r = ball->keyframe_r + ((time - ball->keyframe_time) * ball->v);
+    ball->keyframe_rotation =
+        ball->keyframe_rotation + ((time - ball->keyframe_time) * ball->angular_velocity);
+    ball->keyframe_time = time;
 }
 
 double ball_ball_collision_time(ball* ball1, ball* ball2) {
     vekt2 r, v;
-    double a, b, c, det, t;
+    double a, b, c, discriminant, t;
 
-    osszeigazit(ball1, ball2);
+    synchronize_keyframes(ball1, ball2);
     v = ball1->v - ball2->v;
     r = ball2->keyframe_r - ball1->keyframe_r;
     a = v.x * v.x + v.y * v.y;
@@ -39,162 +44,164 @@ double ball_ball_collision_time(ball* ball1, ball* ball2) {
         return (NO_COLLISION_TIME);
     }
     c = r.x * r.x + r.y * r.y - (ball1->radius + ball2->radius) * (ball1->radius + ball2->radius);
-    det = b * b - 4 * a * c;
-    if (det <= 0) {
+    discriminant = b * b - 4 * a * c;
+    if (discriminant <= 0) {
         return (NO_COLLISION_TIME);
     }
-    t = (-b - gyok(det)) / (2 * a);
+    t = (-b - gyok(discriminant)) / (2 * a);
     return (t + ball1->keyframe_time);
 }
 
 void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
-    idoreigazit(ball1, time);
-    idoreigazit(ball2, time);
+    update_keyframe(ball1, time);
+    update_keyframe(ball2, time);
     // Kiszamolja tomegkozeppont sebesseg vektorat (v):
-    double m1, m2;
-    double theta1, theta2;
+    double mass1, mass2;
+    double inertia1, inertia2;
     if (Balls3D) {
-        m1 = ball1->radius * ball1->radius * ball1->radius;
-        m2 = ball2->radius * ball2->radius * ball2->radius;
-        theta1 = 0.4 * m1 * ball1->radius * ball1->radius; // Gomb
-        theta2 = 0.4 * m2 * ball2->radius * ball2->radius;
+        mass1 = ball1->radius * ball1->radius * ball1->radius;
+        mass2 = ball2->radius * ball2->radius * ball2->radius;
+        inertia1 = 0.4 * mass1 * ball1->radius * ball1->radius; // Gomb
+        inertia2 = 0.4 * mass2 * ball2->radius * ball2->radius;
     } else {
-        m1 = ball1->radius * ball1->radius;
-        m2 = ball2->radius * ball2->radius;
-        theta1 = 0.5 * m1 * ball1->radius * ball1->radius;
-        theta2 = 0.5 * m2 * ball2->radius * ball2->radius;
+        mass1 = ball1->radius * ball1->radius;
+        mass2 = ball2->radius * ball2->radius;
+        inertia1 = 0.5 * mass1 * ball1->radius * ball1->radius;
+        inertia2 = 0.5 * mass2 * ball2->radius * ball2->radius;
     }
     // Kiszamitjuk ero radialis komponenset:
-    double mall = m1 + m2;
-    vekt2 v = ((m1 / mall) * ball1->v) + ((m2 / mall) * ball2->v);
+    double mass = mass1 + mass2;
+    vekt2 center_of_mass_velocity = ((mass1 / mass) * ball1->v) + ((mass2 / mass) * ball2->v);
 
     // Megmaradas kesobbi vizsgalatahoz:
-    // vekt2 tomegpontteszt = v;
-    double oldenergia = m1 * ball1->v * ball1->v + m2 * ball2->v * ball2->v +
-                        theta1 * ball1->angular_velocity * ball1->angular_velocity +
-                        theta2 * ball2->angular_velocity * ball2->angular_velocity;
+    // vekt2 tomegpontteszt = center_of_mass_velocity;
+    double initial_energy = mass1 * ball1->v * ball1->v + mass2 * ball2->v * ball2->v +
+                            inertia1 * ball1->angular_velocity * ball1->angular_velocity +
+                            inertia2 * ball2->angular_velocity * ball2->angular_velocity;
 
-    vekt2 n = (1 / (ball1->radius + ball2->radius)) * (ball1->keyframe_r - ball2->keyframe_r);
+    vekt2 dr_normal =
+        (1 / (ball1->radius + ball2->radius)) * (ball1->keyframe_r - ball2->keyframe_r);
     // Szamitas elsore:
-    vekt2 diff1 = 2 * (n * (ball1->v - v)) * n;
-    // ball1->v = ball1->v - diff1;
+    vekt2 vperp1 = 2 * (dr_normal * (ball1->v - center_of_mass_velocity)) * dr_normal;
+    // ball1->v = ball1->v - vperp1;
     //  Szamitas masodikra:
-    vekt2 diff2 = 2 * (n * (ball2->v - v)) * n;
-    // ball2->v = ball2->v - diff2;
-    //  Eloallt radialis sebesseg valtozas diff1, diff2 vektorokban. Ezeket
+    vekt2 vperp2 = 2 * (dr_normal * (ball2->v - center_of_mass_velocity)) * dr_normal;
+    // ball2->v = ball2->v - vperp2;
+    //  Eloallt radialis sebesseg valtozas vperp1, vperp2 vektorokban. Ezeket
     //  majd vegen adjuk hozza sebesseghez, eloszor tangencialis szamolunk:
 
     // De most csak ezt szamoljuk, ugyhogy hozzaadjuk:
-    // ball1->v = ball1->v - diff1;
-    // ball2->v = ball2->v - diff2;
+    // ball1->v = ball1->v - vperp1;
+    // ball2->v = ball2->v - vperp2;
 
     vekt2 dr = ball2->keyframe_r - ball1->keyframe_r;
     dr.normal();
-    vekt2 tangens = forgatas90fokkal(dr);
-    double v1 = tangens * ball1->v;
-    double v2 = tangens * ball2->v;
-    double omega1 = ball1->angular_velocity;
-    double omega2 = ball2->angular_velocity;
-    double R1 = ball1->radius;
-    double R2 = ball2->radius;
-    double F = (v2 - v1 - omega1 * R1 - omega2 * R2) /
-               (1 / m1 + 1 / m2 + R1 * R1 / theta1 + R1 * R1 / theta1);
+    vekt2 collision_plane = forgatas90fokkal(dr);
+    double vtang1 = collision_plane * ball1->v;
+    double vtang2 = collision_plane * ball2->v;
+    double angular_v1 = ball1->angular_velocity;
+    double angular_v2 = ball2->angular_velocity;
+    double rad1 = ball1->radius;
+    double rad2 = ball2->radius;
+    double tangential_impulse =
+        (vtang2 - vtang1 - angular_v1 * rad1 - angular_v2 * rad2) /
+        (1 / mass1 + 1 / mass2 + rad1 * rad1 / inertia1 + rad1 * rad1 / inertia1);
 
-    F /= 2.0;
+    tangential_impulse /= 2.0;
 
-    ball1->angular_velocity += F * R1 / theta1;
-    ball2->angular_velocity += F * R2 / theta2;
-    // ball1->v = ball1->v + F/m1*tangens - diff1;
-    // ball2->v = ball2->v - F/m2*tangens - diff2;
+    ball1->angular_velocity += tangential_impulse * rad1 / inertia1;
+    ball2->angular_velocity += tangential_impulse * rad2 / inertia2;
+    // ball1->v = ball1->v + tangential_impulse/mass1*collision_plane - vperp1;
+    // ball2->v = ball2->v - tangential_impulse/mass2*collision_plane - vperp2;
 
-    // vekt2 vuj = ((m1/mall) * ball1->v) + ((m2/mall) * ball2->v );
+    // vekt2 vuj = ((mass1/mass) * ball1->v) + ((mass2/mass) * ball2->v );
     // double elteres1 = abs( tomegpontteszt - vuj );
 
-    int i = 0;
-    double szorzo = 1.0;
-    double dszorzo = 0.5;
-    int felfele = 1;
+    int interation = 0;
+    double step = 1.0;
+    double adjust = 0.5;
+    int increase_energy = 1;
     while (1) {
-        i++;
+        interation++;
 
-        vekt2 ujv1 = ball1->v + F / m1 * tangens - diff1 * szorzo;
-        vekt2 ujv2 = ball2->v - F / m2 * tangens - diff2 * szorzo;
+        vekt2 new_v1 = ball1->v + tangential_impulse / mass1 * collision_plane - vperp1 * step;
+        vekt2 new_v2 = ball2->v - tangential_impulse / mass2 * collision_plane - vperp2 * step;
 
-        double ujenergia = m1 * ujv1 * ujv1 + m2 * ujv2 * ujv2 +
-                           theta1 * ball1->angular_velocity * ball1->angular_velocity +
-                           theta2 * ball2->angular_velocity * ball2->angular_velocity;
+        double new_energy = mass1 * new_v1 * new_v1 + mass2 * new_v2 * new_v2 +
+                            inertia1 * ball1->angular_velocity * ball1->angular_velocity +
+                            inertia2 * ball2->angular_velocity * ball2->angular_velocity;
 
-        if (felfele) {
-            if (ujenergia > oldenergia) {
-                felfele = 0;
+        if (increase_energy) {
+            if (new_energy > initial_energy) {
+                increase_energy = 0;
             } else {
-                szorzo *= 2.0;
-                dszorzo *= 2.0;
+                step *= 2.0;
+                adjust *= 2.0;
             }
         } else {
-            if (i == 30) {
-                ball1->v = ujv1;
-                ball2->v = ujv2;
-                if (fabs(ujenergia - oldenergia) > 0.001) {
-                    hiba("fabs( ujenergia - oldenergia ) > 0.001!");
+            if (interation == 30) {
+                ball1->v = new_v1;
+                ball2->v = new_v2;
+                if (fabs(new_energy - initial_energy) > 0.001) {
+                    hiba("fabs( new_energy - initial_energy ) > 0.001!");
                 }
                 break;
             }
 
-            if (ujenergia > oldenergia) {
-                szorzo -= dszorzo;
+            if (new_energy > initial_energy) {
+                step -= adjust;
             } else {
-                szorzo += dszorzo;
+                step += adjust;
             }
-            dszorzo *= 0.5001;
+            adjust *= 0.5001;
         }
     }
 
-    // double elteresenerg = ujenergia - energiateszt;
+    // double elteresenerg = new_energy - energiateszt;
     // if( elteresenerg > 0.0 )
     //	hiba( "elteresnergia > 0.0!" );
 }
 
-static int Balszel = 0, Jobbszel = SCREEN_WIDTH;
-static int Alsoszel = 0, Felsoszel = SCREEN_HEIGHT;
+static int WallLeft = 0, WallRight = SCREEN_WIDTH;
+static int WallTop = 0, WallBottom = SCREEN_HEIGHT;
 
 double ball_wall_collision_time(ball* ball, int wall) {
     if (WallsDisabled) {
         return NO_COLLISION_TIME;
     }
     switch (wall) {
-    case ALSO:
+    case Wall_Top:
         if (ball->v.y >= 0) {
             return NO_COLLISION_TIME;
         }
-        if (ball->keyframe_r.y <= Alsoszel + ball->radius) {
+        if (ball->keyframe_r.y <= WallTop + ball->radius) {
             return NO_COLLISION_TIME;
         }
-        return ball->keyframe_time - ((ball->keyframe_r.y - Alsoszel - ball->radius) / ball->v.y);
-    case FELSO:
+        return ball->keyframe_time - ((ball->keyframe_r.y - WallTop - ball->radius) / ball->v.y);
+    case Wall_Bottom:
         if (ball->v.y <= 0) {
             return NO_COLLISION_TIME;
         }
-        if (ball->keyframe_r.y >= Felsoszel - ball->radius) {
+        if (ball->keyframe_r.y >= WallBottom - ball->radius) {
             return NO_COLLISION_TIME;
         }
-        return ball->keyframe_time + ((Felsoszel - ball->radius - ball->keyframe_r.y) / ball->v.y);
-    case JOBB:
+        return ball->keyframe_time + ((WallBottom - ball->radius - ball->keyframe_r.y) / ball->v.y);
+    case Wall_Right:
         if (ball->v.x <= 0) {
             return NO_COLLISION_TIME;
         }
-        if (ball->keyframe_r.x >= Jobbszel - ball->radius) {
+        if (ball->keyframe_r.x >= WallRight - ball->radius) {
             return NO_COLLISION_TIME;
         }
-        return ball->keyframe_time + ((Jobbszel - ball->radius - ball->keyframe_r.x) / ball->v.x);
-    case BAL:
+        return ball->keyframe_time + ((WallRight - ball->radius - ball->keyframe_r.x) / ball->v.x);
+    case Wall_Left:
         if (ball->v.x >= 0) {
             return NO_COLLISION_TIME;
         }
-        if (ball->keyframe_r.x <= Balszel + ball->radius) {
+        if (ball->keyframe_r.x <= WallLeft + ball->radius) {
             return NO_COLLISION_TIME;
         }
-        return ball->keyframe_time - ((ball->keyframe_r.x - Balszel - ball->radius) / ball->v.x);
+        return ball->keyframe_time - ((ball->keyframe_r.x - WallLeft - ball->radius) / ball->v.x);
     }
     return (NO_COLLISION_TIME);
 }
@@ -203,14 +210,14 @@ void simulate_ball_wall_collision(ball* ball, int wall, double time) {
     if (WallsDisabled) {
         return;
     }
-    idoreigazit(ball, time);
+    update_keyframe(ball, time);
     switch (wall) {
-    case ALSO:
-    case FELSO:
+    case Wall_Top:
+    case Wall_Bottom:
         ball->v.y = -ball->v.y;
         break;
-    case JOBB:
-    case BAL:
+    case Wall_Right:
+    case Wall_Left:
         ball->v.x = -ball->v.x;
         break;
     }

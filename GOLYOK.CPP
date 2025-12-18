@@ -29,8 +29,8 @@ static void create_balls(void) {
             Balls[i].keyframe_time = 0.0;
             Balls[i].v.x = 0.0;
             Balls[i].v.y = 0.0;
-            Balls[i].keyframe_r.x = 320.0 + (x - 1) * 120.0;
-            Balls[i].keyframe_r.y = 240.0 + (y - 1) * 120.0;
+            Balls[i].keyframe_r.x = SCREEN_WIDTH / 2 + (x - 1) * 120.0;
+            Balls[i].keyframe_r.y = SCREEN_HEIGHT / 2 + (y - 1) * 120.0;
             Balls[i].keyframe_rotation = 0.0;
             Balls[i].current_rotation = 0.0;
             Balls[i].angular_velocity = 0.0;

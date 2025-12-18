@@ -11,6 +11,6 @@ void simulate_ball_wall_collision(ball* ball, int wall, double time);
 
 void update_keyframe(ball* m, double t);
 
-extern int WallsDisabled; // Ha ez igaz, golyok kimehetnek falon kivulre
+extern int WallsDisabled;
 
 #endif

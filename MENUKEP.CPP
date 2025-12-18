@@ -115,7 +115,7 @@ static void kirajzgolyo(vekt2 g, double r, pic8* forras) {
         }
     }
 
-    if (Nincsfal) {
+    if (WallsDisabled) {
         if (g.x < -500.0 || g.x > 1500.0 || g.y < -500.0 || g.y > 1500.0) {
             return;
         }

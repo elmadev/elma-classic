@@ -3,14 +3,14 @@
 
 enum { ALSO = 0, FELSO, JOBB, BAL };
 
-double ggutkozesideje(ball*, ball*);
-void ggutkozes(ball*, ball*, double t);
+double ball_ball_collision_time(ball* ball1, ball* ball2);
+void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time);
 
-double goutkozesideje(ball*, int);
-void goutkozes(ball*, int, double t);
+double ball_wall_collision_time(ball* ball, int wall);
+void simulate_ball_wall_collision(ball* ball, int wall, double time);
 
 void idoreigazit(ball* m, double t);
 
-extern int Nincsfal; // Ha ez igaz, golyok kimehetnek falon kivulre
+extern int WallsDisabled; // Ha ez igaz, golyok kimehetnek falon kivulre
 
 #endif

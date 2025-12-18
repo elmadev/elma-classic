@@ -190,7 +190,7 @@ void kilep( void ) {
 } */
 
 void kilep(void) {
-    Nincsfal = 1; // golyok ezentul kimenek falon kivulre
+    WallsDisabled = 1; // golyok ezentul kimenek falon kivulre
     szoveglista* pszovlist = new szoveglista;
     pszovlist->addszoveg_kozep("Thank you for registering the game!", 320, 220);
     pszovlist->addszoveg_kozep("Please do not distribute!", 320, 300);

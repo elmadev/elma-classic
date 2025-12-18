@@ -13,7 +13,7 @@ double next_collision_time(int* collider1, int* collider2) {
         for (j = i + 1; j < BallCount; j++) {
             // Update collision time if unknown
             if (CollisionTimeGrid[i][j] < -1) {
-                CollisionTimeGrid[i][j] = ggutkozesideje(&Balls[i], &Balls[j]);
+                CollisionTimeGrid[i][j] = ball_ball_collision_time(&Balls[i], &Balls[j]);
             }
             // Grab the earliest collision
             if (CollisionTimeGrid[i][j] < next_collision_time) {
@@ -26,7 +26,7 @@ double next_collision_time(int* collider1, int* collider2) {
         for (j = BallCount; j < BallCount + 4; j++) {
             // Update collision time if unknown
             if (CollisionTimeGrid[i][j] < -1) {
-                CollisionTimeGrid[i][j] = goutkozesideje(&Balls[i], j - BallCount);
+                CollisionTimeGrid[i][j] = ball_wall_collision_time(&Balls[i], j - BallCount);
             }
             // Grab the earliest collision
             if (CollisionTimeGrid[i][j] < next_collision_time) {
@@ -45,7 +45,8 @@ void simulate_collision(int collider1, int collider2) {
 
     // Ball-Ball collision
     if (collider2 < BallCount) {
-        ggutkozes(&Balls[collider1], &Balls[collider2], CollisionTimeGrid[collider1][collider2]);
+        simulate_ball_ball_collision(&Balls[collider1], &Balls[collider2],
+                                     CollisionTimeGrid[collider1][collider2]);
         // Reset all collision times of collider1 and collider2 to unknown
         for (i = 0; i < BallCount + 4; i++) {
             CollisionTimeGrid[collider1][i] = -2;
@@ -59,7 +60,8 @@ void simulate_collision(int collider1, int collider2) {
         return;
     }
     // Ball-Wall collision
-    goutkozes(&Balls[collider1], collider2 - BallCount, CollisionTimeGrid[collider1][collider2]);
+    simulate_ball_wall_collision(&Balls[collider1], collider2 - BallCount,
+                                 CollisionTimeGrid[collider1][collider2]);
     // Reset all collision times of collider1 to unknown
     for (i = 0; i < BallCount + 4; i++) {
         CollisionTimeGrid[collider1][i] = -2;

@@ -770,8 +770,8 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         if ((Single && befejezte1) || (!Single && befejezte1 && befejezte2)) {
             // Motor hangjat kikapcsolja:
-            setmotor(1, 1.0, 0.0001);
-            setmotor(0, 1.0, 0.0001);
+            setmotor(1, 1.0, 0);
+            setmotor(0, 1.0, 0);
             stopmotor(1);
             stopmotor(0);
             setsurlodas(0);
@@ -857,8 +857,8 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
                 fclose(h);
             }
             // Hang kikapcsolas:
-            setmotor(1, 1.0, 0.0001);
-            setmotor(0, 1.0, 0.0001);
+            setmotor(1, 1.0, 0);
+            setmotor(0, 1.0, 0);
             stopmotor(1);
             stopmotor(0);
             setsurlodas(0);

@@ -93,10 +93,6 @@ bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
     return false;
 }
 
-int pic8::get_width() { return width; }
-
-int pic8::get_height() { return height; }
-
 void pic8::ppixel(int x, int y, unsigned char index) {
     if (x < 0 || x >= width || y < 0 || y >= height) {
         return;

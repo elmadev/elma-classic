@@ -36,8 +36,8 @@ class pic8 {
     pic8(const char* filename, FILE* h = nullptr);
     ~pic8();
     bool save(const char* filename, unsigned char* pal = nullptr, FILE* h = nullptr);
-    int get_width();
-    int get_height();
+    int get_width() { return width; }
+    int get_height() { return height; }
     void ppixel(int x, int y, unsigned char index);
     unsigned char gpixel(int x, int y);
 #ifdef DEBUG

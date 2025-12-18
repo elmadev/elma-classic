@@ -1,5 +1,7 @@
 #include "ALL.H"
 
+static WallId wall_id(int collider) { return static_cast<WallId>(collider - BallCount); }
+
 // Returns the time of the next expected collision, as well as the ids of the two culprits
 double next_collision_time(int* collider1, int* collider2) {
     double next_collision_time = NO_COLLISION_TIME;
@@ -23,7 +25,7 @@ double next_collision_time(int* collider1, int* collider2) {
         for (int j = BallCount; j < BallCount + 4; j++) {
             // Update collision time if unknown
             if (CollisionTimeGrid[i][j] < -1) {
-                CollisionTimeGrid[i][j] = ball_wall_collision_time(&Balls[i], j - BallCount);
+                CollisionTimeGrid[i][j] = ball_wall_collision_time(&Balls[i], wall_id(j));
             }
             // Grab the earliest collision
             if (CollisionTimeGrid[i][j] < next_collision_time) {
@@ -55,7 +57,7 @@ void simulate_collision(int collider1, int collider2) {
         return;
     }
     // Ball-Wall collision
-    simulate_ball_wall_collision(&Balls[collider1], collider2 - BallCount,
+    simulate_ball_wall_collision(&Balls[collider1], wall_id(collider2),
                                  CollisionTimeGrid[collider1][collider2]);
     // Reset all collision times of collider1 to unknown
     for (int i = 0; i < BallCount + 4; i++) {

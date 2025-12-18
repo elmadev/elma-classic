@@ -171,12 +171,12 @@ static const int WallTop = 0;
 static const int WallBottom = SCREEN_HEIGHT;
 
 // Get collision time between a ball and wall
-double ball_wall_collision_time(ball* ball, int wall) {
+double ball_wall_collision_time(ball* ball, WallId wall) {
     if (WallsDisabled) {
         return NO_COLLISION_TIME;
     }
     switch (wall) {
-    case Wall_Top:
+    case WallId::Top:
         if (ball->v.y >= 0) {
             return NO_COLLISION_TIME;
         }
@@ -184,7 +184,7 @@ double ball_wall_collision_time(ball* ball, int wall) {
             return NO_COLLISION_TIME;
         }
         return ball->keyframe_time - ((ball->keyframe_r.y - WallTop - ball->radius) / ball->v.y);
-    case Wall_Bottom:
+    case WallId::Bottom:
         if (ball->v.y <= 0) {
             return NO_COLLISION_TIME;
         }
@@ -192,7 +192,7 @@ double ball_wall_collision_time(ball* ball, int wall) {
             return NO_COLLISION_TIME;
         }
         return ball->keyframe_time + ((WallBottom - ball->radius - ball->keyframe_r.y) / ball->v.y);
-    case Wall_Right:
+    case WallId::Right:
         if (ball->v.x <= 0) {
             return NO_COLLISION_TIME;
         }
@@ -200,7 +200,7 @@ double ball_wall_collision_time(ball* ball, int wall) {
             return NO_COLLISION_TIME;
         }
         return ball->keyframe_time + ((WallRight - ball->radius - ball->keyframe_r.x) / ball->v.x);
-    case Wall_Left:
+    case WallId::Left:
         if (ball->v.x >= 0) {
             return NO_COLLISION_TIME;
         }
@@ -213,18 +213,18 @@ double ball_wall_collision_time(ball* ball, int wall) {
 }
 
 // Simulate a collision between a ball and wall
-void simulate_ball_wall_collision(ball* ball, int wall, double time) {
+void simulate_ball_wall_collision(ball* ball, WallId wall, double time) {
     if (WallsDisabled) {
         return;
     }
     update_keyframe(ball, time);
     switch (wall) {
-    case Wall_Top:
-    case Wall_Bottom:
+    case WallId::Top:
+    case WallId::Bottom:
         ball->v.y = -ball->v.y;
         break;
-    case Wall_Right:
-    case Wall_Left:
+    case WallId::Right:
+    case WallId::Left:
         ball->v.x = -ball->v.x;
         break;
     }

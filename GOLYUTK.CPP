@@ -103,14 +103,15 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
     // Simulate a no-slip collision
     // When we calculate our effective mass, there is a bug here:
     // We use the effective mass of the system, but we accidentally use the first inertial factor
-    // twice
+    // twice instead of using mass_I1 and mass_I2
     double angular_v1 = ball1->angular_velocity;
     double angular_v2 = ball2->angular_velocity;
     double rad1 = ball1->radius;
     double rad2 = ball2->radius;
+    double mass_I1 = rad1 * rad1 / inertia1;
+    double effective_mass = 1.0 / mass1 + 1.0 / mass2 + mass_I1 + mass_I1; // Bug
     double tangential_impulse =
-        (vtang2 - vtang1 - angular_v1 * rad1 - angular_v2 * rad2) /
-        (1 / mass1 + 1 / mass2 + rad1 * rad1 / inertia1 + rad1 * rad1 / inertia1);
+        (vtang2 - vtang1 - angular_v1 * rad1 - angular_v2 * rad2) / effective_mass;
     tangential_impulse /= 2.0;
 
     // Update angular velocities

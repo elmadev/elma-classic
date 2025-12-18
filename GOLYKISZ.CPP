@@ -1,5 +1,6 @@
 #include "ALL.H"
 
+// Returns the time of the next expected collision, as well as the ids of the two culprits
 double next_collision_time(int* collider1, int* collider2) {
     double next_collision_time = NO_COLLISION_TIME;
     int i, j;
@@ -8,22 +9,26 @@ double next_collision_time(int* collider1, int* collider2) {
     *collider2 = 1;
 
     for (i = 0; i < BallCount; i++) {
-        // Golyo-Golyo:
+        // Check collision between two balls
         for (j = i + 1; j < BallCount; j++) {
+            // Update collision time if unknown
             if (CollisionTimeGrid[i][j] < -1) {
                 CollisionTimeGrid[i][j] = ggutkozesideje(&Balls[i], &Balls[j]);
             }
+            // Grab the earliest collision
             if (CollisionTimeGrid[i][j] < next_collision_time) {
                 next_collision_time = CollisionTimeGrid[i][j];
                 *collider1 = i;
                 *collider2 = j;
             }
         }
-        // Golyo-Oldal:
+        // Check collisions between ball and walls
         for (j = BallCount; j < BallCount + 4; j++) {
+            // Update collision time if unknown
             if (CollisionTimeGrid[i][j] < -1) {
                 CollisionTimeGrid[i][j] = goutkozesideje(&Balls[i], j - BallCount);
             }
+            // Grab the earliest collision
             if (CollisionTimeGrid[i][j] < next_collision_time) {
                 next_collision_time = CollisionTimeGrid[i][j];
                 *collider1 = i;
@@ -31,32 +36,35 @@ double next_collision_time(int* collider1, int* collider2) {
             }
         }
     }
+    // Return the time of the earliest collision
     return CollisionTimeGrid[*collider1][*collider2];
 }
 
 void simulate_collision(int collider1, int collider2) {
     int i;
 
-    // Golyo-Golyo:
+    // Ball-Ball collision
     if (collider2 < BallCount) {
         ggutkozes(&Balls[collider1], &Balls[collider2], CollisionTimeGrid[collider1][collider2]);
-        // Oszlopokat es sorokat ervenytelenit:
+        // Reset all collision times of collider1 and collider2 to unknown
         for (i = 0; i < BallCount + 4; i++) {
             CollisionTimeGrid[collider1][i] = -2;
             CollisionTimeGrid[collider2][i] = -2;
             if (i < BallCount) {
+                // (if i is not a wall)
                 CollisionTimeGrid[i][collider1] = -2;
                 CollisionTimeGrid[i][collider2] = -2;
             }
         }
         return;
     }
-    // Golyo-Oldal:
+    // Ball-Wall collision
     goutkozes(&Balls[collider1], collider2 - BallCount, CollisionTimeGrid[collider1][collider2]);
-    // Oszlopot ervenytelenit:
+    // Reset all collision times of collider1 to unknown
     for (i = 0; i < BallCount + 4; i++) {
         CollisionTimeGrid[collider1][i] = -2;
         if (i < BallCount) {
+            // (if i is not a wall)
             CollisionTimeGrid[i][collider1] = -2;
         }
     }

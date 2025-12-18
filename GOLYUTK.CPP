@@ -2,8 +2,6 @@
 
 bool WallsDisabled = false;
 
-static int Balls3D = 0;
-
 // Update keyframe time of one of the two balls so that the two balls are synchronized
 static void synchronize_keyframes(ball* ball1, ball* ball2) {
     if (ball1->keyframe_time < ball2->keyframe_time) {
@@ -76,21 +74,11 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
     update_keyframe(ball2, time);
 
     // Inertial calculations
-    double mass1, mass2;
-    double inertia1, inertia2;
-    if (Balls3D) {
-        // Simulate as 3D spheres (moment of inertia = 0.4 * m * r^2)
-        mass1 = ball1->radius * ball1->radius * ball1->radius;
-        mass2 = ball2->radius * ball2->radius * ball2->radius;
-        inertia1 = 0.4 * mass1 * ball1->radius * ball1->radius;
-        inertia2 = 0.4 * mass2 * ball2->radius * ball2->radius;
-    } else {
-        // Simulate as 2D disks (moment of inertia = 1/2 * m * r^2)
-        mass1 = ball1->radius * ball1->radius;
-        mass2 = ball2->radius * ball2->radius;
-        inertia1 = 0.5 * mass1 * ball1->radius * ball1->radius;
-        inertia2 = 0.5 * mass2 * ball2->radius * ball2->radius;
-    }
+    // Simulate as 2D disks (moment of inertia = 1/2 * m * r^2)
+    double mass1 = ball1->radius * ball1->radius;
+    double mass2 = ball2->radius * ball2->radius;
+    double inertia1 = 0.5 * mass1 * ball1->radius * ball1->radius;
+    double inertia2 = 0.5 * mass2 * ball2->radius * ball2->radius;
 
     // Center of mass frame of reference's velocity before collision
     double mass = mass1 + mass2;

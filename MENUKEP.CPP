@@ -40,7 +40,7 @@ void initmenukep1(void) {
     sisaktmp = NULL;
     Psisak->make_helmet_top();
 
-    initgolyo();
+    balls_init();
 }
 
 void initmenukep2(void) {
@@ -281,21 +281,21 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
         dt = 100.0;
     }
 
-    leptetgolyo(dt); // 12.0 volt regebben
+    balls_simulate(dt); // 12.0 volt regebben
 
     blit8(Tmpbuffer, Buffsima);
 
-    for (int i = 0; i < Ngolyok; i++) {
+    for (int i = 0; i < BallCount; i++) {
         if (nemkellgolyo || !State->animated_menus) {
             break;
         }
 
-        kirajzgolyo(Golyok[i].rmostani, Golyok[i].sug, Buffgolyo);
+        kirajzgolyo(Balls[i].current_r, Balls[i].radius, Buffgolyo);
 
-        vekt2 diff(Golyok[i].sug * 0.5 * cos(Golyok[i].alfamostani),
-                   Golyok[i].sug * 0.5 * sin(Golyok[i].alfamostani));
-        kirajzgolyo(Golyok[i].rmostani + diff, Golyok[i].sug * 0.25, Buffsima);
-        kirajzgolyo(Golyok[i].rmostani - diff, Golyok[i].sug * 0.25, Buffsima);
+        vekt2 diff(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
+                   Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
+        kirajzgolyo(Balls[i].current_r + diff, Balls[i].radius * 0.25, Buffsima);
+        kirajzgolyo(Balls[i].current_r - diff, Balls[i].radius * 0.25, Buffsima);
     }
     if (!nemkellgolyo) {
         pic8* sisakframe = NULL;
@@ -322,7 +322,7 @@ static double Animkezdete = 0.0;
 // Hamis ha animnak mar vege:
 int szoveglista::kirajzolanim(double ido) {
     if (Elsokiranim) {
-        leptetgolyo(0.000000001);
+        balls_simulate(0.000000001);
         Elsokiranim = 0;
         Animkezdete = ido;
 
@@ -349,21 +349,21 @@ int szoveglista::kirajzolanim(double ido) {
 
         Scrolly1 = 0;
         double yeltolas = 0.0;
-        for (int i = 0; i < Ngolyok; i++) {
+        for (int i = 0; i < BallCount; i++) {
             if (!State->animated_menus) {
                 break;
             }
 
-            Golyok[i].rmostani.y += yeltolas;
+            Balls[i].current_r.y += yeltolas;
 
-            kirajzgolyo(Golyok[i].rmostani, Golyok[i].sug, Buffgolyo);
+            kirajzgolyo(Balls[i].current_r, Balls[i].radius, Buffgolyo);
 
-            vekt2 diff(Golyok[i].sug * 0.5 * cos(Golyok[i].alfamostani),
-                       Golyok[i].sug * 0.5 * sin(Golyok[i].alfamostani));
-            kirajzgolyo(Golyok[i].rmostani + diff, Golyok[i].sug * 0.25, Buffsima);
-            kirajzgolyo(Golyok[i].rmostani - diff, Golyok[i].sug * 0.25, Buffsima);
+            vekt2 diff(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
+                       Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
+            kirajzgolyo(Balls[i].current_r + diff, Balls[i].radius * 0.25, Buffsima);
+            kirajzgolyo(Balls[i].current_r - diff, Balls[i].radius * 0.25, Buffsima);
 
-            Golyok[i].rmostani.y -= yeltolas;
+            Balls[i].current_r.y -= yeltolas;
         }
 
         // Rairjuk szovegeket:
@@ -407,21 +407,21 @@ int szoveglista::kirajzolanim(double ido) {
 
     Scrolly1 = SCREEN_HEIGHT - frame;
     double yeltolas = frame - double(SCREEN_HEIGHT);
-    for (int i = 0; i < Ngolyok; i++) {
+    for (int i = 0; i < BallCount; i++) {
         if (!State->animated_menus) {
             break;
         }
 
-        Golyok[i].rmostani.y += yeltolas;
+        Balls[i].current_r.y += yeltolas;
 
-        kirajzgolyo(Golyok[i].rmostani, Golyok[i].sug, Buffgolyo);
+        kirajzgolyo(Balls[i].current_r, Balls[i].radius, Buffgolyo);
 
-        vekt2 diff(Golyok[i].sug * 0.5 * cos(Golyok[i].alfamostani),
-                   Golyok[i].sug * 0.5 * sin(Golyok[i].alfamostani));
-        kirajzgolyo(Golyok[i].rmostani + diff, Golyok[i].sug * 0.25, Buffsima);
-        kirajzgolyo(Golyok[i].rmostani - diff, Golyok[i].sug * 0.25, Buffsima);
+        vekt2 diff(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
+                   Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
+        kirajzgolyo(Balls[i].current_r + diff, Balls[i].radius * 0.25, Buffsima);
+        kirajzgolyo(Balls[i].current_r - diff, Balls[i].radius * 0.25, Buffsima);
 
-        Golyok[i].rmostani.y -= yeltolas;
+        Balls[i].current_r.y -= yeltolas;
     }
 
     // Rairjuk szovegeket:
@@ -578,7 +578,7 @@ void menuproba(void) {
     if( dt > 100.0 )
         dt = 100.0;
 
-    leptetgolyo( dt ); // 12.0 volt regebben
+    balls_simulate( dt ); // 12.0 volt regebben
 
     // Kirakjuk hatteret:
     if( !Tmpbuffer ) // Ideiglenes
@@ -586,18 +586,18 @@ void menuproba(void) {
 
     blit8( Tmpbuffer, Buffsima );
 
-    for( int i = 0; i < Ngolyok; i++ ) {
+    for( int i = 0; i < BallCount; i++ ) {
         if( nemkellgolyo || !State->animated_menus )
             break;
 
-        kirajzgolyo( Golyok[i].rmostani, Golyok[i].sug, Buffgolyo );
+        kirajzgolyo( Balls[i].current_r, Balls[i].radius, Buffgolyo );
 
-        vekt2 diff( Golyok[i].sug*0.5*cos( Golyok[i].alfamostani ),
-                    Golyok[i].sug*0.5*sin( Golyok[i].alfamostani ) );
-        kirajzgolyo( Golyok[i].rmostani + diff,
-                    Golyok[i].sug*0.25, Buffsima );
-        kirajzgolyo( Golyok[i].rmostani - diff,
-                    Golyok[i].sug*0.25, Buffsima );
+        vekt2 diff( Balls[i].radius*0.5*cos( Balls[i].current_rotation ),
+                    Balls[i].radius*0.5*sin( Balls[i].current_rotation ) );
+        kirajzgolyo( Balls[i].current_r + diff,
+                    Balls[i].radius*0.25, Buffsima );
+        kirajzgolyo( Balls[i].current_r - diff,
+                    Balls[i].radius*0.25, Buffsima );
     }
     if( !nemkellgolyo ) {
         pic8* sisakframe = NULL;

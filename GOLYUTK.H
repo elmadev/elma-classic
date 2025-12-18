@@ -3,13 +3,13 @@
 
 enum { ALSO = 0, FELSO, JOBB, BAL };
 
-double ggutkozesideje(golyo*, golyo*);
-void ggutkozes(golyo*, golyo*, double t);
+double ggutkozesideje(ball*, ball*);
+void ggutkozes(ball*, ball*, double t);
 
-double goutkozesideje(golyo*, int);
-void goutkozes(golyo*, int, double t);
+double goutkozesideje(ball*, int);
+void goutkozes(ball*, int, double t);
 
-void idoreigazit(golyo* m, double t);
+void idoreigazit(ball* m, double t);
 
 // Visszaadja osszenergiat:
 double getenergia(void);

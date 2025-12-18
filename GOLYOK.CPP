@@ -1,42 +1,42 @@
 #include "ALL.H"
 
-double Hosszuido = 500000000.0;
+double NO_COLLISION_TIME = 500000000.0;
 
 double Maxgolyoseb = 0;
 
-int Ngolyok = 0;
-golyo* Golyok = NULL;
+int BallCount = 0;
+ball* Balls = NULL;
 int Konstrualva = 0;
-double** Idok = NULL;
+double** CollisionTimeGrid = NULL;
 
 static double Legkozelebbiutkozesideje = -2, Pillanatnyiido = 0;
 
 typedef double* duplaramutato;
 
 static void kitoltgolyokat(void) {
-    Ngolyok = 9;
-    Golyok = new golyo[Ngolyok];
+    BallCount = 9;
+    Balls = new ball[BallCount];
     // Nullazas:
     for (int x = 0; x < 3; x++) {
         for (int y = 0; y < 3; y++) {
             int i = y * 3 + x;
             if (x == 0) {
-                Golyok[i].sug = 24;
+                Balls[i].radius = 24;
             }
             if (x == 1) {
-                Golyok[i].sug = 30;
+                Balls[i].radius = 30;
             }
             if (x == 2) {
-                Golyok[i].sug = 50;
+                Balls[i].radius = 50;
             }
-            Golyok[i].t = 0;
-            Golyok[i].v.x = 0;
-            Golyok[i].v.y = 0;
-            Golyok[i].r.x = 320 + (x - 1) * 120;
-            Golyok[i].r.y = 240 + (y - 1) * 120;
-            Golyok[i].alfa = 0.0;
-            Golyok[i].alfamostani = 0.0;
-            Golyok[i].omega = 0.0;
+            Balls[i].keyframe_time = 0;
+            Balls[i].v.x = 0;
+            Balls[i].v.y = 0;
+            Balls[i].keyframe_r.x = 320 + (x - 1) * 120;
+            Balls[i].keyframe_r.y = 240 + (y - 1) * 120;
+            Balls[i].keyframe_rotation = 0.0;
+            Balls[i].current_rotation = 0.0;
+            Balls[i].angular_velocity = 0.0;
         }
     }
 
@@ -47,12 +47,12 @@ static void kitoltgolyokat(void) {
     alfa *= 0.999;
     alfa += 0.0005;
 
-    Golyok[0].v.x = -sin(alfa);
-    Golyok[0].v.y = -cos(alfa);
+    Balls[0].v.x = -sin(alfa);
+    Balls[0].v.y = -cos(alfa);
 }
 
 // Siker eseten igazzal ter vissza:
-void initgolyo(void) {
+void balls_init(void) {
     kitoltgolyokat();
 
     int sikerultlefoglalni;
@@ -62,37 +62,37 @@ void initgolyo(void) {
         hiba("Nem destrualtad golyokat!");
     }
     sikerultlefoglalni = 1;
-    Idok = new duplaramutato[Ngolyok + 4];
-    if (!Idok) {
+    CollisionTimeGrid = new duplaramutato[BallCount + 4];
+    if (!CollisionTimeGrid) {
         sikerultlefoglalni = 0;
     }
     if (sikerultlefoglalni) {
-        for (int i = 0; i < Ngolyok + 4; i++) {
-            Idok[i] = NULL;
+        for (int i = 0; i < BallCount + 4; i++) {
+            CollisionTimeGrid[i] = NULL;
         }
     }
     if (sikerultlefoglalni) {
-        for (int i = 0; i < Ngolyok + 4 && sikerultlefoglalni; i++) {
-            Idok[i] = new double[Ngolyok + 4];
-            if (Idok[i]) {
-                for (int j = 0; j < Ngolyok + 4; j++) {
-                    Idok[i][j] = -2;
+        for (int i = 0; i < BallCount + 4 && sikerultlefoglalni; i++) {
+            CollisionTimeGrid[i] = new double[BallCount + 4];
+            if (CollisionTimeGrid[i]) {
+                for (int j = 0; j < BallCount + 4; j++) {
+                    CollisionTimeGrid[i][j] = -2;
                 }
             }
-            if (!Idok[i]) {
+            if (!CollisionTimeGrid[i]) {
                 sikerultlefoglalni = 0;
             }
         }
     }
     if (!sikerultlefoglalni) {
-        if (Idok) {
-            for (int i = 0; i < Ngolyok + 4; i++) {
-                if (Idok[i]) {
-                    delete Idok[i];
+        if (CollisionTimeGrid) {
+            for (int i = 0; i < BallCount + 4; i++) {
+                if (CollisionTimeGrid[i]) {
+                    delete CollisionTimeGrid[i];
                 }
             }
-            delete Idok;
-            Idok = NULL;
+            delete CollisionTimeGrid;
+            CollisionTimeGrid = NULL;
         }
         hiba("Out of memory!");
     }
@@ -104,23 +104,23 @@ void initgolyo(void) {
     int i;
 
     if( Konstrualva ) {
-        for( i = 0; i < Ngolyok; i ++ )
-            delete Idok[i];
-        delete Idok;
-        Idok = NULL;
+        for( i = 0; i < BallCount; i ++ )
+            delete CollisionTimeGrid[i];
+        delete CollisionTimeGrid;
+        CollisionTimeGrid = NULL;
         Konstrualva = 0;
     }
 } */
 
 static double Kezdoszamlalo = 0.0;
 
-void leptetgolyo(double stept) {
+void balls_simulate(double dt) {
     if (Kezdoszamlalo < 1.0 /*400.0*/) {
-        Kezdoszamlalo += stept;
-        stept = 0.00000000001;
+        Kezdoszamlalo += dt;
+        dt = 0.00000000001;
     }
 
-    // stept *= 2.0;
+    // dt *= 2.0;
 
     if (!Konstrualva) {
         hiba("Nem konstrualtad golyokat!");
@@ -129,64 +129,66 @@ void leptetgolyo(double stept) {
 
     // Kiszamoljuk osszenergiat:
     /*double sum = 0.0;
-    for( int i = 0; i < Ngolyok; i++ )
-        sum += Golyok[i].v.x*Golyok[i].v.x + Golyok[i].v.y*Golyok[i].v.y;
+    for( int i = 0; i < BallCount; i++ )
+        sum += Balls[i].v.x*Balls[i].v.x + Balls[i].v.y*Balls[i].v.y;
 
     sum = sqrt( sum );
     // Korrigaljuk energiat:
-    stept /= sum;*/
+    dt /= sum;*/
 
     // Atmasolja mostani r-t regi r-be:
-    // for( int i = 0; i < Ngolyok; i++ ) {
-    //	Golyok[i].relozo.x = Golyok[i].rmostani.x;
-    //	Golyok[i].relozo.y = Golyok[i].rmostani.y;
+    // for( int i = 0; i < BallCount; i++ ) {
+    //	Balls[i].relozo.x = Balls[i].current_r.x;
+    //	Balls[i].relozo.y = Balls[i].current_r.y;
     //}
 
     // Most jon az a resz, ami biztositja, hogy ha nincs utkozes ne kelljen
     // sokat szamolni (Egyszeruen kihagyja hatso reszt):
-    if (Legkozelebbiutkozesideje > -1 && Legkozelebbiutkozesideje > Pillanatnyiido + stept) {
-        Pillanatnyiido += stept;
-        for (int i = 0; i < Ngolyok; i++) {
-            Golyok[i].rmostani = Golyok[i].r + (Pillanatnyiido * Golyok[i].v);
-            Golyok[i].alfamostani = Golyok[i].alfa + (Pillanatnyiido * Golyok[i].omega);
+    if (Legkozelebbiutkozesideje > -1 && Legkozelebbiutkozesideje > Pillanatnyiido + dt) {
+        Pillanatnyiido += dt;
+        for (int i = 0; i < BallCount; i++) {
+            Balls[i].current_r = Balls[i].keyframe_r + (Pillanatnyiido * Balls[i].v);
+            Balls[i].current_rotation =
+                Balls[i].keyframe_rotation + (Pillanatnyiido * Balls[i].angular_velocity);
         }
         return;
     }
 
-    stept += Pillanatnyiido;
+    dt += Pillanatnyiido;
 
     int done = 0;
     while (!done) {
         int x, y;
         Legkozelebbiutkozesideje = megkeresidot(&x, &y);
-        // if( Legkozelebbiutkozesideje > Hosszuido-1.0 ) {
+        // if( Legkozelebbiutkozesideje > NO_COLLISION_TIME-1.0 ) {
         //	Maxgolyoseb = 0;
         //	return;
         // }
-        if (Legkozelebbiutkozesideje > stept) {
+        if (Legkozelebbiutkozesideje > dt) {
             done = 1;
         } else {
             utkoztet(x, y);
         }
     }
-    // stept idore igazit minden golyot es lenullazza idejet:
-    for (int i = 0; i < Ngolyok; i++) {
-        // dsvlet( &Golyok[i].r, dsvossz( &Golyok[i].r,
-        //					dsvmul( stept-Golyok[i].t, &Golyok[i].v ) ) );
-        Golyok[i].r = Golyok[i].r + ((stept - Golyok[i].t) * Golyok[i].v);
-        Golyok[i].rmostani = Golyok[i].r;
-        Golyok[i].alfa = Golyok[i].alfa + ((stept - Golyok[i].t) * Golyok[i].omega);
-        Golyok[i].alfamostani = Golyok[i].alfa;
-        Golyok[i].t = 0;
+    // dt idore igazit minden golyot es lenullazza idejet:
+    for (int i = 0; i < BallCount; i++) {
+        // dsvlet( &Balls[i].keyframe_r, dsvossz( &Balls[i].keyframe_r,
+        //					dsvmul( dt-Balls[i].t, &Balls[i].v ) ) );
+        Balls[i].keyframe_r = Balls[i].keyframe_r + ((dt - Balls[i].keyframe_time) * Balls[i].v);
+        Balls[i].current_r = Balls[i].keyframe_r;
+        Balls[i].keyframe_rotation = Balls[i].keyframe_rotation +
+                                     ((dt - Balls[i].keyframe_time) * Balls[i].angular_velocity);
+        Balls[i].current_rotation = Balls[i].keyframe_rotation;
+        Balls[i].keyframe_time = 0;
     }
-    // Idok tablaban mindenbol kivon stept idot:
-    for (int i = 0; i < Ngolyok; i++) {
-        for (int j = i + 1; j < Ngolyok + 4; j++) {
-            Idok[i][j] -= stept;
+    // CollisionTimeGrid tablaban mindenbol kivon dt idot:
+    for (int i = 0; i < BallCount; i++) {
+        for (int j = i + 1; j < BallCount + 4; j++) {
+            CollisionTimeGrid[i][j] -= dt;
         }
     }
     Pillanatnyiido = 0;
-    Legkozelebbiutkozesideje -= stept;
+    Legkozelebbiutkozesideje -= dt;
 }
 
 /*void ujraszamol( void ) {

@@ -1,63 +1,63 @@
 #include "ALL.H"
 
 double megkeresidot(int* xlegjobb, int* ylegjobb) {
-    double eddigilegjobbt = Hosszuido;
+    double eddigilegjobbt = NO_COLLISION_TIME;
     int x, y;
 
     *xlegjobb = 0;
     *ylegjobb = 1;
 
-    for (x = 0; x < Ngolyok; x++) {
+    for (x = 0; x < BallCount; x++) {
         // Golyo-Golyo:
-        for (y = x + 1; y < Ngolyok; y++) {
-            if (Idok[x][y] < -1) {
-                Idok[x][y] = ggutkozesideje(&Golyok[x], &Golyok[y]);
+        for (y = x + 1; y < BallCount; y++) {
+            if (CollisionTimeGrid[x][y] < -1) {
+                CollisionTimeGrid[x][y] = ggutkozesideje(&Balls[x], &Balls[y]);
             }
-            if (Idok[x][y] < eddigilegjobbt) {
-                eddigilegjobbt = Idok[x][y];
+            if (CollisionTimeGrid[x][y] < eddigilegjobbt) {
+                eddigilegjobbt = CollisionTimeGrid[x][y];
                 *xlegjobb = x;
                 *ylegjobb = y;
             }
         }
         // Golyo-Oldal:
-        for (y = Ngolyok; y < Ngolyok + 4; y++) {
-            if (Idok[x][y] < -1) {
-                Idok[x][y] = goutkozesideje(&Golyok[x], y - Ngolyok);
+        for (y = BallCount; y < BallCount + 4; y++) {
+            if (CollisionTimeGrid[x][y] < -1) {
+                CollisionTimeGrid[x][y] = goutkozesideje(&Balls[x], y - BallCount);
             }
-            if (Idok[x][y] < eddigilegjobbt) {
-                eddigilegjobbt = Idok[x][y];
+            if (CollisionTimeGrid[x][y] < eddigilegjobbt) {
+                eddigilegjobbt = CollisionTimeGrid[x][y];
                 *xlegjobb = x;
                 *ylegjobb = y;
             }
         }
     }
-    return Idok[*xlegjobb][*ylegjobb];
+    return CollisionTimeGrid[*xlegjobb][*ylegjobb];
 }
 
 void utkoztet(int x, int y) {
     int i;
 
     // Golyo-Golyo:
-    if (y < Ngolyok) {
-        ggutkozes(&Golyok[x], &Golyok[y], Idok[x][y]);
+    if (y < BallCount) {
+        ggutkozes(&Balls[x], &Balls[y], CollisionTimeGrid[x][y]);
         // Oszlopokat es sorokat ervenytelenit:
-        for (i = 0; i < Ngolyok + 4; i++) {
-            Idok[x][i] = -2;
-            Idok[y][i] = -2;
-            if (i < Ngolyok) {
-                Idok[i][x] = -2;
-                Idok[i][y] = -2;
+        for (i = 0; i < BallCount + 4; i++) {
+            CollisionTimeGrid[x][i] = -2;
+            CollisionTimeGrid[y][i] = -2;
+            if (i < BallCount) {
+                CollisionTimeGrid[i][x] = -2;
+                CollisionTimeGrid[i][y] = -2;
             }
         }
         return;
     }
     // Golyo-Oldal:
-    goutkozes(&Golyok[x], y - Ngolyok, Idok[x][y]);
+    goutkozes(&Balls[x], y - BallCount, CollisionTimeGrid[x][y]);
     // Oszlopot ervenytelenit:
-    for (i = 0; i < Ngolyok + 4; i++) {
-        Idok[x][i] = -2;
-        if (i < Ngolyok) {
-            Idok[i][x] = -2;
+    for (i = 0; i < BallCount + 4; i++) {
+        CollisionTimeGrid[x][i] = -2;
+        if (i < BallCount) {
+            CollisionTimeGrid[i][x] = -2;
         }
     }
 }

@@ -2,27 +2,27 @@
 #define GOLYOK_H
 
 typedef struct {
-    vekt2 r,
+    vekt2 keyframe_r,
         // relozo,
-        rmostani, v;
-    double alfa, alfamostani, omega;
-    double sug;
-    double t;
-} golyo;
+        current_r, v;
+    double keyframe_rotation, current_rotation, angular_velocity;
+    double radius;
+    double keyframe_time;
+} ball;
 
-void initgolyo(void);
-void leptetgolyo(double stept);
+void balls_init(void);
+void balls_simulate(double dt);
 // void ujraszamol( void );
 // void idoreigazitmindet( void );
 
-extern int Ngolyok;
-extern golyo* Golyok;
+extern int BallCount;
+extern ball* Balls;
 
-extern double Hosszuido;
+extern double NO_COLLISION_TIME;
 
 extern int Konstrualva;
 
-extern double** Idok;
+extern double** CollisionTimeGrid;
 extern double* T;
 
 #endif

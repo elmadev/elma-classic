@@ -83,56 +83,56 @@ void options(void) {
         }
 
         // Jatekos valasztas:
-        sprintf(Rubrikak[1 + vantagis], "Player A:");
-        sprintf(Rubrikak_tab[1 + vantagis], State->player1);
+        strcpy(Rubrikak[1 + vantagis], "Player A:");
+        strcpy(Rubrikak_tab[1 + vantagis], State->player1);
 
-        sprintf(Rubrikak[2 + vantagis], "Player B:");
-        sprintf(Rubrikak_tab[2 + vantagis], State->player2);
+        strcpy(Rubrikak[2 + vantagis], "Player B:");
+        strcpy(Rubrikak_tab[2 + vantagis], State->player2);
 
         strcpy(Rubrikak[3 + vantagis], "Sound:");
         if (State->sound_on) {
-            sprintf(Rubrikak_tab[3 + vantagis], "Enabled");
+            strcpy(Rubrikak_tab[3 + vantagis], "Enabled");
         } else {
-            sprintf(Rubrikak_tab[3 + vantagis], "Disabled");
+            strcpy(Rubrikak_tab[3 + vantagis], "Disabled");
         }
 
         strcpy(Rubrikak[4 + vantagis], "Sound Optimization:");
         if (State->compatibility_mode) {
-            sprintf(Rubrikak_tab[4 + vantagis], "Compatibility");
+            strcpy(Rubrikak_tab[4 + vantagis], "Compatibility");
         } else {
-            sprintf(Rubrikak_tab[4 + vantagis], "Best Quality");
+            strcpy(Rubrikak_tab[4 + vantagis], "Best Quality");
         }
 
-        sprintf(Rubrikak[5 + vantagis], "Animated Menus:");
+        strcpy(Rubrikak[5 + vantagis], "Animated Menus:");
         if (State->animated_menus) {
-            sprintf(Rubrikak_tab[5 + vantagis], "Yes");
+            strcpy(Rubrikak_tab[5 + vantagis], "Yes");
         } else {
-            sprintf(Rubrikak_tab[5 + vantagis], "No");
+            strcpy(Rubrikak_tab[5 + vantagis], "No");
         }
 
-        sprintf(Rubrikak[6 + vantagis], "Video Detail:");
+        strcpy(Rubrikak[6 + vantagis], "Video Detail:");
         if (State->high_quality) {
-            sprintf(Rubrikak_tab[6 + vantagis], "High");
+            strcpy(Rubrikak_tab[6 + vantagis], "High");
         } else {
-            sprintf(Rubrikak_tab[6 + vantagis], "Low");
+            strcpy(Rubrikak_tab[6 + vantagis], "Low");
         }
 
-        sprintf(Rubrikak[7 + vantagis], "Animated Objects:");
+        strcpy(Rubrikak[7 + vantagis], "Animated Objects:");
         if (State->animated_objects) {
-            sprintf(Rubrikak_tab[7 + vantagis], "Yes");
+            strcpy(Rubrikak_tab[7 + vantagis], "Yes");
         } else {
-            sprintf(Rubrikak_tab[7 + vantagis], "No");
+            strcpy(Rubrikak_tab[7 + vantagis], "No");
         }
 
-        sprintf(Rubrikak[8 + vantagis], "Swap Bikes:");
+        strcpy(Rubrikak[8 + vantagis], "Swap Bikes:");
         if (State->player1_bike1) {
-            sprintf(Rubrikak_tab[8 + vantagis], "No");
+            strcpy(Rubrikak_tab[8 + vantagis], "No");
         } else {
-            sprintf(Rubrikak_tab[8 + vantagis], "Yes");
+            strcpy(Rubrikak_tab[8 + vantagis], "Yes");
         }
 
-        sprintf(Rubrikak[9 + vantagis], "Customize Controls ...");
-        sprintf(Rubrikak_tab[9 + vantagis], "");
+        strcpy(Rubrikak[9 + vantagis], "Customize Controls ...");
+        strcpy(Rubrikak_tab[9 + vantagis], "");
 
         val.bead(10 + vantagis, 1);
 

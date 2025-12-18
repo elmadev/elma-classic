@@ -73,7 +73,7 @@ needs_stub = true
 
 cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
-    cpp_args = ['/D_CRT_SECURE_NO_WARNINGS']
+    cpp_args = []
     if host_machine.cpu_family() == 'x86'
         win_subsystem = 'windows'
         needs_stub = false

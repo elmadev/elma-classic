@@ -185,13 +185,13 @@ static void write_stats_topten(FILE* h, topten* tten, bool single) {
         char time_text[40];
         centiseconds_to_string(tten->times[i], time_text, true);
         fprintf(h, "    ");
-        fprintf(h, time_text);
+        fprintf(h, "%s", time_text);
 
         for (int alignment = 0; alignment < (12 - strlen(time_text)); alignment++) {
             fprintf(h, " ");
         }
 
-        fprintf(h, tten->names1[i]);
+        fprintf(h, "%s", tten->names1[i]);
         if (!single) {
             fprintf(h, ", %s", tten->names2[i]);
         }
@@ -231,7 +231,7 @@ void state::write_stats_anonymous_total_time(FILE* h, bool single, const char* t
 
     char time_text[40];
     centiseconds_to_string(total_time, time_text, true);
-    fprintf(h, time_text);
+    fprintf(h, "%s", time_text);
     fprintf(h, "\n\n");
 }
 
@@ -272,7 +272,7 @@ void state::write_stats_player_total_time(FILE* h, const char* player_name, bool
     }
     char time_text[40];
     centiseconds_to_string(total_time, time_text, true);
-    fprintf(h, time_text);
+    fprintf(h, "%s", time_text);
     for (int alignment = 0; alignment < (12 - strlen(time_text)); alignment++) {
         fprintf(h, " ");
     }

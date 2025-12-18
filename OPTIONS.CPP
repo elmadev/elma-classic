@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "eol_settings.h"
 
 int Hangmarmegy = 0;
 
@@ -134,7 +135,14 @@ void options(void) {
         strcpy(Rubrikak[9 + vantagis], "Customize Controls ...");
         strcpy(Rubrikak_tab[9 + vantagis], "");
 
-        val.bead(10 + vantagis, 1);
+        sprintf(Rubrikak[10 + vantagis], "Pics In Background:");
+        if (EolSettings->pictures_in_background) {
+            sprintf(Rubrikak_tab[10 + vantagis], "Yes");
+        } else {
+            sprintf(Rubrikak_tab[10 + vantagis], "No");
+        }
+
+        val.bead(11 + vantagis, 1);
 
         kurrens = val.valassz();
 
@@ -209,6 +217,11 @@ void options(void) {
 
         if (kurrens == 9) {
             customize();
+        }
+
+        if (kurrens == 10) {
+            EolSettings->pictures_in_background = !EolSettings->pictures_in_background;
+            invalidate_level();
         }
 
         if (vantagis) { // Visszaalitjuk eredeti helyzetebe

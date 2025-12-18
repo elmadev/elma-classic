@@ -20,7 +20,7 @@ extern ball* Balls;
 
 extern double NO_COLLISION_TIME;
 
-extern int Konstrualva;
+extern int BallsInitialized;
 
 extern double** CollisionTimeGrid;
 extern double* T;

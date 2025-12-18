@@ -142,7 +142,14 @@ void options(void) {
             strcpy(Rubrikak_tab[10 + vantagis], "No");
         }
 
-        val.bead(11 + vantagis, 1);
+        strcpy(Rubrikak[11 + vantagis], "Centered Camera:");
+        if (EolSettings->center_camera) {
+            strcpy(Rubrikak_tab[11 + vantagis], "Yes");
+        } else {
+            strcpy(Rubrikak_tab[11 + vantagis], "No");
+        }
+
+        val.bead(12 + vantagis, 1);
 
         kurrens = val.valassz();
 
@@ -222,6 +229,10 @@ void options(void) {
         if (kurrens == 10) {
             EolSettings->pictures_in_background = !EolSettings->pictures_in_background;
             invalidate_level();
+        }
+
+        if (kurrens == 11) {
+            EolSettings->center_camera = !EolSettings->center_camera;
         }
 
         if (vantagis) { // Visszaalitjuk eredeti helyzetebe

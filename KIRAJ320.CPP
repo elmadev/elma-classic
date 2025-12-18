@@ -200,7 +200,22 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vekt2 motorkozep, m
     vekt2 sarokbolkozepre(Viewxsize_d * (szeltoltav + baljobb * atfuthossz), Viewysize_d / 2);
     vekt2 sarok = motorkozep - sarokbolkozepre;
 
-    int vx1 = Viewxorig + baljobb * Viewxtolas;
+    double align;
+    switch (EolSettings->map_alignment) {
+    case MapAlignment::None:
+        align = baljobb;
+        break;
+    case MapAlignment::Left:
+        align = 0.0;
+        break;
+    case MapAlignment::Middle:
+        align = 0.5;
+        break;
+    case MapAlignment::Right:
+        align = 1.0;
+        break;
+    }
+    int vx1 = Viewxorig + align * Viewxtolas;
     int vx2 = vx1 + Viewxsize - 1;
     int vy1 = 1;
     int vy2 = vy1 + Viewysize - 1;

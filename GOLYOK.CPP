@@ -165,21 +165,3 @@ void balls_simulate(double dt) {
     ElapsedTimeSinceKeyframe = 0;
     NextCollisionTime -= dt;
 }
-
-/*void ujraszamol( void ) {
-    for( int i = 0; i < Ngolyok; i++ )
-        for( int j = i+1; j < Ngolyok+4; j++ )
-            Idok[i][j] = -2;
-    Legkozelebbiutkozesideje = -2;
-    Pillanatnyiido = 0;
-}
-
-void idoreigazitmindet( void ) {
-    for( int i = 0; i < Ngolyok; i++ ) {
-        //dsvlet( &Golyok[i].r, dsvossz( &Golyok[i].r,
-        //		dsvmul( Pillanatnyiido-Golyok[i].t, &Golyok[i].v ) ) );
-        Golyok[i].r = Golyok[i].r +
-                        ((Pillanatnyiido-Golyok[i].t) * Golyok[i].v);
-        Golyok[i].t = 0;
-    }
-} */

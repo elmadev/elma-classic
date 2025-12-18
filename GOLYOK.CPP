@@ -1,51 +1,47 @@
 #include "ALL.H"
 
-double NO_COLLISION_TIME = 500000000.0;
-
-double Maxgolyoseb = 0;
-
 int BallCount = 0;
-ball* Balls = NULL;
-int BallsInitialized = 0;
-double** CollisionTimeGrid = NULL;
+ball* Balls = nullptr;
+bool BallsInitialized = false;
+double** CollisionTimeGrid = nullptr;
 
-static double NextCollisionTime = -2, ElapsedTimeSinceKeyframe = 0;
+static double NextCollisionTime = UNKNOWN_COLLISION_TIME;
+static double ElapsedTimeSinceKeyframe = 0.0;
 
-typedef double* duplaramutato;
+static const int InitColumns = 3;
+static const int InitRows = 3;
 
 static void create_balls(void) {
-    BallCount = 9;
+    BallCount = InitColumns * InitRows;
     Balls = new ball[BallCount];
-    for (int x = 0; x < 3; x++) {
-        for (int y = 0; y < 3; y++) {
-            int i = y * 3 + x;
+    for (int x = 0; x < InitColumns; x++) {
+        for (int y = 0; y < InitRows; y++) {
+            int i = y * InitRows + x;
             if (x == 0) {
-                Balls[i].radius = 24;
+                Balls[i].radius = 24.0;
             }
             if (x == 1) {
-                Balls[i].radius = 30;
+                Balls[i].radius = 30.0;
             }
             if (x == 2) {
-                Balls[i].radius = 50;
+                Balls[i].radius = 50.0;
             }
-            Balls[i].keyframe_time = 0;
-            Balls[i].v.x = 0;
-            Balls[i].v.y = 0;
-            Balls[i].keyframe_r.x = 320 + (x - 1) * 120;
-            Balls[i].keyframe_r.y = 240 + (y - 1) * 120;
+            Balls[i].keyframe_time = 0.0;
+            Balls[i].v.x = 0.0;
+            Balls[i].v.y = 0.0;
+            Balls[i].keyframe_r.x = 320.0 + (x - 1) * 120.0;
+            Balls[i].keyframe_r.y = 240.0 + (y - 1) * 120.0;
             Balls[i].keyframe_rotation = 0.0;
             Balls[i].current_rotation = 0.0;
             Balls[i].angular_velocity = 0.0;
         }
     }
-
     // Choose a random starting angle for the top-left ball
-    srand(time(NULL));
+    srand((unsigned int)time(nullptr));
     double angle = s_random(1000);
     angle *= K_pip2 / 1000.0;
     angle *= 0.999;
     angle += 0.0005;
-
     Balls[0].v.x = -sin(angle);
     Balls[0].v.y = -cos(angle);
 }
@@ -57,20 +53,19 @@ void balls_init(void) {
     // Create collision grid
     // Allocate a 2D grid of width and height BallCount+4
     // The last 4 elements represent the 4 walls
-    int allocation_success;
-    NextCollisionTime = -2;
-    ElapsedTimeSinceKeyframe = 0;
+    NextCollisionTime = UNKNOWN_COLLISION_TIME;
+    ElapsedTimeSinceKeyframe = 0.0;
     if (BallsInitialized) {
         hiba("Balls already initialized!");
     }
-    allocation_success = 1;
-    CollisionTimeGrid = new duplaramutato[BallCount + 4];
+    bool allocation_success = true;
+    CollisionTimeGrid = new double*[BallCount + 4];
     if (!CollisionTimeGrid) {
-        allocation_success = 0;
+        allocation_success = false;
     }
     if (allocation_success) {
         for (int i = 0; i < BallCount + 4; i++) {
-            CollisionTimeGrid[i] = NULL;
+            CollisionTimeGrid[i] = nullptr;
         }
     }
     if (allocation_success) {
@@ -78,11 +73,11 @@ void balls_init(void) {
             CollisionTimeGrid[i] = new double[BallCount + 4];
             if (CollisionTimeGrid[i]) {
                 for (int j = 0; j < BallCount + 4; j++) {
-                    CollisionTimeGrid[i][j] = -2;
+                    CollisionTimeGrid[i][j] = UNKNOWN_COLLISION_TIME;
                 }
             }
             if (!CollisionTimeGrid[i]) {
-                allocation_success = 0;
+                allocation_success = false;
             }
         }
     }
@@ -94,12 +89,11 @@ void balls_init(void) {
                 }
             }
             delete CollisionTimeGrid;
-            CollisionTimeGrid = NULL;
+            CollisionTimeGrid = nullptr;
         }
         hiba("Out of memory!");
     }
-
-    BallsInitialized = 1;
+    BallsInitialized = true;
 }
 
 static double FirstTimeDelay = 0.0;
@@ -118,8 +112,9 @@ void balls_simulate(double dt) {
     }
 
     // If no collision occurs during dt, then just update position
-    if (NextCollisionTime > -1 && NextCollisionTime > ElapsedTimeSinceKeyframe + dt) {
-        ElapsedTimeSinceKeyframe += dt;
+    double current_time = ElapsedTimeSinceKeyframe + dt;
+    if (NextCollisionTime > -1 && NextCollisionTime > current_time) {
+        ElapsedTimeSinceKeyframe = current_time;
         for (int i = 0; i < BallCount; i++) {
             Balls[i].current_r = Balls[i].keyframe_r + (ElapsedTimeSinceKeyframe * Balls[i].v);
             Balls[i].current_rotation =
@@ -130,38 +125,36 @@ void balls_simulate(double dt) {
 
     // At least one collision will occur during dt
     // Or alternatively, some collision times are unknown
-    dt += ElapsedTimeSinceKeyframe;
-
     // Handle all the collisions
-    int done = 0;
-    while (!done) {
+    while (true) {
         // Update all the collision times and get the next collision time
         int collider1, collider2;
         NextCollisionTime = next_collision_time(&collider1, &collider2);
         // Handle one collision
-        if (NextCollisionTime > dt) {
-            done = 1;
-        } else {
-            simulate_collision(collider1, collider2);
+        if (NextCollisionTime > current_time) {
+            break;
         }
+        simulate_collision(collider1, collider2);
     }
     // Update keyframe position time of all the balls to the current time
     for (int i = 0; i < BallCount; i++) {
-        Balls[i].keyframe_r = Balls[i].keyframe_r + ((dt - Balls[i].keyframe_time) * Balls[i].v);
+        Balls[i].keyframe_r =
+            Balls[i].keyframe_r + ((current_time - Balls[i].keyframe_time) * Balls[i].v);
         Balls[i].current_r = Balls[i].keyframe_r;
-        Balls[i].keyframe_rotation = Balls[i].keyframe_rotation +
-                                     ((dt - Balls[i].keyframe_time) * Balls[i].angular_velocity);
+        Balls[i].keyframe_rotation =
+            Balls[i].keyframe_rotation +
+            ((current_time - Balls[i].keyframe_time) * Balls[i].angular_velocity);
         Balls[i].current_rotation = Balls[i].keyframe_rotation;
         Balls[i].keyframe_time = 0;
     }
     // Update collision time to be relative to current time, skipping unused parts of the grid
     for (int i = 0; i < BallCount; i++) {
         for (int j = i + 1; j < BallCount + 4; j++) {
-            CollisionTimeGrid[i][j] -= dt;
+            CollisionTimeGrid[i][j] -= current_time;
         }
     }
 
     // Reset keyframe time to current time
-    ElapsedTimeSinceKeyframe = 0;
-    NextCollisionTime -= dt;
+    ElapsedTimeSinceKeyframe = 0.0;
+    NextCollisionTime -= current_time;
 }

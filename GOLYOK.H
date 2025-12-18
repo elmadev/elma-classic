@@ -1,26 +1,25 @@
 #ifndef GOLYOK_H
 #define GOLYOK_H
 
-typedef struct {
-    vekt2 keyframe_r,
-        // relozo,
-        current_r, v;
-    double keyframe_rotation, current_rotation, angular_velocity;
+constexpr double UNKNOWN_COLLISION_TIME = -2.0;
+constexpr double NO_COLLISION_TIME = 500000000.0;
+
+struct ball {
+    vekt2 keyframe_r;
+    vekt2 current_r;
+    vekt2 v;
+    double keyframe_rotation;
+    double current_rotation;
+    double angular_velocity;
     double radius;
     double keyframe_time;
-} ball;
+};
 
-void balls_init(void);
+void balls_init();
 void balls_simulate(double dt);
 
 extern int BallCount;
 extern ball* Balls;
-
-extern double NO_COLLISION_TIME;
-
-extern int BallsInitialized;
-
 extern double** CollisionTimeGrid;
-extern double* T;
 
 #endif

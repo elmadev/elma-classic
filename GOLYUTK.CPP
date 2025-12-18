@@ -2,31 +2,21 @@
 
 bool WallsDisabled = false;
 
-// Update keyframe time of one of the two balls so that the two balls are synchronized
-static void synchronize_keyframes(ball* ball1, ball* ball2) {
-    if (ball1->keyframe_time < ball2->keyframe_time) {
-        ball1->keyframe_r =
-            ball1->keyframe_r + ((ball2->keyframe_time - ball1->keyframe_time) * ball1->v);
-        ball1->keyframe_rotation =
-            ball1->keyframe_rotation +
-            ((ball2->keyframe_time - ball1->keyframe_time) * ball1->angular_velocity);
-        ball1->keyframe_time = ball2->keyframe_time;
-    } else {
-        ball2->keyframe_r =
-            ball2->keyframe_r + ((ball1->keyframe_time - ball2->keyframe_time) * ball2->v);
-        ball2->keyframe_rotation =
-            ball2->keyframe_rotation +
-            ((ball1->keyframe_time - ball2->keyframe_time) * ball2->angular_velocity);
-        ball2->keyframe_time = ball1->keyframe_time;
-    }
-}
-
 // Update ball keyframe time to current time
 static void update_keyframe(ball* ball, double time) {
     ball->keyframe_r = ball->keyframe_r + ((time - ball->keyframe_time) * ball->v);
     ball->keyframe_rotation =
         ball->keyframe_rotation + ((time - ball->keyframe_time) * ball->angular_velocity);
     ball->keyframe_time = time;
+}
+
+// Update keyframe time of one of the two balls so that the two balls are synchronized
+static void synchronize_keyframes(ball* ball1, ball* ball2) {
+    if (ball1->keyframe_time < ball2->keyframe_time) {
+        update_keyframe(ball1, ball2->keyframe_time);
+    } else {
+        update_keyframe(ball2, ball1->keyframe_time);
+    }
 }
 
 // Get collision time between two balls

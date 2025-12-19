@@ -42,8 +42,8 @@ static int Viewxorig, Viewxtolas;
 void beallitmereteket(int splitscreen) {
     Cy1Bplayer = 100, Cy2Bplayer = 200;
 
-    Cxsize = SCREEN_WIDTH * (Kepmeret * 1.001);
-    Cysize = SCREEN_HEIGHT * (Kepmeret * 1.001);
+    Cxsize = SCREEN_WIDTH * (Kepmeret * 1.0001);
+    Cysize = SCREEN_HEIGHT * (Kepmeret * 1.0001);
     Cx1 = (SCREEN_WIDTH - Cxsize) / 2;
     Cy1 = (SCREEN_HEIGHT - Cysize) / 2;
     Cx2 = Cx1 + Cxsize - 1;

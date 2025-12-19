@@ -1,11 +1,12 @@
+#include "LGRFILE.H"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
-#include "LGRFILE.H"
 #include "affine_pic.h"
 #include "anim.h"
 #include "ECSET.H"
 #include "grass.h"
 #include "KIRAJZOL.H"
+#include "LOAD.H"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"
@@ -44,6 +45,11 @@ kisbox KisboxA = {3, 36, 147, 184};
 kisbox KisboxB = {32, 183, 147, 297};
 kisbox KisboxC = {146, 141, 273, 264};
 kisbox KisboxD = {272, 181, 353, 244};
+
+void invalidate_lgr_cache() {
+    invalidate_ptop();
+    Bentlgrnev[0] = '\0';
+}
 
 // Ha nincs ilyen nevu file, akkor default-ot olvassa:
 void loadlgrfile(const char* nev) {

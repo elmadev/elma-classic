@@ -12,33 +12,40 @@ int Locky0_alul = 0;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
+int sdl_get_surface() {
+    SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
+    if (!SDLSurfaceMain) {
+        hiba(SDL_GetError());
+        return 1;
+    }
+    SDLSurfacePaletted = SDL_CreateRGBSurfaceWithFormat(0, SDLSurfaceMain->w, SDLSurfaceMain->h, 0,
+                                                        SDL_PIXELFORMAT_INDEX8);
+    if (!SDLSurfacePaletted) {
+        hiba(SDL_GetError());
+        return 1;
+    }
+    return 0;
+}
+
 int sdl_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-        hiba((char*)SDL_GetError());
+        hiba(SDL_GetError());
         return 1;
     }
 
     SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                  SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (!SDLWindow) {
-        hiba((char*)SDL_GetError());
+        hiba(SDL_GetError());
+        return 1;
+    }
+
+    if (sdl_get_surface()) {
         return 1;
     }
 
     SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
     SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
-
-    SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
-    if (!SDLSurfaceMain) {
-        hiba((char*)SDL_GetError());
-        return 1;
-    }
-    SDLSurfacePaletted = SDL_CreateRGBSurfaceWithFormat(0, SDLSurfaceMain->w, SDLSurfaceMain->h, 0,
-                                                        SDL_PIXELFORMAT_INDEX8);
-    if (!SDLSurfacePaletted) {
-        hiba((char*)SDL_GetError());
-        return 1;
-    }
 
     return 0;
 }

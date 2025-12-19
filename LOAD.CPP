@@ -4,6 +4,8 @@ int Volttopsave = 0;
 
 static char Bentlevelnev[20] = "";
 
+void invalidate_level() { Volttopsave = 1; }
+
 // Beolvas egy level-t ha kell (nev max 12 karakter).
 // Torli es kitolti Ptop, Plgr, Pszak, ecset mutatokat.
 // Ha belso file-ban is megvan palya onnan veszi:

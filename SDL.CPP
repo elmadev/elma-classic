@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include <SDL.h>
 #include "scancodes_windows.h"
+#include <mutex>
 
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
@@ -37,15 +38,17 @@ static int resize_event(void* data, SDL_Event* event) {
     if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
         SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
         if (win == (SDL_Window*)data) {
-            printf("Resize\n");
-            sdl_get_surface();
-            SDLPalette->set();
-            invalidateegesz();
-            Kitoltestmegrak = Kitoltestmegrakkezd;
-            if (Plgr) {
-                Plgr->fgnevbent[0] = 0;
-                Plgr->bgnevbent[0] = 0;
-                Plgr->betolthattereket();
+            {
+                std::lock_guard<std::mutex> lock(mtx);
+                sdl_get_surface();
+                SDLPalette->set();
+                invalidateegesz();
+                Kitoltestmegrak = Kitoltestmegrakkezd;
+                if (Plgr) {
+                    Plgr->fgnevbent[0] = 0;
+                    Plgr->bgnevbent[0] = 0;
+                    Plgr->betolthattereket();
+                }
             }
         }
     }

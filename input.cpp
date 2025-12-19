@@ -78,9 +78,9 @@ void mkw_getDIstate(void) {
     }
 
     if (UseKeyState2) {
-        fill_kb_state(KeyState1);
-    } else {
         fill_kb_state(KeyState2);
+    } else {
+        fill_kb_state(KeyState1);
     }
     UseKeyState2 = !UseKeyState2;
 }

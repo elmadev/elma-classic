@@ -4,8 +4,6 @@
 // ddinit setmode utan 1-be megy, hiba figyeli:
 int Margrafikus = 0;
 
-extern int Waitforretrace; // main.cpp es h-ban ven definialva
-
 // static LRESULT CALLBACK _export WndProc( HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 // );
 static long FAR PASCAL WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
@@ -95,10 +93,6 @@ int main(int argc, char* argv[]) {
             }
         }
     }*/
-
-    if (access("noretrac.inf", 0) == 0) {
-        Waitforretrace = 0;
-    }
 
     Inicializalva = 1;
 

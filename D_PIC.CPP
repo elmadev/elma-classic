@@ -4,10 +4,6 @@ static pic8* Lockbuff = NULL;
 
 static int Backpiclocked = 0, Frontpiclocked = 0;
 
-// int Mindigfront = 0;
-
-static pic8* Pmindigfpic = NULL;
-
 pic8* lockbackbuffer_pic() {
     if (Backpiclocked || Frontpiclocked) {
         hiba("lbb_p lock!");
@@ -20,16 +16,8 @@ pic8* lockbackbuffer_pic() {
         Lockbuff->height = SCREEN_HEIGHT;
         Lockbuff->rows = NULL;
     }
-
-    if (Waitforretrace) {
-        Lockbuff->rows = lockbackbuffer();
-        return Lockbuff;
-    } else {
-        if (!Pmindigfpic) {
-            Pmindigfpic = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
-        }
-        return Pmindigfpic;
-    }
+    Lockbuff->rows = lockbackbuffer();
+    return Lockbuff;
 }
 
 void unlockbackbuffer_pic(void) {
@@ -38,12 +26,8 @@ void unlockbackbuffer_pic(void) {
     }
     Backpiclocked = 0;
 
-    if (Waitforretrace) {
-        unlockbackbuffer();
-        Lockbuff->rows = NULL;
-    } else {
-        bltfront(Pmindigfpic);
-    }
+    unlockbackbuffer();
+    Lockbuff->rows = NULL;
 }
 
 void lockfrontbuffer_pic(void) {

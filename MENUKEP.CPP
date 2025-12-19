@@ -177,9 +177,26 @@ static int Kezdoanimjon = 1;
 
 void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, pic8* rarakkep3,
                            pic8* rarakkep4) {
+    if (!Kezdoanimjon && (screen_height != SCREEN_HEIGHT || screen_width != SCREEN_WIDTH)) {
+        delete Tmpbuffer;
+        Tmpbuffer = nullptr;
+        delete Buffgolyo;
+        Buffgolyo = nullptr;
+        delete Buffsima;
+        Buffsima = nullptr;
+        ervenyes = 0;
+        screen_height = SCREEN_HEIGHT;
+        screen_width = SCREEN_WIDTH;
+    }
     // Kirakjuk hatteret:
     if (!Tmpbuffer) { // Ideiglenes
         Tmpbuffer = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
+    }
+    if (!Buffgolyo) {
+        Buffgolyo = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
+    }
+    if (!Buffsima) {
+        Buffsima = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
     if (Kezdoanimjon && !Pintro) {
@@ -222,8 +239,10 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
             blit8(Buffgolyo, rarakkep4, 0, 360);
         } else {
             for (int i = 0; i < elemszam; i++) {
-                Pmenuabc->write(Buffsima, sorok[i].x, sorok[i].y, sorok[i].text);
-                Pmenuabc->write(Buffgolyo, sorok[i].x, sorok[i].y, sorok[i].text);
+                Pmenuabc->write(Buffsima, SCREEN_WIDTH / 2 - 320 + sorok[i].x, sorok[i].y,
+                                sorok[i].text);
+                Pmenuabc->write(Buffgolyo, SCREEN_WIDTH / 2 - 320 + sorok[i].x, sorok[i].y,
+                                sorok[i].text);
             }
         }
 
@@ -305,7 +324,7 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
             sisakframe = Psisak->get_frame_by_index(25);
         }
 
-        blit8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
+        blit8(Tmpbuffer, sisakframe, SCREEN_WIDTH / 2 - 320 + sisakx - 20, sisaky - 7);
     }
 
     // Tmpbuffer->save( "kezdszov.pcx", Menupaltomb );

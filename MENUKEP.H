@@ -29,6 +29,8 @@ class szoveglista {
     egyszovsor* sorok;
     int elemszam;
     int ervenyes;
+    int screen_width;
+    int screen_height;
 
   public:
     szoveglista(void);

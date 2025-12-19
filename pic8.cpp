@@ -773,3 +773,9 @@ void pic8::subview(int x1, int y1, int x2, int y2, pic8* source) {
         rows[y] = source->get_row(y + y1) + x1;
     }
 }
+
+pic8* pic8::copy(pic8* src) {
+    pic8* scaled = new pic8(src->get_width(), src->get_height());
+    blit_scale8(scaled, src);
+    return scaled;
+}

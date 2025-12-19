@@ -711,7 +711,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     }
 }
 
-static pic8* Bpic = NULL;
+static pic8* Bpic = new pic8();
 
 extern int Ucsosurlodas;
 
@@ -741,10 +741,6 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
     Locky0_alul = 1;
     pic8* npic = lockbackbuffer_pic();
     Locky0_alul = 0;
-
-    if (!Bpic) {
-        Bpic = new pic8(10, SCREEN_HEIGHT);
-    }
 
     // hiba( "Itt van 11!" ); idejott
 

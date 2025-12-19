@@ -5,6 +5,7 @@
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
 SDL_Surface* SDLSurfacePaletted;
+ddpal* SDLPalette;
 
 int SCREEN_WIDTH = 640;
 int SCREEN_HEIGHT = 480;
@@ -38,8 +39,7 @@ static int resize_event(void* data, SDL_Event* event) {
         if (win == (SDL_Window*)data) {
             printf("Resize\n");
             sdl_get_surface();
-            SCREEN_WIDTH = event->window.data1;
-            SCREEN_HEIGHT = event->window.data2;
+            SDLPalette->set();
             invalidateegesz();
             Kitoltestmegrak = Kitoltestmegrakkezd;
         }
@@ -74,29 +74,17 @@ int sdl_init() {
 static unsigned char** Mutbuffer = nullptr;
 static int Bufflocked = 0;
 
-unsigned char** lockbackbuffer() {
+void lockbackbuffer(pic8* view) {
     if (Bufflocked) {
         hiba("lockbackbuffer-ben Bufflocked!");
     }
     Bufflocked = 1;
 
-    unsigned char* mut = (unsigned char*)SDLSurfacePaletted->pixels;
-    Mutbuffer = (unsigned char**)realloc(Mutbuffer, sizeof(*Mutbuffer) * SCREEN_HEIGHT);
-    if (Locky0_alul) {
-        // Set the row buffer bottom-down
-        for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            Mutbuffer[SCREEN_HEIGHT - 1 - y] = mut;
-            mut += SDLSurfacePaletted->w;
-        }
-    } else {
-        // Set the row buffer top-down
-        for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            Mutbuffer[y] = mut;
-            mut += SDLSurfacePaletted->w;
-        }
-    }
-
-    return Mutbuffer;
+    SCREEN_WIDTH = SDLSurfacePaletted->w;
+    SCREEN_HEIGHT = SDLSurfacePaletted->h;
+    unsigned char* pixels = (unsigned char*)SDLSurfacePaletted->pixels;
+    int pitch = SDLSurfacePaletted->pitch;
+    view->subview(SCREEN_WIDTH, SCREEN_HEIGHT, pixels, pitch, Locky0_alul);
 }
 
 void unlockbackbuffer(void) {
@@ -109,12 +97,12 @@ void unlockbackbuffer(void) {
     SDL_UpdateWindowSurface(SDLWindow);
 }
 
-unsigned char** lockfrontbuffer(void) {
+void lockfrontbuffer(pic8* view) {
     if (Bufflocked) {
         hiba("lockfrontbuffer-ben Bufflocked!");
     }
 
-    return lockbackbuffer();
+    return lockbackbuffer(view);
 }
 
 void unlockfrontbuffer(void) {
@@ -134,7 +122,10 @@ ddpal::ddpal(unsigned char* tomb) {
     }
 }
 
-void ddpal::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
+void ddpal::set() {
+    SDLPalette = this;
+    SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256);
+}
 
 #if defined(_WIN64) || !defined(_WIN32)
 void mv_check(int skip_key_update) {

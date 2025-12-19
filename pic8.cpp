@@ -762,6 +762,24 @@ void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
     hiba("pic8::line diagonal lines not implemented!");
 }
 
+void pic8::subview(int w, int h, unsigned char* pixels, int pitch, bool inverted) {
+    if (!view) {
+        hiba("pic8 is not a view!");
+    }
+    width = w;
+    height = h;
+    rows = (unsigned char**)realloc(rows, sizeof(*rows) * height);
+    if (inverted) {
+        for (int y = 0; y < height; y++) {
+            rows[height - y - 1] = pixels + y * pitch;
+        }
+    } else {
+        for (int y = 0; y < height; y++) {
+            rows[y] = pixels + y * pitch;
+        }
+    }
+}
+
 // Make this picture point by reference of a subview of the source picture
 void pic8::subview(int x1, int y1, int x2, int y2, pic8* source) {
     if (!view) {

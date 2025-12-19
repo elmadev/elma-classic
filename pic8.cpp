@@ -151,32 +151,6 @@ void pic8::fill_box(int x1, int y1, int x2, int y2, unsigned char index) {
     }
 }
 
-// Draw horizontal line for the ingame timer, using the provided palette map
-void pic8::horizontal_line(int x, int y, int size, unsigned char* lookup) {
-#ifdef DEBUG
-    if (x < 0 || y < 0 || x + size - 1 >= width || y >= height) {
-        hiba("pic8::horizontal_line x/y out of range!");
-    }
-#endif
-    unsigned char* row = get_row(y);
-    for (int i = 0; i < size; i++) {
-        row[x + i] = lookup[row[x + i]];
-    }
-}
-
-// Draw vertical line for the ingame timer, using the provided palette map
-void pic8::vertical_line(int x, int y, int size, unsigned char* lookup) {
-#ifdef DEBUG
-    if (x < 0 || y < 0 || x >= width || y + size - 1 >= height) {
-        hiba("pic8::vertical_line x/y out of range!");
-    }
-#endif
-    for (int i = 0; i < size; i++) {
-        unsigned char* row = get_row(y + i);
-        row[x] = lookup[row[x]];
-    }
-}
-
 // Read a .spr file
 // char Header[1] == 0x2D
 // short width

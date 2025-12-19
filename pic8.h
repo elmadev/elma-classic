@@ -49,8 +49,6 @@ class pic8 {
     void fill_box(int x1, int y1, int x2, int y2, unsigned char index);
     void fill_box(unsigned char index);
     void line(int x1, int y1, int x2, int y2, unsigned char index);
-    void vertical_line(int x, int y, int size, unsigned char* lookup);
-    void horizontal_line(int x, int y, int size, unsigned char* lookup);
     void subview(int x1, int y1, int x2, int y2, pic8* source);
 };
 

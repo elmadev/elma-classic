@@ -13,37 +13,63 @@ static unsigned char* Lookup = NULL;
 
 const double Idod2lszorzo = 100.0 / (182.0 * 0.0024);
 
-static void kikettospont(int x, int y) {
-    Ppic8->horizontal_line(x + Ketpx, y + Ketpy1, 2, Lookup);
-    Ppic8->horizontal_line(x + Ketpx, y + Ketpy1 + 1, 2, Lookup);
+// Draw horizontal line for the ingame timer, using the provided palette map
+static void horizontal_line(pic8* dest, int x, int y, int size, unsigned char* lookup) {
+#ifdef DEBUG
+    if (x < 0 || y < 0 || x + size - 1 >= dest->get_width() || y >= dest->get_height()) {
+        hiba("horizontal_line x/y out of range!");
+    }
+#endif
+    unsigned char* row = dest->get_row(y);
+    for (int i = 0; i < size; i++) {
+        row[x + i] = lookup[row[x + i]];
+    }
+}
 
-    Ppic8->horizontal_line(x + Ketpx, y + Ketpy2, 2, Lookup);
-    Ppic8->horizontal_line(x + Ketpx, y + Ketpy2 + 1, 2, Lookup);
+// Draw vertical line for the ingame timer, using the provided palette map
+static void vertical_line(pic8* dest, int x, int y, int size, unsigned char* lookup) {
+#ifdef DEBUG
+    if (x < 0 || y < 0 || x >= dest->get_width() || y + size - 1 >= dest->get_height()) {
+        hiba("vertical_line x/y out of range!");
+    }
+#endif
+    for (int i = 0; i < size; i++) {
+        unsigned char* row = dest->get_row(y + i);
+        row[x] = lookup[row[x]];
+    }
+}
+
+static void kikettospont(int x, int y) {
+    horizontal_line(Ppic8, x + Ketpx, y + Ketpy1, 2, Lookup);
+    horizontal_line(Ppic8, x + Ketpx, y + Ketpy1 + 1, 2, Lookup);
+
+    horizontal_line(Ppic8, x + Ketpx, y + Ketpy2, 2, Lookup);
+    horizontal_line(Ppic8, x + Ketpx, y + Ketpy2 + 1, 2, Lookup);
 }
 
 static void kiszegmens(int szam, int x, int y) {
     switch (szam) {
     case 0:
-        Ppic8->vertical_line(x, y + 1, Vonalfugghossz, Lookup);
+        vertical_line(Ppic8, x, y + 1, Vonalfugghossz, Lookup);
         break;
     case 1:
-        Ppic8->vertical_line(x + Vonalvizhossz + 1, y + 1, Vonalfugghossz, Lookup);
+        vertical_line(Ppic8, x + Vonalvizhossz + 1, y + 1, Vonalfugghossz, Lookup);
         break;
     case 2:
-        Ppic8->vertical_line(x, y + Vonalfugghossz + 2, Vonalfugghossz, Lookup);
+        vertical_line(Ppic8, x, y + Vonalfugghossz + 2, Vonalfugghossz, Lookup);
         break;
     case 3:
-        Ppic8->vertical_line(x + Vonalvizhossz + 1, y + Vonalfugghossz + 2, Vonalfugghossz, Lookup);
+        vertical_line(Ppic8, x + Vonalvizhossz + 1, y + Vonalfugghossz + 2, Vonalfugghossz, Lookup);
         break;
     case 4:
-        Ppic8->horizontal_line(x + 1, y, Vonalvizhossz, Lookup);
+        horizontal_line(Ppic8, x + 1, y, Vonalvizhossz, Lookup);
         break;
     case 5:
-        Ppic8->horizontal_line(x + 1, y + Vonalfugghossz + 1, Vonalvizhossz, Lookup);
+        horizontal_line(Ppic8, x + 1, y + Vonalfugghossz + 1, Vonalvizhossz, Lookup);
         break;
     case 6:
-        Ppic8->horizontal_line(x + 1, y + Vonalfugghossz + Vonalfugghossz + 2, Vonalvizhossz,
-                               Lookup);
+        horizontal_line(Ppic8, x + 1, y + Vonalfugghossz + Vonalfugghossz + 2, Vonalvizhossz,
+                        Lookup);
         break;
     default:
         hiba("kiszegmens-ben szegmens out of range!");

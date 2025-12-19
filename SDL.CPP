@@ -32,7 +32,7 @@ int sdl_get_surface() {
 }
 
 // This needs to be via event watcher, and not in event queue, or else it only procs at the very end
-// of the event in windows. Stackoverflow seems to imply that this bug is fixed in SDL3.
+// of the event in windows. Stackoverflow seems to imply that this is fixed in SDL3.
 static int resize_event(void* data, SDL_Event* event) {
     if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
         SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
@@ -42,6 +42,11 @@ static int resize_event(void* data, SDL_Event* event) {
             SDLPalette->set();
             invalidateegesz();
             Kitoltestmegrak = Kitoltestmegrakkezd;
+            if (Plgr) {
+                Plgr->fgnevbent[0] = 0;
+                Plgr->bgnevbent[0] = 0;
+                Plgr->betolthattereket();
+            }
         }
     }
     return 0;

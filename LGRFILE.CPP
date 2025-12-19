@@ -857,7 +857,7 @@ lgrfile::lgrfile(const char* lgrnev) {
     // ecsetben mutato fog hivatkozni rajuk (max 3 egymas utan):
     viewexit[2] = viewexit[1] = viewexit[0];
     viewkiller[2] = viewkiller[1] = viewkiller[0];
-    for (int i = 1; i < SCREEN_WIDTH; i++) {
+    for (int i = 1; i < BASE_WIDTH; i++) {
         viewfoldsor[i] = viewfoldsor[0];
         viewegsor[i] = viewegsor[0];
     }

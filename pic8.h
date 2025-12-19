@@ -1,6 +1,8 @@
 #ifndef PIC8_H
 #define PIC8_H
 
+class ddpal;
+
 constexpr int BLIT_ALL = -10000;
 
 class pic8;
@@ -9,24 +11,23 @@ void blit8(pic8* dest, pic8* source, int x = 0, int y = 0, int x1 = BLIT_ALL, in
            int x2 = BLIT_ALL, int y2 = BLIT_ALL);
 
 class pic8 {
-  public:
+  private:
     friend void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2);
     friend void spriteosit(pic8* ppic, int index);
     friend void spriteosit(pic8* ppic);
+    friend pic8* lockbackbuffer_pic();
+    friend void lockfrontbuffer_pic();
+    friend void unlockbackbuffer_pic();
 
-  protected:
     void allocate(int w, int h);
     void spr_open(const char* filename, FILE* h);
     bool spr_save(const char* filename, FILE* h);
     void pcx_open(const char* filename, FILE* h = nullptr);
     bool pcx_save(const char* filename, unsigned char* pal);
 
-  public:
     int width;
     int height;
     unsigned char** rows;
-
-  private:
     unsigned char* pixels;
     unsigned char* transparency_data;
     unsigned short transparency_data_length;
@@ -36,10 +37,10 @@ class pic8 {
     pic8(const char* filename, FILE* h = nullptr);
     ~pic8();
     bool save(const char* filename, unsigned char* pal = nullptr, FILE* h = nullptr);
-    int get_width() { return width; }
-    int get_height() { return height; }
     void ppixel(int x, int y, unsigned char index);
     unsigned char gpixel(int x, int y);
+    int get_width() { return width; }
+    int get_height() { return height; }
 #ifdef DEBUG
     unsigned char* get_row(int y);
 #else
@@ -53,9 +54,6 @@ class pic8 {
     void subview(int x1, int y1, int x2, int y2, pic8* source);
 };
 
-class ddpal;
-
-unsigned char* spriteadat8(pic8* pmask, unsigned char szin, unsigned short* pspritehossz);
 bool get_pcx_pal(const char* filename, unsigned char* pal);
 bool get_pcx_pal(const char* filename, ddpal** sdl_pal);
 

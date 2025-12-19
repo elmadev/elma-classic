@@ -22,6 +22,7 @@
 
 #include "MAIN.H"
 #include "pic8.h"
+#include "SPRITE.H"
 #include "anim.h"
 
 #include "abc8.h"

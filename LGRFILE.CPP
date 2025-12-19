@@ -29,6 +29,8 @@ kisbox KisboxB = {32, 183, 147, 297};
 kisbox KisboxC = {146, 141, 273, 264};
 kisbox KisboxD = {272, 181, 353, 244};
 
+void invalidate_lgr_cache() { Bentlgrnev[0] = '\0'; }
+
 // Ha nincs ilyen nevu file, akkor default-ot olvassa:
 void loadlgrfile(const char* nev) {
     // tesztloadlgr();

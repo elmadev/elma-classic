@@ -3,6 +3,8 @@
 #include "scancodes_windows.h"
 #include <mutex>
 
+std::mutex mtx;
+
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
 SDL_Surface* SDLSurfacePaletted;
@@ -44,7 +46,7 @@ static int resize_event(void* data, SDL_Event* event) {
                 SDLPalette->set();
                 invalidateegesz();
                 Kitoltestmegrak = Kitoltestmegrakkezd;
-                if (Plgr) {
+                if (Plgr && Ptop) {
                     Plgr->fgnevbent[0] = 0;
                     Plgr->bgnevbent[0] = 0;
                     Plgr->betolthattereket();

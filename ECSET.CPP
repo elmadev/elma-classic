@@ -1983,7 +1983,7 @@ void betoltecseteket(void) {
     }
 
     // Rovid folddarabokat atalakitja konkret mutatova:
-    Pecsetalso->foldmutatocsere();
+    // Pecsetalso->foldmutatocsere();
     // Egymas utani ket azonos texturat
     // lecsereli egyre (mar beepiteskor is megtortenik nemileg):
     Pecsetalso->duplaeliminacio();

@@ -41,6 +41,7 @@ class valaszt2 {
     // Visszaadja valasztott szamat, ESC eseten -1-et:
     // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
     int valassz(egyszovsor* preszovegek = NULL, int preszovegszam = 0, int csakkirajzol = 0);
+    void update_egykepen(int* valtozott, int* kur, int* felso);
 
     void kirajzol(void);
 };

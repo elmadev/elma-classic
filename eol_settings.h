@@ -3,6 +3,8 @@
 
 struct eol_settings {
     eol_settings();
+
+    bool pictures_in_background;
 };
 
 extern eol_settings* EolSettings;

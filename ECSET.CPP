@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "eol_settings.h"
 
 typedef uintptr_t pixelek_t;
 
@@ -1954,31 +1955,35 @@ void betoltecseteket(void) {
         hiba("Nincs eleg memoria Pecsetalso-nak!");
     }
 
-    Pecsetalso->foltoz();
+    if (!EolSettings->pictures_in_background) {
+        Pecsetalso->foltoz();
+    }
 
     Pecsetfelso = new ecset(Pecsetalso);
     if (!Pecsetfelso) {
         hiba("Nincs eleg memoria Pecsetfelso-nak!");
     }
 
-    // Most betesszuk felsobe is 500-nal kozelebbi madarabokat:
-    // Es egyben uresse tesszuk alsoban helyuket:
-    for (int i = 0; i < Pecsetalso->sorszam; i++) {
-        mdarab* pmd = Pecsetalso->msorok[i];
-        int xpos = Pecsetalso->kurxposok_A[i];
-        if (xpos > 100) {
-            hiba("betoltecseteket xpos > 100!");
-        }
-        while (pmd) {
-            if (pmd->tavolsag < 500) {
-                if ((pixelek_t)pmd->pixelek >= 10) {
-                    Pecsetfelso->addbytesor(pmd->pixelek, pmd->tavolsag, xpos,
-                                            xpos + pmd->xsize - 1, i, FAZIS_URESRE);
-                    pmd->pixelek = (unsigned char*)PX_URES;
-                }
+    if (!EolSettings->pictures_in_background) {
+        // Most betesszuk felsobe is 500-nal kozelebbi madarabokat:
+        // Es egyben uresse tesszuk alsoban helyuket:
+        for (int i = 0; i < Pecsetalso->sorszam; i++) {
+            mdarab* pmd = Pecsetalso->msorok[i];
+            int xpos = Pecsetalso->kurxposok_A[i];
+            if (xpos > 100) {
+                hiba("betoltecseteket xpos > 100!");
             }
-            xpos += pmd->xsize;
-            pmd = pmd->pkov;
+            while (pmd) {
+                if (pmd->tavolsag < 500) {
+                    if ((pixelek_t)pmd->pixelek >= 10) {
+                        Pecsetfelso->addbytesor(pmd->pixelek, pmd->tavolsag, xpos,
+                                                xpos + pmd->xsize - 1, i, FAZIS_URESRE);
+                        pmd->pixelek = (unsigned char*)PX_URES;
+                    }
+                }
+                xpos += pmd->xsize;
+                pmd = pmd->pkov;
+            }
         }
     }
 

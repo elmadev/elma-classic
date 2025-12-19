@@ -114,8 +114,8 @@ class lgrfile {
     void betolthattereket();
 
     // Ezeket colors.pcx file-bol veszi:
-    unsigned char viewfoldsor[SCREEN_WIDTH];
-    unsigned char viewegsor[SCREEN_WIDTH];
+    unsigned char viewfoldsor[BASE_WIDTH];
+    unsigned char viewegsor[BASE_WIDTH];
     unsigned char viewmotorindex1;
     unsigned char viewmotorindex2;
     unsigned char idoszin1; // Ezt torolni lehet

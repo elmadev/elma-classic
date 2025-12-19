@@ -6,6 +6,9 @@ SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
 SDL_Surface* SDLSurfacePaletted;
 
+int SCREEN_WIDTH = 640;
+int SCREEN_HEIGHT = 480;
+
 // Ha igaz, alulrol indul y (kirajz320 allitja igazba):
 int Locky0_alul = 0;
 
@@ -27,6 +30,23 @@ int sdl_get_surface() {
     return 0;
 }
 
+// This needs to be via event watcher, and not in event queue, or else it only procs at the very end
+// of the event in windows. Stackoverflow seems to imply that this bug is fixed in SDL3.
+static int resize_event(void* data, SDL_Event* event) {
+    if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
+        SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
+        if (win == (SDL_Window*)data) {
+            printf("Resize\n");
+            sdl_get_surface();
+            SCREEN_WIDTH = event->window.data1;
+            SCREEN_HEIGHT = event->window.data2;
+            invalidateegesz();
+            Kitoltestmegrak = Kitoltestmegrakkezd;
+        }
+    }
+    return 0;
+}
+
 int sdl_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         hiba(SDL_GetError());
@@ -44,13 +64,14 @@ int sdl_init() {
         return 1;
     }
 
+    SDL_AddEventWatch(resize_event, SDLWindow);
     SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
     SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
 
     return 0;
 }
 
-static unsigned char* Mutbuffer[SCREEN_HEIGHT];
+static unsigned char** Mutbuffer = nullptr;
 static int Bufflocked = 0;
 
 unsigned char** lockbackbuffer() {
@@ -60,6 +81,7 @@ unsigned char** lockbackbuffer() {
     Bufflocked = 1;
 
     unsigned char* mut = (unsigned char*)SDLSurfacePaletted->pixels;
+    Mutbuffer = (unsigned char**)realloc(Mutbuffer, sizeof(*Mutbuffer) * SCREEN_HEIGHT);
     if (Locky0_alul) {
         // Set the row buffer bottom-down
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
@@ -136,15 +158,6 @@ void mv_check(int skip_key_update) {
             }
             if (event.button.button == SDL_BUTTON_RIGHT) {
                 RightMouseDown = false;
-            }
-            break;
-        case SDL_WINDOWEVENT:
-            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-                printf("SDL_WINDOWEVENT_RESIZED\n");
-            }
-            if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-                printf("SDL_WINDOWEVENT_SIZE_CHANGED\n");
-                sdl_get_surface();
             }
             break;
         }

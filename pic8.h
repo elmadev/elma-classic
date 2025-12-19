@@ -25,8 +25,10 @@ class pic8 {
     unsigned char* pixels;
     unsigned char* transparency_data;
     unsigned short transparency_data_length;
+    bool view;
 
   public:
+    pic8();
     pic8(int w, int h);
     pic8(const char* filename, FILE* h = nullptr);
     ~pic8();

@@ -11,7 +11,7 @@ pic8* lockbackbuffer_pic() {
     Backpiclocked = 1;
 
     if (!Lockbuff) {
-        Lockbuff = new pic8(10, 10);
+        Lockbuff = new pic8();
         Lockbuff->width = SCREEN_WIDTH;
         Lockbuff->height = SCREEN_HEIGHT;
         Lockbuff->rows = NULL;

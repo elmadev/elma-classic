@@ -10,8 +10,10 @@
 #include <unistd.h>
 #endif
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+extern int SCREEN_WIDTH;
+extern int SCREEN_HEIGHT;
+constexpr int BASE_WIDTH = 640;
+constexpr int BASE_HEIGHT = 480;
 
 // Ez Win95-os verzio h file-ja, csak ennek egy szinten kell
 // lennie tobbi forras file-lal.

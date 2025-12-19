@@ -170,7 +170,17 @@ void options(void) {
             break;
         }
 
-        val.setup(14 + vantagis, true);
+        strcpy(NavEntriesLeft[14 + vantagis], "Zoom:");
+        sprintf(NavEntriesRight[14 + vantagis], "%.2f", EolSettings->zoom);
+
+        strcpy(NavEntriesLeft[15 + vantagis], "Zoom Textures:");
+        if (EolSettings->zoom_textures) {
+            strcpy(NavEntriesRight[15 + vantagis], "Yes");
+        } else {
+            strcpy(NavEntriesRight[15 + vantagis], "No");
+        }
+
+        val.setup(16 + vantagis, 1);
 
         kurrens = val.navigate();
 
@@ -275,6 +285,23 @@ void options(void) {
                 EolSettings->map_alignment = MapAlignment::None;
                 break;
             }
+        }
+
+        if (kurrens == 14) {
+            EolSettings->zoom += 0.25;
+            if (EolSettings->zoom > 2.5) {
+                EolSettings->zoom = 1;
+            }
+
+            set_zoom_factor();
+            invalidate_lgr_cache();
+            invalidate_ptop();
+        }
+
+        if (kurrens == 15) {
+            EolSettings->zoom_textures = !EolSettings->zoom_textures;
+            invalidate_lgr_cache();
+            invalidate_ptop();
         }
 
         if (vantagis) { // Visszaalitjuk eredeti helyzetebe

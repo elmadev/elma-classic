@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "eol_settings.h"
 
 // Jatek modja ket fele lehet:
 int Single = 1;
@@ -101,14 +102,15 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
                       long* pmegvanido, int* pmeghalt, double eddig, double dt) {
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
+    int alo = EolSettings->alovolt_P1;
     if (eddig > pvalt->utolsougras + VoltDelay) {
-        if (mk_getstate(popciok->right_volt)) {
+        if (mk_getstate(alo) || mk_getstate(popciok->right_volt)) {
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
             startwavegyujto(WAV_UGRAS1, 0.99, -1);
         }
-        if (mk_getstate(popciok->left_volt)) {
+        if (mk_getstate(alo) || mk_getstate(popciok->left_volt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;

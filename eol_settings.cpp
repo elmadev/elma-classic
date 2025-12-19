@@ -1,3 +1,4 @@
+#include "directinput_scancodes.h"
 #include "eol_settings.h"
 
 eol_settings::eol_settings() {
@@ -7,4 +8,5 @@ eol_settings::eol_settings() {
     map_alignment = MapAlignment::None;
     zoom = 1.0;
     zoom_textures = false;
+    alovolt_P1 = DIK_S;
 }

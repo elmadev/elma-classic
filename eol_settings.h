@@ -12,6 +12,8 @@ struct eol_settings {
     MapAlignment map_alignment;
     double zoom;
     bool zoom_textures;
+
+    int alovolt_P1;
 };
 
 extern eol_settings* EolSettings;

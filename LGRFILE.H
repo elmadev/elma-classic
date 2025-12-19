@@ -134,6 +134,7 @@ class lgrfile {
 extern lgrfile* Plgr; // Az eppen bentlevo lgrfile-ra mutat
 // Ha nincs ilyen nevu file, akkor default-ot olvassa:
 void loadlgrfile(const char* nev);
+void invalidate_lgr_cache();
 
 extern int Allandokepszam;
 // [stringek szama][egy string hossza]:

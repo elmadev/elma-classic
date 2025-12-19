@@ -315,7 +315,7 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
 
 static int Elsokiranim = 1;
 // Teljes olvassa be es elso kiirloading szabaditja fel:
-extern pic8* Pintro = NULL;
+pic8* Pintro = NULL;
 
 static double Animkezdete = 0.0;
 

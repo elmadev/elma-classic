@@ -3,16 +3,10 @@
 
 class ddpal;
 
-constexpr int BLIT_ALL = -10000;
-
-class pic8;
-
-void blit8(pic8* dest, pic8* source, int x = 0, int y = 0, int x1 = BLIT_ALL, int y1 = BLIT_ALL,
-           int x2 = BLIT_ALL, int y2 = BLIT_ALL);
-
 class pic8 {
   private:
     friend void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2);
+    friend void blit8(pic8* dest, pic8* source, int x, int y);
     friend void spriteosit(pic8* ppic, int index);
     friend void spriteosit(pic8* ppic);
     friend pic8* lockbackbuffer_pic();
@@ -51,6 +45,8 @@ class pic8 {
     void line(int x1, int y1, int x2, int y2, unsigned char index);
     void subview(int x1, int y1, int x2, int y2, pic8* source);
 };
+
+void blit8(pic8* dest, pic8* source, int x = 0, int y = 0);
 
 bool get_pcx_pal(const char* filename, unsigned char* pal);
 bool get_pcx_pal(const char* filename, ddpal** sdl_pal);

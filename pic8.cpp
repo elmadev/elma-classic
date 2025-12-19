@@ -501,10 +501,6 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
 // Paste source (x1, y1, x2, y2) into dest at (x, y)
 void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2) {
 #ifdef DEBUG
-    if (y2 == BLIT_ALL && (x1 != BLIT_ALL || y1 != BLIT_ALL || x2 != BLIT_ALL)) {
-        hiba("blit8 y2 == BLIT_ALL, but x1/y1/x2 are not!");
-        return;
-    }
     if (!dest || !source) {
         hiba("blit8 missing dest or source!");
         return;
@@ -514,21 +510,15 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
         hiba("blit8 destination has transparency_data!");
         return;
     }
-    if (x1 == BLIT_ALL) {
-        x1 = y1 = 0;
-        x2 = source->width - 1;
-        y2 = source->height - 1;
-    } else {
-        if (x2 < x1) {
-            int tmp = x1;
-            x1 = x2;
-            x2 = tmp;
-        }
-        if (y2 < y1) {
-            int tmp = y1;
-            y1 = y2;
-            y2 = tmp;
-        }
+    if (x2 < x1) {
+        int tmp = x1;
+        x1 = x2;
+        x2 = tmp;
+    }
+    if (y2 < y1) {
+        int tmp = y1;
+        y1 = y2;
+        y2 = tmp;
     }
     // x - Make sure we don't grab pixels that are out of range of source picture
     if (x1 < 0) {
@@ -625,6 +615,21 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
     for (int fy = y1; fy <= y2; fy++) {
         memcpy(&dest->rows[dfy++][x], &source->rows[fy][x1], length);
     }
+}
+
+// Paste source (x1, y1, x2, y2) into dest at (x, y)
+void blit8(pic8* dest, pic8* source, int x, int y) {
+#ifdef DEBUG
+    if (!dest || !source) {
+        hiba("blit8 missing dest or source!");
+        return;
+    }
+#endif
+    int x1 = 0;
+    int y1 = 0;
+    int x2 = source->width - 1;
+    int y2 = source->height - 1;
+    blit8(dest, source, x, y, x1, y1, x2, y2);
 }
 
 bool get_pcx_pal(const char* filename, unsigned char* pal) {

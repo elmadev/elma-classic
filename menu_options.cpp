@@ -125,7 +125,13 @@ void menu_options() {
             break;
         }
 
-        nav.setup(13 + flag_tag_opt, true);
+        strcpy(NavEntriesLeft[13 + flag_tag_opt], "Zoom:");
+        sprintf(NavEntriesRight[13 + flag_tag_opt], "%.2f", EolSettings->zoom);
+
+        strcpy(NavEntriesLeft[14 + flag_tag_opt], "Zoom Textures:");
+        strcpy(NavEntriesRight[14 + flag_tag_opt], EolSettings->zoom_textures ? "Yes" : "No");
+
+        nav.setup(15 + flag_tag_opt, true);
 
         choice = nav.navigate();
 
@@ -206,6 +212,23 @@ void menu_options() {
                 EolSettings->map_alignment = MapAlignment::None;
                 break;
             }
+        }
+
+        if (choice == 13) {
+            EolSettings->zoom += 0.25;
+            if (EolSettings->zoom > 2.5) {
+                EolSettings->zoom = 1;
+            }
+
+            set_zoom_factor();
+            invalidate_lgr_cache();
+            invalidate_ptop();
+        }
+
+        if (choice == 14) {
+            EolSettings->zoom_textures = !EolSettings->zoom_textures;
+            invalidate_lgr_cache();
+            invalidate_ptop();
         }
 
         if (flag_tag_opt) {

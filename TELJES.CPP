@@ -1,6 +1,8 @@
 #include "ALL.H"
+#include "eol_settings.h"
 
 state* State = NULL;
+eol_settings* EolSettings = nullptr;
 
 void cheatplayer(void) {
     // Egyetlen jatekosnak sem szabad lennie:
@@ -50,6 +52,8 @@ void teljes(void) {
     if (!State) {
         uzenet("memory");
     }
+
+    EolSettings = new eol_settings();
 
     mergestatedat();
 

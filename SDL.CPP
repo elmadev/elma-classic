@@ -31,6 +31,8 @@ int sdl_get_surface() {
         hiba(SDL_GetError());
         return 1;
     }
+    SCREEN_WIDTH = SDLSurfacePaletted->w;
+    SCREEN_HEIGHT = SDLSurfacePaletted->h;
     return 0;
 }
 

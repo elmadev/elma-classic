@@ -3,6 +3,8 @@
 
 extern int Volttopsave;
 
+void invalidate_level();
+
 // Beolvas egy level-t ha kell.
 // Torli es kitolti Ptop, Plgr, Pszak, ecsetek mutatokat:
 // Ha belso file-ban is megvan palya onnan veszi:

@@ -33,14 +33,6 @@ int sdl_init() {
         hiba((char*)SDL_GetError());
         return 1;
     }
-
-    SDL_LockSurface(SDLSurfaceMain);
-    for (int i = 0; i < (SDLSurfaceMain->w * SDLSurfaceMain->h * 4); i++) {
-        ((unsigned char*)SDLSurfaceMain->pixels)[i] = 0xFF;
-    }
-    SDL_UnlockSurface(SDLSurfaceMain);
-    SDL_UpdateWindowSurface(SDLWindow);
-
     SDLSurfacePaletted = SDL_CreateRGBSurfaceWithFormat(0, SDLSurfaceMain->w, SDLSurfaceMain->h, 0,
                                                         SDL_PIXELFORMAT_INDEX8);
     if (!SDLSurfacePaletted) {

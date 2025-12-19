@@ -34,7 +34,7 @@ int sdl_init() {
     }
 
     SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                 SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+                                 SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
     if (!SDLWindow) {
         hiba(SDL_GetError());
         return 1;
@@ -136,6 +136,15 @@ void mv_check(int skip_key_update) {
             }
             if (event.button.button == SDL_BUTTON_RIGHT) {
                 RightMouseDown = false;
+            }
+            break;
+        case SDL_WINDOWEVENT:
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                printf("SDL_WINDOWEVENT_RESIZED\n");
+            }
+            if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+                printf("SDL_WINDOWEVENT_SIZE_CHANGED\n");
+                sdl_get_surface();
             }
             break;
         }

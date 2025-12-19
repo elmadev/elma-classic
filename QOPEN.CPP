@@ -182,7 +182,7 @@ int qseek(FILE* h, long offset, int whence) {
             }
         }
         hiba("qclose nem talalta meg h-t!");
-        return NULL;
+        return 0;
     } else {
         return fseek(h, offset, whence);
     }

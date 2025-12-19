@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include <algorithm>
+#include "eol_settings.h"
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
 
@@ -666,8 +667,10 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     // Motoros kirajzolasa:
     kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1);
 
-    // Felso ecset kitevese:
-    Pecsetfelso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+    if (!EolSettings->pictures_in_background) {
+        // Felso ecset kitevese:
+        Pecsetfelso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+    }
 
     if (viewki) {
         if (Single) {

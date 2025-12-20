@@ -10,11 +10,6 @@ double K_pi = 3.141592;
 double K_pip2 = K_pi * 0.5;
 double K_2pi = K_pi * 2.0;
 
-void k_memcpy(void* dest, const void* src, size_t n) {
-    // inkremental();
-    memcpy(dest, src, n);
-}
-
 constexpr int MAX_FILENAME_LEN = 8;
 static std::filesystem::directory_iterator CurrentIterator;
 static std::filesystem::directory_iterator EndIterator;

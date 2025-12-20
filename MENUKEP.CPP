@@ -10,26 +10,14 @@ anim* Psisak = NULL;
 ddpal* Pmenupal = NULL;
 unsigned char Menupaltomb[768];
 
-/*void retusal( pic8* ppic ) {
-    int xsize = ppic->get_width();
-    int ysize = ppic->get_height();
-    for( int y = 0; y < ysize; y++ ) {
-        for( int x = 0; x < xsize; x++ ) {
-            unsigned szin = ppic->gpixel( x, y );
-            if( szin == 2 )
-                ppic->ppixel( x, y, 30 );
-        }
-    }
-} */
-
 void initmenukep1(void) {
     if (Buffsima) {
         hiba("initmenukep1-ben Buffsima!");
     }
     Buffsima = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     Buffgolyo = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
-    Kisnevsima = new pic8("szoveg1.pcx");  // retusal( Kisnevsima );
-    Kisnevgolyo = new pic8("szoveg2.pcx"); // retusal( Kisnevgolyo );
+    Kisnevsima = new pic8("szoveg1.pcx");
+    Kisnevgolyo = new pic8("szoveg2.pcx");
     Pmenuabc = new abc8("menu.abc");
     Pmenuabc->set_spacing(2);
 
@@ -204,39 +192,16 @@ void szoveglista::kirajzol(int nemkellgolyo) {
             y += Kisnevsima->get_height();
         }
 
-        // Menu lemezre mentese:
-        // Buffsima->save( "menu.pcx", Menupaltomb );
-        // hiba( "Menu kimentve!" );
-
         for (int i = 0; i < elemszam; i++) {
             Pmenuabc->write(Buffsima, sorok[i].x, sorok[i].y, sorok[i].text);
             Pmenuabc->write(Buffgolyo, sorok[i].x, sorok[i].y, sorok[i].text);
         }
-
-        // Ha kell logokep, azt itt rarajzoljuk:
-        /*if( logokep ) {
-            static int elsologo = 1;
-            if( !elsologo )
-                hiba( "8989654" );
-            elsologo = 0;
-
-            pic8* ppiclogo = new pic8( "intro.pcx" );
-            spriteosit( ppiclogo );
-            blit8( Buffsima, ppiclogo );
-            blit8( Buffgolyo, ppiclogo );
-            delete ppiclogo; ppiclogo = NULL;
-        } */
     }
 
     double ujido = mv_stopperido();
     if (Kezdoanimjon) {
         Pmenupal->set();
         while (1) {
-            /*if( mk_kbhit() ) {
-                int c = mk_getextchar();
-                if( c == MK_ESC )
-                    return;
-            }*/
             if (!kirajzolanim(ujido)) {
                 Kezdoanimjon = 0;
                 Regiido = ujido;
@@ -294,8 +259,6 @@ void szoveglista::kirajzol(int nemkellgolyo) {
         blit8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
     }
 
-    // Tmpbuffer->save( "kezdszov.pcx", Menupaltomb );
-    // hiba( "kezdszov.pcx kiirva!" );
     bltfront(Tmpbuffer);
 }
 
@@ -367,26 +330,11 @@ int szoveglista::kirajzolanim(double ido) {
     ido -= Animkezdete;
 
     int frame = ido * 2.3;
-    // int framex = ido*2.3*(640.0/480.0);
-
-    /*if( frame < 480 ) {
-        // Kirakjuk legordulo hatteret:
-        Tmpbuffer->fill_box( Introhatter );
-        blit8( Tmpbuffer, Buffsima, 0, frame-480 );
-        blit8( Tmpbuffer, Pintro );
-        bltfront( Tmpbuffer );
-        return 1;
-    }
-
-    frame -= 480;*/
 
     if (frame >= SCREEN_HEIGHT) {
         Scrolly1 = 0;
         return 0;
     }
-
-    // Most mar masodik animaciot rajzoljuk:
-    // blit8( Tmpbuffer, Buffsima );
 
     Tmpbuffer->fill_box(Introhatter);
     blit8(Tmpbuffer, Buffsima, 0, SCREEN_HEIGHT - frame);
@@ -426,8 +374,6 @@ int szoveglista::kirajzolanim(double ido) {
     blit8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7 - (SCREEN_HEIGHT - 1) + frame);
 
     blit8(Tmpbuffer, Pintro, 0, frame);
-    // blit8( Tmpbuffer, Pintro, framex, 0, 0, 0, 639, 206 );
-    // blit8( Tmpbuffer, Pintro, -framex, 206, 0, 206, 639, 479 );
     bltfront(Tmpbuffer);
     return 1;
 }
@@ -513,87 +459,3 @@ void grafikushiba(const char* text1, const char* text2, const char* text3) {
         Pmenupal->set();
     }
 }
-
-void menuproba(void) {
-    szoveglista szl;
-    szl.addszoveg("ABCDEFGH", 100, 100);
-    szl.addszoveg("abcdefgh", 100, 200);
-    Pmenupal->set();
-    while (1) {
-        if (mk_kbhit()) {
-            hiba("Vege!");
-        }
-        szl.kirajzol();
-    }
-}
-
-/*void szoveglista::kirajzol( int nemkellgolyo ) {
-    if( !ervenyes ) {
-        // Ujrarajzoljuk hatterkepeket:
-        ervenyes = 1;
-        int y = 0;
-        int paros = 0;
-        while( y < 480 ) {
-            int x = 0;
-            if( paros )
-                x -= Kisnevsima->get_width()/2;
-            paros = !paros;
-            while( x < 640 ) {
-                blit8( Buffsima, Kisnevsima, x, y );
-                blit8( Buffgolyo, Kisnevgolyo, x, y );
-                x += Kisnevsima->get_width();
-            }
-            y += Kisnevsima->get_height();
-        }
-        // Rairjuk szovegeket:
-        for( int i = 0; i < elemszam; i++ ) {
-            Pmenuabc->write( Buffsima, sorok[i].x, sorok[i].y,
-                                sorok[i].text );
-            Pmenuabc->write( Buffgolyo, sorok[i].x, sorok[i].y,
-                                sorok[i].text );
-        }
-    }
-
-    double ujido = mv_stopperido();
-    double dt = ujido-Regiido;
-    Regiido = ujido;
-    if( dt < 0.0 )
-        dt = 0.001;
-
-    dt *= 3.6;
-    if( dt > 100.0 )
-        dt = 100.0;
-
-    balls_simulate( dt ); // 12.0 volt regebben
-
-    // Kirakjuk hatteret:
-    if( !Tmpbuffer ) // Ideiglenes
-        Tmpbuffer = new pic8( 640, 480 );
-
-    blit8( Tmpbuffer, Buffsima );
-
-    for( int i = 0; i < BallCount; i++ ) {
-        if( nemkellgolyo || !State->animated_menus )
-            break;
-
-        kirajzgolyo( Balls[i].current_r, Balls[i].radius, Buffgolyo );
-
-        vekt2 diff( Balls[i].radius*0.5*cos( Balls[i].current_rotation ),
-                    Balls[i].radius*0.5*sin( Balls[i].current_rotation ) );
-        kirajzgolyo( Balls[i].current_r + diff,
-                    Balls[i].radius*0.25, Buffsima );
-        kirajzgolyo( Balls[i].current_r - diff,
-                    Balls[i].radius*0.25, Buffsima );
-    }
-    if( !nemkellgolyo ) {
-        pic8* sisakframe = NULL;
-        if( State->animated_menus )
-            sisakframe = Psisak->get_frame_by_time( ujido*0.0024 );
-        else
-            sisakframe = Psisak->get_frame_by_index( 25 );
-
-        blit8( Tmpbuffer, sisakframe, sisakx-20, sisaky-7 );
-    }
-
-    bltfront( Tmpbuffer );
-} */

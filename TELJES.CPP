@@ -109,9 +109,6 @@ void teljes(void) {
     Pabc2 = new abc8("kisbetu2.abc");
     Pabc2->set_spacing(1);
 
-    // void menuproba( void );
-    // menuproba();
-
     Prec1 = new recorder;
     Prec2 = new recorder;
 

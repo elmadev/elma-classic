@@ -37,8 +37,7 @@ class szoveglista {
     void addszoveg_kozep(const char* text, int x, int y);
     void setsisak(int x, int y);
     void clear(void);
-    void kirajzol(int nemkellgolyo = 0, pic8* rarakkep1 = NULL, pic8* rarakkep2 = NULL,
-                  pic8* rarakkep3 = NULL, pic8* rarakkep4 = NULL);
+    void kirajzol(int nemkellgolyo = 0);
     int kirajzolanim(double ido);
 };
 

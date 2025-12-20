@@ -1,6 +1,6 @@
 #include "ALL.H"
-#include <assert.h>
 #ifndef _WIN32
+#include <assert.h>
 #include <cstring>
 #include <string>
 #endif

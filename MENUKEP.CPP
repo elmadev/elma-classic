@@ -175,8 +175,7 @@ static double Regiido = 0.0;
 static double Elsostabilido = 0.0; // Scroll befejezesekor
 static int Kezdoanimjon = 1;
 
-void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, pic8* rarakkep3,
-                           pic8* rarakkep4) {
+void szoveglista::kirajzol(int nemkellgolyo) {
     // Kirakjuk hatteret:
     if (!Tmpbuffer) { // Ideiglenes
         Tmpbuffer = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -209,22 +208,9 @@ void szoveglista::kirajzol(int nemkellgolyo, pic8* rarakkep1, pic8* rarakkep2, p
         // Buffsima->save( "menu.pcx", Menupaltomb );
         // hiba( "Menu kimentve!" );
 
-        // Rairjuk szovegeket vagy kepet:
-        if (rarakkep4) {
-            blit8(Buffsima, rarakkep1);
-            blit8(Buffsima, rarakkep2, 0, 120);
-            blit8(Buffsima, rarakkep3, 0, 240);
-            blit8(Buffsima, rarakkep4, 0, 360);
-
-            blit8(Buffgolyo, rarakkep1);
-            blit8(Buffgolyo, rarakkep2, 0, 120);
-            blit8(Buffgolyo, rarakkep3, 0, 240);
-            blit8(Buffgolyo, rarakkep4, 0, 360);
-        } else {
-            for (int i = 0; i < elemszam; i++) {
-                Pmenuabc->write(Buffsima, sorok[i].x, sorok[i].y, sorok[i].text);
-                Pmenuabc->write(Buffgolyo, sorok[i].x, sorok[i].y, sorok[i].text);
-            }
+        for (int i = 0; i < elemszam; i++) {
+            Pmenuabc->write(Buffsima, sorok[i].x, sorok[i].y, sorok[i].text);
+            Pmenuabc->write(Buffgolyo, sorok[i].x, sorok[i].y, sorok[i].text);
         }
 
         // Ha kell logokep, azt itt rarajzoljuk:

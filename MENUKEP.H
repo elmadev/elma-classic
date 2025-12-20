@@ -21,14 +21,14 @@ struct text_line {
     int x, y;
 };
 
-#define MAXSZOVEGSOR (30)
+#define MENU_MAX_LINES (30)
 
 class menu_pic {
-    int sisakx, sisaky;
+    int helmet_x, helmet_y;
 
-    text_line* sorok;
-    int elemszam;
-    int ervenyes;
+    text_line* lines;
+    int line_count;
+    int image_valid;
 
   public:
     menu_pic(void);

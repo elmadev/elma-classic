@@ -3,73 +3,73 @@
 pic8* BufferMain = NULL;
 pic8* BufferBall = NULL;
 
-static pic8 *Kisnevsima = NULL, *Kisnevgolyo = NULL;
+static pic8 *BackgroundTileMain = NULL, *BackgroundTileBall = NULL;
 abc8* MenuFont = NULL;
-anim* Psisak = NULL;
+anim* Helmet = NULL;
 
 ddpal* MenuPal = NULL;
 unsigned char MenuPalData[768];
 
 void init_menu_pictures1(void) {
     if (BufferMain) {
-        hiba("init_menu_pictures1-ben BufferMain!");
+        hiba("init_menu_pictures1 already called!");
     }
     BufferMain = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     BufferBall = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
-    Kisnevsima = new pic8("szoveg1.pcx");
-    Kisnevgolyo = new pic8("szoveg2.pcx");
+    BackgroundTileMain = new pic8("szoveg1.pcx");
+    BackgroundTileBall = new pic8("szoveg2.pcx");
     MenuFont = new abc8("menu.abc");
     MenuFont->set_spacing(2);
 
-    pic8* sisaktmp = new pic8("sisak.pcx");
-    forditkepet(sisaktmp);
-    Psisak = new anim(sisaktmp, "sisak.pcx");
-    delete sisaktmp;
-    sisaktmp = NULL;
-    Psisak->make_helmet_top();
+    pic8* helmet_tmp = new pic8("sisak.pcx");
+    forditkepet(helmet_tmp);
+    Helmet = new anim(helmet_tmp, "sisak.pcx");
+    delete helmet_tmp;
+    helmet_tmp = NULL;
+    Helmet->make_helmet_top();
 
     balls_init();
 }
 
 void init_menu_pictures2(void) {
     if (MenuPal) {
-        hiba("init_menu_pictures2-ben MenuPal!");
+        hiba("init_menu_pictures2 already called!");
     }
     get_pcx_pal("intro.pcx", &MenuPal); // O new-ik egy ddpal-t
     get_pcx_pal("intro.pcx", MenuPalData);
 }
 
 menu_pic::menu_pic(void) {
-    sisakx = sisaky = -100;
+    helmet_x = helmet_y = -100;
 
-    elemszam = 0;
-    ervenyes = 0;
-    sorok = new text_line[MAXSZOVEGSOR];
-    if (!sorok) {
-        hiba("Memoria!");
+    line_count = 0;
+    image_valid = 0;
+    lines = new text_line[MENU_MAX_LINES];
+    if (!lines) {
+        hiba("menu_pic memory!");
     }
 }
 
 menu_pic::~menu_pic(void) {
-    if (!sorok) {
-        hiba("menu_pic::~menu_pic !sorok!");
+    if (!lines) {
+        hiba("menu_pic::~menu_pic !lines!");
     }
-    delete sorok;
-    sorok = NULL;
+    delete lines;
+    lines = NULL;
 }
 
 void menu_pic::add_line(const char* text, int x, int y) {
     if (strlen(text) > 100) {
-        hiba("89ygui");
+        hiba("menu::add_line strlen(text) > MENU_LINE_LENGTH");
     }
-    if (elemszam >= MAXSZOVEGSOR - 1) {
-        hiba("849yptgp8");
+    if (line_count >= MENU_MAX_LINES - 1) {
+        hiba("menu::add_line linecount >= MENU_MAX_LINES - 1");
     }
-    strcpy(sorok[elemszam].text, text);
-    sorok[elemszam].x = x;
-    sorok[elemszam].y = y;
-    elemszam++;
-    ervenyes = 0;
+    strcpy(lines[line_count].text, text);
+    lines[line_count].x = x;
+    lines[line_count].y = y;
+    line_count++;
+    image_valid = 0;
 }
 
 void menu_pic::add_line_centered(const char* text, int x, int y) {
@@ -77,55 +77,55 @@ void menu_pic::add_line_centered(const char* text, int x, int y) {
 }
 
 void menu_pic::set_helmet(int x, int y) {
-    sisakx = x;
-    sisaky = y;
+    helmet_x = x;
+    helmet_y = y;
 }
 
 void menu_pic::clear(void) {
-    elemszam = 0;
-    ervenyes = 0;
+    line_count = 0;
+    image_valid = 0;
 }
 
-static pic8* Tmpbuffer = NULL; // Ideiglenes
+static pic8* ScreenBuffer = NULL; // Ideiglenes
 
-static int Scrolly1 = 0; // Ennel kiseb x-ek helyere sotet zoldet rak kirazgolyo
-static unsigned char Introhatter = 254;
-static unsigned char* Zoldsor = NULL;
-static unsigned char* Hattersor = NULL;
+static int ScrollingAnimationY = 0; // Ennel kiseb x-ek helyere sotet zoldet rak kirazgolyo
+static unsigned char BLACK_PALETTE_ID = 254;
+static unsigned char* GreenRow = NULL;
+static unsigned char* BlackRow = NULL;
 
-static void kirajzgolyo(vekt2 g, double r, pic8* forras) {
-    if (!Zoldsor) {
-        Zoldsor = new unsigned char[SCREEN_WIDTH];
-        Hattersor = new unsigned char[SCREEN_WIDTH];
+static void render_ball(vekt2 r, double radius, pic8* source_pic) {
+    if (!GreenRow) {
+        GreenRow = new unsigned char[SCREEN_WIDTH];
+        BlackRow = new unsigned char[SCREEN_WIDTH];
         for (int i = 0; i < SCREEN_WIDTH; i++) {
-            Zoldsor[i] = 248;
-            Hattersor[i] = Introhatter;
+            GreenRow[i] = 248;
+            BlackRow[i] = BLACK_PALETTE_ID;
         }
     }
 
     if (WallsDisabled) {
-        if (g.x < -500.0 || g.x > 1500.0 || g.y < -500.0 || g.y > 1500.0) {
+        if (r.x < -500.0 || r.x > 1500.0 || r.y < -500.0 || r.y > 1500.0) {
             return;
         }
     }
 
-    double xo = g.x;
-    double yo = g.y;
-    int y = yo - r;
-    while (y < yo + r) {
+    double x_center = r.x;
+    double y_center = r.y;
+    int y = y_center - radius;
+    while (y < y_center + radius) {
         if (y < 0 || y >= SCREEN_HEIGHT) {
             y++;
             continue;
         }
 
-        double dx = r * r - (y - yo) * (y - yo);
+        double dx = radius * radius - (y - y_center) * (y - y_center);
         if (dx < 0.5) {
             y++;
             continue;
         }
         dx = sqrt(dx);
-        int x1 = xo - dx;
-        int x2 = xo + dx;
+        int x1 = x_center - dx;
+        int x2 = x_center + dx;
         if (x1 < 0) {
             x1 = 0;
         }
@@ -142,16 +142,16 @@ static void kirajzgolyo(vekt2 g, double r, pic8* forras) {
             y++;
             continue;
         }
-        unsigned char* dest = Tmpbuffer->get_row(y) + x1;
+        unsigned char* dest = ScreenBuffer->get_row(y) + x1;
         unsigned char* source;
-        if (y < Scrolly1) {
-            if (forras == BufferBall) {
-                source = Zoldsor;
+        if (y < ScrollingAnimationY) {
+            if (source_pic == BufferBall) {
+                source = GreenRow;
             } else {
-                source = Hattersor;
+                source = BlackRow;
             }
         } else {
-            source = forras->get_row(y) + x1;
+            source = source_pic->get_row(y) + x1;
         }
         memcpy(dest, source, x2 - x1 + 1);
 
@@ -159,70 +159,70 @@ static void kirajzgolyo(vekt2 g, double r, pic8* forras) {
     }
 }
 
-static double Regiido = 0.0;
-static double Elsostabilido = 0.0; // Scroll befejezesekor
-static int Kezdoanimjon = 1;
+static double BallsPrevTime = 0.0;
+static double BallsStartTime = 0.0; // Scroll befejezesekor
+static int IntroAnimation = 1;
 
 void menu_pic::render(int skip_balls_helmet) {
     // Kirakjuk hatteret:
-    if (!Tmpbuffer) { // Ideiglenes
-        Tmpbuffer = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
+    if (!ScreenBuffer) { // Ideiglenes
+        ScreenBuffer = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
-    if (Kezdoanimjon && !Intro) {
-        Kezdoanimjon = 0;
+    if (IntroAnimation && !Intro) {
+        IntroAnimation = 0;
     }
 
-    if (!ervenyes && !Kezdoanimjon) {
+    if (!image_valid && !IntroAnimation) {
         // Ujrarajzoljuk hatterkepeket:
-        ervenyes = 1;
+        image_valid = 1;
         int y = -47;
-        int kezdox = 0;
+        int x1 = 0;
         while (y < SCREEN_HEIGHT) {
-            int x = kezdox;
-            kezdox += 110;
+            int x = x1;
+            x1 += 110;
             while (x > 0) {
-                x -= Kisnevsima->get_width();
+                x -= BackgroundTileMain->get_width();
             }
             while (x < SCREEN_WIDTH) {
-                blit8(BufferMain, Kisnevsima, x, y);
-                blit8(BufferBall, Kisnevgolyo, x, y);
-                x += Kisnevsima->get_width();
+                blit8(BufferMain, BackgroundTileMain, x, y);
+                blit8(BufferBall, BackgroundTileBall, x, y);
+                x += BackgroundTileMain->get_width();
             }
-            y += Kisnevsima->get_height();
+            y += BackgroundTileMain->get_height();
         }
 
-        for (int i = 0; i < elemszam; i++) {
-            MenuFont->write(BufferMain, sorok[i].x, sorok[i].y, sorok[i].text);
-            MenuFont->write(BufferBall, sorok[i].x, sorok[i].y, sorok[i].text);
+        for (int i = 0; i < line_count; i++) {
+            MenuFont->write(BufferMain, lines[i].x, lines[i].y, lines[i].text);
+            MenuFont->write(BufferBall, lines[i].x, lines[i].y, lines[i].text);
         }
     }
 
-    double ujido = mv_stopperido();
-    if (Kezdoanimjon) {
+    double time = mv_stopperido();
+    if (IntroAnimation) {
         MenuPal->set();
         while (1) {
-            if (!render_intro_anim(ujido)) {
-                Kezdoanimjon = 0;
-                Regiido = ujido;
+            if (!render_intro_anim(time)) {
+                IntroAnimation = 0;
+                BallsPrevTime = time;
                 return;
             }
 
-            ujido = mv_stopperido();
-            Elsostabilido = ujido;
-            Kezdoanimjon = 0;
+            time = mv_stopperido();
+            BallsStartTime = time;
+            IntroAnimation = 0;
         }
     }
 
     double dt;
-    if (ujido < Elsostabilido + 10.0) {
+    if (time < BallsStartTime + 10.0) {
         dt = 0.0000000000001;
     } else {
-        dt = ujido - Regiido;
-        Elsostabilido = -100.0;
+        dt = time - BallsPrevTime;
+        BallsStartTime = -100.0;
     }
 
-    Regiido = ujido;
+    BallsPrevTime = time;
     if (dt < 0.0) {
         dt = 0.001;
     }
@@ -234,173 +234,176 @@ void menu_pic::render(int skip_balls_helmet) {
 
     balls_simulate(dt); // 12.0 volt regebben
 
-    blit8(Tmpbuffer, BufferMain);
+    blit8(ScreenBuffer, BufferMain);
 
     for (int i = 0; i < BallCount; i++) {
         if (skip_balls_helmet || !State->animated_menus) {
             break;
         }
 
-        kirajzgolyo(Balls[i].current_r, Balls[i].radius, BufferBall);
+        render_ball(Balls[i].current_r, Balls[i].radius, BufferBall);
 
-        vekt2 diff(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
-                   Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
-        kirajzgolyo(Balls[i].current_r + diff, Balls[i].radius * 0.25, BufferMain);
-        kirajzgolyo(Balls[i].current_r - diff, Balls[i].radius * 0.25, BufferMain);
+        vekt2 small_circle_offset(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
+                                  Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
+        render_ball(Balls[i].current_r + small_circle_offset, Balls[i].radius * 0.25, BufferMain);
+        render_ball(Balls[i].current_r - small_circle_offset, Balls[i].radius * 0.25, BufferMain);
     }
     if (!skip_balls_helmet) {
-        pic8* sisakframe = NULL;
+        pic8* helmet_frame = NULL;
         if (State->animated_menus) {
-            sisakframe = Psisak->get_frame_by_time(ujido * 0.0024);
+            helmet_frame = Helmet->get_frame_by_time(time * 0.0024);
         } else {
-            sisakframe = Psisak->get_frame_by_index(25);
+            helmet_frame = Helmet->get_frame_by_index(25);
         }
 
-        blit8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
+        blit8(ScreenBuffer, helmet_frame, helmet_x - 20, helmet_y - 7);
     }
 
-    bltfront(Tmpbuffer);
+    bltfront(ScreenBuffer);
 }
 
-static int Elsokiranim = 1;
+static int IntroAnimFirstFrame = 1;
 // Teljes olvassa be es elso kiirloading szabaditja fel:
 pic8* Intro = NULL;
 
-static double Animkezdete = 0.0;
+static double IntroAnimStartTime = 0.0;
 
 // Hamis ha animnak mar vege:
 int menu_pic::render_intro_anim(double time) {
-    if (Elsokiranim) {
+    if (IntroAnimFirstFrame) {
         balls_simulate(0.000000001);
-        Elsokiranim = 0;
-        Animkezdete = time;
+        IntroAnimFirstFrame = 0;
+        IntroAnimStartTime = time;
 
         // Berajzoljuk hatterkepeket:
         int y = -47;
-        int kezdox = 0;
+        int x1 = 0;
         while (y < SCREEN_HEIGHT) {
-            int x = kezdox;
-            kezdox += 110;
+            int x = x1;
+            x1 += 110;
             while (x > 0) {
-                x -= Kisnevsima->get_width();
+                x -= BackgroundTileMain->get_width();
             }
             while (x < SCREEN_WIDTH) {
-                blit8(BufferMain, Kisnevsima, x, y);
-                blit8(BufferBall, Kisnevgolyo, x, y);
-                x += Kisnevsima->get_width();
+                blit8(BufferMain, BackgroundTileMain, x, y);
+                blit8(BufferBall, BackgroundTileBall, x, y);
+                x += BackgroundTileMain->get_width();
             }
-            y += Kisnevsima->get_height();
+            y += BackgroundTileMain->get_height();
         }
         // Most egyszer kirakunk minden elemet kepre hogy
         // ne akadjon meg elso lejatszas kozben:
-        Tmpbuffer->fill_box(Introhatter);
-        blit8(Tmpbuffer, BufferMain, 0, 0);
+        ScreenBuffer->fill_box(BLACK_PALETTE_ID);
+        blit8(ScreenBuffer, BufferMain, 0, 0);
 
-        Scrolly1 = 0;
-        double yeltolas = 0.0;
+        ScrollingAnimationY = 0;
+        double menu_y1 = 0.0;
         for (int i = 0; i < BallCount; i++) {
             if (!State->animated_menus) {
                 break;
             }
 
-            Balls[i].current_r.y += yeltolas;
+            Balls[i].current_r.y += menu_y1;
 
-            kirajzgolyo(Balls[i].current_r, Balls[i].radius, BufferBall);
+            render_ball(Balls[i].current_r, Balls[i].radius, BufferBall);
 
-            vekt2 diff(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
-                       Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
-            kirajzgolyo(Balls[i].current_r + diff, Balls[i].radius * 0.25, BufferMain);
-            kirajzgolyo(Balls[i].current_r - diff, Balls[i].radius * 0.25, BufferMain);
+            vekt2 small_circle_offset(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
+                                      Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
+            render_ball(Balls[i].current_r + small_circle_offset, Balls[i].radius * 0.25,
+                        BufferMain);
+            render_ball(Balls[i].current_r - small_circle_offset, Balls[i].radius * 0.25,
+                        BufferMain);
 
-            Balls[i].current_r.y -= yeltolas;
+            Balls[i].current_r.y -= menu_y1;
         }
 
         // Rairjuk szovegeket:
-        for (int i = 0; i < elemszam; i++) {
-            MenuFont->write(Tmpbuffer, sorok[i].x, sorok[i].y, sorok[i].text);
+        for (int i = 0; i < line_count; i++) {
+            MenuFont->write(ScreenBuffer, lines[i].x, lines[i].y, lines[i].text);
         }
 
-        pic8* sisakframe = NULL;
-        sisakframe = Psisak->get_frame_by_index(25);
-        blit8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7);
-        blit8(Tmpbuffer, Intro, 0, 0);
+        pic8* helmet_frame = NULL;
+        helmet_frame = Helmet->get_frame_by_index(25);
+        blit8(ScreenBuffer, helmet_frame, helmet_x - 20, helmet_y - 7);
+        blit8(ScreenBuffer, Intro, 0, 0);
         // Idaig tartott minden elem kirakasa egyszer
     }
 
-    time -= Animkezdete;
+    time -= IntroAnimStartTime;
 
     int frame = time * 2.3;
 
     if (frame >= SCREEN_HEIGHT) {
-        Scrolly1 = 0;
+        ScrollingAnimationY = 0;
         return 0;
     }
 
-    Tmpbuffer->fill_box(Introhatter);
-    blit8(Tmpbuffer, BufferMain, 0, SCREEN_HEIGHT - frame);
+    ScreenBuffer->fill_box(BLACK_PALETTE_ID);
+    blit8(ScreenBuffer, BufferMain, 0, SCREEN_HEIGHT - frame);
 
-    Scrolly1 = SCREEN_HEIGHT - frame;
-    double yeltolas = frame - double(SCREEN_HEIGHT);
+    ScrollingAnimationY = SCREEN_HEIGHT - frame;
+    double menu_y1 = frame - double(SCREEN_HEIGHT);
     for (int i = 0; i < BallCount; i++) {
         if (!State->animated_menus) {
             break;
         }
 
-        Balls[i].current_r.y += yeltolas;
+        Balls[i].current_r.y += menu_y1;
 
-        kirajzgolyo(Balls[i].current_r, Balls[i].radius, BufferBall);
+        render_ball(Balls[i].current_r, Balls[i].radius, BufferBall);
 
-        vekt2 diff(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
-                   Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
-        kirajzgolyo(Balls[i].current_r + diff, Balls[i].radius * 0.25, BufferMain);
-        kirajzgolyo(Balls[i].current_r - diff, Balls[i].radius * 0.25, BufferMain);
+        vekt2 small_circle_offset(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
+                                  Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
+        render_ball(Balls[i].current_r + small_circle_offset, Balls[i].radius * 0.25, BufferMain);
+        render_ball(Balls[i].current_r - small_circle_offset, Balls[i].radius * 0.25, BufferMain);
 
-        Balls[i].current_r.y -= yeltolas;
+        Balls[i].current_r.y -= menu_y1;
     }
 
     // Rairjuk szovegeket:
-    for (int i = 0; i < elemszam; i++) {
-        MenuFont->write(Tmpbuffer, sorok[i].x, sorok[i].y + frame - SCREEN_HEIGHT, sorok[i].text);
+    for (int i = 0; i < line_count; i++) {
+        MenuFont->write(ScreenBuffer, lines[i].x, lines[i].y + frame - SCREEN_HEIGHT,
+                        lines[i].text);
     }
 
     // Rarakjuk sisakot:
-    pic8* sisakframe = NULL;
+    pic8* helmet_frame = NULL;
     if (State->animated_menus) {
-        sisakframe = Psisak->get_frame_by_time(time * 0.0024);
+        helmet_frame = Helmet->get_frame_by_time(time * 0.0024);
     } else {
-        sisakframe = Psisak->get_frame_by_index(25);
+        helmet_frame = Helmet->get_frame_by_index(25);
     }
 
-    blit8(Tmpbuffer, sisakframe, sisakx - 20, sisaky - 7 - (SCREEN_HEIGHT - 1) + frame);
+    blit8(ScreenBuffer, helmet_frame, helmet_x - 20, helmet_y - 7 - (SCREEN_HEIGHT - 1) + frame);
 
-    blit8(Tmpbuffer, Intro, 0, frame);
-    bltfront(Tmpbuffer);
+    blit8(ScreenBuffer, Intro, 0, frame);
+    bltfront(ScreenBuffer);
     return 1;
 }
 
-#define MAXHIBASORHOSSZ (34)
-typedef char hibasor[MAXHIBASORHOSSZ + 4];
-#define MAXHIBASOR (10)
-static hibasor Hibasortomb[MAXHIBASOR];
+#define ERROR_MAX_ROW_LENGTH (34)
+typedef char hibasor[ERROR_MAX_ROW_LENGTH + 4];
+#define ERROR_MAX_ROWS (10)
+static hibasor ErrorLines[ERROR_MAX_ROWS];
 
 void render_error(const char* text1, const char* text2, const char* text3) {
     // Kirajzoljuk hatteret BufferMain-ba:
     int y = 0;
-    int paros = 0;
+    int odd_row = 0;
     while (y < SCREEN_HEIGHT) {
         int x = 0;
-        if (paros) {
-            x -= Kisnevsima->get_width() / 2;
+        if (odd_row) {
+            x -= BackgroundTileMain->get_width() / 2;
         }
-        paros = !paros;
+        odd_row = !odd_row;
         while (x < SCREEN_WIDTH) {
-            blit8(BufferMain, Kisnevsima, x, y);
-            x += Kisnevsima->get_width();
+            blit8(BufferMain, BackgroundTileMain, x, y);
+            x += BackgroundTileMain->get_width();
         }
-        y += Kisnevsima->get_height();
+        y += BackgroundTileMain->get_height();
     }
 
-    int sorszam = 0;
+    int line_count = 0;
     for (int i = 0; i < 3; i++) {
         const char* text = text1;
         if (i == 1) {
@@ -414,17 +417,17 @@ void render_error(const char* text1, const char* text2, const char* text3) {
         }
 
         while (1) {
-            if (sorszam >= MAXHIBASOR) {
+            if (line_count >= ERROR_MAX_ROWS) {
                 break;
             }
-            if (strlen(text) <= MAXHIBASORHOSSZ) {
+            if (strlen(text) <= ERROR_MAX_ROW_LENGTH) {
                 // Siman belefer:
-                strcpy(Hibasortomb[sorszam], text);
-                sorszam++;
+                strcpy(ErrorLines[line_count], text);
+                line_count++;
                 break;
             }
             // Tul hosszu sor, le kell vagni belole:
-            int j = MAXHIBASORHOSSZ;
+            int j = ERROR_MAX_ROW_LENGTH;
             while (j > 0) {
                 if (text[j] == ' ') {
                     break;
@@ -434,12 +437,12 @@ void render_error(const char* text1, const char* text2, const char* text3) {
             }
             if (j <= 0) {
                 // Nem talalt szovegben space-t:
-                strncpy(Hibasortomb[sorszam], text, MAXHIBASORHOSSZ);
-                sorszam++;
-                text += MAXHIBASORHOSSZ;
+                strncpy(ErrorLines[line_count], text, ERROR_MAX_ROW_LENGTH);
+                line_count++;
+                text += ERROR_MAX_ROW_LENGTH;
             } else {
-                strncpy(Hibasortomb[sorszam], text, j);
-                sorszam++;
+                strncpy(ErrorLines[line_count], text, j);
+                line_count++;
                 text += j;
                 while (text[j] == ' ') {
                     text++;
@@ -449,9 +452,9 @@ void render_error(const char* text1, const char* text2, const char* text3) {
     }
 
     // Rairjuk szovegeket:
-    for (int i = 0; i < sorszam; i++) {
-        int y = 240 - 20 - sorszam * (40 / 2) + i * 40;
-        MenuFont->write_centered(BufferMain, 320, y, Hibasortomb[i]);
+    for (int i = 0; i < line_count; i++) {
+        int y = 240 - 20 - line_count * (40 / 2) + i * 40;
+        MenuFont->write_centered(BufferMain, 320, y, ErrorLines[i]);
     }
     // Kirakjuk:
     bltfront(BufferMain);

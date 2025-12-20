@@ -72,7 +72,7 @@ static int afterplayext( char* filenev, long ido ) {
             return 1; // Play again
         if( eredmeny == 1 ) {
             replayjelenlegi(); // Replay
-            Pmenupal->set();
+            MenuPal->set();
             continue;
         }
         if( eredmeny == 2 ) {
@@ -174,7 +174,7 @@ void playextmenu(void) {
             Prec1->erase(filenev);
             Prec2->erase(filenev);
             int ido = lejatszo(filenev);
-            Pmenupal->set();
+            MenuPal->set();
             char valasz[100] = "";
             idoelintezes(ido, valasz, 0, filenev);
             // Igaz, ha ujra jatszik, hamis ha listat ker:

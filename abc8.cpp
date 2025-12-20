@@ -109,7 +109,7 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
         int index = (unsigned char)*text;
         // Space character is hardcoded
         if (index == ' ') {
-            if (this == Pmenuabc) {
+            if (this == MenuFont) {
                 x += SpaceWidthMenu;
             } else {
                 x += SpaceWidth;
@@ -142,7 +142,7 @@ int abc8::len(const char* text) {
         // Space character is hardcoded (slightly different to abc8::write)
         if (!ppsprite[index]) {
             if (index == ' ') {
-                if (this == Pmenuabc) {
+                if (this == MenuFont) {
                     width += SpaceWidthMenu;
                 } else {
                     width += SpaceWidth;

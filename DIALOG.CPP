@@ -101,9 +101,9 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     int y1 = 240 - ysize / 2;
     int x2 = 320 + xsize / 2;
     int y2 = 240 + ysize / 2;
-    kirajzbox(Buffsima, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
+    kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
     for (int i = 0; i < textszam; i++) {
-        Pabc2->write_centered(Buffsima, 320, y1 + 22 + i * dy, texttomb[i]);
+        Pabc2->write_centered(BufferMain, 320, y1 + 22 + i * dy, texttomb[i]);
     }
 
     // Kirajzoljuk gombokat is:
@@ -128,11 +128,11 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         int xs = Pabc2->len(gombtomb[i]) + 10;
         gx2tomb[i] = gx1tomb[i] + xs / 2;
         gx1tomb[i] = gx1tomb[i] - xs / 2;
-        kirajzbox(Buffsima, gx1tomb[i], gy1, gx2tomb[i], gy2, Buttonszin, Dialogszelszin);
-        Pabc2->write_centered(Buffsima, (gx2tomb[i] + gx1tomb[i]) / 2, gy1 + 14, gombtomb[i]);
+        kirajzbox(BufferMain, gx1tomb[i], gy1, gx2tomb[i], gy2, Buttonszin, Dialogszelszin);
+        Pabc2->write_centered(BufferMain, (gx2tomb[i] + gx1tomb[i]) / 2, gy1 + 14, gombtomb[i]);
     }
 
-    bltfront(Buffsima);
+    bltfront(BufferMain);
     pop();
 
     if (visszater) {

@@ -223,9 +223,9 @@ void vonalrajz(vekt2 p1, vekt2 p2, int szaggatott) {
             double yd = y0 + m * x;
             int y = yd + 0.5;
             if (x >= Savx && y >= Savy && x < Fxsize && y < Fysize) {
-                unsigned char szin = Buffsima->gpixel(x, y);
+                unsigned char szin = BufferMain->gpixel(x, y);
                 szin += 128;
-                Buffsima->ppixel(x, y, szin);
+                BufferMain->ppixel(x, y, szin);
                 if (!Vonalcsakeditbe) {
                     ppixelfront(x, y, szin);
                 }
@@ -263,9 +263,9 @@ void vonalrajz(vekt2 p1, vekt2 p2, int szaggatott) {
             double xd = x0 + m * y;
             int x = xd + 0.5;
             if (x >= Savx && y >= Savy && x < Fxsize && y < Fysize) {
-                unsigned char szin = Buffsima->gpixel(x, y);
+                unsigned char szin = BufferMain->gpixel(x, y);
                 szin += 128;
-                Buffsima->ppixel(x, y, szin);
+                BufferMain->ppixel(x, y, szin);
                 if (!Vonalcsakeditbe) {
                     ppixelfront(x, y, szin);
                 }

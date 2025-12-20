@@ -129,7 +129,7 @@ int RECidokellis = 0;
 
 // Visszaadja valasztott szamat, ESC eseten -1-t:
 // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
-int valaszt2::valassz(egyszovsor* preszovegek, int preszovegszam, int csakkirajzol) {
+int valaszt2::valassz(text_line* preszovegek, int preszovegszam, int csakkirajzol) {
     if (szam < 1 || egykepen < 2) {
         hiba("valaszt2::valassz nem jo elejen!");
     }
@@ -150,7 +150,7 @@ int valaszt2::valassz(egyszovsor* preszovegek, int preszovegszam, int csakkirajz
     if (pszovlist) {
         delete pszovlist;
     }
-    pszovlist = new szoveglista;
+    pszovlist = new menu_pic;
 
     mk_emptychar();
     int valtozott = 1;
@@ -235,26 +235,26 @@ int valaszt2::valassz(egyszovsor* preszovegek, int preszovegszam, int csakkirajz
             for (int i = 0; i < preszovegszam; i++) {
                 if (strncmp(preszovegek[i].text, "*$$^&|@", 7) == 0) {
                     // Kozepre kell tenni:
-                    pszovlist->addszoveg_kozep(&preszovegek[i].text[7], preszovegek[i].x,
-                                               preszovegek[i].y);
+                    pszovlist->add_line_centered(&preszovegek[i].text[7], preszovegek[i].x,
+                                                 preszovegek[i].y);
                 } else {
                     // Nem kell kozepre tenni:
-                    pszovlist->addszoveg(preszovegek[i].text, preszovegek[i].x, preszovegek[i].y);
+                    pszovlist->add_line(preszovegek[i].text, preszovegek[i].x, preszovegek[i].y);
                 }
             }
 
-            pszovlist->addszoveg_kozep(cim, 320, cimy);
+            pszovlist->add_line_centered(cim, 320, cimy);
             for (int i = 0; i < egykepen && i < szam - felso; i++) {
-                pszovlist->addszoveg(rubrikak[felso + i], x0, y0 + i * dy);
+                pszovlist->add_line(rubrikak[felso + i], x0, y0 + i * dy);
             }
             if (tabos) {
                 for (int i = 0; i < egykepen && i < szam - felso; i++) {
-                    pszovlist->addszoveg(rubrikak_tab[felso + i], x0_tab, y0 + i * dy);
+                    pszovlist->add_line(rubrikak_tab[felso + i], x0_tab, y0 + i * dy);
                 }
             }
         }
-        pszovlist->setsisak(x0 - 30, y0 + (kur - felso) * dy);
-        pszovlist->kirajzol();
+        pszovlist->set_helmet(x0 - 30, y0 + (kur - felso) * dy);
+        pszovlist->render();
         if (csakkirajzol) {
             return 0;
         }
@@ -265,5 +265,5 @@ void valaszt2::kirajzol(void) {
     if (!pszovlist) {
         hiba("tegcdy");
     }
-    pszovlist->kirajzol();
+    pszovlist->render();
 }

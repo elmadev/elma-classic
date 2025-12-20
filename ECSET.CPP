@@ -903,7 +903,7 @@ static int Kovetoytomb[KOVVONALHOSSZ + 10];
 static const int Keltolas = 20;
 
 void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
-    if (!Buffsima) {
+    if (!BufferMain) {
         hiba("6dejuhfe");
     }
 
@@ -926,10 +926,10 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
     unsigned char atlatszo = ppic->gpixel(0, 0);
 
     // Toroljuk seged kepet:
-    // Buffsima: 0 -> atlatszo, 1 -> van textura:
+    // BufferMain: 0 -> atlatszo, 1 -> van textura:
     for (int y = 0; y < ysize; y++) {
         for (int x = 0; x < xsize; x++) {
-            Buffsima->ppixel(x, y, 0);
+            BufferMain->ppixel(x, y, 0);
         }
     }
     // Feltoltjuk segedkepet:
@@ -938,7 +938,7 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
         if (felso) {
             for (int y = 0; y < ysize; y++) {
                 if (ppic->gpixel(x, y) == atlatszo) {
-                    Buffsima->ppixel(x, y, 1);
+                    BufferMain->ppixel(x, y, 1);
                 } else {
                     break;
                 }
@@ -946,7 +946,7 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
         } else {
             for (int y = ysize - 1; y >= 0; y--) {
                 if (ppic->gpixel(x, y) == atlatszo) {
-                    Buffsima->ppixel(x, y, 1);
+                    BufferMain->ppixel(x, y, 1);
                 } else {
                     break;
                 }
@@ -957,7 +957,7 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
     // Beadjuk textura darabokat ecset-be:
     for (int y = 0; y < ysize; y++) {
         int x = 0;
-        unsigned char* sor = Buffsima->get_row(ysize - 1 - y);
+        unsigned char* sor = BufferMain->get_row(ysize - 1 - y);
         while (x < xsize) {
             x += getatlaatszoszam(sor, x, xsize, 0);
             if (x >= xsize) {

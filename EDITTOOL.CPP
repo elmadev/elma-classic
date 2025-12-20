@@ -702,9 +702,9 @@ void t_zoomin_esc(void) {
 }
 
 static void zoompont(int x, int y) {
-    unsigned char szin = Buffsima->gpixel(x, y);
+    unsigned char szin = BufferMain->gpixel(x, y);
     szin += 128;
-    Buffsima->ppixel(x, y, szin);
+    BufferMain->ppixel(x, y, szin);
     ppixelfront(x, y, szin);
 }
 

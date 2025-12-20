@@ -52,7 +52,7 @@
 
 // Siker eseten igazzal ter vissza:
 static int bevesznevet(char* nev) {
-    szoveglista szovlist;
+    menu_pic szovlist;
 
     int i = 0;
     mk_emptychar();
@@ -95,13 +95,13 @@ static int bevesznevet(char* nev) {
 
             nev[i] = '_';
             nev[i + 1] = 0;
-            szovlist.addszoveg_kozep(nev, 320, 240);
+            szovlist.add_line_centered(nev, 320, 240);
             nev[i] = 0;
 
-            szovlist.addszoveg_kozep("Please enter the filename:", 320, 180);
-            // szovlist.addszoveg_kozep( "Press ESC to exit", 320, 300 );
+            szovlist.add_line_centered("Please enter the filename:", 320, 180);
+            // szovlist.add_line_centered( "Press ESC to exit", 320, 300 );
         }
-        szovlist.kirajzol();
+        szovlist.render();
     }
 }
 
@@ -324,11 +324,11 @@ void saveplay(long belyeg) {
         sor3[13] = 'n';
         sor3[18] = '7';
 
-        szoveglista szl;
-        szl.addszoveg(sor1, 160, 3 * SM);
-        szl.addszoveg(sor2, 160, 5 * SM);
-        szl.addszoveg(sor3, 160, 7 * SM);
-        szl.addszoveg(sor4, 160, 9 * SM);
+        menu_pic szl;
+        szl.add_line(sor1, 160, 3 * SM);
+        szl.add_line(sor2, 160, 5 * SM);
+        szl.add_line(sor3, 160, 7 * SM);
+        szl.add_line(sor4, 160, 9 * SM);
 
         // Korny->pabc_saveplay->writekozep( Korny->picbuffer, 160, 3*SM, sor1 );
         // Korny->pabc_saveplay->writekozep( Korny->picbuffer, 160, 5*SM, sor2 );
@@ -348,7 +348,7 @@ void saveplay(long belyeg) {
                     return;
                 }
             }
-            szl.kirajzol();
+            szl.render();
         }
     }
     strcat(tmp, ".rec");
@@ -513,7 +513,7 @@ void replayjelenlegi(const char* filenev) {
     }
 }
 
-static egyszovsor Idoszovegek[14];
+static text_line Idoszovegek[14];
 
 // 0-ESC, 1-this level, 2-next level, 3-skip level
 // Ha filenev nem NULL, akkor external file:
@@ -554,7 +554,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
                 hiba("67834767");
             }
             sprintf(fejlec, "External: %s", Ptop->levelname);
-            if (Pmenuabc->len(fejlec) > 630) {
+            if (MenuFont->len(fejlec) > 630) {
                 sprintf(fejlec, "Ext: %s", Ptop->levelname);
             }
         } else {
@@ -599,7 +599,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
             int ya = 380;
             int yb = 415;
             int hosszunevek = 0;
-            if (Pmenuabc->len(pjatekosa->name) > 160 || Pmenuabc->len(pjatekosb->name) > 160) {
+            if (MenuFont->len(pjatekosa->name) > 160 || MenuFont->len(pjatekosb->name) > 160) {
                 hosszunevek = 1;
             }
             // A jatekos:
@@ -727,7 +727,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         }
         if (eredmeny == 2) {
             replayprec();
-            Pmenupal->set();
+            MenuPal->set();
         }
         if (eredmeny == 3) {
             if (level != INTERNAL_LEVEL_COUNT - 1) { // Utolso palyat nem lehet menteni
@@ -745,14 +745,14 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
 }
 
 void kiirloading(void) {
-    if (Pintro) {
-        delete Pintro;
-        Pintro = NULL;
+    if (Intro) {
+        delete Intro;
+        Intro = NULL;
     }
-    szoveglista szovlist;
+    menu_pic szovlist;
     szovlist.clear();
-    szovlist.addszoveg_kozep("Loading", 320, 230);
-    szovlist.kirajzol(1); // Golyok nelkul
+    szovlist.add_line_centered("Loading", 320, 230);
+    szovlist.render(1); // Golyok nelkul
 }
 
 static void playlevel(int level) {
@@ -774,7 +774,7 @@ static void playlevel(int level) {
         Prec1->erase(tmpnev);
         Prec2->erase(tmpnev);
         long ido = lejatszo(tmpnev);
-        Pmenupal->set();
+        MenuPal->set();
         if (Ptop->kerekekfejjellefele) {
             hiba("playlevel-ben Ptop->kerekekfejjellefel!");
         }

@@ -63,9 +63,9 @@ int main(int argc, char* argv[]) {
     Mute = 1;
 
     // Ezt hiba miatt kell mar most meghivni:
-    void initmenukep1(void);
-    void initmenukep2(void);
-    initmenukep1();
+    void init_menu_pictures1(void);
+    void init_menu_pictures2(void);
+    init_menu_pictures1();
 
     mv_check(/*"W_V init utan"*/);
 
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
     Inicializalva = 1;
 
     // Ez csak palettat allitja be:
-    initmenukep2();
+    init_menu_pictures2();
 
     ShowCursor(0);
 
@@ -259,8 +259,8 @@ static void directhiba(const char* text1, const char* text2, const char* text3, 
                 text3 = Tmphibatext;
             }
         }
-        void grafikushiba(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
-        grafikushiba(text1, text2, text3);
+        void render_error(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
+        render_error(text1, text2, text3);
         while (1) {
             int c = mk_getextchar();
             if (c == MK_ESC || c == MK_ENTER) {

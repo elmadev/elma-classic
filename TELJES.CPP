@@ -30,7 +30,7 @@ void cheatplayer(void) {
 }
 
 /*static void kiraklogot( void ) {
-    szoveglista szl;
+    menu_pic szl;
 
     mk_emptychar();
     while( 1 ) {
@@ -39,7 +39,7 @@ void cheatplayer(void) {
             //if( c == MK_ESC || c == MK_ENTER )
                 return;
         }
-        szl.kirajzol( 1, 1 );
+        szl.render( 1, 1 );
     }
 } */
 
@@ -80,16 +80,16 @@ void teljes(void) {
     delete tile; tile = NULL;*/
 
     // Ezt majd elso kiirloading szabaditja fel (menukep-ben van definialva):
-    Pintro = new pic8("intro.pcx");
+    Intro = new pic8("intro.pcx");
     // Itt most atirjuk verziot 1.1-re:
-    // blit8( Pintro, Pintro, 343, 433, 520, 459, 530, 468 ); // a betu
-    blit8(Pintro, Pintro, 321, 420, 297, 420, 315, 441);
-    blit8(Pintro, Pintro, 321 + 15, 420, 297, 420, 315, 441);
-    blit8(Pintro, Pintro, 321 + 15 + 16, 432, 88, 458, 98, 468);
-    spriteosit(Pintro);
+    // blit8( Intro, Intro, 343, 433, 520, 459, 530, 468 ); // a betu
+    blit8(Intro, Intro, 321, 420, 297, 420, 315, 441);
+    blit8(Intro, Intro, 321 + 15, 420, 297, 420, 315, 441);
+    blit8(Intro, Intro, 321 + 15 + 16, 432, 88, 458, 98, 468);
+    spriteosit(Intro);
     pic8* tmpintro = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT); // ezt majd kesobb szabaditjuk fel
     tmpintro->fill_box(254);
-    blit8(tmpintro, Pintro);
+    blit8(tmpintro, Intro);
 
     ddpal* pintropal = NULL;
     // Gany, ezzel az egy nevvel get_pcx_pal(pic.cpp) elso harom byte-ot 0-azza:
@@ -156,7 +156,7 @@ void teljes(void) {
         bltfront( pbuffer );
     } */
 
-    Pmenupal->set();
+    MenuPal->set();
 
     // Ez kell valaszt2-hoz:
     initrubrikak();
@@ -188,13 +188,13 @@ void kilep( void ) {
 
 void kilep(void) {
     WallsDisabled = true; // golyok ezentul kimenek falon kivulre
-    szoveglista* pszovlist = new szoveglista;
-    pszovlist->addszoveg_kozep("Thank you for registering the game!", 320, 220);
-    pszovlist->addszoveg_kozep("Please do not distribute!", 320, 300);
+    menu_pic* pszovlist = new menu_pic;
+    pszovlist->add_line_centered("Thank you for registering the game!", 320, 220);
+    pszovlist->add_line_centered("Please do not distribute!", 320, 300);
 
     double kezdoido = mv_stopperido();
     while (1) {
-        pszovlist->kirajzol();
+        pszovlist->render();
         double idovaras = 50.0;
         if ((mv_stopperido() > (kezdoido + idovaras)) && mk_kbhit()) {
             int c = mk_getextchar();

@@ -95,10 +95,10 @@ int main() {
     void mk_init(void);
     mk_init();
 
-    void initmenukep1(void);
-    void initmenukep2(void);
-    initmenukep1();
-    initmenukep2();
+    void init_menu_pictures1(void);
+    void init_menu_pictures2(void);
+    init_menu_pictures1();
+    init_menu_pictures2();
     mv_main();
 }
 

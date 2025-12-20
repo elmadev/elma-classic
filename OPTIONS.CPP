@@ -3,38 +3,38 @@
 int Hangmarmegy = 0;
 
 void help(void) {
-    szoveglista szl;
+    menu_pic szl;
 
     int x1 = 90;
     int x2 = 220;
     int yo = 80;
     int dy = 32;
     // Korny->pabc_help->write( Korny->picbuffer, x1+60, yo,      "Help" );
-    szl.addszoveg_kozep("Default controls:", 320, 20);
+    szl.add_line_centered("Default controls:", 320, 20);
 
-    szl.addszoveg("UP", x1, yo);
-    szl.addszoveg("- Accelerate", x2, yo);
+    szl.add_line("UP", x1, yo);
+    szl.add_line("- Accelerate", x2, yo);
 
-    szl.addszoveg("DOWN", x1, yo + dy);
-    szl.addszoveg("- Block Wheels", x2, yo + dy);
+    szl.add_line("DOWN", x1, yo + dy);
+    szl.add_line("- Block Wheels", x2, yo + dy);
 
-    szl.addszoveg("LEFT", x1, yo + dy * 2);
-    szl.addszoveg("- Rotate AntiClockwise", x2, yo + dy * 2);
+    szl.add_line("LEFT", x1, yo + dy * 2);
+    szl.add_line("- Rotate AntiClockwise", x2, yo + dy * 2);
 
-    szl.addszoveg("RIGHT", x1, yo + dy * 3);
-    szl.addszoveg("- Rotate Clockwise", x2, yo + dy * 3);
+    szl.add_line("RIGHT", x1, yo + dy * 3);
+    szl.add_line("- Rotate Clockwise", x2, yo + dy * 3);
 
-    szl.addszoveg("SPACE", x1, yo + dy * 4);
-    szl.addszoveg("- Turn Around", x2, yo + dy * 4);
+    szl.add_line("SPACE", x1, yo + dy * 4);
+    szl.add_line("- Turn Around", x2, yo + dy * 4);
 
-    szl.addszoveg("V", x1, yo + dy * 5);
-    szl.addszoveg("- View Box Toggle", x2, yo + dy * 5);
+    szl.add_line("V", x1, yo + dy * 5);
+    szl.add_line("- View Box Toggle", x2, yo + dy * 5);
 
-    szl.addszoveg("T", x1, yo + dy * 6);
-    szl.addszoveg("- Time Display Toggle", x2, yo + dy * 6);
+    szl.add_line("T", x1, yo + dy * 6);
+    szl.add_line("- Time Display Toggle", x2, yo + dy * 6);
 
-    szl.addszoveg_kozep("After you have eaten all the fruits,", 320, yo + dy * 9);
-    szl.addszoveg_kozep("touch the flower!", 320, yo + dy * 10);
+    szl.add_line_centered("After you have eaten all the fruits,", 320, yo + dy * 9);
+    szl.add_line_centered("touch the flower!", 320, yo + dy * 10);
 
     mk_emptychar();
     while (1) {
@@ -44,7 +44,7 @@ void help(void) {
                 return;
             }
         }
-        szl.kirajzol();
+        szl.render();
     }
 }
 
@@ -142,12 +142,12 @@ void options(void) {
             // State->save_aaa(); majd programbol valo kilepeskor kiirjuk
             if (origsecondary != State->compatibility_mode && Hangmarmegy) {
                 // Kiirunk egy dialogust, hogy ujra kell inditani ehhez:
-                szoveglista szl;
-                szl.addszoveg_kozep("You modified the sound buffer", 320, 140);
-                szl.addszoveg_kozep("optimization! As you already", 320, 190);
-                szl.addszoveg_kozep("used the sound in this session,", 320, 240);
-                szl.addszoveg_kozep("this will only take effect", 320, 290);
-                szl.addszoveg_kozep("if you restart the game.", 320, 340);
+                menu_pic szl;
+                szl.add_line_centered("You modified the sound buffer", 320, 140);
+                szl.add_line_centered("optimization! As you already", 320, 190);
+                szl.add_line_centered("used the sound in this session,", 320, 240);
+                szl.add_line_centered("this will only take effect", 320, 290);
+                szl.add_line_centered("if you restart the game.", 320, 340);
                 mk_emptychar();
                 while (1) {
                     if (mk_kbhit()) {
@@ -156,7 +156,7 @@ void options(void) {
                             break;
                         }
                     }
-                    szl.kirajzol();
+                    szl.render();
                 }
             }
             return;

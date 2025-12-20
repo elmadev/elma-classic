@@ -4,7 +4,7 @@ static int Maxnevhossz = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-
 
 // Siker eseten igazzal ter vissza:
 static int bevesznevet(char* nev, int visszater) {
-    szoveglista szovlist;
+    menu_pic szovlist;
 
     int i = 0;
     mk_emptychar();
@@ -50,13 +50,13 @@ static int bevesznevet(char* nev, int visszater) {
 
             nev[i] = '_';
             nev[i + 1] = 0;
-            szovlist.addszoveg_kozep(nev, 320, 240);
+            szovlist.add_line_centered(nev, 320, 240);
             nev[i] = 0;
 
-            szovlist.addszoveg_kozep("Please enter your name:", 320, 180);
-            // szovlist.addszoveg_kozep( "Press ESC to exit", 320, 300 );
+            szovlist.add_line_centered("Please enter your name:", 320, 180);
+            // szovlist.add_line_centered( "Press ESC to exit", 320, 300 );
         }
-        szovlist.kirajzol();
+        szovlist.render();
     }
 }
 

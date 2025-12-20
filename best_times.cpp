@@ -67,8 +67,8 @@ static void render_topten(topten* tten, const char* header, int single) {
         return;
     }
 
-    szoveglista men;
-    men.addszoveg_kozep(header, 320, 37);
+    menu_pic men;
+    men.add_line_centered(header, 320, 37);
 
     int player_x;
     int time_x;
@@ -87,14 +87,14 @@ static void render_topten(topten* tten, const char* header, int single) {
             strcat(player_text, tten->names2[i]);
         }
         // Truncate the player names so it doesn't overlap with the times
-        while (Pmenuabc->len(player_text) > time_x - player_x - 4) {
+        while (MenuFont->len(player_text) > time_x - player_x - 4) {
             player_text[strlen(player_text) - 1] = 0;
         }
 
-        men.addszoveg(player_text, player_x, 110 + i * (SM + 19));
+        men.add_line(player_text, player_x, 110 + i * (SM + 19));
         char time_text[30];
         centiseconds_to_string(tten->times[i], time_text);
-        men.addszoveg(time_text, time_x, 110 + i * (SM + 19));
+        men.add_line(time_text, time_x, 110 + i * (SM + 19));
     }
 
     mk_emptychar();
@@ -105,7 +105,7 @@ static void render_topten(topten* tten, const char* header, int single) {
                 return;
             }
         }
-        men.kirajzol();
+        men.render();
     }
 }
 

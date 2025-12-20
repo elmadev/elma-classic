@@ -193,7 +193,7 @@ void replay(void) {
                 strcpy(tmp, Rubrikak[pl + 1]);
                 strcat(tmp, ".REC");
                 // 0 param azt jelenti, hogy nem resource filebol olvas:
-                Pmenupal->set();
+                MenuPal->set();
                 kiirloading();
                 long belyeg = loadrecek(tmp, 0);
                 if (access_topol(Prec1->palyanev) != 0) {
@@ -264,7 +264,7 @@ void replay(void) {
                 }
             }
         }
-        Pmenupal->set();
+        MenuPal->set();
     }
 }
 
@@ -293,10 +293,10 @@ static void demo(void) {
         Prec1->rewind();
         Prec2->rewind();
         if (lejatszo_r(Prec1->palyanev, 0)) {
-            Pmenupal->set();
+            MenuPal->set();
             return;
         }
-        Pmenupal->set();
+        MenuPal->set();
     }
 }
 
@@ -329,7 +329,7 @@ static void kilephakell(void) {
 }
 
 void mainmenu(void) {
-    Pmenupal->set();
+    MenuPal->set();
 
     // State->save_aaa(); ide minek kene?
     valaszt2 val;
@@ -354,12 +354,12 @@ void mainmenu(void) {
     while (1) {
         // Korny->pabc_fomenu->write( Korny->picbuffer, 70, 10, "Main menu" );
 
-        // Pmenupal->set(); // Torlendo
+        // MenuPal->set(); // Torlendo
 
         int eredmeny = val.valassz();
 
         // Kimenti menut pcx file-ba:
-        // Buffsima->save( "menu.pcx", Menupaltomb );
+        // BufferMain->save( "menu.pcx", Menupaltomb );
         // uzenet( "Menut mentett menu.pcx file-ba!" );
 
         if (eredmeny == 0) {
@@ -392,7 +392,7 @@ void mainmenu(void) {
             editor();
             show_cursor();
             Editorban_dialnak = 0;
-            Pmenupal->set();
+            MenuPal->set();
         }
 
         if (eredmeny == -1) {

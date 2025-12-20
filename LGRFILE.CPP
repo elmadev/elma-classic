@@ -53,9 +53,9 @@ void loadlgrfile(const char* nev) {
         strcat(nevtmp, ".LGR");
 
         // Kiirunk egy uzenetet:
-        blit8(Buffgolyo, Buffsima);
-        Buffsima->fill_box(Hatterindex);
-        bltfront(Buffsima);
+        blit8(BufferBall, BufferMain);
+        BufferMain->fill_box(Hatterindex);
+        bltfront(BufferMain);
         if (!Editorban_dialnak) {
             Pal_editor->set();
         }
@@ -65,10 +65,10 @@ void loadlgrfile(const char* nev) {
             "This file doesn't exist in the LGR directory, so the DEFAULT.LGR file will be loaded.",
             "This level file will look now different from that it was designed to look.");
         if (!Editorban_dialnak) {
-            Pmenupal->set();
+            MenuPal->set();
         }
-        blit8(Buffsima, Buffgolyo);
-        bltfront(Buffsima);
+        blit8(BufferMain, BufferBall);
+        bltfront(BufferMain);
 
         // (Ptop->lgrnev lehet egy mutato nev-vel)
         strcpy(Ptop->lgrnev, "DEFAULT");

@@ -22,11 +22,11 @@ int dialog320(const char* text1, const char* text2, const char* text3, const cha
         szam--;
     }
 
-    szoveglista szl;
+    menu_pic szl;
     int dy = 40;
     int y0 = 240 - (szam - 1) / 2 * dy;
     for (int i = 0; i < szam; i++) {
-        szl.addszoveg_kozep(textek[i], 320, y0 + i * dy);
+        szl.add_line_centered(textek[i], 320, y0 + i * dy);
     }
     mk_emptychar();
     while (1) {
@@ -40,6 +40,6 @@ int dialog320(const char* text1, const char* text2, const char* text3, const cha
                 return c;
             }
         }
-        szl.kirajzol();
+        szl.render();
     }
 }

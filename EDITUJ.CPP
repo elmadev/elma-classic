@@ -130,9 +130,9 @@ static void elintezegymousepixelt(int x, int y) {
     if (x < 0 || y < 0 || x > (SCREEN_WIDTH - 1) || y > (SCREEN_HEIGHT - 1)) {
         return;
     }
-    unsigned char szin = Buffsima->gpixel(x, y);
+    unsigned char szin = BufferMain->gpixel(x, y);
     szin += 128;
-    Buffsima->ppixel(x, y, szin);
+    BufferMain->ppixel(x, y, szin);
     ppixelfront(x, y, szin);
 }
 
@@ -205,9 +205,9 @@ void toolhelp(const char* text) {
         strcpy(Toolhelpszoveg, text);
     }
     int x1 = 1, y1 = 18, x2 = SCREEN_WIDTH - 2, y2 = Savy - 2;
-    Buffsima->fill_box(x1, y1, x2, y2, Hatterindex);
-    Pabc1->write(Buffsima, 10, y1 + 12, Toolhelpszoveg);
-    bltfront(Buffsima, x1, y1, x2, y2);
+    BufferMain->fill_box(x1, y1, x2, y2, Hatterindex);
+    Pabc1->write(BufferMain, 10, y1 + 12, Toolhelpszoveg);
+    bltfront(BufferMain, x1, y1, x2, y2);
 }
 
 // KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK
@@ -252,15 +252,15 @@ static char Menuszovegek[23][15] = { // Masodik egy string hossza
 int Tool = T_MOVE;
 
 static void editbe_balmenu(void) {
-    Buffsima->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menuszin);
+    BufferMain->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menuszin);
     // Eloszor is egy nagy keret:
-    Buffsima->line(0, 0, SCREEN_WIDTH - 1, 0, Menulineszin);
-    Buffsima->line(0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
-    Buffsima->line(0, 0, 0, SCREEN_HEIGHT - 1, Menulineszin);
-    Buffsima->line(SCREEN_WIDTH - 1, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
+    BufferMain->line(0, 0, SCREEN_WIDTH - 1, 0, Menulineszin);
+    BufferMain->line(0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
+    BufferMain->line(0, 0, 0, SCREEN_HEIGHT - 1, Menulineszin);
+    BufferMain->line(SCREEN_WIDTH - 1, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
     // Meg ket belso vonal:
-    Buffsima->line(0, Savy - 1, SCREEN_WIDTH - 1, Savy - 1, Menulineszin);
-    Buffsima->line(Savx - 1, Savy, Savx - 1, SCREEN_HEIGHT - 1, Menulineszin);
+    BufferMain->line(0, Savy - 1, SCREEN_WIDTH - 1, Savy - 1, Menulineszin);
+    BufferMain->line(Savx - 1, Savy, Savx - 1, SCREEN_HEIGHT - 1, Menulineszin);
     for (int i = 0; i < Menuszam; i++) {
         // x1... stb a belso reszt jelenti:
         int x1 = 1;
@@ -268,32 +268,32 @@ static void editbe_balmenu(void) {
         int x2 = Savx - 2;
         int y2 = Savy + (i + 1) * Menudy - 1;
         if (i == Elsotool + Tool) {
-            Buffsima->fill_box(x1, y1, x2, y2, Menu_nyomottszin);
+            BufferMain->fill_box(x1, y1, x2, y2, Menu_nyomottszin);
         }
-        Buffsima->line(x1, y2 + 1, x2, y2 + 1, Menulineszin);
-        Pabc1->write(Buffsima, 5, Savy + i * Menudy + 14, Menuszovegek[i]);
+        BufferMain->line(x1, y2 + 1, x2, y2 + 1, Menulineszin);
+        Pabc1->write(BufferMain, 5, Savy + i * Menudy + 14, Menuszovegek[i]);
     }
     // Meg benyomunk par felirat ala vonalakat:
     // Save and Play felirat P-je ala:
     int x = 66;
     int y = Savy + 5 * Menudy + 15;
-    Buffsima->line(x, y, x + 6, y, 247);
+    BufferMain->line(x, y, x + 6, y, 247);
     // Exit felirat x-e ala:
     x = 13;
     y = Savy + 0 * Menudy + 15;
-    Buffsima->line(x, y, x + 7, y, 247);
+    BufferMain->line(x, y, x + 7, y, 247);
     // Open felirat o-ja ala:
     x = 5;
     y = Savy + 2 * Menudy + 15;
-    Buffsima->line(x, y, x + 6, y, 247);
+    BufferMain->line(x, y, x + 6, y, 247);
     // Zoom Out felirat z-je ala:
     x = 5;
     y = Savy + 8 * Menudy + 15;
-    Buffsima->line(x, y, x + 7, y, 247);
+    BufferMain->line(x, y, x + 7, y, 247);
     // Save felirat s-e ala:
     x = 4;
     y = Savy + 4 * Menudy + 15;
-    Buffsima->line(x, y, x + 7, y, 247);
+    BufferMain->line(x, y, x + 7, y, 247);
 }
 
 static pic8* Pspritenevbuffer = NULL;
@@ -355,8 +355,8 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
         Pabc2->write(Pspritenevbuffer, 164, 14, tmp);
     }
 
-    blit8(Buffsima, Pspritenevbuffer, 226, 2);
-    bltfront(Buffsima, 226, 2, 540, 30);
+    blit8(BufferMain, Pspritenevbuffer, 226, 2);
+    bltfront(BufferMain, 226, 2, 540, 30);
 }
 
 void kikereknev(int tipus, int kajatipus, int foodsorszam) {
@@ -410,8 +410,8 @@ void kikereknev(int tipus, int kajatipus, int foodsorszam) {
 
     Pabc2->write(Pspritenevbuffer, 50, 14, tmp);
 
-    blit8(Buffsima, Pspritenevbuffer, 226, 2);
-    bltfront(Buffsima, 226, 2, 540, 30);
+    blit8(BufferMain, Pspritenevbuffer, 226, 2);
+    bltfront(BufferMain, 226, 2, 540, 30);
 }
 
 static void ujrarajzol(int egesz) {
@@ -423,34 +423,34 @@ static void ujrarajzol(int egesz) {
         editbe_balmenu();
     }
 
-    Buffsima->fill_box(Savx, Savy, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2, Hatterindex);
-    Buffsima->fill_box(1, 1, SCREEN_WIDTH - 2, Savy - 2, Hatterindex);
+    BufferMain->fill_box(Savx, Savy, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2, Hatterindex);
+    BufferMain->fill_box(1, 1, SCREEN_WIDTH - 2, Savy - 2, Hatterindex);
     // Kiirjuk file nevet:
-    Pabc1->write(Buffsima, 6, 15, "File:");
+    Pabc1->write(BufferMain, 6, 15, "File:");
     strupr(State->editor_filename);
     int len = 0;
     int xfile = 41;
     if (State->editor_filename[0] == 0) {
-        Pabc2->write(Buffsima, xfile, 15, "UNNAMED");
+        Pabc2->write(BufferMain, xfile, 15, "UNNAMED");
         len = Pabc2->len("UNNAMED");
     } else {
-        Pabc2->write(Buffsima, xfile, 15, State->editor_filename);
+        Pabc2->write(BufferMain, xfile, 15, State->editor_filename);
         len = Pabc2->len(State->editor_filename);
     }
     if (Valtozott) {
-        Pabc1->write(Buffsima, xfile + len + 3, 15, "(Changed)");
+        Pabc1->write(BufferMain, xfile + len + 3, 15, "(Changed)");
     } else {
-        Pabc1->write(Buffsima, xfile + len + 3, 15, "(Unchanged)");
+        Pabc1->write(BufferMain, xfile + len + 3, 15, "(Unchanged)");
     }
 
     // Kiirjuk sprite allando szoveget ha olyan tool:
     // if( Tool == T_MOVE || Tool == T_CREATE_SPRITE || Tool == T_DELETE_SPRITE )
-    //	Pabc1->write( Buffsima, 392, 15, "Picture:" );
+    //	Pabc1->write( BufferMain, 392, 15, "Picture:" );
 
     // Kiirjuk tool szoveget:
     toolhelp();
     // Kiirjuk zoomot:
-    Pabc1->write(Buffsima, 543, 15, "Zoom:");
+    Pabc1->write(BufferMain, 543, 15, "Zoom:");
     char text[30];
     sprintf(text, "%lf", getzoomvalue());
     // Tizedespont utani jegyek szamat maximaljuk 2-re:
@@ -458,9 +458,9 @@ static void ujrarajzol(int egesz) {
         *(strstr(text, ".") + 5) = 0; // + 3
     }
     if (strlen(text) < 7) {
-        Pabc2->write(Buffsima, 584, 15, text); // 1234.5
+        Pabc2->write(BufferMain, 584, 15, text); // 1234.5
     } else {
-        Pabc2->write(Buffsima, 580, 15, text); // 10000.0
+        Pabc2->write(BufferMain, 580, 15, text); // 10000.0
     }
 
     Vonalcsakeditbe = 1; // Csak edit bufferbe rajzoljon kirajzol
@@ -474,7 +474,7 @@ static void ujrarajzol(int egesz) {
 
     Vonalcsakeditbe = 0;
 
-    bltfront(Buffsima);
+    bltfront(BufferMain);
 
     Kellredraw = 0;
     if (egesz) {
@@ -577,14 +577,14 @@ static void toolvaltas(int t) {
 // static int Mouseinited = 0;
 
 void editor(void) {
-    if (!Buffsima) {
-        hiba("editor-ban !Buffsima!");
+    if (!BufferMain) {
+        hiba("editor-ban !BufferMain!");
     }
 
     Pal_editor->set();
 
     editbe_balmenu();
-    bltfront(Buffsima);
+    bltfront(BufferMain);
 
     // Egeret eloszor helyezzuk ki:
     Egerkint = 0;
@@ -715,7 +715,7 @@ void editor(void) {
                         if (access(filenev, 0) != 0) {
                             // Ez a nev nem foglalt:
                             // forditkepet( ppic );
-                            Buffsima->save(filenev, Pal_editor_byteok);
+                            BufferMain->save(filenev, Pal_editor_byteok);
                             // forditkepet( ppic );
                             break;
                         }

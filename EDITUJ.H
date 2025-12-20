@@ -4,8 +4,8 @@
 // Uj integralt editor h-ja:
 
 extern topol* Ptop;
-// extern pic8* Editbuffer; Ezentul ez Buffsima
-// extern pic8* Editbuffer2;  Ezentul ez Buffgolyo
+// extern pic8* Editbuffer; Ezentul ez BufferMain
+// extern pic8* Editbuffer2;  Ezentul ez BufferBall
 
 extern ddpal* Pal_editor;
 void seteditorpal(void); // Pal_editor-t hozza letre es allitja be

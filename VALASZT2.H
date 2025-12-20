@@ -25,7 +25,7 @@ class valaszt2 {
     rubrika* rubrikak_tab;
     int szam;
     int tabos;
-    szoveglista* pszovlist;
+    menu_pic* pszovlist;
 
   public:
     int kur;
@@ -40,7 +40,7 @@ class valaszt2 {
     void bead(int szam, int tabos = 0); // Rubrikakat beveszi
     // Visszaadja valasztott szamat, ESC eseten -1-et:
     // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
-    int valassz(egyszovsor* preszovegek = NULL, int preszovegszam = 0, int csakkirajzol = 0);
+    int valassz(text_line* preszovegek = NULL, int preszovegszam = 0, int csakkirajzol = 0);
 
     void kirajzol(void);
 };

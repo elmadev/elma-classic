@@ -18,7 +18,7 @@ int skippelheto(int level) {
     }
     int skippelheto = eddigskippelt < maxskippelheto;
 
-    szoveglista szl;
+    menu_pic szl;
     if (skippelheto) {
         // Lehet meg skippelni!
         int x0 = 320;
@@ -29,15 +29,15 @@ int skippelheto(int level) {
         char tmp[100] = "Number of skips allowed: ";
         strcat(tmp, szam);
         // Korny->pabc_afterplaymenu->writekozep( Korny->picbuffer, x0, y0, tmp );
-        szl.addszoveg_kozep(tmp, x0, y0);
+        szl.add_line_centered(tmp, x0, y0);
         itoa(eddigskippelt, szam, 10);
         strcpy(tmp, "Number of skips so far:   ");
         strcat(tmp, szam);
         // Korny->pabc_afterplaymenu->writekozep( Korny->picbuffer, x0, y0+dy, tmp );
-        szl.addszoveg_kozep(tmp, x0, y0 + dy);
+        szl.add_line_centered(tmp, x0, y0 + dy);
         // Korny->pabc_afterplaymenu->writekozep( Korny->picbuffer, x0, y0+3*dy,
         //	"Press a key to continue!" );
-        szl.addszoveg_kozep("Press a key to continue!", x0, y0 + 3 * dy);
+        szl.add_line_centered("Press a key to continue!", x0, y0 + 3 * dy);
     } else {
         // Nem lehet mar skippelni!
         int x0 = 320;
@@ -45,10 +45,10 @@ int skippelheto(int level) {
         int dy = 50;
         // Korny->pabc_afterplaymenu->writekozep( Korny->picbuffer, x0, y0,
         //	"You already have reached" );
-        szl.addszoveg_kozep("You already have reached", x0, y0);
+        szl.add_line_centered("You already have reached", x0, y0);
         // Korny->pabc_afterplaymenu->writekozep( Korny->picbuffer, x0, y0+dy,
         //	"the maximum number of" );
-        szl.addszoveg_kozep("the maximum number of", x0, y0 + dy);
+        szl.add_line_centered("the maximum number of", x0, y0 + dy);
 
         char szam[10];
         itoa(maxskippelheto, szam, 10);
@@ -56,16 +56,16 @@ int skippelheto(int level) {
         strcat(tmp, szam);
         strcat(tmp, ")!");
         // Korny->pabc_afterplaymenu->writekozep( Korny->picbuffer, x0, y0+2*dy, tmp );
-        szl.addszoveg_kozep(tmp, x0, y0 + 2 * dy);
+        szl.add_line_centered(tmp, x0, y0 + 2 * dy);
         // Korny->pabc_afterplaymenu->writekozep( Korny->picbuffer, x0, y0+3*dy,
         //	"Fullfill a previously skipped" );
-        szl.addszoveg_kozep("Fullfill a previously skipped", x0, y0 + 3 * dy);
+        szl.add_line_centered("Fullfill a previously skipped", x0, y0 + 3 * dy);
         // Korny->pabc_afterplaymenu->writekozep( Korny->picbuffer, x0, y0+4*dy,
         //	"level to skip this level!" );
-        szl.addszoveg_kozep("level to skip this level!", x0, y0 + 4 * dy);
+        szl.add_line_centered("level to skip this level!", x0, y0 + 4 * dy);
         // Korny->pabc_afterplaymenu->writekozep( Korny->picbuffer, x0, y0+5*dy,
         //	"Press a key to continue!" );
-        szl.addszoveg_kozep("Press a key to continue!", x0, y0 + 6 * dy);
+        szl.add_line_centered("Press a key to continue!", x0, y0 + 6 * dy);
     }
 
     // Kep kiteves:
@@ -75,6 +75,6 @@ int skippelheto(int level) {
             mk_getextchar();
             return skippelheto;
         }
-        szl.kirajzol();
+        szl.render();
     }
 }

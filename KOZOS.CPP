@@ -1,7 +1,7 @@
 #include "ALL.H"
+#include <filesystem>
 #ifndef _WIN32
 #include <assert.h>
-#include <filesystem>
 #include <cstring>
 #include <string>
 #endif
@@ -15,7 +15,6 @@ void k_memcpy(void* dest, const void* src, size_t n) {
     memcpy(dest, src, n);
 }
 
-#ifndef _WIN32
 constexpr int MAX_FILENAME_LEN = 8;
 static std::filesystem::directory_iterator CurrentIterator;
 static std::filesystem::directory_iterator EndIterator;
@@ -72,88 +71,6 @@ void ficlose(void) {
     FindInProgress = false;
     CurrentIterator = EndIterator;
 }
-
-#else
-
-static int Fiben = 0;
-static intptr_t Fihandler = -1;
-
-int fifirst(const char* minta, char* filenev) {
-    if (Fiben || Fihandler != -1L) {
-        hiba("fifirst");
-    }
-    Fiben = 1;
-
-    filenev[0];
-    struct _finddata_t c_file;
-    Fihandler = _findfirst(minta, &c_file);
-    if (Fihandler == -1) {
-        return 1;
-    }
-
-    // Megvizsgaljuk nem tul hosszu-e nev:
-    if (strlen(c_file.name) <= 12) {
-        char tmpnev[20];
-        strcpy(tmpnev, c_file.name);
-        // Levagjuk vegerol kiterjesztest:
-        if (strstr(tmpnev, ".")) {
-            *strstr(tmpnev, ".") = 0;
-        }
-        if (strlen(tmpnev) <= 8) {
-            strcpy(filenev, c_file.name);
-            return 0;
-        }
-    }
-    // Tul hosszu volt nev, tehat nezzuk tovabb:
-    return finext(filenev);
-}
-
-int finext(char* filenev) {
-    if (!Fiben || Fihandler == -1L) {
-        hiba("8794t");
-    }
-
-    filenev[0] = 0;
-
-    while (1) {
-        struct _finddata_t c_file;
-        if (_findnext(Fihandler, &c_file) != 0) {
-            return 1;
-        }
-
-        // Megvizsgaljuk nem tul hosszu-e nev:
-        if (strlen(c_file.name) > 12) {
-            continue; // Tul hosszu nev
-        }
-
-        char tmpnev[20];
-        strcpy(tmpnev, c_file.name);
-        // Levagjuk vegerol kiterjesztest:
-        if (strstr(tmpnev, ".")) {
-            *strstr(tmpnev, ".") = 0;
-        }
-        if (strlen(tmpnev) > 8) {
-            continue; // Tul hosszu nev
-        }
-
-        // Nev rendben van:
-        strcpy(filenev, c_file.name);
-        return 0;
-    }
-}
-
-void ficlose(void) {
-    if (!Fiben) {
-        hiba("908uy6");
-    }
-    Fiben = 0;
-    if (Fihandler != -1L) {
-        _findclose(Fihandler);
-        Fihandler = -1L;
-    }
-}
-
-#endif
 
 #ifndef _WIN32
 void itoa(int value, char* str, int base) {

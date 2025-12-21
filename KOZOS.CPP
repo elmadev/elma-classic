@@ -6,9 +6,9 @@
 #include <string>
 #endif
 
-double K_pi = 3.141592;
-double K_pip2 = K_pi * 0.5;
-double K_2pi = K_pi * 2.0;
+double PI = 3.141592;
+double HALF_PI = PI * 0.5;
+double TWO_PI = PI * 2.0;
 
 constexpr int MAX_FILENAME_LEN = 8;
 static std::filesystem::directory_iterator CurrentIterator;
@@ -16,26 +16,26 @@ static std::filesystem::directory_iterator EndIterator;
 static std::string CurrentExt;
 static bool FindInProgress = false;
 
-int fifirst(const char* minta, char* filenev) {
+int find_first(const char* pattern, char* filename_dest) {
     if (FindInProgress) {
-        internal_error("Called fifirst while a find is already in progress!");
+        internal_error("Called find_first while a find is already in progress!");
     }
 
     FindInProgress = true;
-    std::string directory = std::filesystem::path(minta).parent_path().generic_string();
-    CurrentExt = std::filesystem::path(minta).extension().generic_string();
+    std::string directory = std::filesystem::path(pattern).parent_path().generic_string();
+    CurrentExt = std::filesystem::path(pattern).extension().generic_string();
     try {
         CurrentIterator = std::filesystem::directory_iterator(directory);
     } catch (const std::filesystem::filesystem_error&) {
         return 1;
     }
 
-    return finext(filenev);
+    return find_next(filename_dest);
 }
 
-int finext(char* filenev) {
+int find_next(char* filename_dest) {
     if (!FindInProgress) {
-        internal_error("Called finext while no find is in progress!");
+        internal_error("Called find_next while no find is in progress!");
     }
 
     while (CurrentIterator != EndIterator) {
@@ -46,7 +46,7 @@ int finext(char* filenev) {
             if (strcmpi(path.extension().generic_string().c_str(), CurrentExt.c_str()) == 0) {
                 const std::string filename = path.filename().generic_string();
                 if (path.stem().generic_string().size() <= MAX_FILENAME_LEN) {
-                    strcpy(filenev, filename.c_str());
+                    strcpy(filename_dest, filename.c_str());
                     ++CurrentIterator;
                     return 0;
                 }
@@ -59,7 +59,7 @@ int finext(char* filenev) {
     return 1;
 }
 
-void ficlose(void) {
+void find_close(void) {
     if (!FindInProgress) {
         internal_error("Called ficlose while no find is in progress!");
     }

@@ -371,7 +371,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     if (forgas < 0.999) {
         vanforgas = 1;
         // forgast 0, 1 intervallumbol atkonvertaljuk -1, 1 intervallumba:
-        forgas = -cos(forgas * K_pi);
+        forgas = -cos(forgas * PI);
     }
 
     vect2 p_k1 = (pmot->left_wheel.r - sarok);

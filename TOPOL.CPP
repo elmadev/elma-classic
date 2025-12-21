@@ -93,17 +93,17 @@ void kiirdesceket(void) {
 void hakellmentbelleveket(void) {
 #ifdef BELSOTIR
     finame fname;
-    int done = fifirst("lev/*.lev", fname);
+    int done = find_first("lev/*.lev", fname);
     // Vegigmegyunk osszes lev file-on es kimentjuk oket belsokent:
     while (!done) {
         topol* ptop = new topol(fname);
         ptop->save(fname, 1);
         delete ptop;
 
-        done = finext(fname);
+        done = find_next(fname);
     }
 
-    ficlose();
+    find_close();
 
     internal_error("Kiirta lev fileokat belsokent!");
 #endif
@@ -209,7 +209,7 @@ void kerek::kirajzol(void) {
     int szegmensszam = 16;
     double sugar = 0.4;
 
-    double elfordulas = 2.0 * K_pi / szegmensszam;
+    double elfordulas = 2.0 * PI / szegmensszam;
     for (int i = 0; i < szegmensszam; i++) {
         double alfa1 = i * elfordulas;
         double alfa2 = (i + 1) * elfordulas;
@@ -1850,7 +1850,7 @@ int topol::setallaktiv(motorst* pmot) {
         kerek* pker = Ptop->kerektomb[i];
         if (pker) {
             pker->sinfazisint = random_range(1000);
-            pker->sinfazis = pker->sinfazisint * 2.0 * K_pi / 1000.0;
+            pker->sinfazis = pker->sinfazisint * 2.0 * PI / 1000.0;
 
             pker->aktiv = 1;
             if (pker->tipus == T_KAJA) {

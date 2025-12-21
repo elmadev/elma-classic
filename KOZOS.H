@@ -5,9 +5,9 @@
 #include <sys/time.h>
 #endif
 
-extern double K_pi;
-extern double K_pip2;
-extern double K_2pi;
+extern double PI;
+extern double HALF_PI;
+extern double TWO_PI;
 
 #define _fstrnicmp _strnicmp
 
@@ -20,9 +20,9 @@ extern double K_2pi;
 #endif
 
 typedef char finame[20];
-int fifirst(const char* minta, char* filenev);
-int finext(char* filenev);
-void ficlose(void);
+int find_first(const char* pattern, char* filename_dest);
+int find_next(char* filename_dest);
+void find_close(void);
 
 #ifndef _WIN32
 

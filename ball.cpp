@@ -41,7 +41,7 @@ static void create_balls(void) {
     // Choose a random starting angle for the top-left ball
     srand((unsigned int)time(nullptr));
     double angle = random_range(1000);
-    angle *= K_pip2 / 1000.0;
+    angle *= HALF_PI / 1000.0;
     angle *= 0.999;
     angle += 0.0005;
     Balls[0].v.x = -sin(angle);

@@ -143,7 +143,7 @@ void tolt_open(void) {
         Soknev[i] = 0;
     }
     finame fname;
-    int done = fifirst("lev/*.lev", fname);
+    int done = find_first("lev/*.lev", fname);
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
@@ -164,7 +164,7 @@ void tolt_open(void) {
             internal_error("iuoriureiur");
         }
 
-        done = finext(fname);
+        done = find_next(fname);
         nevszam++;
         if (nevszam >= Maxnev) {
             dialog("Number of files > 1000 in open dialog box!", "Could not load all the files!");
@@ -172,7 +172,7 @@ void tolt_open(void) {
         }
     }
 
-    ficlose();
+    find_close();
 
     if (nevszam < 1) {
         dialog("There is not any level file (*.lev) in this directory!");
@@ -313,7 +313,7 @@ void kivalasztkezdetit(void) {
         Soknev[i] = 0;
     }
     finame fname;
-    int done = fifirst("lev/*.lev", fname);
+    int done = find_first("lev/*.lev", fname);
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
@@ -335,7 +335,7 @@ void kivalasztkezdetit(void) {
             internal_error("iuoriureiur");
         }
 
-        done = finext(fname);
+        done = find_next(fname);
         nevszam++;
         if (nevszam >= Maxnev) {
             dialog("Number of files > 1000 in open dialog box!", "Could not load all the files!");
@@ -343,7 +343,7 @@ void kivalasztkezdetit(void) {
         }
     }
 
-    ficlose();
+    find_close();
 
     if (nevszam < 1) {
         State->editor_filename[0] = 0;
@@ -1284,7 +1284,7 @@ int tolt_picklgrfile(char* lgrnev) {
         Soknev[i] = 0;
     }
     finame fname;
-    int done = fifirst("lgr/*.lgr", fname);
+    int done = find_first("lgr/*.lgr", fname);
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
@@ -1305,7 +1305,7 @@ int tolt_picklgrfile(char* lgrnev) {
             internal_error("3875665");
         }
 
-        done = finext(fname);
+        done = find_next(fname);
         nevszam++;
         if (nevszam >= Maxnev) {
             dialog("Number of files > 1000 in Pick LGR File dialog box!",
@@ -1314,7 +1314,7 @@ int tolt_picklgrfile(char* lgrnev) {
         }
     }
 
-    ficlose();
+    find_close();
 
     if (nevszam < 1) {
         external_error("There is not any LGR files (*.lgr) in LGR directory!");

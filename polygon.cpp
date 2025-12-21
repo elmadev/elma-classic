@@ -329,10 +329,10 @@ static double get_and_fix_angle(vect2* a, vect2 b, vect2 c) {
         // Real angle
         double angle = angle1 - angle2;
         if (angle < 0) {
-            angle += 2 * K_pi;
+            angle += 2 * PI;
         }
-        if (angle > 2 * K_pi - 0.0000001) {
-            angle -= 2 * K_pi;
+        if (angle > 2 * PI - 0.0000001) {
+            angle -= 2 * PI;
         }
         if (angle < 0.0000002) {
             // Move a perpendicularly to the line
@@ -385,8 +385,8 @@ bool polygon::is_clockwise() {
     sum += get_and_fix_angle(&vertices[vertex_count - 2], vertices[vertex_count - 1], vertices[0]);
     sum += get_and_fix_angle(&vertices[vertex_count - 1], vertices[0], vertices[1]);
     // Check the orientation of the polygon
-    double normalized_angle = sum - vertex_count * K_pi;
-    if (fabs(fabs(normalized_angle) - 2 * K_pi) > 0.1) {
+    double normalized_angle = sum - vertex_count * PI;
+    if (fabs(fabs(normalized_angle) - 2 * PI) > 0.1) {
         // Angle !~= 2*Pi
         // Probably a self-intersecting polygon, return false for fun
         return false;

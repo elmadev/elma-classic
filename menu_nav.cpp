@@ -17,21 +17,21 @@ void menu_nav_entries_init() {
     // Count level files
     int level_count = 0;
     finame filename;
-    bool done = fifirst("lev/*.lev", filename);
+    bool done = find_first("lev/*.lev", filename);
     while (!done) {
-        done = finext(filename);
+        done = find_next(filename);
         level_count++;
     }
-    ficlose();
+    find_close();
 
     // Count replay files
     int rec_count = 0;
-    done = fifirst("rec/*.rec", filename);
+    done = find_first("rec/*.rec", filename);
     while (!done) {
-        done = finext(filename);
+        done = find_next(filename);
         rec_count++;
     }
-    ficlose();
+    find_close();
 
     // Get the max + 220
     int max_count = level_count;

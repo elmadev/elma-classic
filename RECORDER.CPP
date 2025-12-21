@@ -140,8 +140,8 @@ bool recorder::frame_count_integrity() {
 }
 
 static double Korrszorzo = 1000.0, Korrszorzo_rec = 1.0 / Korrszorzo;
-static double Alfaszorzo = 250 / (2.0 * K_pi), Alfaszorzo_rec = 1.0 / Alfaszorzo;
-static double Alfaszorzo_16 = 10000 / (2.0 * K_pi), Alfaszorzo_16_rec = 1.0 / Alfaszorzo_16;
+static double Alfaszorzo = 250 / (2.0 * PI), Alfaszorzo_rec = 1.0 / Alfaszorzo;
+static double Alfaszorzo_16 = 10000 / (2.0 * PI), Alfaszorzo_16_rec = 1.0 / Alfaszorzo_16;
 static double Frekvszorzo = 250.0, Frekvszorzo_rec = 1.0 / Frekvszorzo;
 // static double Frekvszorzo = 250.0/2.0, 	   Frekvszorzo_rec = 1.0 / Frekvszorzo;
 static double Surlszorzo = 250 / 2.0, Surlszorzo_rec = 1.0 / Surlszorzo;
@@ -332,20 +332,20 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         // Alfak:
         double alfa1 = pmot->bike.rotation;
         while (alfa1 <= 0) {
-            alfa1 += K_2pi;
+            alfa1 += TWO_PI;
         }
-        while (alfa1 > K_2pi) {
-            alfa1 -= K_2pi;
+        while (alfa1 > TWO_PI) {
+            alfa1 -= TWO_PI;
         }
         pk1alfa[i] = alfa1 * Alfaszorzo_16;
 
         if (pmot->left_wheel.rotation <= 0) {
-            pk2alfa[i] = (pmot->left_wheel.rotation + K_2pi) * Alfaszorzo;
+            pk2alfa[i] = (pmot->left_wheel.rotation + TWO_PI) * Alfaszorzo;
         } else {
             pk2alfa[i] = pmot->left_wheel.rotation * Alfaszorzo;
         }
         if (pmot->right_wheel.rotation <= 0) {
-            pk4alfa[i] = (pmot->right_wheel.rotation + K_2pi) * Alfaszorzo;
+            pk4alfa[i] = (pmot->right_wheel.rotation + TWO_PI) * Alfaszorzo;
         } else {
             pk4alfa[i] = pmot->right_wheel.rotation * Alfaszorzo;
         }
@@ -419,17 +419,17 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         // Alfak:
         double alfa1 = pmot->bike.rotation;
         while( alfa1 <= 0 )
-            alfa1 += K_2pi;
-        while( alfa1 > K_2pi )
-            alfa1 -= K_2pi;
+            alfa1 += TWO_PI;
+        while( alfa1 > TWO_PI )
+            alfa1 -= TWO_PI;
         pk1alfa[i] = alfa1*Alfaszorzo_16;
 
         if( pmot->left_wheel.rotation <= 0 )
-            pk2alfa[i] = (pmot->left_wheel.rotation + K_2pi)*Alfaszorzo;
+            pk2alfa[i] = (pmot->left_wheel.rotation + TWO_PI)*Alfaszorzo;
         else
             pk2alfa[i] = pmot->left_wheel.rotation*Alfaszorzo;
         if( pmot->right_wheel.rotation <= 0 )
-            pk4alfa[i] = (pmot->right_wheel.rotation + K_2pi)*Alfaszorzo;
+            pk4alfa[i] = (pmot->right_wheel.rotation + TWO_PI)*Alfaszorzo;
         else
             pk4alfa[i] = pmot->right_wheel.rotation*Alfaszorzo;
 

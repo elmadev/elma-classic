@@ -106,7 +106,7 @@ void replay(void) {
     strcpy(NavEntriesLeft[0], "Randomizer");
 
     finame fname;
-    int done = fifirst("rec/*.rec", fname);
+    int done = find_first("rec/*.rec", fname);
     // Ez mindig eggyel tobb, mint valosag, mivel az elso
     // rubrika mindig 'Randomizer':
     int szamuk = 1;
@@ -135,13 +135,13 @@ void replay(void) {
             //strcpy( nev, "R" );
         */
 
-        done = finext(fname);
+        done = find_next(fname);
         szamuk++;
         if (szamuk >= NavEntriesLeftMaxLength - 4) {
             done = 1;
         }
     }
-    ficlose();
+    find_close();
 
     if (szamuk < 2) {
         return;

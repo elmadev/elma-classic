@@ -7,11 +7,11 @@ static void surlodasverseny(motorst* pmot, vect2 fgumi, vect2 sebesseg);
 static double Maxsurlodas = 0;
 
 static void szogigazit(double* pd) {
-    if (*pd < -K_pi) {
-        *pd += 2 * K_pi;
+    if (*pd < -PI) {
+        *pd += 2 * PI;
     }
-    if (*pd > K_pi) {
-        *pd -= 2 * K_pi;
+    if (*pd > PI) {
+        *pd -= 2 * PI;
     }
 }
 
@@ -316,7 +316,7 @@ int vizsgalat(motorst* pmot) {
 static double Oszto = 1.0 / 1.0;
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi_v, vect2 sebesseg_v) {
-    vect2 joirany(cos(pmot->bike.rotation - K_pip2), sin(pmot->bike.rotation - K_pip2));
+    vect2 joirany(cos(pmot->bike.rotation - HALF_PI), sin(pmot->bike.rotation - HALF_PI));
     double fgumi = joirany * fgumi_v;
     double sebesseg = joirany * sebesseg_v;
     if (fgumi <= 0 || sebesseg <= 0) {

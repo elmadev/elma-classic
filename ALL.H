@@ -88,7 +88,7 @@
 
 #include "LOAD.H"
 #include "ECSET.H"
-#include "MENUKEP.H"
+#include "menu_pic.h"
 
 #include "VALASZT2.H"
 #include "DIALOG32.H"

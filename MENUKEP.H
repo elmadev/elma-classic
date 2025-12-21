@@ -13,7 +13,6 @@ extern pic8* BufferBall;
 extern abc8* MenuFont;
 
 extern ddpal* MenuPal;
-extern unsigned char MenuPalData[768];
 
 constexpr int MENU_LINE_LENGTH = 100;
 constexpr int MENU_MAX_LINES = 30;

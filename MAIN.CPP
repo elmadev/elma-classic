@@ -85,7 +85,6 @@ double mv_stopperido(void) { return timeGetTime() * 0.182 - Startido; }
 
 void mv_startstopper(void) { Startido = timeGetTime() * 0.182; }
 
-#if defined(_WIN64) || !defined(_WIN32)
 int sdl_init(void);
 int main() {
     sdl_init();
@@ -99,8 +98,6 @@ int main() {
     init_menu_pictures();
     mv_main();
 }
-
-#endif
 
 void mv_main(void) {
     // new wav( "utodes.wav", 0.25 );

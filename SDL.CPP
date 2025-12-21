@@ -113,7 +113,6 @@ ddpal::ddpal(unsigned char* tomb) {
 
 void ddpal::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
 
-#if defined(_WIN64) || !defined(_WIN32)
 void mv_check(int skip_key_update) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -162,7 +161,6 @@ void mv_check(int skip_key_update) {
         mkw_setkeydown();
     }
 }
-#endif
 
 void fill_kb_state(char* buffer) {
     const unsigned char* state = SDL_GetKeyboardState(NULL);

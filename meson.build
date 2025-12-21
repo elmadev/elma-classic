@@ -70,18 +70,12 @@ elma_sources = files(
 
 link_args = []
 win_subsystem = 'console'
-needs_stub = true
 
 cpp = meson.get_compiler('cpp')
 if cpp.get_id() == 'msvc'
     cpp_args = []
     if host_machine.cpu_family() == 'x86'
         win_subsystem = 'windows'
-        needs_stub = false
-        elma_sources += files(
-            'F_WIN/W_V.CPP',
-            'dxinc/getdxver.CPP',
-        )
         link_args += [
             '/ENTRY:mainCRTStartup',
             'winmm.lib',
@@ -89,10 +83,6 @@ if cpp.get_id() == 'msvc'
     endif
 else
     cpp_args = ['-Wno-deprecated-declarations']
-endif
-
-if needs_stub
-    elma_sources += files('stub.cpp')
 endif
 
 sdl2_dep = dependency('sdl2',

@@ -3,6 +3,7 @@
 ## Minor Features
 * Translate error messages to English
 * Improve picture loading speed by allocating all needed memory at once instead of allocating in blocks of 64 KB (DOS-era restriction)
+* Error messages are now vertically centered on the screen
 * Background menu balls start off centered in the screen
 
 ## Minor Bug Fixes

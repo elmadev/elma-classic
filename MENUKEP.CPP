@@ -469,8 +469,8 @@ void render_error(const char* text1, const char* text2, const char* text3) {
     }
     // Write all the text to the screen
     for (int i = 0; i < line_count; i++) {
-        int y = 240 - 20 - line_count * (40 / 2) + i * 40;
-        MenuFont->write_centered(BufferMain, 320, y, ErrorLines[i]);
+        int y = SCREEN_HEIGHT / 2 - 20 - line_count * (40 / 2) + i * 40;
+        MenuFont->write_centered(BufferMain, SCREEN_WIDTH / 2, y, ErrorLines[i]);
     }
     // Display the error message
     bltfront(BufferMain);

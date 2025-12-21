@@ -201,7 +201,7 @@ static long FAR PASCAL WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 static int Hibaban = 0;
 static char Tmphibatext[500];
 
-static void directhiba(const char* text1, const char* text2, const char* text3, const char* text4) {
+void directhiba(const char* text1, const char* text2, const char* text3, const char* text4) {
     FILE* h;
     if (Hibaban) {
         h = fopen("error_b.txt", "wt");
@@ -267,23 +267,4 @@ static void directhiba(const char* text1, const char* text2, const char* text3, 
         MessageBox(NULL, text, "Message", MB_OK | MB_ICONINFORMATION);
     }
     mv_exit();
-}
-
-void hiba(const char* text1, const char* text2, const char* text3) {
-    if (access("message.inf", 0) == 0) {
-        directhiba("<<message.inf accessed>>", text1, text2, text3);
-    }
-    directhiba("Sorry, internal error.", NULL, NULL, NULL);
-}
-
-void uzenet(const char* text1, const char* text2, const char* text3) {
-    // about azert kell, hogy kezdo memchecknel ne agazzon el:
-    if (strstr(text1, "memory") && !strstr(text1, "about")) {
-        // Ha memory szerepel text1-ben:
-        if (access("message.inf", 0) == 0) { // Most mem-et is csak inf-re adja:
-            directhiba("message.inf accessed\n", text1, text2, text3);
-        }
-        directhiba("Sorry, out of memory!", NULL, NULL, NULL);
-    }
-    directhiba(text1, text2, text3, NULL);
 }

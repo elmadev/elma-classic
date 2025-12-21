@@ -137,3 +137,23 @@ void mv_main(void) {
 void mv_exit() { exit(0); }
 
 int s_random(int maximum) { return rand() % maximum; }
+
+void directhiba(const char* text1, const char* text2, const char* text3, const char* text4);
+void hiba(const char* text1, const char* text2, const char* text3) {
+    if (access("message.inf", 0) == 0) {
+        directhiba("<<message.inf accessed>>", text1, text2, text3);
+    }
+    directhiba("Sorry, internal error.", NULL, NULL, NULL);
+}
+
+void uzenet(const char* text1, const char* text2, const char* text3) {
+    // about azert kell, hogy kezdo memchecknel ne agazzon el:
+    if (strstr(text1, "memory") && !strstr(text1, "about")) {
+        // Ha memory szerepel text1-ben:
+        if (access("message.inf", 0) == 0) { // Most mem-et is csak inf-re adja:
+            directhiba("message.inf accessed\n", text1, text2, text3);
+        }
+        directhiba("Sorry, out of memory!", NULL, NULL, NULL);
+    }
+    directhiba(text1, text2, text3, NULL);
+}

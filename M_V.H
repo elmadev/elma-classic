@@ -1,6 +1,8 @@
 #ifndef M_V_H
 #define M_V_H
 
+void message_box(const char* text);
+
 void mv_main(void); // Ennek nem szabad visszajonnie!
 // Ezt neha meg kell hivni!:
 void mv_check(/*char* hivta,*/ int nemkellnyomas = 0);

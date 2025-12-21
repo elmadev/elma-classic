@@ -10,9 +10,9 @@ anim* Helmet = NULL;
 ddpal* MenuPal = NULL;
 unsigned char MenuPalData[768];
 
-void init_menu_pictures1(void) {
+void init_menu_pictures(void) {
     if (BufferMain) {
-        hiba("init_menu_pictures1 already called!");
+        hiba("init_menu_pictures already called!");
     }
     BufferMain = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     BufferBall = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -31,12 +31,7 @@ void init_menu_pictures1(void) {
     Helmet->make_helmet_top();
 
     balls_init();
-}
 
-void init_menu_pictures2(void) {
-    if (MenuPal) {
-        hiba("init_menu_pictures2 already called!");
-    }
     get_pcx_pal("intro.pcx", &MenuPal); // O new-ik egy ddpal-t
     get_pcx_pal("intro.pcx", MenuPalData);
 }

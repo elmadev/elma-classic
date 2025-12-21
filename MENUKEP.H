@@ -3,8 +3,7 @@
 
 // Ezt mv_main elott meghivja es grafikus hibakiirashoz
 // kell beolvasni peldaul abc-t es hatteret (teljes.cpp-ben):
-// void init_menu_pictures1( void );
-// void init_menu_pictures2( void );
+// void init_menu_pictures( void );
 
 void render_error(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
 

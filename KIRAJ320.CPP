@@ -42,8 +42,8 @@ static int Viewxorig, Viewxtolas;
 void beallitmereteket(int splitscreen) {
     Cy1Bplayer = 100, Cy2Bplayer = 200;
 
-    Cxsize = SCREEN_WIDTH * (Kepmeret * 1.001);
-    Cysize = SCREEN_HEIGHT * (Kepmeret * 1.001);
+    Cxsize = SCREEN_WIDTH * (Kepmeret * 1.0001);
+    Cysize = SCREEN_HEIGHT * (Kepmeret * 1.0001);
     Cx1 = (SCREEN_WIDTH - Cxsize) / 2;
     Cy1 = (SCREEN_HEIGHT - Cysize) / 2;
     Cx2 = Cx1 + Cxsize - 1;
@@ -711,7 +711,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     }
 }
 
-static pic8* Bpic = NULL;
+static pic8* Bpic = new pic8();
 
 extern int Ucsosurlodas;
 
@@ -741,10 +741,6 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
     Locky0_alul = 1;
     pic8* npic = lockbackbuffer_pic();
     Locky0_alul = 0;
-
-    if (!Bpic) {
-        Bpic = new pic8(10, SCREEN_HEIGHT);
-    }
 
     // hiba( "Itt van 11!" ); idejott
 

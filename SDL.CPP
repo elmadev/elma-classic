@@ -1,10 +1,17 @@
 #include "ALL.H"
 #include <SDL.h>
 #include "scancodes_windows.h"
+#include <mutex>
+
+std::mutex mtx;
 
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
 SDL_Surface* SDLSurfacePaletted;
+ddpal* SDLPalette;
+
+int SCREEN_WIDTH = 640;
+int SCREEN_HEIGHT = 480;
 
 // Ha igaz, alulrol indul y (kirajz320 allitja igazba):
 int Locky0_alul = 0;
@@ -12,62 +19,84 @@ int Locky0_alul = 0;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
-int sdl_init() {
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-        hiba((char*)SDL_GetError());
-        return 1;
-    }
-
-    SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                 SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-    if (!SDLWindow) {
-        hiba((char*)SDL_GetError());
-        return 1;
-    }
-
-    SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
-    SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
-
+int sdl_get_surface() {
     SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
     if (!SDLSurfaceMain) {
-        hiba((char*)SDL_GetError());
+        hiba(SDL_GetError());
         return 1;
     }
     SDLSurfacePaletted = SDL_CreateRGBSurfaceWithFormat(0, SDLSurfaceMain->w, SDLSurfaceMain->h, 0,
                                                         SDL_PIXELFORMAT_INDEX8);
     if (!SDLSurfacePaletted) {
-        hiba((char*)SDL_GetError());
+        hiba(SDL_GetError());
         return 1;
     }
+    SCREEN_WIDTH = SDLSurfacePaletted->w;
+    SCREEN_HEIGHT = SDLSurfacePaletted->h;
+    return 0;
+}
+
+// This needs to be via event watcher, and not in event queue, or else it only procs at the very end
+// of the event in windows. Stackoverflow seems to imply that this is fixed in SDL3.
+static int resize_event(void* data, SDL_Event* event) {
+    if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
+        SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
+        if (win == (SDL_Window*)data) {
+            {
+                std::lock_guard<std::mutex> lock(mtx);
+                sdl_get_surface();
+                SDLPalette->set();
+                invalidateegesz();
+                Kitoltestmegrak = Kitoltestmegrakkezd;
+                if (Plgr && Ptop) {
+                    Plgr->fgnevbent[0] = 0;
+                    Plgr->bgnevbent[0] = 0;
+                    Plgr->betolthattereket();
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+int sdl_init() {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
+        hiba(SDL_GetError());
+        return 1;
+    }
+
+    SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                 SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+    if (!SDLWindow) {
+        hiba(SDL_GetError());
+        return 1;
+    }
+
+    if (sdl_get_surface()) {
+        return 1;
+    }
+
+    SDL_AddEventWatch(resize_event, SDLWindow);
+    SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
+    SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
 
     return 0;
 }
 
-static unsigned char* Mutbuffer[SCREEN_HEIGHT];
+static unsigned char** Mutbuffer = nullptr;
 static int Bufflocked = 0;
 
-unsigned char** lockbackbuffer() {
+void lockbackbuffer(pic8* view) {
     if (Bufflocked) {
         hiba("lockbackbuffer-ben Bufflocked!");
     }
     Bufflocked = 1;
 
-    unsigned char* mut = (unsigned char*)SDLSurfacePaletted->pixels;
-    if (Locky0_alul) {
-        // Set the row buffer bottom-down
-        for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            Mutbuffer[SCREEN_HEIGHT - 1 - y] = mut;
-            mut += SDLSurfacePaletted->w;
-        }
-    } else {
-        // Set the row buffer top-down
-        for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            Mutbuffer[y] = mut;
-            mut += SDLSurfacePaletted->w;
-        }
-    }
-
-    return Mutbuffer;
+    SCREEN_WIDTH = SDLSurfacePaletted->w;
+    SCREEN_HEIGHT = SDLSurfacePaletted->h;
+    unsigned char* pixels = (unsigned char*)SDLSurfacePaletted->pixels;
+    int pitch = SDLSurfacePaletted->pitch;
+    view->subview(SCREEN_WIDTH, SCREEN_HEIGHT, pixels, pitch, Locky0_alul);
 }
 
 void unlockbackbuffer(void) {
@@ -80,12 +109,12 @@ void unlockbackbuffer(void) {
     SDL_UpdateWindowSurface(SDLWindow);
 }
 
-unsigned char** lockfrontbuffer(void) {
+void lockfrontbuffer(pic8* view) {
     if (Bufflocked) {
         hiba("lockfrontbuffer-ben Bufflocked!");
     }
 
-    return lockbackbuffer();
+    return lockbackbuffer(view);
 }
 
 void unlockfrontbuffer(void) {
@@ -105,7 +134,10 @@ ddpal::ddpal(unsigned char* tomb) {
     }
 }
 
-void ddpal::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
+void ddpal::set() {
+    SDLPalette = this;
+    SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256);
+}
 
 #if defined(_WIN64) || !defined(_WIN32)
 void mv_check(int skip_key_update) {

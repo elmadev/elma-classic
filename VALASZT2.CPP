@@ -127,6 +127,23 @@ void valaszt2::bead(int szam_p, int tabos_p) {
 int RECidokellhet = 0;
 int RECidokellis = 0;
 
+void valaszt2::update_egykepen(int* valtozott, int* kur, int* felso) {
+    int new_egykepen = (SCREEN_HEIGHT - y0) / dy;
+    if (new_egykepen < 2) {
+        new_egykepen = 2;
+    }
+    if (new_egykepen >= MAXSZOVEGSOR) {
+        new_egykepen = MAXSZOVEGSOR - 1;
+    }
+    if (egykepen != new_egykepen) {
+        egykepen = new_egykepen;
+        *valtozott = 1;
+        if (*kur > *felso + egykepen - 1) {
+            *felso = *kur - egykepen + 1;
+        }
+    }
+}
+
 // Visszaadja valasztott szamat, ESC eseten -1-t:
 // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
 int valaszt2::valassz(egyszovsor* preszovegek, int preszovegszam, int csakkirajzol) {
@@ -155,6 +172,7 @@ int valaszt2::valassz(egyszovsor* preszovegek, int preszovegszam, int csakkirajz
     mk_emptychar();
     int valtozott = 1;
     while (1) {
+        update_egykepen(&valtozott, &kur, &felso);
         while (!csakkirajzol && mk_kbhit()) {
             int c = mk_getextchar();
             if (c == MK_ESC && escelheto) {

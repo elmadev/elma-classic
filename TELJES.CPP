@@ -98,8 +98,6 @@ void teljes(void) {
     // Hatrebb tettem folyamatos kirakasra (Alt-Tab miatt):
     pintropal->set();
     bltfront(tmpintro);
-    delete pintropal;
-    pintropal = NULL;
 
     init_sound();
 
@@ -139,6 +137,8 @@ void teljes(void) {
     }
     delete tmpintro;
     tmpintro = NULL;
+    delete pintropal;
+    pintropal = NULL;
 
     /*delete tmpintro;
     tmpintro = new pic8( "torol.pcx" );

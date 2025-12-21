@@ -9,9 +9,6 @@ class pic8 {
     friend void blit8(pic8* dest, pic8* source, int x, int y);
     friend void spriteosit(pic8* ppic, int index);
     friend void spriteosit(pic8* ppic);
-    friend pic8* lockbackbuffer_pic();
-    friend void lockfrontbuffer_pic();
-    friend void unlockbackbuffer_pic();
 
     void allocate(int w, int h);
     void spr_open(const char* filename, FILE* h);
@@ -25,8 +22,10 @@ class pic8 {
     unsigned char* pixels;
     unsigned char* transparency_data;
     unsigned short transparency_data_length;
+    bool view;
 
   public:
+    pic8();
     pic8(int w, int h);
     pic8(const char* filename, FILE* h = nullptr);
     ~pic8();
@@ -43,6 +42,7 @@ class pic8 {
     void fill_box(int x1, int y1, int x2, int y2, unsigned char index);
     void fill_box(unsigned char index);
     void line(int x1, int y1, int x2, int y2, unsigned char index);
+    void subview(int w, int h, unsigned char* pixels, int pitch, bool inverted);
     void subview(int x1, int y1, int x2, int y2, pic8* source);
 };
 

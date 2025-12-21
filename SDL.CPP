@@ -113,6 +113,11 @@ void mv_check(int skip_key_update) {
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
         case SDL_QUIT:
+            // Exit request probably sent by user to terminate program
+            if (Editorban_dialnak && Valtozott) {
+                // Disallow exiting if unsaved changes in editor
+                break;
+            }
             exit(0);
             break;
         case SDL_MOUSEBUTTONDOWN:

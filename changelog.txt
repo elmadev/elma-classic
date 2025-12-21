@@ -14,6 +14,7 @@
 * Internal editor marks a level as changed if the case of the level description is changed
 * Pictures named "aaccbbdd" could prevent internal editor tooltip from properly updating
 * Show dialog if state.dat is inaccessible when updating top10 in an internal or merging state.dat
+* Background menu balls would sometimes vanish on the "Please do not distribute" screen
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

@@ -108,12 +108,6 @@ static void render_ball(vekt2 r, double radius, pic8* source_pic) {
         }
     }
 
-    if (WallsDisabled) {
-        if (r.x < -500.0 || r.x > 1500.0 || r.y < -500.0 || r.y > 1500.0) {
-            return;
-        }
-    }
-
     // Draw circle
     double x_center = r.x;
     double y_center = r.y;

@@ -327,7 +327,7 @@ bool menu_pic::render_intro_anim(double time) {
 
     // Calculate our current progression through time
     time -= IntroAnimStartTime;
-    int frame = (int)(time * 2.3);
+    int frame = (int)(time * 2.3 * SCREEN_HEIGHT / 480.0);
     if (frame >= SCREEN_HEIGHT) {
         ScrollingAnimationY = 0;
         return false;

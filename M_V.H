@@ -4,7 +4,7 @@
 void mv_main(void); // Ennek nem szabad visszajonnie!
 // Ezt neha meg kell hivni!:
 void mv_check(/*char* hivta,*/ int nemkellnyomas = 0);
-void mv_exit(char* text = NULL); // Ezzel kell kilepni!
+void mv_exit(); // Ezzel kell kilepni!
 
 // MOUSE:
 void getmou(int* px, int* py);

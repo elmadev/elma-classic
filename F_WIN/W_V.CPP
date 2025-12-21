@@ -198,19 +198,6 @@ static long FAR PASCAL WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
     return 0;
 }
 
-void mv_exit(char* text) {
-    // PostQuitMessage( 0 );
-    // mv_check();
-    // MessageBox( NULL, text, "Message", MB_OK | MB_ICONINFORMATION);
-    Menubollepettki = 1;
-    SendMessage(GhWnd, WM_CLOSE, 0, 0);
-
-    // exit( 0 );
-    while (1) {
-        mv_check(/*"W_V mv_exit-ben"*/);
-    }
-}
-
 static int Hibaban = 0;
 static char Tmphibatext[500];
 

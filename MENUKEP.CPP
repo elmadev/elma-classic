@@ -327,45 +327,8 @@ bool menu_pic::render_intro_anim(double time) {
             }
             y += BackgroundTileMain->get_height();
         }
-
-        // Here is where it diverges from the normal render
         // Instead of pre-rendering the text into BufferMain/BufferBall,
-        // they will be directly drawn onto ScreenBuffer
-
-        // The following code here draws to ScreenBuffer as if the current time is 0.0
-        // but it's not strictly necessary since it is immediately overwritten below
-        ScreenBuffer->fill_box(BLACK_PALETTE_ID);
-        blit8(ScreenBuffer, BufferMain, 0, 0);
-
-        ScrollingAnimationY = 0;
-        double menu_y1 = 0.0;
-        for (int i = 0; i < BallCount; i++) {
-            if (!State->animated_menus) {
-                break;
-            }
-
-            Balls[i].current_r.y += menu_y1;
-
-            render_ball(Balls[i].current_r, Balls[i].radius, BufferBall);
-
-            vekt2 small_circle_offset(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
-                                      Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
-            render_ball(Balls[i].current_r + small_circle_offset, Balls[i].radius * 0.25,
-                        BufferMain);
-            render_ball(Balls[i].current_r - small_circle_offset, Balls[i].radius * 0.25,
-                        BufferMain);
-
-            Balls[i].current_r.y -= menu_y1;
-        }
-
-        for (int i = 0; i < line_count; i++) {
-            MenuFont->write(ScreenBuffer, lines[i].x, lines[i].y, lines[i].text);
-        }
-
-        pic8* helmet_frame = nullptr;
-        helmet_frame = Helmet->get_frame_by_index(25);
-        blit8(ScreenBuffer, helmet_frame, helmet_x - 20, helmet_y - 7);
-        blit8(ScreenBuffer, Intro, 0, 0);
+        // they will be directly drawn onto ScreenBuffer, so we don't do this here
     }
 
     // Calculate our current progression through time

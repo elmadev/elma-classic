@@ -1,8 +1,6 @@
 #ifndef MENUKEP_H
 #define MENUKEP_H
 
-// Ezt mv_main elott meghivja es grafikus hibakiirashoz
-// kell beolvasni peldaul abc-t es hatteret (teljes.cpp-ben):
 // void init_menu_pictures( void );
 
 void render_error(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
@@ -40,7 +38,6 @@ class menu_pic {
     int render_intro_anim(double time);
 };
 
-// Teljes olvassa be es elso kiirloading szabaditja fel:
 extern pic8* Intro;
 
 #endif

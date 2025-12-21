@@ -24,4 +24,6 @@ void unlockbackbuffer(void); // Ki is teszi
 unsigned char** lockfrontbuffer(void);
 void unlockfrontbuffer(void);
 
+extern bool Margrafikus;
+
 #endif

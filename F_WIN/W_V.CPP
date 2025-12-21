@@ -1,8 +1,7 @@
 #include "w_all.h"
 #include <SDL_syswm.h>
 
-// ddinit setmode utan 1-be megy, hiba figyeli:
-int Margrafikus = 0;
+bool Margrafikus = false;
 
 // static LRESULT CALLBACK _export WndProc( HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 // );

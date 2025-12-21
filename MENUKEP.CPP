@@ -21,6 +21,8 @@ void init_menu_pictures1(void) {
     MenuFont = new abc8("menu.abc");
     MenuFont->set_spacing(2);
 
+    Margrafikus = true;
+
     pic8* helmet_tmp = new pic8("sisak.pcx");
     forditkepet(helmet_tmp);
     Helmet = new anim(helmet_tmp, "sisak.pcx");

@@ -15,3 +15,5 @@ int s_random(int maximum) { return 0; }
 int Billint = 0;
 
 void mv_exit(char* text) { exit(0); }
+
+bool Margrafikus = false;

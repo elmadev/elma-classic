@@ -93,7 +93,8 @@ void teljes(void) {
     spriteosit(Intro);
     pic8* tmpintro = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT); // ezt majd kesobb szabaditjuk fel
     tmpintro->fill_box(BLACK_PALETTE_ID);
-    blit8(tmpintro, Intro);
+    blit8(tmpintro, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,
+          SCREEN_HEIGHT / 2 - Intro->get_height() / 2);
 
     ddpal* pintropal = NULL;
     // Gany, ezzel az egy nevvel get_pcx_pal(pic.cpp) elso harom byte-ot 0-azza:

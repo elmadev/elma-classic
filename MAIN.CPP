@@ -133,3 +133,5 @@ void mv_main(void) {
 
     teljes();
 }
+
+int s_random(int maximum) { return rand() % maximum; }

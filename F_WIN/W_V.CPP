@@ -300,5 +300,3 @@ void uzenet(const char* text1, const char* text2, const char* text3) {
     }
     directhiba(text1, text2, text3, NULL);
 }
-
-int s_random(int maximum) { return rand() % maximum; }

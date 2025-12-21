@@ -120,6 +120,16 @@ void mv_check(int skip_key_update) {
             }
             exit(0);
             break;
+        case SDL_WINDOWEVENT:
+            // Force editor redraw if focus gained/lost to fix editor sometimes blanking
+            switch (event.window.event) {
+            case SDL_WINDOWEVENT_FOCUS_GAINED:
+                invalidateegesz();
+                break;
+            case SDL_WINDOWEVENT_FOCUS_LOST:
+                invalidateegesz();
+                break;
+            }
         case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {
                 LeftMouseDown = true;

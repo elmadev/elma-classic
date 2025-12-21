@@ -149,7 +149,14 @@ void options(void) {
             strcpy(Rubrikak_tab[11 + vantagis], "No");
         }
 
-        val.bead(12 + vantagis, 1);
+        strcpy(Rubrikak[12 + vantagis], "Centered Minimap:");
+        if (EolSettings->center_map) {
+            strcpy(Rubrikak_tab[12 + vantagis], "Yes");
+        } else {
+            strcpy(Rubrikak_tab[12 + vantagis], "No");
+        }
+
+        val.bead(13 + vantagis, 1);
 
         kurrens = val.valassz();
 
@@ -233,6 +240,10 @@ void options(void) {
 
         if (kurrens == 11) {
             EolSettings->center_camera = !EolSettings->center_camera;
+        }
+
+        if (kurrens == 12) {
+            EolSettings->center_map = !EolSettings->center_map;
         }
 
         if (vantagis) { // Visszaalitjuk eredeti helyzetebe

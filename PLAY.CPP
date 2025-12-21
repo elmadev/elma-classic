@@ -745,10 +745,6 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
 }
 
 void kiirloading(void) {
-    if (Intro) {
-        delete Intro;
-        Intro = NULL;
-    }
     menu_pic szovlist;
     szovlist.clear();
     szovlist.add_line_centered("Loading", 320, 230);

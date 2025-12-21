@@ -227,6 +227,8 @@ void menu_pic::render(bool skip_balls_helmet) {
             if (!render_intro_anim(time)) {
                 IntroAnimation = false;
                 BallsPrevTime = time;
+                delete Intro;
+                Intro = nullptr;
                 return;
             }
 

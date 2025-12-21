@@ -5,6 +5,7 @@
 * Improve picture loading speed by allocating all needed memory at once instead of allocating in blocks of 64 KB (DOS-era restriction)
 * Error messages are now vertically centered on the screen
 * Intro scrolling animation will always take 1.15 seconds, regardless of screen resolution
+* Intro scrolling animation is now skippable by pressing Enter or Esc, instead of being an eolconf setting
 * Background menu balls start off centered in the screen
 
 ## Minor Bug Fixes

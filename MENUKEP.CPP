@@ -217,19 +217,26 @@ void menu_pic::render(bool skip_balls_helmet) {
     double time = mv_stopperido();
     if (IntroAnimation) {
         MenuPal->set();
+        IntroAnimation = false;
+        mk_emptychar();
         while (true) {
-            if (!render_intro_anim(time)) {
-                IntroAnimation = false;
-                BallsPrevTime = time;
-                delete Intro;
-                Intro = nullptr;
-                return;
+            if (mk_kbhit()) {
+                int c = mk_getextchar();
+                if (c == MK_ESC || c == MK_ENTER) {
+                    break;
+                }
             }
-
+            if (!render_intro_anim(time)) {
+                break;
+            }
             time = mv_stopperido();
             BallsStartTime = time;
-            IntroAnimation = false;
         }
+        ScrollingAnimationY = 0;
+        BallsPrevTime = time;
+        delete Intro;
+        Intro = nullptr;
+        return;
     }
 
     // Display a normal menu (not scrolling)
@@ -329,7 +336,6 @@ bool menu_pic::render_intro_anim(double time) {
     time -= IntroAnimStartTime;
     int frame = (int)(time * 2.3 * SCREEN_HEIGHT / 480.0);
     if (frame >= SCREEN_HEIGHT) {
-        ScrollingAnimationY = 0;
         return false;
     }
 

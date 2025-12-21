@@ -134,4 +134,6 @@ void mv_main(void) {
     teljes();
 }
 
+void mv_exit() { exit(0); }
+
 int s_random(int maximum) { return rand() % maximum; }

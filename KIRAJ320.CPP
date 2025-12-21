@@ -195,7 +195,7 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vekt2 motorkozep, m
     double Viewxsize_d = Viewxsize * MinimapScaleFactor * PixelsToMeters;
     double Viewysize_d = Viewysize * MinimapScaleFactor * PixelsToMeters;
 
-    double szeltoltav = 0.2; // 20%
+    double szeltoltav = EolSettings->center_map ? 0.5 : 0.2;
     double atfuthossz = 1.0 - 2.0 * szeltoltav;
     vekt2 sarokbolkozepre(Viewxsize_d * (szeltoltav + baljobb * atfuthossz), Viewysize_d / 2);
     vekt2 sarok = motorkozep - sarokbolkozepre;

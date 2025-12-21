@@ -6,6 +6,7 @@ struct eol_settings {
 
     bool pictures_in_background;
     bool center_camera;
+    bool center_map;
 };
 
 extern eol_settings* EolSettings;

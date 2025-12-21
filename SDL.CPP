@@ -12,6 +12,12 @@ int Locky0_alul = 0;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
+void message_box(const char* text) {
+    // As per docs, can be called even before SDL_Init
+    // SDLWindow will either be a handle to the window, or nullptr if no parent
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Message", text, SDLWindow);
+}
+
 int sdl_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         hiba((char*)SDL_GetError());

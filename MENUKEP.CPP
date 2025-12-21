@@ -17,7 +17,6 @@ abc8* MenuFont = nullptr;
 static anim* Helmet = nullptr;
 
 ddpal* MenuPal = nullptr;
-unsigned char MenuPalData[768];
 
 void init_menu_pictures() {
     if (BufferMain) {
@@ -42,7 +41,6 @@ void init_menu_pictures() {
     balls_init();
 
     get_pcx_pal("intro.pcx", &MenuPal);
-    get_pcx_pal("intro.pcx", MenuPalData);
 }
 
 menu_pic::menu_pic() {

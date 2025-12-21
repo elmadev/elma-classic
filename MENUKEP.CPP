@@ -377,7 +377,8 @@ bool menu_pic::render_intro_anim(double time) {
     blit8(ScreenBuffer, helmet_frame, helmet_x - 20, helmet_y - 7 - (SCREEN_HEIGHT - 1) + frame);
 
     // intro.pcx moves down from 0 to SCREEN_HEIGHT
-    blit8(ScreenBuffer, Intro, 0, frame);
+    blit8(ScreenBuffer, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,
+          SCREEN_HEIGHT / 2 - Intro->get_height() / 2 + frame);
 
     // We're done!
     bltfront(ScreenBuffer);

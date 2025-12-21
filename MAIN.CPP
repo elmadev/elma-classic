@@ -95,10 +95,8 @@ int main() {
     void mk_init(void);
     mk_init();
 
-    void init_menu_pictures1(void);
-    void init_menu_pictures2(void);
-    init_menu_pictures1();
-    init_menu_pictures2();
+    void init_menu_pictures(void);
+    init_menu_pictures();
     mv_main();
 }
 

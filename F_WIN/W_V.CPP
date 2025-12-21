@@ -62,9 +62,8 @@ int main(int argc, char* argv[]) {
     Mute = 1;
 
     // Ezt hiba miatt kell mar most meghivni:
-    void init_menu_pictures1(void);
-    void init_menu_pictures2(void);
-    init_menu_pictures1();
+    void init_menu_pictures(void);
+    init_menu_pictures();
 
     mv_check(/*"W_V init utan"*/);
 
@@ -94,9 +93,6 @@ int main(int argc, char* argv[]) {
     }*/
 
     Inicializalva = 1;
-
-    // Ez csak palettat allitja be:
-    init_menu_pictures2();
 
     ShowCursor(0);
 

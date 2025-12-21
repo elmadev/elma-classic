@@ -2,7 +2,7 @@
 
 int Hangenabled = 0;
 
-int Mute = 0;
+int Mute = 1;
 
 #define WAVBANKSZAM (20)
 typedef wav* wavramut;

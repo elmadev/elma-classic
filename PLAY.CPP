@@ -752,7 +752,7 @@ void kiirloading(void) {
     menu_pic szovlist;
     szovlist.clear();
     szovlist.add_line_centered("Loading", 320, 230);
-    szovlist.render(1); // Golyok nelkul
+    szovlist.render(true); // Golyok nelkul
 }
 
 static void playlevel(int level) {

@@ -1,24 +1,25 @@
 #include "ALL.H"
 
-// Drawing of the screen when there is no ball
-pic8* BufferMain = NULL;
-// Darker drawing of the screen when a ball is passing over that section
-pic8* BufferBall = NULL;
+// Drawing of the screen when there is no ball. Also used as generic buffer by editor.
+pic8* BufferMain = nullptr;
+// Darker drawing of the screen when a ball is passing over that section. Also used as backup buffer
+// by editor.
+pic8* BufferBall = nullptr;
 
 // Background image when there is no ball
-static pic8* BackgroundTileMain = NULL;
+static pic8* BackgroundTileMain = nullptr;
 // Darker background image when a ball is passing over that section
-static pic8* BackgroundTileBall = NULL;
+static pic8* BackgroundTileBall = nullptr;
 
-abc8* MenuFont = NULL;
+abc8* MenuFont = nullptr;
 
 // Menu red helmet animation
-anim* Helmet = NULL;
+static anim* Helmet = nullptr;
 
-ddpal* MenuPal = NULL;
+ddpal* MenuPal = nullptr;
 unsigned char MenuPalData[768];
 
-void init_menu_pictures(void) {
+void init_menu_pictures() {
     if (BufferMain) {
         hiba("init_menu_pictures already called!");
     }
@@ -35,7 +36,7 @@ void init_menu_pictures(void) {
     forditkepet(helmet_tmp);
     Helmet = new anim(helmet_tmp, "sisak.pcx");
     delete helmet_tmp;
-    helmet_tmp = NULL;
+    helmet_tmp = nullptr;
     Helmet->make_helmet_top();
 
     balls_init();
@@ -44,27 +45,27 @@ void init_menu_pictures(void) {
     get_pcx_pal("intro.pcx", MenuPalData);
 }
 
-menu_pic::menu_pic(void) {
-    helmet_x = helmet_y = -100;
-
+menu_pic::menu_pic() {
+    helmet_x = -100;
+    helmet_y = -100;
     line_count = 0;
-    image_valid = 0;
+    image_valid = false;
     lines = new text_line[MENU_MAX_LINES];
     if (!lines) {
         hiba("menu_pic memory!");
     }
 }
 
-menu_pic::~menu_pic(void) {
+menu_pic::~menu_pic() {
     if (!lines) {
         hiba("menu_pic::~menu_pic !lines!");
     }
     delete lines;
-    lines = NULL;
+    lines = nullptr;
 }
 
 void menu_pic::add_line(const char* text, int x, int y) {
-    if (strlen(text) > 100) {
+    if (strlen(text) > MENU_LINE_LENGTH) {
         hiba("menu::add_line strlen(text) > MENU_LINE_LENGTH");
     }
     if (line_count >= MENU_MAX_LINES - 1) {
@@ -74,7 +75,7 @@ void menu_pic::add_line(const char* text, int x, int y) {
     lines[line_count].x = x;
     lines[line_count].y = y;
     line_count++;
-    image_valid = 0;
+    image_valid = false;
 }
 
 void menu_pic::add_line_centered(const char* text, int x, int y) {
@@ -87,17 +88,16 @@ void menu_pic::set_helmet(int x, int y) {
     helmet_y = y;
 }
 
-void menu_pic::clear(void) {
+void menu_pic::clear() {
     line_count = 0;
-    image_valid = 0;
+    image_valid = false;
 }
 
-static pic8* ScreenBuffer = NULL;
+static pic8* ScreenBuffer = nullptr;
 
 static int ScrollingAnimationY = 0;
-static unsigned char BLACK_PALETTE_ID = 254;
-static unsigned char* GreenRow = NULL;
-static unsigned char* BlackRow = NULL;
+static unsigned char* GreenRow = nullptr;
+static unsigned char* BlackRow = nullptr;
 
 static void render_ball(vekt2 r, double radius, pic8* source_pic) {
     // Solid colors are used to render the balls in top half of the screen during scrolling intro
@@ -105,7 +105,7 @@ static void render_ball(vekt2 r, double radius, pic8* source_pic) {
         GreenRow = new unsigned char[SCREEN_WIDTH];
         BlackRow = new unsigned char[SCREEN_WIDTH];
         for (int i = 0; i < SCREEN_WIDTH; i++) {
-            GreenRow[i] = 248;
+            GreenRow[i] = GREEN_PALETTE_ID;
             BlackRow[i] = BLACK_PALETTE_ID;
         }
     }
@@ -119,7 +119,7 @@ static void render_ball(vekt2 r, double radius, pic8* source_pic) {
     // Draw circle
     double x_center = r.x;
     double y_center = r.y;
-    int y = y_center - radius;
+    int y = (int)(y_center - radius);
     while (y < y_center + radius) {
         if (y < 0 || y >= SCREEN_HEIGHT) {
             y++;
@@ -139,8 +139,8 @@ static void render_ball(vekt2 r, double radius, pic8* source_pic) {
         dx = sqrt(dx);
 
         // Clip horizontally to the screen
-        int x1 = x_center - dx;
-        int x2 = x_center + dx;
+        int x1 = (int)(x_center - dx);
+        int x2 = (int)(x_center + dx);
         if (x1 < 0) {
             x1 = 0;
         }
@@ -180,22 +180,22 @@ static void render_ball(vekt2 r, double radius, pic8* source_pic) {
 
 static double BallsPrevTime = 0.0;
 static double BallsStartTime = 0.0;
-static int IntroAnimation = 1;
+static bool IntroAnimation = true;
 
 // Draw the menu. Optionally don't draw the background balls or helmet.
-void menu_pic::render(int skip_balls_helmet) {
+void menu_pic::render(bool skip_balls_helmet) {
     if (!ScreenBuffer) {
         ScreenBuffer = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
     // Skip the intro if we are missing intro.pcx (should not occur)
     if (IntroAnimation && !Intro) {
-        IntroAnimation = 0;
+        IntroAnimation = false;
     }
 
     // Regenerate the image cache if the menu has changed
     if (!image_valid && !IntroAnimation) {
-        image_valid = 1;
+        image_valid = true;
 
         // Tile the background vertically
         int y = -47;
@@ -225,16 +225,16 @@ void menu_pic::render(int skip_balls_helmet) {
     double time = mv_stopperido();
     if (IntroAnimation) {
         MenuPal->set();
-        while (1) {
+        while (true) {
             if (!render_intro_anim(time)) {
-                IntroAnimation = 0;
+                IntroAnimation = false;
                 BallsPrevTime = time;
                 return;
             }
 
             time = mv_stopperido();
             BallsStartTime = time;
-            IntroAnimation = 0;
+            IntroAnimation = false;
         }
     }
 
@@ -280,7 +280,7 @@ void menu_pic::render(int skip_balls_helmet) {
     }
 
     if (!skip_balls_helmet) {
-        pic8* helmet_frame = NULL;
+        pic8* helmet_frame = nullptr;
         if (State->animated_menus) {
             helmet_frame = Helmet->get_frame_by_time(time * 0.0024);
         } else {
@@ -294,8 +294,8 @@ void menu_pic::render(int skip_balls_helmet) {
     bltfront(ScreenBuffer);
 }
 
-static int IntroAnimFirstFrame = 1;
-pic8* Intro = NULL;
+static bool IntroAnimFirstFrame = true;
+pic8* Intro = nullptr;
 
 static double IntroAnimStartTime = 0.0;
 
@@ -303,10 +303,10 @@ static double IntroAnimStartTime = 0.0;
 // The menu text, helmet and balls start at offset -SCREEN_HEIGHT and move down to 0
 // intro.pcx starts at offset 0 and moves down to SCREEN_HEIGHT
 // The background tiles start at offset SCREEN_HEIGHT and move up to 0
-int menu_pic::render_intro_anim(double time) {
+bool menu_pic::render_intro_anim(double time) {
     if (IntroAnimFirstFrame) {
         balls_simulate(0.000000001);
-        IntroAnimFirstFrame = 0;
+        IntroAnimFirstFrame = false;
         IntroAnimStartTime = time;
 
         // Tile background vertically
@@ -362,7 +362,7 @@ int menu_pic::render_intro_anim(double time) {
             MenuFont->write(ScreenBuffer, lines[i].x, lines[i].y, lines[i].text);
         }
 
-        pic8* helmet_frame = NULL;
+        pic8* helmet_frame = nullptr;
         helmet_frame = Helmet->get_frame_by_index(25);
         blit8(ScreenBuffer, helmet_frame, helmet_x - 20, helmet_y - 7);
         blit8(ScreenBuffer, Intro, 0, 0);
@@ -370,10 +370,10 @@ int menu_pic::render_intro_anim(double time) {
 
     // Calculate our current progression through time
     time -= IntroAnimStartTime;
-    int frame = time * 2.3;
+    int frame = (int)(time * 2.3);
     if (frame >= SCREEN_HEIGHT) {
         ScrollingAnimationY = 0;
-        return 0;
+        return false;
     }
 
     // Draw the screen
@@ -411,7 +411,7 @@ int menu_pic::render_intro_anim(double time) {
     }
 
     // The helmet moves down from -SCREEN_HEIGHT to 0
-    pic8* helmet_frame = NULL;
+    pic8* helmet_frame = nullptr;
     if (State->animated_menus) {
         helmet_frame = Helmet->get_frame_by_time(time * 0.0024);
     } else {
@@ -424,13 +424,12 @@ int menu_pic::render_intro_anim(double time) {
 
     // We're done!
     bltfront(ScreenBuffer);
-    return 1;
+    return true;
 }
 
-#define ERROR_MAX_ROW_LENGTH (34)
-typedef char hibasor[ERROR_MAX_ROW_LENGTH + 4];
-#define ERROR_MAX_ROWS (10)
-static hibasor ErrorLines[ERROR_MAX_ROWS];
+constexpr int ERROR_MAX_ROW_LENGTH = 34;
+constexpr int ERROR_MAX_ROWS = 10;
+static char ErrorLines[ERROR_MAX_ROWS][ERROR_MAX_ROW_LENGTH + 4];
 
 void render_error(const char* text1, const char* text2, const char* text3) {
     // Tile the background vertically
@@ -470,7 +469,7 @@ void render_error(const char* text1, const char* text2, const char* text3) {
             break;
         }
 
-        while (1) {
+        while (true) {
             if (line_count >= ERROR_MAX_ROWS) {
                 break;
             }

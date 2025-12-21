@@ -92,7 +92,7 @@ void teljes(void) {
     blit8(Intro, Intro, 321 + 15 + 16, 432, 88, 458, 98, 468);
     spriteosit(Intro);
     pic8* tmpintro = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT); // ezt majd kesobb szabaditjuk fel
-    tmpintro->fill_box(254);
+    tmpintro->fill_box(BLACK_PALETTE_ID);
     blit8(tmpintro, Intro);
 
     ddpal* pintropal = NULL;
@@ -145,7 +145,7 @@ void teljes(void) {
     tmpintro = new pic8( "torol.pcx" );
     mk_getextchar();
     for( int i = 1; i < 480; i += 5  ) {
-        pbuffer->fill_box( 254 );
+        pbuffer->fill_box( BLACK_PALETTE_ID );
         //blit8( pbuffer, tmpintro, 0, -240+i, 0, 0, 639, 239 );
         //blit8( pbuffer, tmpintro, 0, 479-i, 0, 240, 639, 479 );
         blit8( pbuffer, tmpintro, 0, -480+i );

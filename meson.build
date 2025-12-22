@@ -68,21 +68,28 @@ elma_sources = files(
     'input.cpp',
 )
 
-link_args = []
-win_subsystem = 'console'
-
 cpp = meson.get_compiler('cpp')
+link_args = []
+cpp_args = []
+
+win_subsystem = 'windows'
 if cpp.get_id() == 'msvc'
-    cpp_args = []
+    if get_option('buildtype') == 'debug'
+        # Allows printf when debugging
+        win_subsystem = 'console'
+    endif
+
+    if win_subsystem == 'windows'
+        # Override windows subsystem entrypoint to main instead of WinMain
+        link_args += ['/ENTRY:mainCRTStartup']
+    endif
+
     if host_machine.cpu_family() == 'x86'
-        win_subsystem = 'windows'
-        link_args += [
-            '/ENTRY:mainCRTStartup',
-            'winmm.lib',
-        ]
+        # winmm.lib is automatically linked by meson when 64-bit, but not 32-bit
+        link_args += ['winmm.lib']
     endif
 else
-    cpp_args = ['-Wno-deprecated-declarations']
+    cpp_args += ['-Wno-deprecated-declarations']
 endif
 
 sdl2_dep = dependency('sdl2',

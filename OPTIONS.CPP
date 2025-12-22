@@ -156,7 +156,23 @@ void options(void) {
             strcpy(Rubrikak_tab[12 + vantagis], "No");
         }
 
-        val.bead(13 + vantagis, 1);
+        strcpy(Rubrikak[13 + vantagis], "Minimap Alignment:");
+        switch (EolSettings->map_alignment) {
+        case MapAlignment::None:
+            strcpy(Rubrikak_tab[13 + vantagis], "None");
+            break;
+        case MapAlignment::Left:
+            strcpy(Rubrikak_tab[13 + vantagis], "Left");
+            break;
+        case MapAlignment::Middle:
+            strcpy(Rubrikak_tab[13 + vantagis], "Middle");
+            break;
+        case MapAlignment::Right:
+            strcpy(Rubrikak_tab[13 + vantagis], "Right");
+            break;
+        }
+
+        val.bead(14 + vantagis, 1);
 
         kurrens = val.valassz();
 
@@ -244,6 +260,23 @@ void options(void) {
 
         if (kurrens == 12) {
             EolSettings->center_map = !EolSettings->center_map;
+        }
+
+        if (kurrens == 13) {
+            switch (EolSettings->map_alignment) {
+            case MapAlignment::None:
+                EolSettings->map_alignment = MapAlignment::Left;
+                break;
+            case MapAlignment::Left:
+                EolSettings->map_alignment = MapAlignment::Middle;
+                break;
+            case MapAlignment::Middle:
+                EolSettings->map_alignment = MapAlignment::Right;
+                break;
+            case MapAlignment::Right:
+                EolSettings->map_alignment = MapAlignment::None;
+                break;
+            }
         }
 
         if (vantagis) { // Visszaalitjuk eredeti helyzetebe

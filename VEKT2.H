@@ -9,19 +9,19 @@ class vekt2 {
     vekt2 operator+(vekt2);
     vekt2 operator-(vekt2);
     double operator*(vekt2);
-    void normal(void);
-    void forgatas(double alfa);
+    void normalize(void);
+    void rotate(double rotation);
 };
 
 vekt2 operator*(double, vekt2);
 vekt2 operator*(vekt2, double);
 double abs(vekt2);
-vekt2 egys(vekt2);
-vekt2 forgatas90fokkal(vekt2);
-vekt2 forgatasminusz90fokkal(vekt2);
+vekt2 unit_vector(vekt2);
+vekt2 rotate_90deg(vekt2);
+vekt2 rotate_minus90deg(vekt2);
 
 // Sajat negyzetgyok:
-double gyok(double x);
+double square_root(double x);
 
 // KULONBOZO SZAMITASOK:
 
@@ -31,21 +31,22 @@ double gyok(double x);
 vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
 // Pont szakasztol valo tavolsagat szamolja ki:
 // (Szakasz hossza vsz hossza).
-double pontszakasztav(vekt2 rpont, vekt2 rsz, vekt2 vsz);
+double point_segment_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v);
 // Pont egyenestol valo tavolsagat szamolja ki:
-double pontegyenestav(vekt2 rpont, vekt2 rsz, vekt2 vsz);
+double point_line_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v);
 // Visszaadja ket kor metszetet, r1-bol r2-be bal oldalon (Ganyolt):
-vekt2 ketkormetszete(vekt2 r1, vekt2 r2, double l1, double l2);
+vekt2 circles_intersection(vekt2 r1, vekt2 r2, double l1, double l2);
 
 // Igaz, ha az r1-bol indulo v1 vektor es az r2-bol indulo v2 vektor
 // metszi egymast:
-bool vektormetszes(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
+bool segments_intersect(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
 // Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
-bool vektormetszes3(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
+bool segments_intersect_inexact(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
 
 // Igazzal ter vissza, ha metszi kort egyenes:
 // Ket metszespont kozul a v iranyaba haladva az elsot adja vissza:
-bool egyeneskormetszes(vekt2 r, vekt2 v, vekt2 r_kor, double sugar, vekt2* pmetszet);
+bool line_circle_intersection(vekt2 line_r, vekt2 line_v, vekt2 circle_r, double radius,
+                              vekt2* intersection_point);
 
 extern vekt2 Vekt2i, Vekt2j, Vekt2null;
 

@@ -54,7 +54,7 @@ double ball_ball_collision_time(ball* ball1, ball* ball2) {
         // Balls will miss each other and not collide
         return NO_COLLISION_TIME;
     }
-    double t = (-b - gyok(discriminant)) / (2 * a);
+    double t = (-b - square_root(discriminant)) / (2 * a);
     return (t + ball1->keyframe_time);
 }
 
@@ -93,8 +93,8 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
 
     // Plane of reflection as a normal vector
     vekt2 dr = ball2->keyframe_r - ball1->keyframe_r;
-    dr.normal();
-    vekt2 collision_plane = forgatas90fokkal(dr);
+    dr.normalize();
+    vekt2 collision_plane = rotate_90deg(dr);
 
     // Velocity component perpendicular to collision
     double vtang1 = collision_plane * ball1->v;

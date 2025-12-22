@@ -35,7 +35,7 @@ static void erokszamitasa(motorst* pmot, rigidbody* pkor, vekt2 i1, vekt2 j1, do
         // Gumieronek szetbontasa ket komponensre:
         double rudhossz = abs(gumis);
         vekt2 rudegys = gumis * (1.0 / rudhossz);
-        vekt2 rudegysmer = forgatas90fokkal(rudegys);
+        vekt2 rudegysmer = rotate_90deg(rudegys);
 
         Fsugar = (gumi * rudegys) * SpringTensionCoefficient;
         Ftang = (gumi * rudegysmer) * SpringTensionCoefficient;
@@ -54,8 +54,8 @@ static void erokszamitasa(motorst* pmot, rigidbody* pkor, vekt2 i1, vekt2 j1, do
     double kotol = abs(koto);
     double reckotol = 1.0 / kotol;
     vekt2 kotoe = koto * reckotol;
-    vekt2 kotomer = forgatas90fokkal(koto);
-    vekt2 kotoemer = forgatas90fokkal(kotoe);
+    vekt2 kotomer = rotate_90deg(koto);
+    vekt2 kotoemer = rotate_90deg(kotoe);
     vekt2 korongrelv = (kotomer * pmot->bike.angular_velocity + pmot->bike.v) - pkor->v;
     double vlong = korongrelv * kotoe;
     double vtang = korongrelv * kotoemer;
@@ -93,7 +93,7 @@ void resetleptet(motorst* pmot) {
 // Kor1-bol eloallitja Fejr-et!:
 void szamitfejr(motorst* pmot) {
     vekt2 i(cos(pmot->bike.rotation), sin(pmot->bike.rotation));
-    vekt2 j = forgatas90fokkal(i);
+    vekt2 j = rotate_90deg(i);
 
     if (pmot->flipped_bike) {
         pmot->head_r = pmot->body_r + i * 0.09 + j * 0.63;
@@ -106,7 +106,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
     Maxsurlodas = 0;
 
     vekt2 i1(cos(pmot->bike.rotation), sin(pmot->bike.rotation));
-    vekt2 j1 = forgatas90fokkal(i1);
+    vekt2 j1 = rotate_90deg(i1);
 
     // Fek, gaz:
     if (!pmot->prev_brake && fek) {
@@ -225,7 +225,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
     if (ugrik1 || ugrik2) {
         // Vezetot kulon forgatjuk meg:
         double domega = pmot->bike.angular_velocity - oldomega;
-        vekt2 tangens = forgatas90fokkal(pmot->body_r - pmot->bike.r);
+        vekt2 tangens = rotate_90deg(pmot->body_r - pmot->bike.r);
         pmot->body_v = pmot->body_v + tangens * domega;
     }
 

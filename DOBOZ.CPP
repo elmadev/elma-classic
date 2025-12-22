@@ -58,7 +58,7 @@ void egysor(unsigned char lyuk, short szam, unsigned char* sor, unsigned char* t
 
 void setaffinitas(vekt2 kozep, vekt2 irany, double nagysag, double aranyx, double aranyy) {
     Affinkozep = kozep;
-    irany.normal();
+    irany.normalize();
     Affinirany = irany;
     Affinnagysag = nagysag;
     Affinaranyx = aranyx;
@@ -130,11 +130,11 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vekt2 u, vekt2 v, vekt2 r) {
 
     if (vizszintes) {
         if (pozitivan) {
-            u.forgatas(Tulvizszintes);
-            v.forgatas(Tulvizszintes);
+            u.rotate(Tulvizszintes);
+            v.rotate(Tulvizszintes);
         } else {
-            u.forgatas(-Tulvizszintes);
-            v.forgatas(-Tulvizszintes);
+            u.rotate(-Tulvizszintes);
+            v.rotate(-Tulvizszintes);
         }
     }
     // Most mar biztos, hogy egy kicsit ferde az egesz!
@@ -168,8 +168,8 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vekt2 u, vekt2 v, vekt2 r) {
                 vizszintes = 1;
             }
             if (vizszintes) {
-                u.forgatas(Tulvizszintes);
-                v.forgatas(Tulvizszintes);
+                u.rotate(Tulvizszintes);
+                v.rotate(Tulvizszintes);
             }
         }
     }

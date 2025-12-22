@@ -150,22 +150,22 @@ void vonalrajz(vekt2 p1, vekt2 p2, int szaggatott) {
         p2kilog = 1;
     }
     if (p1kilog && p2kilog) {
-        if (pontszakasztav(Vonalkozep, p1, p2 - p1) / Vonalsugar > 0.998) {
+        if (point_segment_distance(Vonalkozep, p1, p2 - p1) / Vonalsugar > 0.998) {
             return;
         }
     }
     // Most mar biztos hogy legalabb belelog korbe szakasz
     if (p1kilog) {
         vekt2 ujp1;
-        if (!egyeneskormetszes(p1, p2 - p1, Vonalkozep, Vonalsugar, &ujp1)) {
-            hiba("vonal-ban !egyeneskormetszes!");
+        if (!line_circle_intersection(p1, p2 - p1, Vonalkozep, Vonalsugar, &ujp1)) {
+            hiba("vonal-ban !line_circle_intersection!");
         }
         p1 = ujp1;
     }
     if (p2kilog) {
         vekt2 ujp2;
-        if (!egyeneskormetszes(p2, p1 - p2, Vonalkozep, Vonalsugar, &ujp2)) {
-            hiba("vonal-ban !egyeneskormetszes!");
+        if (!line_circle_intersection(p2, p1 - p2, Vonalkozep, Vonalsugar, &ujp2)) {
+            hiba("vonal-ban !line_circle_intersection!");
         }
         p2 = ujp2;
     }

@@ -151,7 +151,7 @@ int gyuru::metszesszam(vekt2 r1, vekt2 v1) {
         }
         vekt2 r2(x1, y1);
         vekt2 v2 = vekt2(x2, y2) - r2;
-        if (vektormetszes(r1, v1, r2, v2)) {
+        if (segments_intersect(r1, v1, r2, v2)) {
             metszes++;
         }
     }
@@ -243,7 +243,7 @@ int gyuru::metszeshely(vekt2 r1, vekt2 v1, int kihagy, vekt2* phely) {
 
         vekt2 r2(x1, y1);
         vekt2 v2 = vekt2(x2, y2) - r2;
-        if (vektormetszes3(r1, v1, r2, v2)) {
+        if (segments_intersect_inexact(r1, v1, r2, v2)) {
             *phely = intersection(r1, v1, r2, v2);
             return 1;
         }
@@ -381,8 +381,8 @@ static double balszog(vekt2* pa, vekt2 b, vekt2 c) {
             // Szog tul hegyes, egyik pontjat arrebb rakjuk:
             constexpr double egytav = 0.0002;
             vekt2 meroleges = *pa - b;
-            meroleges = forgatas90fokkal(meroleges);
-            meroleges.normal();
+            meroleges = rotate_90deg(meroleges);
+            meroleges.normalize();
             *pa = *pa + meroleges * egytav;
             // dialog( "Arrebb raktuk!" );
 

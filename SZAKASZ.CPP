@@ -142,7 +142,7 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
     if (pv->hossz < 0.00000001) {
         hiba("Vonal hossza tul kicsi!");
     }
-    pv->egyseg = egys(pv->v);
+    pv->egyseg = unit_vector(pv->v);
 
     vekt2 v = pv->v;
     vekt2 r = pv->r - origo;

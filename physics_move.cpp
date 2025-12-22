@@ -49,7 +49,7 @@ static bool valid_anchor_points_old(vekt2 point1, vekt2 point2, rigidbody* rb, v
     // Get the unit vectors
     double length = abs(rb->r - point2);
     vekt2 n = (rb->r - point2) * (1.0 / length);
-    vekt2 n90 = forgatas90fokkal(n);
+    vekt2 n90 = rotate_90deg(n);
 
     // Convert linear force into torque and get the net torque (gas/brake torque + linear force
     // torque)
@@ -65,7 +65,7 @@ static bool valid_anchor_points_new(vekt2 point1, vekt2 point2, rigidbody* rb) {
     // Get the unit vectors
     double length = abs(rb->r - point2);
     vekt2 n = (rb->r - point2) * (1.0 / length);
-    vekt2 n90 = forgatas90fokkal(n);
+    vekt2 n90 = rotate_90deg(n);
 
     // Get the velocity orthogonal to the point of collision + angular velocity
     // The units here don't really match (m/s + rad/s) so it's kind of flawed
@@ -184,7 +184,7 @@ void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, bo
     // We need to roll perpendicular to the point of contact, so get the corresponding unit vector
     double length = abs(rb->r - point1);
     vekt2 n = (rb->r - point1) * (1.0 / length);
-    vekt2 n90 = forgatas90fokkal(n);
+    vekt2 n90 = rotate_90deg(n);
     // Take our linear velocity - since we are rolling, convert it into equivalent angular velocity
     rb->angular_velocity = rb->v * n90 * (1.0 / rb->radius);
     torque += force * n90 * rb->radius;
@@ -222,7 +222,7 @@ static void body_boundaries(motorst* mot, vekt2 i, vekt2 j) {
     static const vekt2 LINE_POINT(-0.35, 0.13);
     static const vekt2 LINE_SLOPE(0.14 - (-0.35), 0.36 - (0.13));
     static const vekt2 LINE_SLOPE_ORTHO(-LINE_SLOPE.y, LINE_SLOPE.x);
-    static const vekt2 LINE_SLOPE_ORTHO_UNIT = egys(LINE_SLOPE_ORTHO);
+    static const vekt2 LINE_SLOPE_ORTHO_UNIT = unit_vector(LINE_SLOPE_ORTHO);
     if ((body_r - LINE_POINT) * LINE_SLOPE_ORTHO_UNIT < 0.0) {
         double distance = (body_r - LINE_POINT) * LINE_SLOPE_ORTHO_UNIT;
         body_r = body_r - LINE_SLOPE_ORTHO_UNIT * distance;
@@ -300,7 +300,7 @@ void body_movement(motorst* mot, vekt2 gravity, vekt2 i, vekt2 j, double dt) {
     // However, the bike velocity has linear motion as well as angular motion
     // BikeVelocity = AngularVel(body_length) - LinearVel
     // AngularVel = radius(m)*rotational_velocity(rad/s)
-    vekt2 body_length_ortho = forgatas90fokkal(mot->body_r - mot->bike.r);
+    vekt2 body_length_ortho = rotate_90deg(mot->body_r - mot->bike.r);
     vekt2 neutral_v = body_length_ortho * mot->bike.angular_velocity + mot->bike.v;
     vekt2 relative_v = mot->body_v - neutral_v;
     vekt2 force_damping = relative_v * SpringResistanceCoefficient * 3.0;

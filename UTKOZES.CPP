@@ -19,7 +19,7 @@ static int gombszakasz(vekt2 r, double sugar, vonal* pv, vekt2* pt) {
             return 0;
         }
     }
-    vekt2 n = forgatas90fokkal(pv->egyseg);
+    vekt2 n = rotate_90deg(pv->egyseg);
     double tav = rel * n;
     if (tav < -sugar || tav > sugar) {
         return 0;

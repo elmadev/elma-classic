@@ -19,30 +19,30 @@ vekt2 vekt2::operator-(vekt2 a) { return vekt2(x - a.x, y - a.y); }
 
 double vekt2::operator*(vekt2 a) { return x * a.x + y * a.y; }
 
-void vekt2::forgatas(double alfa) {
-    double a = sin(alfa);
-    double b = cos(alfa);
+void vekt2::rotate(double rotation) {
+    double a = sin(rotation);
+    double b = cos(rotation);
     double xo = x;
     x = b * x - a * y;
     y = a * xo + b * y;
 }
 
-double abs(vekt2 a) { return gyok(a.x * a.x + a.y * a.y); }
+double abs(vekt2 a) { return square_root(a.x * a.x + a.y * a.y); }
 
-vekt2 egys(vekt2 a) { return a * (1 / abs(a)); }
+vekt2 unit_vector(vekt2 a) { return a * (1 / abs(a)); }
 
-void vekt2::normal(void) {
+void vekt2::normalize(void) {
     double recabs = 1 / abs(*this);
     x *= recabs;
     y *= recabs;
 }
 
-vekt2 forgatas90fokkal(vekt2 in) { return vekt2(-in.y, in.x); }
+vekt2 rotate_90deg(vekt2 in) { return vekt2(-in.y, in.x); }
 
-vekt2 forgatasminusz90fokkal(vekt2 in) { return vekt2(in.y, -in.x); }
+vekt2 rotate_minus90deg(vekt2 in) { return vekt2(in.y, -in.x); }
 
 // Sajat negyzetgyok:
-double gyok(double a) {
+double square_root(double a) {
     if (a < 0) {
         hiba("Gyokvonas negativ szammal!");
         return 1;
@@ -59,7 +59,7 @@ double gyok(double a) {
 // Parhuzamosok eseten hiba( char* ); fv.-t hivja meg.
 // A keplet a kovetkezo: p = r2-v2*(n*(r2-r1))/(n*v2), ahol n meroleges v1-re.
 vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
-    vekt2 n = forgatas90fokkal(v1);
+    vekt2 n = rotate_90deg(v1);
     double nv2 = n * v2;
     if (fabs(nv2) < 0.00000001) {
         // Ket parhuzamos egyenesrol van szo, visszaadjuk egyiknek a
@@ -74,8 +74,8 @@ vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
             return r1;
         }
     }
-    v1.normal();
-    v2.normal();
+    v1.normalize();
+    v2.normalize();
     nv2 = n * v2;
     double nr21 = n * (r2 - r1);
     return r2 - v2 * (nr21 / nv2);
@@ -83,31 +83,31 @@ vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
 
 // Pont szakasztol valo tavolsagat szamolja ki:
 // (Szakasz hossza vsz hossza).
-double pontszakasztav(vekt2 rpont, vekt2 rsz, vekt2 vsz) {
-    vekt2 rr = rpont - rsz;
-    double skalered = vsz * rr;
+double point_segment_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v) {
+    vekt2 rr = point_r - segment_r;
+    double skalered = segment_r * rr;
     if (skalered <= 0) {
         // Elso pont tavolsagat adja vissza:
         return abs(rr);
     }
-    if (skalered >= vsz * vsz) {
+    if (skalered >= segment_v * segment_v) {
         // Masodik pont tavolsagat adja vissza:
-        return abs(rr - vsz);
+        return abs(rr - segment_v);
     }
     // Egyenestol valo tavolsagat adja vissza:
-    vekt2 n = forgatas90fokkal(egys(vsz));
+    vekt2 n = rotate_90deg(unit_vector(segment_v));
     return fabs(n * rr);
 }
 
 // Pont egyenestol valo tavolsagat szamolja ki:
-double pontegyenestav(vekt2 rpont, vekt2 rsz, vekt2 vsz) {
-    vekt2 rr = rpont - rsz;
-    vekt2 n = forgatas90fokkal(egys(vsz));
+double point_line_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v) {
+    vekt2 rr = point_r - segment_r;
+    vekt2 n = rotate_90deg(unit_vector(segment_v));
     return fabs(n * rr);
 }
 
 // Visszaadja ket kor metszetet, r1-bol r2-be bal oldalon (Ganyolt):
-vekt2 ketkormetszete(vekt2 r1, vekt2 r2, double l1, double l2) {
+vekt2 circles_intersection(vekt2 r1, vekt2 r2, double l1, double l2) {
     vekt2 v = r2 - r1;
     double l = abs(v);
     // Egy kis ganyolas:
@@ -121,10 +121,10 @@ vekt2 ketkormetszete(vekt2 r1, vekt2 r2, double l1, double l2) {
         l2 = l + l1 - 0.00001;
     }
     vekt2 vegys = v * (1 / l);
-    vekt2 normal = forgatas90fokkal(vegys);
+    vekt2 normal = rotate_90deg(vegys);
 
     double x = (l1 * l1 - l2 * l2 + l * l) / (2.0 * l);
-    double m = gyok(l1 * l1 - x * x);
+    double m = square_root(l1 * l1 - x * x);
 
     vekt2 r = r1 + x * vegys + m * normal;
     return r;
@@ -133,7 +133,7 @@ vekt2 ketkormetszete(vekt2 r1, vekt2 r2, double l1, double l2) {
 // Igaz, ha v1 altal meghatarozott egyenest metszi r2,v2,
 // vagyis ha v2 kezdo es vegpontja egyenes ket oldalan fekszik:
 static bool ketoldalon(vekt2 v1, vekt2 r2, vekt2 v2) {
-    vekt2 norm = forgatas90fokkal(v1);
+    vekt2 norm = rotate_90deg(v1);
     int elso = r2 * norm > 0;
     int masodik = (r2 + v2) * norm > 0;
     return (elso && !masodik) || (!elso && masodik);
@@ -144,7 +144,7 @@ static bool ketoldalon(vekt2 v1, vekt2 r2, vekt2 v2) {
 // Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
 static bool ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
     static double kishatar = 0.00000001;
-    vekt2 norm = forgatas90fokkal(v1);
+    vekt2 norm = rotate_90deg(v1);
     int elso = 0;
     double elsoertek = r2 * norm;
     if (elsoertek > kishatar) {
@@ -169,27 +169,28 @@ static bool ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
 
 // Igaz, ha az r1-bol indulo v1 vektor es az r2-bol indulo v2 vektor
 // metszi egymast:
-bool vektormetszes(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
+bool segments_intersect(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     return ketoldalon(v1, r2 - r1, v2) && ketoldalon(v2, r1 - r2, v1);
 }
 
 // Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
-bool vektormetszes3(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
+bool segments_intersect_inexact(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     return ketoldalon3(v1, r2 - r1, v2) && ketoldalon3(v2, r1 - r2, v1);
 }
 
 // Igazzal ter vissza, ha metszi kort egyenes:
 // Ket metszespont kozul a v iranyaba haladva az elsot adja vissza:
-bool egyeneskormetszes(vekt2 p1, vekt2 v, vekt2 r_kor, double sugar, vekt2* p) {
-    vekt2 r = r_kor - p1;
-    v.normal();
-    vekt2 k = v * (v * r); // p1-bol mutat egyenes legkozelebbi pontjaba
-    double tav = pontegyenestav(r_kor, p1, v);
-    double gyokalatt = sugar * sugar - tav * tav;
+bool line_circle_intersection(vekt2 line_r, vekt2 line_v, vekt2 circle_r, double radius,
+                              vekt2* intersection_point) {
+    vekt2 r = circle_r - line_r;
+    line_v.normalize();
+    vekt2 k = line_v * (line_v * r); // line_r-bol mutat egyenes legkozelebbi pontjaba
+    double tav = point_line_distance(circle_r, line_r, line_v);
+    double gyokalatt = radius * radius - tav * tav;
     if (gyokalatt < 0.0) {
         return false;
     }
     double t = sqrt(gyokalatt);
-    *p = p1 + k - v * t;
+    *intersection_point = line_r + k - line_v * t;
     return true;
 }

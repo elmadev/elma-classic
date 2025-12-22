@@ -135,11 +135,11 @@ void options(void) {
         strcpy(Rubrikak[9 + vantagis], "Customize Controls ...");
         strcpy(Rubrikak_tab[9 + vantagis], "");
 
-        sprintf(Rubrikak[10 + vantagis], "Pics In Background:");
+        strcpy(Rubrikak[10 + vantagis], "Pics In Background:");
         if (EolSettings->pictures_in_background) {
-            sprintf(Rubrikak_tab[10 + vantagis], "Yes");
+            strcpy(Rubrikak_tab[10 + vantagis], "Yes");
         } else {
-            sprintf(Rubrikak_tab[10 + vantagis], "No");
+            strcpy(Rubrikak_tab[10 + vantagis], "No");
         }
 
         val.bead(11 + vantagis, 1);

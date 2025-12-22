@@ -105,15 +105,15 @@ void forditkepet(pic8* ppic) {
 // Meg nem affin koordok:
 static void kidoboz(vekt2 a, vekt2 b, pic8* ppic8, double szelesseg, kiskep* pk, double tulloga,
                     double tullogb, int tukor = 0) {
-    vekt2 vegys = egys(b - a);
+    vekt2 vegys = unit_vector(b - a);
     b = b + vegys * tullogb;
     a = a - vegys * tulloga;
     vekt2 v = b - a;
     vekt2 v2fel;
     if (tukor) {
-        v2fel = forgatas90fokkal(vegys) * szelesseg;
+        v2fel = rotate_90deg(vegys) * szelesseg;
     } else {
-        v2fel = forgatasminusz90fokkal(vegys) * szelesseg;
+        v2fel = rotate_minus90deg(vegys) * szelesseg;
     }
     a = a - v2fel;
 
@@ -392,7 +392,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
 
     vekt2 kozep = pmot->bike.r - sarok;
     vekt2 jobbra = vekt2(cos(pmot->bike.rotation), sin(pmot->bike.rotation));
-    vekt2 fel = forgatas90fokkal(jobbra);
+    vekt2 fel = rotate_90deg(jobbra);
 
     if (vanforgas) {
         Affinitas = 1;
@@ -410,7 +410,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     double malfa = 0.62;
     double mmeret = 0.0045;
     Mi = jobbra * (mmeret * cos(malfa)) + fel * (mmeret * sin(malfa));
-    Mj = forgatas90fokkal(Mi);
+    Mj = rotate_90deg(Mi);
     if (pmot->flipped_bike) {
         Mj = Vekt2null - Mj;
     }
@@ -475,9 +475,9 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     */
 
     if (pmot->flipped_bike) {
-        p_terd = ketkormetszete(p_csipo, p_labfej, combhossz, labszarhossz);
+        p_terd = circles_intersection(p_csipo, p_labfej, combhossz, labszarhossz);
     } else {
-        p_terd = ketkormetszete(p_labfej, p_csipo, labszarhossz, combhossz);
+        p_terd = circles_intersection(p_labfej, p_csipo, labszarhossz, combhossz);
     }
 
     // Fej:
@@ -538,9 +538,9 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
         // alfa es hosszit alapjan p_kezfej forgatasa es nyujtasa vall korul:
         vekt2 kar = p_kezfej - p_vall;
         if (!pmot->flipped_bike) {
-            kar.forgatas(-alfa);
+            kar.rotate(-alfa);
         } else {
-            kar.forgatas(alfa);
+            kar.rotate(alfa);
         }
         kar = kar * hosszit;
         p_kezfej = p_vall + kar;
@@ -550,9 +550,9 @@ static void kibike(int ajatekos, pic8* ppic, double t, vekt2 sarok, motorst* pmo
     double felkarhossz = 0.328 * 1.05;
     vekt2 p_konyok;
     if (pmot->flipped_bike) {
-        p_konyok = ketkormetszete(p_kezfej, p_vall, alkarhossz, felkarhossz);
+        p_konyok = circles_intersection(p_kezfej, p_vall, alkarhossz, felkarhossz);
     } else {
-        p_konyok = ketkormetszete(p_vall, p_kezfej, felkarhossz, alkarhossz);
+        p_konyok = circles_intersection(p_vall, p_kezfej, felkarhossz, alkarhossz);
     }
 
     // Lab:

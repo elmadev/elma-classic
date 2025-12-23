@@ -31,26 +31,6 @@ void mv_main(void) {
 
     // initqopen();
 
-    if (access("nemmem.inf", 0) != 0) {
-        // Ha nem talalja nemmem.inf-et:
-        // mem Totall Free 11600K-nal meg eppen elmegy, 101 mar uzenetet ir:
-        int memkell = 100;
-        char* tomb[110];
-        for (int i = 0; i < memkell; i++) {
-            {
-                tomb[i] = new char[100000];
-            }
-            if (!tomb[i]) {
-                char tmp[200];
-                sprintf(tmp, "You need about %d00K more free memory!\n", memkell - i);
-                uzenet(tmp);
-            }
-        }
-        for (int i = 0; i < memkell; i++) {
-            delete tomb[i];
-        }
-    }
-
     // init_physics_data(); teljesben van mar ujabban
 
     teljes();
@@ -140,7 +120,7 @@ void hiba(const char* text1, const char* text2, const char* text3) {
 
 void uzenet(const char* text1, const char* text2, const char* text3) {
     // about azert kell, hogy kezdo memchecknel ne agazzon el:
-    if (strstr(text1, "memory") && !strstr(text1, "about")) {
+    if (strstr(text1, "memory")) {
         // Ha memory szerepel text1-ben:
         if (access("message.inf", 0) == 0) { // Most mem-et is csak inf-re adja:
             directhiba("message.inf accessed\n", text1, text2, text3);

@@ -5,64 +5,6 @@
 #include <timeapi.h>
 #endif
 
-// magassagokeloallitasa-bol kimasolva!!!!!:
-/*static void elemszam( char* text, szakaszok* pszakok ) {
-    pszakok->felsorolasresetszak();
-    szakasz* psz = pszakok->getnextszak();
-    if( !psz )
-        hiba( "Nincs egyetlen szakasz sem definialva!" );
-    double minx = psz->vv.r.x;
-    double maxx = psz->vv.r.x;
-    double miny = psz->vv.r.y;
-    double maxy = psz->vv.r.y;
-    while( psz ) {
-        if( psz->vv.r.x < minx )
-            minx = psz->vv.r.x;
-        if( psz->vv.r.x > maxx )
-            maxx = psz->vv.r.x;
-        if( psz->vv.r.y < miny )
-            miny = psz->vv.r.y;
-        if( psz->vv.r.y > maxy )
-            maxy = psz->vv.r.y;
-
-        if( psz->vv.r.x+psz->vv.v.x < minx )
-            minx = psz->vv.r.x+psz->vv.v.x;
-        if( psz->vv.r.x+psz->vv.v.x > maxx )
-            maxx = psz->vv.r.x+psz->vv.v.x;
-        if( psz->vv.r.y+psz->vv.v.y < miny )
-            miny = psz->vv.r.y+psz->vv.v.y;
-        if( psz->vv.r.y+psz->vv.v.y > maxy )
-            maxy = psz->vv.r.y+psz->vv.v.y;
-
-        psz = pszakok->getnextszak();
-    }
-
-    vekt2 origo = vekt2( minx-400/Aranyx, miny-300/Aranyy );
-    // Egy kis veletlenites!:
-    origo.x += 0.0000145839857463;
-    origo.y += 0.0000295874632574;
-
-    double xsize = (maxx+400/Aranyx)-origo.x;
-    double ysize = (maxy+300/Aranyy)-origo.y;
-
-    // Lefoglalja magassagokat:
-    int xszazalek = 100.0*(xsize*Aranyx)/Magmaxelemszam;
-    int yszazalek = 100.0*(ysize*Aranyy)/Magmaxelemszam;
-    sprintf( text, "Kihasznaltsag szazalekban: x = %d, y = %d", xszazalek,
-                                                                yszazalek );
-} */
-
-/*
-q7/8
-    232, 473
-o0/1
-    336, 343
-n8/9
-    241, 245, 246, 580, 611, 982
-o8/9
-    376, 379, 634
-*/
-
 static double Startido = 0;
 
 // 182*sec-et adja vissza idot tortresszel egyutt!

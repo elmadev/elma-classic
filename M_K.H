@@ -7,6 +7,7 @@ const static int MaxKeycode = 256;
 
 void fill_kb_state(char* buffer);
 
+void mk_init(void);
 int mk_getextchar(void);
 void mk_emptychar(void);
 int mk_kbhit(void);

@@ -48,6 +48,12 @@ void cheatplayer(void) {
 static void mergestatedat(void);
 
 void teljes(void) {
+    initqopen();
+
+    mk_init();
+
+    init_menu_pictures();
+
     State = new state;
     if (!State) {
         uzenet("memory");

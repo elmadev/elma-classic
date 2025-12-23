@@ -17,22 +17,6 @@ int sdl_init(void);
 int main() {
     sdl_init();
 
-    initqopen();
-
-    void mk_init(void);
-    mk_init();
-
-    init_menu_pictures();
-    mv_main();
-}
-
-void mv_main(void) {
-    // new wav( "utodes.wav", 0.25 );
-
-    // initqopen();
-
-    // init_physics_data(); teljesben van mar ujabban
-
     teljes();
 }
 

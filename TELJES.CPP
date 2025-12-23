@@ -169,8 +169,8 @@ void teljes(void) {
 
     MenuPal->set();
 
-    // Ez kell valaszt2-hoz:
-    initrubrikak();
+    // Ez kell menu_nav-hoz:
+    menu_nav_entries_init();
 
     // kiraklogot();
 

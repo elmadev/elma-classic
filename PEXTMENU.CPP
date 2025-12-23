@@ -37,33 +37,33 @@ static int afterplayext( char* filenev, long ido ) {
 
         //Korny->pal_afterplaymenu->set();
         // Valasztas:
-        valaszt2 val;
-        val.kur = kurrens;
-        val.egykepen = 6;
-        val.x0 = 50;
-        val.y0 = 40;
+        menu_nav val;
+        val.selected_index = kurrens;
+        val.max_visible_entries = 6;
+        val.x_left = 50;
+        val.y_entries = 40;
         val.dy = 25;
-        val.escelheto = 1;
+        val.enable_esc = 1;
         char* levdesc = getlevelname( filenev );
         if( levdesc )
-            strcpy( val.cim, levdesc );
+            strcpy( val.title, levdesc );
         else
-            strcpy( val.cim, "External level" );
+            strcpy( val.title, "External level" );
 
-        strcpy( Rubrikak[0], "Play again" );
-        strcpy( Rubrikak[1], "Replay" );
-        strcpy( Rubrikak[2], "Save play" );
-        strcpy( Rubrikak[3], "File list" );
+        strcpy( NavEntriesLeft[0], "Play again" );
+        strcpy( NavEntriesLeft[1], "Replay" );
+        strcpy( NavEntriesLeft[2], "Save play" );
+        strcpy( NavEntriesLeft[3], "File list" );
 
         // Idoszoveg helyere beirjuk ecset-ben levok lefoglaltak szamat:
         //sprintf( Idoszovegek[0].text, "%d", Osszegszam );
 
-        val.bead( 4 );
+        val.setup( 4 );
         int eredmeny = 0;
         if( Ptop->lezart )
-            eredmeny = val.valassz( Idoszovegek, 3 );
+            eredmeny = val.navigate( Idoszovegek, 3 );
         else
-            eredmeny = val.valassz( Idoszovegek, 2 );
+            eredmeny = val.navigate( Idoszovegek, 2 );
         kurrens = eredmeny;
 
         if( eredmeny < 0 || eredmeny == 3 )
@@ -90,8 +90,8 @@ static void abcberendez(int szam) {
     for (int i = 0; i < szam + 3; i++) {
         for (int j = 0; j < szam - 1; j++) {
             // Ha j es j+1 edik elem forditva van visszacsereljuk oket:
-            char* nev1 = Rubrikak[j];
-            char* nev2 = Rubrikak[j + 1];
+            char* nev1 = NavEntriesLeft[j];
+            char* nev2 = NavEntriesLeft[j + 1];
             if (abcbenelobb(nev2, nev1) > 0) {
                 // Csere:
                 char tmp[20];
@@ -112,11 +112,11 @@ void playextmenu(void) {
     while (!done) {
         char* filenev = fname;
 
-        strcpy(Rubrikak[szam], filenev);
+        strcpy(NavEntriesLeft[szam], filenev);
 
         done = finext(fname);
         szam++;
-        if (szam >= Maxrubrikaszam - 4) {
+        if (szam >= NavEntriesLeftMaxLength - 4) {
             done = 1;
         }
     }
@@ -132,7 +132,7 @@ void playextmenu(void) {
     int kezdo = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
     for (int i = 0; i < szam; i++) {
         char tmp[50];
-        strcpy(tmp, Rubrikak[i]);
+        strcpy(tmp, NavEntriesLeft[i]);
         // strcat( tmp, ".lev" );
         if (strcmpi(tmp, State->external_filename) == 0) {
             kezdo = i;
@@ -140,28 +140,28 @@ void playextmenu(void) {
     }
 
     // Feltoltottuk neveket, jon valasztas:
-    valaszt2 val;
-    val.kur = kezdo;
-    val.egykepen = LISTegykepen;
-    val.x0 = LISTx0;
-    val.y0 = LISTy0;
+    menu_nav val;
+    val.selected_index = kezdo;
+    val.max_visible_entries = LISTegykepen;
+    val.x_left = LISTx0;
+    val.y_entries = LISTy0;
     val.dy = LISTdy;
-    val.escelheto = 1;
-    strcpy(val.cim, "Select External File!");
+    val.enable_esc = 1;
+    strcpy(val.title, "Select External File!");
 
-    val.bead(szam);
+    val.setup(szam);
 
     while (1) {
-        int eredmeny = val.valassz();
+        int eredmeny = val.navigate();
         if (eredmeny < 0) {
             return;
         }
 
         char filenev[20];
-        if (strlen(val.rubrikak[eredmeny]) > 15) {
-            hiba("playextmenu-ben val.rubrikak[eredmeny] ) > 15!");
+        if (strlen(val.entries_left[eredmeny]) > 15) {
+            hiba("playextmenu-ben val.entries_left[eredmeny] ) > 15!");
         }
-        strcpy(filenev, val.rubrikak[eredmeny]);
+        strcpy(filenev, val.entries_left[eredmeny]);
 
         strcpy(State->external_filename, filenev);
 

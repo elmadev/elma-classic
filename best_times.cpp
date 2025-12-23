@@ -150,18 +150,18 @@ void menu_best_times_choose_level(bool single) {
         visible_levels = INTERNAL_LEVEL_COUNT - 1;
     }
 
-    valaszt2 nav;
-    nav.kur = 0;
-    nav.egykepen = LISTegykepen;
-    nav.x0 = 61;
-    nav.x0_tab = 380;
-    nav.y0 = LISTy0;
+    menu_nav nav;
+    nav.selected_index = 0;
+    nav.max_visible_entries = LISTegykepen;
+    nav.x_left = 61;
+    nav.x_right = 380;
+    nav.y_entries = LISTy0;
     nav.dy = LISTdy;
-    nav.escelheto = 1;
+    nav.enable_esc = 1;
     if (single) {
-        strcpy(nav.cim, "Single Player Best Times");
+        strcpy(nav.title, "Single Player Best Times");
     } else {
-        strcpy(nav.cim, "Multi Player Best Times");
+        strcpy(nav.title, "Multi Player Best Times");
     }
 
     // Draw "1 Warm Up         bestplayer"
@@ -172,24 +172,24 @@ void menu_best_times_choose_level(bool single) {
         }
 
         // "1 Warm Up"
-        itoa(i + 1, Rubrikak[i], 10);
-        strcat(Rubrikak[i], " ");
-        strcat(Rubrikak[i], getleveldescription(i));
+        itoa(i + 1, NavEntriesLeft[i], 10);
+        strcat(NavEntriesLeft[i], " ");
+        strcat(NavEntriesLeft[i], getleveldescription(i));
 
         // Best player, if exists
-        strcpy(Rubrikak_tab[i], "-");
+        strcpy(NavEntriesRight[i], "-");
         if (tten->times_count > 0) {
-            strcpy(Rubrikak_tab[i], tten->names1[0]);
+            strcpy(NavEntriesRight[i], tten->names1[0]);
             if (!single) {
-                strcat(Rubrikak_tab[i], "  ");
-                strcat(Rubrikak_tab[i], tten->names2[0]);
+                strcat(NavEntriesRight[i], "  ");
+                strcat(NavEntriesRight[i], tten->names2[0]);
             }
         }
     }
 
-    nav.bead(visible_levels, 1);
+    nav.setup(visible_levels, 1);
     while (true) {
-        int choice = nav.valassz();
+        int choice = nav.navigate();
         if (choice < 0) {
             return;
         }
@@ -198,25 +198,25 @@ void menu_best_times_choose_level(bool single) {
 }
 
 void menu_best_times() {
-    valaszt2 nav;
+    menu_nav nav;
     if (State->single) {
-        nav.kur = 0;
+        nav.selected_index = 0;
     } else {
-        nav.kur = 1;
+        nav.selected_index = 1;
     }
-    nav.egykepen = 6;
-    nav.x0 = 170;
-    nav.y0 = 190;
+    nav.max_visible_entries = 6;
+    nav.x_left = 170;
+    nav.y_entries = 190;
     nav.dy = 50;
-    nav.escelheto = 1;
-    strcpy(nav.cim, "Best Times");
+    nav.enable_esc = 1;
+    strcpy(nav.title, "Best Times");
 
-    strcpy(Rubrikak[0], "Single Player Times");
-    strcpy(Rubrikak[1], "Multi Player Times");
+    strcpy(NavEntriesLeft[0], "Single Player Times");
+    strcpy(NavEntriesLeft[1], "Multi Player Times");
 
-    nav.bead(2);
+    nav.setup(2);
     while (true) {
-        int choice = nav.valassz();
+        int choice = nav.navigate();
         if (choice < 0) {
             return;
         }

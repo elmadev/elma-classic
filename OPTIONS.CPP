@@ -55,126 +55,126 @@ void options(void) {
 
     int kurrens = 0;
     while (1) {
-        valaszt2 val;
-        val.kur = kurrens;
-        val.egykepen = 11;
-        val.x0 = 72;
-        val.x0_tab = 390;
-        val.y0 = 77;
+        menu_nav val;
+        val.selected_index = kurrens;
+        val.max_visible_entries = 11;
+        val.x_left = 72;
+        val.x_right = 390;
+        val.y_entries = 77;
         val.dy = 36;
-        val.escelheto = 1;
-        strcpy(val.cim, "Options");
+        val.enable_esc = 1;
+        strcpy(val.title, "Options");
 
         int vantagis = 0;
-        strcpy(Rubrikak[0], "Play mode:");
+        strcpy(NavEntriesLeft[0], "Play mode:");
         if (State->single) {
-            strcpy(Rubrikak_tab[0], "Single Player");
+            strcpy(NavEntriesRight[0], "Single Player");
         } else {
-            strcpy(Rubrikak_tab[0], "Multiplayer");
+            strcpy(NavEntriesRight[0], "Multiplayer");
             vantagis = 1;
         }
 
         if (vantagis) {
-            strcpy(Rubrikak[1], "Flag Tag:");
+            strcpy(NavEntriesLeft[1], "Flag Tag:");
             if (State->flag_tag) {
-                strcpy(Rubrikak_tab[1], "On");
+                strcpy(NavEntriesRight[1], "On");
             } else {
-                strcpy(Rubrikak_tab[1], "Off");
+                strcpy(NavEntriesRight[1], "Off");
             }
         }
 
         // Jatekos valasztas:
-        strcpy(Rubrikak[1 + vantagis], "Player A:");
-        strcpy(Rubrikak_tab[1 + vantagis], State->player1);
+        strcpy(NavEntriesLeft[1 + vantagis], "Player A:");
+        strcpy(NavEntriesRight[1 + vantagis], State->player1);
 
-        strcpy(Rubrikak[2 + vantagis], "Player B:");
-        strcpy(Rubrikak_tab[2 + vantagis], State->player2);
+        strcpy(NavEntriesLeft[2 + vantagis], "Player B:");
+        strcpy(NavEntriesRight[2 + vantagis], State->player2);
 
-        strcpy(Rubrikak[3 + vantagis], "Sound:");
+        strcpy(NavEntriesLeft[3 + vantagis], "Sound:");
         if (State->sound_on) {
-            strcpy(Rubrikak_tab[3 + vantagis], "Enabled");
+            strcpy(NavEntriesRight[3 + vantagis], "Enabled");
         } else {
-            strcpy(Rubrikak_tab[3 + vantagis], "Disabled");
+            strcpy(NavEntriesRight[3 + vantagis], "Disabled");
         }
 
-        strcpy(Rubrikak[4 + vantagis], "Sound Optimization:");
+        strcpy(NavEntriesLeft[4 + vantagis], "Sound Optimization:");
         if (State->compatibility_mode) {
-            strcpy(Rubrikak_tab[4 + vantagis], "Compatibility");
+            strcpy(NavEntriesRight[4 + vantagis], "Compatibility");
         } else {
-            strcpy(Rubrikak_tab[4 + vantagis], "Best Quality");
+            strcpy(NavEntriesRight[4 + vantagis], "Best Quality");
         }
 
-        strcpy(Rubrikak[5 + vantagis], "Animated Menus:");
+        strcpy(NavEntriesLeft[5 + vantagis], "Animated Menus:");
         if (State->animated_menus) {
-            strcpy(Rubrikak_tab[5 + vantagis], "Yes");
+            strcpy(NavEntriesRight[5 + vantagis], "Yes");
         } else {
-            strcpy(Rubrikak_tab[5 + vantagis], "No");
+            strcpy(NavEntriesRight[5 + vantagis], "No");
         }
 
-        strcpy(Rubrikak[6 + vantagis], "Video Detail:");
+        strcpy(NavEntriesLeft[6 + vantagis], "Video Detail:");
         if (State->high_quality) {
-            strcpy(Rubrikak_tab[6 + vantagis], "High");
+            strcpy(NavEntriesRight[6 + vantagis], "High");
         } else {
-            strcpy(Rubrikak_tab[6 + vantagis], "Low");
+            strcpy(NavEntriesRight[6 + vantagis], "Low");
         }
 
-        strcpy(Rubrikak[7 + vantagis], "Animated Objects:");
+        strcpy(NavEntriesLeft[7 + vantagis], "Animated Objects:");
         if (State->animated_objects) {
-            strcpy(Rubrikak_tab[7 + vantagis], "Yes");
+            strcpy(NavEntriesRight[7 + vantagis], "Yes");
         } else {
-            strcpy(Rubrikak_tab[7 + vantagis], "No");
+            strcpy(NavEntriesRight[7 + vantagis], "No");
         }
 
-        strcpy(Rubrikak[8 + vantagis], "Swap Bikes:");
+        strcpy(NavEntriesLeft[8 + vantagis], "Swap Bikes:");
         if (State->player1_bike1) {
-            strcpy(Rubrikak_tab[8 + vantagis], "No");
+            strcpy(NavEntriesRight[8 + vantagis], "No");
         } else {
-            strcpy(Rubrikak_tab[8 + vantagis], "Yes");
+            strcpy(NavEntriesRight[8 + vantagis], "Yes");
         }
 
-        strcpy(Rubrikak[9 + vantagis], "Customize Controls ...");
-        strcpy(Rubrikak_tab[9 + vantagis], "");
+        strcpy(NavEntriesLeft[9 + vantagis], "Customize Controls ...");
+        strcpy(NavEntriesRight[9 + vantagis], "");
 
-        strcpy(Rubrikak[10 + vantagis], "Pics In Background:");
+        strcpy(NavEntriesLeft[10 + vantagis], "Pics In Background:");
         if (EolSettings->pictures_in_background) {
-            strcpy(Rubrikak_tab[10 + vantagis], "Yes");
+            strcpy(NavEntriesRight[10 + vantagis], "Yes");
         } else {
-            strcpy(Rubrikak_tab[10 + vantagis], "No");
+            strcpy(NavEntriesRight[10 + vantagis], "No");
         }
 
-        strcpy(Rubrikak[11 + vantagis], "Centered Camera:");
+        strcpy(NavEntriesLeft[11 + vantagis], "Centered Camera:");
         if (EolSettings->center_camera) {
-            strcpy(Rubrikak_tab[11 + vantagis], "Yes");
+            strcpy(NavEntriesRight[11 + vantagis], "Yes");
         } else {
-            strcpy(Rubrikak_tab[11 + vantagis], "No");
+            strcpy(NavEntriesRight[11 + vantagis], "No");
         }
 
-        strcpy(Rubrikak[12 + vantagis], "Centered Minimap:");
+        strcpy(NavEntriesLeft[12 + vantagis], "Centered Minimap:");
         if (EolSettings->center_map) {
-            strcpy(Rubrikak_tab[12 + vantagis], "Yes");
+            strcpy(NavEntriesRight[12 + vantagis], "Yes");
         } else {
-            strcpy(Rubrikak_tab[12 + vantagis], "No");
+            strcpy(NavEntriesRight[12 + vantagis], "No");
         }
 
-        strcpy(Rubrikak[13 + vantagis], "Minimap Alignment:");
+        strcpy(NavEntriesLeft[13 + vantagis], "Minimap Alignment:");
         switch (EolSettings->map_alignment) {
         case MapAlignment::None:
-            strcpy(Rubrikak_tab[13 + vantagis], "None");
+            strcpy(NavEntriesRight[13 + vantagis], "None");
             break;
         case MapAlignment::Left:
-            strcpy(Rubrikak_tab[13 + vantagis], "Left");
+            strcpy(NavEntriesRight[13 + vantagis], "Left");
             break;
         case MapAlignment::Middle:
-            strcpy(Rubrikak_tab[13 + vantagis], "Middle");
+            strcpy(NavEntriesRight[13 + vantagis], "Middle");
             break;
         case MapAlignment::Right:
-            strcpy(Rubrikak_tab[13 + vantagis], "Right");
+            strcpy(NavEntriesRight[13 + vantagis], "Right");
             break;
         }
 
-        val.bead(14 + vantagis, 1);
+        val.setup(14 + vantagis, 1);
 
-        kurrens = val.valassz();
+        kurrens = val.navigate();
 
         if (kurrens < 0) {
             // State->save_aaa(); majd programbol valo kilepeskor kiirjuk

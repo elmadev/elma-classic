@@ -365,7 +365,7 @@ void idoelintezes(long ido, char* valasz, int level, const char* filenev) {
     valasz[0] = 0;
     if (ido <= 0) {
         // Nem fejeztek be:
-        // Azt jelzi valaszt2::valassz-nak, hogy kozepre tegye:
+        // Azt jelzi menu_nav::navigate-nak, hogy kozepre tegye:
         strcpy(valasz, "*$$^&|@You Failed to Finish!");
         if (MeghalteloszorAB == 1) {
             strcat(valasz, "    (A died first)");
@@ -660,46 +660,46 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         }
 
         // Valasztas:
-        valaszt2 val;
+        menu_nav val;
         // val.szam = 5+nextisvan+skipisvan;
-        val.kur = kurrens;
-        val.egykepen = 6;
-        val.x0 = 230;
+        val.selected_index = kurrens;
+        val.max_visible_entries = 6;
+        val.x_left = 230;
         if (Single) {
-            val.y0 = 110;
+            val.y_entries = 110;
             val.dy = 42;
         } else {
-            val.y0 = 110;
+            val.y_entries = 110;
             val.dy = 42;
         }
-        val.escelheto = 1;
-        strcpy(val.cim, fejlec);
+        val.enable_esc = 1;
+        strcpy(val.title, fejlec);
 
         if (nextisvan || skipisvan) {
-            strcpy(Rubrikak[0], "Play again");
+            strcpy(NavEntriesLeft[0], "Play again");
             if (nextisvan) {
-                strcpy(Rubrikak[1], "Play next");
+                strcpy(NavEntriesLeft[1], "Play next");
             } else {
-                strcpy(Rubrikak[1], "Skip level");
+                strcpy(NavEntriesLeft[1], "Skip level");
             }
-            strcpy(Rubrikak[2], "Replay");
-            strcpy(Rubrikak[3], "Save play");
-            strcpy(Rubrikak[4], "Best times");
-            // strcpy( Rubrikak[5], "Main menu" );
+            strcpy(NavEntriesLeft[2], "Replay");
+            strcpy(NavEntriesLeft[3], "Save play");
+            strcpy(NavEntriesLeft[4], "Best times");
+            // strcpy( NavEntriesLeft[5], "Main menu" );
         } else {
-            strcpy(Rubrikak[0], "Play again");
-            strcpy(Rubrikak[1], "Replay");
-            strcpy(Rubrikak[2], "Save play");
-            strcpy(Rubrikak[3], "Best times");
-            // strcpy( Rubrikak[4], "Main menu" );
+            strcpy(NavEntriesLeft[0], "Play again");
+            strcpy(NavEntriesLeft[1], "Replay");
+            strcpy(NavEntriesLeft[2], "Save play");
+            strcpy(NavEntriesLeft[3], "Best times");
+            // strcpy( NavEntriesLeft[4], "Main menu" );
         }
 
-        val.bead(4 + nextisvan + skipisvan);
+        val.setup(4 + nextisvan + skipisvan);
 
         // Idoszoveg helyere beirjuk ecset-ben levok lefoglaltak szamat:
         // sprintf( Idoszovegek[0].text, "%d", Osszegszam );
 
-        int eredmeny = val.valassz(Idoszovegek, idoszovegszam);
+        int eredmeny = val.navigate(Idoszovegek, idoszovegszam);
         kurrens = eredmeny;
         // eredmeny-t nextisvan esetere konvertalja:
         if (eredmeny > 0 && !nextisvan && !skipisvan) {
@@ -837,18 +837,18 @@ void play(void) {
         }
 
         // Valasztas:
-        valaszt2 val;
-        val.kur = int(pjatekos->selected_level) + 1;
-        val.egykepen = LISTegykepen;
-        val.x0 = LISTx0;
-        val.y0 = LISTy0;
+        menu_nav val;
+        val.selected_index = int(pjatekos->selected_level) + 1;
+        val.max_visible_entries = LISTegykepen;
+        val.x_left = LISTx0;
+        val.y_entries = LISTy0;
         val.dy = LISTdy;
-        val.escelheto = 1;
-        strcpy(val.cim, "Select Level!");
+        val.enable_esc = 1;
+        strcpy(val.title, "Select Level!");
 
-        strcpy(Rubrikak[0], "External File");
+        strcpy(NavEntriesLeft[0], "External File");
         for (int i = 0; i < kirpalyszam; i++) {
-            char tmp[MAXRUBRIKAHOSSZ];
+            char tmp[NAV_ENTRY_TEXT_MAX_LENGTH];
             itoa(i + 1, tmp, 10);
             strcat(tmp, " ");
             if (pjatekos->skipped[i]) {
@@ -857,14 +857,14 @@ void play(void) {
                 strcat(tmp, getleveldescription(i));
                 // strcat( tmp, "Nincs level nev!" );
             }
-            if (strlen(tmp) > MAXRUBRIKAHOSSZ - 5) {
-                hiba("play-ben! strlen( tmp ) > MAXRUBRIKAHOSSZ-5!");
+            if (strlen(tmp) > NAV_ENTRY_TEXT_MAX_LENGTH - 5) {
+                hiba("play-ben! strlen( tmp ) > NAV_ENTRY_TEXT_MAX_LENGTH-5!");
             }
-            strcpy(Rubrikak[i + 1], tmp);
+            strcpy(NavEntriesLeft[i + 1], tmp);
         }
 
-        val.bead(kirpalyszam + 1);
-        int eredmeny = val.valassz();
+        val.setup(kirpalyszam + 1);
+        int eredmeny = val.navigate();
 
         if (eredmeny < 0) {
             return;

@@ -65,9 +65,9 @@ void newjatekos(int A, int visszater) {
     if (State->player_count >= MAX_PLAYERS - 1) {
         uzenet("Sorry, no more players can get onto the list!");
     }
-    int maxrub = Maxrubrikaszam;
+    int maxrub = NavEntriesLeftMaxLength;
     if (MAX_PLAYERS > maxrub) {
-        hiba("MAX_PLAYERS > Maxrubrikaszam!");
+        hiba("MAX_PLAYERS > NavEntriesLeftMaxLength!");
     }
 
     if (bevesznevet(State->players[int(State->player_count)].name, visszater)) {
@@ -101,40 +101,40 @@ void newjatekos(int A, int visszater) {
 
 void jatekosvalasztas(int A, int visszater) {
     // Valasztas:
-    valaszt2* pval = NULL;
-    pval = new valaszt2;
+    menu_nav* pval = NULL;
+    pval = new menu_nav;
     char* eddigjatekos = NULL;
     if (A) {
         eddigjatekos = State->player1;
     } else {
         eddigjatekos = State->player2;
     }
-    pval->egykepen = LISTegykepen;
-    pval->x0 = LISTx0;
-    pval->y0 = LISTy0;
+    pval->max_visible_entries = LISTegykepen;
+    pval->x_left = LISTx0;
+    pval->y_entries = LISTy0;
     pval->dy = LISTdy;
-    pval->escelheto = 1;
-    strcpy(pval->cim, "Choose Player");
+    pval->enable_esc = 1;
+    strcpy(pval->title, "Choose Player");
 
-    strcpy(Rubrikak[0], "Create New Player");
-    pval->kur = 0;
+    strcpy(NavEntriesLeft[0], "Create New Player");
+    pval->selected_index = 0;
     for (int i = 0; i < State->player_count; i++) {
-        if (strlen(State->players[i].name) > MAXRUBRIKAHOSSZ) {
+        if (strlen(State->players[i].name) > NAV_ENTRY_TEXT_MAX_LENGTH) {
             hiba("Tul hosszu nev jatekosvalasztas-ban!");
         }
-        strcpy(Rubrikak[i + 1], State->players[i].name);
+        strcpy(NavEntriesLeft[i + 1], State->players[i].name);
 
         if (strcmp(eddigjatekos, State->players[i].name) == 0) {
-            pval->kur = i + 1;
+            pval->selected_index = i + 1;
         }
     }
 
-    pval->bead(State->player_count + 1);
+    pval->setup(State->player_count + 1);
 
-    RECidokellhet = 1;
-    RECidokellis = 0;
-    int eredmeny = pval->valassz();
-    RECidokellhet = 0;
+    CtrlAltEnabled = 1;
+    CtrlAltPressed = 0;
+    int eredmeny = pval->navigate();
+    CtrlAltEnabled = 0;
 
     delete pval;
     pval = NULL;
@@ -150,7 +150,7 @@ void jatekosvalasztas(int A, int visszater) {
         return;
     }
 
-    if (RECidokellis && visszater) {
+    if (CtrlAltPressed && visszater) {
         // Ezt a jatekost akarja torolni (opciokbol hivva):
         if (State->player_count <= 1) {
             return;

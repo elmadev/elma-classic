@@ -97,15 +97,15 @@ static unsigned int veletlen(void) {
 }
 
 void replay(void) {
-    strcpy(Rubrikak[0], "Randomizer");
+    strcpy(NavEntriesLeft[0], "Randomizer");
 
     finame fname;
     int done = fifirst("rec/*.rec", fname);
     // Ez mindig eggyel tobb, mint valosag, mivel az elso
     // rubrika mindig 'Randomizer':
     int szamuk = 1;
-    while (!done && szamuk < Maxrubrikaszam) {
-        char* nev = Rubrikak[szamuk];
+    while (!done && szamuk < NavEntriesLeftMaxLength) {
+        char* nev = NavEntriesLeft[szamuk];
         strcpy(nev, fname);
         // Leveszi kiterjesztest:
         int i = 0;
@@ -131,7 +131,7 @@ void replay(void) {
 
         done = finext(fname);
         szamuk++;
-        if (szamuk >= Maxrubrikaszam - 4) {
+        if (szamuk >= NavEntriesLeftMaxLength - 4) {
             done = 1;
         }
     }
@@ -144,33 +144,33 @@ void replay(void) {
     // ABC sorrendbe rendez:
     for (int i = 0; i < szamuk + 1; i++) {
         for (int j = 1; j < szamuk - 1; j++) {
-            if (abcbenelobb(Rubrikak[j + 1], Rubrikak[j])) {
+            if (abcbenelobb(NavEntriesLeft[j + 1], NavEntriesLeft[j])) {
                 // Csere:
                 char tmp[100];
-                strcpy(tmp, Rubrikak[j]);
-                strcpy(Rubrikak[j], Rubrikak[j + 1]);
-                strcpy(Rubrikak[j + 1], tmp);
+                strcpy(tmp, NavEntriesLeft[j]);
+                strcpy(NavEntriesLeft[j], NavEntriesLeft[j + 1]);
+                strcpy(NavEntriesLeft[j + 1], tmp);
             }
         }
     }
 
-    valaszt2 val;
-    val.kur = 0;
-    val.egykepen = LISTegykepen;
-    val.x0 = LISTx0;
-    val.y0 = LISTy0;
+    menu_nav val;
+    val.selected_index = 0;
+    val.max_visible_entries = LISTegykepen;
+    val.x_left = LISTx0;
+    val.y_entries = LISTy0;
     val.dy = LISTdy;
-    val.escelheto = 1;
-    strcpy(val.cim, "Select replay file!");
+    val.enable_esc = 1;
+    strcpy(val.title, "Select replay file!");
 
-    val.bead(szamuk);
+    val.setup(szamuk);
 
     while (1) {
         // Valasztas:
-        RECidokellhet = 1;
-        RECidokellis = 0;
-        int kurrens = val.valassz();
-        RECidokellhet = 0;
+        CtrlAltEnabled = 1;
+        CtrlAltPressed = 0;
+        int kurrens = val.navigate();
+        CtrlAltEnabled = 0;
 
         if (kurrens < 0) { // ESC
             return;
@@ -190,7 +190,7 @@ void replay(void) {
                 elozopl = pl;
                 // Nev eloallitasa:
                 char tmp[30];
-                strcpy(tmp, Rubrikak[pl + 1]);
+                strcpy(tmp, NavEntriesLeft[pl + 1]);
                 strcat(tmp, ".REC");
                 // 0 param azt jelenti, hogy nem resource filebol olvas:
                 MenuPal->set();
@@ -222,11 +222,11 @@ void replay(void) {
         } else {
             // Egy rec file lejatszasa:
             char tmp[30];
-            strcpy(tmp, Rubrikak[kurrens]);
+            strcpy(tmp, NavEntriesLeft[kurrens]);
             strcat(tmp, ".REC");
             kiirloading();
             long belyeg = loadrecek(tmp, 0);
-            if (RECidokellis) {
+            if (CtrlAltPressed) {
                 // loadrecek beallitotta Multirec-et.
                 int ido = Prec1->betoltve;
                 if (Multirec && Prec2->betoltve > ido) {
@@ -248,7 +248,7 @@ void replay(void) {
                 centiseconds_to_string(ido, idostr);
                 strcat(idostr, "    +- 0.01 sec");
                 dialog320(tmp, "The time of this replay file is:", idostr);
-                RECidokellis = 0;
+                CtrlAltPressed = 0;
                 continue;
             }
             if (access_topol(Prec1->palyanev) != 0) {
@@ -301,22 +301,22 @@ static void demo(void) {
 }
 
 static void kilephakell(void) {
-    valaszt2 val;
-    val.kur = 0;
-    val.egykepen = 6;
-    val.x0 = 300;
-    val.y0 = 200;
+    menu_nav val;
+    val.selected_index = 0;
+    val.max_visible_entries = 6;
+    val.x_left = 300;
+    val.y_entries = 200;
     val.dy = 40;
-    val.cimy = 50; // ezt nem szokas allitani egyebkent
-    val.escelheto = 0;
-    strcpy(val.cim, "Do you want to quit?");
+    val.y_title = 50; // ezt nem szokas allitani egyebkent
+    val.enable_esc = 0;
+    strcpy(val.title, "Do you want to quit?");
 
-    strcpy(Rubrikak[0], "Yes");
-    strcpy(Rubrikak[1], "No");
+    strcpy(NavEntriesLeft[0], "Yes");
+    strcpy(NavEntriesLeft[1], "No");
 
-    val.bead(2);
+    val.setup(2);
 
-    int eredmeny = val.valassz();
+    int eredmeny = val.navigate();
 
     if (eredmeny == 0) {
         // Ezt csak watmment.exe-ben szabad kikomentezni:
@@ -332,31 +332,31 @@ void mainmenu(void) {
     MenuPal->set();
 
     // State->save_aaa(); ide minek kene?
-    valaszt2 val;
-    val.kur = 0;
-    val.egykepen = 7;
-    val.x0 = 200;
-    val.y0 = 100;
+    menu_nav val;
+    val.selected_index = 0;
+    val.max_visible_entries = 7;
+    val.x_left = 200;
+    val.y_entries = 100;
     val.dy = 50;
-    val.escelheto = 1;
-    strcpy(val.cim, "Main Menu");
+    val.enable_esc = 1;
+    strcpy(val.title, "Main Menu");
 
-    strcpy(Rubrikak[0], "Play");
-    strcpy(Rubrikak[1], "Replay");
-    strcpy(Rubrikak[2], "Demo");
-    strcpy(Rubrikak[3], "Options");
-    strcpy(Rubrikak[4], "Help");
-    strcpy(Rubrikak[5], "Best Times");
-    strcpy(Rubrikak[6], "Editor");
+    strcpy(NavEntriesLeft[0], "Play");
+    strcpy(NavEntriesLeft[1], "Replay");
+    strcpy(NavEntriesLeft[2], "Demo");
+    strcpy(NavEntriesLeft[3], "Options");
+    strcpy(NavEntriesLeft[4], "Help");
+    strcpy(NavEntriesLeft[5], "Best Times");
+    strcpy(NavEntriesLeft[6], "Editor");
 
-    val.bead(7);
+    val.setup(7);
 
     while (1) {
         // Korny->pabc_fomenu->write( Korny->picbuffer, 70, 10, "Main menu" );
 
         // MenuPal->set(); // Torlendo
 
-        int eredmeny = val.valassz();
+        int eredmeny = val.navigate();
 
         // Kimenti menut pcx file-ba:
         // BufferMain->save( "menu.pcx", Menupaltomb );

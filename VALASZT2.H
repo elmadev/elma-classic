@@ -6,49 +6,49 @@ extern const int LISTx0;
 extern const int LISTy0;
 extern const int LISTdy;
 
-#define MAXRUBRIKAHOSSZ (40)
-extern int Maxrubrikaszam;
-#define MAXRUBRIKASZAM_TAB (110)
+#define NAV_ENTRY_TEXT_MAX_LENGTH (40)
+extern int NavEntriesLeftMaxLength;
+#define NAV_ENTRIES_RIGHT_MAX_LENGTH (110)
 
-typedef char rubrika[MAXRUBRIKAHOSSZ + 2];
+typedef char nav_entry[NAV_ENTRY_TEXT_MAX_LENGTH + 2];
 
-extern rubrika* Rubrikak;
-extern rubrika Rubrikak_tab[MAXRUBRIKASZAM_TAB + 1];
+extern nav_entry* NavEntriesLeft;
+extern nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
-void initrubrikak(void);
+void menu_nav_entries_init(void);
 
 // Felhasznalja, Korny rubrikak-at es picbuffer-t!
-class valaszt2 {
+class menu_nav {
     friend void playextmenu(void);
 
-    rubrika* rubrikak;
-    rubrika* rubrikak_tab;
-    int szam;
-    int tabos;
-    menu_pic* pszovlist;
+    nav_entry* entries_left;
+    nav_entry* entries_right;
+    int length;
+    int two_columns;
+    menu_pic* menu;
 
   public:
-    int kur;
-    int x0, y0, dy, egykepen;
-    int x0_tab; // Csak akkor erdekes, ha tabos igaz
-    int cimy;   // Ezt o maganak beallitja, de nehanyan atdefinialjak
-    int escelheto;
-    char cim[100];
+    int selected_index;
+    int x_left, y_entries, dy, max_visible_entries;
+    int x_right; // Csak akkor erdekes, ha two_columns igaz
+    int y_title; // Ezt o maganak beallitja, de nehanyan atdefinialjak
+    int enable_esc;
+    char title[100];
 
-    valaszt2(void);
-    ~valaszt2(void);
-    void bead(int szam, int tabos = 0); // Rubrikakat beveszi
+    menu_nav(void);
+    ~menu_nav(void);
+    void setup(int len, int two_col = 0); // Rubrikakat beveszi
     // Visszaadja valasztott szamat, ESC eseten -1-et:
     // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
-    int valassz(text_line* preszovegek = NULL, int preszovegszam = 0, int csakkirajzol = 0);
+    int navigate(text_line* extra_lines = NULL, int extra_lines_length = 0, int render_only = 0);
 
-    void kirajzol(void);
+    void render(void);
 };
 
 // RECidomenteshez kell (mainmenu.cpp-ben is):
-// Ha RECidokellhet-et beallitjuk, akkor RECidokellis-t beallitja
-// Ctrl+Alt+Enter eseten (elotte RECidokellis-t nullazni kell):
-extern int RECidokellhet;
-extern int RECidokellis;
+// Ha CtrlAltEnabled-et beallitjuk, akkor CtrlAltPressed-t beallitja
+// Ctrl+Alt+Enter eseten (elotte CtrlAltPressed-t nullazni kell):
+extern int CtrlAltEnabled;
+extern int CtrlAltPressed;
 
 #endif

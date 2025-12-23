@@ -286,7 +286,7 @@ const char* kodtobillnev(int billkod) {
     return NULL;
 }
 
-typedef int* billmuttomb[MAXRUBRIKASZAM_TAB + 1];
+typedef int* billmuttomb[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
 static billmuttomb Pbilltomb0;
 static billmuttomb Pbilltomb1;
@@ -296,7 +296,7 @@ static int Rubrikaszam0 = 6;
 static int Rubrikaszam12 = 8;
 
 static void betolt(billmuttomb bmuttomb, int sorszam, const char* szoveg, int* pbillkod) {
-    strcpy(Rubrikak[sorszam], szoveg);
+    strcpy(NavEntriesLeft[sorszam], szoveg);
 
     const char* billnev = kodtobillnev(*pbillkod);
     char tmp[20] = "";
@@ -309,26 +309,26 @@ static void betolt(billmuttomb bmuttomb, int sorszam, const char* szoveg, int* p
         billnev = tmp;
     }
 
-    strcpy(Rubrikak_tab[sorszam], billnev);
+    strcpy(NavEntriesRight[sorszam], billnev);
     bmuttomb[sorszam] = pbillkod;
 }
 
 static void gombotvalaszt(int rubrikaszam, billmuttomb bmuttomb, int sorszam) {
-    valaszt2 val;
-    val.kur = sorszam;
-    val.egykepen = 10;
-    val.x0 = 60;
-    val.x0_tab = 400;
-    val.y0 = 86;
+    menu_nav val;
+    val.selected_index = sorszam;
+    val.max_visible_entries = 10;
+    val.x_left = 60;
+    val.x_right = 400;
+    val.y_entries = 86;
     val.dy = 40;
-    val.escelheto = 1;
+    val.enable_esc = 1;
 
-    strcpy(val.cim, "Customize controls");
-    strcpy(Rubrikak_tab[sorszam], "_");
+    strcpy(val.title, "Customize controls");
+    strcpy(NavEntriesRight[sorszam], "_");
 
-    val.bead(rubrikaszam, 1); // tab-os kiiras
+    val.setup(rubrikaszam, 1); // tab-os kiiras
 
-    val.valassz(NULL, 0, 1); // Csak kirajzolja kepet
+    val.navigate(NULL, 0, 1); // Csak kirajzolja kepet
 
     // Megnezzuk milyen gombot nyomott le:
     while (1) {
@@ -371,17 +371,17 @@ static void gombotvalaszt(int rubrikaszam, billmuttomb bmuttomb, int sorszam) {
             return;
         }
         // Golyokat leptetjuk:
-        val.kirajzol();
+        val.render();
     }
 }
 
 static void bejegyez0(void) {
-    strcpy(Rubrikak[0], "Reset all controls to default");
-    Rubrikak_tab[0][0] = 0;
-    strcpy(Rubrikak[1], "Customize Player A");
-    Rubrikak_tab[1][0] = 0;
-    strcpy(Rubrikak[2], "Customize Player B");
-    Rubrikak_tab[2][0] = 0;
+    strcpy(NavEntriesLeft[0], "Reset all controls to default");
+    NavEntriesRight[0][0] = 0;
+    strcpy(NavEntriesLeft[1], "Customize Player A");
+    NavEntriesRight[1][0] = 0;
+    strcpy(NavEntriesLeft[2], "Customize Player B");
+    NavEntriesRight[2][0] = 0;
     betolt(Pbilltomb0, 3, "Inc. Screen Size", &State->key_increase_screen_size);
     betolt(Pbilltomb0, 4, "Dec. Screen Size", &State->key_decrease_screen_size);
     betolt(Pbilltomb0, 5, "Make a Screenshot", &State->key_screenshot);
@@ -401,23 +401,23 @@ static void bejegyez12(billmuttomb bmuttomb, player_keys* pjatopc) {
 static void customizeplayer(billmuttomb bmuttomb, player_keys* pjatopc, const char* ABjel) {
     int kurrens = 0;
     while (1) {
-        valaszt2 val;
-        val.kur = kurrens;
-        val.egykepen = 10;
-        val.x0 = 60;
-        val.x0_tab = 400;
-        val.y0 = 86;
+        menu_nav val;
+        val.selected_index = kurrens;
+        val.max_visible_entries = 10;
+        val.x_left = 60;
+        val.x_right = 400;
+        val.y_entries = 86;
         val.dy = 40;
-        val.escelheto = 1;
+        val.enable_esc = 1;
 
-        strcpy(val.cim, "Customize Player ");
-        strcat(val.cim, ABjel);
+        strcpy(val.title, "Customize Player ");
+        strcat(val.title, ABjel);
 
         bejegyez12(bmuttomb, pjatopc);
 
-        val.bead(Rubrikaszam12, 1); // tab-os kiiras
+        val.setup(Rubrikaszam12, 1); // tab-os kiiras
 
-        kurrens = val.valassz();
+        kurrens = val.navigate();
 
         if (kurrens < 0) {
             return;
@@ -435,22 +435,22 @@ void customize(void) {
 
     int kurrens = 0;
     while (1) {
-        valaszt2 val;
-        val.kur = kurrens;
-        val.egykepen = 10;
-        val.x0 = 60;
-        val.x0_tab = 400;
-        val.y0 = 86;
+        menu_nav val;
+        val.selected_index = kurrens;
+        val.max_visible_entries = 10;
+        val.x_left = 60;
+        val.x_right = 400;
+        val.y_entries = 86;
         val.dy = 40;
-        val.escelheto = 1;
+        val.enable_esc = 1;
 
-        strcpy(val.cim, "Customize controls");
+        strcpy(val.title, "Customize controls");
 
         bejegyez0();
 
-        val.bead(Rubrikaszam0, 1); // tab-os kiiras
+        val.setup(Rubrikaszam0, 1); // tab-os kiiras
 
-        kurrens = val.valassz();
+        kurrens = val.navigate();
 
         if (kurrens < 0) {
             return;

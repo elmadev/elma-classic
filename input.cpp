@@ -186,7 +186,7 @@ static void init_dik_to_ascii(void) {
     DIKToAscii[DIK_ADD] = MK_RIGHT;
 }
 
-// valaszt2-ben meg van irve DOS-os verziohoz:
+// menu_nav-ben meg van irve DOS-os verziohoz:
 int controlaltnyomva(void) {
     if (mk_getstate(DIK_LMENU) && mk_getstate(DIK_LCONTROL)) {
         return 1;

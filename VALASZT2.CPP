@@ -5,13 +5,13 @@ const int LISTx0 = 200;
 const int LISTy0 = 90;
 const int LISTdy = 33;
 
-int Maxrubrikaszam = 1;
+int NavEntriesLeftMaxLength = 1;
 
-rubrika* Rubrikak = NULL;
-rubrika Rubrikak_tab[MAXRUBRIKASZAM_TAB + 1];
+nav_entry* NavEntriesLeft = NULL;
+nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
-void initrubrikak(void) {
-    if (Rubrikak) {
+void menu_nav_entries_init(void) {
+    if (NavEntriesLeft) {
         hiba("98y5t4");
     }
     // Megszamolja maximalis lev es rec file-okat:
@@ -47,99 +47,99 @@ void initrubrikak(void) {
         szam = 40000;
     }
 
-    Rubrikak = new rubrika[szam + 10];
-    if (!Rubrikak) {
-        hiba("Nincs eleg memoria Rubrikak-at lefoglalni!");
+    NavEntriesLeft = new nav_entry[szam + 10];
+    if (!NavEntriesLeft) {
+        hiba("Nincs eleg memoria NavEntriesLeft-at lefoglalni!");
     }
-    Maxrubrikaszam = szam;
-    if (Maxrubrikaszam < 200) {
+    NavEntriesLeftMaxLength = szam;
+    if (NavEntriesLeftMaxLength < 200) {
         hiba("87iuo");
     }
 }
 
-valaszt2::valaszt2(void) {
-    rubrikak = NULL;
-    rubrikak_tab = NULL;
-    szam = 0;
-    kur = x0 = y0 = dy = egykepen = escelheto = 0;
-    cim[0] = 0;
+menu_nav::menu_nav(void) {
+    entries_left = NULL;
+    entries_right = NULL;
+    length = 0;
+    selected_index = x_left = y_entries = dy = max_visible_entries = enable_esc = 0;
+    title[0] = 0;
     // Ezt o maganak beallitja, de nehanyan atdefinialjak:
-    cimy = 30;
-    pszovlist = NULL;
+    y_title = 30;
+    menu = NULL;
 }
 
-valaszt2::~valaszt2(void) {
-    if (rubrikak) {
-        delete[] rubrikak;
+menu_nav::~menu_nav(void) {
+    if (entries_left) {
+        delete[] entries_left;
     }
-    if (rubrikak_tab) {
-        delete[] rubrikak_tab;
+    if (entries_right) {
+        delete[] entries_right;
     }
-    if (pszovlist) {
-        delete pszovlist;
+    if (menu) {
+        delete menu;
     }
 
-    rubrikak = NULL;
-    rubrikak_tab = NULL;
-    pszovlist = NULL;
-    szam = 0;
-    kur = x0 = y0 = dy = egykepen = escelheto = 0;
+    entries_left = NULL;
+    entries_right = NULL;
+    menu = NULL;
+    length = 0;
+    selected_index = x_left = y_entries = dy = max_visible_entries = enable_esc = 0;
 }
 
 // Rubrikakat beveszi:
-void valaszt2::bead(int szam_p, int tabos_p) {
-    if (rubrikak) {
-        hiba("valaszt2::bead rubrikak!");
+void menu_nav::setup(int len, int two_col) {
+    if (entries_left) {
+        hiba("menu_nav::setup entries_left!");
     }
-    szam = szam_p;
-    tabos = tabos_p;
-    if (szam < 1 || szam > Maxrubrikaszam) {
-        hiba("valaszt2::bead nem jo szam!");
+    length = len;
+    two_columns = two_col;
+    if (length < 1 || length > NavEntriesLeftMaxLength) {
+        hiba("menu_nav::setup nem jo length!");
     }
-    if (tabos && szam > MAXRUBRIKASZAM_TAB) {
-        hiba("valaszt2::bead nem jo szam (tabos)!");
+    if (two_columns && length > NAV_ENTRIES_RIGHT_MAX_LENGTH) {
+        hiba("menu_nav::setup nem jo length (two_columns)!");
     }
-    rubrikak = new rubrika[szam];
-    if (!rubrikak) {
+    entries_left = new nav_entry[length];
+    if (!entries_left) {
         hiba("memoria");
     }
-    rubrikak_tab = NULL;
-    if (tabos) {
-        rubrikak_tab = new rubrika[szam];
-        if (!rubrikak_tab) {
+    entries_right = NULL;
+    if (two_columns) {
+        entries_right = new nav_entry[length];
+        if (!entries_right) {
             hiba("memoria");
         }
     }
-    for (int i = 0; i < szam; i++) {
-        if (strlen(Rubrikak[i]) > MAXRUBRIKAHOSSZ) {
-            hiba("valaszt2::bead tul hosszu string!:", Rubrikak[i]);
+    for (int i = 0; i < length; i++) {
+        if (strlen(NavEntriesLeft[i]) > NAV_ENTRY_TEXT_MAX_LENGTH) {
+            hiba("menu_nav::setup tul hosszu string!:", NavEntriesLeft[i]);
         }
-        strcpy(rubrikak[i], Rubrikak[i]);
-        if (tabos) {
-            if (strlen(Rubrikak_tab[i]) > MAXRUBRIKAHOSSZ) {
-                hiba("valaszt2::bead tul hosszu string (tab)!:", Rubrikak_tab[i]);
+        strcpy(entries_left[i], NavEntriesLeft[i]);
+        if (two_columns) {
+            if (strlen(NavEntriesRight[i]) > NAV_ENTRY_TEXT_MAX_LENGTH) {
+                hiba("menu_nav::setup tul hosszu string (tab)!:", NavEntriesRight[i]);
             }
-            strcpy(rubrikak_tab[i], Rubrikak_tab[i]);
+            strcpy(entries_right[i], NavEntriesRight[i]);
         }
     }
 }
 
-int RECidokellhet = 0;
-int RECidokellis = 0;
+int CtrlAltEnabled = 0;
+int CtrlAltPressed = 0;
 
 // Visszaadja valasztott szamat, ESC eseten -1-t:
 // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
-int valaszt2::valassz(text_line* preszovegek, int preszovegszam, int csakkirajzol) {
-    if (szam < 1 || egykepen < 2) {
-        hiba("valaszt2::valassz nem jo elejen!");
+int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int render_only) {
+    if (length < 1 || max_visible_entries < 2) {
+        hiba("menu_nav::navigate nem jo elejen!");
     }
 
-    if (kur > szam - 1) {
-        kur = szam - 1;
+    if (selected_index > length - 1) {
+        selected_index = length - 1;
     }
 
-    int felso = kur - egykepen / 2;
-    int maxfelso = szam - egykepen;
+    int felso = selected_index - max_visible_entries / 2;
+    int maxfelso = length - max_visible_entries;
     if (felso > maxfelso) {
         felso = maxfelso;
     }
@@ -147,74 +147,74 @@ int valaszt2::valassz(text_line* preszovegek, int preszovegszam, int csakkirajzo
         felso = 0;
     }
 
-    if (pszovlist) {
-        delete pszovlist;
+    if (menu) {
+        delete menu;
     }
-    pszovlist = new menu_pic;
+    menu = new menu_pic;
 
     mk_emptychar();
     int valtozott = 1;
     while (1) {
-        while (!csakkirajzol && mk_kbhit()) {
+        while (!render_only && mk_kbhit()) {
             int c = mk_getextchar();
-            if (c == MK_ESC && escelheto) {
+            if (c == MK_ESC && enable_esc) {
                 return -1;
             }
             if (c == MK_ENTER) {
                 // RECidomenteshez kell (mainmenu.cpp-ben is):
                 int controlaltnyomva(void);
-                if (RECidokellhet && controlaltnyomva()) {
-                    RECidokellis = 1;
+                if (CtrlAltEnabled && controlaltnyomva()) {
+                    CtrlAltPressed = 1;
                 }
-                return kur;
+                return selected_index;
             }
             if (c == MK_UP) {
-                if (kur > 0) {
-                    kur--;
-                    if (kur < felso) {
+                if (selected_index > 0) {
+                    selected_index--;
+                    if (selected_index < felso) {
                         felso--;
                         valtozott = 1;
                     }
                 }
             }
             if (c == MK_PGUP) {
-                if (kur > 0) {
-                    kur -= egykepen;
-                    if (kur < 0) {
-                        kur = 0;
+                if (selected_index > 0) {
+                    selected_index -= max_visible_entries;
+                    if (selected_index < 0) {
+                        selected_index = 0;
                     }
-                    if (kur < felso) {
-                        felso = kur;
+                    if (selected_index < felso) {
+                        felso = selected_index;
                         valtozott = 1;
                     }
                 }
             }
             if (c == MK_DOWN) {
-                if (kur < szam - 1) {
-                    kur++;
-                    if (kur > felso + egykepen - 1) {
+                if (selected_index < length - 1) {
+                    selected_index++;
+                    if (selected_index > felso + max_visible_entries - 1) {
                         felso++;
                         valtozott = 1;
                     }
                 }
             }
             if (c == MK_PGDOWN) {
-                if (kur < szam - 1) {
-                    kur += egykepen;
-                    if (kur >= szam) {
-                        kur = szam - 1;
+                if (selected_index < length - 1) {
+                    selected_index += max_visible_entries;
+                    if (selected_index >= length) {
+                        selected_index = length - 1;
                     }
-                    if (kur > felso + egykepen - 1) {
-                        felso = kur - egykepen + 1;
+                    if (selected_index > felso + max_visible_entries - 1) {
+                        felso = selected_index - max_visible_entries + 1;
                         valtozott = 1;
                     }
                 }
             }
             // Volume allitas itt specialisan van elintezve:
             /*if( (c == MK_LEFT || c == MK_RIGHT) &&
-                strcmp( rubrikak[kur], "Sound Volume:" ) == 0 &&
-                (kur == 3 || kur == 4) &&
-                strcmp( rubrikak[kur-1], "Player B:" ) == 0 ) {
+                strcmp( entries_left[selected_index], "Sound Volume:" ) == 0 &&
+                (selected_index == 3 || selected_index == 4) &&
+                strcmp( entries_left[selected_index-1], "Player B:" ) == 0 ) {
                 if( c == MK_LEFT ) {
                     State->soundvolume -= 0.05;
                     if( State->soundvolume < 0.0 )
@@ -225,45 +225,45 @@ int valaszt2::valassz(text_line* preszovegek, int preszovegszam, int csakkirajzo
                     if( State->soundvolume > 1.0 )
                         State->soundvolume = 1.0;
                 }
-                return kur;
+                return selected_index;
             } */
         }
         if (valtozott) {
             valtozott = 0;
             // Betaplalja kirajzba uj kepszoveget:
-            pszovlist->clear();
-            for (int i = 0; i < preszovegszam; i++) {
-                if (strncmp(preszovegek[i].text, "*$$^&|@", 7) == 0) {
+            menu->clear();
+            for (int i = 0; i < extra_lines_length; i++) {
+                if (strncmp(extra_lines[i].text, "*$$^&|@", 7) == 0) {
                     // Kozepre kell tenni:
-                    pszovlist->add_line_centered(&preszovegek[i].text[7], preszovegek[i].x,
-                                                 preszovegek[i].y);
+                    menu->add_line_centered(&extra_lines[i].text[7], extra_lines[i].x,
+                                            extra_lines[i].y);
                 } else {
                     // Nem kell kozepre tenni:
-                    pszovlist->add_line(preszovegek[i].text, preszovegek[i].x, preszovegek[i].y);
+                    menu->add_line(extra_lines[i].text, extra_lines[i].x, extra_lines[i].y);
                 }
             }
 
-            pszovlist->add_line_centered(cim, 320, cimy);
-            for (int i = 0; i < egykepen && i < szam - felso; i++) {
-                pszovlist->add_line(rubrikak[felso + i], x0, y0 + i * dy);
+            menu->add_line_centered(title, 320, y_title);
+            for (int i = 0; i < max_visible_entries && i < length - felso; i++) {
+                menu->add_line(entries_left[felso + i], x_left, y_entries + i * dy);
             }
-            if (tabos) {
-                for (int i = 0; i < egykepen && i < szam - felso; i++) {
-                    pszovlist->add_line(rubrikak_tab[felso + i], x0_tab, y0 + i * dy);
+            if (two_columns) {
+                for (int i = 0; i < max_visible_entries && i < length - felso; i++) {
+                    menu->add_line(entries_right[felso + i], x_right, y_entries + i * dy);
                 }
             }
         }
-        pszovlist->set_helmet(x0 - 30, y0 + (kur - felso) * dy);
-        pszovlist->render();
-        if (csakkirajzol) {
+        menu->set_helmet(x_left - 30, y_entries + (selected_index - felso) * dy);
+        menu->render();
+        if (render_only) {
             return 0;
         }
     }
 }
 
-void valaszt2::kirajzol(void) {
-    if (!pszovlist) {
+void menu_nav::render(void) {
+    if (!menu) {
         hiba("tegcdy");
     }
-    pszovlist->render();
+    menu->render();
 }

@@ -144,14 +144,14 @@ static void render_ball(vekt2 r, double radius, pic8* source_pic) {
         if (x1 < 0) {
             x1 = 0;
         }
-        if (x1 > 639) {
-            x1 = 639;
+        if (x1 > SCREEN_WIDTH - 1) {
+            x1 = SCREEN_WIDTH - 1;
         }
         if (x2 < 0) {
             x2 = 0;
         }
-        if (x2 > 639) {
-            x2 = 639;
+        if (x2 > SCREEN_WIDTH - 1) {
+            x2 = SCREEN_WIDTH - 1;
         }
         if (x1 >= x2) {
             y++;

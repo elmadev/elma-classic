@@ -101,15 +101,13 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
     if (eddig > pvalt->utolsougras + VoltDelay) {
-        if ((mk_getstate(popciok->right_volt) && Sajatugras) ||
-            (mk_getstate(popciok->left_volt) && !Sajatugras)) {
+        if (mk_getstate(popciok->right_volt)) {
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
             startwavegyujto(WAV_UGRAS1, 0.99, -1);
         }
-        if ((mk_getstate(popciok->left_volt) && Sajatugras) ||
-            (mk_getstate(popciok->right_volt) && !Sajatugras)) {
+        if (mk_getstate(popciok->left_volt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;

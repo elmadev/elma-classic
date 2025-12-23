@@ -5,20 +5,6 @@
 #include <timeapi.h>
 #endif
 
-// szamitogep
-// monitor
-
-int Sajatugras = 0; // (forditva mint regen) Ha igaz, akkor jo ugras (right-clockwise)
-// Ha nem igaz, csak memoriaba ir es nem flip-pel:
-
-static void ugraseldontes(void) {
-    if (access("fordit.inf", 0) == 0) {
-        Sajatugras = 0;
-    } else {
-        Sajatugras = 1;
-    }
-}
-
 // magassagokeloallitasa-bol kimasolva!!!!!:
 /*static void elemszam( char* text, szakaszok* pszakok ) {
     pszakok->felsorolasresetszak();
@@ -124,8 +110,6 @@ void mv_main(void) {
     }
 
     // init_physics_data(); teljesben van mar ujabban
-
-    ugraseldontes();
 
     teljes();
 }

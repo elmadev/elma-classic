@@ -197,7 +197,7 @@ kerek::kerek(double x, double y, int tipusp) {
     foodsorszam = 0;
 }
 
-static const double Hal_eltol = -0.15 + 0.3 * (0.07 / 0.37);
+constexpr double Hal_eltol = -0.15 + 0.3 * (0.07 / 0.37);
 
 void kerek::kirajzol(void) {
     int szegmensszam = 16;

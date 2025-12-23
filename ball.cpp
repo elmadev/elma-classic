@@ -8,8 +8,8 @@ double** CollisionTimeGrid = nullptr;
 static double NextCollisionTime = UNKNOWN_COLLISION_TIME;
 static double ElapsedTimeSinceKeyframe = 0.0;
 
-static const int InitColumns = 3;
-static const int InitRows = 3;
+constexpr int InitColumns = 3;
+constexpr int InitRows = 3;
 
 static void create_balls(void) {
     BallCount = InitColumns * InitRows;

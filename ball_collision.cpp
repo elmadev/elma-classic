@@ -166,10 +166,10 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
     }
 }
 
-static const int WallLeft = 0;
-static const int WallRight = SCREEN_WIDTH;
-static const int WallTop = 0;
-static const int WallBottom = SCREEN_HEIGHT;
+constexpr int WallLeft = 0;
+constexpr int WallRight = SCREEN_WIDTH;
+constexpr int WallTop = 0;
+constexpr int WallBottom = SCREEN_HEIGHT;
 
 // Get collision time between a ball and wall
 double ball_wall_collision_time(ball* ball, WallId wall) {

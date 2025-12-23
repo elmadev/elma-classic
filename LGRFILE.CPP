@@ -10,7 +10,7 @@
     }
 } */
 
-static const int Checknumber_lgr = 187565543;
+constexpr int Checknumber_lgr = 187565543;
 
 lgrfile* Plgr = NULL; // Az eppen bentlevo lgrfile-ra mutat
 

@@ -41,7 +41,7 @@ anim::~anim() {
     }
 }
 
-static const double FrameTimestep = 0.014;
+constexpr double FrameTimestep = 0.014;
 
 // Input time is milliseconds*0.182*0.0024
 // Therefore framerate is 31.2 fps?

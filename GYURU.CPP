@@ -379,7 +379,7 @@ static double balszog(vekt2* pa, vekt2 b, vekt2 c) {
         }
         if (szog < 0.0000002) {
             // Szog tul hegyes, egyik pontjat arrebb rakjuk:
-            static const double egytav = 0.0002;
+            constexpr double egytav = 0.0002;
             vekt2 meroleges = *pa - b;
             meroleges = forgatas90fokkal(meroleges);
             meroleges.normal();
@@ -393,7 +393,7 @@ static double balszog(vekt2* pa, vekt2 b, vekt2 c) {
 }
 
 static void szetvalaszt_fv(vekt2* pa, vekt2* pb) {
-    static const double egytav = 0.0002;
+    constexpr double egytav = 0.0002;
     if (fabs(pa->x - pb->x) < 0.0000002 && fabs(pa->y - pb->y) < 0.0000002) {
         // Egy helyen vannak:
         pa->x += egytav + egytav * s_random(1000) / 1200.0;

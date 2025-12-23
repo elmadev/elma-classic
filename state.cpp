@@ -1,12 +1,12 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
 
-static const int STATE_VERSION = 200;
+constexpr int STATE_VERSION = 200;
 
-static const int STATE_MAGICNUMBER_SHAREWARE = 123432112;
-static const int STATE_MAGICNUMBER_REGISTERED = 123432221;
+constexpr int STATE_MAGICNUMBER_SHAREWARE = 123432112;
+constexpr int STATE_MAGICNUMBER_REGISTERED = 123432221;
 
-static const char STATE_FILENAME[] = "state.dat";
+constexpr char STATE_FILENAME[] = "state.dat";
 
 static void read_encrypted(void* buffer, int length, FILE* h, const char* filename) {
     if (fread(buffer, 1, length, h) != length) {
@@ -200,7 +200,7 @@ static void write_stats_topten(FILE* h, topten* tten, bool single) {
 }
 
 // Default time if uncompleted level: 10 minutes
-static const int STATS_MAX_TIME = 100 * 60 * 10;
+constexpr int STATS_MAX_TIME = 100 * 60 * 10;
 
 // Print total time of all players combined
 void state::write_stats_anonymous_total_time(FILE* h, bool single, const char* text1,

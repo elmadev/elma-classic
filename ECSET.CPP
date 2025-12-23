@@ -901,7 +901,7 @@ static int getanyagszam(unsigned char* sor, int x, int xsize, unsigned char atla
 #define KOVVONALHOSSZ (10000)
 static int Kovetoytomb[KOVVONALHOSSZ + 10];
 
-static const int Keltolas = 20;
+constexpr int Keltolas = 20;
 
 void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
     if (!BufferMain) {

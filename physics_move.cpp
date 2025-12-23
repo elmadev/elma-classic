@@ -10,7 +10,7 @@ static void move_wheel_out_of_ground(rigidbody* rb, vekt2* point) {
 }
 
 // Minimum speed loss to trigger a bump sound effect
-static const double BumpThreshold = 1.5;
+constexpr double BumpThreshold = 1.5;
 
 // Handle collision between a wheel and one anchor point
 // Return true if there is collision

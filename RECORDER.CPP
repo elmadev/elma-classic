@@ -9,11 +9,11 @@ int Multirec = 0; // Ha multiplayer, akkor ez igaz
 // #define Hangdarabszam (3000u)
 
 // Friss kikomentezes:
-// static const int Darabszam = 14370;
-// static const int Hangdarabszam = 3000;
+// constexpr int Darabszam = 14370;
+// constexpr int Hangdarabszam = 3000;
 
-static const int Darabszam = 8981; // Ot perc
-static const int Hangdarabszam = 3900;
+constexpr int Darabszam = 8981; // Ot perc
+constexpr int Hangdarabszam = 3900;
 
 static double Valtrate = 30; // 60;
 static double Recorderszorzo = Valtrate / (182.0 * 0.0024);

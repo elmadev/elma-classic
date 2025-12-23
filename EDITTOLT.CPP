@@ -1,6 +1,6 @@
 #include "ALL.H"
 
-static const unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;
+constexpr unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;
 
 static unsigned char Openlistaszin = 6, Openlistainvszin = 7;
 

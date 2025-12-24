@@ -147,34 +147,6 @@ static int ketoldalon(vekt2 v1, vekt2 r2, vekt2 v2) {
 
 // Igaz, ha v1 altal meghatarozott egyenest metszi r2,v2,
 // vagyis ha v2 kezdo es vegpontja egyenes ket oldalan fekszik:
-// Ez csak akkor tekinti metszesnek, ha nem csak eppen erintik egymast:
-static int ketoldalon2(vekt2 v1, vekt2 r2, vekt2 v2) {
-    static double kishatar = 0.0000000001;
-    vekt2 norm = forgatas90fokkal(v1);
-    int elso = 0;
-    double elsoertek = r2 * norm;
-    if (elsoertek > kishatar) {
-        elso = 1;
-    }
-    if (elsoertek < -kishatar) {
-        elso = -1;
-    }
-    int masodik = 0;
-    double masodikertek = (r2 + v2) * norm;
-    if (masodikertek > kishatar) {
-        masodik = 1;
-    }
-    if (masodikertek < -kishatar) {
-        masodik = -1;
-    }
-    if ((elso == -1 && masodik == 1) || (elso == 1 && masodik == -1)) {
-        return 1;
-    }
-    return 0;
-}
-
-// Igaz, ha v1 altal meghatarozott egyenest metszi r2,v2,
-// vagyis ha v2 kezdo es vegpontja egyenes ket oldalan fekszik:
 // Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
 static int ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
     static double kishatar = 0.00000001;
@@ -205,16 +177,6 @@ static int ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
 // metszi egymast:
 int vektormetszes(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     if (ketoldalon(v1, r2 - r1, v2) && ketoldalon(v2, r1 - r2, v1)) {
-        return 1;
-    }
-    return 0;
-}
-
-// Igaz, ha az r1-bol indulo v1 vektor es az r2-bol indulo v2 vektor
-// metszi egymast:
-// Ez csak akkor tekinti metszesnek, ha nem csak eppen erintik egymast:
-int vektormetszes2(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
-    if (ketoldalon2(v1, r2 - r1, v2) && ketoldalon2(v2, r1 - r2, v1)) {
         return 1;
     }
     return 0;

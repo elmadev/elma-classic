@@ -12,48 +12,48 @@ nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
 void menu_nav_entries_init(void) {
     if (NavEntriesLeft) {
-        hiba("98y5t4");
+        hiba("menu_nav_entries_init already called!");
     }
     // Megszamolja maximalis lev es rec file-okat:
-    int levszam = 0;
-    finame fname;
-    int done = fifirst("lev/*.lev", fname);
+    int level_count = 0;
+    finame filename;
+    int done = fifirst("lev/*.lev", filename);
     while (!done) {
-        done = finext(fname);
-        levszam++;
+        done = finext(filename);
+        level_count++;
     }
     ficlose();
 
-    int recszam = 0;
-    done = fifirst("rec/*.rec", fname);
+    int rec_count = 0;
+    done = fifirst("rec/*.rec", filename);
     while (!done) {
-        done = finext(fname);
-        recszam++;
+        done = finext(filename);
+        rec_count++;
     }
     ficlose();
 
-    int szam = levszam;
-    if (szam < recszam) {
-        szam = recszam;
+    int max_count = level_count;
+    if (max_count < rec_count) {
+        max_count = rec_count;
     }
 
-    // if( szam < MAXKEPSZAM )
-    //	szam = MAXKEPSZAM;
+    // if( max_count < MAXKEPSZAM )
+    //	max_count = MAXKEPSZAM;
 
     // Megvan max szam:
-    szam += 220;
+    max_count += 220;
 
-    if (szam > 40000) {
-        szam = 40000;
+    if (max_count > 40000) {
+        max_count = 40000;
     }
 
-    NavEntriesLeft = new nav_entry[szam + 10];
+    NavEntriesLeft = new nav_entry[max_count + 10];
     if (!NavEntriesLeft) {
-        hiba("Nincs eleg memoria NavEntriesLeft-at lefoglalni!");
+        hiba("menu_nav_entries_init out of memory!");
     }
-    NavEntriesLeftMaxLength = szam;
+    NavEntriesLeftMaxLength = max_count;
     if (NavEntriesLeftMaxLength < 200) {
-        hiba("87iuo");
+        hiba("menu_nav_entries_init max count invalid!");
     }
 }
 
@@ -89,35 +89,35 @@ menu_nav::~menu_nav(void) {
 // Rubrikakat beveszi:
 void menu_nav::setup(int len, int two_col) {
     if (entries_left) {
-        hiba("menu_nav::setup entries_left!");
+        hiba("menu_nav::setup called twice!");
     }
     length = len;
     two_columns = two_col;
     if (length < 1 || length > NavEntriesLeftMaxLength) {
-        hiba("menu_nav::setup nem jo length!");
+        hiba("menu_nav::setup length too long!");
     }
     if (two_columns && length > NAV_ENTRIES_RIGHT_MAX_LENGTH) {
-        hiba("menu_nav::setup nem jo length (two_columns)!");
+        hiba("menu_nav::setup length too long (two_columns)!");
     }
     entries_left = new nav_entry[length];
     if (!entries_left) {
-        hiba("memoria");
+        hiba("menu_nav::setup out of memory!");
     }
     entries_right = NULL;
     if (two_columns) {
         entries_right = new nav_entry[length];
         if (!entries_right) {
-            hiba("memoria");
+            hiba("menu_nav::setup out of memory!");
         }
     }
     for (int i = 0; i < length; i++) {
         if (strlen(NavEntriesLeft[i]) > NAV_ENTRY_TEXT_MAX_LENGTH) {
-            hiba("menu_nav::setup tul hosszu string!:", NavEntriesLeft[i]);
+            hiba("menu_nav::setup text length too long!: ", NavEntriesLeft[i]);
         }
         strcpy(entries_left[i], NavEntriesLeft[i]);
         if (two_columns) {
             if (strlen(NavEntriesRight[i]) > NAV_ENTRY_TEXT_MAX_LENGTH) {
-                hiba("menu_nav::setup tul hosszu string (tab)!:", NavEntriesRight[i]);
+                hiba("menu_nav::setup text length too long (two_columns)!:", NavEntriesRight[i]);
             }
             strcpy(entries_right[i], NavEntriesRight[i]);
         }
@@ -131,20 +131,20 @@ int CtrlAltPressed = 0;
 // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
 int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int render_only) {
     if (length < 1 || max_visible_entries < 2) {
-        hiba("menu_nav::navigate nem jo elejen!");
+        hiba("menu_nav::navigate invalid setup!");
     }
 
     if (selected_index > length - 1) {
         selected_index = length - 1;
     }
 
-    int felso = selected_index - max_visible_entries / 2;
-    int maxfelso = length - max_visible_entries;
-    if (felso > maxfelso) {
-        felso = maxfelso;
+    int view_index = selected_index - max_visible_entries / 2;
+    int view_max = length - max_visible_entries;
+    if (view_index > view_max) {
+        view_index = view_max;
     }
-    if (felso < 0) {
-        felso = 0;
+    if (view_index < 0) {
+        view_index = 0;
     }
 
     if (menu) {
@@ -153,7 +153,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
     menu = new menu_pic;
 
     mk_emptychar();
-    int valtozott = 1;
+    int rerender = 1;
     while (1) {
         while (!render_only && mk_kbhit()) {
             int c = mk_getextchar();
@@ -171,9 +171,9 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
             if (c == MK_UP) {
                 if (selected_index > 0) {
                     selected_index--;
-                    if (selected_index < felso) {
-                        felso--;
-                        valtozott = 1;
+                    if (selected_index < view_index) {
+                        view_index--;
+                        rerender = 1;
                     }
                 }
             }
@@ -183,18 +183,18 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
                     if (selected_index < 0) {
                         selected_index = 0;
                     }
-                    if (selected_index < felso) {
-                        felso = selected_index;
-                        valtozott = 1;
+                    if (selected_index < view_index) {
+                        view_index = selected_index;
+                        rerender = 1;
                     }
                 }
             }
             if (c == MK_DOWN) {
                 if (selected_index < length - 1) {
                     selected_index++;
-                    if (selected_index > felso + max_visible_entries - 1) {
-                        felso++;
-                        valtozott = 1;
+                    if (selected_index > view_index + max_visible_entries - 1) {
+                        view_index++;
+                        rerender = 1;
                     }
                 }
             }
@@ -204,9 +204,9 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
                     if (selected_index >= length) {
                         selected_index = length - 1;
                     }
-                    if (selected_index > felso + max_visible_entries - 1) {
-                        felso = selected_index - max_visible_entries + 1;
-                        valtozott = 1;
+                    if (selected_index > view_index + max_visible_entries - 1) {
+                        view_index = selected_index - max_visible_entries + 1;
+                        rerender = 1;
                     }
                 }
             }
@@ -228,8 +228,8 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
                 return selected_index;
             } */
         }
-        if (valtozott) {
-            valtozott = 0;
+        if (rerender) {
+            rerender = 0;
             // Betaplalja kirajzba uj kepszoveget:
             menu->clear();
             for (int i = 0; i < extra_lines_length; i++) {
@@ -244,16 +244,16 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
             }
 
             menu->add_line_centered(title, 320, y_title);
-            for (int i = 0; i < max_visible_entries && i < length - felso; i++) {
-                menu->add_line(entries_left[felso + i], x_left, y_entries + i * dy);
+            for (int i = 0; i < max_visible_entries && i < length - view_index; i++) {
+                menu->add_line(entries_left[view_index + i], x_left, y_entries + i * dy);
             }
             if (two_columns) {
-                for (int i = 0; i < max_visible_entries && i < length - felso; i++) {
-                    menu->add_line(entries_right[felso + i], x_right, y_entries + i * dy);
+                for (int i = 0; i < max_visible_entries && i < length - view_index; i++) {
+                    menu->add_line(entries_right[view_index + i], x_right, y_entries + i * dy);
                 }
             }
         }
-        menu->set_helmet(x_left - 30, y_entries + (selected_index - felso) * dy);
+        menu->set_helmet(x_left - 30, y_entries + (selected_index - view_index) * dy);
         menu->render();
         if (render_only) {
             return 0;
@@ -263,7 +263,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
 
 void menu_nav::render(void) {
     if (!menu) {
-        hiba("tegcdy");
+        hiba("menu_nav::render !menu");
     }
     menu->render();
 }

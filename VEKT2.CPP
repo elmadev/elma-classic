@@ -19,8 +19,6 @@ vekt2 vekt2::operator-(vekt2 a) { return vekt2(x - a.x, y - a.y); }
 
 double vekt2::operator*(vekt2 a) { return x * a.x + y * a.y; }
 
-double vekt2::operator%(vekt2 b) { return x * b.y - y * b.x; }
-
 void vekt2::forgatas(double alfa) {
     double a = sin(alfa);
     double b = cos(alfa);

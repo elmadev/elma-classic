@@ -9,7 +9,6 @@ class vekt2 {
     vekt2 operator+(vekt2);
     vekt2 operator-(vekt2);
     double operator*(vekt2);
-    double operator%(vekt2); // Vektorialis szorzas.
     void normal(void);
     void forgatas(double alfa);
 };

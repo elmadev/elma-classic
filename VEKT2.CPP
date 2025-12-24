@@ -32,9 +32,9 @@ double abs(vekt2 a) { return square_root(a.x * a.x + a.y * a.y); }
 vekt2 unit_vector(vekt2 a) { return a * (1 / abs(a)); }
 
 void vekt2::normalize(void) {
-    double recabs = 1 / abs(*this);
-    x *= recabs;
-    y *= recabs;
+    double recip = 1 / abs(*this);
+    x *= recip;
+    y *= recip;
 }
 
 vekt2 rotate_90deg(vekt2 in) { return vekt2(-in.y, in.x); }
@@ -43,7 +43,7 @@ vekt2 rotate_minus90deg(vekt2 in) { return vekt2(in.y, -in.x); }
 
 double square_root(double a) {
     if (a < 0) {
-        hiba("Gyokvonas negativ szammal!");
+        hiba("square_root() of a negative number!");
         return 1;
     }
     double x1 = sqrt(a);
@@ -78,12 +78,12 @@ vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
 
 double point_segment_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v) {
     vekt2 rr = point_r - segment_r;
-    double skalered = segment_r * rr;
-    if (skalered <= 0) {
+    double scalar = segment_r * rr;
+    if (scalar <= 0) {
         // Distance to the first point.
         return abs(rr);
     }
-    if (skalered >= segment_v * segment_v) {
+    if (scalar >= segment_v * segment_v) {
         // Distance to the second point.
         return abs(rr - segment_v);
     }
@@ -111,57 +111,58 @@ vekt2 circles_intersection(vekt2 r1, vekt2 r2, double l1, double l2) {
     if (l2 >= l + l1) {
         l2 = l + l1 - 0.00001;
     }
-    vekt2 vegys = v * (1 / l);
-    vekt2 normal = rotate_90deg(vegys);
+    vekt2 v_unit = v * (1 / l);
+    vekt2 normal = rotate_90deg(v_unit);
 
     double x = (l1 * l1 - l2 * l2 + l * l) / (2.0 * l);
     double m = square_root(l1 * l1 - x * x);
 
-    vekt2 r = r1 + x * vegys + m * normal;
+    vekt2 r = r1 + x * v_unit + m * normal;
     return r;
 }
 
 // Returns true if the infinite line `v1` and segment `r2`, `v2` intersect.
-static bool ketoldalon(vekt2 v1, vekt2 r2, vekt2 v2) {
+static bool line_segment_intersects(vekt2 v1, vekt2 r2, vekt2 v2) {
     vekt2 norm = rotate_90deg(v1);
-    int elso = r2 * norm > 0;
-    int masodik = (r2 + v2) * norm > 0;
-    return (elso && !masodik) || (!elso && masodik);
+    int first_side = r2 * norm > 0;
+    int second_side = (r2 + v2) * norm > 0;
+    return (first_side && !second_side) || (!first_side && second_side);
 }
 
 // Returns true if the infinite line `v1` and segment `r2`, `v2` intersect.
 // This is inexact and will return true if the line and segment are close.
-static bool ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
-    static double kishatar = 0.00000001;
+static bool line_segment_intersects_inexact(vekt2 v1, vekt2 r2, vekt2 v2) {
+    static double epsilon = 0.00000001;
     vekt2 norm = rotate_90deg(v1);
-    int elso = 0;
-    double elsoertek = r2 * norm;
-    if (elsoertek > kishatar) {
-        elso = 1;
+    int first_side = 0;
+    double first_side_dist = r2 * norm;
+    if (first_side_dist > epsilon) {
+        first_side = 1;
     }
-    if (elsoertek < -kishatar) {
-        elso = -1;
+    if (first_side_dist < -epsilon) {
+        first_side = -1;
     }
-    int masodik = 0;
-    double masodikertek = (r2 + v2) * norm;
-    if (masodikertek > kishatar) {
-        masodik = 1;
+    int second_side = 0;
+    double second_side_dist = (r2 + v2) * norm;
+    if (second_side_dist > epsilon) {
+        second_side = 1;
     }
-    if (masodikertek < -kishatar) {
-        masodik = -1;
+    if (second_side_dist < -epsilon) {
+        second_side = -1;
     }
-    if ((elso == -1 && masodik == -1) || (elso == 1 && masodik == 1)) {
+    if ((first_side == -1 && second_side == -1) || (first_side == 1 && second_side == 1)) {
         return false;
     }
     return true;
 }
 
 bool segments_intersect(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
-    return ketoldalon(v1, r2 - r1, v2) && ketoldalon(v2, r1 - r2, v1);
+    return line_segment_intersects(v1, r2 - r1, v2) && line_segment_intersects(v2, r1 - r2, v1);
 }
 
 bool segments_intersect_inexact(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
-    return ketoldalon3(v1, r2 - r1, v2) && ketoldalon3(v2, r1 - r2, v1);
+    return line_segment_intersects_inexact(v1, r2 - r1, v2) &&
+           line_segment_intersects_inexact(v2, r1 - r2, v1);
 }
 
 bool line_circle_intersection(vekt2 line_r, vekt2 line_v, vekt2 circle_r, double radius,
@@ -169,12 +170,12 @@ bool line_circle_intersection(vekt2 line_r, vekt2 line_v, vekt2 circle_r, double
     vekt2 r = circle_r - line_r;
     line_v.normalize();
     vekt2 k = line_v * (line_v * r);
-    double tav = point_line_distance(circle_r, line_r, line_v);
-    double gyokalatt = radius * radius - tav * tav;
-    if (gyokalatt < 0.0) {
+    double distance = point_line_distance(circle_r, line_r, line_v);
+    double squared = radius * radius - distance * distance;
+    if (squared < 0.0) {
         return false;
     }
-    double t = sqrt(gyokalatt);
+    double t = sqrt(squared);
     *intersection_point = line_r + k - line_v * t;
     return true;
 }

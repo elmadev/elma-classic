@@ -47,7 +47,7 @@ int vektormetszes3(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
 // Ket metszespont kozul a v iranyaba haladva az elsot adja vissza:
 int egyeneskormetszes(vekt2 r, vekt2 v, vekt2 r_kor, double sugar, vekt2* pmetszet);
 
-extern vekt2 Vekt2i, Vekt2j, Vekt2k, Vekt2null;
+extern vekt2 Vekt2i, Vekt2j, Vekt2null;
 
 // Ezt meg kell irni hozza:
 // Uzenetet kuld peldaul 0-val valo osztas eseten (inverz matrix).

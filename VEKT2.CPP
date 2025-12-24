@@ -132,20 +132,17 @@ vekt2 ketkormetszete(vekt2 r1, vekt2 r2, double l1, double l2) {
 
 // Igaz, ha v1 altal meghatarozott egyenest metszi r2,v2,
 // vagyis ha v2 kezdo es vegpontja egyenes ket oldalan fekszik:
-static int ketoldalon(vekt2 v1, vekt2 r2, vekt2 v2) {
+static bool ketoldalon(vekt2 v1, vekt2 r2, vekt2 v2) {
     vekt2 norm = forgatas90fokkal(v1);
     int elso = r2 * norm > 0;
     int masodik = (r2 + v2) * norm > 0;
-    if ((elso && !masodik) || (!elso && masodik)) {
-        return 1;
-    }
-    return 0;
+    return (elso && !masodik) || (!elso && masodik);
 }
 
 // Igaz, ha v1 altal meghatarozott egyenest metszi r2,v2,
 // vagyis ha v2 kezdo es vegpontja egyenes ket oldalan fekszik:
 // Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
-static int ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
+static bool ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
     static double kishatar = 0.00000001;
     vekt2 norm = forgatas90fokkal(v1);
     int elso = 0;
@@ -165,40 +162,34 @@ static int ketoldalon3(vekt2 v1, vekt2 r2, vekt2 v2) {
         masodik = -1;
     }
     if ((elso == -1 && masodik == -1) || (elso == 1 && masodik == 1)) {
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 // Igaz, ha az r1-bol indulo v1 vektor es az r2-bol indulo v2 vektor
 // metszi egymast:
-int vektormetszes(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
-    if (ketoldalon(v1, r2 - r1, v2) && ketoldalon(v2, r1 - r2, v1)) {
-        return 1;
-    }
-    return 0;
+bool vektormetszes(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
+    return ketoldalon(v1, r2 - r1, v2) && ketoldalon(v2, r1 - r2, v1);
 }
 
 // Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
-int vektormetszes3(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
-    if (ketoldalon3(v1, r2 - r1, v2) && ketoldalon3(v2, r1 - r2, v1)) {
-        return 1;
-    }
-    return 0;
+bool vektormetszes3(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
+    return ketoldalon3(v1, r2 - r1, v2) && ketoldalon3(v2, r1 - r2, v1);
 }
 
 // Igazzal ter vissza, ha metszi kort egyenes:
 // Ket metszespont kozul a v iranyaba haladva az elsot adja vissza:
-int egyeneskormetszes(vekt2 p1, vekt2 v, vekt2 r_kor, double sugar, vekt2* p) {
+bool egyeneskormetszes(vekt2 p1, vekt2 v, vekt2 r_kor, double sugar, vekt2* p) {
     vekt2 r = r_kor - p1;
     v.normal();
     vekt2 k = v * (v * r); // p1-bol mutat egyenes legkozelebbi pontjaba
     double tav = pontegyenestav(r_kor, p1, v);
     double gyokalatt = sugar * sugar - tav * tav;
     if (gyokalatt < 0.0) {
-        return 0;
+        return false;
     }
     double t = sqrt(gyokalatt);
     *p = p1 + k - v * t;
-    return 1;
+    return true;
 }

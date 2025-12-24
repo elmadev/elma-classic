@@ -41,8 +41,6 @@ vekt2 ketkormetszete(vekt2 r1, vekt2 r2, double l1, double l2);
 // Igaz, ha az r1-bol indulo v1 vektor es az r2-bol indulo v2 vektor
 // metszi egymast:
 int vektormetszes(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
-// Ez csak akkor tekinti metszesnek, ha nem csak eppen erintik egymast:
-int vektormetszes2(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
 // Ez mar akkor is metszesnek tekinti, ha kozel vannak egymashoz:
 int vektormetszes3(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
 

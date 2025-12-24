@@ -66,7 +66,6 @@ vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
         // vegpontjat, ami masikon fekszik:
         if (v1 * v2 < 0) {
             r2 = r2 + v2;
-            v2 = Vekt2null - v2; // ezt mar felesleges, mivel mar nem hasznaljuk
         }
         // Most egyiranyba mutat v1 es v2:
         if ((r2 - r1) * v1 > 0) {

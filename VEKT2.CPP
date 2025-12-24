@@ -31,8 +31,6 @@ void vekt2::forgatas(double alfa) {
 
 double abs(vekt2 a) { return gyok(a.x * a.x + a.y * a.y); }
 
-double absnegyzet(vekt2 a) { return a.x * a.x + a.y * a.y; }
-
 vekt2 egys(vekt2 a) { return a * (1 / abs(a)); }
 
 void vekt2::normal(void) {

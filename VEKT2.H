@@ -17,7 +17,6 @@ class vekt2 {
 vekt2 operator*(double, vekt2);
 vekt2 operator*(vekt2, double);
 double abs(vekt2);
-double absnegyzet(vekt2);
 vekt2 egys(vekt2);
 vekt2 forgatas90fokkal(vekt2);
 vekt2 forgatasminusz90fokkal(vekt2);

@@ -3,22 +3,23 @@
 
 class vekt2 {
   public:
-    double x, y;
-    vekt2(void);
-    vekt2(double, double);
+    double x;
+    double y;
+    vekt2();
+    vekt2(double x, double y);
     vekt2 operator+(vekt2);
     vekt2 operator-(vekt2);
     double operator*(vekt2);
-    void normalize(void);
+    void normalize();
     void rotate(double rotation);
 };
 
-vekt2 operator*(double, vekt2);
-vekt2 operator*(vekt2, double);
+vekt2 operator*(double x, vekt2 a);
+vekt2 operator*(vekt2 a, double x);
 double abs(vekt2);
-vekt2 unit_vector(vekt2);
-vekt2 rotate_90deg(vekt2);
-vekt2 rotate_minus90deg(vekt2);
+vekt2 unit_vector(vekt2 a);
+vekt2 rotate_90deg(vekt2 in);
+vekt2 rotate_minus90deg(vekt2 in);
 
 double square_root(double x);
 

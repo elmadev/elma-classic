@@ -31,7 +31,7 @@ double abs(vekt2 a) { return square_root(a.x * a.x + a.y * a.y); }
 
 vekt2 unit_vector(vekt2 a) { return a * (1 / abs(a)); }
 
-void vekt2::normalize(void) {
+void vekt2::normalize() {
     double recip = 1 / abs(*this);
     x *= recip;
     y *= recip;

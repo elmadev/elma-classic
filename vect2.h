@@ -1,5 +1,5 @@
-#ifndef VEKT2_H
-#define VEKT2_H
+#ifndef VECT2_H
+#define VECT2_H
 
 class vect2 {
   public:

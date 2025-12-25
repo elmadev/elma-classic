@@ -33,7 +33,7 @@ static void erokszamitasa(motorst* pmot, rigidbody* pkor, vekt2 i1, vekt2 j1, do
     double Ftang = 0;
     if (gumi.x < -0.0001 || gumi.x > 0.0001 || gumi.y < -0.0001 || gumi.y > 0.0001) {
         // Gumieronek szetbontasa ket komponensre:
-        double rudhossz = abs(gumis);
+        double rudhossz = gumis.length();
         vekt2 rudegys = gumis * (1.0 / rudhossz);
         vekt2 rudegysmer = rotate_90deg(rudegys);
 
@@ -51,7 +51,7 @@ static void erokszamitasa(motorst* pmot, rigidbody* pkor, vekt2 i1, vekt2 j1, do
     }
     // Most jon surlodas szamitasa:
     vekt2 koto = pkor->r - pmot->bike.r;
-    double kotol = abs(koto);
+    double kotol = koto.length();
     double reckotol = 1.0 / kotol;
     vekt2 kotoe = koto * reckotol;
     vekt2 kotomer = rotate_90deg(koto);

@@ -138,7 +138,7 @@ void szakaszok::bekot(int cellax, int cellay, vonal* pv) {
 // Egy vonalat hozzarendel osszes olyan cellahoz, amihez koze lehet:
 void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
     // Kitolti vonal egyseg es hossz rubrikait:
-    pv->hossz = abs(pv->v);
+    pv->hossz = pv->v.length();
     if (pv->hossz < 0.00000001) {
         hiba("Vonal hossza tul kicsi!");
     }

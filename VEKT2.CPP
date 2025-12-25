@@ -41,12 +41,12 @@ static double square_root(double a) {
     return .5 * (x1 + a / x1);
 }
 
-double abs(vekt2 a) { return square_root(a.x * a.x + a.y * a.y); }
+double vekt2::length() { return square_root(x * x + y * y); }
 
-vekt2 unit_vector(vekt2 a) { return a * (1 / abs(a)); }
+vekt2 unit_vector(vekt2 a) { return a * (1 / a.length()); }
 
 void vekt2::normalize() {
-    double recip = 1 / abs(*this);
+    double recip = 1 / length();
     x *= recip;
     y *= recip;
 }
@@ -81,11 +81,11 @@ double point_segment_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v) {
     double scalar = segment_r * rr;
     if (scalar <= 0) {
         // Distance to the first point.
-        return abs(rr);
+        return rr.length();
     }
     if (scalar >= segment_v * segment_v) {
         // Distance to the second point.
-        return abs(rr - segment_v);
+        return (rr - segment_v).length();
     }
     // Distance from the segment.
     vekt2 n = rotate_90deg(unit_vector(segment_v));
@@ -100,7 +100,7 @@ double point_line_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v) {
 
 vekt2 circles_intersection(vekt2 r1, vekt2 r2, double l1, double l2) {
     vekt2 v = r2 - r1;
-    double l = abs(v);
+    double l = v.length();
     // If the circles don't intersect, resize the circles so they intersect.
     if (l >= l1 + l2) {
         l = l1 + l2 - 0.000001;

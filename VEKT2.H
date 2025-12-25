@@ -12,11 +12,11 @@ class vekt2 {
     double operator*(vekt2);
     void normalize();
     void rotate(double rotation);
+    double length();
 };
 
 vekt2 operator*(double x, vekt2 a);
 vekt2 operator*(vekt2 a, double x);
-double abs(vekt2);
 vekt2 unit_vector(vekt2 a);
 vekt2 rotate_90deg(vekt2 in);
 vekt2 rotate_minus90deg(vekt2 in);

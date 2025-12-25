@@ -2,7 +2,7 @@
 
 // Push the wheel out from the ground so it is standing on the anchor point
 static void move_wheel_out_of_ground(rigidbody* rb, vekt2* point) {
-    double length = abs(rb->r - *point);
+    double length = (rb->r - *point).length();
     vekt2 n = (rb->r - *point) * (1.0 / length);
     if (length < rb->radius - WheelDeformationLength) {
         rb->r = rb->r + n * (rb->radius - WheelDeformationLength - length);
@@ -17,7 +17,7 @@ constexpr double BumpThreshold = 1.5;
 // Delete all of the velocity towards the point and keep velocity perpendicular to the point
 static bool simulate_anchor_point_collision(rigidbody* rb, vekt2* point, vekt2 force) {
     // Return false if no collision
-    double length = abs(rb->r - *point);
+    double length = (rb->r - *point).length();
     vekt2 n = (rb->r - *point) * (1.0 / length);
     if (n * rb->v > -GroundEscapeVelocity && n * force > 0) {
         return false;
@@ -26,7 +26,7 @@ static bool simulate_anchor_point_collision(rigidbody* rb, vekt2* point, vekt2 f
     vekt2 deleted_velocity = n * rb->v * n;
     rb->v = rb->v - deleted_velocity;
     // Make a "bump" sound effect if enough velocity deleted
-    double bump_magnitude = abs(deleted_velocity);
+    double bump_magnitude = deleted_velocity.length();
     if (bump_magnitude > BumpThreshold) {
         bump_magnitude = bump_magnitude / 0.8 * 0.1;
         if (bump_magnitude >= 0.99) {
@@ -47,7 +47,7 @@ static bool simulate_anchor_point_collision(rigidbody* rb, vekt2* point, vekt2 f
 static bool valid_anchor_points_old(vekt2 point1, vekt2 point2, rigidbody* rb, vekt2 force,
                                     double torque) {
     // Get the unit vectors
-    double length = abs(rb->r - point2);
+    double length = (rb->r - point2).length();
     vekt2 n = (rb->r - point2) * (1.0 / length);
     vekt2 n90 = rotate_90deg(n);
 
@@ -63,7 +63,7 @@ static bool valid_anchor_points_old(vekt2 point1, vekt2 point2, rigidbody* rb, v
 // Assuming that the wheel is rolling on point2, does the wheel slide towards point1 or away?
 static bool valid_anchor_points_new(vekt2 point1, vekt2 point2, rigidbody* rb) {
     // Get the unit vectors
-    double length = abs(rb->r - point2);
+    double length = (rb->r - point2).length();
     vekt2 n = (rb->r - point2) * (1.0 / length);
     vekt2 n90 = rotate_90deg(n);
 
@@ -118,7 +118,7 @@ void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, bo
     // If we have two points of collision, check whether the wheel is stuck in the corner
     // When the wheel is moving fast, try to discard one of the collision points if you are moving
     // away from it
-    if (anchor_point_count == 2 && abs(rb->v) > 1.0) {
+    if (anchor_point_count == 2 && rb->v.length() > 1.0) {
         // Elma-exclusive bike-stuck fixes:
         if (!valid_anchor_points_new(point1, point2, rb)) {
             anchor_point_count = 1;
@@ -131,7 +131,7 @@ void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, bo
     }
     // When the wheel is moving slow, try to discard one of the collision points if the force pushes
     // away from it
-    if (anchor_point_count == 2 && abs(rb->v) < 1.0) {
+    if (anchor_point_count == 2 && rb->v.length() < 1.0) {
         // Original across bike-stuck (previously always checked, regardless of velocity)
         if (!valid_anchor_points_old(point1, point2, rb, force, torque)) {
             anchor_point_count = 1;
@@ -182,7 +182,7 @@ void rigidbody_movement(rigidbody* rb, vekt2 force, double torque, double dt, bo
 
     // We collide with one point, so roll the wheel on the ground
     // We need to roll perpendicular to the point of contact, so get the corresponding unit vector
-    double length = abs(rb->r - point1);
+    double length = (rb->r - point1).length();
     vekt2 n = (rb->r - point1) * (1.0 / length);
     vekt2 n90 = rotate_90deg(n);
     // Take our linear velocity - since we are rolling, convert it into equivalent angular velocity
@@ -283,7 +283,7 @@ void body_movement(motorst* mot, vekt2 gravity, vekt2 i, vekt2 j, double dt) {
     // Acting as if the body is a spring, calculate the spring force
     // Force = Stretch*Tension
     // where Tension is 5x the tension of the wheel spring
-    double spring_length = abs(delta_body_r);
+    double spring_length = delta_body_r.length();
     if (spring_length < 0.0000001) {
         spring_length = 0.0000001;
     }

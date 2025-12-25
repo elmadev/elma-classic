@@ -4,7 +4,7 @@ static int gombszakasz(vekt2 r, double sugar, vonal* pv, vekt2* pt) {
     vekt2 rel = r - pv->r;
     double pozicio = rel * pv->egyseg;
     if (pozicio < 0) {
-        if (abs(r - pv->r) < sugar) {
+        if ((r - pv->r).length() < sugar) {
             *pt = pv->r;
             return 1;
         } else {
@@ -12,7 +12,7 @@ static int gombszakasz(vekt2 r, double sugar, vonal* pv, vekt2* pt) {
         }
     }
     if (pozicio > pv->hossz) {
-        if (abs(r - (pv->r + pv->egyseg * pv->hossz)) < sugar) {
+        if ((r - (pv->r + pv->egyseg * pv->hossz)).length() < sugar) {
             *pt = pv->r + pv->egyseg * pv->hossz;
             return 1;
         } else {
@@ -48,7 +48,7 @@ int talppontkereses(vekt2 r, double sugar, vekt2* pt1, vekt2* pt2, vonal** ppv1,
                 talppontszam++;
                 // Ellenorzes, hogy nincs-e tul kozel ketpont,
                 // ha ket pontrol van szo:
-                if (abs(*pt1 - *pt2) < TwoPointDiscriminationDistance) {
+                if ((*pt1 - *pt2).length() < TwoPointDiscriminationDistance) {
                     *pt1 = (*pt1 + *pt2) * 0.5; // atlagol
                     talppontszam = 1;
                     *ppv2 = NULL;

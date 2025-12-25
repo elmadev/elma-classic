@@ -136,17 +136,17 @@ void kitolt(void) {
 // VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL
 
 void vonalrajz(vekt2 p1, vekt2 p2, int szaggatott) {
-    if (abs(p2 - p1) < 0.00000001) {
+    if ((p2 - p1).length() < 0.00000001) {
         return;
     }
     // Eloszor is levagjuk p1-p2 szakaszt, ha kilog Vonalkozep es Vonalsugar
     // altal meghatarozott korbol:
     int p1kilog = 0;
-    if (abs(p1 - Vonalkozep) > Vonalsugar * 0.999) {
+    if ((p1 - Vonalkozep).length() > Vonalsugar * 0.999) {
         p1kilog = 1;
     }
     int p2kilog = 0;
-    if (abs(p2 - Vonalkozep) > Vonalsugar * 0.999) {
+    if ((p2 - Vonalkozep).length() > Vonalsugar * 0.999) {
         p2kilog = 1;
     }
     if (p1kilog && p2kilog) {

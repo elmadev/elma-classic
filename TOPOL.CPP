@@ -694,7 +694,7 @@ kerek* topol::legkozkerek(double x, double y, double* ptav) {
     vekt2 r(x, y);
     for (int i = 0; i < MAXKEREK; i++) {
         if (kerektomb[i]) {
-            double ujtav = abs(kerektomb[i]->r - r);
+            double ujtav = (kerektomb[i]->r - r).length();
             if (ujtav < tav) {
                 tav = ujtav;
                 pker = kerektomb[i];
@@ -726,7 +726,7 @@ sprite* topol::legkozsprite(double x, double y, double* ptav) {
             continue;
         }
 
-        double ujtav = abs(spritetomb[i]->r - r);
+        double ujtav = (spritetomb[i]->r - r).length();
         if (ujtav < tav) {
             tav = ujtav;
             psp = spritetomb[i];

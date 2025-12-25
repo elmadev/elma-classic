@@ -39,21 +39,21 @@ struct rigidbody {
     double radius;
     double mass;
     double inertia; // Moment of inertia
-    vekt2 r;
-    vekt2 v;
+    vect2 r;
+    vect2 v;
 };
 
 struct motorst {
     rigidbody bike;
     rigidbody left_wheel;
     rigidbody right_wheel;
-    vekt2 head_r;
+    vect2 head_r;
     int flipped_bike;
     int flipped_camera;
     MotorGravity gravity_direction;
 
-    vekt2 body_r;
-    vekt2 body_v;
+    vect2 body_r;
+    vect2 body_v;
 
     int apple_count;
 

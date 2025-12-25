@@ -207,43 +207,43 @@ void kerek::kirajzol(void) {
     for (int i = 0; i < szegmensszam; i++) {
         double alfa1 = i * elfordulas;
         double alfa2 = (i + 1) * elfordulas;
-        vekt2 r1(sugar * sin(alfa1), sugar * cos(alfa1));
-        vekt2 r2(sugar * sin(alfa2), sugar * cos(alfa2));
+        vect2 r1(sugar * sin(alfa1), sugar * cos(alfa1));
+        vect2 r2(sugar * sin(alfa2), sugar * cos(alfa2));
         vonalrajz(r + r1, r + r2, 0);
     }
 
     // Kis jel kor kozepere:
     double meret = 0.02;
-    vonalrajz(r + vekt2(-meret, -meret), r + vekt2(meret, meret), 0);
-    vonalrajz(r + vekt2(meret, -meret), r + vekt2(-meret, meret), 0);
+    vonalrajz(r + vect2(-meret, -meret), r + vect2(meret, meret), 0);
+    vonalrajz(r + vect2(meret, -meret), r + vect2(-meret, meret), 0);
 
     // Beleirjuk betut korbe:
     if (tipus == T_CEL) {
-        vonalrajz(r + vekt2(-0.15, 0.3), r + vekt2(-0.15, -0.3), 0);
-        vonalrajz(r + vekt2(-0.15, 0.3), r + vekt2(0.15, 0.3), 0);
-        vonalrajz(r + vekt2(-0.15, -0.3), r + vekt2(0.15, -0.3), 0);
-        vonalrajz(r + vekt2(-0.15, 0.0), r + vekt2(0.1, 0.0), 0);
+        vonalrajz(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), 0);
+        vonalrajz(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), 0);
+        vonalrajz(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), 0);
+        vonalrajz(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), 0);
         return;
     }
     if (tipus == T_KAJA) {
-        vonalrajz(r + vekt2(-0.15, 0.3), r + vekt2(-0.15, -0.3), 0);
-        vonalrajz(r + vekt2(-0.15, -0.3), r + vekt2(0.15, -0.3), 0);
-        vonalrajz(r + vekt2(-0.15, 0.0), r + vekt2(0.1, 0.0), 0);
+        vonalrajz(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), 0);
+        vonalrajz(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), 0);
+        vonalrajz(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), 0);
         return;
     }
     if (tipus == T_KEZDO) {
-        vonalrajz(r + vekt2(0.15, 0.3), r + vekt2(0.15, 0.0), 0);
-        vonalrajz(r + vekt2(-0.15, -0.3), r + vekt2(-0.15, 0.0), 0);
+        vonalrajz(r + vect2(0.15, 0.3), r + vect2(0.15, 0.0), 0);
+        vonalrajz(r + vect2(-0.15, -0.3), r + vect2(-0.15, 0.0), 0);
 
-        vonalrajz(r + vekt2(-0.15, 0.3), r + vekt2(0.15, 0.3), 0);
-        vonalrajz(r + vekt2(-0.15, -0.3), r + vekt2(0.15, -0.3), 0);
-        vonalrajz(r + vekt2(-0.15, 0.0), r + vekt2(0.15, 0.0), 0);
+        vonalrajz(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), 0);
+        vonalrajz(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), 0);
+        vonalrajz(r + vect2(-0.15, 0.0), r + vect2(0.15, 0.0), 0);
         return;
     }
     if (tipus == T_HALALOS) {
-        vonalrajz(r + vekt2(-0.15, 0.3), r + vekt2(-0.15, -0.3), 0);
-        vonalrajz(r + vekt2(-0.15, 0.07), r + vekt2(0.15, -0.3), 0);
-        vonalrajz(r + vekt2(Hal_eltol, 0.0), r + vekt2(0.15, 0.3), 0);
+        vonalrajz(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), 0);
+        vonalrajz(r + vect2(-0.15, 0.07), r + vect2(0.15, -0.3), 0);
+        vonalrajz(r + vect2(Hal_eltol, 0.0), r + vect2(0.15, 0.3), 0);
         return;
     }
     hiba("iugiffiif");
@@ -315,7 +315,7 @@ sprite::sprite(double x, double y, char* kepnev_p, char* texturanev_p, char* mas
         hiba("7uyhfg");
     }
 
-    r = vekt2(x, y);
+    r = vect2(x, y);
     if (strlen(kepnev_p) > 8 || strlen(maszknev_p) > 8 || strlen(texturanev_p) > 8) {
         hiba("87vgrg");
     }
@@ -371,11 +371,11 @@ sprite::sprite(double x, double y, char* kepnev_p, char* texturanev_p, char* mas
 }
 
 void sprite::kirajzol(void) {
-    vonalrajz(r, r + vekt2(xsize, 0.0), 0);
-    vonalrajz(r, r + vekt2(0.0, ysize), 0);
-    vekt2 r2(xsize + r.x, ysize + r.y);
-    vonalrajz(r2, r2 - vekt2(xsize, 0.0), 0);
-    vonalrajz(r2, r2 - vekt2(0.0, ysize), 0);
+    vonalrajz(r, r + vect2(xsize, 0.0), 0);
+    vonalrajz(r, r + vect2(0.0, ysize), 0);
+    vect2 r2(xsize + r.x, ysize + r.y);
+    vonalrajz(r2, r2 - vect2(xsize, 0.0), 0);
+    vonalrajz(r2, r2 - vect2(0.0, ysize), 0);
 }
 
 sprite::sprite(FILE* h) {
@@ -691,7 +691,7 @@ kerek* topol::legkozkerek(double x, double y, double* ptav) {
 
     double tav = 1000000.0;
     kerek* pker = NULL;
-    vekt2 r(x, y);
+    vect2 r(x, y);
     for (int i = 0; i < MAXKEREK; i++) {
         if (kerektomb[i]) {
             double ujtav = (kerektomb[i]->r - r).length();
@@ -717,7 +717,7 @@ sprite* topol::legkozsprite(double x, double y, double* ptav) {
 
     double tav = 1000000.0;
     sprite* psp = NULL;
-    vekt2 r(x, y);
+    vect2 r(x, y);
     for (int i = 0; i < MAXSPRITE; i++) {
         if (!Rajzolkepek) {
             continue;
@@ -772,18 +772,18 @@ void topol::kirajzol(void) {
 }
 
 // Igaz, ha bent van:
-int topol::levegoben(gyuru* pgy, vekt2* pr) {
+int topol::levegoben(gyuru* pgy, vect2* pr) {
     if ((pgy && pr) || (!pgy && !pr)) {
         hiba("topol::levegoben-ben paramok nem stimmelnek!");
     }
 
-    vekt2 r;
+    vect2 r;
     if (pgy) {
         r = pgy->ponttomb[0]; // pgy->sulypont();
     } else {
         r = *pr;
     }
-    vekt2 v = vekt2(27654.475374565578, 37850.5364775);
+    vect2 v = vect2(27654.475374565578, 37850.5364775);
     // Vegigmegyunk az egeszen:
     int metszes = 0;
     for (int i = 0; i < MAXGYURU; i++) {
@@ -1833,7 +1833,7 @@ unsigned long double2belyeg( long l ) {
 // KEREKKEL kapcsolatos play elotti inicializalasok:
 
 // lejatszo.cpp-ben Falg Tag ennek alapjan teszi vissza motorost:
-vekt2 Kezdetihelydiff;
+vect2 Kezdetihelydiff;
 
 // Motor helyzetet is o allitja be, kajaszamot adja vissza:
 // Eheto kerekeket aktivizalja:

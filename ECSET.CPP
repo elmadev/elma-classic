@@ -112,12 +112,12 @@ void ecset::getorigoandsize(void) {
     if (view) {
         // VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW
         // x-re jol ra lehet hagyni, nem noveli memoria foglalast:
-        origo = vekt2(minx - 10000 / MetersToPixels, miny - 4000 / MetersToPixels);
+        origo = vect2(minx - 10000 / MetersToPixels, miny - 4000 / MetersToPixels);
         xsizedb = (maxx + 10000 / MetersToPixels) - origo.x;
         ysizedb = (maxy + 4000 / MetersToPixels) - origo.y;
     } else {
         // x-re jol ra lehet hagyni, nem noveli memoria foglalast:
-        origo = vekt2(minx - 10000 / MetersToPixels, miny - 1000 / MetersToPixels);
+        origo = vect2(minx - 10000 / MetersToPixels, miny - 1000 / MetersToPixels);
         // Beallitjuk ugy, hogy mindig pixel felezo helyen legyen origo:
         meghelyez(&origo.x);
         meghelyez(&origo.y);
@@ -128,7 +128,7 @@ void ecset::getorigoandsize(void) {
 }
 
 void ecset::addszakasz(vonal* psz) {
-    vekt2 r, v;
+    vect2 r, v;
     r = psz->r - origo;
     r.x *= MetersToPixels;
     r.y *= MetersToPixels;
@@ -1674,8 +1674,8 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
     }
 }
 
-void ecset::getbalalso_int(vekt2 balalso, int* px, int* py) {
-    vekt2 relat = balalso - origo;
+void ecset::getbalalso_int(vect2 balalso, int* px, int* py) {
+    vect2 relat = balalso - origo;
     if (view) {
         *px = relat.x * (MetersToPixels / MinimapScaleFactor); // Ecset egesz koordinatak
         *py = relat.y * (MetersToPixels / MinimapScaleFactor); // Ecset egesz koordinatak
@@ -1733,7 +1733,7 @@ static void egetkeszit( pic8* peg, int xhely, int xkezd, int xmodulus ) {
     blit8( peg, Felho, x, 0 );
 } */
 
-void ecset::kitesz(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int x2, int y2) {
+void ecset::kitesz(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int x2, int y2) {
     if (x1 >= x2 || y1 >= y2) {
         hiba("ecset::kitesz x1 >= x2 || y1 >= y2!");
     }
@@ -1782,7 +1782,7 @@ void ecset::kitesz(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int 
 }
 
 // Szinte ugyanaz, mint kiteszalso:
-void ecset::kiteszview(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int x2, int y2) {
+void ecset::kiteszview(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int x2, int y2) {
     Foldsor = Plgr->viewfoldsor;
     Egsor = Plgr->viewegsor;
 

@@ -1,7 +1,7 @@
 #include "ALL.H"
 
-static int gombszakasz(vekt2 r, double sugar, vonal* pv, vekt2* pt) {
-    vekt2 rel = r - pv->r;
+static int gombszakasz(vect2 r, double sugar, vonal* pv, vect2* pt) {
+    vect2 rel = r - pv->r;
     double pozicio = rel * pv->egyseg;
     if (pozicio < 0) {
         if ((r - pv->r).length() < sugar) {
@@ -19,7 +19,7 @@ static int gombszakasz(vekt2 r, double sugar, vonal* pv, vekt2* pt) {
             return 0;
         }
     }
-    vekt2 n = rotate_90deg(pv->egyseg);
+    vect2 n = rotate_90deg(pv->egyseg);
     double tav = rel * n;
     if (tav < -sugar || tav > sugar) {
         return 0;
@@ -28,7 +28,7 @@ static int gombszakasz(vekt2 r, double sugar, vonal* pv, vekt2* pt) {
     return 1;
 }
 
-int talppontkereses(vekt2 r, double sugar, vekt2* pt1, vekt2* pt2, vonal** ppv1, vonal** ppv2) {
+int talppontkereses(vect2 r, double sugar, vect2* pt1, vect2* pt2, vonal** ppv1, vonal** ppv2) {
     *ppv1 = *ppv2 = NULL;
 
     Pszak->felsorolasreset(r);
@@ -37,7 +37,7 @@ int talppontkereses(vekt2 r, double sugar, vekt2* pt1, vekt2* pt2, vonal** ppv1,
     // int vegignezett = 0; // tesztelesre!
     while ((pv = Pszak->getnext()) != NULL) {
         // vegignezett++;
-        vekt2 t;
+        vect2 t;
         if (gombszakasz(r, sugar, pv, &t)) {
             if (talppontszam == 2) {
                 hiba("Egyszerre kettonel tobb talppontszam is van");

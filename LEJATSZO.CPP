@@ -567,11 +567,11 @@ long lejatszo(const char* filenev) {
             return -1;
         }
         l++;
-        /*vekt2 tomba[100], tombb[100];
+        /*vect2 tomba[100], tombb[100];
         double dtomb[100];
         for( int i = 0; i < 100; i++ ) {
-            tomba[i] = vekt2( i+2, i+3 );
-            tombb[i] = vekt2( i-23, i-70 );
+            tomba[i] = vect2( i+2, i+3 );
+            tombb[i] = vect2( i-23, i-70 );
         }
         for( i = 0; i < 200000; i++ ) {
             for( int j = 0; j < 100; j++ )

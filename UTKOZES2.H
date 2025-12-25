@@ -2,6 +2,6 @@
 #define UTKOZES2_H
 
 // negativ eseten nem utkozik:
-int utkozikesprite(vekt2 r, double sugar);
+int utkozikesprite(vect2 r, double sugar);
 
 #endif

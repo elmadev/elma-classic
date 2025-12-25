@@ -1,6 +1,6 @@
 #include "ALL.H"
 
-static void surlodasverseny(motorst* pmot, vekt2 fgumi, vekt2 sebesseg);
+static void surlodasverseny(motorst* pmot, vect2 fgumi, vect2 sebesseg);
 
 static double Maxsurlodas = 0;
 
@@ -21,21 +21,21 @@ static double Szorzo = 2.0;
 static pic8* Ppic8 = NULL;
 */
 
-static void erokszamitasa(motorst* pmot, rigidbody* pkor, vekt2 i1, vekt2 j1, double kordx,
-                          double kordy, vekt2* pFkerek, vekt2* pFtest, double* pMtest,
+static void erokszamitasa(motorst* pmot, rigidbody* pkor, vect2 i1, vect2 j1, double kordx,
+                          double kordy, vect2* pFkerek, vect2* pFtest, double* pMtest,
                           double* pMkerek) {
-    vekt2 gumis = i1 * kordx + j1 * kordy;
-    vekt2 gumisabsz = gumis + pmot->bike.r;
+    vect2 gumis = i1 * kordx + j1 * kordy;
+    vect2 gumisabsz = gumis + pmot->bike.r;
 
     // Gumi huzoero kiszamolasa:
-    vekt2 gumi = gumisabsz - pkor->r;
+    vect2 gumi = gumisabsz - pkor->r;
     double Fsugar = 0;
     double Ftang = 0;
     if (gumi.x < -0.0001 || gumi.x > 0.0001 || gumi.y < -0.0001 || gumi.y > 0.0001) {
         // Gumieronek szetbontasa ket komponensre:
         double rudhossz = gumis.length();
-        vekt2 rudegys = gumis * (1.0 / rudhossz);
-        vekt2 rudegysmer = rotate_90deg(rudegys);
+        vect2 rudegys = gumis * (1.0 / rudhossz);
+        vect2 rudegysmer = rotate_90deg(rudegys);
 
         Fsugar = (gumi * rudegys) * SpringTensionCoefficient;
         Ftang = (gumi * rudegysmer) * SpringTensionCoefficient;
@@ -45,25 +45,25 @@ static void erokszamitasa(motorst* pmot, rigidbody* pkor, vekt2 i1, vekt2 j1, do
         *pFtest = Vekt2null - *pFkerek;
         *pMtest = -Ftang * rudhossz;
     } else {
-        *pFkerek = vekt2();
-        *pFtest = vekt2();
+        *pFkerek = vect2();
+        *pFtest = vect2();
         *pMtest = 0;
     }
     // Most jon surlodas szamitasa:
-    vekt2 koto = pkor->r - pmot->bike.r;
+    vect2 koto = pkor->r - pmot->bike.r;
     double kotol = koto.length();
     double reckotol = 1.0 / kotol;
-    vekt2 kotoe = koto * reckotol;
-    vekt2 kotomer = rotate_90deg(koto);
-    vekt2 kotoemer = rotate_90deg(kotoe);
-    vekt2 korongrelv = (kotomer * pmot->bike.angular_velocity + pmot->bike.v) - pkor->v;
+    vect2 kotoe = koto * reckotol;
+    vect2 kotomer = rotate_90deg(koto);
+    vect2 kotoemer = rotate_90deg(kotoe);
+    vect2 korongrelv = (kotomer * pmot->bike.angular_velocity + pmot->bike.v) - pkor->v;
     double vlong = korongrelv * kotoe;
     double vtang = korongrelv * kotoemer;
-    vekt2 Fklong = (vlong * SpringResistanceCoefficient) * kotoe;
-    vekt2 Fktang = (vtang * SpringResistanceCoefficient) * kotoemer;
+    vect2 Fklong = (vlong * SpringResistanceCoefficient) * kotoe;
+    vect2 Fktang = (vtang * SpringResistanceCoefficient) * kotoemer;
 
     // Most jon kerek forgatonyomateka:
-    vekt2 Ftestnyom = kotoemer * (*pMkerek * reckotol);
+    vect2 Ftestnyom = kotoemer * (*pMkerek * reckotol);
 
     *pFkerek = *pFkerek + Fklong + Fktang - Ftestnyom;
     *pMtest += -(Fktang * kotomer);
@@ -92,8 +92,8 @@ void resetleptet(motorst* pmot) {
 
 // Kor1-bol eloallitja Fejr-et!:
 void szamitfejr(motorst* pmot) {
-    vekt2 i(cos(pmot->bike.rotation), sin(pmot->bike.rotation));
-    vekt2 j = rotate_90deg(i);
+    vect2 i(cos(pmot->bike.rotation), sin(pmot->bike.rotation));
+    vect2 j = rotate_90deg(i);
 
     if (pmot->flipped_bike) {
         pmot->head_r = pmot->body_r + i * 0.09 + j * 0.63;
@@ -105,8 +105,8 @@ void szamitfejr(motorst* pmot) {
 void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1, int ugrik2) {
     Maxsurlodas = 0;
 
-    vekt2 i1(cos(pmot->bike.rotation), sin(pmot->bike.rotation));
-    vekt2 j1 = rotate_90deg(i1);
+    vect2 i1(cos(pmot->bike.rotation), sin(pmot->bike.rotation));
+    vect2 j1 = rotate_90deg(i1);
 
     // Fek, gaz:
     if (!pmot->prev_brake && fek) {
@@ -147,14 +147,14 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
         szogigazit(&pmot->right_wheel.rotation);
     }
 
-    vekt2 Fkerek2;
-    vekt2 Ftest2;
+    vect2 Fkerek2;
+    vect2 Ftest2;
     double Mtest2;
     erokszamitasa(pmot, &pmot->left_wheel, i1, j1, LeftWheelDX, LeftWheelDY, &Fkerek2, &Ftest2,
                   &Mtest2, &Mkerek2);
 
-    vekt2 Fkerek4;
-    vekt2 Ftest4;
+    vect2 Fkerek4;
+    vect2 Ftest4;
     double Mtest4;
     erokszamitasa(pmot, &pmot->right_wheel, i1, j1, RightWheelDX, RightWheelDY, &Fkerek4, &Ftest4,
                   &Mtest4, &Mkerek4);
@@ -225,7 +225,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
     if (ugrik1 || ugrik2) {
         // Vezetot kulon forgatjuk meg:
         double domega = pmot->bike.angular_velocity - oldomega;
-        vekt2 tangens = rotate_90deg(pmot->body_r - pmot->bike.r);
+        vect2 tangens = rotate_90deg(pmot->body_r - pmot->bike.r);
         pmot->body_v = pmot->body_v + tangens * domega;
     }
 
@@ -240,7 +240,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
 
     switch (pmot->gravity_direction) {
     case MotorGravity::Down:
-        body_movement(pmot, vekt2(0.0, -1.0), i1, j1, dt); // vezeto
+        body_movement(pmot, vect2(0.0, -1.0), i1, j1, dt); // vezeto
         rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 - Vekt2j * pmot->bike.mass * Gravity,
                            Mtest2 + Mtest4, dt, false);
         rigidbody_movement(&pmot->left_wheel, Fkerek2 - Vekt2j * pmot->left_wheel.mass * Gravity,
@@ -249,7 +249,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
                            Mkerek4, dt, true);
         break;
     case MotorGravity::Up:
-        body_movement(pmot, vekt2(0.0, 1.0), i1, j1, dt); // vezeto
+        body_movement(pmot, vect2(0.0, 1.0), i1, j1, dt); // vezeto
         rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 + Vekt2j * pmot->bike.mass * Gravity,
                            Mtest2 + Mtest4, dt, false);
         rigidbody_movement(&pmot->left_wheel, Fkerek2 + Vekt2j * pmot->left_wheel.mass * Gravity,
@@ -258,7 +258,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
                            Mkerek4, dt, true);
         break;
     case MotorGravity::Left:
-        body_movement(pmot, vekt2(-1.0, 0.0), i1, j1, dt); // vezeto
+        body_movement(pmot, vect2(-1.0, 0.0), i1, j1, dt); // vezeto
         rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 - Vekt2i * pmot->bike.mass * Gravity,
                            Mtest2 + Mtest4, dt, false);
         rigidbody_movement(&pmot->left_wheel, Fkerek2 - Vekt2i * pmot->left_wheel.mass * Gravity,
@@ -267,7 +267,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
                            Mkerek4, dt, true);
         break;
     case MotorGravity::Right:
-        body_movement(pmot, vekt2(1.0, 0.0), i1, j1, dt); // vezeto
+        body_movement(pmot, vect2(1.0, 0.0), i1, j1, dt); // vezeto
         rigidbody_movement(&pmot->bike, Ftest2 + Ftest4 + Vekt2i * pmot->bike.mass * Gravity,
                            Mtest2 + Mtest4, dt, false);
         rigidbody_movement(&pmot->left_wheel, Fkerek2 + Vekt2i * pmot->left_wheel.mass * Gravity,
@@ -282,7 +282,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
 
 // 0-meghalt, 2-semmi kulonos
 int vizsgalat(motorst* pmot) {
-    vekt2 t1, t2;
+    vect2 t1, t2;
     vonal *pv1, *pv2;
     if (talppontkereses(pmot->head_r, HeadRadius, &t1, &t2, &pv1, &pv2)) {
         return 0;
@@ -313,8 +313,8 @@ int vizsgalat(motorst* pmot) {
 
 static double Oszto = 1.0 / 1.0;
 
-static void surlodasverseny(motorst* pmot, vekt2 fgumi_v, vekt2 sebesseg_v) {
-    vekt2 joirany(cos(pmot->bike.rotation - K_pip2), sin(pmot->bike.rotation - K_pip2));
+static void surlodasverseny(motorst* pmot, vect2 fgumi_v, vect2 sebesseg_v) {
+    vect2 joirany(cos(pmot->bike.rotation - K_pip2), sin(pmot->bike.rotation - K_pip2));
     double fgumi = joirany * fgumi_v;
     double sebesseg = joirany * sebesseg_v;
     if (fgumi <= 0 || sebesseg <= 0) {

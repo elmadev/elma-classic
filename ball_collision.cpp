@@ -35,8 +35,8 @@ double ball_ball_collision_time(ball* ball1, ball* ball2) {
     // One last caveat: r is ball2 - ball1 instead of ball1 - ball2
     // To compensate for this mistake, we multiply b by -2.0 instead of 2.0
     // clang-format on
-    vekt2 v = ball1->v - ball2->v;
-    vekt2 r = ball2->keyframe_r - ball1->keyframe_r;
+    vect2 v = ball1->v - ball2->v;
+    vect2 r = ball2->keyframe_r - ball1->keyframe_r;
     double a = v.x * v.x + v.y * v.y;
     if (a == 0) {
         // No relative movement, so no collision
@@ -72,7 +72,7 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
 
     // Center of mass frame of reference's velocity before collision
     double mass = mass1 + mass2;
-    vekt2 center_of_mass_velocity = ((mass1 / mass) * ball1->v) + ((mass2 / mass) * ball2->v);
+    vect2 center_of_mass_velocity = ((mass1 / mass) * ball1->v) + ((mass2 / mass) * ball2->v);
 
     // Energy = AngularEnergy + KineticEnergy
     // AngularEnergy = 0.5*I*angular_velocity^2
@@ -83,18 +83,18 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
                             inertia2 * ball2->angular_velocity * ball2->angular_velocity;
 
     // Collision direction (from ball2 to ball1) as a normal vector
-    vekt2 dr_normal =
+    vect2 dr_normal =
         (1 / (ball1->radius + ball2->radius)) * (ball1->keyframe_r - ball2->keyframe_r);
 
     // Velocity component towards collision, multiplied by 2.
     // We use this as a reference value when updating velocities below
-    vekt2 vperp1 = 2 * (dr_normal * (ball1->v - center_of_mass_velocity)) * dr_normal;
-    vekt2 vperp2 = 2 * (dr_normal * (ball2->v - center_of_mass_velocity)) * dr_normal;
+    vect2 vperp1 = 2 * (dr_normal * (ball1->v - center_of_mass_velocity)) * dr_normal;
+    vect2 vperp2 = 2 * (dr_normal * (ball2->v - center_of_mass_velocity)) * dr_normal;
 
     // Plane of reflection as a normal vector
-    vekt2 dr = ball2->keyframe_r - ball1->keyframe_r;
+    vect2 dr = ball2->keyframe_r - ball1->keyframe_r;
     dr.normalize();
-    vekt2 collision_plane = rotate_90deg(dr);
+    vect2 collision_plane = rotate_90deg(dr);
 
     // Velocity component perpendicular to collision
     double vtang1 = collision_plane * ball1->v;
@@ -130,8 +130,8 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
     while (true) {
         // Keep adjusting velocity by a factor of "step" until we achieve conservation of energy
         interation++;
-        vekt2 new_v1 = ball1->v + tangential_impulse / mass1 * collision_plane - vperp1 * step;
-        vekt2 new_v2 = ball2->v - tangential_impulse / mass2 * collision_plane - vperp2 * step;
+        vect2 new_v1 = ball1->v + tangential_impulse / mass1 * collision_plane - vperp1 * step;
+        vect2 new_v2 = ball2->v - tangential_impulse / mass2 * collision_plane - vperp2 * step;
 
         double new_energy = mass1 * new_v1 * new_v1 + mass2 * new_v2 * new_v2 +
                             inertia1 * ball1->angular_velocity * ball1->angular_velocity +

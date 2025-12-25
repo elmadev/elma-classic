@@ -308,7 +308,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
             hiba("ido-ucsot == 0.0!");
         }
 #endif
-        vekt2 kor1r = (pmot->bike.r - ucso_r) * ((legkozt - ucsot) / (ido - ucsot)) + ucso_r;
+        vect2 kor1r = (pmot->bike.r - ucso_r) * ((legkozt - ucsot) / (ido - ucsot)) + ucso_r;
 
         if (legkozindex >= Darabszam) {
             // betelt:

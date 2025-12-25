@@ -97,7 +97,7 @@ static int ScrollingAnimationY = 0;
 static unsigned char* GreenRow = nullptr;
 static unsigned char* BlackRow = nullptr;
 
-static void render_ball(vekt2 r, double radius, pic8* source_pic) {
+static void render_ball(vect2 r, double radius, pic8* source_pic) {
     // Solid colors are used to render the balls in top half of the screen during scrolling intro
     if (!GreenRow) {
         GreenRow = new unsigned char[SCREEN_WIDTH];
@@ -274,7 +274,7 @@ void menu_pic::render(bool skip_balls_helmet) {
         // Draw big circle
         render_ball(Balls[i].current_r, Balls[i].radius, BufferBall);
         // Draw two inner subcircles
-        vekt2 small_circle_offset(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
+        vect2 small_circle_offset(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
                                   Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
         render_ball(Balls[i].current_r + small_circle_offset, Balls[i].radius * 0.25, BufferMain);
         render_ball(Balls[i].current_r - small_circle_offset, Balls[i].radius * 0.25, BufferMain);
@@ -359,7 +359,7 @@ bool menu_pic::render_intro_anim(double time) {
         // Draw big circle
         render_ball(Balls[i].current_r, Balls[i].radius, BufferBall);
         // Draw two inner subcircles
-        vekt2 small_circle_offset(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
+        vect2 small_circle_offset(Balls[i].radius * 0.5 * cos(Balls[i].current_rotation),
                                   Balls[i].radius * 0.5 * sin(Balls[i].current_rotation));
         render_ball(Balls[i].current_r + small_circle_offset, Balls[i].radius * 0.25, BufferMain);
         render_ball(Balls[i].current_r - small_circle_offset, Balls[i].radius * 0.25, BufferMain);

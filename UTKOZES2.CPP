@@ -1,6 +1,6 @@
 #include "ALL.H"
 
-int utkozikesprite(vekt2 r, double sugar) {
+int utkozikesprite(vect2 r, double sugar) {
     int balalsox, balalsoy;
     if (!Pecsetalso) {
         hiba("uovruor");
@@ -30,7 +30,7 @@ int utkozikesprite(vekt2 r, double sugar) {
             continue;
         }
 
-        vekt2 diff = r - pker->r;
+        vect2 diff = r - pker->r;
         double maxtav = sugar + ObjectRadius;
         if (diff.x * diff.x + diff.y * diff.y < maxtav * maxtav) {
             return i;

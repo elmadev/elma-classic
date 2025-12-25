@@ -393,9 +393,7 @@ long lejatszo(const char* filenev) {
             uzenet( "System not fast enough!" );
         */
 
-        // handle_events( "Lej torlendo, ciklus kezdodik" );
-
-        handle_events(/*"Lej 112"*/); // Billentyut itt olvassuk be
+        handle_events(); // Billentyut itt olvassuk be
         while (eddig <= cel - 0.000001) {
             // char tmp[10];
             // sprintf( tmp, "Gaz kodja: %d", (int)State->keys1.gas );
@@ -753,7 +751,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     long l = 0;
     int jar1 = 1, jar2 = 1;
     while (1) {
-        handle_events(/*"Lej 534"*/); // Billentyut itt olvassuk be
+        handle_events(); // Billentyut itt olvassuk be
         // Kiszamolja mennyit kell leptetni:
         double eddig = mv_stopperido() * 0.0024;
         // recall koordokat es Hatra-t is beallitja:

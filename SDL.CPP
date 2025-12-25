@@ -49,57 +49,57 @@ int sdl_init() {
     return 0;
 }
 
-static unsigned char* Mutbuffer[SCREEN_HEIGHT];
-static int Bufflocked = 0;
+static unsigned char* SurfaceBuffer[SCREEN_HEIGHT];
+static int SurfaceLocked = 0;
 
-unsigned char** lockbackbuffer() {
-    if (Bufflocked) {
-        hiba("lockbackbuffer-ben Bufflocked!");
+unsigned char** lock_backbuffer() {
+    if (SurfaceLocked) {
+        hiba("lock_backbuffer SurfaceLocked!");
     }
-    Bufflocked = 1;
+    SurfaceLocked = 1;
 
-    unsigned char* mut = (unsigned char*)SDLSurfacePaletted->pixels;
+    unsigned char* row = (unsigned char*)SDLSurfacePaletted->pixels;
     if (Locky0_alul) {
         // Set the row buffer bottom-down
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            Mutbuffer[SCREEN_HEIGHT - 1 - y] = mut;
-            mut += SDLSurfacePaletted->w;
+            SurfaceBuffer[SCREEN_HEIGHT - 1 - y] = row;
+            row += SDLSurfacePaletted->w;
         }
     } else {
         // Set the row buffer top-down
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            Mutbuffer[y] = mut;
-            mut += SDLSurfacePaletted->w;
+            SurfaceBuffer[y] = row;
+            row += SDLSurfacePaletted->w;
         }
     }
 
-    return Mutbuffer;
+    return SurfaceBuffer;
 }
 
-void unlockbackbuffer(void) {
-    if (!Bufflocked) {
-        hiba("unlockbackbuffer-ben !Bufflocked!");
+void unlock_backbuffer(void) {
+    if (!SurfaceLocked) {
+        hiba("unlock_backbuffer !SurfaceLocked!");
     }
-    Bufflocked = 0;
+    SurfaceLocked = 0;
 
     SDL_BlitSurface(SDLSurfacePaletted, NULL, SDLSurfaceMain, NULL);
     SDL_UpdateWindowSurface(SDLWindow);
 }
 
-unsigned char** lockfrontbuffer(void) {
-    if (Bufflocked) {
-        hiba("lockfrontbuffer-ben Bufflocked!");
+unsigned char** lock_frontbuffer(void) {
+    if (SurfaceLocked) {
+        hiba("lock_frontbuffer SurfaceLocked!");
     }
 
-    return lockbackbuffer();
+    return lock_backbuffer();
 }
 
-void unlockfrontbuffer(void) {
-    if (!Bufflocked) {
-        hiba("unlockbackbuffer-ben !Bufflocked!");
+void unlock_frontbuffer(void) {
+    if (!SurfaceLocked) {
+        hiba("unlock_frontbuffer !SurfaceLocked!");
     }
 
-    unlockbackbuffer();
+    unlock_backbuffer();
 }
 
 ddpal::ddpal(unsigned char* tomb) {
@@ -113,7 +113,7 @@ ddpal::ddpal(unsigned char* tomb) {
 
 void ddpal::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
 
-void mv_check(int skip_key_update) {
+void handle_events(int skip_key_update) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -162,7 +162,7 @@ void mv_check(int skip_key_update) {
     }
 }
 
-void fill_kb_state(char* buffer) {
+void fill_key_state(char* buffer) {
     const unsigned char* state = SDL_GetKeyboardState(NULL);
     for (int i = 0; i < MaxKeycode; i++) {
         buffer[i] = state[windows_scancode_table[i]];
@@ -172,16 +172,16 @@ void fill_kb_state(char* buffer) {
 void hide_cursor() { SDL_ShowCursor(SDL_DISABLE); }
 void show_cursor() { SDL_ShowCursor(SDL_ENABLE); }
 
-void getmou(int* x, int* y) { SDL_GetMouseState(x, y); }
-void setmou(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }
+void get_mouse_position(int* x, int* y) { SDL_GetMouseState(x, y); }
+void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }
 
-int getbutbmou(void) {
-    mv_check();
+int left_mouse_clicked(void) {
+    handle_events();
     return LeftMouseDown;
 }
 
-int getbutjmou(void) {
-    mv_check();
+int right_mouse_clicked(void) {
+    handle_events();
     return RightMouseDown;
 }
 
@@ -194,7 +194,7 @@ static void audio_callback(void* udata, Uint8* stream, int len) {
 
 void init_sound() {
     if (SoundInitialized) {
-        hiba("78egry78yt7");
+        hiba("Sound already initialized!");
     }
     SoundInitialized = true;
 

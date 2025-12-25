@@ -5,14 +5,14 @@ void message_box(const char* text);
 
 void mv_main(void); // Ennek nem szabad visszajonnie!
 // Ezt neha meg kell hivni!:
-void mv_check(/*char* hivta,*/ int nemkellnyomas = 0);
+void handle_events(/*char* hivta,*/ int nemkellnyomas = 0);
 void mv_exit(); // Ezzel kell kilepni!
 
 // MOUSE:
-void getmou(int* px, int* py);
-void setmou(int x, int y);
-int getbutbmou(void);
-int getbutjmou(void);
+void get_mouse_position(int* px, int* py);
+void set_mouse_position(int x, int y);
+int left_mouse_clicked(void);
+int right_mouse_clicked(void);
 void show_cursor();
 void hide_cursor();
 

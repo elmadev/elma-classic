@@ -236,7 +236,7 @@ void tolt_open(void) {
         }
         // Eger lenyomas:
         int balnyomva = 0;
-        int balallapot = getbutbmou();
+        int balallapot = left_mouse_clicked();
         if (balallapot && !egerballevoltnyomva) {
             balnyomva = 1;
         }
@@ -244,7 +244,7 @@ void tolt_open(void) {
 
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -302,7 +302,7 @@ void tolt_open(void) {
             eddigkur = kur;
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -431,7 +431,7 @@ void kivalasztkezdetit(void) {
         }
         // Eger lenyomas:
         int balnyomva = 0;
-        if (getbutbmou() && !egerballevoltnyomva) {
+        if (left_mouse_clicked() && !egerballevoltnyomva) {
             egerballevoltnyomva = 1;
             balnyomva = 1;
         } else {
@@ -439,7 +439,7 @@ void kivalasztkezdetit(void) {
         }
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             Moux = ujx;
             Mouy = ujy;
             // Most nezzuk meg, hogy hova kattintott:
@@ -506,7 +506,7 @@ void kivalasztkezdetit(void) {
             eddigkur = kur;
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -675,7 +675,7 @@ int tolt_save_as(int lokkolhato) {
         }
         // Eger lenyomas:
         int balnyomva = 0;
-        if (getbutbmou() && !egerballevoltnyomva) {
+        if (left_mouse_clicked() && !egerballevoltnyomva) {
             egerballevoltnyomva = 1;
             balnyomva = 1;
         } else {
@@ -683,7 +683,7 @@ int tolt_save_as(int lokkolhato) {
         }
 
         int jobbnyomva = 0;
-        if (getbutjmou() && !egerjobblevoltnyomva) {
+        if (right_mouse_clicked() && !egerjobblevoltnyomva) {
             egerjobblevoltnyomva = 1;
             jobbnyomva = 1;
         } else {
@@ -696,7 +696,7 @@ int tolt_save_as(int lokkolhato) {
 
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -765,7 +765,7 @@ int tolt_save_as(int lokkolhato) {
             }
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -1026,7 +1026,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
         }
         // Eger lenyomas:
         int balnyomva = 0;
-        if (getbutbmou()) {
+        if (left_mouse_clicked()) {
             if (!egerballevoltnyomva) {
                 balnyomva = 1;
             }
@@ -1036,7 +1036,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
         }
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -1204,7 +1204,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
             eddigkur = kur;
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -1262,7 +1262,7 @@ void tolt_pickasprite(void) {
         }
         // Eger lenyomas:
         int balnyomva = 0;
-        if (getbutbmou()) {
+        if (left_mouse_clicked()) {
             if (!egerballevoltnyomva) {
                 balnyomva = 1;
             }
@@ -1272,7 +1272,7 @@ void tolt_pickasprite(void) {
         }
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -1362,7 +1362,7 @@ void tolt_pickasprite(void) {
             pop();
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -1480,7 +1480,7 @@ int tolt_picklgrfile(char* lgrnev) {
 
         // Eger lenyomas:
         int balnyomva = 0;
-        if (getbutbmou()) {
+        if (left_mouse_clicked()) {
             if (!egerballevoltnyomva) {
                 balnyomva = 1;
             }
@@ -1491,7 +1491,7 @@ int tolt_picklgrfile(char* lgrnev) {
 
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -1556,7 +1556,7 @@ int tolt_picklgrfile(char* lgrnev) {
             eddigkur = kur;
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -1667,7 +1667,7 @@ void setspritetav(sprite* psp) {
         }
         // Eger lenyomas:
         int balnyomva = 0;
-        if (getbutbmou() && !egerballevoltnyomva) {
+        if (left_mouse_clicked() && !egerballevoltnyomva) {
             egerballevoltnyomva = 1;
             balnyomva = 1;
         } else {
@@ -1675,7 +1675,7 @@ void setspritetav(sprite* psp) {
         }
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -1786,7 +1786,7 @@ void setspritetav(sprite* psp) {
             pop();
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -1833,7 +1833,7 @@ void set_gyuru_attributes(gyuru* pgy) {
             }
         }
         // Eger lenyomas:
-        int egermost = getbutbmou();
+        int egermost = left_mouse_clicked();
         int balnyomva = 0;
         if (egermost && !egerballevoltnyomva) {
             balnyomva = 1;
@@ -1842,7 +1842,7 @@ void set_gyuru_attributes(gyuru* pgy) {
 
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -1895,7 +1895,7 @@ void set_gyuru_attributes(gyuru* pgy) {
             pop();
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -1983,7 +1983,7 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
         }
         // Eger lenyomas:
         int balnyomva = 0;
-        if (getbutbmou() && !egerballevoltnyomva) {
+        if (left_mouse_clicked() && !egerballevoltnyomva) {
             egerballevoltnyomva = 1;
             balnyomva = 1;
         } else {
@@ -1991,7 +1991,7 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
         }
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -2053,7 +2053,7 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
             }
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -2210,7 +2210,7 @@ void change_level_properties(void) {
 
         int ujx = 0, ujy = 0;
         //for( int i = 0; i < 10; i++ )
-        getmou( &ujx, &ujy );
+        get_mouse_position( &ujx, &ujy );
         if( ujx != Moux && ujy != Mouy ) {
             push();
             Moux = ujx;
@@ -2248,7 +2248,7 @@ void change_level_properties(void) {
         }
         // Eger lenyomas:
         int balnyomva = 0;
-        if (getbutbmou()) {
+        if (left_mouse_clicked()) {
             if (!egerballevoltnyomva) {
                 balnyomva = 1;
             }
@@ -2258,7 +2258,7 @@ void change_level_properties(void) {
         }
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -2373,7 +2373,7 @@ void change_level_properties(void) {
             pop();
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;
@@ -2412,7 +2412,7 @@ void setviewoptions(void) {
             }
         }
         // Eger lenyomas:
-        int egermost = getbutbmou();
+        int egermost = left_mouse_clicked();
         int balnyomva = 0;
         if (egermost && !egerballevoltnyomva) {
             balnyomva = 1;
@@ -2421,7 +2421,7 @@ void setviewoptions(void) {
 
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -2481,7 +2481,7 @@ void setviewoptions(void) {
             pop();
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx != Moux && ujy != Mouy) {
             push();
             Moux = ujx;

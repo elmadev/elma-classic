@@ -138,7 +138,7 @@ void t_move_nyomva(int mx, int my) {
                 my = konvy_d2i(Moveorigy);
             }
         }
-        setmou(mx, my);
+        set_mouse_position(mx, my);
         push();
         Moux = mx;
         Mouy = my;
@@ -477,7 +477,7 @@ void t_create_vert_space(void) {
     K = kkov;
     Moux = konvx(Pgy->ponttomb[K]);
     Mouy = konvy(Pgy->ponttomb[K]);
-    setmou(Moux, Mouy);
+    set_mouse_position(Moux, Mouy);
     Fel = !Fel;
     invalidate();
 }

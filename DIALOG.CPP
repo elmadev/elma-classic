@@ -171,7 +171,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         // Megnezzuk eger gombok lemenetelet:
         // Regi modszer, rogton visszament help peldaul:
         /*int balnyomva = 0;
-        if( getbutbmou() && !egerballevoltnyomva ) {
+        if( left_mouse_clicked() && !egerballevoltnyomva ) {
             egerballevoltnyomva = 1;
             balnyomva = 1;
         }
@@ -179,7 +179,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             egerballevoltnyomva = 0;
         }
         int jobbnyomva = 0;
-        if( getbutjmou() && !egerjobblevoltnyomva ) {
+        if( right_mouse_clicked() && !egerjobblevoltnyomva ) {
             egerjobblevoltnyomva = 1;
             jobbnyomva = 1;
         }
@@ -188,14 +188,14 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         }*/
         // Megnezzuk eger gombok lemenetelet:
         int balnyomva = 0;
-        int mostnyomva = getbutbmou();
+        int mostnyomva = left_mouse_clicked();
         if (mostnyomva && !egerballevoltnyomva) {
             balnyomva = 1;
         }
         egerballevoltnyomva = mostnyomva;
 
         int jobbnyomva = 0;
-        mostnyomva = getbutjmou();
+        mostnyomva = right_mouse_clicked();
         if (mostnyomva && !egerjobblevoltnyomva) {
             jobbnyomva = 1;
         }
@@ -212,7 +212,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
 
         if (balnyomva) {
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             push();
             Moux = ujx;
             Mouy = ujy;
@@ -229,7 +229,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             continue;
         }
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujx == Moux && ujy == Mouy) {
             continue;
         }

@@ -38,7 +38,7 @@ void mk_init(void) {
 
 int mk_getextchar(void) {
     while (1) {
-        mv_check();
+        handle_events();
         if (KeyBufferCount > 0) {
             int c = KeyBuffer[0];
             for (int i = 0; i < KeyBufferCount - 1; i++) {
@@ -51,12 +51,12 @@ int mk_getextchar(void) {
 }
 
 void mk_emptychar(void) {
-    mv_check();
+    handle_events();
     KeyBufferCount = 0;
 }
 
 int mk_kbhit(void) {
-    mv_check();
+    handle_events();
     return KeyBufferCount > 0;
 }
 
@@ -78,9 +78,9 @@ void mkw_getDIstate(void) {
     }
 
     if (UseKeyState2) {
-        fill_kb_state(KeyState1);
+        fill_key_state(KeyState1);
     } else {
-        fill_kb_state(KeyState2);
+        fill_key_state(KeyState2);
     }
     UseKeyState2 = !UseKeyState2;
 }

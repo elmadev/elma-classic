@@ -330,7 +330,7 @@ static void gombotvalaszt(int rubrikaszam, billmuttomb bmuttomb, int sorszam) {
 
     // Megnezzuk milyen gombot nyomott le:
     while (1) {
-        mv_check(/*"cust.cpp"*/);
+        handle_events(/*"cust.cpp"*/);
         for (int i = 1; i < 256; i++) {
             if (mk_getstate(MK_ESC)) {
                 return;

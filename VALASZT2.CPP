@@ -132,8 +132,7 @@ void menu_nav::setup(int len, bool two_col) {
     }
 }
 
-int CtrlAltEnabled = 0;
-int CtrlAltPressed = 0;
+bool CtrlAltPressed = false;
 
 // Render menu and return selected index (or -1 if Esc)
 int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool render_only) {
@@ -167,12 +166,11 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
         while (!render_only && mk_kbhit()) {
             int c = mk_getextchar();
             if (c == MK_ESC && enable_esc) {
+                CtrlAltPressed = false;
                 return -1;
             }
             if (c == MK_ENTER) {
-                if (CtrlAltEnabled && controlaltnyomva()) {
-                    CtrlAltPressed = 1;
-                }
+                CtrlAltPressed = controlaltnyomva();
                 return selected_index;
             }
             if (c == MK_UP) {

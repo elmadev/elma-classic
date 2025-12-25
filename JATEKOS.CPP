@@ -131,10 +131,7 @@ void jatekosvalasztas(int A, int visszater) {
 
     pval->setup(State->player_count + 1);
 
-    CtrlAltEnabled = 1;
-    CtrlAltPressed = 0;
     int eredmeny = pval->navigate();
-    CtrlAltEnabled = 0;
 
     delete pval;
     pval = NULL;

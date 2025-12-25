@@ -167,10 +167,7 @@ void replay(void) {
 
     while (1) {
         // Valasztas:
-        CtrlAltEnabled = 1;
-        CtrlAltPressed = 0;
         int kurrens = val.navigate();
-        CtrlAltEnabled = 0;
 
         if (kurrens < 0) { // ESC
             return;
@@ -248,7 +245,6 @@ void replay(void) {
                 centiseconds_to_string(ido, idostr);
                 strcat(idostr, "    +- 0.01 sec");
                 dialog320(tmp, "The time of this replay file is:", idostr);
-                CtrlAltPressed = 0;
                 continue;
             }
             if (access_topol(Prec1->palyanev) != 0) {

@@ -48,7 +48,6 @@ class menu_nav {
     void render();
 };
 
-extern int CtrlAltEnabled;
-extern int CtrlAltPressed;
+extern bool CtrlAltPressed;
 
 #endif

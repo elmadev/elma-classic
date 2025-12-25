@@ -366,7 +366,7 @@ void idoelintezes(long ido, char* valasz, int level, const char* filenev) {
     if (ido <= 0) {
         // Nem fejeztek be:
         // Azt jelzi menu_nav::navigate-nak, hogy kozepre tegye:
-        strcpy(valasz, "*$$^&|@You Failed to Finish!");
+        strcpy(valasz, MENU_CENTER_TEXT "You Failed to Finish!");
         if (MeghalteloszorAB == 1) {
             strcat(valasz, "    (A died first)");
         }
@@ -385,12 +385,12 @@ void idoelintezes(long ido, char* valasz, int level, const char* filenev) {
     char tmp[10];
     centiseconds_to_string(ido, tmp);
     if (Single) {
-        sprintf(valasz, "*$$^&|@%s", tmp);
+        sprintf(valasz, MENU_CENTER_TEXT "%s", tmp);
     } else {
         if (Aerintetteviragot) {
-            sprintf(valasz, "*$$^&|@A:   %s", tmp);
+            sprintf(valasz, MENU_CENTER_TEXT "A:   %s", tmp);
         } else {
-            sprintf(valasz, "*$$^&|@B:   %s", tmp);
+            sprintf(valasz, MENU_CENTER_TEXT "B:   %s", tmp);
         }
     }
 
@@ -568,9 +568,9 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
 
         if (!Single && Tag) {
             if (Aleszfogo) {
-                sprintf(Idoszovegek[0].text, "*$$^&|@A start with the flag next.");
+                sprintf(Idoszovegek[0].text, MENU_CENTER_TEXT "A start with the flag next.");
             } else {
-                sprintf(Idoszovegek[0].text, "*$$^&|@B start with the flag next.");
+                sprintf(Idoszovegek[0].text, MENU_CENTER_TEXT "B start with the flag next.");
             }
         } else {
             strcpy(Idoszovegek[0].text, idoeredmeny);

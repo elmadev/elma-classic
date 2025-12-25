@@ -6,6 +6,8 @@ extern const int LISTx0;
 extern const int LISTy0;
 extern const int LISTdy;
 
+#define MENU_CENTER_TEXT "*$$^&|@"
+
 constexpr int NAV_ENTRY_TEXT_MAX_LENGTH = 40;
 extern int NavEntriesLeftMaxLength;
 constexpr int NAV_ENTRIES_RIGHT_MAX_LENGTH = 110;

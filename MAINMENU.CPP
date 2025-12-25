@@ -225,11 +225,6 @@ void replay(void) {
                     ido = Prec2->betoltve;
                 }
 
-                // Innentol csak akkor nem kikommentez, ha recido direkt ki:
-                char tmp8[50];
-                sprintf(tmp8, "Ido: %d", ido);
-                hiba(tmp8);
-
                 ido *= 3.3333333333333;
                 ido -= 2;
                 if (ido < 1) {

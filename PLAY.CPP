@@ -663,7 +663,6 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         menu_nav val;
         // val.szam = 5+nextisvan+skipisvan;
         val.selected_index = kurrens;
-        val.max_visible_entries = 6;
         val.x_left = 230;
         if (Single) {
             val.y_entries = 110;
@@ -839,7 +838,6 @@ void play(void) {
         // Valasztas:
         menu_nav val;
         val.selected_index = int(pjatekos->selected_level) + 1;
-        val.max_visible_entries = LISTegykepen;
         val.x_left = LISTx0;
         val.y_entries = LISTy0;
         val.dy = LISTdy;

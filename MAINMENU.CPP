@@ -156,7 +156,6 @@ void replay(void) {
 
     menu_nav val;
     val.selected_index = 0;
-    val.max_visible_entries = LISTegykepen;
     val.x_left = LISTx0;
     val.y_entries = LISTy0;
     val.dy = LISTdy;
@@ -299,7 +298,6 @@ static void demo(void) {
 static void kilephakell(void) {
     menu_nav val;
     val.selected_index = 0;
-    val.max_visible_entries = 6;
     val.x_left = 300;
     val.y_entries = 200;
     val.dy = 40;
@@ -330,7 +328,6 @@ void mainmenu(void) {
     // State->save_aaa(); ide minek kene?
     menu_nav val;
     val.selected_index = 0;
-    val.max_visible_entries = 7;
     val.x_left = 200;
     val.y_entries = 100;
     val.dy = 50;

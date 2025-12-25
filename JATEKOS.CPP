@@ -109,7 +109,6 @@ void jatekosvalasztas(int A, int visszater) {
     } else {
         eddigjatekos = State->player2;
     }
-    pval->max_visible_entries = LISTegykepen;
     pval->x_left = LISTx0;
     pval->y_entries = LISTy0;
     pval->dy = LISTdy;

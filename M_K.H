@@ -5,7 +5,7 @@ typedef int DIK_Code;
 
 const static int MaxKeycode = 256;
 
-void fill_kb_state(char* buffer);
+void fill_key_state(char* buffer);
 
 void mk_init(void);
 int mk_getextchar(void);

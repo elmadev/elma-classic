@@ -18,11 +18,11 @@ class ddpal {
 // Ha igaz, alulrol indul y (kirajz320 allitja igazba):
 extern int Locky0_alul;
 
-unsigned char** lockbackbuffer();
-void unlockbackbuffer(void); // Ki is teszi
+unsigned char** lock_backbuffer();
+void unlock_backbuffer(void); // Ki is teszi
 
-unsigned char** lockfrontbuffer(void);
-void unlockfrontbuffer(void);
+unsigned char** lock_frontbuffer(void);
+void unlock_frontbuffer(void);
 
 extern bool Margrafikus;
 

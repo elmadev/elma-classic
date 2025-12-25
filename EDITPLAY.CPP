@@ -27,12 +27,12 @@ void editplay(void) {
 
     // Megprobaljuk kozepre hozni egeret:
     for( int i = 0; i < 1000; i++ )
-        getmou( &Moux, &Mouy );
+        get_mouse_position( &Moux, &Mouy );
     int mmx = 300;
     int mmy = 255;
     Moux = mmx;
     Mouy = mmy;
-    setmou( mmx, mmy );
+    set_mouse_position( mmx, mmy );
     Moux = mmx;
     Mouy = mmy;*/
 }

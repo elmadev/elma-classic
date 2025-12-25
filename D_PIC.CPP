@@ -16,7 +16,7 @@ pic8* lockbackbuffer_pic() {
         Lockbuff->height = SCREEN_HEIGHT;
         Lockbuff->rows = NULL;
     }
-    Lockbuff->rows = lockbackbuffer();
+    Lockbuff->rows = lock_backbuffer();
     return Lockbuff;
 }
 
@@ -26,7 +26,7 @@ void unlockbackbuffer_pic(void) {
     }
     Backpiclocked = 0;
 
-    unlockbackbuffer();
+    unlock_backbuffer();
     Lockbuff->rows = NULL;
 }
 
@@ -43,7 +43,7 @@ void lockfrontbuffer_pic(void) {
         Lockbuff->rows = NULL;
     }
 
-    Lockbuff->rows = lockfrontbuffer();
+    Lockbuff->rows = lock_frontbuffer();
 }
 
 void unlockfrontbuffer_pic(void) {
@@ -51,7 +51,7 @@ void unlockfrontbuffer_pic(void) {
         hiba("ulfb_pw lock!");
     }
     Frontpiclocked = 0;
-    unlockfrontbuffer();
+    unlock_frontbuffer();
 }
 
 void ppixelfront(int x, int y, unsigned char szin) {

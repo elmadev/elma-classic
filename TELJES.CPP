@@ -130,7 +130,7 @@ void teljes(void) {
     int mmy = 265;
     Moux = mmx;
     Mouy = mmy;
-    setmou(mmx, mmy);
+    set_mouse_position(mmx, mmy);
     Moux = mmx;
     Mouy = mmy;
 

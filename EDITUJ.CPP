@@ -598,7 +598,7 @@ void editor(void) {
         if( mk_kbhit() )
             if( mk_getextchar() == MK_ESC )
                 hiba( "Vege!" );
-        int ujlenyomva = getbutbmou();
+        int ujlenyomva = left_mouse_clicked();
         if( lenyomva == ujlenyomva )
             continue;
 
@@ -736,14 +736,14 @@ void editor(void) {
         }
         // Megnezzuk eger gombok lemenetelet:
         int balnyomva = 0;
-        int balallapot = getbutbmou();
+        int balallapot = left_mouse_clicked();
         if (balallapot && !egerballevoltnyomva) {
             balnyomva = 1;
         }
         egerballevoltnyomva = balallapot;
 
         int jobbnyomva = 0;
-        int jobballapot = getbutjmou();
+        int jobballapot = right_mouse_clicked();
         if (jobballapot && !egerjobblevoltnyomva) {
             jobbnyomva = 1;
         }
@@ -767,14 +767,14 @@ void editor(void) {
                 magassag = 460;	*/
 
             int ujx = 0, ujy = 0;
-            getmou(&ujx, &ujy);
+            get_mouse_position(&ujx, &ujy);
             if (ujy < Savy) {
                 ujy = Savy;
             }
             if ((Pgy || Pker || Psp || Zoomfogva || Egypont) && ujx < Savx) {
                 // Ha meg van valami fogva, nem mehetunk gombok fole:
                 ujx = Savx;
-                setmou(ujx, ujy);
+                set_mouse_position(ujx, ujy);
             }
             if (ujx != Moux || ujy != Mouy) {
                 push();
@@ -978,14 +978,14 @@ void editor(void) {
         // INNENTOL MAR CSAK EGER MOZGATASA AZ ESEMENY:
 
         int ujx = 0, ujy = 0;
-        getmou(&ujx, &ujy);
+        get_mouse_position(&ujx, &ujy);
         if (ujy < Savy) {
             ujy = Savy;
         }
         if ((Pgy || Pker || Psp || Zoomfogva || Egypont) && ujx < Savx) {
             // Ha meg van valami fogva, nem mehetunk gombok fole:
             ujx = Savx;
-            setmou(ujx, ujy);
+            set_mouse_position(ujx, ujy);
         }
         if (ujx == Moux && ujy == Mouy) {
             continue;

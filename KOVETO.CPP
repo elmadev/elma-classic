@@ -32,13 +32,13 @@ koveto::~koveto(void) {
 // cur-t adja vissza (ami mindig utolso jol kitoltott hely):
 // Elso alkalommal kitolti *px0-at:
 static int feldolgvonalszakasz(gyuru* pgy, int p1, int p2, int* px0, int cur, int* ytomb,
-                               int maxhely, vekt2* porigo) {
+                               int maxhely, vect2* porigo) {
     if (p1 < 0 || p1 >= pgy->pontszam || p2 < 0 || p2 >= pgy->pontszam) {
         hiba("8u9tg4");
     }
 
-    vekt2 r1 = pgy->ponttomb[p1];
-    vekt2 r2 = pgy->ponttomb[p2];
+    vect2 r1 = pgy->ponttomb[p1];
+    vect2 r2 = pgy->ponttomb[p2];
     if (r1.x > r2.x) {
         return cur;
     }
@@ -91,7 +91,7 @@ static int feldolgvonalszakasz(gyuru* pgy, int p1, int p2, int* px0, int cur, in
 }
 
 // Ez nem hasznal semmit koveto adatokbol:
-int makevonal(gyuru* pgy, int* ytomb, int* phossz, int* px0, int maxhely, vekt2* porigo) {
+int makevonal(gyuru* pgy, int* ytomb, int* phossz, int* px0, int maxhely, vect2* porigo) {
     *phossz = 0;
     // Most megkeressuk osszekoto szakaszt:
     double maxxhossz = 0.0;

@@ -7,7 +7,7 @@ gyuru::gyuru(void) {
     // Koveto valtozok:
     koveto = 0;
 
-    ponttomb = new vekt2[lefoglaltmaxpont];
+    ponttomb = new vect2[lefoglaltmaxpont];
     for (int i = 0; i < lefoglaltmaxpont; i++) {
         ponttomb[i].x = 0;
         ponttomb[i].y = 0;
@@ -78,7 +78,7 @@ int gyuru::beszur(int k) {
     if (pontszam >= lefoglaltmaxpont) {
         // Ujra fel kell venni pontok tombjet, csak most tobb ponttal:
         lefoglaltmaxpont += 10;
-        vekt2* ujponttomb = new vekt2[lefoglaltmaxpont];
+        vect2* ujponttomb = new vect2[lefoglaltmaxpont];
         for (int i = 0; i < lefoglaltmaxpont; i++) {
             ujponttomb[i].x = 0;
             ujponttomb[i].y = 0;
@@ -128,7 +128,7 @@ double gyuru::legkozpont(double x, double y, int* pk) {
     return sqrt(tav);
 }
 
-int gyuru::metszesszam(vekt2 r1, vekt2 v1) {
+int gyuru::metszesszam(vect2 r1, vect2 v1) {
 #ifdef DEBUG
     if (koveto) {
         hiba("89yy");
@@ -149,8 +149,8 @@ int gyuru::metszesszam(vekt2 r1, vekt2 v1) {
             x2 = ponttomb[0].x;
             y2 = ponttomb[0].y;
         }
-        vekt2 r2(x1, y1);
-        vekt2 v2 = vekt2(x2, y2) - r2;
+        vect2 r2(x1, y1);
+        vect2 v2 = vect2(x2, y2) - r2;
         if (segments_intersect(r1, v1, r2, v2)) {
             metszes++;
         }
@@ -158,7 +158,7 @@ int gyuru::metszesszam(vekt2 r1, vekt2 v1) {
     return metszes;
 }
 
-int gyuru::metszeshely(vekt2 r1, vekt2 v1, int kihagy, vekt2* phely) {
+int gyuru::metszeshely(vect2 r1, vect2 v1, int kihagy, vect2* phely) {
 #ifdef DEBUG
     if (koveto) {
         hiba("0i9p9");
@@ -241,8 +241,8 @@ int gyuru::metszeshely(vekt2 r1, vekt2 v1, int kihagy, vekt2* phely) {
             continue;
         }
 
-        vekt2 r2(x1, y1);
-        vekt2 v2 = vekt2(x2, y2) - r2;
+        vect2 r2(x1, y1);
+        vect2 v2 = vect2(x2, y2) - r2;
         if (segments_intersect_inexact(r1, v1, r2, v2)) {
             *phely = intersection(r1, v1, r2, v2);
             return 1;
@@ -302,12 +302,12 @@ gyuru::gyuru(FILE* h, int verzio) {
     }
 
     lefoglaltmaxpont = pontszam + 10;
-    ponttomb = new vekt2[lefoglaltmaxpont];
+    ponttomb = new vect2[lefoglaltmaxpont];
     for (int i = 0; i < lefoglaltmaxpont; i++) {
         ponttomb[i].x = 0;
         ponttomb[i].y = 0;
     }
-    if (fread(ponttomb, 1, sizeof(vekt2) * pontszam, h) != sizeof(vekt2) * pontszam) {
+    if (fread(ponttomb, 1, sizeof(vect2) * pontszam, h) != sizeof(vect2) * pontszam) {
         hiba("gyuru::gyuru-ben nem megy file olvasasa!");
     }
 }
@@ -336,7 +336,7 @@ void gyuru::save(FILE* h, topol* ptop) {
             // Meg kell cserelni pontok sorrendjet:
             for (int i = 0; i < pontszam / 2; i++) {
                 int j = pontszam - 1 - i;
-                vekt2 tmpv = ponttomb[i];
+                vect2 tmpv = ponttomb[i];
                 ponttomb[i] = ponttomb[j];
                 ponttomb[j] = tmpv;
             }
@@ -347,14 +347,14 @@ void gyuru::save(FILE* h, topol* ptop) {
     if (fwrite(&pontszam, 1, sizeof(pontszam), h) != sizeof(pontszam)) {
         hiba("gyuru::save-ben nem megy file-ba iras!");
     }
-    if (fwrite(ponttomb, 1, sizeof(vekt2) * pontszam, h) != sizeof(vekt2) * pontszam) {
+    if (fwrite(ponttomb, 1, sizeof(vect2) * pontszam, h) != sizeof(vect2) * pontszam) {
         hiba("gyuru::save-ben nem megy file-ba iras!");
     }
 }
 
 // Visszaadja b pontban fekvo belso szoget, ha belso oldal bal oldal a, b, c
 // haladas eseten:
-static double balszog(vekt2* pa, vekt2 b, vekt2 c) {
+static double balszog(vect2* pa, vect2 b, vect2 c) {
     while (1) {
         double dy1 = pa->y - b.y;
         double dx1 = pa->x - b.x;
@@ -380,7 +380,7 @@ static double balszog(vekt2* pa, vekt2 b, vekt2 c) {
         if (szog < 0.0000002) {
             // Szog tul hegyes, egyik pontjat arrebb rakjuk:
             constexpr double egytav = 0.0002;
-            vekt2 meroleges = *pa - b;
+            vect2 meroleges = *pa - b;
             meroleges = rotate_90deg(meroleges);
             meroleges.normalize();
             *pa = *pa + meroleges * egytav;
@@ -392,7 +392,7 @@ static double balszog(vekt2* pa, vekt2 b, vekt2 c) {
     }
 }
 
-static void szetvalaszt_fv(vekt2* pa, vekt2* pb) {
+static void szetvalaszt_fv(vect2* pa, vect2* pb) {
     constexpr double egytav = 0.0002;
     if (fabs(pa->x - pb->x) < 0.0000002 && fabs(pa->y - pb->y) < 0.0000002) {
         // Egy helyen vannak:
@@ -440,8 +440,8 @@ int gyuru::pozitivkorjaras(void) {
     }
 }
 
-vekt2 gyuru::sulypont(void) {
-    vekt2 suly(0.0, 0.0);
+vect2 gyuru::sulypont(void) {
+    vect2 suly(0.0, 0.0);
     for (int i = 0; i < pontszam; i++) {
         suly = suly + ponttomb[i];
     }

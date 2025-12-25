@@ -46,8 +46,8 @@ int check_topology(int kelldialog) {
         gyuru* pgy = Ptop->ptomb[i];
         if (pgy && !pgy->koveto) {
             for (int j = 0; j < pgy->pontszam; j++) {
-                vekt2 r = pgy->ponttomb[j];
-                vekt2 v;
+                vect2 r = pgy->ponttomb[j];
+                vect2 v;
                 if (j == pgy->pontszam - 1) {
                     v = pgy->ponttomb[0] - r;
                 } else {
@@ -59,7 +59,7 @@ int check_topology(int kelldialog) {
                     gyuru* pgy2 = Ptop->ptomb[k];
                     if (pgy2 && !pgy2->koveto) {
                         int vanmetszes = 0;
-                        vekt2 m;
+                        vect2 m;
                         if (pgy == pgy2) {
                             vanmetszes = pgy2->metszeshely(r, v, j, &m);
                         } else {

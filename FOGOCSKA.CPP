@@ -15,7 +15,7 @@ void fogocskareset(void) {
     Ucsoido = 0.0;
 }
 
-static int kozelvan(vekt2* pa, vekt2* pb, double tavnegyzet) {
+static int kozelvan(vect2* pa, vect2* pb, double tavnegyzet) {
     double dx = pa->x - pb->x;
     double dy = pa->y - pb->y;
     if (dx * dx + dy * dy < tavnegyzet) {

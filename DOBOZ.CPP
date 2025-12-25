@@ -3,8 +3,8 @@
 // Affinitassal kapcsolatos dolgok:
 int Affinitas = 0;
 static double Affinnagysag = 1.0;
-static vekt2 Affinkozep = Vekt2i;
-static vekt2 Affinirany = Vekt2i;
+static vect2 Affinkozep = Vekt2i;
+static vect2 Affinirany = Vekt2i;
 static double Affinaranyx = 1.0;
 static double Affinaranyy = 1.0;
 
@@ -56,7 +56,7 @@ void egysor(unsigned char lyuk, short szam, unsigned char* sor, unsigned char* t
     }
 }
 
-void setaffinitas(vekt2 kozep, vekt2 irany, double nagysag, double aranyx, double aranyy) {
+void setaffinitas(vect2 kozep, vect2 irany, double nagysag, double aranyx, double aranyy) {
     Affinkozep = kozep;
     irany.normalize();
     Affinirany = irany;
@@ -67,7 +67,7 @@ void setaffinitas(vekt2 kozep, vekt2 irany, double nagysag, double aranyx, doubl
 
 // static unsigned char Egysor[400];
 
-void dobozki(pic8* ppic8, kiskep* pkiskep, vekt2 u, vekt2 v, vekt2 r) {
+void dobozki(pic8* ppic8, kiskep* pkiskep, vect2 u, vect2 v, vect2 r) {
     unsigned char lyuk = pkiskep->lyuk;
 
     // Affinitas:
@@ -83,7 +83,7 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vekt2 u, vekt2 v, vekt2 r) {
 
         // szamitas:
         double tav = (r - Affinkozep) * Affinirany;
-        vekt2 kivonando = (tav * (1.0 - Affinnagysag)) * Affinirany;
+        vect2 kivonando = (tav * (1.0 - Affinnagysag)) * Affinirany;
         r = r - kivonando;
 
         tav = u * Affinirany;
@@ -175,11 +175,11 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vekt2 u, vekt2 v, vekt2 r) {
     }
 
     // Inverz matrix kiszamitasa:
-    vekt2 uu = u * (1.0 / (pkiskep->xsize - 1));
-    vekt2 vv = v * (1.0 / (pkiskep->ysize - 1));
+    vect2 uu = u * (1.0 / (pkiskep->xsize - 1));
+    vect2 vv = v * (1.0 / (pkiskep->ysize - 1));
     double recdet = 1.0 / (uu.x * vv.y - vv.x * uu.y);
-    vekt2 invi(vv.y * recdet, -uu.y * recdet);
-    vekt2 invj(-vv.x * recdet, uu.x * recdet);
+    vect2 invi(vv.y * recdet, -uu.y * recdet);
+    vect2 invj(-vv.x * recdet, uu.x * recdet);
 
     // Most megnezzuk, hogy nem log-e ki a negy csucs kozul valamelyik
     // kepernyorol (negy csucs: r, r+u, r+v, r+u+v
@@ -217,7 +217,7 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vekt2 u, vekt2 v, vekt2 r) {
     }
 
     // A legmagasabban fekvo pontot kell erre valasztani:
-    vekt2 csucs;
+    vect2 csucs;
 
     // Y irany;
     if (u.y > 0) {
@@ -313,8 +313,8 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vekt2 u, vekt2 v, vekt2 r) {
     long m2 = m2d * 65536.0;
 
     // Most kiszamoljuk kis kepen futok elejet:
-    vekt2 diff = vekt2(xbal, ybal) - r;
-    vekt2 kiskeporigo = vekt2(0.5, 0.5) + diff.x * invi + diff.y * invj;
+    vect2 diff = vect2(xbal, ybal) - r;
+    vect2 kiskeporigo = vect2(0.5, 0.5) + diff.x * invi + diff.y * invj;
     long xkiskep = kiskeporigo.x * 65536.0;
     long ykiskep = kiskeporigo.y * 65536.0;
 

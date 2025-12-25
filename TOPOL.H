@@ -10,7 +10,7 @@ class gyuru {
 
   public:
     int pontszam;
-    vekt2* ponttomb;
+    vect2* ponttomb;
 
     // Koveto valtozok:
     int koveto;
@@ -29,12 +29,12 @@ class gyuru {
     int beszur(int k); // k pont utan beszur egyet ugyanolyan koordokkal
     void torol(int k);
     double legkozpont(double x, double y, int* pk);
-    int metszesszam(vekt2 r1, vekt2 v1);
+    int metszesszam(vect2 r1, vect2 v1);
     // Ez csak akkor tekinti metszesnek, ha nem csak eppen erintik egymast:
-    int metszeshely(vekt2 r1, vekt2 v1, int kihagy, vekt2* pmetszes);
+    int metszeshely(vect2 r1, vect2 v1, int kihagy, vect2* pmetszes);
     // akkor ad igazat, ha korbejaraskor poligon belseje bal oldalon van;
     int pozitivkorjaras(void);
-    vekt2 sulypont(void);
+    vect2 sulypont(void);
     // Beadott px1, stb-bol indul ki:
     void getminmax(double* px1, double* py1, double* px2, double* py2);
     double belyegszamitas(void);
@@ -50,7 +50,7 @@ enum { KT_NORMAL, KT_UP, KT_DOWN, KT_LEFT, KT_RIGHT };
 
 class kerek {
   public:
-    vekt2 r;
+    vect2 r;
     int rxint, ryint;     // Kaja lejatszas kozbeni kirajzolasahoz
     int rxint_v, ryint_v; // Ugyanez view-ra
     int tipus;
@@ -80,7 +80,7 @@ class sprite {
     char kepnev[10];
     char texturanev[10];
     char maszknev[10];
-    vekt2 r;
+    vect2 r;
     double xsize, ysize;
     // Ha override, akkor tavolsagot es hatarolast nem irja felul LGR alapjan:
     int tavolsag;
@@ -146,7 +146,7 @@ class topol {
     void saveidok(const char* filenev);
     void kirajzol(void);
     // pgy levegoben van-e. Akkor folddarab:
-    int levegoben(gyuru* pgy, vekt2* pr = NULL);
+    int levegoben(gyuru* pgy, vect2* pr = NULL);
     void getminmax(double* px1, double* py1, double* px2, double* py2, int kerekkel);
 
     // Kerekkel kapcsolatos dolgok:
@@ -163,7 +163,7 @@ class topol {
 };
 
 // lejatszo.cpp-ben Falg Tag ennek alapjan teszi vissza motorost:
-extern vekt2 Kezdetihelydiff; // setallaktiv allitja be
+extern vect2 Kezdetihelydiff; // setallaktiv allitja be
 
 // Ha letezik file, akkor 0-t ad vissza!:
 // Ugyanugy viselkedik nevvel, mint topol konstruktora:

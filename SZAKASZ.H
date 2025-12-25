@@ -28,7 +28,7 @@ class szakaszok {
     pvonalnode* tertomb;
     int xdim, ydim;
     double cellameret;
-    vekt2 origo;
+    vect2 origo;
     vonalnode* nextnode; // getnext ez alapjan dolgozik!
 
     void beindexelvonalat(vonal* pv, double maxtav);
@@ -47,7 +47,7 @@ class szakaszok {
     // Terbeli fv.-ek:
     // rendez-t csak egyszer szabad hivni!
     void rendez(double maxtav);
-    void felsorolasreset(vekt2 r);
+    void felsorolasreset(vect2 r);
     vonal* getnext(void);
 
     // Osszes szakaszon vegigmennek:
@@ -59,7 +59,7 @@ class szakaszok {
 };
 
 struct vonal {
-    vekt2 r, v, egyseg;
+    vect2 r, v, egyseg;
     double hossz;
 };
 

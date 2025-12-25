@@ -5,9 +5,9 @@ constexpr double UNKNOWN_COLLISION_TIME = -2.0;
 constexpr double NO_COLLISION_TIME = 500000000.0;
 
 struct ball {
-    vekt2 keyframe_r;
-    vekt2 current_r;
-    vekt2 v;
+    vect2 keyframe_r;
+    vect2 current_r;
+    vect2 v;
     double keyframe_rotation;
     double current_rotation;
     double angular_velocity;

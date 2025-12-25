@@ -13,8 +13,8 @@ static double Maxxmeret = 170.0;
 static double Ratio = double((Fxsize - Savx - 1)) / (Fysize - Savy - 1);
 static double Maxymeret = Maxxmeret / Ratio;
 
-static vekt2 Dw1(-10.0, -10.0); // Dw1 a savnelkuli kep bal-felso sarka
-static vekt2 Dw2(-10.0 + 20.0 * Ratio, 10.0);
+static vect2 Dw1(-10.0, -10.0); // Dw1 a savnelkuli kep bal-felso sarka
+static vect2 Dw2(-10.0 + 20.0 * Ratio, 10.0);
 
 static double Nagyitas = 1.0;     // (Fxsize-Savx-1)/(Dw2.x-Dw1.x), zoom allitja
 static double Nagyitas_rec = 1.0; // Reciprok
@@ -33,19 +33,19 @@ int konvy_d2i(double y) {
     return outy + 0.5 + Savy;
 }
 
-vekt2 konv(int x, int y) { return vekt2(konvx_i2d(x), konvy_i2d(y)); }
+vect2 konv(int x, int y) { return vect2(konvx_i2d(x), konvy_i2d(y)); }
 
-int konvx(vekt2 v) { return konvx_d2i(v.x); }
+int konvx(vect2 v) { return konvx_d2i(v.x); }
 
-int konvy(vekt2 v) { return konvy_d2i(v.y); }
+int konvy(vect2 v) { return konvy_d2i(v.y); }
 
-static vekt2 Vonalkozep;
+static vect2 Vonalkozep;
 static double Vonalsugar = 1.0; // Egy kicsit nagyobb  tenyleges sugarnal
 
 static double Xsizemin = 0.017;
 
 // Minden zoom-ot ez allit:
-void zoom(vekt2 kozep, double xsize) {
+void zoom(vect2 kozep, double xsize) {
     if (xsize < Xsizemin) {
         xsize = Xsizemin;
     }
@@ -102,7 +102,7 @@ static void zoomin_double(double x1, double y1, double x2, double y2) {
     if (x2 - x1 < 0.0000001 || y2 - y1 < 0.0000001) {
         return;
     }
-    vekt2 kozep((x2 + x1) * 0.5, (y2 + y1) * 0.5);
+    vect2 kozep((x2 + x1) * 0.5, (y2 + y1) * 0.5);
     if ((x2 - x1) / (y2 - y1) > Ratio) {
         // Vizszintesen hosszukasabb:
         zoom(kozep, x2 - x1);
@@ -135,7 +135,7 @@ void kitolt(void) {
 // VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL
 // VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL
 
-void vonalrajz(vekt2 p1, vekt2 p2, int szaggatott) {
+void vonalrajz(vect2 p1, vect2 p2, int szaggatott) {
     if ((p2 - p1).length() < 0.00000001) {
         return;
     }
@@ -156,14 +156,14 @@ void vonalrajz(vekt2 p1, vekt2 p2, int szaggatott) {
     }
     // Most mar biztos hogy legalabb belelog korbe szakasz
     if (p1kilog) {
-        vekt2 ujp1;
+        vect2 ujp1;
         if (!line_circle_intersection(p1, p2 - p1, Vonalkozep, Vonalsugar, &ujp1)) {
             hiba("vonal-ban !line_circle_intersection!");
         }
         p1 = ujp1;
     }
     if (p2kilog) {
-        vekt2 ujp2;
+        vect2 ujp2;
         if (!line_circle_intersection(p2, p1 - p2, Vonalkozep, Vonalsugar, &ujp2)) {
             hiba("vonal-ban !line_circle_intersection!");
         }

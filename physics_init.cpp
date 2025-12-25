@@ -52,27 +52,27 @@ void init_motor(motorst* motor) {
     // inertia = mass * radius * radius
     // although radius = 0.55 is used instead of 0.3, as set above.
     motor->bike.inertia = 200.0 * 0.55 * 0.55;
-    motor->bike.r = vekt2(2.75, 3.6);
-    motor->bike.v = vekt2(0, 0);
+    motor->bike.r = vect2(2.75, 3.6);
+    motor->bike.v = vect2(0, 0);
 
     motor->left_wheel.rotation = 0.0;
     motor->left_wheel.angular_velocity = 0.0;
     motor->left_wheel.radius = 0.4;
     motor->left_wheel.mass = 10;
     motor->left_wheel.inertia = 0.32;
-    motor->left_wheel.r = vekt2(1.9, 3.0);
-    motor->left_wheel.v = vekt2(0, 0);
+    motor->left_wheel.r = vect2(1.9, 3.0);
+    motor->left_wheel.v = vect2(0, 0);
 
     motor->right_wheel.rotation = 0.0;
     motor->right_wheel.angular_velocity = 0.0;
     motor->right_wheel.radius = 0.4;
     motor->right_wheel.mass = 10;
     motor->right_wheel.inertia = 0.32;
-    motor->right_wheel.r = vekt2(3.6, 3.0);
-    motor->right_wheel.v = vekt2(0, 0);
+    motor->right_wheel.r = vect2(3.6, 3.0);
+    motor->right_wheel.v = vect2(0, 0);
 
-    motor->body_r = vekt2(2.75, 4.04);
-    motor->body_v = vekt2(0.0, 0.0);
+    motor->body_r = vect2(2.75, 4.04);
+    motor->body_v = vect2(0.0, 0.0);
 }
 
 void init_physics_data(void) {
@@ -99,7 +99,7 @@ void init_physics_data(void) {
     HeadRadius = 0.238; // m
 
     // Relative positions
-    vekt2 vtmp = Motor1->left_wheel.r - Motor1->bike.r;
+    vect2 vtmp = Motor1->left_wheel.r - Motor1->bike.r;
     LeftWheelDX = vtmp.x;
     LeftWheelDY = vtmp.y;
     vtmp = Motor1->right_wheel.r - Motor1->bike.r;

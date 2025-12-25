@@ -17,7 +17,7 @@ szakaszok::szakaszok(topol* ptop) {
     xdim = 1;
     ydim = 1;
     cellameret = 1.0;
-    origo = vekt2(0, 0);
+    origo = vect2(0, 0);
     nextnode = NULL;
     pelsocsomag = NULL;
     csomagbanbetelt = 0;
@@ -45,7 +45,7 @@ szakaszok::szakaszok(topol* ptop) {
             if (szam >= Szakaszmaxszam) {
                 hiba("szakaszok::szakaszok-ban z >= Szakaszmaxszam!");
             }
-            vekt2 r1, r2;
+            vect2 r1, r2;
             if (j < pgy->pontszam - 1) {
                 r1 = pgy->ponttomb[j];
                 r2 = pgy->ponttomb[j + 1];
@@ -144,8 +144,8 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
     }
     pv->egyseg = unit_vector(pv->v);
 
-    vekt2 v = pv->v;
-    vekt2 r = pv->r - origo;
+    vect2 v = pv->v;
+    vect2 r = pv->r - origo;
 
     v = v * (1 / cellameret);
     r = r * (1 / cellameret);
@@ -276,7 +276,7 @@ void szakaszok::rendez(double maxtav) {
     maxy += 6.0;
 
     // Beallitja kezdopontot:
-    origo = vekt2(minx, miny);
+    origo = vect2(minx, miny);
     double xsized = maxx - minx;
     double ysized = maxy - miny;
 
@@ -310,7 +310,7 @@ void szakaszok::rendez(double maxtav) {
     }
 }
 
-void szakaszok::felsorolasreset(vekt2 r) {
+void szakaszok::felsorolasreset(vect2 r) {
     if (!tertomb) {
         hiba("szakaszok::felsorolasreset-ban !tertomb!");
     }

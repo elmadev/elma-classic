@@ -39,7 +39,7 @@ class recorder {
     long hangbetoltve;
     long hangkov;
 
-    vekt2 ucso_r;
+    vect2 ucso_r;
     double ucsot, legkozt;
     int legkozindex;
 

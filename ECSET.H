@@ -59,7 +59,7 @@ class ecset {
     darab* nagydarabtomb;
 
     int view;
-    vekt2 origo;
+    vect2 origo;
     double xsizedb, ysizedb;
     int maxx, sorszam;
     mdarab* msorok[MAXECSETSOR];
@@ -106,9 +106,9 @@ class ecset {
     ~ecset(void);
 
   public:
-    void getbalalso_int(vekt2 balalso, int* px, int* py);
-    void kitesz(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int x2, int y2);
-    void kiteszview(int ajatekos, pic8* ppic, vekt2 balalso, int x1, int y1, int x2, int y2);
+    void getbalalso_int(vect2 balalso, int* px, int* py);
+    void kitesz(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int x2, int y2);
+    void kiteszview(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int x2, int y2);
 
     // void egetkeszit( void );
 };

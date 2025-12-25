@@ -1,25 +1,25 @@
 #include "ALL.H"
 
-vekt2 Vekt2i(1.0, 0.0), Vekt2j(0.0, 1.0), Vekt2null(0.0, 0.0);
+vect2 Vekt2i(1.0, 0.0), Vekt2j(0.0, 1.0), Vekt2null(0.0, 0.0);
 
-vekt2 operator*(double x, vekt2 a) { return vekt2(a.x * x, a.y * x); }
+vect2 operator*(double x, vect2 a) { return vect2(a.x * x, a.y * x); }
 
-vekt2 operator*(vekt2 a, double x) { return vekt2(a.x * x, a.y * x); }
+vect2 operator*(vect2 a, double x) { return vect2(a.x * x, a.y * x); }
 
-vekt2::vekt2(void) { x = y = 0; }
+vect2::vect2(void) { x = y = 0; }
 
-vekt2::vekt2(double xp, double yp) {
+vect2::vect2(double xp, double yp) {
     x = xp;
     y = yp;
 }
 
-vekt2 vekt2::operator+(vekt2 a) { return vekt2(x + a.x, y + a.y); }
+vect2 vect2::operator+(vect2 a) { return vect2(x + a.x, y + a.y); }
 
-vekt2 vekt2::operator-(vekt2 a) { return vekt2(x - a.x, y - a.y); }
+vect2 vect2::operator-(vect2 a) { return vect2(x - a.x, y - a.y); }
 
-double vekt2::operator*(vekt2 a) { return x * a.x + y * a.y; }
+double vect2::operator*(vect2 a) { return x * a.x + y * a.y; }
 
-void vekt2::rotate(double rotation) {
+void vect2::rotate(double rotation) {
     double a = sin(rotation);
     double b = cos(rotation);
     double xo = x;
@@ -41,22 +41,22 @@ static double square_root(double a) {
     return .5 * (x1 + a / x1);
 }
 
-double vekt2::length() { return square_root(x * x + y * y); }
+double vect2::length() { return square_root(x * x + y * y); }
 
-vekt2 unit_vector(vekt2 a) { return a * (1 / a.length()); }
+vect2 unit_vector(vect2 a) { return a * (1 / a.length()); }
 
-void vekt2::normalize() {
+void vect2::normalize() {
     double recip = 1 / length();
     x *= recip;
     y *= recip;
 }
 
-vekt2 rotate_90deg(vekt2 in) { return vekt2(-in.y, in.x); }
+vect2 rotate_90deg(vect2 in) { return vect2(-in.y, in.x); }
 
-vekt2 rotate_minus90deg(vekt2 in) { return vekt2(in.y, -in.x); }
+vect2 rotate_minus90deg(vect2 in) { return vect2(in.y, -in.x); }
 
-vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
-    vekt2 n = rotate_90deg(v1);
+vect2 intersection(vect2 r1, vect2 v1, vect2 r2, vect2 v2) {
+    vect2 n = rotate_90deg(v1);
     double nv2 = n * v2;
     if (fabs(nv2) < 0.00000001) {
         // Parallel lines, no true intersection point
@@ -76,8 +76,8 @@ vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     return r2 - v2 * (nr21 / nv2);
 }
 
-double point_segment_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v) {
-    vekt2 rr = point_r - segment_r;
+double point_segment_distance(vect2 point_r, vect2 segment_r, vect2 segment_v) {
+    vect2 rr = point_r - segment_r;
     double scalar = segment_r * rr;
     if (scalar <= 0) {
         // Distance to the first point.
@@ -88,18 +88,18 @@ double point_segment_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v) {
         return (rr - segment_v).length();
     }
     // Distance from the segment.
-    vekt2 n = rotate_90deg(unit_vector(segment_v));
+    vect2 n = rotate_90deg(unit_vector(segment_v));
     return fabs(n * rr);
 }
 
-double point_line_distance(vekt2 point_r, vekt2 segment_r, vekt2 segment_v) {
-    vekt2 rr = point_r - segment_r;
-    vekt2 n = rotate_90deg(unit_vector(segment_v));
+double point_line_distance(vect2 point_r, vect2 segment_r, vect2 segment_v) {
+    vect2 rr = point_r - segment_r;
+    vect2 n = rotate_90deg(unit_vector(segment_v));
     return fabs(n * rr);
 }
 
-vekt2 circles_intersection(vekt2 r1, vekt2 r2, double l1, double l2) {
-    vekt2 v = r2 - r1;
+vect2 circles_intersection(vect2 r1, vect2 r2, double l1, double l2) {
+    vect2 v = r2 - r1;
     double l = v.length();
     // If the circles don't intersect, resize the circles so they intersect.
     if (l >= l1 + l2) {
@@ -111,19 +111,19 @@ vekt2 circles_intersection(vekt2 r1, vekt2 r2, double l1, double l2) {
     if (l2 >= l + l1) {
         l2 = l + l1 - 0.00001;
     }
-    vekt2 v_unit = v * (1 / l);
-    vekt2 normal = rotate_90deg(v_unit);
+    vect2 v_unit = v * (1 / l);
+    vect2 normal = rotate_90deg(v_unit);
 
     double x = (l1 * l1 - l2 * l2 + l * l) / (2.0 * l);
     double m = square_root(l1 * l1 - x * x);
 
-    vekt2 r = r1 + x * v_unit + m * normal;
+    vect2 r = r1 + x * v_unit + m * normal;
     return r;
 }
 
 // Returns true if the infinite line `v1` and segment `r2`, `v2` intersect.
-static bool line_segment_intersects(vekt2 v1, vekt2 r2, vekt2 v2) {
-    vekt2 norm = rotate_90deg(v1);
+static bool line_segment_intersects(vect2 v1, vect2 r2, vect2 v2) {
+    vect2 norm = rotate_90deg(v1);
     int first_side = r2 * norm > 0;
     int second_side = (r2 + v2) * norm > 0;
     return (first_side && !second_side) || (!first_side && second_side);
@@ -131,9 +131,9 @@ static bool line_segment_intersects(vekt2 v1, vekt2 r2, vekt2 v2) {
 
 // Returns true if the infinite line `v1` and segment `r2`, `v2` intersect.
 // This is inexact and will return true if the line and segment are close.
-static bool line_segment_intersects_inexact(vekt2 v1, vekt2 r2, vekt2 v2) {
+static bool line_segment_intersects_inexact(vect2 v1, vect2 r2, vect2 v2) {
     static double epsilon = 0.00000001;
-    vekt2 norm = rotate_90deg(v1);
+    vect2 norm = rotate_90deg(v1);
     int first_side = 0;
     double first_side_dist = r2 * norm;
     if (first_side_dist > epsilon) {
@@ -156,20 +156,20 @@ static bool line_segment_intersects_inexact(vekt2 v1, vekt2 r2, vekt2 v2) {
     return true;
 }
 
-bool segments_intersect(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
+bool segments_intersect(vect2 r1, vect2 v1, vect2 r2, vect2 v2) {
     return line_segment_intersects(v1, r2 - r1, v2) && line_segment_intersects(v2, r1 - r2, v1);
 }
 
-bool segments_intersect_inexact(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
+bool segments_intersect_inexact(vect2 r1, vect2 v1, vect2 r2, vect2 v2) {
     return line_segment_intersects_inexact(v1, r2 - r1, v2) &&
            line_segment_intersects_inexact(v2, r1 - r2, v1);
 }
 
-bool line_circle_intersection(vekt2 line_r, vekt2 line_v, vekt2 circle_r, double radius,
-                              vekt2* intersection_point) {
-    vekt2 r = circle_r - line_r;
+bool line_circle_intersection(vect2 line_r, vect2 line_v, vect2 circle_r, double radius,
+                              vect2* intersection_point) {
+    vect2 r = circle_r - line_r;
     line_v.normalize();
-    vekt2 k = line_v * (line_v * r);
+    vect2 k = line_v * (line_v * r);
     double distance = point_line_distance(circle_r, line_r, line_v);
     double squared = radius * radius - distance * distance;
     if (squared < 0.0) {

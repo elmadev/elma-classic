@@ -61,7 +61,7 @@ elma_sources = files(
     'TOPOL.CPP',
     'UTKOZES.CPP',
     'UTKOZES2.CPP',
-    'VALASZT2.CPP',
+    'menu_nav.cpp',
     'vect2.cpp',
     'eol_settings.cpp',
     'hhigh.cpp',

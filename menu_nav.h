@@ -1,5 +1,5 @@
-#ifndef VALASZT2_H
-#define VALASZT2_H
+#ifndef MENU_NAV_H
+#define MENU_NAV_H
 
 #define MENU_CENTER_TEXT "*$$^&|@"
 

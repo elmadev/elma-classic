@@ -90,7 +90,7 @@
 #include "ECSET.H"
 #include "menu_pic.h"
 
-#include "VALASZT2.H"
+#include "menu_nav.h"
 #include "DIALOG32.H"
 
 #include "ball.h"

@@ -152,7 +152,6 @@ void menu_best_times_choose_level(bool single) {
 
     menu_nav nav;
     nav.selected_index = 0;
-    nav.max_visible_entries = LISTegykepen;
     nav.x_left = 61;
     nav.x_right = 380;
     nav.y_entries = LISTy0;
@@ -204,7 +203,6 @@ void menu_best_times() {
     } else {
         nav.selected_index = 1;
     }
-    nav.max_visible_entries = 6;
     nav.x_left = 170;
     nav.y_entries = 190;
     nav.dy = 50;

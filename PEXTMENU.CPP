@@ -39,7 +39,6 @@ static int afterplayext( char* filenev, long ido ) {
         // Valasztas:
         menu_nav val;
         val.selected_index = kurrens;
-        val.max_visible_entries = 6;
         val.x_left = 50;
         val.y_entries = 40;
         val.dy = 25;
@@ -142,7 +141,6 @@ void playextmenu(void) {
     // Feltoltottuk neveket, jon valasztas:
     menu_nav val;
     val.selected_index = kezdo;
-    val.max_visible_entries = LISTegykepen;
     val.x_left = LISTx0;
     val.y_entries = LISTy0;
     val.dy = LISTdy;

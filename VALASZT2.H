@@ -1,7 +1,6 @@
 #ifndef VALASZT2_H
 #define VALASZT2_H
 
-extern const int LISTegykepen;
 extern const int LISTx0;
 extern const int LISTy0;
 extern const int LISTdy;
@@ -33,7 +32,6 @@ class menu_nav {
     int x_left;
     int y_entries;
     int dy;
-    int max_visible_entries;
     int x_right;
     int y_title;
     bool enable_esc;
@@ -46,6 +44,9 @@ class menu_nav {
                  bool render_only = false);
 
     void render();
+
+  private:
+    int calculate_visible_entries(int extra_lines_length);
 };
 
 extern bool CtrlAltPressed;

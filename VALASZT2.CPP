@@ -1,6 +1,5 @@
 #include "ALL.H"
 
-const int LISTegykepen = 11;
 const int LISTx0 = 200;
 const int LISTy0 = 90;
 const int LISTdy = 33;
@@ -64,7 +63,6 @@ menu_nav::menu_nav() {
     x_left = 0;
     y_entries = 0;
     dy = 0;
-    max_visible_entries = 0;
     enable_esc = false;
     title[0] = 0;
     y_title = 30;
@@ -90,7 +88,6 @@ menu_nav::~menu_nav() {
     x_left = 0;
     y_entries = 0;
     dy = 0;
-    max_visible_entries = 0;
     enable_esc = false;
 }
 
@@ -134,9 +131,20 @@ void menu_nav::setup(int len, bool two_col) {
 
 bool CtrlAltPressed = false;
 
+int menu_nav::calculate_visible_entries(int extra_lines_length) {
+    int max_visible_entries = (SCREEN_HEIGHT - y_entries) / dy;
+    if (max_visible_entries < 2) {
+        max_visible_entries = 2;
+    }
+    if (max_visible_entries >= MENU_MAX_LINES - extra_lines_length) {
+        max_visible_entries = MENU_MAX_LINES - extra_lines_length - 1;
+    }
+    return max_visible_entries;
+}
+
 // Render menu and return selected index (or -1 if Esc)
 int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool render_only) {
-    if (length < 1 || max_visible_entries < 2) {
+    if (length < 1) {
         hiba("menu_nav::navigate invalid setup!");
     }
 
@@ -144,6 +152,8 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     if (selected_index > length - 1) {
         selected_index = length - 1;
     }
+
+    int max_visible_entries = calculate_visible_entries(extra_lines_length);
 
     // Center current selection on the screen
     int view_index = selected_index - max_visible_entries / 2;

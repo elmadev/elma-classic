@@ -316,7 +316,6 @@ static void betolt(billmuttomb bmuttomb, int sorszam, const char* szoveg, int* p
 static void gombotvalaszt(int rubrikaszam, billmuttomb bmuttomb, int sorszam) {
     menu_nav val;
     val.selected_index = sorszam;
-    val.max_visible_entries = 10;
     val.x_left = 60;
     val.x_right = 400;
     val.y_entries = 86;
@@ -403,7 +402,6 @@ static void customizeplayer(billmuttomb bmuttomb, player_keys* pjatopc, const ch
     while (1) {
         menu_nav val;
         val.selected_index = kurrens;
-        val.max_visible_entries = 10;
         val.x_left = 60;
         val.x_right = 400;
         val.y_entries = 86;
@@ -437,7 +435,6 @@ void customize(void) {
     while (1) {
         menu_nav val;
         val.selected_index = kurrens;
-        val.max_visible_entries = 10;
         val.x_left = 60;
         val.x_right = 400;
         val.y_entries = 86;

@@ -57,7 +57,6 @@ void options(void) {
     while (1) {
         menu_nav val;
         val.selected_index = kurrens;
-        val.max_visible_entries = 11;
         val.x_left = 72;
         val.x_right = 390;
         val.y_entries = 77;

@@ -27,6 +27,20 @@ void vekt2::rotate(double rotation) {
     y = a * xo + b * y;
 }
 
+static double square_root(double a) {
+    if (a < 0) {
+        hiba("square_root() of a negative number!");
+        return 1;
+    }
+    double x1 = sqrt(a);
+    if (x1 == 0) {
+        return 0;
+    }
+    // Apply Newton's method... even though we have a pretty perfect
+    // value from sqrt() function.
+    return .5 * (x1 + a / x1);
+}
+
 double abs(vekt2 a) { return square_root(a.x * a.x + a.y * a.y); }
 
 vekt2 unit_vector(vekt2 a) { return a * (1 / abs(a)); }
@@ -40,20 +54,6 @@ void vekt2::normalize() {
 vekt2 rotate_90deg(vekt2 in) { return vekt2(-in.y, in.x); }
 
 vekt2 rotate_minus90deg(vekt2 in) { return vekt2(in.y, -in.x); }
-
-double square_root(double a) {
-    if (a < 0) {
-        hiba("square_root() of a negative number!");
-        return 1;
-    }
-    double x1 = sqrt(a);
-    if (x1 == 0) {
-        return 0;
-    }
-    // Apply Newton's method... even though we have a pretty perfect
-    // value from sqrt() function.
-    return .5 * (x1 + a / x1);
-}
 
 vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2) {
     vekt2 n = rotate_90deg(v1);

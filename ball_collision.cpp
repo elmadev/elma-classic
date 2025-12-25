@@ -54,7 +54,7 @@ double ball_ball_collision_time(ball* ball1, ball* ball2) {
         // Balls will miss each other and not collide
         return NO_COLLISION_TIME;
     }
-    double t = (-b - square_root(discriminant)) / (2 * a);
+    double t = (-b - sqrt(discriminant)) / (2 * a);
     return (t + ball1->keyframe_time);
 }
 

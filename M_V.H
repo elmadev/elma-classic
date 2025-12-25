@@ -4,7 +4,7 @@
 void message_box(const char* text);
 
 // Ezt neha meg kell hivni!:
-void handle_events(/*char* hivta,*/ int nemkellnyomas = 0);
+void handle_events();
 void mv_exit(); // Ezzel kell kilepni!
 
 // MOUSE:

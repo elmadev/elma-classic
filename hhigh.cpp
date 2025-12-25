@@ -476,6 +476,6 @@ void hangosdelay(int t) {
     // 182*sec-et adja vissza idot tortresszel egyutt!
     double kezdo = mv_stopperido();
     while (mv_stopperido() / 182.0 < kezdo / 182.0 + t / 1000.0) {
-        handle_events(/*"w_hhigh hangosdelay"*/);
+        handle_events();
     }
 }

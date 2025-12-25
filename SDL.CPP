@@ -111,7 +111,7 @@ ddpal::ddpal(unsigned char* tomb) {
 
 void ddpal::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
 
-void handle_events(int skip_key_update) {
+void handle_events() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -153,9 +153,7 @@ void handle_events(int skip_key_update) {
     }
 
     mkw_getDIstate();
-    if (!skip_key_update) {
-        mkw_setkeydown();
-    }
+    mkw_setkeydown();
 }
 
 void fill_key_state(char* buffer) {

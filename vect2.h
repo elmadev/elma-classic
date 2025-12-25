@@ -40,6 +40,6 @@ bool segments_intersect_inexact(vect2 r1, vect2 v1, vect2 r2, vect2 v2);
 bool line_circle_intersection(vect2 line_r, vect2 line_v, vect2 circle_r, double radius,
                               vect2* intersection_point);
 
-extern vect2 Vekt2i, Vekt2j, Vekt2null;
+extern vect2 Vect2i, Vect2j, Vect2null;
 
 #endif

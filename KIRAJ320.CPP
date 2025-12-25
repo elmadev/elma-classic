@@ -400,7 +400,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     }
 
     if (pmot->flipped_bike) {
-        jobbra = Vekt2null - jobbra;
+        jobbra = Vect2null - jobbra;
         vect2 tmpv = p_k1;
         p_k1 = p_k2;
         p_k2 = tmpv;
@@ -412,7 +412,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     Mi = jobbra * (mmeret * cos(malfa)) + fel * (mmeret * sin(malfa));
     Mj = rotate_90deg(Mi);
     if (pmot->flipped_bike) {
-        Mj = Vekt2null - Mj;
+        Mj = Vect2null - Mj;
     }
     Mr = kozep;
     // Most MetersToPixels-t betesszuk Mi, Mj, Mr-be:

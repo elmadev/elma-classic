@@ -152,7 +152,7 @@ void ecset::addszakasz(vonal* psz) {
     // Alulrol felfele mutasson:
     if (v.y < 0) {
         r = r + v;
-        v = Vekt2null - v;
+        v = Vect2null - v;
     }
     // Nem vizszintes-e?:
     if (v.y < 0.001) {

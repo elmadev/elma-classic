@@ -165,7 +165,7 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
     if (v.x < 0) {
         // Vegpont csere:
         r = r + v;
-        v = Vekt2null - v;
+        v = Vect2null - v;
     }
     // Most v x-pozitiv iranyba mutat:
     // Kiszamoljuk y = m*x + y0 fuggveny parametereit:

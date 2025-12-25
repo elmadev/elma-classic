@@ -3,8 +3,8 @@
 // Affinitassal kapcsolatos dolgok:
 int Affinitas = 0;
 static double Affinnagysag = 1.0;
-static vect2 Affinkozep = Vekt2i;
-static vect2 Affinirany = Vekt2i;
+static vect2 Affinkozep = Vect2i;
+static vect2 Affinirany = Vect2i;
 static double Affinaranyx = 1.0;
 static double Affinaranyy = 1.0;
 

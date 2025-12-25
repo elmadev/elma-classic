@@ -175,7 +175,7 @@ void rigidbody_movement(rigidbody* rb, vect2 force, double torque, double dt, bo
     }
     // We collide with two points, so we are stuck
     if (anchor_point_count == 2) {
-        rb->v = Vekt2null;
+        rb->v = Vect2null;
         rb->angular_velocity = 0;
         return;
     }

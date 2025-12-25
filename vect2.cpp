@@ -1,6 +1,6 @@
 #include "ALL.H"
 
-vect2 Vekt2i(1.0, 0.0), Vekt2j(0.0, 1.0), Vekt2null(0.0, 0.0);
+vect2 Vect2i(1.0, 0.0), Vect2j(0.0, 1.0), Vect2null(0.0, 0.0);
 
 vect2 operator*(double x, vect2 a) { return vect2(a.x * x, a.y * x); }
 

@@ -160,7 +160,7 @@ void replay(void) {
     val.x_left = LISTx0;
     val.y_entries = LISTy0;
     val.dy = LISTdy;
-    val.enable_esc = 1;
+    val.enable_esc = true;
     strcpy(val.title, "Select replay file!");
 
     val.setup(szamuk);
@@ -308,7 +308,7 @@ static void kilephakell(void) {
     val.y_entries = 200;
     val.dy = 40;
     val.y_title = 50; // ezt nem szokas allitani egyebkent
-    val.enable_esc = 0;
+    val.enable_esc = false;
     strcpy(val.title, "Do you want to quit?");
 
     strcpy(NavEntriesLeft[0], "Yes");
@@ -338,7 +338,7 @@ void mainmenu(void) {
     val.x_left = 200;
     val.y_entries = 100;
     val.dy = 50;
-    val.enable_esc = 1;
+    val.enable_esc = true;
     strcpy(val.title, "Main Menu");
 
     strcpy(NavEntriesLeft[0], "Play");

@@ -113,7 +113,7 @@ void jatekosvalasztas(int A, int visszater) {
     pval->x_left = LISTx0;
     pval->y_entries = LISTy0;
     pval->dy = LISTdy;
-    pval->enable_esc = 1;
+    pval->enable_esc = true;
     strcpy(pval->title, "Choose Player");
 
     strcpy(NavEntriesLeft[0], "Create New Player");

@@ -62,7 +62,7 @@ void options(void) {
         val.x_right = 390;
         val.y_entries = 77;
         val.dy = 36;
-        val.enable_esc = 1;
+        val.enable_esc = true;
         strcpy(val.title, "Options");
 
         int vantagis = 0;
@@ -172,7 +172,7 @@ void options(void) {
             break;
         }
 
-        val.setup(14 + vantagis, 1);
+        val.setup(14 + vantagis, true);
 
         kurrens = val.navigate();
 

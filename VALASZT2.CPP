@@ -7,17 +7,17 @@ const int LISTdy = 33;
 
 int NavEntriesLeftMaxLength = 1;
 
-nav_entry* NavEntriesLeft = NULL;
+nav_entry* NavEntriesLeft = nullptr;
 nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
-void menu_nav_entries_init(void) {
+void menu_nav_entries_init() {
     if (NavEntriesLeft) {
         hiba("menu_nav_entries_init already called!");
     }
     // Megszamolja maximalis lev es rec file-okat:
     int level_count = 0;
     finame filename;
-    int done = fifirst("lev/*.lev", filename);
+    bool done = fifirst("lev/*.lev", filename);
     while (!done) {
         done = finext(filename);
         level_count++;
@@ -57,18 +57,23 @@ void menu_nav_entries_init(void) {
     }
 }
 
-menu_nav::menu_nav(void) {
-    entries_left = NULL;
-    entries_right = NULL;
+menu_nav::menu_nav() {
+    entries_left = nullptr;
+    entries_right = nullptr;
     length = 0;
-    selected_index = x_left = y_entries = dy = max_visible_entries = enable_esc = 0;
+    selected_index = 0;
+    x_left = 0;
+    y_entries = 0;
+    dy = 0;
+    max_visible_entries = 0;
+    enable_esc = false;
     title[0] = 0;
     // Ezt o maganak beallitja, de nehanyan atdefinialjak:
     y_title = 30;
-    menu = NULL;
+    menu = nullptr;
 }
 
-menu_nav::~menu_nav(void) {
+menu_nav::~menu_nav() {
     if (entries_left) {
         delete[] entries_left;
     }
@@ -79,15 +84,20 @@ menu_nav::~menu_nav(void) {
         delete menu;
     }
 
-    entries_left = NULL;
-    entries_right = NULL;
-    menu = NULL;
+    entries_left = nullptr;
+    entries_right = nullptr;
+    menu = nullptr;
     length = 0;
-    selected_index = x_left = y_entries = dy = max_visible_entries = enable_esc = 0;
+    selected_index = 0;
+    x_left = 0;
+    y_entries = 0;
+    dy = 0;
+    max_visible_entries = 0;
+    enable_esc = false;
 }
 
 // Rubrikakat beveszi:
-void menu_nav::setup(int len, int two_col) {
+void menu_nav::setup(int len, bool two_col) {
     if (entries_left) {
         hiba("menu_nav::setup called twice!");
     }
@@ -103,7 +113,7 @@ void menu_nav::setup(int len, int two_col) {
     if (!entries_left) {
         hiba("menu_nav::setup out of memory!");
     }
-    entries_right = NULL;
+    entries_right = nullptr;
     if (two_columns) {
         entries_right = new nav_entry[length];
         if (!entries_right) {
@@ -129,7 +139,7 @@ int CtrlAltPressed = 0;
 
 // Visszaadja valasztott szamat, ESC eseten -1-t:
 // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
-int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int render_only) {
+int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool render_only) {
     if (length < 1 || max_visible_entries < 2) {
         hiba("menu_nav::navigate invalid setup!");
     }
@@ -153,8 +163,8 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
     menu = new menu_pic;
 
     mk_emptychar();
-    int rerender = 1;
-    while (1) {
+    bool rerender = true;
+    while (true) {
         while (!render_only && mk_kbhit()) {
             int c = mk_getextchar();
             if (c == MK_ESC && enable_esc) {
@@ -162,7 +172,6 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
             }
             if (c == MK_ENTER) {
                 // RECidomenteshez kell (mainmenu.cpp-ben is):
-                int controlaltnyomva(void);
                 if (CtrlAltEnabled && controlaltnyomva()) {
                     CtrlAltPressed = 1;
                 }
@@ -173,7 +182,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
                     selected_index--;
                     if (selected_index < view_index) {
                         view_index--;
-                        rerender = 1;
+                        rerender = true;
                     }
                 }
             }
@@ -185,7 +194,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
                     }
                     if (selected_index < view_index) {
                         view_index = selected_index;
-                        rerender = 1;
+                        rerender = true;
                     }
                 }
             }
@@ -194,7 +203,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
                     selected_index++;
                     if (selected_index > view_index + max_visible_entries - 1) {
                         view_index++;
-                        rerender = 1;
+                        rerender = true;
                     }
                 }
             }
@@ -206,7 +215,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
                     }
                     if (selected_index > view_index + max_visible_entries - 1) {
                         view_index = selected_index - max_visible_entries + 1;
-                        rerender = 1;
+                        rerender = true;
                     }
                 }
             }
@@ -229,7 +238,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
             } */
         }
         if (rerender) {
-            rerender = 0;
+            rerender = false;
             // Betaplalja kirajzba uj kepszoveget:
             menu->clear();
             for (int i = 0; i < extra_lines_length; i++) {
@@ -261,7 +270,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, int rende
     }
 }
 
-void menu_nav::render(void) {
+void menu_nav::render() {
     if (!menu) {
         hiba("menu_nav::render !menu");
     }

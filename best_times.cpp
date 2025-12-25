@@ -157,7 +157,7 @@ void menu_best_times_choose_level(bool single) {
     nav.x_right = 380;
     nav.y_entries = LISTy0;
     nav.dy = LISTdy;
-    nav.enable_esc = 1;
+    nav.enable_esc = true;
     if (single) {
         strcpy(nav.title, "Single Player Best Times");
     } else {
@@ -187,7 +187,7 @@ void menu_best_times_choose_level(bool single) {
         }
     }
 
-    nav.setup(visible_levels, 1);
+    nav.setup(visible_levels, true);
     while (true) {
         int choice = nav.navigate();
         if (choice < 0) {
@@ -208,7 +208,7 @@ void menu_best_times() {
     nav.x_left = 170;
     nav.y_entries = 190;
     nav.dy = 50;
-    nav.enable_esc = 1;
+    nav.enable_esc = true;
     strcpy(nav.title, "Best Times");
 
     strcpy(NavEntriesLeft[0], "Single Player Times");

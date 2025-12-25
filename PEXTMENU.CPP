@@ -43,7 +43,7 @@ static int afterplayext( char* filenev, long ido ) {
         val.x_left = 50;
         val.y_entries = 40;
         val.dy = 25;
-        val.enable_esc = 1;
+        val.enable_esc = true;
         char* levdesc = getlevelname( filenev );
         if( levdesc )
             strcpy( val.title, levdesc );
@@ -146,7 +146,7 @@ void playextmenu(void) {
     val.x_left = LISTx0;
     val.y_entries = LISTy0;
     val.dy = LISTdy;
-    val.enable_esc = 1;
+    val.enable_esc = true;
     strcpy(val.title, "Select External File!");
 
     val.setup(szam);

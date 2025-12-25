@@ -321,14 +321,14 @@ static void gombotvalaszt(int rubrikaszam, billmuttomb bmuttomb, int sorszam) {
     val.x_right = 400;
     val.y_entries = 86;
     val.dy = 40;
-    val.enable_esc = 1;
+    val.enable_esc = true;
 
     strcpy(val.title, "Customize controls");
     strcpy(NavEntriesRight[sorszam], "_");
 
-    val.setup(rubrikaszam, 1); // tab-os kiiras
+    val.setup(rubrikaszam, true); // tab-os kiiras
 
-    val.navigate(NULL, 0, 1); // Csak kirajzolja kepet
+    val.navigate(nullptr, 0, true); // Csak kirajzolja kepet
 
     // Megnezzuk milyen gombot nyomott le:
     while (1) {
@@ -408,14 +408,14 @@ static void customizeplayer(billmuttomb bmuttomb, player_keys* pjatopc, const ch
         val.x_right = 400;
         val.y_entries = 86;
         val.dy = 40;
-        val.enable_esc = 1;
+        val.enable_esc = true;
 
         strcpy(val.title, "Customize Player ");
         strcat(val.title, ABjel);
 
         bejegyez12(bmuttomb, pjatopc);
 
-        val.setup(Rubrikaszam12, 1); // tab-os kiiras
+        val.setup(Rubrikaszam12, true); // tab-os kiiras
 
         kurrens = val.navigate();
 
@@ -442,13 +442,13 @@ void customize(void) {
         val.x_right = 400;
         val.y_entries = 86;
         val.dy = 40;
-        val.enable_esc = 1;
+        val.enable_esc = true;
 
         strcpy(val.title, "Customize controls");
 
         bejegyez0();
 
-        val.setup(Rubrikaszam0, 1); // tab-os kiiras
+        val.setup(Rubrikaszam0, true); // tab-os kiiras
 
         kurrens = val.navigate();
 

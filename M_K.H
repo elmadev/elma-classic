@@ -12,6 +12,7 @@ int mk_getextchar(void);
 void mk_emptychar(void);
 int mk_kbhit(void);
 int mk_getstate(int kod);
+int controlaltnyomva(void);
 
 #define MK_ESC (1) // DIK_ESCAPE
 #define MK_ENTER (400)

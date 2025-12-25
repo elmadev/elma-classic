@@ -6,43 +6,47 @@ extern const int LISTx0;
 extern const int LISTy0;
 extern const int LISTdy;
 
-#define NAV_ENTRY_TEXT_MAX_LENGTH (40)
+constexpr int NAV_ENTRY_TEXT_MAX_LENGTH = 40;
 extern int NavEntriesLeftMaxLength;
-#define NAV_ENTRIES_RIGHT_MAX_LENGTH (110)
+constexpr int NAV_ENTRIES_RIGHT_MAX_LENGTH = 110;
 
 typedef char nav_entry[NAV_ENTRY_TEXT_MAX_LENGTH + 2];
 
 extern nav_entry* NavEntriesLeft;
 extern nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
-void menu_nav_entries_init(void);
+void menu_nav_entries_init();
 
 // Felhasznalja, Korny rubrikak-at es picbuffer-t!
 class menu_nav {
-    friend void playextmenu(void);
+    friend void playextmenu();
 
     nav_entry* entries_left;
     nav_entry* entries_right;
     int length;
-    int two_columns;
+    bool two_columns;
     menu_pic* menu;
 
   public:
     int selected_index;
-    int x_left, y_entries, dy, max_visible_entries;
+    int x_left;
+    int y_entries;
+    int dy;
+    int max_visible_entries;
     int x_right; // Csak akkor erdekes, ha two_columns igaz
     int y_title; // Ezt o maganak beallitja, de nehanyan atdefinialjak
-    int enable_esc;
+    bool enable_esc;
     char title[100];
 
-    menu_nav(void);
-    ~menu_nav(void);
-    void setup(int len, int two_col = 0); // Rubrikakat beveszi
+    menu_nav();
+    ~menu_nav();
+    void setup(int len, bool two_col = false); // Rubrikakat beveszi
     // Visszaadja valasztott szamat, ESC eseten -1-et:
     // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
-    int navigate(text_line* extra_lines = NULL, int extra_lines_length = 0, int render_only = 0);
+    int navigate(text_line* extra_lines = nullptr, int extra_lines_length = 0,
+                 bool render_only = false);
 
-    void render(void);
+    void render();
 };
 
 // RECidomenteshez kell (mainmenu.cpp-ben is):

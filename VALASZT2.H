@@ -17,7 +17,6 @@ extern nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
 void menu_nav_entries_init();
 
-// Felhasznalja, Korny rubrikak-at es picbuffer-t!
 class menu_nav {
     friend void playextmenu();
 
@@ -33,25 +32,20 @@ class menu_nav {
     int y_entries;
     int dy;
     int max_visible_entries;
-    int x_right; // Csak akkor erdekes, ha two_columns igaz
-    int y_title; // Ezt o maganak beallitja, de nehanyan atdefinialjak
+    int x_right;
+    int y_title;
     bool enable_esc;
     char title[100];
 
     menu_nav();
     ~menu_nav();
-    void setup(int len, bool two_col = false); // Rubrikakat beveszi
-    // Visszaadja valasztott szamat, ESC eseten -1-et:
-    // tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
+    void setup(int len, bool two_col = false);
     int navigate(text_line* extra_lines = nullptr, int extra_lines_length = 0,
                  bool render_only = false);
 
     void render();
 };
 
-// RECidomenteshez kell (mainmenu.cpp-ben is):
-// Ha CtrlAltEnabled-et beallitjuk, akkor CtrlAltPressed-t beallitja
-// Ctrl+Alt+Enter eseten (elotte CtrlAltPressed-t nullazni kell):
 extern int CtrlAltEnabled;
 extern int CtrlAltPressed;
 

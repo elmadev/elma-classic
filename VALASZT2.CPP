@@ -10,11 +10,14 @@ int NavEntriesLeftMaxLength = 1;
 nav_entry* NavEntriesLeft = nullptr;
 nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
+// Initialize the left column by counting the total number of .lev and .rec files to use as the
+// maximum column length
 void menu_nav_entries_init() {
     if (NavEntriesLeft) {
         hiba("menu_nav_entries_init already called!");
     }
-    // Megszamolja maximalis lev es rec file-okat:
+
+    // Count level files
     int level_count = 0;
     finame filename;
     bool done = fifirst("lev/*.lev", filename);
@@ -24,6 +27,7 @@ void menu_nav_entries_init() {
     }
     ficlose();
 
+    // Count replay files
     int rec_count = 0;
     done = fifirst("rec/*.rec", filename);
     while (!done) {
@@ -32,14 +36,12 @@ void menu_nav_entries_init() {
     }
     ficlose();
 
+    // Get the max + 220
     int max_count = level_count;
     if (max_count < rec_count) {
         max_count = rec_count;
     }
-
-    // Megvan max szam:
     max_count += 220;
-
     if (max_count > 40000) {
         max_count = 40000;
     }
@@ -65,7 +67,6 @@ menu_nav::menu_nav() {
     max_visible_entries = 0;
     enable_esc = false;
     title[0] = 0;
-    // Ezt o maganak beallitja, de nehanyan atdefinialjak:
     y_title = 30;
     menu = nullptr;
 }
@@ -93,7 +94,7 @@ menu_nav::~menu_nav() {
     enable_esc = false;
 }
 
-// Rubrikakat beveszi:
+// Load the menu with data from NavEntriesLeft and, if two columns, NavEntriesRight
 void menu_nav::setup(int len, bool two_col) {
     if (entries_left) {
         hiba("menu_nav::setup called twice!");
@@ -134,17 +135,18 @@ void menu_nav::setup(int len, bool two_col) {
 int CtrlAltEnabled = 0;
 int CtrlAltPressed = 0;
 
-// Visszaadja valasztott szamat, ESC eseten -1-t:
-// tobbrajz eseten tobbszor is kirajzolja kezdetben (Win95):
+// Render menu and return selected index (or -1 if Esc)
 int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool render_only) {
     if (length < 1 || max_visible_entries < 2) {
         hiba("menu_nav::navigate invalid setup!");
     }
 
+    // Bound current selection
     if (selected_index > length - 1) {
         selected_index = length - 1;
     }
 
+    // Center current selection on the screen
     int view_index = selected_index - max_visible_entries / 2;
     int view_max = length - max_visible_entries;
     if (view_index > view_max) {
@@ -168,7 +170,6 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
                 return -1;
             }
             if (c == MK_ENTER) {
-                // RECidomenteshez kell (mainmenu.cpp-ben is):
                 if (CtrlAltEnabled && controlaltnyomva()) {
                     CtrlAltPressed = 1;
                 }
@@ -217,22 +218,25 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
                 }
             }
         }
+        // Rerender screen only if updated menu position
         if (rerender) {
             rerender = false;
-            // Betaplalja kirajzba uj kepszoveget:
             menu->clear();
+
+            // Fixed-position extra text lines
             for (int i = 0; i < extra_lines_length; i++) {
                 if (strncmp(extra_lines[i].text, "*$$^&|@", 7) == 0) {
-                    // Kozepre kell tenni:
                     menu->add_line_centered(&extra_lines[i].text[7], extra_lines[i].x,
                                             extra_lines[i].y);
                 } else {
-                    // Nem kell kozepre tenni:
                     menu->add_line(extra_lines[i].text, extra_lines[i].x, extra_lines[i].y);
                 }
             }
 
+            // Title
             menu->add_line_centered(title, 320, y_title);
+
+            // Only the visible menu entries
             for (int i = 0; i < max_visible_entries && i < length - view_index; i++) {
                 menu->add_line(entries_left[view_index + i], x_left, y_entries + i * dy);
             }

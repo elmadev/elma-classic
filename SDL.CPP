@@ -18,17 +18,17 @@ void message_box(const char* text) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Message", text, SDLWindow);
 }
 
-int sdl_init() {
+void sdl_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-        hiba((char*)SDL_GetError());
-        return 1;
+        hiba(SDL_GetError());
+        return;
     }
 
     SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                  SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (!SDLWindow) {
-        hiba((char*)SDL_GetError());
-        return 1;
+        hiba(SDL_GetError());
+        return;
     }
 
     SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
@@ -36,27 +36,25 @@ int sdl_init() {
 
     SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
     if (!SDLSurfaceMain) {
-        hiba((char*)SDL_GetError());
-        return 1;
+        hiba(SDL_GetError());
+        return;
     }
     SDLSurfacePaletted = SDL_CreateRGBSurfaceWithFormat(0, SDLSurfaceMain->w, SDLSurfaceMain->h, 0,
                                                         SDL_PIXELFORMAT_INDEX8);
     if (!SDLSurfacePaletted) {
-        hiba((char*)SDL_GetError());
-        return 1;
+        hiba(SDL_GetError());
+        return;
     }
-
-    return 0;
 }
 
 static unsigned char* SurfaceBuffer[SCREEN_HEIGHT];
-static int SurfaceLocked = 0;
+static bool SurfaceLocked = false;
 
 unsigned char** lock_backbuffer() {
     if (SurfaceLocked) {
         hiba("lock_backbuffer SurfaceLocked!");
     }
-    SurfaceLocked = 1;
+    SurfaceLocked = true;
 
     unsigned char* row = (unsigned char*)SDLSurfacePaletted->pixels;
     if (Locky0_alul) {
@@ -76,17 +74,17 @@ unsigned char** lock_backbuffer() {
     return SurfaceBuffer;
 }
 
-void unlock_backbuffer(void) {
+void unlock_backbuffer() {
     if (!SurfaceLocked) {
         hiba("unlock_backbuffer !SurfaceLocked!");
     }
-    SurfaceLocked = 0;
+    SurfaceLocked = false;
 
     SDL_BlitSurface(SDLSurfacePaletted, NULL, SDLSurfaceMain, NULL);
     SDL_UpdateWindowSurface(SDLWindow);
 }
 
-unsigned char** lock_frontbuffer(void) {
+unsigned char** lock_frontbuffer() {
     if (SurfaceLocked) {
         hiba("lock_frontbuffer SurfaceLocked!");
     }
@@ -94,7 +92,7 @@ unsigned char** lock_frontbuffer(void) {
     return lock_backbuffer();
 }
 
-void unlock_frontbuffer(void) {
+void unlock_frontbuffer() {
     if (!SurfaceLocked) {
         hiba("unlock_frontbuffer !SurfaceLocked!");
     }
@@ -154,10 +152,8 @@ void handle_events(int skip_key_update) {
         }
     }
 
-    void mkw_getDIstate();
     mkw_getDIstate();
     if (!skip_key_update) {
-        void mkw_setkeydown();
         mkw_setkeydown();
     }
 }
@@ -175,12 +171,12 @@ void show_cursor() { SDL_ShowCursor(SDL_ENABLE); }
 void get_mouse_position(int* x, int* y) { SDL_GetMouseState(x, y); }
 void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }
 
-int left_mouse_clicked(void) {
+bool left_mouse_clicked() {
     handle_events();
     return LeftMouseDown;
 }
 
-int right_mouse_clicked(void) {
+bool right_mouse_clicked() {
     handle_events();
     return RightMouseDown;
 }

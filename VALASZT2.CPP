@@ -37,9 +37,6 @@ void menu_nav_entries_init() {
         max_count = rec_count;
     }
 
-    // if( max_count < MAXKEPSZAM )
-    //	max_count = MAXKEPSZAM;
-
     // Megvan max szam:
     max_count += 220;
 
@@ -219,23 +216,6 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
                     }
                 }
             }
-            // Volume allitas itt specialisan van elintezve:
-            /*if( (c == MK_LEFT || c == MK_RIGHT) &&
-                strcmp( entries_left[selected_index], "Sound Volume:" ) == 0 &&
-                (selected_index == 3 || selected_index == 4) &&
-                strcmp( entries_left[selected_index-1], "Player B:" ) == 0 ) {
-                if( c == MK_LEFT ) {
-                    State->soundvolume -= 0.05;
-                    if( State->soundvolume < 0.0 )
-                        State->soundvolume = 0.0;
-                }
-                if( c == MK_RIGHT ) {
-                    State->soundvolume += 0.05;
-                    if( State->soundvolume > 1.0 )
-                        State->soundvolume = 1.0;
-                }
-                return selected_index;
-            } */
         }
         if (rerender) {
             rerender = false;

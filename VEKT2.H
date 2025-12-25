@@ -21,8 +21,6 @@ vekt2 unit_vector(vekt2 a);
 vekt2 rotate_90deg(vekt2 in);
 vekt2 rotate_minus90deg(vekt2 in);
 
-double square_root(double x);
-
 // The intersection point of two infinite lines.
 vekt2 intersection(vekt2 r1, vekt2 v1, vekt2 r2, vekt2 v2);
 // The distance between a point and a line segment.

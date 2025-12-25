@@ -19,10 +19,10 @@ class ddpal {
 extern int Locky0_alul;
 
 unsigned char** lock_backbuffer();
-void unlock_backbuffer(void); // Ki is teszi
+void unlock_backbuffer(); // Ki is teszi
 
-unsigned char** lock_frontbuffer(void);
-void unlock_frontbuffer(void);
+unsigned char** lock_frontbuffer();
+void unlock_frontbuffer();
 
 extern bool Margrafikus;
 

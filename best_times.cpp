@@ -154,9 +154,6 @@ void menu_best_times_choose_level(bool single) {
     nav.selected_index = 0;
     nav.x_left = 61;
     nav.x_right = 380;
-    nav.y_entries = LISTy0;
-    nav.dy = LISTdy;
-    nav.enable_esc = true;
     if (single) {
         strcpy(nav.title, "Single Player Best Times");
     } else {
@@ -206,7 +203,6 @@ void menu_best_times() {
     nav.x_left = 170;
     nav.y_entries = 190;
     nav.dy = 50;
-    nav.enable_esc = true;
     strcpy(nav.title, "Best Times");
 
     strcpy(NavEntriesLeft[0], "Single Player Times");

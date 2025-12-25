@@ -109,10 +109,6 @@ void jatekosvalasztas(int A, int visszater) {
     } else {
         eddigjatekos = State->player2;
     }
-    pval->x_left = LISTx0;
-    pval->y_entries = LISTy0;
-    pval->dy = LISTdy;
-    pval->enable_esc = true;
     strcpy(pval->title, "Choose Player");
 
     strcpy(NavEntriesLeft[0], "Create New Player");

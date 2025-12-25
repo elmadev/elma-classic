@@ -671,7 +671,6 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
             val.y_entries = 110;
             val.dy = 42;
         }
-        val.enable_esc = true;
         strcpy(val.title, fejlec);
 
         if (nextisvan || skipisvan) {
@@ -838,10 +837,6 @@ void play(void) {
         // Valasztas:
         menu_nav val;
         val.selected_index = int(pjatekos->selected_level) + 1;
-        val.x_left = LISTx0;
-        val.y_entries = LISTy0;
-        val.dy = LISTdy;
-        val.enable_esc = true;
         strcpy(val.title, "Select Level!");
 
         strcpy(NavEntriesLeft[0], "External File");

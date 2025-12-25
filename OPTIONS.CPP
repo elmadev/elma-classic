@@ -61,7 +61,6 @@ void options(void) {
         val.x_right = 390;
         val.y_entries = 77;
         val.dy = 36;
-        val.enable_esc = true;
         strcpy(val.title, "Options");
 
         int vantagis = 0;

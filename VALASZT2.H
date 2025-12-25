@@ -1,10 +1,6 @@
 #ifndef VALASZT2_H
 #define VALASZT2_H
 
-extern const int LISTx0;
-extern const int LISTy0;
-extern const int LISTdy;
-
 #define MENU_CENTER_TEXT "*$$^&|@"
 
 constexpr int NAV_ENTRY_TEXT_MAX_LENGTH = 40;

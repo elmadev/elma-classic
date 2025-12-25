@@ -1,9 +1,5 @@
 #include "ALL.H"
 
-const int LISTx0 = 200;
-const int LISTy0 = 90;
-const int LISTdy = 33;
-
 int NavEntriesLeftMaxLength = 1;
 
 nav_entry* NavEntriesLeft = nullptr;
@@ -60,10 +56,10 @@ menu_nav::menu_nav() {
     entries_right = nullptr;
     length = 0;
     selected_index = 0;
-    x_left = 0;
-    y_entries = 0;
-    dy = 0;
-    enable_esc = false;
+    x_left = 200;
+    y_entries = 90;
+    dy = 33;
+    enable_esc = true;
     title[0] = 0;
     y_title = 30;
     menu = nullptr;

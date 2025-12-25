@@ -156,10 +156,6 @@ void replay(void) {
 
     menu_nav val;
     val.selected_index = 0;
-    val.x_left = LISTx0;
-    val.y_entries = LISTy0;
-    val.dy = LISTdy;
-    val.enable_esc = true;
     strcpy(val.title, "Select replay file!");
 
     val.setup(szamuk);
@@ -331,7 +327,6 @@ void mainmenu(void) {
     val.x_left = 200;
     val.y_entries = 100;
     val.dy = 50;
-    val.enable_esc = true;
     strcpy(val.title, "Main Menu");
 
     strcpy(NavEntriesLeft[0], "Play");

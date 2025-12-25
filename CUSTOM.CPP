@@ -320,7 +320,6 @@ static void gombotvalaszt(int rubrikaszam, billmuttomb bmuttomb, int sorszam) {
     val.x_right = 400;
     val.y_entries = 86;
     val.dy = 40;
-    val.enable_esc = true;
 
     strcpy(val.title, "Customize controls");
     strcpy(NavEntriesRight[sorszam], "_");
@@ -406,7 +405,6 @@ static void customizeplayer(billmuttomb bmuttomb, player_keys* pjatopc, const ch
         val.x_right = 400;
         val.y_entries = 86;
         val.dy = 40;
-        val.enable_esc = true;
 
         strcpy(val.title, "Customize Player ");
         strcat(val.title, ABjel);
@@ -439,7 +437,6 @@ void customize(void) {
         val.x_right = 400;
         val.y_entries = 86;
         val.dy = 40;
-        val.enable_esc = true;
 
         strcpy(val.title, "Customize controls");
 

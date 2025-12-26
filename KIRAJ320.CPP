@@ -756,9 +756,7 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
         }
     }
 
-    Locky0_alul = 1;
     pic8* npic = lockbackbuffer_pic();
-    Locky0_alul = 0;
 
     if (!Bpic) {
         Bpic = new pic8(10, SCREEN_HEIGHT);
@@ -802,7 +800,5 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
     // for( int i = 0; i < Ucsosurlodas; i++ )
     //	npic->ppixel( i, 100, 0 );
 
-    Locky0_alul = 1;
     unlockbackbuffer_pic();
-    Locky0_alul = 0;
 }

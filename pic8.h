@@ -9,8 +9,8 @@ class pic8 {
     friend void blit8(pic8* dest, pic8* source, int x, int y);
     friend void spriteosit(pic8* ppic, int index);
     friend void spriteosit(pic8* ppic);
-    friend pic8* lockbackbuffer_pic();
-    friend void lockfrontbuffer_pic();
+    friend pic8* lockbackbuffer_pic(bool flipped);
+    friend void lockfrontbuffer_pic(bool flipped);
     friend void unlockbackbuffer_pic();
 
     void allocate(int w, int h);

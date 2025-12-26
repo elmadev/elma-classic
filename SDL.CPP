@@ -6,9 +6,6 @@ SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
 SDL_Surface* SDLSurfacePaletted;
 
-// Ha igaz, alulrol indul y (kirajz320 allitja igazba):
-int Locky0_alul = 0;
-
 static bool LeftMouseDownPrev = false;
 static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
@@ -52,14 +49,14 @@ void sdl_init() {
 static unsigned char* SurfaceBuffer[SCREEN_HEIGHT];
 static bool SurfaceLocked = false;
 
-unsigned char** lock_backbuffer() {
+unsigned char** lock_backbuffer(bool flipped) {
     if (SurfaceLocked) {
         hiba("lock_backbuffer SurfaceLocked!");
     }
     SurfaceLocked = true;
 
     unsigned char* row = (unsigned char*)SDLSurfacePaletted->pixels;
-    if (Locky0_alul) {
+    if (flipped) {
         // Set the row buffer bottom-down
         for (int y = 0; y < SCREEN_HEIGHT; y++) {
             SurfaceBuffer[SCREEN_HEIGHT - 1 - y] = row;
@@ -86,12 +83,12 @@ void unlock_backbuffer() {
     SDL_UpdateWindowSurface(SDLWindow);
 }
 
-unsigned char** lock_frontbuffer() {
+unsigned char** lock_frontbuffer(bool flipped) {
     if (SurfaceLocked) {
         hiba("lock_frontbuffer SurfaceLocked!");
     }
 
-    return lock_backbuffer();
+    return lock_backbuffer(flipped);
 }
 
 void unlock_frontbuffer() {

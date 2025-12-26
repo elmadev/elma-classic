@@ -28,6 +28,7 @@ static int Hibaban = 0;
 static char Tmphibatext[500];
 
 static void directhiba(const char* text1, const char* text2, const char* text3, const char* text4) {
+    ErrorOnMissingCodepoint = false;
     FILE* h;
     if (Hibaban) {
         h = fopen("error_b.txt", "wt");

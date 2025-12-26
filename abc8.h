@@ -3,6 +3,8 @@
 
 typedef pic8* ptrpic8;
 
+extern bool ErrorOnMissingCodepoint;
+
 class abc8 {
   private:
     ptrpic8* ppsprite;

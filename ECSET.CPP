@@ -975,15 +975,16 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
         }
     }
     // Most beadjuk alul vagy felul megtoldott reszt is:
+    int grass_height_padding = FUGGTOLDAS * EolSettings->zoom;
     if (felso) {
         // Felso:
-        for (int y = 0; y < FUGGTOLDAS; y++) {
+        for (int y = 0; y < grass_height_padding; y++) {
             addbytesor((unsigned char*)(textindex + 10), tavolsag, xo, xo + xsize - 1,
                        yo + ysize + y, fazis);
         }
     } else {
         // Also:
-        for (int y = 0; y < FUGGTOLDAS; y++) {
+        for (int y = 0; y < grass_height_padding; y++) {
             addbytesor((unsigned char*)(textindex + 10), tavolsag, xo, xo + xsize - 1, yo - 1 - y,
                        fazis);
         }

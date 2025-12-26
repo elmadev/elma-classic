@@ -1,19 +1,8 @@
 #ifndef M_V_H
 #define M_V_H
 
-void message_box(const char* text);
-
 // Ezt neha meg kell hivni!:
-void handle_events();
 void mv_exit(); // Ezzel kell kilepni!
-
-// MOUSE:
-void get_mouse_position(int* x, int* y);
-void set_mouse_position(int x, int y);
-int left_mouse_click();
-int right_mouse_click();
-void show_cursor();
-void hide_cursor();
 
 // 182*sec-et adja vissza idot tortresszel egyutt!
 // d_stoppe.cpp-ben vannak megvalositva:

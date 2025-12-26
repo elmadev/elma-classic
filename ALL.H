@@ -101,3 +101,4 @@
 #include "M_K.H"
 #include "M_V.H"
 #include "M_PIC.H"
+#include "platform_impl.h"

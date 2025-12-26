@@ -17,7 +17,7 @@ void message_box(const char* text) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Message", text, SDLWindow);
 }
 
-void sdl_init() {
+void platform_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         hiba(SDL_GetError());
         return;

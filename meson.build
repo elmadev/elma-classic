@@ -52,7 +52,7 @@ elma_sources = files(
     'PLAY.CPP',
     'QOPEN.CPP',
     'RECORDER.CPP',
-    'SDL.CPP',
+    'platform_sdl.cpp',
     'SKIP.CPP',
     'SPRITE.CPP',
     'state.cpp',

@@ -9,6 +9,8 @@ SDL_Surface* SDLSurfacePaletted;
 // Ha igaz, alulrol indul y (kirajz320 allitja igazba):
 int Locky0_alul = 0;
 
+static bool LeftMouseDownPrev = false;
+static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
@@ -171,12 +173,16 @@ void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }
 
 bool left_mouse_clicked() {
     handle_events();
-    return LeftMouseDown;
+    bool click = !LeftMouseDownPrev && LeftMouseDown;
+    LeftMouseDownPrev = LeftMouseDown;
+    return click;
 }
 
 bool right_mouse_clicked() {
     handle_events();
-    return RightMouseDown;
+    bool click = !RightMouseDownPrev && RightMouseDown;
+    RightMouseDownPrev = RightMouseDown;
+    return click;
 }
 
 static SDL_AudioDeviceID SDLAudioDevice;

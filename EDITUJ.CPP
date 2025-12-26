@@ -592,30 +592,6 @@ void editor(void) {
 
     Valtozott = 0;
 
-    // int magassag = 10;
-    /*int lenyomva = 0;
-    while( 1 ) {
-        if( mk_kbhit() )
-            if( mk_getextchar() == MK_ESC )
-                hiba( "Vege!" );
-        int ujlenyomva = left_mouse_clicked();
-        if( lenyomva == ujlenyomva )
-            continue;
-
-        lenyomva = ujlenyomva;
-
-        lockfrontbuffer_pic();
-        if( lenyomva )
-            ppixelfront( 300, magassag, 0 );
-        else
-            ppixelfront( 310, magassag, 0 );
-        unlockfrontbuffer_pic();
-
-        magassag += 5;
-        if( magassag > 460 )
-            magassag = 460;
-    }*/
-
     // Most megnezzuk, hogy megvannak-e palyai fazonnak:
     if (hanypalyavanmeg() < 5) {
         char tmp[50];
@@ -654,8 +630,8 @@ void editor(void) {
     kitolt();
     ujrarajzol(1);
 
-    int egerballevoltnyomva = 0; // Eger gombja csak lemenetnel aktivizalodik
-    int egerjobblevoltnyomva = 0;
+    left_mouse_clicked();
+    right_mouse_clicked();
     while (1) {
         while (mk_kbhit()) {
             int c = mk_getextchar();
@@ -735,29 +711,9 @@ void editor(void) {
             } */
         }
         // Megnezzuk eger gombok lemenetelet:
-        int balnyomva = 0;
-        int balallapot = left_mouse_clicked();
-        if (balallapot && !egerballevoltnyomva) {
-            balnyomva = 1;
-        }
-        egerballevoltnyomva = balallapot;
-
-        int jobbnyomva = 0;
-        int jobballapot = right_mouse_clicked();
-        if (jobballapot && !egerjobblevoltnyomva) {
-            jobbnyomva = 1;
-        }
-        egerjobblevoltnyomva = jobballapot;
-
+        bool balnyomva = left_mouse_clicked();
+        bool jobbnyomva = right_mouse_clicked();
         if (balnyomva || jobbnyomva) {
-
-            // Ez most azert van, hogy ha peldaul jobb
-            // gombbal helpet kertunk, es bal gombbal
-            // 'OK'-ra kattintva lepunk ki help boxbol
-            // aktiv tool ne erzekelje rogton lenyomasnak
-            // gombot, hanem elotte egyszer meg fel
-            // kelljen azt engedni:
-            egerballevoltnyomva = 1;
 
             /*lockfrontbuffer_pic();
             ppixelfront( 300, magassag, 0 );

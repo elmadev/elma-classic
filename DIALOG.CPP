@@ -146,8 +146,8 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     // Azert adunk egy erteket, hogy ha lenyomassal jutott
     // dialogba, egyszer fel kell engednie mielott ujra
     // lenyomasnak erzekelne:
-    int egerballevoltnyomva = 1;  // Eger gombja csak lemenetnel aktivizalodik
-    int egerjobblevoltnyomva = 1; // Eger gombja csak lemenetnel aktivizalodik
+    left_mouse_clicked();
+    right_mouse_clicked();
     while (1) {
         while (mk_kbhit()) {
             int c = mk_getextchar();
@@ -169,39 +169,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             }
         }
         // Megnezzuk eger gombok lemenetelet:
-        // Regi modszer, rogton visszament help peldaul:
-        /*int balnyomva = 0;
-        if( left_mouse_clicked() && !egerballevoltnyomva ) {
-            egerballevoltnyomva = 1;
-            balnyomva = 1;
-        }
-        else {
-            egerballevoltnyomva = 0;
-        }
-        int jobbnyomva = 0;
-        if( right_mouse_clicked() && !egerjobblevoltnyomva ) {
-            egerjobblevoltnyomva = 1;
-            jobbnyomva = 1;
-        }
-        else {
-            egerjobblevoltnyomva = 0;
-        }*/
-        // Megnezzuk eger gombok lemenetelet:
-        int balnyomva = 0;
-        int mostnyomva = left_mouse_clicked();
-        if (mostnyomva && !egerballevoltnyomva) {
-            balnyomva = 1;
-        }
-        egerballevoltnyomva = mostnyomva;
-
-        int jobbnyomva = 0;
-        mostnyomva = right_mouse_clicked();
-        if (mostnyomva && !egerjobblevoltnyomva) {
-            jobbnyomva = 1;
-        }
-        egerjobblevoltnyomva = mostnyomva;
-
-        if (jobbnyomva) {
+        if (right_mouse_clicked()) {
             if (gombszam == 1) {
                 if (!Editorban_dialnak) {
                     push(); // Leszedjuk egeret keprol
@@ -210,7 +178,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             }
         }
 
-        if (balnyomva) {
+        if (left_mouse_clicked()) {
             int ujx = 0, ujy = 0;
             get_mouse_position(&ujx, &ujy);
             push();

@@ -5,7 +5,7 @@ constexpr unsigned char BLACK_PALETTE_ID = 254;
 constexpr unsigned char GREEN_PALETTE_ID = 248;
 
 constexpr int MENU_LINE_LENGTH = 100;
-constexpr int MENU_MAX_LINES = 29;
+constexpr int MENU_MAX_LINES = 200;
 
 extern pic8* BufferMain;
 extern pic8* BufferBall;

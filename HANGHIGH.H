@@ -15,8 +15,6 @@ enum {
     WAV_TURA
 };
 
-void init_sound();
-
 // Csak program elejen allithato:
 // Ha hamis, semmi directsound fv.-t nem hiv:
 extern int Hangenabled;

@@ -97,8 +97,6 @@
 #include "ball_handler.h"
 #include "ball_collision.h"
 
-#include "M_DD.H"
 #include "M_K.H"
-#include "M_V.H"
 #include "M_PIC.H"
 #include "platform_impl.h"

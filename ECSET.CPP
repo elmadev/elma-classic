@@ -459,6 +459,7 @@ void ecset::mutatotlanit(void) {
 
 // Ptop kerek-jeinek egesz koordinatait kitolti:
 void ecset::kitoltfoodkoordokat(void) {
+    const double offset = ANIM_WIDTH / 2.0 * EolSettings->zoom();
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* pker = Ptop->objects[i];
         if (!pker) {
@@ -470,10 +471,8 @@ void ecset::kitoltfoodkoordokat(void) {
             pker->minimap_canvas_y =
                 (int)((-pker->r.y - origo.y) * MetersToPixels / MinimapScaleFactor);
         } else {
-            pker->canvas_x =
-                (int)((pker->r.x - origo.x) * MetersToPixels - (double)(ANIM_WIDTH / 2));
-            pker->canvas_y =
-                (int)((-pker->r.y - origo.y) * MetersToPixels - (double)(ANIM_WIDTH / 2));
+            pker->canvas_x = (int)((pker->r.x - origo.x) * MetersToPixels - offset);
+            pker->canvas_y = (int)((-pker->r.y - origo.y) * MetersToPixels - offset);
         }
     }
 }

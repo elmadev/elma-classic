@@ -71,6 +71,7 @@ struct motorst {
 
 extern motorst *Motor1, *Motor2;
 
+void set_zoom_factor();
 void init_physics_data();
 void init_motor(motorst* motor);
 

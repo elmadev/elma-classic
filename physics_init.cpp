@@ -76,15 +76,19 @@ void init_motor(motorst* motor) {
     motor->body_v = vect2(0.0, 0.0);
 }
 
-void init_physics_data(void) {
-    init_motor(Motor1);
-    init_motor(Motor2);
-
+void set_zoom_factor() {
     double zoom_factor = 0.48 * EolSettings->zoom;
     MetersToPixels = 100.0 * zoom_factor;
     PixelsToMeters = 1.0 / MetersToPixels;
 
     MinimapScaleFactor = (int)(0.42 * MetersToPixels * 0.5);
+}
+
+void init_physics_data(void) {
+    init_motor(Motor1);
+    init_motor(Motor2);
+
+    set_zoom_factor();
 
     GroundEscapeVelocity = 0.01;          // m/s
     WheelDeformationLength = 0.005;       // m

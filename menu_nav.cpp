@@ -132,8 +132,12 @@ int menu_nav::calculate_visible_entries(int extra_lines_length) {
     if (max_visible_entries < 2) {
         max_visible_entries = 2;
     }
-    if (max_visible_entries > MENU_MAX_LINES - extra_lines_length) {
-        max_visible_entries = MENU_MAX_LINES - extra_lines_length;
+    int max_value = MENU_MAX_LINES - extra_lines_length;
+    if (two_columns) {
+        max_value /= 2;
+    }
+    if (max_visible_entries > max_value) {
+        max_visible_entries = max_value;
     }
     return max_visible_entries;
 }

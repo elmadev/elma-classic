@@ -244,7 +244,7 @@ void options(void) {
         }
 
         if (kurrens == 9) {
-            customize();
+            menu_customize_controls();
         }
 
         if (kurrens == 10) {

@@ -66,8 +66,8 @@ void menu_pic::add_line(const char* text, int x, int y) {
     if (strlen(text) > MENU_LINE_LENGTH) {
         hiba("menu::add_line strlen(text) > MENU_LINE_LENGTH");
     }
-    if (line_count >= MENU_MAX_LINES - 1) {
-        hiba("menu::add_line linecount >= MENU_MAX_LINES - 1");
+    if (line_count >= MENU_MAX_LINES) {
+        hiba("menu::add_line linecount >= MENU_MAX_LINES");
     }
     strcpy(lines[line_count].text, text);
     lines[line_count].x = x;

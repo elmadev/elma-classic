@@ -7,6 +7,7 @@
 * Intro scrolling animation will always take 1.15 seconds, regardless of screen resolution
 * Intro scrolling animation is now skippable by pressing Enter or Esc, instead of being an eolconf setting
 * Background menu balls start off centered in the screen
+* Maximum number of displayed levels/recs in menu increased from 29 to up to 200 for high resolutions
 
 ## Minor Bug Fixes
 * Foreground grass was accidentally inefficiently calculated, causing increased load time

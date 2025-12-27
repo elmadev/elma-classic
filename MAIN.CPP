@@ -13,9 +13,8 @@ double mv_stopperido(void) { return timeGetTime() * 0.182 - Startido; }
 
 void mv_startstopper(void) { Startido = timeGetTime() * 0.182; }
 
-int sdl_init(void);
 int main() {
-    sdl_init();
+    platform_init();
 
     teljes();
 }

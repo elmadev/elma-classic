@@ -1,10 +1,10 @@
 #ifndef M_PIC_H
 #define M_PIC_H
 
-pic8* lockbackbuffer_pic(void);
+pic8* lockbackbuffer_pic(bool flipped = true);
 void unlockbackbuffer_pic(void);
 
-void lockfrontbuffer_pic(void);
+void lockfrontbuffer_pic(bool flipped = false);
 void unlockfrontbuffer_pic(void);
 void ppixelfront(int x, int y, unsigned char szin);
 

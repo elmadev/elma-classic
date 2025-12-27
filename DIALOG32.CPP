@@ -2,9 +2,12 @@
 
 #define MENU_DIALOG_MAX_LENGTH (6)
 
-// Visszaadja lenyomott billentyut:
+// Display the menu with the provided text, then return the key pressed by the user.
+// Unused feature:
+// If text1 == MENU_DIALOG_ONLY_ESC ("ESC"), then only ESC can quit this menu
 int menu_dialog(const char* text1, const char* text2, const char* text3, const char* text4,
                 const char* text5, const char* text6) {
+    // Count the number of entries
     int text_count;
     const char* text_array[MENU_DIALOG_MAX_LENGTH + 1] = {text1, text2, text3, text4,
                                                           text5, text6, NULL};
@@ -14,6 +17,7 @@ int menu_dialog(const char* text1, const char* text2, const char* text3, const c
         }
     }
 
+    // Check "ESC" as first string
     int esc_only = 0;
     if (strcmp(text_array[0], "ESC") == 0) {
         esc_only = 1;
@@ -23,6 +27,7 @@ int menu_dialog(const char* text1, const char* text2, const char* text3, const c
         text_count--;
     }
 
+    // Render and prompt for key input
     menu_pic menu;
     int dy = 40;
     int y0 = 240 - (text_count - 1) / 2 * dy;

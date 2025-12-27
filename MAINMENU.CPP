@@ -189,16 +189,16 @@ void replay(void) {
                 kiirloading();
                 long belyeg = loadrecek(tmp, 0);
                 if (access_topol(Prec1->palyanev) != 0) {
-                    int c = dialog320("Cannot find the lev file that corresponds",
-                                      "to the record file!", tmp, Prec1->palyanev);
+                    int c = menu_dialog("Cannot find the lev file that corresponds",
+                                        "to the record file!", tmp, Prec1->palyanev);
                     if (c == MK_ESC) {
                         return;
                     }
                 } else {
                     floadlevel_p(Prec1->palyanev);
                     if (Ptop->belyeg != belyeg) {
-                        int c = dialog320("The level file has changed since the",
-                                          "saving of the record file!", tmp, Prec1->palyanev);
+                        int c = menu_dialog("The level file has changed since the",
+                                            "saving of the record file!", tmp, Prec1->palyanev);
                         if (c == MK_ESC) {
                             return;
                         }
@@ -234,17 +234,17 @@ void replay(void) {
                 char idostr[25];
                 centiseconds_to_string(ido, idostr);
                 strcat(idostr, "    +- 0.01 sec");
-                dialog320(tmp, "The time of this replay file is:", idostr);
+                menu_dialog(tmp, "The time of this replay file is:", idostr);
                 continue;
             }
             if (access_topol(Prec1->palyanev) != 0) {
-                dialog320("Cannot find the lev file that corresponds", "to the record file!", tmp,
-                          Prec1->palyanev);
+                menu_dialog("Cannot find the lev file that corresponds", "to the record file!", tmp,
+                            Prec1->palyanev);
             } else {
                 floadlevel_p(Prec1->palyanev);
                 if (Ptop->belyeg != belyeg) {
-                    dialog320("The level file has changed since the", "saving of the record file!",
-                              tmp, Prec1->palyanev);
+                    menu_dialog("The level file has changed since the",
+                                "saving of the record file!", tmp, Prec1->palyanev);
                 } else {
                     replayjelenlegi(Prec1->palyanev);
                 }

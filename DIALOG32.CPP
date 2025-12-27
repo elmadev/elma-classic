@@ -1,38 +1,39 @@
 #include "ALL.H"
 
-#define MAXSOR32 (6)
+#define MENU_DIALOG_MAX_LENGTH (6)
 
 // Visszaadja lenyomott billentyut:
-int dialog320(const char* text1, const char* text2, const char* text3, const char* text4,
-              const char* text5, const char* text6) {
-    int szam;
-    const char* textek[MAXSOR32 + 1] = {text1, text2, text3, text4, text5, text6, NULL};
-    for (szam = 0; szam < 6; szam++) {
-        if (!textek[szam]) {
+int menu_dialog(const char* text1, const char* text2, const char* text3, const char* text4,
+                const char* text5, const char* text6) {
+    int text_count;
+    const char* text_array[MENU_DIALOG_MAX_LENGTH + 1] = {text1, text2, text3, text4,
+                                                          text5, text6, NULL};
+    for (text_count = 0; text_count < 6; text_count++) {
+        if (!text_array[text_count]) {
             break;
         }
     }
 
-    int enter = 0;
-    if (strcmp(textek[0], "ESC") == 0) {
-        enter = 1;
-        for (int i = 0; i < szam; i++) {
-            textek[i] = textek[i + 1];
+    int esc_only = 0;
+    if (strcmp(text_array[0], "ESC") == 0) {
+        esc_only = 1;
+        for (int i = 0; i < text_count; i++) {
+            text_array[i] = text_array[i + 1];
         }
-        szam--;
+        text_count--;
     }
 
-    menu_pic szl;
+    menu_pic menu;
     int dy = 40;
-    int y0 = 240 - (szam - 1) / 2 * dy;
-    for (int i = 0; i < szam; i++) {
-        szl.add_line_centered(textek[i], 320, y0 + i * dy);
+    int y0 = 240 - (text_count - 1) / 2 * dy;
+    for (int i = 0; i < text_count; i++) {
+        menu.add_line_centered(text_array[i], 320, y0 + i * dy);
     }
     mk_emptychar();
     while (1) {
         if (mk_kbhit()) {
             int c = mk_getextchar();
-            if (enter) {
+            if (esc_only) {
                 if (c == MK_ESC) {
                     return c;
                 }
@@ -40,6 +41,6 @@ int dialog320(const char* text1, const char* text2, const char* text3, const cha
                 return c;
             }
         }
-        szl.render();
+        menu.render();
     }
 }

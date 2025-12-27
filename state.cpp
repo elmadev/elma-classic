@@ -127,8 +127,8 @@ void state::reload_toptens() {
     const char* filename = STATE_FILENAME;
     FILE* h = fopen(filename, "rb");
     while (!h) {
-        dialog320("The state.dat file cannot be opened!",
-                  "Please make sure state.dat is accessible,", "then press enter!");
+        menu_dialog("The state.dat file cannot be opened!",
+                    "Please make sure state.dat is accessible,", "then press enter!");
         h = fopen(filename, "rb");
     }
 

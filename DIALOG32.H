@@ -1,7 +1,10 @@
 #ifndef DIALOG32_H
 #define DIALOG32_H
 
-int menu_dialog(const char* text1, const char* text2 = NULL, const char* text3 = NULL,
-                const char* text4 = NULL, const char* text5 = NULL, const char* text6 = NULL);
+#define MENU_DIALOG_ONLY_ESC "ESC"
+
+int menu_dialog(const char* text1, const char* text2 = nullptr, const char* text3 = nullptr,
+                const char* text4 = nullptr, const char* text5 = nullptr,
+                const char* text6 = nullptr);
 
 #endif

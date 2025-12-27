@@ -1,26 +1,23 @@
 #include "ALL.H"
 
-#define MENU_DIALOG_MAX_LENGTH (6)
-
 // Display the menu with the provided text, then return the key pressed by the user.
 // Unused feature:
 // If text1 == MENU_DIALOG_ONLY_ESC ("ESC"), then only ESC can quit this menu
 int menu_dialog(const char* text1, const char* text2, const char* text3, const char* text4,
                 const char* text5, const char* text6) {
     // Count the number of entries
-    int text_count;
-    const char* text_array[MENU_DIALOG_MAX_LENGTH + 1] = {text1, text2, text3, text4,
-                                                          text5, text6, NULL};
-    for (text_count = 0; text_count < 6; text_count++) {
-        if (!text_array[text_count]) {
-            break;
-        }
+    constexpr int MENU_DIALOG_MAX_LENGTH = 6;
+    const char* text_array[MENU_DIALOG_MAX_LENGTH + 1] = {text1, text2, text3,  text4,
+                                                          text5, text6, nullptr};
+    int text_count = 0;
+    while (text_array[text_count] && text_count < MENU_DIALOG_MAX_LENGTH) {
+        text_count += 1;
     }
 
     // Check "ESC" as first string
-    int esc_only = 0;
-    if (strcmp(text_array[0], "ESC") == 0) {
-        esc_only = 1;
+    bool esc_only = false;
+    if (strcmp(text_array[0], MENU_DIALOG_ONLY_ESC) == 0) {
+        esc_only = true;
         for (int i = 0; i < text_count; i++) {
             text_array[i] = text_array[i + 1];
         }
@@ -35,7 +32,7 @@ int menu_dialog(const char* text1, const char* text2, const char* text3, const c
         menu.add_line_centered(text_array[i], 320, y0 + i * dy);
     }
     mk_emptychar();
-    while (1) {
+    while (true) {
         if (mk_kbhit()) {
             int c = mk_getextchar();
             if (esc_only) {

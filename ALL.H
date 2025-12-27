@@ -91,7 +91,7 @@
 #include "menu_pic.h"
 
 #include "menu_nav.h"
-#include "DIALOG32.H"
+#include "menu_dialog.h"
 
 #include "ball.h"
 #include "ball_handler.h"

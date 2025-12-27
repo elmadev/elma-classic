@@ -1,5 +1,5 @@
-#ifndef DIALOG32_H
-#define DIALOG32_H
+#ifndef MENU_DIALOG_H
+#define MENU_DIALOG_H
 
 #define MENU_DIALOG_ONLY_ESC "ESC"
 

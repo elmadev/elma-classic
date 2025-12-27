@@ -14,7 +14,7 @@ elma_sources = files(
     'best_times.cpp',
     'CUSTOM.CPP',
     'DIALOG.CPP',
-    'DIALOG32.CPP',
+    'menu_dialog.cpp',
     'DIGIT.CPP',
     'DISPLAY.CPP',
     'DOBOZ.CPP',

@@ -1,7 +1,6 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
 
-// Customize kiirashoz kell:
 const char* dik_to_string(int keycode) {
     switch (keycode) {
     case DIK_1:
@@ -53,13 +52,13 @@ const char* dik_to_string(int keycode) {
     case DIK_P:
         return "P";
     case DIK_LBRACKET:
-        return "["; // The [ key
+        return "[";
     case DIK_RBRACKET:
-        return "]"; // The ] key
+        return "]";
     case DIK_RETURN:
-        return "ENTER"; // ENTER key on main keyboard
+        return "ENTER";
     case DIK_LCONTROL:
-        return "LEFT CTRL"; // Left CTRL key
+        return "LEFT CTRL";
     case DIK_A:
         return "A";
     case DIK_S:
@@ -83,9 +82,9 @@ const char* dik_to_string(int keycode) {
     case DIK_APOSTROPHE:
         return "\"";
     case DIK_GRAVE:
-        return "`"; // Grave accent (`) key
+        return "`";
     case DIK_LSHIFT:
-        return "LEFT SHIFT"; // Left SHIFT key
+        return "LEFT SHIFT";
     case DIK_BACKSLASH:
         return "\\";
     case DIK_Z:
@@ -105,19 +104,19 @@ const char* dik_to_string(int keycode) {
     case DIK_COMMA:
         return ",";
     case DIK_PERIOD:
-        return "."; // On main keyboard
+        return ".";
     case DIK_SLASH:
-        return "SLASH"; // Forward slash on main keyboard
+        return "SLASH";
     case DIK_RSHIFT:
-        return "RIGHT SHIFT"; // Right SHIFT key
+        return "RIGHT SHIFT";
     case DIK_MULTIPLY:
-        return "PAD_*"; // The * key on numeric keypad
+        return "PAD_*";
     case DIK_LMENU:
-        return "LEFT ALT"; // Left ALT key
+        return "LEFT ALT";
     case DIK_SPACE:
-        return "SPACEBAR"; // SPACEBAR
+        return "SPACEBAR";
     case DIK_CAPITAL:
-        return "CAPS LOCK"; // CAPS LOCK key
+        return "CAPS LOCK";
     case DIK_F1:
         return "F1";
     case DIK_F2:
@@ -141,7 +140,7 @@ const char* dik_to_string(int keycode) {
     case DIK_NUMLOCK:
         return "NUM LOCK";
     case DIK_SCROLL:
-        return "SCROLL LOCK"; // SCROLL LOCK
+        return "SCROLL LOCK";
     case DIK_NUMPAD7:
         return "PAD_HOME";
     case DIK_NUMPAD8:
@@ -149,7 +148,7 @@ const char* dik_to_string(int keycode) {
     case DIK_NUMPAD9:
         return "PAD_PGUP";
     case DIK_SUBTRACT:
-        return "PAD_-"; // MINUS SIGN on numeric keypad
+        return "PAD_-";
     case DIK_NUMPAD4:
         return "PAD_LEFT";
     case DIK_NUMPAD5:
@@ -157,7 +156,7 @@ const char* dik_to_string(int keycode) {
     case DIK_NUMPAD6:
         return "PAD_RIGHT";
     case DIK_ADD:
-        return "PAD_+"; // PLUS SIGN on numeric keypad
+        return "PAD_+";
     case DIK_NUMPAD1:
         return "PAD_END";
     case DIK_NUMPAD2:
@@ -167,7 +166,7 @@ const char* dik_to_string(int keycode) {
     case DIK_NUMPAD0:
         return "PAD_INS";
     case DIK_DECIMAL:
-        return "PAD_DEL"; // PERIOD (decimal point) on numeric keypad
+        return "PAD_DEL";
     case DIK_F11:
         return "F11";
     case DIK_F12:
@@ -179,122 +178,84 @@ const char* dik_to_string(int keycode) {
     case DIK_F15:
         return "F15";
     case DIK_KANA:
-        return "KANA"; // On Japanese keyboard
+        return "KANA";
     case DIK_CONVERT:
-        return "CONVERT"; // On Japanese keyboard
+        return "CONVERT";
     case DIK_NOCONVERT:
-        return "NOCONVERT"; // On Japanese keyboard
+        return "NOCONVERT";
     case DIK_YEN:
-        return "YEN"; // On Japanese keyboard
+        return "YEN";
     case DIK_NUMPADEQUALS:
-        return "PAD_="; // On numeric keypad (NEC PC98)
+        return "PAD_=";
     case DIK_PREVTRACK:
-        return "CIRCUMFLEX"; // On Japanese keyboard
+        return "CIRCUMFLEX";
     case DIK_AT:
-        return "AT"; // On Japanese keyboard
+        return "AT";
     case DIK_COLON:
-        return "COLON"; // On Japanese keyboard
+        return "COLON";
     case DIK_UNDERLINE:
-        return "UNDERLINE"; // On Japanese keyboard
+        return "UNDERLINE";
     case DIK_KANJI:
-        return "KANJI"; // On Japanese keyboard
+        return "KANJI";
     case DIK_STOP:
-        return "STOP"; // On Japanese keyboard
+        return "STOP";
     case DIK_AX:
-        return "AX"; // On Japanese keyboard
+        return "AX";
     case DIK_UNLABELED:
-        return "UNLABELED"; // On Japanese keyboard
+        return "UNLABELED";
     case DIK_NUMPADENTER:
         return "PAD_ENTER";
     case DIK_RCONTROL:
-        return "RIGHT CTRL"; // Right CTRL key
+        return "RIGHT CTRL";
     case DIK_NUMPADCOMMA:
-        return "COMMA"; // COMMA on NEC PC98 numeric keypad
+        return "COMMA";
     case DIK_DIVIDE:
-        return "PAD_/"; // Forward slash on numeric keypad
+        return "PAD_/";
     case DIK_SYSRQ:
         return "SYSRQ";
     case DIK_RMENU:
-        return "RIGHT ALT"; // Right ALT key
+        return "RIGHT ALT";
     case DIK_HOME:
         return "HOME";
     case DIK_UP:
-        return "UP ARROW"; // UP ARROW
+        return "UP ARROW";
     case DIK_PRIOR:
-        return "PAGEUP"; // PAGE UP
+        return "PAGEUP";
     case DIK_LEFT:
-        return "LEFT ARROW"; // LEFT ARROW
+        return "LEFT ARROW";
     case DIK_RIGHT:
-        return "RIGHT ARROW"; // RIGHT ARROW
+        return "RIGHT ARROW";
     case DIK_END:
         return "END";
     case DIK_DOWN:
-        return "DOWN ARROW"; // DOWN ARROW
+        return "DOWN ARROW";
     case DIK_NEXT:
-        return "PAGE DOWN"; // PAGE DOWN
+        return "PAGE DOWN";
     case DIK_INSERT:
         return "INS";
     case DIK_DELETE:
         return "DEL";
     case DIK_LWIN:
-        return "LEFT WIN"; // Left Windows key
+        return "LEFT WIN";
     case DIK_RWIN:
-        return "RIGHT WIN"; // Right Windows key
+        return "RIGHT WIN";
     case DIK_APPS:
-        return "APPLICATION"; // Application key
-
-        // Japan:
-
-        /*case DIK_AT: return "";
-        case DIK_PREVTRACK: return "";
-        case DIK_COLON: return "";
-        case DIK_CONVERT: return "";
-        case DIK_KANA: return "";
-        case DIK_KANJI: return "";
-        case DIK_NOCONVERT: return "";
-        case DIK_YEN: return "";
-        case DIK_APOSTROPHE: return "";
-        case DIK_EQUALS: return "";
-        case DIK_GRAVE: return "";
-
-        case DIK_F13: return "";
-        case DIK_F14: return "";
-        case DIK_F15: return "";
-        case DIK_NUMPADCOMMA: return "";
-        case DIK_NUMPADEQUALS: return "";
-        case DIK_STOP: return "";
-        case DIK_UNDERLINE: return "";
-        case DIK_BACKSLASH: return "";
-        case DIK_GRAVE: return "";
-        case DIK_NUMLOCK: return "";
-        case DIK_NUMPADENTER: return "";
-        case DIK_RCONTROL: return "";
-        case DIK_RMENU: return "";
-        case DIK_RSHIFT: return "";
-        case DIK_SCROLL: return "";
-
-        case DIK_AX: return "";
-        case DIK_CONVERT: return "";
-        case DIK_KANJI: return "";
-        case DIK_NOCONVERT: return "";
-
-        case DIK_NOLABEL: return "";
-        */
+        return "APPLICATION";
     }
-
-    // Nem talalta meg billentyuhoz nevet:
     return NULL;
 }
 
+// A list of pointers to where the keys are stored (somewhere in a state class object)
 typedef int* key_pointers[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
-static key_pointers UniversalKeys;
+static key_pointers UniversalKeys; // +/- and Screenshot
 static key_pointers Player1Keys;
 static key_pointers Player2Keys;
 
 static int UNIVERSAL_KEYS_END = 6;
 static int PLAYER_KEYS_END = 8;
 
+// Setup the menu to display one control key
 static void load_control(key_pointers keys, int offset, const char* label, int* key) {
     strcpy(NavEntriesLeft[offset], label);
 
@@ -313,6 +274,7 @@ static void load_control(key_pointers keys, int offset, const char* label, int* 
     keys[offset] = key;
 }
 
+// Await keypress to choose a new key for one control
 static void prompt_control(int length, key_pointers keys, int index) {
     menu_nav nav;
     nav.selected_index = index;
@@ -324,11 +286,11 @@ static void prompt_control(int length, key_pointers keys, int index) {
     strcpy(nav.title, "Customize controls");
     strcpy(NavEntriesRight[index], "_");
 
-    nav.setup(length, true); // tab-os kiiras
+    nav.setup(length, true);
 
-    nav.navigate(nullptr, 0, true); // Csak kirajzolja kepet
+    // Render only!
+    nav.navigate(nullptr, 0, true);
 
-    // Megnezzuk milyen gombot nyomott le:
     while (1) {
         handle_events();
         for (int i = 1; i < 256; i++) {
@@ -344,20 +306,13 @@ static void prompt_control(int length, key_pointers keys, int index) {
                 continue;
             }
 
-            // Ez a billentyu le van nyomva:
-
-            // char tmp[10];
-            // sprintf( tmp, "Bill: %d", i );
-            // hiba( tmp );
-
-            // Most meg van nyomva egy gomb:
-            // Kiszedjuk mindenhonnan mashonnan ezt a billt:
-            for (int j = 3; j < UNIVERSAL_KEYS_END; j++) { // 1-tol megy
+            // Disallow multiple controls being mapped to the same key
+            for (int j = 3; j < UNIVERSAL_KEYS_END; j++) {
                 if (*UniversalKeys[j] == i) {
                     *UniversalKeys[j] = 0;
                 }
             }
-            for (int j = 0; j < PLAYER_KEYS_END; j++) { // 0-tol megy
+            for (int j = 0; j < PLAYER_KEYS_END; j++) {
                 if (*Player1Keys[j] == i) {
                     *Player1Keys[j] = 0;
                 }
@@ -368,11 +323,11 @@ static void prompt_control(int length, key_pointers keys, int index) {
             *keys[index] = i;
             return;
         }
-        // Golyokat leptetjuk:
         nav.render();
     }
 }
 
+// Setup the menu to display the universal controls
 static void load_universal_controls(void) {
     strcpy(NavEntriesLeft[0], "Reset all controls to default");
     NavEntriesRight[0][0] = 0;
@@ -385,6 +340,7 @@ static void load_universal_controls(void) {
     load_control(UniversalKeys, 5, "Make a Screenshot", &State->key_screenshot);
 }
 
+// Setup the menu to display one player's controls
 static void load_player_controls(key_pointers keys, player_keys* player_controls) {
     load_control(keys, 0, "Throttle", &player_controls->gas);
     load_control(keys, 1, "Brake", &player_controls->brake);
@@ -396,6 +352,7 @@ static void load_player_controls(key_pointers keys, player_keys* player_controls
     load_control(keys, 7, "Toggle Show/Hide", &player_controls->toggle_visibility);
 }
 
+// Menu to change controls for one player
 static void menu_customize_player(key_pointers keys, player_keys* player_controls,
                                   const char* player_letter) {
     int choice = 0;
@@ -412,7 +369,7 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
 
         load_player_controls(keys, player_controls);
 
-        nav.setup(PLAYER_KEYS_END, true); // tab-os kiiras
+        nav.setup(PLAYER_KEYS_END, true);
 
         choice = nav.navigate();
 
@@ -426,7 +383,9 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
     }
 }
 
+// Menu to customize universal controls or select a player
 void menu_customize_controls(void) {
+    // Initialize these pointers so we can check/modify the values in prompt_control
     load_player_controls(Player1Keys, &State->keys1);
     load_player_controls(Player2Keys, &State->keys2);
 
@@ -443,7 +402,7 @@ void menu_customize_controls(void) {
 
         load_universal_controls();
 
-        nav.setup(UNIVERSAL_KEYS_END, true); // tab-os kiiras
+        nav.setup(UNIVERSAL_KEYS_END, true);
 
         choice = nav.navigate();
 
@@ -452,6 +411,7 @@ void menu_customize_controls(void) {
         }
 
         if (choice == 0) {
+            // Reset all controls to default
             State->reset_keys();
             load_player_controls(Player1Keys, &State->keys1);
             load_player_controls(Player2Keys, &State->keys2);
@@ -459,14 +419,17 @@ void menu_customize_controls(void) {
         }
 
         if (choice == 1) {
+            // Customize Player A
             menu_customize_player(Player1Keys, &State->keys1, "A");
         }
 
         if (choice == 2) {
+            // Customize Player B
             menu_customize_player(Player2Keys, &State->keys2, "B");
         }
 
         if (choice >= 3 && choice < UNIVERSAL_KEYS_END) {
+            // Modify universal control
             prompt_control(UNIVERSAL_KEYS_END, UniversalKeys, choice);
         }
     }

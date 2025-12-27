@@ -19,7 +19,7 @@ unsigned char Hatterindex = 3;
 unsigned char Feherszin = 9;
 // unsigned char Feketeindex = Hatterindex+128;
 
-ddpal* Pal_editor = NULL;
+palette* Pal_editor = NULL;
 static unsigned char Pal_editor_byteok[768];
 
 void seteditorpal(void) {
@@ -102,7 +102,7 @@ void seteditorpal(void) {
     if (Pal_editor) {
         hiba("uvcguyew");
     }
-    Pal_editor = new ddpal(pal);
+    Pal_editor = new palette(pal);
 }
 
 static int hanypalyavanmeg(void) {

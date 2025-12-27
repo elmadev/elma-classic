@@ -16,7 +16,7 @@ abc8* MenuFont = nullptr;
 // Menu red helmet animation
 static anim* Helmet = nullptr;
 
-ddpal* MenuPal = nullptr;
+palette* MenuPal = nullptr;
 
 void init_menu_pictures() {
     if (BufferMain) {

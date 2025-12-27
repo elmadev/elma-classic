@@ -10,7 +10,7 @@ constexpr int MENU_MAX_LINES = 200;
 extern pic8* BufferMain;
 extern pic8* BufferBall;
 extern abc8* MenuFont;
-extern ddpal* MenuPal;
+extern palette* MenuPal;
 extern pic8* Intro;
 
 struct text_line {

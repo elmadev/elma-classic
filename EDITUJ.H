@@ -7,7 +7,7 @@ extern topol* Ptop;
 // extern pic8* Editbuffer; Ezentul ez BufferMain
 // extern pic8* Editbuffer2;  Ezentul ez BufferBall
 
-extern ddpal* Pal_editor;
+extern palette* Pal_editor;
 void seteditorpal(void); // Pal_editor-t hozza letre es allitja be
 
 extern abc8 *Pabc1, *Pabc2;

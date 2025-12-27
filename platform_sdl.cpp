@@ -99,7 +99,7 @@ void unlock_frontbuffer() {
     unlock_backbuffer();
 }
 
-ddpal::ddpal(unsigned char* tomb) {
+palette::palette(unsigned char* tomb) {
     for (int i = 0; i < 256; i++) {
         pal[i].r = tomb[3 * i] << 2;
         pal[i].g = tomb[3 * i + 1] << 2;
@@ -108,7 +108,7 @@ ddpal::ddpal(unsigned char* tomb) {
     }
 }
 
-void ddpal::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
+void palette::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
 
 void handle_events() {
     SDL_Event event;

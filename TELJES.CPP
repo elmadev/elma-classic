@@ -102,7 +102,7 @@ void teljes(void) {
     blit8(tmpintro, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,
           SCREEN_HEIGHT / 2 - Intro->get_height() / 2);
 
-    ddpal* pintropal = NULL;
+    palette* pintropal = NULL;
     // Gany, ezzel az egy nevvel get_pcx_pal(pic.cpp) elso harom byte-ot 0-azza:
     get_pcx_pal("intro.pcx", &pintropal);
 
@@ -185,7 +185,7 @@ void teljes(void) {
 /* Regi kilepes
 void kilep( void ) {
     pic8* ppic = new pic8( "vegekep.pcx" );
-    ddpal* pvegepal = NULL;
+    palette* pvegepal = NULL;
     get_pcx_pal( "vegekep.pcx", &pvegepal );
     pvegepal->set();
     bltfront( ppic );

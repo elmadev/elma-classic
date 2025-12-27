@@ -3,11 +3,11 @@
 
 #include <SDL_pixels.h>
 
-class ddpal {
+class palette {
     SDL_Color pal[256];
 
   public:
-    ddpal(unsigned char* tomb);
+    palette(unsigned char* tomb);
     void set();
 };
 

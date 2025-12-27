@@ -155,11 +155,6 @@ static unsigned char* getnewpalfromh(FILE* h) {
     if (fread(pal, 1, 768, h) != 768) {
         hiba("Nem tud olvasni palettat LGR-ben!: ");
     }
-
-    for (int i = 0; i < 768; i++) {
-        pal[i] = (unsigned char)(pal[i] >> 2);
-    }
-
     return pal;
 }
 
@@ -425,7 +420,7 @@ static unsigned char* makenegalttomb(unsigned char* pal) {
     // Most lookup tabla minden szinehez hozza rendeljuk feketet (0 index),
     // vagy legvilagosabbat:
     for (int i = 0; i < 256; i++) {
-        if ((pal[i * 3] < 20) && (pal[i * 3 + 1] < 20) && (pal[i * 3 + 2] < 20)) {
+        if ((pal[i * 3] < 80) && (pal[i * 3 + 1] < 80) && (pal[i * 3 + 2] < 80)) {
             lookuptomb[i] = (unsigned char)legvilag;
         } else {
             lookuptomb[i] = (unsigned char)legsotet;

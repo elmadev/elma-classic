@@ -474,8 +474,7 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     }
     if (pal) {
         for (int i = 0; i < 768; i++) {
-            unsigned char c = (unsigned char)(pal[i] << 2);
-            if (fwrite(&c, 1, 1, h) != 1) {
+            if (fwrite(&pal[i], 1, 1, h) != 1) {
                 hiba("pcx_save failed to write to file: ", filename);
                 fclose(h);
                 return false;
@@ -660,9 +659,6 @@ bool get_pcx_pal(const char* filename, unsigned char* pal) {
         hiba("get_pcx_pal failed to read file: ", filename);
         qclose(h);
         return false;
-    }
-    for (int i = 0; i < 768; i++) {
-        pal[i] = (unsigned char)(pal[i] >> 2);
     }
     qclose(h);
     return true;

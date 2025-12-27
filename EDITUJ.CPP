@@ -95,10 +95,6 @@ void seteditorpal(void) {
         }
     }
 
-    for (int i = 0; i < 768; i++) {
-        pal[i] /= 4;
-    }
-
     if (Pal_editor) {
         hiba("uvcguyew");
     }

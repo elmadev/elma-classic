@@ -13,6 +13,9 @@ int menu_dialog(const char* text1, const char* text2, const char* text3, const c
     while (text_array[text_count] && text_count < MENU_DIALOG_MAX_LENGTH) {
         text_count += 1;
     }
+    if (text_count <= 0) {
+        hiba("menu_dialog text_count <= 0!");
+    }
 
     // Check "ESC" as first string
     bool esc_only = false;

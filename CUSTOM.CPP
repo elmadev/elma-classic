@@ -1,7 +1,7 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
 
-const char* dik_to_string(int keycode) {
+const char* dik_to_string(DIK_Code keycode) {
     switch (keycode) {
     case DIK_1:
         return "1";
@@ -246,30 +246,30 @@ const char* dik_to_string(int keycode) {
 }
 
 // A list of pointers to where the keys are stored (somewhere in a state class object)
-typedef int* key_pointers[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
+typedef DIK_Code* key_pointers[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
 static key_pointers UniversalKeys; // +/- and Screenshot
 static key_pointers Player1Keys;
 static key_pointers Player2Keys;
 
-static int UNIVERSAL_KEYS_END = 6;
-static int PLAYER_KEYS_END = 8;
+constexpr int UNIVERSAL_KEYS_START = 3;
+constexpr int UNIVERSAL_KEYS_END = UNIVERSAL_KEYS_START + 3;
+constexpr int PLAYER_KEYS_START = 0;
+constexpr int PLAYER_KEYS_END = PLAYER_KEYS_START + 8;
 
 // Setup the menu to display one control key
 static void load_control(key_pointers keys, int offset, const char* label, int* key) {
     strcpy(NavEntriesLeft[offset], label);
-
     const char* key_text = dik_to_string(*key);
     char tmp[20] = "";
     if (!key_text) {
         if (*key == 0) {
-            sprintf(tmp, "???");
+            strcpy(tmp, "???");
         } else {
             sprintf(tmp, "Key code: %d", *key);
         }
         key_text = tmp;
     }
-
     strcpy(NavEntriesRight[offset], key_text);
     keys[offset] = key;
 }
@@ -282,45 +282,39 @@ static void prompt_control(int length, key_pointers keys, int index) {
     nav.x_right = 400;
     nav.y_entries = 86;
     nav.dy = 40;
-
     strcpy(nav.title, "Customize controls");
     strcpy(NavEntriesRight[index], "_");
-
     nav.setup(length, true);
 
     // Render only!
     nav.navigate(nullptr, 0, true);
-
-    while (1) {
+    while (true) {
         handle_events();
-        for (int i = 1; i < 256; i++) {
-            if (mk_getstate(MK_ESC)) {
+        for (DIK_Code keycode = 1; keycode < MaxKeycode; keycode++) {
+            if (mk_getstate(DIK_ESCAPE)) {
                 return;
             }
-
-            if (i == 28 || i == MK_ESC) {
+            if (keycode == DIK_RETURN || keycode == DIK_ESCAPE) {
                 continue;
             }
-
-            if (!mk_getstate(i)) {
+            if (!mk_getstate(keycode)) {
                 continue;
             }
-
             // Disallow multiple controls being mapped to the same key
-            for (int j = 3; j < UNIVERSAL_KEYS_END; j++) {
-                if (*UniversalKeys[j] == i) {
-                    *UniversalKeys[j] = 0;
+            for (int i = UNIVERSAL_KEYS_START; i < UNIVERSAL_KEYS_END; i++) {
+                if (*UniversalKeys[i] == keycode) {
+                    *UniversalKeys[i] = 0;
                 }
             }
-            for (int j = 0; j < PLAYER_KEYS_END; j++) {
-                if (*Player1Keys[j] == i) {
-                    *Player1Keys[j] = 0;
+            for (int i = PLAYER_KEYS_START; i < PLAYER_KEYS_END; i++) {
+                if (*Player1Keys[i] == keycode) {
+                    *Player1Keys[i] = 0;
                 }
-                if (*Player2Keys[j] == i) {
-                    *Player2Keys[j] = 0;
+                if (*Player2Keys[i] == keycode) {
+                    *Player2Keys[i] = 0;
                 }
             }
-            *keys[index] = i;
+            *keys[index] = keycode;
             return;
         }
         nav.render();
@@ -328,42 +322,43 @@ static void prompt_control(int length, key_pointers keys, int index) {
 }
 
 // Setup the menu to display the universal controls
-static void load_universal_controls(void) {
+static void load_universal_controls() {
     strcpy(NavEntriesLeft[0], "Reset all controls to default");
     NavEntriesRight[0][0] = 0;
     strcpy(NavEntriesLeft[1], "Customize Player A");
     NavEntriesRight[1][0] = 0;
     strcpy(NavEntriesLeft[2], "Customize Player B");
     NavEntriesRight[2][0] = 0;
-    load_control(UniversalKeys, 3, "Inc. Screen Size", &State->key_increase_screen_size);
-    load_control(UniversalKeys, 4, "Dec. Screen Size", &State->key_decrease_screen_size);
-    load_control(UniversalKeys, 5, "Make a Screenshot", &State->key_screenshot);
+    int i = UNIVERSAL_KEYS_START;
+    load_control(UniversalKeys, i++, "Inc. Screen Size", &State->key_increase_screen_size);
+    load_control(UniversalKeys, i++, "Dec. Screen Size", &State->key_decrease_screen_size);
+    load_control(UniversalKeys, i++, "Make a Screenshot", &State->key_screenshot);
 }
 
 // Setup the menu to display one player's controls
 static void load_player_controls(key_pointers keys, player_keys* player_controls) {
-    load_control(keys, 0, "Throttle", &player_controls->gas);
-    load_control(keys, 1, "Brake", &player_controls->brake);
-    load_control(keys, 2, "Rotate left", &player_controls->left_volt);
-    load_control(keys, 3, "Rotate right", &player_controls->right_volt);
-    load_control(keys, 4, "Change direction", &player_controls->turn);
-    load_control(keys, 5, "Toggle Navigator", &player_controls->toggle_minimap);
-    load_control(keys, 6, "Toggle Time", &player_controls->toggle_timer);
-    load_control(keys, 7, "Toggle Show/Hide", &player_controls->toggle_visibility);
+    int i = PLAYER_KEYS_START;
+    load_control(keys, i++, "Throttle", &player_controls->gas);
+    load_control(keys, i++, "Brake", &player_controls->brake);
+    load_control(keys, i++, "Rotate left", &player_controls->left_volt);
+    load_control(keys, i++, "Rotate right", &player_controls->right_volt);
+    load_control(keys, i++, "Change direction", &player_controls->turn);
+    load_control(keys, i++, "Toggle Navigator", &player_controls->toggle_minimap);
+    load_control(keys, i++, "Toggle Time", &player_controls->toggle_timer);
+    load_control(keys, i++, "Toggle Show/Hide", &player_controls->toggle_visibility);
 }
 
 // Menu to change controls for one player
 static void menu_customize_player(key_pointers keys, player_keys* player_controls,
                                   const char* player_letter) {
     int choice = 0;
-    while (1) {
+    while (true) {
         menu_nav nav;
         nav.selected_index = choice;
         nav.x_left = 60;
         nav.x_right = 400;
         nav.y_entries = 86;
         nav.dy = 40;
-
         strcpy(nav.title, "Customize Player ");
         strcat(nav.title, player_letter);
 
@@ -372,11 +367,9 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
         nav.setup(PLAYER_KEYS_END, true);
 
         choice = nav.navigate();
-
         if (choice < 0) {
             return;
         }
-
         if (choice >= 0 && choice < PLAYER_KEYS_END) {
             prompt_control(PLAYER_KEYS_END, keys, choice);
         }
@@ -384,20 +377,19 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
 }
 
 // Menu to customize universal controls or select a player
-void menu_customize_controls(void) {
+void menu_customize_controls() {
     // Initialize these pointers so we can check/modify the values in prompt_control
     load_player_controls(Player1Keys, &State->keys1);
     load_player_controls(Player2Keys, &State->keys2);
 
     int choice = 0;
-    while (1) {
+    while (true) {
         menu_nav nav;
         nav.selected_index = choice;
         nav.x_left = 60;
         nav.x_right = 400;
         nav.y_entries = 86;
         nav.dy = 40;
-
         strcpy(nav.title, "Customize controls");
 
         load_universal_controls();
@@ -405,11 +397,9 @@ void menu_customize_controls(void) {
         nav.setup(UNIVERSAL_KEYS_END, true);
 
         choice = nav.navigate();
-
         if (choice < 0) {
             return;
         }
-
         if (choice == 0) {
             // Reset all controls to default
             State->reset_keys();
@@ -417,18 +407,15 @@ void menu_customize_controls(void) {
             load_player_controls(Player2Keys, &State->keys2);
             load_universal_controls();
         }
-
         if (choice == 1) {
             // Customize Player A
             menu_customize_player(Player1Keys, &State->keys1, "A");
         }
-
         if (choice == 2) {
             // Customize Player B
             menu_customize_player(Player2Keys, &State->keys2, "B");
         }
-
-        if (choice >= 3 && choice < UNIVERSAL_KEYS_END) {
+        if (choice >= UNIVERSAL_KEYS_START && choice < UNIVERSAL_KEYS_END) {
             // Modify universal control
             prompt_control(UNIVERSAL_KEYS_END, UniversalKeys, choice);
         }

@@ -67,7 +67,7 @@
 #include "KOZOS.H"
 #include "DIGIT.H"
 
-#include "CUSTOM.H"
+#include "menu_controls.h"
 #include "OPTIONS.H"
 
 #include "TOPOL.H"

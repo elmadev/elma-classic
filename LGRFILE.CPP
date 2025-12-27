@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "eol_settings.h"
 
 /*void tesztloadlgr( void ) {
     int a = 1, b = 2, c = 4;
@@ -27,6 +28,8 @@ kisbox KisboxA = {3, 36, 147, 184};
 kisbox KisboxB = {32, 183, 147, 297};
 kisbox KisboxC = {146, 141, 273, 264};
 kisbox KisboxD = {272, 181, 353, 244};
+
+void invalidate_lgr_cache() { Bentlgrnev[0] = '\0'; }
 
 // Ha nincs ilyen nevu file, akkor default-ot olvassa:
 void loadlgrfile(const char* nev) {
@@ -644,13 +647,13 @@ lgrfile::lgrfile(const char* lgrnev) {
 
         // Objektumok:
         if (strcmpi(nev, "qkiller.pcx") == 0) {
-            pkiller = new anim(ppic, "qkiller.pcx");
+            pkiller = new anim(ppic, "qkiller.pcx", EolSettings->zoom);
             delete ppic;
             ppic = NULL;
             continue;
         }
         if (strcmpi(nev, "qexit.pcx") == 0) {
-            pexit = new anim(ppic, "qexit.pcx");
+            pexit = new anim(ppic, "qexit.pcx", EolSettings->zoom);
             delete ppic;
             ppic = NULL;
             continue;
@@ -670,7 +673,7 @@ lgrfile::lgrfile(const char* lgrnev) {
             char tmpnev[20];
             sprintf(tmpnev, "qfood%d.pcx", foodi + 1);
             if (strcmpi(nev, tmpnev) == 0) {
-                foodtomb[foodi] = new anim(ppic, tmpnev);
+                foodtomb[foodi] = new anim(ppic, tmpnev, EolSettings->zoom);
                 delete ppic;
                 ppic = NULL;
                 ezfoodvolt = 1;
@@ -712,16 +715,21 @@ lgrfile::lgrfile(const char* lgrnev) {
             uzenet("There is no line in PICTURES.LST corresponding to picture:", nev);
         }
         if (ppiclist->tipusok[index] == PLTIP_KEP) {
+            ppic = pic8::scale(ppic, EolSettings->zoom);
             beirkepet(ppic, ppiclist, index);
             delete ppic; // Kepre mar nincsen tobbe szuksegunk
             ppic = NULL;
             continue;
         }
         if (ppiclist->tipusok[index] == PLTIP_TEXT) {
+            if (EolSettings->zoom_textures) {
+                ppic = pic8::scale(ppic, EolSettings->zoom);
+            }
             beirtexturat(ppic, ppiclist, index);
             continue;
         }
         if (ppiclist->tipusok[index] == PLTIP_MINTA) {
+            ppic = pic8::scale(ppic, EolSettings->zoom);
             // delete-li ppic-et:
             beirmaszkot(ppic, ppiclist, index);
             ppic = NULL;

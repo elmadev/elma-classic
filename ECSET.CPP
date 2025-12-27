@@ -445,6 +445,7 @@ void ecset::mutatotlanit(void) {
 
 // Ptop kerek-jeinek egesz koordinatait kitolti:
 void ecset::kitoltfoodkoordokat(void) {
+    const double offset = (ANIM_WIDTH / 2) * EolSettings->zoom;
     for (int i = 0; i < MAXKEREK; i++) {
         kerek* pker = Ptop->kerektomb[i];
         if (!pker) {
@@ -454,8 +455,8 @@ void ecset::kitoltfoodkoordokat(void) {
             pker->rxint_v = (pker->r.x - origo.x) * MetersToPixels / MinimapScaleFactor;
             pker->ryint_v = (-pker->r.y - origo.y) * MetersToPixels / MinimapScaleFactor;
         } else {
-            pker->rxint = (pker->r.x - origo.x) * MetersToPixels - ANIM_WIDTH / 2;
-            pker->ryint = (-pker->r.y - origo.y) * MetersToPixels - ANIM_WIDTH / 2;
+            pker->rxint = (pker->r.x - origo.x) * MetersToPixels - offset;
+            pker->ryint = (-pker->r.y - origo.y) * MetersToPixels - offset;
         }
     }
 }
@@ -974,15 +975,16 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
         }
     }
     // Most beadjuk alul vagy felul megtoldott reszt is:
+    int grass_height_padding = FUGGTOLDAS * EolSettings->zoom;
     if (felso) {
         // Felso:
-        for (int y = 0; y < FUGGTOLDAS; y++) {
+        for (int y = 0; y < grass_height_padding; y++) {
             addbytesor((unsigned char*)(textindex + 10), tavolsag, xo, xo + xsize - 1,
                        yo + ysize + y, fazis);
         }
     } else {
         // Also:
-        for (int y = 0; y < FUGGTOLDAS; y++) {
+        for (int y = 0; y < grass_height_padding; y++) {
             addbytesor((unsigned char*)(textindex + 10), tavolsag, xo, xo + xsize - 1, yo - 1 - y,
                        fazis);
         }

@@ -1,6 +1,6 @@
 #include "ALL.H"
 
-anim::anim(pic8* source_sheet, const char* error_filename) {
+anim::anim(pic8* source_sheet, const char* error_filename, double scale) {
     frame_count = 0;
     for (int i = 0; i < ANIM_MAX_FRAMES; i++) {
         frames[i] = nullptr;
@@ -26,6 +26,7 @@ anim::anim(pic8* source_sheet, const char* error_filename) {
     for (int i = 0; i < frame_count; i++) {
         frames[i] = new pic8(ANIM_WIDTH, ANIM_WIDTH);
         blit8(frames[i], source_sheet, -ANIM_WIDTH * i, 0);
+        frames[i] = pic8::scale(frames[i], scale);
         forditkepet(frames[i]);
         spriteosit(frames[i], source_sheet->gpixel(0, 0));
     }

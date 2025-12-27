@@ -462,7 +462,7 @@ void render_error(const char* text1, const char* text2, const char* text3) {
                 strncpy(ErrorLines[line_count], text, j);
                 line_count++;
                 text += j;
-                while (text[j] == ' ') {
+                while (text[0] == ' ') {
                     text++;
                 }
             }

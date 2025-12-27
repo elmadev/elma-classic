@@ -1,6 +1,6 @@
 #ifndef CUSTOM_H
 #define CUSTOM_H
 
-void customize(void);
+void menu_customize_controls(void);
 
 #endif

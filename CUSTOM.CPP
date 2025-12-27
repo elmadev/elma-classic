@@ -2,8 +2,8 @@
 #include "directinput_scancodes.h"
 
 // Customize kiirashoz kell:
-const char* kodtobillnev(int billkod) {
-    switch (billkod) {
+const char* dik_to_string(int keycode) {
+    switch (keycode) {
     case DIK_1:
         return "1";
     case DIK_2:
@@ -286,47 +286,47 @@ const char* kodtobillnev(int billkod) {
     return NULL;
 }
 
-typedef int* billmuttomb[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
+typedef int* key_pointers[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
-static billmuttomb Pbilltomb0;
-static billmuttomb Pbilltomb1;
-static billmuttomb Pbilltomb2;
+static key_pointers UniversalKeys;
+static key_pointers Player1Keys;
+static key_pointers Player2Keys;
 
-static int Rubrikaszam0 = 6;
-static int Rubrikaszam12 = 8;
+static int UNIVERSAL_KEYS_END = 6;
+static int PLAYER_KEYS_END = 8;
 
-static void betolt(billmuttomb bmuttomb, int sorszam, const char* szoveg, int* pbillkod) {
-    strcpy(NavEntriesLeft[sorszam], szoveg);
+static void load_control(key_pointers keys, int offset, const char* label, int* key) {
+    strcpy(NavEntriesLeft[offset], label);
 
-    const char* billnev = kodtobillnev(*pbillkod);
+    const char* key_text = dik_to_string(*key);
     char tmp[20] = "";
-    if (!billnev) {
-        if (*pbillkod == 0) {
+    if (!key_text) {
+        if (*key == 0) {
             sprintf(tmp, "???");
         } else {
-            sprintf(tmp, "Key code: %d", *pbillkod);
+            sprintf(tmp, "Key code: %d", *key);
         }
-        billnev = tmp;
+        key_text = tmp;
     }
 
-    strcpy(NavEntriesRight[sorszam], billnev);
-    bmuttomb[sorszam] = pbillkod;
+    strcpy(NavEntriesRight[offset], key_text);
+    keys[offset] = key;
 }
 
-static void gombotvalaszt(int rubrikaszam, billmuttomb bmuttomb, int sorszam) {
-    menu_nav val;
-    val.selected_index = sorszam;
-    val.x_left = 60;
-    val.x_right = 400;
-    val.y_entries = 86;
-    val.dy = 40;
+static void prompt_control(int length, key_pointers keys, int index) {
+    menu_nav nav;
+    nav.selected_index = index;
+    nav.x_left = 60;
+    nav.x_right = 400;
+    nav.y_entries = 86;
+    nav.dy = 40;
 
-    strcpy(val.title, "Customize controls");
-    strcpy(NavEntriesRight[sorszam], "_");
+    strcpy(nav.title, "Customize controls");
+    strcpy(NavEntriesRight[index], "_");
 
-    val.setup(rubrikaszam, true); // tab-os kiiras
+    nav.setup(length, true); // tab-os kiiras
 
-    val.navigate(nullptr, 0, true); // Csak kirajzolja kepet
+    nav.navigate(nullptr, 0, true); // Csak kirajzolja kepet
 
     // Megnezzuk milyen gombot nyomott le:
     while (1) {
@@ -352,121 +352,122 @@ static void gombotvalaszt(int rubrikaszam, billmuttomb bmuttomb, int sorszam) {
 
             // Most meg van nyomva egy gomb:
             // Kiszedjuk mindenhonnan mashonnan ezt a billt:
-            for (int j = 3; j < Rubrikaszam0; j++) { // 1-tol megy
-                if (*Pbilltomb0[j] == i) {
-                    *Pbilltomb0[j] = 0;
+            for (int j = 3; j < UNIVERSAL_KEYS_END; j++) { // 1-tol megy
+                if (*UniversalKeys[j] == i) {
+                    *UniversalKeys[j] = 0;
                 }
             }
-            for (int j = 0; j < Rubrikaszam12; j++) { // 0-tol megy
-                if (*Pbilltomb1[j] == i) {
-                    *Pbilltomb1[j] = 0;
+            for (int j = 0; j < PLAYER_KEYS_END; j++) { // 0-tol megy
+                if (*Player1Keys[j] == i) {
+                    *Player1Keys[j] = 0;
                 }
-                if (*Pbilltomb2[j] == i) {
-                    *Pbilltomb2[j] = 0;
+                if (*Player2Keys[j] == i) {
+                    *Player2Keys[j] = 0;
                 }
             }
-            *bmuttomb[sorszam] = i;
+            *keys[index] = i;
             return;
         }
         // Golyokat leptetjuk:
-        val.render();
+        nav.render();
     }
 }
 
-static void bejegyez0(void) {
+static void load_universal_controls(void) {
     strcpy(NavEntriesLeft[0], "Reset all controls to default");
     NavEntriesRight[0][0] = 0;
     strcpy(NavEntriesLeft[1], "Customize Player A");
     NavEntriesRight[1][0] = 0;
     strcpy(NavEntriesLeft[2], "Customize Player B");
     NavEntriesRight[2][0] = 0;
-    betolt(Pbilltomb0, 3, "Inc. Screen Size", &State->key_increase_screen_size);
-    betolt(Pbilltomb0, 4, "Dec. Screen Size", &State->key_decrease_screen_size);
-    betolt(Pbilltomb0, 5, "Make a Screenshot", &State->key_screenshot);
+    load_control(UniversalKeys, 3, "Inc. Screen Size", &State->key_increase_screen_size);
+    load_control(UniversalKeys, 4, "Dec. Screen Size", &State->key_decrease_screen_size);
+    load_control(UniversalKeys, 5, "Make a Screenshot", &State->key_screenshot);
 }
 
-static void bejegyez12(billmuttomb bmuttomb, player_keys* pjatopc) {
-    betolt(bmuttomb, 0, "Throttle", &pjatopc->gas);
-    betolt(bmuttomb, 1, "Brake", &pjatopc->brake);
-    betolt(bmuttomb, 2, "Rotate left", &pjatopc->left_volt);
-    betolt(bmuttomb, 3, "Rotate right", &pjatopc->right_volt);
-    betolt(bmuttomb, 4, "Change direction", &pjatopc->turn);
-    betolt(bmuttomb, 5, "Toggle Navigator", &pjatopc->toggle_minimap);
-    betolt(bmuttomb, 6, "Toggle Time", &pjatopc->toggle_timer);
-    betolt(bmuttomb, 7, "Toggle Show/Hide", &pjatopc->toggle_visibility);
+static void load_player_controls(key_pointers keys, player_keys* player_controls) {
+    load_control(keys, 0, "Throttle", &player_controls->gas);
+    load_control(keys, 1, "Brake", &player_controls->brake);
+    load_control(keys, 2, "Rotate left", &player_controls->left_volt);
+    load_control(keys, 3, "Rotate right", &player_controls->right_volt);
+    load_control(keys, 4, "Change direction", &player_controls->turn);
+    load_control(keys, 5, "Toggle Navigator", &player_controls->toggle_minimap);
+    load_control(keys, 6, "Toggle Time", &player_controls->toggle_timer);
+    load_control(keys, 7, "Toggle Show/Hide", &player_controls->toggle_visibility);
 }
 
-static void customizeplayer(billmuttomb bmuttomb, player_keys* pjatopc, const char* ABjel) {
-    int kurrens = 0;
+static void menu_customize_player(key_pointers keys, player_keys* player_controls,
+                                  const char* player_letter) {
+    int choice = 0;
     while (1) {
-        menu_nav val;
-        val.selected_index = kurrens;
-        val.x_left = 60;
-        val.x_right = 400;
-        val.y_entries = 86;
-        val.dy = 40;
+        menu_nav nav;
+        nav.selected_index = choice;
+        nav.x_left = 60;
+        nav.x_right = 400;
+        nav.y_entries = 86;
+        nav.dy = 40;
 
-        strcpy(val.title, "Customize Player ");
-        strcat(val.title, ABjel);
+        strcpy(nav.title, "Customize Player ");
+        strcat(nav.title, player_letter);
 
-        bejegyez12(bmuttomb, pjatopc);
+        load_player_controls(keys, player_controls);
 
-        val.setup(Rubrikaszam12, true); // tab-os kiiras
+        nav.setup(PLAYER_KEYS_END, true); // tab-os kiiras
 
-        kurrens = val.navigate();
+        choice = nav.navigate();
 
-        if (kurrens < 0) {
+        if (choice < 0) {
             return;
         }
 
-        if (kurrens >= 0 && kurrens < Rubrikaszam12) {
-            gombotvalaszt(Rubrikaszam12, bmuttomb, kurrens);
+        if (choice >= 0 && choice < PLAYER_KEYS_END) {
+            prompt_control(PLAYER_KEYS_END, keys, choice);
         }
     }
 }
 
-void customize(void) {
-    bejegyez12(Pbilltomb1, &State->keys1);
-    bejegyez12(Pbilltomb2, &State->keys2);
+void menu_customize_controls(void) {
+    load_player_controls(Player1Keys, &State->keys1);
+    load_player_controls(Player2Keys, &State->keys2);
 
-    int kurrens = 0;
+    int choice = 0;
     while (1) {
-        menu_nav val;
-        val.selected_index = kurrens;
-        val.x_left = 60;
-        val.x_right = 400;
-        val.y_entries = 86;
-        val.dy = 40;
+        menu_nav nav;
+        nav.selected_index = choice;
+        nav.x_left = 60;
+        nav.x_right = 400;
+        nav.y_entries = 86;
+        nav.dy = 40;
 
-        strcpy(val.title, "Customize controls");
+        strcpy(nav.title, "Customize controls");
 
-        bejegyez0();
+        load_universal_controls();
 
-        val.setup(Rubrikaszam0, true); // tab-os kiiras
+        nav.setup(UNIVERSAL_KEYS_END, true); // tab-os kiiras
 
-        kurrens = val.navigate();
+        choice = nav.navigate();
 
-        if (kurrens < 0) {
+        if (choice < 0) {
             return;
         }
 
-        if (kurrens == 0) {
+        if (choice == 0) {
             State->reset_keys();
-            bejegyez12(Pbilltomb1, &State->keys1);
-            bejegyez12(Pbilltomb2, &State->keys2);
-            bejegyez0();
+            load_player_controls(Player1Keys, &State->keys1);
+            load_player_controls(Player2Keys, &State->keys2);
+            load_universal_controls();
         }
 
-        if (kurrens == 1) {
-            customizeplayer(Pbilltomb1, &State->keys1, "A");
+        if (choice == 1) {
+            menu_customize_player(Player1Keys, &State->keys1, "A");
         }
 
-        if (kurrens == 2) {
-            customizeplayer(Pbilltomb2, &State->keys2, "B");
+        if (choice == 2) {
+            menu_customize_player(Player2Keys, &State->keys2, "B");
         }
 
-        if (kurrens >= 3 && kurrens < Rubrikaszam0) {
-            gombotvalaszt(Rubrikaszam0, Pbilltomb0, kurrens);
+        if (choice >= 3 && choice < UNIVERSAL_KEYS_END) {
+            prompt_control(UNIVERSAL_KEYS_END, UniversalKeys, choice);
         }
     }
 }

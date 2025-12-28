@@ -1,7 +1,7 @@
 #include "ALL.H"
 #include "eol_settings.h"
 
-void menu_help(void) {
+void menu_help() {
     menu_pic menu;
 
     int x1 = 90;
@@ -35,7 +35,7 @@ void menu_help(void) {
     menu.add_line_centered("touch the flower!", 320, y0 + dy * 10);
 
     mk_emptychar();
-    while (1) {
+    while (true) {
         if (mk_kbhit()) {
             int c = mk_getextchar();
             if (c == MK_ESC || c == MK_ENTER) {
@@ -46,9 +46,9 @@ void menu_help(void) {
     }
 }
 
-void menu_options(void) {
+void menu_options() {
     int choice = 0;
-    while (1) {
+    while (true) {
         menu_nav nav;
         nav.selected_index = choice;
         nav.x_left = 72;
@@ -82,63 +82,32 @@ void menu_options(void) {
         strcpy(NavEntriesRight[2 + flag_tag_opt], State->player2);
 
         strcpy(NavEntriesLeft[3 + flag_tag_opt], "Sound:");
-        if (State->sound_on) {
-            strcpy(NavEntriesRight[3 + flag_tag_opt], "Enabled");
-        } else {
-            strcpy(NavEntriesRight[3 + flag_tag_opt], "Disabled");
-        }
+        strcpy(NavEntriesRight[3 + flag_tag_opt], State->sound_on ? "Enabled" : "Disabled");
 
         strcpy(NavEntriesLeft[4 + flag_tag_opt], "Animated Menus:");
-        if (State->animated_menus) {
-            strcpy(NavEntriesRight[4 + flag_tag_opt], "Yes");
-        } else {
-            strcpy(NavEntriesRight[4 + flag_tag_opt], "No");
-        }
+        strcpy(NavEntriesRight[4 + flag_tag_opt], State->animated_menus ? "Yes" : "No");
 
         strcpy(NavEntriesLeft[5 + flag_tag_opt], "Video Detail:");
-        if (State->high_quality) {
-            strcpy(NavEntriesRight[5 + flag_tag_opt], "High");
-        } else {
-            strcpy(NavEntriesRight[5 + flag_tag_opt], "Low");
-        }
+        strcpy(NavEntriesRight[5 + flag_tag_opt], State->high_quality ? "High" : "Low");
 
         strcpy(NavEntriesLeft[6 + flag_tag_opt], "Animated Objects:");
-        if (State->animated_objects) {
-            strcpy(NavEntriesRight[6 + flag_tag_opt], "Yes");
-        } else {
-            strcpy(NavEntriesRight[6 + flag_tag_opt], "No");
-        }
+        strcpy(NavEntriesRight[6 + flag_tag_opt], State->animated_objects ? "Yes" : "No");
 
         strcpy(NavEntriesLeft[7 + flag_tag_opt], "Swap Bikes:");
-        if (State->player1_bike1) {
-            strcpy(NavEntriesRight[7 + flag_tag_opt], "No");
-        } else {
-            strcpy(NavEntriesRight[7 + flag_tag_opt], "Yes");
-        }
+        strcpy(NavEntriesRight[7 + flag_tag_opt], State->player1_bike1 ? "No" : "Yes");
 
         strcpy(NavEntriesLeft[8 + flag_tag_opt], "Customize Controls ...");
         strcpy(NavEntriesRight[8 + flag_tag_opt], "");
 
         strcpy(NavEntriesLeft[9 + flag_tag_opt], "Pics In Background:");
-        if (EolSettings->pictures_in_background) {
-            strcpy(NavEntriesRight[9 + flag_tag_opt], "Yes");
-        } else {
-            strcpy(NavEntriesRight[9 + flag_tag_opt], "No");
-        }
+        strcpy(NavEntriesRight[9 + flag_tag_opt],
+               EolSettings->pictures_in_background ? "Yes" : "No");
 
         strcpy(NavEntriesLeft[10 + flag_tag_opt], "Centered Camera:");
-        if (EolSettings->center_camera) {
-            strcpy(NavEntriesRight[10 + flag_tag_opt], "Yes");
-        } else {
-            strcpy(NavEntriesRight[10 + flag_tag_opt], "No");
-        }
+        strcpy(NavEntriesRight[10 + flag_tag_opt], EolSettings->center_camera ? "Yes" : "No");
 
         strcpy(NavEntriesLeft[11 + flag_tag_opt], "Centered Minimap:");
-        if (EolSettings->center_map) {
-            strcpy(NavEntriesRight[11 + flag_tag_opt], "Yes");
-        } else {
-            strcpy(NavEntriesRight[11 + flag_tag_opt], "No");
-        }
+        strcpy(NavEntriesRight[11 + flag_tag_opt], EolSettings->center_map ? "Yes" : "No");
 
         strcpy(NavEntriesLeft[12 + flag_tag_opt], "Minimap Alignment:");
         switch (EolSettings->map_alignment) {

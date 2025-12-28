@@ -25,9 +25,10 @@ class menu_pic {
     text_line* lines;
     int line_count;
     bool image_valid;
+    bool center_vertically;
 
   public:
-    menu_pic();
+    menu_pic(bool center_vert = true);
     ~menu_pic();
     void add_line(const char* text, int x, int y);
     void add_line_centered(const char* text, int x, int y);

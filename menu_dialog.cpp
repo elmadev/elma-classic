@@ -30,7 +30,7 @@ int menu_dialog(const char* text1, const char* text2, const char* text3, const c
     // Render and prompt for key input
     menu_pic menu;
     int dy = 40;
-    int y0 = SCREEN_HEIGHT / 2 - (text_count - 1) / 2 * dy;
+    int y0 = 240 - (text_count - 1) / 2 * dy;
     for (int i = 0; i < text_count; i++) {
         menu.add_line_centered(text_array[i], 320, y0 + i * dy);
     }

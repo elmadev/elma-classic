@@ -169,7 +169,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     if (menu) {
         delete menu;
     }
-    menu = new menu_pic;
+    menu = new menu_pic(false);
 
     mk_emptychar();
     bool rerender = true;

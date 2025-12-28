@@ -43,7 +43,8 @@ void init_menu_pictures() {
     get_pcx_pal("intro.pcx", &MenuPal);
 }
 
-menu_pic::menu_pic() {
+menu_pic::menu_pic(bool center_vert) {
+    center_vertically = center_vert;
     helmet_x = -100;
     helmet_y = -100;
     line_count = 0;
@@ -209,8 +210,13 @@ void menu_pic::render(bool skip_balls_helmet) {
         }
 
         for (int i = 0; i < line_count; i++) {
-            MenuFont->write(BufferMain, lines[i].x, lines[i].y, lines[i].text);
-            MenuFont->write(BufferBall, lines[i].x, lines[i].y, lines[i].text);
+            int x = lines[i].x + SCREEN_WIDTH / 2 - 320;
+            int y = lines[i].y;
+            if (center_vertically) {
+                y += SCREEN_HEIGHT / 2 - 240;
+            }
+            MenuFont->write(BufferMain, x, y, lines[i].text);
+            MenuFont->write(BufferBall, x, y, lines[i].text);
         }
     }
 
@@ -287,8 +293,9 @@ void menu_pic::render(bool skip_balls_helmet) {
         } else {
             helmet_frame = Helmet->get_frame_by_index(25);
         }
-
-        blit8(ScreenBuffer, helmet_frame, helmet_x - 20, helmet_y - 7);
+        int x = helmet_x - 20 + SCREEN_WIDTH / 2 - 320;
+        int y = helmet_y - 7; // Helmet is never centered vertically
+        blit8(ScreenBuffer, helmet_frame, x, y);
     }
 
     // We're done!
@@ -369,8 +376,11 @@ bool menu_pic::render_intro_anim(double time) {
 
     // The text moves down from -SCREEN_HEIGHT to 0
     for (int i = 0; i < line_count; i++) {
-        MenuFont->write(ScreenBuffer, lines[i].x, lines[i].y + frame - SCREEN_HEIGHT,
-                        lines[i].text);
+        int x = lines[i].x + SCREEN_WIDTH / 2 - 320;
+        if (center_vertically) {
+            hiba("menu_pic::render_intro_anim should not center vertically!");
+        }
+        MenuFont->write(ScreenBuffer, x, lines[i].y + frame - SCREEN_HEIGHT, lines[i].text);
     }
 
     // The helmet moves down from -SCREEN_HEIGHT to 0
@@ -380,7 +390,9 @@ bool menu_pic::render_intro_anim(double time) {
     } else {
         helmet_frame = Helmet->get_frame_by_index(25);
     }
-    blit8(ScreenBuffer, helmet_frame, helmet_x - 20, helmet_y - 7 - (SCREEN_HEIGHT - 1) + frame);
+    int x = helmet_x - 20 + SCREEN_WIDTH / 2 - 320;
+    int y = helmet_y - 7; // Helmet is never centered vertically
+    blit8(ScreenBuffer, helmet_frame, x, y - (SCREEN_HEIGHT - 1) + frame);
 
     // intro.pcx moves down from 0 to SCREEN_HEIGHT
     blit8(ScreenBuffer, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,

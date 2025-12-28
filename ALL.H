@@ -68,7 +68,7 @@
 #include "DIGIT.H"
 
 #include "menu_controls.h"
-#include "OPTIONS.H"
+#include "menu_options.h"
 
 #include "TOPOL.H"
 #include "EDITUJ.H"

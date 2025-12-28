@@ -45,7 +45,7 @@ elma_sources = files(
     'MAIN.CPP',
     'MAINMENU.CPP',
     'menu_pic.cpp',
-    'OPTIONS.CPP',
+    'menu_options.cpp',
     'PEXTMENU.CPP',
     'pic8.cpp',
     'PICLIST.CPP',

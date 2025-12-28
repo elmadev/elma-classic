@@ -93,82 +93,75 @@ void options(void) {
             strcpy(NavEntriesRight[3 + vantagis], "Disabled");
         }
 
-        strcpy(NavEntriesLeft[4 + vantagis], "Sound Optimization:");
-        if (State->compatibility_mode) {
-            strcpy(NavEntriesRight[4 + vantagis], "Compatibility");
-        } else {
-            strcpy(NavEntriesRight[4 + vantagis], "Best Quality");
-        }
-
-        strcpy(NavEntriesLeft[5 + vantagis], "Animated Menus:");
+        strcpy(NavEntriesLeft[4 + vantagis], "Animated Menus:");
         if (State->animated_menus) {
-            strcpy(NavEntriesRight[5 + vantagis], "Yes");
+            strcpy(NavEntriesRight[4 + vantagis], "Yes");
         } else {
-            strcpy(NavEntriesRight[5 + vantagis], "No");
+            strcpy(NavEntriesRight[4 + vantagis], "No");
         }
 
-        strcpy(NavEntriesLeft[6 + vantagis], "Video Detail:");
+        strcpy(NavEntriesLeft[5 + vantagis], "Video Detail:");
         if (State->high_quality) {
-            strcpy(NavEntriesRight[6 + vantagis], "High");
+            strcpy(NavEntriesRight[5 + vantagis], "High");
         } else {
-            strcpy(NavEntriesRight[6 + vantagis], "Low");
+            strcpy(NavEntriesRight[5 + vantagis], "Low");
         }
 
-        strcpy(NavEntriesLeft[7 + vantagis], "Animated Objects:");
+        strcpy(NavEntriesLeft[6 + vantagis], "Animated Objects:");
         if (State->animated_objects) {
-            strcpy(NavEntriesRight[7 + vantagis], "Yes");
+            strcpy(NavEntriesRight[6 + vantagis], "Yes");
         } else {
-            strcpy(NavEntriesRight[7 + vantagis], "No");
+            strcpy(NavEntriesRight[6 + vantagis], "No");
         }
 
-        strcpy(NavEntriesLeft[8 + vantagis], "Swap Bikes:");
+        strcpy(NavEntriesLeft[7 + vantagis], "Swap Bikes:");
         if (State->player1_bike1) {
-            strcpy(NavEntriesRight[8 + vantagis], "No");
+            strcpy(NavEntriesRight[7 + vantagis], "No");
         } else {
-            strcpy(NavEntriesRight[8 + vantagis], "Yes");
+            strcpy(NavEntriesRight[7 + vantagis], "Yes");
         }
 
-        strcpy(NavEntriesLeft[9 + vantagis], "Customize Controls ...");
-        strcpy(NavEntriesRight[9 + vantagis], "");
+        strcpy(NavEntriesLeft[8 + vantagis], "Customize Controls ...");
+        strcpy(NavEntriesRight[8 + vantagis], "");
 
-        strcpy(NavEntriesLeft[10 + vantagis], "Pics In Background:");
+        strcpy(NavEntriesLeft[9 + vantagis], "Pics In Background:");
         if (EolSettings->pictures_in_background) {
+            strcpy(NavEntriesRight[9 + vantagis], "Yes");
+        } else {
+            strcpy(NavEntriesRight[9 + vantagis], "No");
+        }
+
+        strcpy(NavEntriesLeft[10 + vantagis], "Centered Camera:");
+        if (EolSettings->center_camera) {
             strcpy(NavEntriesRight[10 + vantagis], "Yes");
         } else {
             strcpy(NavEntriesRight[10 + vantagis], "No");
         }
 
-        strcpy(NavEntriesLeft[11 + vantagis], "Centered Camera:");
-        if (EolSettings->center_camera) {
+        strcpy(NavEntriesLeft[11 + vantagis], "Centered Minimap:");
+        if (EolSettings->center_map) {
             strcpy(NavEntriesRight[11 + vantagis], "Yes");
         } else {
             strcpy(NavEntriesRight[11 + vantagis], "No");
         }
 
-        strcpy(NavEntriesLeft[12 + vantagis], "Centered Minimap:");
-        if (EolSettings->center_map) {
-            strcpy(NavEntriesRight[12 + vantagis], "Yes");
-        } else {
-            strcpy(NavEntriesRight[12 + vantagis], "No");
-        }
-
-        strcpy(NavEntriesLeft[13 + vantagis], "Minimap Alignment:");
+        strcpy(NavEntriesLeft[12 + vantagis], "Minimap Alignment:");
         switch (EolSettings->map_alignment) {
         case MapAlignment::None:
-            strcpy(NavEntriesRight[13 + vantagis], "None");
+            strcpy(NavEntriesRight[12 + vantagis], "None");
             break;
         case MapAlignment::Left:
-            strcpy(NavEntriesRight[13 + vantagis], "Left");
+            strcpy(NavEntriesRight[12 + vantagis], "Left");
             break;
         case MapAlignment::Middle:
-            strcpy(NavEntriesRight[13 + vantagis], "Middle");
+            strcpy(NavEntriesRight[12 + vantagis], "Middle");
             break;
         case MapAlignment::Right:
-            strcpy(NavEntriesRight[13 + vantagis], "Right");
+            strcpy(NavEntriesRight[12 + vantagis], "Right");
             break;
         }
 
-        val.setup(14 + vantagis, true);
+        val.setup(13 + vantagis, true);
 
         kurrens = val.navigate();
 
@@ -201,44 +194,40 @@ void options(void) {
         }
 
         if (kurrens == 4) {
-            State->compatibility_mode = !State->compatibility_mode;
-        }
-
-        if (kurrens == 5) {
             State->animated_menus = !State->animated_menus;
         }
 
-        if (kurrens == 6) {
+        if (kurrens == 5) {
             State->high_quality = !State->high_quality;
             invalidate_ptop();
         }
 
-        if (kurrens == 7) {
+        if (kurrens == 6) {
             State->animated_objects = !State->animated_objects;
         }
 
-        if (kurrens == 8) {
+        if (kurrens == 7) {
             State->player1_bike1 = !State->player1_bike1;
         }
 
-        if (kurrens == 9) {
+        if (kurrens == 8) {
             menu_customize_controls();
         }
 
-        if (kurrens == 10) {
+        if (kurrens == 9) {
             EolSettings->pictures_in_background = !EolSettings->pictures_in_background;
             invalidate_level();
         }
 
-        if (kurrens == 11) {
+        if (kurrens == 10) {
             EolSettings->center_camera = !EolSettings->center_camera;
         }
 
-        if (kurrens == 12) {
+        if (kurrens == 11) {
             EolSettings->center_map = !EolSettings->center_map;
         }
 
-        if (kurrens == 13) {
+        if (kurrens == 12) {
             switch (EolSettings->map_alignment) {
             case MapAlignment::None:
                 EolSettings->map_alignment = MapAlignment::Left;

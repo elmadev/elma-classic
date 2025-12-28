@@ -1,7 +1,7 @@
 #ifndef OPTIONS_H
 #define OPTIONS_H
 
-void help(void);
-void options(void);
+void menu_help(void);
+void menu_options(void);
 
 #endif

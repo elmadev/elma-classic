@@ -358,11 +358,11 @@ void mainmenu(void) {
         }
 
         if (eredmeny == 3) {
-            options();
+            menu_options();
         }
 
         if (eredmeny == 4) {
-            help();
+            menu_help();
         }
 
         if (eredmeny == 5) {

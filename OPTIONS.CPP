@@ -51,8 +51,6 @@ void help(void) {
 
 // Egyben allithato:
 void options(void) {
-    int origsecondary = State->compatibility_mode;
-
     int kurrens = 0;
     while (1) {
         menu_nav val;
@@ -175,26 +173,6 @@ void options(void) {
         kurrens = val.navigate();
 
         if (kurrens < 0) {
-            // State->save_aaa(); majd programbol valo kilepeskor kiirjuk
-            if (origsecondary != State->compatibility_mode && Hangmarmegy) {
-                // Kiirunk egy dialogust, hogy ujra kell inditani ehhez:
-                menu_pic szl;
-                szl.add_line_centered("You modified the sound buffer", 320, 140);
-                szl.add_line_centered("optimization! As you already", 320, 190);
-                szl.add_line_centered("used the sound in this session,", 320, 240);
-                szl.add_line_centered("this will only take effect", 320, 290);
-                szl.add_line_centered("if you restart the game.", 320, 340);
-                mk_emptychar();
-                while (1) {
-                    if (mk_kbhit()) {
-                        int c = mk_getextchar();
-                        if (c == MK_ESC || c == MK_ENTER) {
-                            break;
-                        }
-                    }
-                    szl.render();
-                }
-            }
             return;
         }
 

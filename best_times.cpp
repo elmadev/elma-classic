@@ -67,7 +67,7 @@ static void render_topten(topten* tten, const char* header, int single) {
         return;
     }
 
-    menu_pic men;
+    menu_pic men(false);
     men.add_line_centered(header, 320, 37);
 
     int player_x;

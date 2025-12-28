@@ -16,6 +16,7 @@ struct viewtimest {
 };
 
 static void initsoundlejatszoban(void) {
+    static int Hangmarmegy = 0;
     if (State->sound_on && !Hangmarmegy) {
         Hangmarmegy = 1;
         Hangenabled = 1;

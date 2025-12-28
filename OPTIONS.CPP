@@ -1,8 +1,6 @@
 #include "ALL.H"
 #include "eol_settings.h"
 
-int Hangmarmegy = 0;
-
 void help(void) {
     menu_pic szl;
 

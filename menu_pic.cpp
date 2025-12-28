@@ -391,7 +391,7 @@ bool menu_pic::render_intro_anim(double time) {
     }
     int x = helmet_x - 20 + SCREEN_WIDTH / 2 - 320;
     int y = helmet_y - 7; // Helmet is never centered vertically
-    blit8(ScreenBuffer, helmet_frame, x, y - (SCREEN_HEIGHT - 1) + frame);
+    blit8(ScreenBuffer, helmet_frame, x, y - SCREEN_HEIGHT + frame);
 
     // intro.pcx moves down from 0 to SCREEN_HEIGHT
     blit8(ScreenBuffer, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,

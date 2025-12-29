@@ -5,7 +5,7 @@ class palette {
     void* data;
 
   public:
-    palette(unsigned char* tomb);
+    palette(unsigned char* palette_data);
     ~palette();
     void set();
 };

@@ -99,12 +99,12 @@ void unlock_frontbuffer() {
     unlock_backbuffer();
 }
 
-palette::palette(unsigned char* tomb) {
+palette::palette(unsigned char* palette_data) {
     SDL_Color* pal = new SDL_Color[256];
     for (int i = 0; i < 256; i++) {
-        pal[i].r = tomb[3 * i] << 2;
-        pal[i].g = tomb[3 * i + 1] << 2;
-        pal[i].b = tomb[3 * i + 2] << 2;
+        pal[i].r = palette_data[3 * i] << 2;
+        pal[i].g = palette_data[3 * i + 1] << 2;
+        pal[i].b = palette_data[3 * i + 2] << 2;
         pal[i].a = 0xFF;
     }
     data = (void*)pal;

@@ -682,11 +682,11 @@ lgrfile::lgrfile(const char* lgrnev) {
 
         // Kovetok:
         if (_fstrnicmp(nev, "qup_", 4) == 0) {
-            pkoveto->addkep(ppic, 1);
+            pkoveto->add(ppic, 1);
             continue;
         }
         if (_fstrnicmp(nev, "qdown_", 6) == 0) {
-            pkoveto->addkep(ppic, 0);
+            pkoveto->add(ppic, 0);
             continue;
         }
 
@@ -968,7 +968,7 @@ lgrfile::lgrfile(const char* lgrnev) {
         vanfu = 0;
         opentextkimarad = 0;
     }
-    if (pkoveto->kepszam < 2) {
+    if (pkoveto->length < 2) {
         // uzenet( "Picture not found in LGR file!: ", "qgrass.pcx", lgrtmp );
         vanfu = 0;
     }

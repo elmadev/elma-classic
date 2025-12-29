@@ -2,29 +2,29 @@
 
 koveto::koveto(void) {
     // Nullazas:
-    kepszam = 0;
-    for (int i = 0; i < MAXKOVETOKEPSZAM; i++) {
-        pkeptomb[i] = NULL;
-        feltomb[i] = 0;
+    length = 0;
+    for (int i = 0; i < MAX_GRASS_PICS; i++) {
+        pics[i] = NULL;
+        is_up[i] = 0;
     }
 }
 
 // nev kiterjesztes nelkuli:
-void koveto::addkep(pic8* ppic, int up) {
-    if (kepszam >= MAXKOVETOKEPSZAM) {
+void koveto::add(pic8* pic, int up) {
+    if (length >= MAX_GRASS_PICS) {
         uzenet("Too many grass pictures in lgr file!");
     }
-    pkeptomb[kepszam] = ppic;
-    feltomb[kepszam] = up;
+    pics[length] = pic;
+    is_up[length] = up;
 
-    kepszam++;
+    length++;
 }
 
 koveto::~koveto(void) {
-    for (int i = 0; i < MAXKOVETOKEPSZAM; i++) {
-        if (pkeptomb[i]) {
-            delete pkeptomb[i];
-            pkeptomb[i] = NULL;
+    for (int i = 0; i < MAX_GRASS_PICS; i++) {
+        if (pics[i]) {
+            delete pics[i];
+            pics[i] = NULL;
         }
     }
 }
@@ -91,17 +91,18 @@ static int feldolgvonalszakasz(gyuru* pgy, int p1, int p2, int* px0, int cur, in
 }
 
 // Ez nem hasznal semmit koveto adatokbol:
-int makevonal(gyuru* pgy, int* ytomb, int* phossz, int* px0, int maxhely, vect2* porigo) {
-    *phossz = 0;
+int create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_length, int* x0,
+                                   int max_heightmap_length, vect2* origin) {
+    *heightmap_length = 0;
     // Most megkeressuk osszekoto szakaszt:
     double maxxhossz = 0.0;
     int p1 = 0;
-    for (int i = 0; i < pgy->pontszam; i++) {
+    for (int i = 0; i < poly->pontszam; i++) {
         int j = i + 1;
-        if (j == pgy->pontszam) {
+        if (j == poly->pontszam) {
             j = 0;
         }
-        double ujxhossz = fabs(pgy->ponttomb[i].x - pgy->ponttomb[j].x);
+        double ujxhossz = fabs(poly->ponttomb[i].x - poly->ponttomb[j].x);
         if (ujxhossz > maxxhossz) {
             p1 = i;
             maxxhossz = ujxhossz;
@@ -113,36 +114,36 @@ int makevonal(gyuru* pgy, int* ytomb, int* phossz, int* px0, int maxhely, vect2*
 
     int elore = 1;
     int p2 = p1 + 1;
-    if (p2 == pgy->pontszam) {
+    if (p2 == poly->pontszam) {
         p2 = 0;
     }
     // Forditva kell nezni, mivel osszekoto szakasz ellentetes:
-    if (pgy->ponttomb[p1].x < pgy->ponttomb[p2].x) {
+    if (poly->ponttomb[p1].x < poly->ponttomb[p2].x) {
         elore = 0;
     }
 
     // Vegigmegyunk szakaszokon:
-    *px0 = -1;
+    *x0 = -1;
     int cur = -1;
-    for (int i = 0; i < pgy->pontszam - 1; i++) {
+    for (int i = 0; i < poly->pontszam - 1; i++) {
         // Eloszor lepunk mert osszekoto szakaszrol indultunk:
         if (elore) {
             p1++;
-            if (p1 == pgy->pontszam) {
+            if (p1 == poly->pontszam) {
                 p1 = 0;
             }
             p2++;
-            if (p2 == pgy->pontszam) {
+            if (p2 == poly->pontszam) {
                 p2 = 0;
             }
         } else {
             p1--;
             if (p1 < 0) {
-                p1 = pgy->pontszam - 1;
+                p1 = poly->pontszam - 1;
             }
             p2--;
             if (p2 < 0) {
-                p2 = pgy->pontszam - 1;
+                p2 = poly->pontszam - 1;
             }
         }
         // Most pedig beetetjuk vonalba szakaszt:
@@ -153,14 +154,15 @@ int makevonal(gyuru* pgy, int* ytomb, int* phossz, int* px0, int maxhely, vect2*
             pnagyobb = p1;
         }
 
-        // Elso alkalommal kitolti *px0-at:
-        cur = feldolgvonalszakasz(pgy, pkisebb, pnagyobb, px0, cur, ytomb, maxhely, porigo);
+        // Elso alkalommal kitolti *x0-at:
+        cur = feldolgvonalszakasz(poly, pkisebb, pnagyobb, x0, cur, heightmap, max_heightmap_length,
+                                  origin);
     }
 
-    if (*px0 < 0) {
+    if (*x0 < 0) {
         return 0;
     }
 
-    *phossz = cur - *px0 + 1;
+    *heightmap_length = cur - *x0 + 1;
     return 1;
 }

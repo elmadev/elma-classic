@@ -921,7 +921,7 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
         hiba("iygtyrt");
     }
 
-    pic8* ppic = pkov->pkeptomb[index];
+    pic8* ppic = pkov->pics[index];
     int xsize = ppic->get_width();
     int ysize = ppic->get_height();
     unsigned char atlatszo = ppic->gpixel(0, 0);
@@ -976,13 +976,13 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
     // Most beadjuk alul vagy felul megtoldott reszt is:
     if (felso) {
         // Felso:
-        for (int y = 0; y < FUGGTOLDAS; y++) {
+        for (int y = 0; y < QGRASS_EXTRA_HEIGHT; y++) {
             addbytesor((unsigned char*)(textindex + 10), tavolsag, xo, xo + xsize - 1,
                        yo + ysize + y, fazis);
         }
     } else {
         // Also:
-        for (int y = 0; y < FUGGTOLDAS; y++) {
+        for (int y = 0; y < QGRASS_EXTRA_HEIGHT; y++) {
             addbytesor((unsigned char*)(textindex + 10), tavolsag, xo, xo + xsize - 1, yo - 1 - y,
                        fazis);
         }
@@ -993,13 +993,13 @@ void ecset::kiegykovetokep(koveto* pkov, int index, int xo, int yo, int fazis) {
 
     int tavolsag = 600;
 
-    pic8* ppic = pkov->pkeptomb[index];
+    pic8* ppic = pkov->pics[index];
     int xsize = ppic->get_width();
     int ysize = ppic->get_height();
     unsigned char atlatszo = ppic->gpixel(0, 0);
 
     // Kiszamoljuk kep tetejenek helyet:
-    if (pkov->feltomb[index]) {
+    if (pkov->is_up[index]) {
         yo -= Keltolas;
     } else {
         yo -= ysize - 1 - Keltolas;
@@ -1054,19 +1054,19 @@ void ecset::kikovetokepek(koveto* pkov, int* ytomb, int hossz, int x0, int fazis
         int elteres = 10000;
         int joindex = -1;
         int jody = 0;
-        for (int i = 0; i < pkov->kepszam; i++) {
-            int dy = pkov->pkeptomb[i]->get_height();
+        for (int i = 0; i < pkov->length; i++) {
+            int dy = pkov->pics[i]->get_height();
             if (dy < 2 * Keltolas + 1) {
                 char tmp[60];
                 sprintf(tmp, "picture's y size is less than %d!", 2 * Keltolas + 1);
                 uzenet("In grass picture ", tmp);
             }
             dy -= 2 * Keltolas + 1;
-            if (!pkov->feltomb[i]) {
+            if (!pkov->is_up[i]) {
                 dy = -dy;
             }
 
-            int ujx = curx + pkov->pkeptomb[i]->get_width();
+            int ujx = curx + pkov->pics[i]->get_width();
             int vonaly;
             if (ujx >= x0 + hossz) {
                 vonaly = ytomb[hossz - 1];
@@ -1090,7 +1090,7 @@ void ecset::kikovetokepek(koveto* pkov, int* ytomb, int hossz, int x0, int fazis
 
         kiegykovetokep(pkov, joindex, curx, cury, fazis);
 
-        curx += pkov->pkeptomb[joindex]->get_width();
+        curx += pkov->pics[joindex]->get_width();
         cury += jody;
     }
 }
@@ -1124,7 +1124,8 @@ void ecset::addkovetok(int fazis) {
         koveto* pkov = Plgr->pkoveto;
 
         int vonalhossz = 0, x0 = 0;
-        if (!makevonal(pgy, Kovetoytomb, &vonalhossz, &x0, KOVVONALHOSSZ, &origo)) {
+        if (!create_grass_polygon_heightmap(pgy, Kovetoytomb, &vonalhossz, &x0, KOVVONALHOSSZ,
+                                            &origo)) {
             continue;
         }
         if (vonalhossz > KOVVONALHOSSZ) {

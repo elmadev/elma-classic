@@ -3,7 +3,6 @@
 
 #define MAX_GRASS_PICS (100)
 
-// Hany pixel magasan log tul textura:
 #define QGRASS_EXTRA_HEIGHT (20)
 
 class koveto {
@@ -16,7 +15,6 @@ class koveto {
     void add(pic8* pic, int up);
 };
 
-// Ez nem hasznal semmit koveto adatokbol, csak Ptop-bol:
 int create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_length, int* x0,
                                    int max_heightmap_length, vect2* origin);
 

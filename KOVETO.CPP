@@ -31,22 +31,22 @@ koveto::~koveto(void) {
 
 // cur-t adja vissza (ami mindig utolso jol kitoltott hely):
 // Elso alkalommal kitolti *px0-at:
-static int feldolgvonalszakasz(gyuru* pgy, int p1, int p2, int* px0, int cur, int* ytomb,
-                               int maxhely, vect2* porigo) {
-    if (p1 < 0 || p1 >= pgy->pontszam || p2 < 0 || p2 >= pgy->pontszam) {
+static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, int* heightmap,
+                                int max_heightmap_length, vect2* origin) {
+    if (v1 < 0 || v1 >= poly->pontszam || v2 < 0 || v2 >= poly->pontszam) {
         hiba("8u9tg4");
     }
 
-    vect2 r1 = pgy->ponttomb[p1];
-    vect2 r2 = pgy->ponttomb[p2];
+    vect2 r1 = poly->ponttomb[v1];
+    vect2 r2 = poly->ponttomb[v2];
     if (r1.x > r2.x) {
         return cur;
     }
 
-    int x1 = (r1.x - porigo->x) * MetersToPixels;
-    double y1 = (-r1.y - porigo->y) * MetersToPixels; // Mivel forditva vannak:
-    int x2 = (r2.x - porigo->x) * MetersToPixels;
-    double y2 = (-r2.y - porigo->y) * MetersToPixels;
+    int x1 = (r1.x - origin->x) * MetersToPixels;
+    double y1 = (-r1.y - origin->y) * MetersToPixels; // Mivel forditva vannak:
+    int x2 = (r2.x - origin->x) * MetersToPixels;
+    double y2 = (-r2.y - origin->y) * MetersToPixels;
 
     if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0) {
         hiba("7yces");
@@ -55,17 +55,17 @@ static int feldolgvonalszakasz(gyuru* pgy, int p1, int p2, int* px0, int cur, in
     if (cur < 0) {
         // Elso jo hivas:
         cur = x1;
-        if (*px0 >= 0) {
+        if (*x0 >= 0) {
             hiba("kjiut67");
         }
-        *px0 = x1;
-        ytomb[0] = y1;
+        *x0 = x1;
+        heightmap[0] = y1;
     }
 
     if (x1 >= x2) {
         return cur;
     }
-    if (x1 - *px0 >= maxhely) {
+    if (x1 - *x0 >= max_heightmap_length) {
         return cur;
     }
 
@@ -80,11 +80,11 @@ static int feldolgvonalszakasz(gyuru* pgy, int p1, int p2, int* px0, int cur, in
         if (x < cur) {
             continue;
         }
-        if (x - *px0 >= maxhely) {
+        if (x - *x0 >= max_heightmap_length) {
             return cur;
         }
         double y = y1 + (y2 - y1) * ((double)x - x1) / (x2 - x1);
-        ytomb[x - *px0] = y;
+        heightmap[x - *x0] = y;
         cur = x;
     }
     return cur;
@@ -95,31 +95,31 @@ int create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_l
                                    int max_heightmap_length, vect2* origin) {
     *heightmap_length = 0;
     // Most megkeressuk osszekoto szakaszt:
-    double maxxhossz = 0.0;
-    int p1 = 0;
+    double max_vertex_length = 0.0;
+    int v1 = 0;
     for (int i = 0; i < poly->pontszam; i++) {
         int j = i + 1;
         if (j == poly->pontszam) {
             j = 0;
         }
-        double ujxhossz = fabs(poly->ponttomb[i].x - poly->ponttomb[j].x);
-        if (ujxhossz > maxxhossz) {
-            p1 = i;
-            maxxhossz = ujxhossz;
+        double length = fabs(poly->ponttomb[i].x - poly->ponttomb[j].x);
+        if (length > max_vertex_length) {
+            v1 = i;
+            max_vertex_length = length;
         }
     }
-    if (maxxhossz < 0.0001) {
+    if (max_vertex_length < 0.0001) {
         return 0;
     }
 
-    int elore = 1;
-    int p2 = p1 + 1;
-    if (p2 == poly->pontszam) {
-        p2 = 0;
+    int polygon_is_counterclockwise = 1;
+    int v2 = v1 + 1;
+    if (v2 == poly->pontszam) {
+        v2 = 0;
     }
     // Forditva kell nezni, mivel osszekoto szakasz ellentetes:
-    if (poly->ponttomb[p1].x < poly->ponttomb[p2].x) {
-        elore = 0;
+    if (poly->ponttomb[v1].x < poly->ponttomb[v2].x) {
+        polygon_is_counterclockwise = 0;
     }
 
     // Vegigmegyunk szakaszokon:
@@ -127,36 +127,36 @@ int create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_l
     int cur = -1;
     for (int i = 0; i < poly->pontszam - 1; i++) {
         // Eloszor lepunk mert osszekoto szakaszrol indultunk:
-        if (elore) {
-            p1++;
-            if (p1 == poly->pontszam) {
-                p1 = 0;
+        if (polygon_is_counterclockwise) {
+            v1++;
+            if (v1 == poly->pontszam) {
+                v1 = 0;
             }
-            p2++;
-            if (p2 == poly->pontszam) {
-                p2 = 0;
+            v2++;
+            if (v2 == poly->pontszam) {
+                v2 = 0;
             }
         } else {
-            p1--;
-            if (p1 < 0) {
-                p1 = poly->pontszam - 1;
+            v1--;
+            if (v1 < 0) {
+                v1 = poly->pontszam - 1;
             }
-            p2--;
-            if (p2 < 0) {
-                p2 = poly->pontszam - 1;
+            v2--;
+            if (v2 < 0) {
+                v2 = poly->pontszam - 1;
             }
         }
         // Most pedig beetetjuk vonalba szakaszt:
-        int pkisebb = p1;
-        int pnagyobb = p2;
-        if (!elore) {
-            pkisebb = p2;
-            pnagyobb = p1;
+        int left_v = v1;
+        int right_v = v2;
+        if (!polygon_is_counterclockwise) {
+            left_v = v2;
+            right_v = v1;
         }
 
         // Elso alkalommal kitolti *x0-at:
-        cur = feldolgvonalszakasz(poly, pkisebb, pnagyobb, x0, cur, heightmap, max_heightmap_length,
-                                  origin);
+        cur = grass_line_heightmap(poly, left_v, right_v, x0, cur, heightmap, max_heightmap_length,
+                                   origin);
     }
 
     if (*x0 < 0) {

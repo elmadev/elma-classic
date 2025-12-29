@@ -19,8 +19,4 @@ class koveto {
 // Ez nem hasznal semmit koveto adatokbol, csak Ptop-bol:
 int makevonal(gyuru* pgy, int* ytomb, int* phossz, int* px0, int maxhely, vect2* porigo);
 
-void makekoveto(void);
-
-void tesztkoveto(void);
-
 #endif

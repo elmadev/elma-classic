@@ -1,14 +1,14 @@
 #include "ALL.H"
 
-koveto::koveto(void) {
+koveto::koveto() {
     length = 0;
     for (int i = 0; i < MAX_GRASS_PICS; i++) {
         pics[i] = NULL;
-        is_up[i] = 0;
+        is_up[i] = false;
     }
 }
 
-void koveto::add(pic8* pic, int up) {
+void koveto::add(pic8* pic, bool up) {
     if (length >= MAX_GRASS_PICS) {
         uzenet("Too many grass pictures in lgr file!");
     }
@@ -18,7 +18,7 @@ void koveto::add(pic8* pic, int up) {
     length++;
 }
 
-koveto::~koveto(void) {
+koveto::~koveto() {
     for (int i = 0; i < MAX_GRASS_PICS; i++) {
         if (pics[i]) {
             delete pics[i];
@@ -112,8 +112,8 @@ static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, i
 }
 
 // Create a heightmap for `poly`.
-int create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_length, int* x0,
-                                   int max_heightmap_length, vect2* origin) {
+bool create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_length, int* x0,
+                                    int max_heightmap_length, vect2* origin) {
     *heightmap_length = 0;
     double max_vertex_length = 0.0;
     int v1 = 0;
@@ -132,13 +132,13 @@ int create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_l
         return 0;
     }
 
-    int polygon_is_counterclockwise = 1;
+    bool polygon_is_counterclockwise = true;
     int v2 = v1 + 1;
     if (v2 == poly->pontszam) {
         v2 = 0;
     }
     if (poly->ponttomb[v1].x < poly->ponttomb[v2].x) {
-        polygon_is_counterclockwise = 0;
+        polygon_is_counterclockwise = false;
     }
 
     *x0 = -1;
@@ -178,9 +178,9 @@ int create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_l
     }
 
     if (*x0 < 0) {
-        return 0;
+        return false;
     }
 
     *heightmap_length = cur - *x0 + 1;
-    return 1;
+    return true;
 }

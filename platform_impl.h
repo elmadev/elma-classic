@@ -1,13 +1,12 @@
 #ifndef PLATFORM_IMPL_H
 #define PLATFORM_IMPL_H
 
-#include <SDL_pixels.h>
-
 class palette {
-    SDL_Color pal[256];
+    void* data;
 
   public:
     palette(unsigned char* tomb);
+    ~palette();
     void set();
 };
 

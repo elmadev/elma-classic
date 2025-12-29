@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "eol_settings.h"
+#include <cstdint>
 
 typedef uintptr_t pixelek_t;
 

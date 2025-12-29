@@ -100,15 +100,21 @@ void unlock_frontbuffer() {
 }
 
 palette::palette(unsigned char* tomb) {
+    SDL_Color* pal = new SDL_Color[256];
     for (int i = 0; i < 256; i++) {
         pal[i].r = tomb[3 * i] << 2;
         pal[i].g = tomb[3 * i + 1] << 2;
         pal[i].b = tomb[3 * i + 2] << 2;
         pal[i].a = 0xFF;
     }
+    data = (void*)pal;
 }
 
-void palette::set() { SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, pal, 0, 256); }
+palette::~palette() { delete[] (SDL_Color*)data; }
+
+void palette::set() {
+    SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, (const SDL_Color*)data, 0, 256);
+}
 
 void handle_events() {
     SDL_Event event;

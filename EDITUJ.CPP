@@ -186,6 +186,18 @@ void pop(void) {
     egeretrajzolja();
 }
 
+void update_and_draw_cursor() {
+    int x, y;
+    get_mouse_position(&x, &y);
+    if (x == Moux && y == Mouy) {
+        return;
+    }
+    push();
+    Moux = x;
+    Mouy = y;
+    pop();
+}
+
 // TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP
 // TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP
 // TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP

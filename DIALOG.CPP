@@ -181,32 +181,17 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         }
         // Left mouse click a button
         if (left_mouse_clicked()) {
-            int mouse_x = 0, mouse_y = 0;
-            get_mouse_position(&mouse_x, &mouse_y);
-            push();
-            Moux = mouse_x;
-            Mouy = mouse_y;
-            pop();
+            update_and_draw_cursor();
             for (int i = 0; i < button_length; i++) {
-                if (mouse_x >= button_array_x1[i] && mouse_x <= button_array_x2[i] &&
-                    mouse_y >= button_y1 && mouse_y <= button_y2) {
+                if (Moux >= button_array_x1[i] && Moux <= button_array_x2[i] && Mouy >= button_y1 &&
+                    Mouy <= button_y2) {
                     choice = i;
                     goto exit;
                 }
             }
             continue;
         }
-        // Update mouse position
-        int mouse_x = 0;
-        int mouse_y = 0;
-        get_mouse_position(&mouse_x, &mouse_y);
-        if (mouse_x == Moux && mouse_y == Mouy) {
-            continue;
-        }
-        push();
-        Moux = mouse_x;
-        Mouy = mouse_y;
-        pop();
+        update_and_draw_cursor();
     }
 exit:
     if (!InEditor) {

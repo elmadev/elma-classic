@@ -236,27 +236,22 @@ void tolt_open(void) {
         }
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxle)) {
+            if (is_in_box(Moux, Mouy, boxle)) {
                 kur += helyszam - 1;
             }
-            if (is_in_box(ujx, ujy, boxfel)) {
+            if (is_in_box(Moux, Mouy, boxfel)) {
                 kur -= helyszam - 1;
             }
-            if (is_in_box(ujx, ujy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, boxcancel)) {
                 return;
             }
-            if (ujx > lx1 && ujx < lx2 && ujy > ly1 && ujy < ly2) {
+            if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 // Lista folott nyomta meg gombot:
-                if (ujy < ly1 + dy * helyszam) {
+                if (Mouy < ly1 + dy * helyszam) {
                     // Egy nevet el is talalt:
-                    int index = (ujy - ly1) / dy;
+                    int index = (Mouy - ly1) / dy;
                     index += felso;
                     if (index < nevszam) {
                         betolt(&Soknev[index * 10]);
@@ -294,14 +289,7 @@ void tolt_open(void) {
             eddigfelso = felso;
             eddigkur = kur;
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -424,29 +412,26 @@ void kivalasztkezdetit(void) {
         }
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            Moux = ujx;
-            Mouy = ujy;
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxle)) {
+            if (is_in_box(Moux, Mouy, boxle)) {
                 kur += helyszam - 1;
             }
-            if (is_in_box(ujx, ujy, boxfel)) {
+            if (is_in_box(Moux, Mouy, boxfel)) {
                 kur -= helyszam - 1;
             }
-            if (is_in_box(ujx, ujy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, boxcancel)) {
                 return;
             }
-            if (is_in_box(ujx, ujy, boxnew)) {
+            if (is_in_box(Moux, Mouy, boxnew)) {
                 State->editor_filename[0] = 0;
                 return;
             }
-            if (ujx > lx1 && ujx < lx2 && ujy > ly1 && ujy < ly2) {
+            if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 // Lista folott nyomta meg gombot:
-                if (ujy < ly1 + dy * helyszam) {
+                if (Mouy < ly1 + dy * helyszam) {
                     // Egy nevet el is talalt:
-                    int index = (ujy - ly1) / dy;
+                    int index = (Mouy - ly1) / dy;
                     index += felso;
                     if (index < nevszam) {
                         char* nev = &Soknev[index * 10];
@@ -491,14 +476,7 @@ void kivalasztkezdetit(void) {
             eddigfelso = felso;
             eddigkur = kur;
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -663,14 +641,9 @@ int tolt_save_as(int lokkolhato) {
             return 0;
         }
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxsave)) {
+            if (is_in_box(Moux, Mouy, boxsave)) {
                 if (nev[0] == 0) {
                     continue;
                 }
@@ -690,7 +663,7 @@ int tolt_save_as(int lokkolhato) {
                 Valtozott = 0;
                 return 1;
             }
-            if (lokkolhato && is_in_box(ujx, ujy, boxsavelock)) {
+            if (lokkolhato && is_in_box(Moux, Mouy, boxsavelock)) {
                 // Lockoltan mentjuk el:
                 if (nev[0] == 0) {
                     continue;
@@ -732,14 +705,7 @@ int tolt_save_as(int lokkolhato) {
                 return 1;
             }
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -994,32 +960,27 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
         }
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxle)) {
+            if (is_in_box(Moux, Mouy, boxle)) {
                 kur += helyszam - 1;
             }
-            if (is_in_box(ujx, ujy, boxfel)) {
+            if (is_in_box(Moux, Mouy, boxfel)) {
                 kur -= helyszam - 1;
             }
-            if (is_in_box(ujx, ujy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, boxcancel)) {
                 strcpy(nev, orignev);
                 return;
             }
-            if (cleares && is_in_box(ujx, ujy, boxclear)) {
+            if (cleares && is_in_box(Moux, Mouy, boxclear)) {
                 nev[0] = 0;
                 return;
             }
-            if (ujx > lx1 && ujx < lx2 && ujy > ly1 && ujy < ly2) {
+            if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 // Lista folott nyomta meg gombot:
-                if (ujy < ly1 + dy * helyszam) {
+                if (Mouy < ly1 + dy * helyszam) {
                     // Egy nevet el is talalt:
-                    int index = (ujy - ly1) / dy;
+                    int index = (Mouy - ly1) / dy;
                     index += felso;
                     if (index < nevszam) {
                         if (tipus == 1) {
@@ -1162,14 +1123,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
             eddigfelso = felso;
             eddigkur = kur;
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -1221,23 +1175,18 @@ void tolt_pickasprite(void) {
         }
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxok)) {
+            if (is_in_box(Moux, Mouy, boxok)) {
                 strcpy(Plgr->aktiv_kepnev, kepnev);
                 strcpy(Plgr->aktiv_texturanev, texturanev);
                 strcpy(Plgr->aktiv_maszknev, maszknev);
                 return;
             }
-            if (is_in_box(ujx, ujy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, boxcancel)) {
                 return;
             }
-            if (is_in_box(ujx, ujy, boxkepnev)) {
+            if (is_in_box(Moux, Mouy, boxkepnev)) {
                 // Kepnevet akarja valtoztatni:
                 pickanev(kepnev, uresnev, uresnev, 1);
                 push();
@@ -1249,7 +1198,7 @@ void tolt_pickasprite(void) {
                 }
                 invalid = 1;
             }
-            if (is_in_box(ujx, ujy, boxtexturanev)) {
+            if (is_in_box(Moux, Mouy, boxtexturanev)) {
                 // Texturanevet akarja valtoztatni:
                 pickanev(uresnev, texturanev, maszknev, 2);
                 push();
@@ -1261,7 +1210,7 @@ void tolt_pickasprite(void) {
                 }
                 invalid = 1;
             }
-            if (is_in_box(ujx, ujy, boxmaszknev)) {
+            if (is_in_box(Moux, Mouy, boxmaszknev)) {
                 // Maszknevet akarja valtoztatni:
                 pickanev(uresnev, texturanev, maszknev, 3);
                 push();
@@ -1311,14 +1260,7 @@ void tolt_pickasprite(void) {
             bltfront(BufferMain);
             pop();
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -1430,27 +1372,22 @@ int tolt_picklgrfile(char* lgrnev) {
 
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxle)) {
+            if (is_in_box(Moux, Mouy, boxle)) {
                 kur += helyszam - 1;
             }
-            if (is_in_box(ujx, ujy, boxfel)) {
+            if (is_in_box(Moux, Mouy, boxfel)) {
                 kur -= helyszam - 1;
             }
-            if (is_in_box(ujx, ujy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, boxcancel)) {
                 return 0;
             }
-            if (ujx > lx1 && ujx < lx2 && ujy > ly1 && ujy < ly2) {
+            if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 // Lista folott nyomta meg gombot:
-                if (ujy < ly1 + dy * helyszam) {
+                if (Mouy < ly1 + dy * helyszam) {
                     // Egy nevet el is talalt:
-                    int index = (ujy - ly1) / dy;
+                    int index = (Mouy - ly1) / dy;
                     index += felso;
                     if (index < nevszam) {
                         strcpy(lgrnev, &Soknev[index * 10]);
@@ -1495,14 +1432,7 @@ int tolt_picklgrfile(char* lgrnev) {
             eddigfelso = felso;
             eddigkur = kur;
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -1607,14 +1537,9 @@ void setspritetav(sprite* psp) {
         }
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxok)) {
+            if (is_in_box(Moux, Mouy, boxok)) {
                 if (psp->tavolsag != tavolsag || psp->hatarol != hatarol) {
                     Valtozott = 1;
                 }
@@ -1622,14 +1547,14 @@ void setspritetav(sprite* psp) {
                 psp->hatarol = hatarol;
                 return;
             }
-            if (is_in_box(ujx, ujy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, boxcancel)) {
                 return;
             }
-            if (is_in_box(ujx, ujy, boxtav)) {
+            if (is_in_box(Moux, Mouy, boxtav)) {
                 tavolsag = tavolsagbeir(BufferMain, boxtav, tavolsag);
                 kepvaltozott = 1;
             }
-            if (is_in_box(ujx, ujy, boxclipp)) {
+            if (is_in_box(Moux, Mouy, boxclipp)) {
                 hatarol = hatarolbeir(BufferMain, boxclipp, hatarol);
                 kepvaltozott = 1;
             }
@@ -1718,14 +1643,7 @@ void setspritetav(sprite* psp) {
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -1767,14 +1685,9 @@ void set_gyuru_attributes(gyuru* pgy) {
         }
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxok)) {
+            if (is_in_box(Moux, Mouy, boxok)) {
                 // Meg van ismetelve ENTER-nel is feljebb:
                 if (pgy->koveto != koveto) {
                     Valtozott = 1;
@@ -1782,10 +1695,10 @@ void set_gyuru_attributes(gyuru* pgy) {
                 pgy->koveto = koveto;
                 return;
             }
-            if (is_in_box(ujx, ujy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, boxcancel)) {
                 return;
             }
-            if (is_in_box(ujx, ujy, boxkoveto)) {
+            if (is_in_box(Moux, Mouy, boxkoveto)) {
                 koveto = !koveto;
                 kepvaltozott = 1;
             }
@@ -1820,14 +1733,7 @@ void set_gyuru_attributes(gyuru* pgy) {
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -1909,17 +1815,12 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
         }
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, boxcancel)) {
                 return;
             }
-            if (is_in_box(ujx, ujy, boxanimszam)) {
+            if (is_in_box(Moux, Mouy, boxanimszam)) {
                 // Berajzolunk egy vizszintes kurzort:
                 push(); // Leveszi egeret
                 render_box(BufferMain, boxanimszam, Feherszin, DIALOG_BORDER_PALETTE_ID);
@@ -1942,9 +1843,9 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
                 pop();
                 return;
             }
-            if (is_in_box(ujx, ujy, boxlista)) {
+            if (is_in_box(Moux, Mouy, boxlista)) {
                 // Benne van listaban:
-                int index = (ujy - boxlista.y1) / dy;
+                int index = (Mouy - boxlista.y1) / dy;
                 if (index >= listaszam) {
                     index = listaszam - 1;
                 }
@@ -1971,14 +1872,7 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
                 return;
             }
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -2111,33 +2005,6 @@ void change_level_properties(void) {
 
     left_mouse_clicked();
     int invalid = 1;
-
-    // Ez a resz sebesseg tesztelesere szolgal:
-    /*int ciklus = 0;
-    while( 1 ) {
-        // Nezzuk gombokat:
-        ciklus++;
-        if( ciklus > 40 ) {
-            ciklus = 0;
-            while( mk_kbhit() ) {
-                int c = mk_getextchar();
-                if( c == MK_ESC )
-                    return;
-            }
-        }
-        //getbutbmou();
-
-        int ujx = 0, ujy = 0;
-        //for( int i = 0; i < 10; i++ )
-        get_mouse_position( &ujx, &ujy );
-        if( ujx != Moux && ujy != Mouy ) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
-    } */
-
     while (1) {
         // Nezzuk gombokat:
         while (mk_kbhit()) {
@@ -2167,14 +2034,9 @@ void change_level_properties(void) {
         }
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxok)) {
+            if (is_in_box(Moux, Mouy, boxok)) {
                 if (strcmpi(Ptop->fgnev, fgnev) != 0 || strcmpi(Ptop->bgnev, bgnev) != 0 ||
                     strcmp(Ptop->levelname, levelname) != 0) {
                     Valtozott = 1;
@@ -2193,10 +2055,10 @@ void change_level_properties(void) {
                 }
                 return;
             }
-            if (is_in_box(ujx, ujy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, boxcancel)) {
                 return;
             }
-            if (is_in_box(ujx, ujy, boxfgnev)) {
+            if (is_in_box(Moux, Mouy, boxfgnev)) {
                 // Foreground nevet akarja valtoztatni:
                 char uresnev[10] = "";
                 pickanev(uresnev, fgnev, uresnev, 2, 0);
@@ -2206,7 +2068,7 @@ void change_level_properties(void) {
                 pop();
                 invalid = 1;
             }
-            if (is_in_box(ujx, ujy, boxbgnev)) {
+            if (is_in_box(Moux, Mouy, boxbgnev)) {
                 // Background nevet akarja valtoztatni:
                 char uresnev[10] = "";
                 pickanev(uresnev, bgnev, uresnev, 2, 0);
@@ -2216,7 +2078,7 @@ void change_level_properties(void) {
                 pop();
                 invalid = 1;
             }
-            if (is_in_box(ujx, ujy, boxlevelname)) {
+            if (is_in_box(Moux, Mouy, boxlevelname)) {
                 // Palya nevet akarja valtoztatni:
                 change_level_name(levelname);
                 push();
@@ -2225,7 +2087,7 @@ void change_level_properties(void) {
                 pop();
                 invalid = 1;
             }
-            if (is_in_box(ujx, ujy, boxlgrfile)) {
+            if (is_in_box(Moux, Mouy, boxlgrfile)) {
                 char belgrnev[20] = "";
                 strcpy(belgrnev, lgrnev);
                 if (!tolt_picklgrfile(lgrnev)) {
@@ -2282,14 +2144,7 @@ void change_level_properties(void) {
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }
 
@@ -2323,25 +2178,20 @@ void setviewoptions(void) {
         }
         // Eger lenyomas:
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(ujx, ujy, boxok)) {
+            if (is_in_box(Moux, Mouy, boxok)) {
                 return;
             }
-            if (is_in_box(ujx, ujy, boxpoligon)) {
+            if (is_in_box(Moux, Mouy, boxpoligon)) {
                 Rajzolpoligon = !Rajzolpoligon;
                 invalid = 1;
             }
-            if (is_in_box(ujx, ujy, boxkoveto)) {
+            if (is_in_box(Moux, Mouy, boxkoveto)) {
                 Rajzolkoveto = !Rajzolkoveto;
                 invalid = 1;
             }
-            if (is_in_box(ujx, ujy, boxkepek)) {
+            if (is_in_box(Moux, Mouy, boxkepek)) {
                 Rajzolkepek = !Rajzolkepek;
                 invalid = 1;
             }
@@ -2383,13 +2233,6 @@ void setviewoptions(void) {
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx != Moux && ujy != Mouy) {
-            push();
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
-        }
+        update_and_draw_cursor();
     }
 }

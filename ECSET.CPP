@@ -351,7 +351,7 @@ void ecset::textura2mutato(void) {
         while (fut) {
             int hozzaad = fut->xsize;
 
-            int kepindex = (pixelek_t)fut->pixelek;
+            pixelek_t kepindex = (pixelek_t)fut->pixelek;
             if (((kepindex & PIXELMASZK) == 0) && (kepindex >= 10)) {
                 kepindex -= 10;
 // Itt van maszk, le kell cserelni:
@@ -1825,7 +1825,7 @@ static int ezfolt(int x, int y, mdbiter* piter1) {
     // Felette levo sort vizsgaljuk:
     mdarab* pmd = piter1->getpmd(x, y + 1);
 
-    int kepindex = (pixelek_t)pmd->pixelek;
+    pixelek_t kepindex = (pixelek_t)pmd->pixelek;
     if (kepindex < 10) {
         // Ha fold, eg, vagy ures:
         return 0;
@@ -1889,7 +1889,7 @@ void ecset::foltoz(void) {
 
             Glb_pfoltdarab = pmd;
             // Egy madarab-ot elintezunk:
-            int kepindex = (pixelek_t)pmd->pixelek;
+            pixelek_t kepindex = (pixelek_t)pmd->pixelek;
             if (((kepindex & PIXELMASZK) == 0) && (kepindex >= 10)) {
                 kepindex -= 10;
 // Itt van maszk, le kell cserelni:

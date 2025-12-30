@@ -2,7 +2,7 @@
 
 // Visszaadja, hogy volt-e hiba:
 int check_topology(int kelldialog) {
-    dialog("Checking Topology, please wait!", "GOMBOK", "VISSZATER");
+    dialog("Checking Topology, please wait!", DIALOG_BUTTONS, DIALOG_RETURN);
 
     // Eloszor egymason fekvo szomszedos pontokat valasztjuk szet:
     for (int i = 0; i < MAXGYURU; i++) {

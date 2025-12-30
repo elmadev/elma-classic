@@ -15,7 +15,7 @@ ecset* Pecsetalso = NULL;
 ecset* Pecsetfelso = NULL;
 ecset* Pecsetview = NULL;
 
-#define PIXELMASZK (0xfffff800) // also 2048 hely ures
+#define PIXELMASZK (~((uintptr_t)0x7FF))
 
 /*void vizsgal( ecset* pecset ) {
 

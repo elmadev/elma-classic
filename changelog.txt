@@ -9,6 +9,7 @@
 * Background menu balls start off centered in the screen
 * Palette is processed as a 24-bit color instead of an 18-bit color, slightly improving color accuracy
 * Maximum number of displayed levels/recs in menu increased from 29 to up to 200 for high resolutions
+* Dialog pop-ups are centered on the screen
 
 ## Minor Bug Fixes
 * Foreground grass was accidentally inefficiently calculated, causing increased load time

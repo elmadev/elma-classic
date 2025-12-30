@@ -90,9 +90,9 @@ class ecset {
     void addspriteok(int fazis);
     void addobjektumok(void); // Ez most nem view eseten visszter
 
-    void kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis);
-    void kiegykovetokep(koveto* pkov, int index, int xo, int yo, int fazis);
-    void kikovetokepek(koveto* pkov, int* ytomb, int hossz, int x0, int fazis);
+    void kovetotextura(grass* pkov, int index, int xo, int yo, int fazis);
+    void kiegykovetokep(grass* pkov, int index, int xo, int yo, int fazis);
+    void kikovetokepek(grass* pkov, int* ytomb, int hossz, int x0, int fazis);
     void addkovetok(int fazis);
 
     void kiegysor_A(unsigned char* pc, int ye);

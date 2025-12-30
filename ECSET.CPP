@@ -904,7 +904,7 @@ static int Kovetoytomb[KOVVONALHOSSZ + 10];
 
 constexpr int Keltolas = 20;
 
-void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
+void ecset::kovetotextura(grass* pkov, int index, int xo, int yo, int fazis) {
     if (!BufferMain) {
         hiba("6dejuhfe");
     }
@@ -990,7 +990,7 @@ void ecset::kovetotextura(koveto* pkov, int index, int xo, int yo, int fazis) {
     }
 }
 
-void ecset::kiegykovetokep(koveto* pkov, int index, int xo, int yo, int fazis) {
+void ecset::kiegykovetokep(grass* pkov, int index, int xo, int yo, int fazis) {
 
     int tavolsag = 600;
 
@@ -1034,7 +1034,7 @@ void ecset::kiegykovetokep(koveto* pkov, int index, int xo, int yo, int fazis) {
     // kovetotextura( 0, pkov, pgy, index, xo, yo, fazis );
 }
 
-void ecset::kikovetokepek(koveto* pkov, int* ytomb, int hossz, int x0, int fazis) {
+void ecset::kikovetokepek(grass* pkov, int* ytomb, int hossz, int x0, int fazis) {
 #ifdef DEBUG
     if (hossz < 1) {
         hiba("dd387d3e");
@@ -1122,7 +1122,7 @@ void ecset::addkovetok(int fazis) {
             continue;
         }
 
-        koveto* pkov = Plgr->pkoveto;
+        grass* pkov = Plgr->pkoveto;
 
         int vonalhossz = 0, x0 = 0;
         if (!create_grass_polygon_heightmap(pgy, Kovetoytomb, &vonalhossz, &x0, KOVVONALHOSSZ,

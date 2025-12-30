@@ -85,8 +85,8 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     if (InEditor) {
         push();
     } else {
-        Moux = 320;
-        Mouy = 240;
+        Moux = SCREEN_WIDTH / 2;
+        Mouy = SCREEN_HEIGHT / 2;
     }
     invalidateegesz();
 
@@ -101,15 +101,15 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     // Draw dialog box
     int dy = 20;
     int height = text_length * dy + 50;
-    int x1 = 320 - width / 2;
-    int y1 = 240 - height / 2;
-    int x2 = 320 + width / 2;
-    int y2 = 240 + height / 2;
+    int x1 = SCREEN_WIDTH / 2 - width / 2;
+    int y1 = SCREEN_HEIGHT / 2 - height / 2;
+    int x2 = SCREEN_WIDTH / 2 + width / 2;
+    int y2 = SCREEN_HEIGHT / 2 + height / 2;
     render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
 
     // Draw text
     for (int i = 0; i < text_length; i++) {
-        Pabc2->write_centered(BufferMain, 320, y1 + 22 + i * dy, text_array[i]);
+        Pabc2->write_centered(BufferMain, SCREEN_WIDTH / 2, y1 + 22 + i * dy, text_array[i]);
     }
 
     // Determine button positions
@@ -119,16 +119,16 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     int button_y2 = y2 - 10;
     int button_dx = 80;
     if (button_length == 1) {
-        button_array_x1[0] = 320;
+        button_array_x1[0] = SCREEN_WIDTH / 2;
     }
     if (button_length == 2) {
-        button_array_x1[0] = 320 - button_dx / 2;
-        button_array_x1[1] = 320 + button_dx / 2;
+        button_array_x1[0] = SCREEN_WIDTH / 2 - button_dx / 2;
+        button_array_x1[1] = SCREEN_WIDTH / 2 + button_dx / 2;
     }
     if (button_length == 3) {
-        button_array_x1[0] = 320 - button_dx;
-        button_array_x1[1] = 320;
-        button_array_x1[2] = 320 + button_dx;
+        button_array_x1[0] = SCREEN_WIDTH / 2 - button_dx;
+        button_array_x1[1] = SCREEN_WIDTH / 2;
+        button_array_x1[2] = SCREEN_WIDTH / 2 + button_dx;
     }
     if (button_length > 3) {
         internal_error("dialog button_length > 3");

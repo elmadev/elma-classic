@@ -47,6 +47,7 @@ extern unsigned char Hatterindex;
 extern int Moux, Mouy;
 void push(void); // levesz
 void pop(void);  // feltesz
+void update_and_draw_cursor();
 
 void invalidate(void);
 void invalidateegesz(void);

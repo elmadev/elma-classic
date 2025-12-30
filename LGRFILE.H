@@ -88,7 +88,7 @@ class lgrfile {
     int vanfu;
     // Textura szelekcio lista utolso eleme kimarad (qgrass):
     int opentextkimarad;
-    koveto* pkoveto;
+    grass* pkoveto;
 
     unsigned char* paltomb;
     ddpal* pal;

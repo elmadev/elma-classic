@@ -1,6 +1,6 @@
 #include "ALL.H"
 
-koveto::koveto() {
+grass::grass() {
     length = 0;
     for (int i = 0; i < MAX_GRASS_PICS; i++) {
         pics[i] = NULL;
@@ -8,7 +8,7 @@ koveto::koveto() {
     }
 }
 
-void koveto::add(pic8* pic, bool up) {
+void grass::add(pic8* pic, bool up) {
     if (length >= MAX_GRASS_PICS) {
         uzenet("Too many grass pictures in lgr file!");
     }
@@ -18,7 +18,7 @@ void koveto::add(pic8* pic, bool up) {
     length++;
 }
 
-koveto::~koveto() {
+grass::~grass() {
     for (int i = 0; i < MAX_GRASS_PICS; i++) {
         if (pics[i]) {
             delete pics[i];

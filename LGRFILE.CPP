@@ -470,7 +470,7 @@ lgrfile::lgrfile(const char* lgrnev) {
         foodtomb[i] = NULL;
     }
 
-    pkoveto = new koveto;
+    pkoveto = new grass;
 
     // Megnyitja file-t:
     char lgrtmp[30];

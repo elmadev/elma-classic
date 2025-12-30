@@ -5,13 +5,13 @@
 
 #define QGRASS_EXTRA_HEIGHT (20)
 
-class koveto {
+class grass {
   public:
     int length;
     pic8* pics[MAX_GRASS_PICS];
     bool is_up[MAX_GRASS_PICS];
-    koveto();
-    ~koveto();
+    grass();
+    ~grass();
     void add(pic8* pic, bool up);
 };
 

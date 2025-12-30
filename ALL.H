@@ -72,7 +72,7 @@
 
 #include "TOPOL.H"
 #include "EDITUJ.H"
-#include "DIALOG.H"
+#include "editor_dialog.h"
 #include "DISPLAY.H"
 #include "EDITTOOL.H"
 #include "EDITMENU.H"

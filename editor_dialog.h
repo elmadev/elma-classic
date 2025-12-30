@@ -1,5 +1,5 @@
-#ifndef DIALOG_H
-#define DIALOG_H
+#ifndef EDITOR_DIALOG_H
+#define EDITOR_DIALOG_H
 
 constexpr unsigned char DIALOG_PALETTE_ID = 4;
 constexpr unsigned char DIALOG_BORDER_PALETTE_ID = 0;

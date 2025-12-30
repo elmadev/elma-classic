@@ -13,7 +13,7 @@ elma_sources = files(
     'physics_move.cpp',
     'best_times.cpp',
     'menu_controls.cpp',
-    'DIALOG.CPP',
+    'editor_dialog.cpp',
     'menu_dialog.cpp',
     'timer.cpp',
     'DISPLAY.CPP',

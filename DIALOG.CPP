@@ -34,47 +34,47 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
            const char* text13, const char* text14, const char* text15, const char* text16,
            const char* text17, const char* text18, const char* text19, const char* text20,
            const char* text21, const char* text22, const char* text23, const char* text24) {
-    const char* texttomb[30] = {text1,  text2,  text3,  text4,  text5,  text6,  text7,  text8,
-                                text9,  text10, text11, text12, text13, text14, text15, text16,
-                                text17, text18, text19, text20, text21, text22, text23, text24};
-    int textszam = 24;
+    const char* text_array[30] = {text1,  text2,  text3,  text4,  text5,  text6,  text7,  text8,
+                                  text9,  text10, text11, text12, text13, text14, text15, text16,
+                                  text17, text18, text19, text20, text21, text22, text23, text24};
+    int text_length = 24;
     for (int i = 0; i < 24; i++) {
-        if (!texttomb[i]) {
-            textszam = i;
+        if (!text_array[i]) {
+            text_length = i;
             break;
         }
     }
-    const char* gombtomb[30];
+    const char* button_array[30];
     for (int i = 0; i < 24; i++) {
-        gombtomb[i] = NULL;
+        button_array[i] = NULL;
     }
-    int gombszam = 0;
-    for (int i = 0; i < textszam; i++) {
-        if (strcmp(texttomb[i], "GOMBOK") == 0) {
-            gombszam = textszam - i - 1;
-            if (gombszam <= 0) {
-                internal_error("dialog-ban gombszam <= 0!");
+    int button_length = 0;
+    for (int i = 0; i < text_length; i++) {
+        if (strcmp(text_array[i], "GOMBOK") == 0) {
+            button_length = text_length - i - 1;
+            if (button_length <= 0) {
+                internal_error("dialog button_length <= 0!");
             }
-            textszam = i;
-            for (int j = 0; j < gombszam; j++) {
-                gombtomb[j] = texttomb[textszam + j + 1];
+            text_length = i;
+            for (int j = 0; j < button_length; j++) {
+                button_array[j] = text_array[text_length + j + 1];
             }
             break;
         }
     }
-    if (gombszam == 0) {
-        gombszam = 1;
-        gombtomb[0] = "OK";
+    if (button_length == 0) {
+        button_length = 1;
+        button_array[0] = "OK";
     }
 
-    int visszater = 0;
-    if (gombszam == 1 && strcmpi(gombtomb[0], "VISSZATER") == 0) {
-        gombszam = 0;
-        visszater = 1;
+    int immediately_return = 0;
+    if (button_length == 1 && strcmpi(button_array[0], "VISSZATER") == 0) {
+        button_length = 0;
+        immediately_return = 1;
     }
 
-    if (textszam < 1) {
-        internal_error("iuofrf");
+    if (text_length < 1) {
+        internal_error("dialog text_length < 1");
     }
 
     // Beallitottuk tomboket!!!
@@ -88,55 +88,56 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
 
     invalidateegesz();
 
-    int xsize = 0;
-    for (int i = 0; i < textszam; i++) {
-        if (xsize < Pabc2->len(texttomb[i]) + 16) {
-            xsize = Pabc2->len(texttomb[i]) + 16;
+    int width = 0;
+    for (int i = 0; i < text_length; i++) {
+        if (width < Pabc2->len(text_array[i]) + 16) {
+            width = Pabc2->len(text_array[i]) + 16;
         }
     }
 
     int dy = 20;
-    int ysize = textszam * dy + 50;
-    int x1 = 320 - xsize / 2;
-    int y1 = 240 - ysize / 2;
-    int x2 = 320 + xsize / 2;
-    int y2 = 240 + ysize / 2;
+    int height = text_length * dy + 50;
+    int x1 = 320 - width / 2;
+    int y1 = 240 - height / 2;
+    int x2 = 320 + width / 2;
+    int y2 = 240 + height / 2;
     render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    for (int i = 0; i < textszam; i++) {
-        Pabc2->write_centered(BufferMain, 320, y1 + 22 + i * dy, texttomb[i]);
+    for (int i = 0; i < text_length; i++) {
+        Pabc2->write_centered(BufferMain, 320, y1 + 22 + i * dy, text_array[i]);
     }
 
     // Kirajzoljuk gombokat is:
-    int gx1tomb[15], gx2tomb[15], gy1 = y2 - 30, gy2 = y2 - 10;
-    int gdx = 80;
-    if (gombszam == 1) {
-        gx1tomb[0] = 320;
+    int button_array_x1[15], button_array_x2[15], button_y1 = y2 - 30, button_y2 = y2 - 10;
+    int button_dx = 80;
+    if (button_length == 1) {
+        button_array_x1[0] = 320;
     }
-    if (gombszam == 2) {
-        gx1tomb[0] = 320 - gdx / 2;
-        gx1tomb[1] = 320 + gdx / 2;
+    if (button_length == 2) {
+        button_array_x1[0] = 320 - button_dx / 2;
+        button_array_x1[1] = 320 + button_dx / 2;
     }
-    if (gombszam == 3) {
-        gx1tomb[0] = 320 - gdx;
-        gx1tomb[1] = 320;
-        gx1tomb[2] = 320 + gdx;
+    if (button_length == 3) {
+        button_array_x1[0] = 320 - button_dx;
+        button_array_x1[1] = 320;
+        button_array_x1[2] = 320 + button_dx;
     }
-    if (gombszam > 3) {
-        internal_error("uofiufriufr");
+    if (button_length > 3) {
+        internal_error("dialog button_length > 3");
     }
-    for (int i = 0; i < gombszam; i++) {
-        int xs = Pabc2->len(gombtomb[i]) + 10;
-        gx2tomb[i] = gx1tomb[i] + xs / 2;
-        gx1tomb[i] = gx1tomb[i] - xs / 2;
-        render_box(BufferMain, gx1tomb[i], gy1, gx2tomb[i], gy2, BUTTON_PALETTE_ID,
-                   DIALOG_BORDER_PALETTE_ID);
-        Pabc2->write_centered(BufferMain, (gx2tomb[i] + gx1tomb[i]) / 2, gy1 + 14, gombtomb[i]);
+    for (int i = 0; i < button_length; i++) {
+        int button_width = Pabc2->len(button_array[i]) + 10;
+        button_array_x2[i] = button_array_x1[i] + button_width / 2;
+        button_array_x1[i] = button_array_x1[i] - button_width / 2;
+        render_box(BufferMain, button_array_x1[i], button_y1, button_array_x2[i], button_y2,
+                   BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+        Pabc2->write_centered(BufferMain, (button_array_x2[i] + button_array_x1[i]) / 2,
+                              button_y1 + 14, button_array[i]);
     }
 
     bltfront(BufferMain);
     pop();
 
-    if (visszater) {
+    if (immediately_return) {
         if (!InEditor) {
             push(); // Leszedjuk egeret keprol
         }
@@ -152,7 +153,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     while (1) {
         while (mk_kbhit()) {
             int c = mk_getextchar();
-            if (gombszam == 1) {
+            if (button_length == 1) {
                 if (c == MK_ESC || c == MK_ENTER) {
                     if (!InEditor) {
                         push(); // Leszedjuk egeret keprol
@@ -160,8 +161,8 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
                     return 0;
                 }
             }
-            for (int i = 0; i < gombszam; i++) {
-                if (c == tolower(*(gombtomb[i]))) {
+            for (int i = 0; i < button_length; i++) {
+                if (c == tolower(*(button_array[i]))) {
                     if (!InEditor) {
                         push(); // Leszedjuk egeret keprol
                     }
@@ -171,7 +172,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         }
         // Megnezzuk eger gombok lemenetelet:
         if (right_mouse_clicked()) {
-            if (gombszam == 1) {
+            if (button_length == 1) {
                 if (!InEditor) {
                     push(); // Leszedjuk egeret keprol
                 }
@@ -180,15 +181,16 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         }
 
         if (left_mouse_clicked()) {
-            int ujx = 0, ujy = 0;
-            get_mouse_position(&ujx, &ujy);
+            int mouse_x = 0, mouse_y = 0;
+            get_mouse_position(&mouse_x, &mouse_y);
             push();
-            Moux = ujx;
-            Mouy = ujy;
+            Moux = mouse_x;
+            Mouy = mouse_y;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            for (int i = 0; i < gombszam; i++) {
-                if (ujx >= gx1tomb[i] && ujx <= gx2tomb[i] && ujy >= gy1 && ujy <= gy2) {
+            for (int i = 0; i < button_length; i++) {
+                if (mouse_x >= button_array_x1[i] && mouse_x <= button_array_x2[i] &&
+                    mouse_y >= button_y1 && mouse_y <= button_y2) {
                     if (!InEditor) {
                         push(); // Leszedjuk egeret keprol
                     }
@@ -197,14 +199,14 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             }
             continue;
         }
-        int ujx = 0, ujy = 0;
-        get_mouse_position(&ujx, &ujy);
-        if (ujx == Moux && ujy == Mouy) {
+        int mouse_x = 0, mouse_y = 0;
+        get_mouse_position(&mouse_x, &mouse_y);
+        if (mouse_x == Moux && mouse_y == Mouy) {
             continue;
         }
         push();
-        Moux = ujx;
-        Mouy = ujy;
+        Moux = mouse_x;
+        Mouy = mouse_y;
         pop();
     }
 }

@@ -1,5 +1,5 @@
-#ifndef KOVETO_H
-#define KOVETO_H
+#ifndef GRASS_H
+#define GRASS_H
 
 #define MAX_GRASS_PICS (100)
 

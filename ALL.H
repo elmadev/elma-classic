@@ -82,7 +82,7 @@
 #include "EDITPLAY.H"
 #include "ED_CHECK.H"
 
-#include "KOVETO.H"
+#include "grass.h"
 #include "PICLIST.H"
 #include "LGRFILE.H"
 

@@ -36,7 +36,7 @@ elma_sources = files(
     'JATEKOS.CPP',
     'KIRAJ320.CPP',
     'KISKEP.CPP',
-    'KOVETO.CPP',
+    'grass.cpp',
     'KOZOS.CPP',
     'LEJATSZO.CPP',
     'LEPTET.CPP',

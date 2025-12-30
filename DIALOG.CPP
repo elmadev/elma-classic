@@ -85,8 +85,11 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     if (InEditor) {
         push();
     } else {
-        Moux = SCREEN_WIDTH / 2;
-        Mouy = SCREEN_HEIGHT / 2;
+        if (is_fullscreen()) {
+            Moux = SCREEN_WIDTH / 2;
+            Mouy = SCREEN_HEIGHT / 2;
+            set_mouse_position(Moux, Mouy);
+        }
     }
     invalidateegesz();
 

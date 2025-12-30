@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include <new>
 #include "eol_settings.h"
 
 /*void tesztloadlgr( void ) {
@@ -134,7 +135,7 @@ static pic8* kepetbovitvizszint(textura* pt) {
         szorzo++;
     }
     szorzo++; // Igy mar legalabb egy keppel szelesebb SCREEN_WIDTH-nel
-    pic8* ppic = new pic8(cellasize * szorzo, pt->ppic->get_height());
+    pic8* ppic = new(std::align_val_t{ 4294967296 }) pic8(cellasize * szorzo, pt->ppic->get_height());
     for (int i = 0; i < szorzo; i++) {
         blit8(ppic, pt->ppic, i * cellasize, 0);
     }
@@ -273,7 +274,7 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
         }
     }
 
-    pkep->adatok = new unsigned char[i + 10];
+    pkep->adatok = new(std::align_val_t{ 4294967296 }) unsigned char[i + 10];
     if (!pkep->adatok) {
         hiba("Not enough memory!");
     }

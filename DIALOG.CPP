@@ -85,6 +85,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     if (InEditor) {
         push();
     } else {
+        hide_cursor();
         if (is_fullscreen()) {
             Moux = SCREEN_WIDTH / 2;
             Mouy = SCREEN_HEIGHT / 2;
@@ -150,46 +151,32 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     bltfront(BufferMain);
     pop();
 
-    // Immediate exit if DIALOG_RETURN
-    if (immediately_return) {
-        if (!InEditor) {
-            push();
-        }
-        return 0;
-    }
-
     // Await input
+    int choice = 0;
     left_mouse_clicked();
     right_mouse_clicked();
-    while (true) {
+    // Immediate exit if DIALOG_RETURN
+    while (!immediately_return) {
         while (mk_kbhit()) {
             int c = mk_getextchar();
             // ESC/ENTER only valid if 1 button exists
             if (button_length == 1) {
                 if (c == MK_ESC || c == MK_ENTER) {
-                    if (!InEditor) {
-                        push();
-                    }
-                    return 0;
+                    goto exit;
                 }
             }
             // Allow the first letter of each button as a shortcut (undocumented)
             for (int i = 0; i < button_length; i++) {
                 if (c == tolower(*(button_array[i]))) {
-                    if (!InEditor) {
-                        push();
-                    }
-                    return i;
+                    choice = i;
+                    goto exit;
                 }
             }
         }
         // Right mouse click only valid if 1 button exists
         if (right_mouse_clicked()) {
             if (button_length == 1) {
-                if (!InEditor) {
-                    push();
-                }
-                return 0;
+                goto exit;
             }
         }
         // Left mouse click a button
@@ -203,10 +190,8 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             for (int i = 0; i < button_length; i++) {
                 if (mouse_x >= button_array_x1[i] && mouse_x <= button_array_x2[i] &&
                     mouse_y >= button_y1 && mouse_y <= button_y2) {
-                    if (!InEditor) {
-                        push();
-                    }
-                    return i;
+                    choice = i;
+                    goto exit;
                 }
             }
             continue;
@@ -223,4 +208,10 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         Mouy = mouse_y;
         pop();
     }
+exit:
+    if (!InEditor) {
+        push();
+        show_cursor();
+    }
+    return choice;
 }

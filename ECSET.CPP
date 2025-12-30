@@ -14,6 +14,7 @@ ecset* Pecsetalso = NULL;
 ecset* Pecsetfelso = NULL;
 ecset* Pecsetview = NULL;
 
+// #define PIXELMASZK (0xFFFFFFFFFFFFF800) // also 2048 hely ures
 #define PIXELMASZK (0xfffff800) // also 2048 hely ures
 
 /*void vizsgal( ecset* pecset ) {
@@ -1889,12 +1890,14 @@ void ecset::foltoz(void) {
 
             Glb_pfoltdarab = pmd;
             // Egy madarab-ot elintezunk:
-            int kepindex = (pixelek_t)pmd->pixelek;
+            uintptr_t kepindex = (pixelek_t)pmd->pixelek;
+            int ok = kepindex;
             if (((kepindex & PIXELMASZK) == 0) && (kepindex >= 10)) {
                 kepindex -= 10;
 // Itt van maszk, le kell cserelni:
 #ifdef DEBUG
                 if (kepindex >= Plgr->texturaszam) {
+                    printf("kepindex: %d %p", ok, (pixelek_t)pmd->pixelek);
                     hiba("egryiegr");
                 }
 #endif

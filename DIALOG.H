@@ -1,10 +1,8 @@
 #ifndef DIALOG_H
 #define DIALOG_H
 
-// Ez igaz, ha editorban van vezerles:
 extern int InEditor;
 
-// Visszaadja, hogy hanyadik gombot nyomtak:
 int dialog(const char* text1, const char* text2 = NULL, const char* text3 = NULL,
            const char* text4 = NULL, const char* text5 = NULL, const char* text6 = NULL,
            const char* text7 = NULL, const char* text8 = NULL, const char* text9 = NULL,

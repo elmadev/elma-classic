@@ -243,13 +243,13 @@ void tolt_open(void) {
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxle)) {
+            if (is_in_box(ujx, ujy, boxle)) {
                 kur += helyszam - 1;
             }
-            if (boxban(ujx, ujy, boxfel)) {
+            if (is_in_box(ujx, ujy, boxfel)) {
                 kur -= helyszam - 1;
             }
-            if (boxban(ujx, ujy, boxcancel)) {
+            if (is_in_box(ujx, ujy, boxcancel)) {
                 return;
             }
             if (ujx > lx1 && ujx < lx2 && ujy > ly1 && ujy < ly2) {
@@ -269,8 +269,8 @@ void tolt_open(void) {
         if (felso != eddigfelso || kur != eddigkur) {
             // Kirajzoljuk, mivel valtozott kep:
             push();
-            kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
-            kirajzbox(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, Dialogszelszin);
+            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
             for (int i = 0; i < helyszam && i < nevszam; i++) {
                 if (i + felso == kur) {
                     // Ez most kurens nev:
@@ -280,11 +280,11 @@ void tolt_open(void) {
                 Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy, &Soknev[(i + felso) * 10]);
             }
             // Most jonnek gombok:
-            kirajzbox(BufferMain, boxfel, Buttonszin, Dialogszelszin);
-            boxbarajz(BufferMain, boxfel, Dialogszelszin, 1);
-            kirajzbox(BufferMain, boxle, Buttonszin, Dialogszelszin);
-            boxbarajz(BufferMain, boxle, Dialogszelszin, 0);
-            kirajzbox(BufferMain, boxcancel, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxfel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            boxbarajz(BufferMain, boxfel, DIALOG_BORDER_PALETTE_ID, 1);
+            render_box(BufferMain, boxle, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            boxbarajz(BufferMain, boxle, DIALOG_BORDER_PALETTE_ID, 0);
+            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                                   "CANCEL");
 
@@ -429,16 +429,16 @@ void kivalasztkezdetit(void) {
             Moux = ujx;
             Mouy = ujy;
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxle)) {
+            if (is_in_box(ujx, ujy, boxle)) {
                 kur += helyszam - 1;
             }
-            if (boxban(ujx, ujy, boxfel)) {
+            if (is_in_box(ujx, ujy, boxfel)) {
                 kur -= helyszam - 1;
             }
-            if (boxban(ujx, ujy, boxcancel)) {
+            if (is_in_box(ujx, ujy, boxcancel)) {
                 return;
             }
-            if (boxban(ujx, ujy, boxnew)) {
+            if (is_in_box(ujx, ujy, boxnew)) {
                 State->editor_filename[0] = 0;
                 return;
             }
@@ -464,8 +464,8 @@ void kivalasztkezdetit(void) {
         if (felso != eddigfelso || kur != eddigkur) {
             // Kirajzoljuk, mivel valtozott kep:
             push();
-            kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
-            kirajzbox(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, Dialogszelszin);
+            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
             for (int i = 0; i < helyszam && i < nevszam; i++) {
                 if (i + felso == kur) {
                     // Ez most kurens nev:
@@ -475,14 +475,14 @@ void kivalasztkezdetit(void) {
                 Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy, &Soknev[(i + felso) * 10]);
             }
             // Most jonnek gombok:
-            kirajzbox(BufferMain, boxfel, Buttonszin, Dialogszelszin);
-            boxbarajz(BufferMain, boxfel, Dialogszelszin, 1);
-            kirajzbox(BufferMain, boxle, Buttonszin, Dialogszelszin);
-            boxbarajz(BufferMain, boxle, Dialogszelszin, 0);
-            kirajzbox(BufferMain, boxcancel, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxfel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            boxbarajz(BufferMain, boxfel, DIALOG_BORDER_PALETTE_ID, 1);
+            render_box(BufferMain, boxle, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            boxbarajz(BufferMain, boxle, DIALOG_BORDER_PALETTE_ID, 0);
+            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                                   "CANCEL");
-            kirajzbox(BufferMain, boxnew, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxnew, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxnew.x1 + boxnew.x2) / 2, boxnew.y1 + 15, "NEW");
 
             bltfront(BufferMain, x1, y1, x2, y2);
@@ -541,10 +541,10 @@ int tolt_save_as(int lokkolhato) {
     box boxsavelock = {320 - 45, 340, 320 + 45, 357};
 
     push();
-    kirajzbox(BufferMain, boxnagy, Dialogszin, Dialogszelszin);
-    kirajzbox(BufferMain, boxsave, Buttonszin, Dialogszelszin);
+    render_box(BufferMain, boxnagy, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+    render_box(BufferMain, boxsave, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
     if (lokkolhato) {
-        kirajzbox(BufferMain, boxsavelock, Buttonszin, Dialogszelszin);
+        render_box(BufferMain, boxsavelock, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
     }
     Pabc2->write_centered(
         BufferMain, (boxnagy.x2 + boxnagy.x1) / 2, 220,
@@ -577,7 +577,7 @@ int tolt_save_as(int lokkolhato) {
             int ey1 = boxnagy.y1 + 30;
             int ex2 = boxnagy.x2 - 100;
             int ey2 = boxnagy.y1 + 55;
-            BufferMain->fill_box(ex1, ey1, ex2, ey2, Dialogszin);
+            BufferMain->fill_box(ex1, ey1, ex2, ey2, DIALOG_PALETTE_ID);
             Pabc2->write(BufferMain, 290, 250, nev);
             char tmp[40];
             strcpy(tmp, nev);
@@ -670,7 +670,7 @@ int tolt_save_as(int lokkolhato) {
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxsave)) {
+            if (is_in_box(ujx, ujy, boxsave)) {
                 if (nev[0] == 0) {
                     continue;
                 }
@@ -690,7 +690,7 @@ int tolt_save_as(int lokkolhato) {
                 Valtozott = 0;
                 return 1;
             }
-            if (lokkolhato && boxban(ujx, ujy, boxsavelock)) {
+            if (lokkolhato && is_in_box(ujx, ujy, boxsavelock)) {
                 // Lockoltan mentjuk el:
                 if (nev[0] == 0) {
                     continue;
@@ -1001,17 +1001,17 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxle)) {
+            if (is_in_box(ujx, ujy, boxle)) {
                 kur += helyszam - 1;
             }
-            if (boxban(ujx, ujy, boxfel)) {
+            if (is_in_box(ujx, ujy, boxfel)) {
                 kur -= helyszam - 1;
             }
-            if (boxban(ujx, ujy, boxcancel)) {
+            if (is_in_box(ujx, ujy, boxcancel)) {
                 strcpy(nev, orignev);
                 return;
             }
-            if (cleares && boxban(ujx, ujy, boxclear)) {
+            if (cleares && is_in_box(ujx, ujy, boxclear)) {
                 nev[0] = 0;
                 return;
             }
@@ -1090,8 +1090,8 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
                 buffervaltozotty = 10 + pmaszk->ysize - 1;
             }
 
-            kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
-            kirajzbox(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, Dialogszelszin);
+            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
             for (int i = 0; i < helyszam && i + felso < nevszam; i++) {
                 if (i + felso == kur) {
                     // Ez most kurens nev:
@@ -1143,15 +1143,15 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
                 }
             }
             // Most jonnek gombok:
-            kirajzbox(BufferMain, boxfel, Buttonszin, Dialogszelszin);
-            boxbarajz(BufferMain, boxfel, Dialogszelszin, 1);
-            kirajzbox(BufferMain, boxle, Buttonszin, Dialogszelszin);
-            boxbarajz(BufferMain, boxle, Dialogszelszin, 0);
-            kirajzbox(BufferMain, boxcancel, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxfel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            boxbarajz(BufferMain, boxfel, DIALOG_BORDER_PALETTE_ID, 1);
+            render_box(BufferMain, boxle, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            boxbarajz(BufferMain, boxle, DIALOG_BORDER_PALETTE_ID, 0);
+            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                                   "CANCEL");
             if (cleares) {
-                kirajzbox(BufferMain, boxclear, Buttonszin, Dialogszelszin);
+                render_box(BufferMain, boxclear, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
                 Pabc2->write_centered(BufferMain, (boxclear.x1 + boxclear.x2) / 2, boxclear.y1 + 15,
                                       "CLEAR");
             }
@@ -1228,16 +1228,16 @@ void tolt_pickasprite(void) {
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxok)) {
+            if (is_in_box(ujx, ujy, boxok)) {
                 strcpy(Plgr->aktiv_kepnev, kepnev);
                 strcpy(Plgr->aktiv_texturanev, texturanev);
                 strcpy(Plgr->aktiv_maszknev, maszknev);
                 return;
             }
-            if (boxban(ujx, ujy, boxcancel)) {
+            if (is_in_box(ujx, ujy, boxcancel)) {
                 return;
             }
-            if (boxban(ujx, ujy, boxkepnev)) {
+            if (is_in_box(ujx, ujy, boxkepnev)) {
                 // Kepnevet akarja valtoztatni:
                 pickanev(kepnev, uresnev, uresnev, 1);
                 push();
@@ -1249,7 +1249,7 @@ void tolt_pickasprite(void) {
                 }
                 invalid = 1;
             }
-            if (boxban(ujx, ujy, boxtexturanev)) {
+            if (is_in_box(ujx, ujy, boxtexturanev)) {
                 // Texturanevet akarja valtoztatni:
                 pickanev(uresnev, texturanev, maszknev, 2);
                 push();
@@ -1261,7 +1261,7 @@ void tolt_pickasprite(void) {
                 }
                 invalid = 1;
             }
-            if (boxban(ujx, ujy, boxmaszknev)) {
+            if (is_in_box(ujx, ujy, boxmaszknev)) {
                 // Maszknevet akarja valtoztatni:
                 pickanev(uresnev, texturanev, maszknev, 3);
                 push();
@@ -1282,13 +1282,13 @@ void tolt_pickasprite(void) {
             push();
 
             // Dialogus nagy teglalapja:
-            kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
+            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
 
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, "Choose picture");
 
             // Most jonnek gombok:
-            kirajzbox(BufferMain, boxok, Buttonszin, Dialogszelszin);
-            kirajzbox(BufferMain, boxcancel, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
             Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                                   "CANCEL");
@@ -1297,15 +1297,15 @@ void tolt_pickasprite(void) {
             // Picture:
             int szovx1 = x1 + 8;
             Pabc2->write(BufferMain, szovx1, boxkepnev.y1 + 15, "Normal Picture:");
-            kirajzbox(BufferMain, boxkepnev, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxkepnev, Feherszin, DIALOG_BORDER_PALETTE_ID);
             boxbair_balra(BufferMain, boxkepnev, Feherszin, kepnev);
             // Textura:
             Pabc2->write(BufferMain, szovx1, boxtexturanev.y1 + 15, "Texture:");
-            kirajzbox(BufferMain, boxtexturanev, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxtexturanev, Feherszin, DIALOG_BORDER_PALETTE_ID);
             boxbair_balra(BufferMain, boxtexturanev, Feherszin, texturanev);
             // Maszk:
             Pabc2->write(BufferMain, szovx1, boxmaszknev.y1 + 15, "Mask:");
-            kirajzbox(BufferMain, boxmaszknev, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxmaszknev, Feherszin, DIALOG_BORDER_PALETTE_ID);
             boxbair_balra(BufferMain, boxmaszknev, Feherszin, maszknev);
 
             bltfront(BufferMain);
@@ -1437,13 +1437,13 @@ int tolt_picklgrfile(char* lgrnev) {
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxle)) {
+            if (is_in_box(ujx, ujy, boxle)) {
                 kur += helyszam - 1;
             }
-            if (boxban(ujx, ujy, boxfel)) {
+            if (is_in_box(ujx, ujy, boxfel)) {
                 kur -= helyszam - 1;
             }
-            if (boxban(ujx, ujy, boxcancel)) {
+            if (is_in_box(ujx, ujy, boxcancel)) {
                 return 0;
             }
             if (ujx > lx1 && ujx < lx2 && ujy > ly1 && ujy < ly2) {
@@ -1463,8 +1463,8 @@ int tolt_picklgrfile(char* lgrnev) {
         if (felso != eddigfelso || kur != eddigkur) {
             // Kirajzoljuk, mivel valtozott kep:
             push();
-            kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
-            kirajzbox(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, Dialogszelszin);
+            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
             for (int i = 0; i < helyszam && i < nevszam; i++) {
                 if (i + felso == kur) {
                     // Ez most kurens nev:
@@ -1474,11 +1474,11 @@ int tolt_picklgrfile(char* lgrnev) {
                 Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy, &Soknev[(i + felso) * 10]);
             }
             // Most jonnek gombok:
-            kirajzbox(BufferMain, boxfel, Buttonszin, Dialogszelszin);
-            boxbarajz(BufferMain, boxfel, Dialogszelszin, 1);
-            kirajzbox(BufferMain, boxle, Buttonszin, Dialogszelszin);
-            boxbarajz(BufferMain, boxle, Dialogszelszin, 0);
-            kirajzbox(BufferMain, boxcancel, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxfel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            boxbarajz(BufferMain, boxfel, DIALOG_BORDER_PALETTE_ID, 1);
+            render_box(BufferMain, boxle, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            boxbarajz(BufferMain, boxle, DIALOG_BORDER_PALETTE_ID, 0);
+            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                                   "CANCEL");
 
@@ -1614,7 +1614,7 @@ void setspritetav(sprite* psp) {
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxok)) {
+            if (is_in_box(ujx, ujy, boxok)) {
                 if (psp->tavolsag != tavolsag || psp->hatarol != hatarol) {
                     Valtozott = 1;
                 }
@@ -1622,14 +1622,14 @@ void setspritetav(sprite* psp) {
                 psp->hatarol = hatarol;
                 return;
             }
-            if (boxban(ujx, ujy, boxcancel)) {
+            if (is_in_box(ujx, ujy, boxcancel)) {
                 return;
             }
-            if (boxban(ujx, ujy, boxtav)) {
+            if (is_in_box(ujx, ujy, boxtav)) {
                 tavolsag = tavolsagbeir(BufferMain, boxtav, tavolsag);
                 kepvaltozott = 1;
             }
-            if (boxban(ujx, ujy, boxclipp)) {
+            if (is_in_box(ujx, ujy, boxclipp)) {
                 hatarol = hatarolbeir(BufferMain, boxclipp, hatarol);
                 kepvaltozott = 1;
             }
@@ -1638,10 +1638,10 @@ void setspritetav(sprite* psp) {
             kepvaltozott = 0;
             // Kirajzoljuk, mivel valtozott kep:
             push();
-            kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
+            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             // Most jonnek gombok:
-            kirajzbox(BufferMain, boxok, Buttonszin, Dialogszelszin);
-            kirajzbox(BufferMain, boxcancel, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
             Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                                   "CANCEL");
@@ -1699,12 +1699,12 @@ void setspritetav(sprite* psp) {
 
             Pabc2->write(BufferMain, x1 + 12, y1 + 130, "Current:");
             // Tavolsag boxba:
-            kirajzbox(BufferMain, boxtav, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxtav, Feherszin, DIALOG_BORDER_PALETTE_ID);
             sprintf(tmp, "%d", tavolsag);
             boxbair(BufferMain, boxtav, Feherszin, tmp);
             Pabc2->write_centered(BufferMain, x1 + 119, boxtav.y2 + 14, "(1-999)");
             // Clipping boxba:
-            kirajzbox(BufferMain, boxclipp, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxclipp, Feherszin, DIALOG_BORDER_PALETTE_ID);
             strcpy(tmp, "U");
             if (hatarol == HATAROL_G) {
                 strcpy(tmp, "G");
@@ -1774,7 +1774,7 @@ void set_gyuru_attributes(gyuru* pgy) {
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxok)) {
+            if (is_in_box(ujx, ujy, boxok)) {
                 // Meg van ismetelve ENTER-nel is feljebb:
                 if (pgy->koveto != koveto) {
                     Valtozott = 1;
@@ -1782,10 +1782,10 @@ void set_gyuru_attributes(gyuru* pgy) {
                 pgy->koveto = koveto;
                 return;
             }
-            if (boxban(ujx, ujy, boxcancel)) {
+            if (is_in_box(ujx, ujy, boxcancel)) {
                 return;
             }
-            if (boxban(ujx, ujy, boxkoveto)) {
+            if (is_in_box(ujx, ujy, boxkoveto)) {
                 koveto = !koveto;
                 kepvaltozott = 1;
             }
@@ -1794,7 +1794,7 @@ void set_gyuru_attributes(gyuru* pgy) {
             kepvaltozott = 0;
             // Kirajzoljuk, mivel valtozott kep:
             push();
-            kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
+            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
 
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15, "Set Polygon Properties");
 
@@ -1802,7 +1802,7 @@ void set_gyuru_attributes(gyuru* pgy) {
             // Koveto vagy nem gomb:
             int szovegx1 = x1 + 18;
             Pabc2->write(BufferMain, szovegx1, boxkoveto.y1 + 15, "Grass polygon:");
-            kirajzbox(BufferMain, boxkoveto, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxkoveto, Feherszin, DIALOG_BORDER_PALETTE_ID);
             if (koveto) {
                 Pabc2->write_centered(BufferMain, (boxkoveto.x1 + boxkoveto.x2) / 2,
                                       boxkoveto.y1 + 15, "YES");
@@ -1811,8 +1811,8 @@ void set_gyuru_attributes(gyuru* pgy) {
                                       boxkoveto.y1 + 15, "NO");
             }
 
-            kirajzbox(BufferMain, boxok, Buttonszin, Dialogszelszin);
-            kirajzbox(BufferMain, boxcancel, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
             Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                                   "CANCEL");
@@ -1852,21 +1852,21 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
 
     // Kirajzoljuk, dialogust:
     push();
-    kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
+    render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
     Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, fejlec);
-    kirajzbox(BufferMain, boxcancel, Buttonszin, Dialogszelszin);
+    render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
     Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                           "Cancel");
     // Anim szam boxa:
     Pabc2->write(BufferMain, boxanimszam.x1 - 162, boxanimszam.y1 + 15, "Food anim number (1-9):");
     char tmp[20];
     sprintf(tmp, "%d", (int)(*pfoodsorszam + 1));
-    kirajzbox(BufferMain, boxanimszam, Feherszin, Dialogszelszin);
+    render_box(BufferMain, boxanimszam, Feherszin, DIALOG_BORDER_PALETTE_ID);
     Pabc2->write_centered(BufferMain, (boxanimszam.x1 + boxanimszam.x2) / 2, boxanimszam.y1 + 15,
                           tmp);
 
     for (int i = 0; i < listaszam; i++) {
-        kirajzbox(BufferMain, boxlista, Openlistaszin, Dialogszelszin);
+        render_box(BufferMain, boxlista, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
         int lx = (boxlista.x1 + boxlista.x2) / 2;
         int ly = boxlista.y1 + 15;
         switch (i) {
@@ -1916,13 +1916,13 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxcancel)) {
+            if (is_in_box(ujx, ujy, boxcancel)) {
                 return;
             }
-            if (boxban(ujx, ujy, boxanimszam)) {
+            if (is_in_box(ujx, ujy, boxanimszam)) {
                 // Berajzolunk egy vizszintes kurzort:
                 push(); // Leveszi egeret
-                kirajzbox(BufferMain, boxanimszam, Feherszin, Dialogszelszin);
+                render_box(BufferMain, boxanimszam, Feherszin, DIALOG_BORDER_PALETTE_ID);
                 Pabc2->write_centered(BufferMain, (boxanimszam.x1 + boxanimszam.x2) / 2,
                                       boxanimszam.y1 + 18, "-");
                 bltfront(BufferMain, x1, y1, x2, y2);
@@ -1942,7 +1942,7 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
                 pop();
                 return;
             }
-            if (boxban(ujx, ujy, boxlista)) {
+            if (is_in_box(ujx, ujy, boxlista)) {
                 // Benne van listaban:
                 int index = (ujy - boxlista.y1) / dy;
                 if (index >= listaszam) {
@@ -2174,7 +2174,7 @@ void change_level_properties(void) {
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxok)) {
+            if (is_in_box(ujx, ujy, boxok)) {
                 if (strcmpi(Ptop->fgnev, fgnev) != 0 || strcmpi(Ptop->bgnev, bgnev) != 0 ||
                     strcmp(Ptop->levelname, levelname) != 0) {
                     Valtozott = 1;
@@ -2193,10 +2193,10 @@ void change_level_properties(void) {
                 }
                 return;
             }
-            if (boxban(ujx, ujy, boxcancel)) {
+            if (is_in_box(ujx, ujy, boxcancel)) {
                 return;
             }
-            if (boxban(ujx, ujy, boxfgnev)) {
+            if (is_in_box(ujx, ujy, boxfgnev)) {
                 // Foreground nevet akarja valtoztatni:
                 char uresnev[10] = "";
                 pickanev(uresnev, fgnev, uresnev, 2, 0);
@@ -2206,7 +2206,7 @@ void change_level_properties(void) {
                 pop();
                 invalid = 1;
             }
-            if (boxban(ujx, ujy, boxbgnev)) {
+            if (is_in_box(ujx, ujy, boxbgnev)) {
                 // Background nevet akarja valtoztatni:
                 char uresnev[10] = "";
                 pickanev(uresnev, bgnev, uresnev, 2, 0);
@@ -2216,7 +2216,7 @@ void change_level_properties(void) {
                 pop();
                 invalid = 1;
             }
-            if (boxban(ujx, ujy, boxlevelname)) {
+            if (is_in_box(ujx, ujy, boxlevelname)) {
                 // Palya nevet akarja valtoztatni:
                 change_level_name(levelname);
                 push();
@@ -2225,7 +2225,7 @@ void change_level_properties(void) {
                 pop();
                 invalid = 1;
             }
-            if (boxban(ujx, ujy, boxlgrfile)) {
+            if (is_in_box(ujx, ujy, boxlgrfile)) {
                 char belgrnev[20] = "";
                 strcpy(belgrnev, lgrnev);
                 if (!tolt_picklgrfile(lgrnev)) {
@@ -2248,35 +2248,35 @@ void change_level_properties(void) {
 
             push();
             // Kirajzoljuk, mivel valtozott kep:
-            kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
+            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
 
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 22, "Level properties");
 
             // Most jonnek gombok:
             // OK:
-            kirajzbox(BufferMain, boxok, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
             // CANCEL:
-            kirajzbox(BufferMain, boxcancel, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                                   "CANCEL");
 
             // Foreground sor:
             int szovegx = x1 + 10;
             Pabc2->write(BufferMain, szovegx, boxfgnev.y1 + 15, "Foreground:");
-            kirajzbox(BufferMain, boxfgnev, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxfgnev, Feherszin, DIALOG_BORDER_PALETTE_ID);
             boxbair_balra(BufferMain, boxfgnev, Feherszin, fgnev);
             // Background sor:
             Pabc2->write(BufferMain, szovegx, boxbgnev.y1 + 15, "Background:");
-            kirajzbox(BufferMain, boxbgnev, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxbgnev, Feherszin, DIALOG_BORDER_PALETTE_ID);
             boxbair_balra(BufferMain, boxbgnev, Feherszin, bgnev);
             // Level name sor:
             Pabc2->write(BufferMain, szovegx, boxlevelname.y1 + 15, "Level name:");
-            kirajzbox(BufferMain, boxlevelname, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxlevelname, Feherszin, DIALOG_BORDER_PALETTE_ID);
             boxbair_balra(BufferMain, boxlevelname, Feherszin, levelname);
             // LGR file nev sor:
             Pabc2->write(BufferMain, szovegx, boxlgrfile.y1 + 15, "LGR file:");
-            kirajzbox(BufferMain, boxlgrfile, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxlgrfile, Feherszin, DIALOG_BORDER_PALETTE_ID);
             boxbair_balra(BufferMain, boxlgrfile, Feherszin, lgrnev);
 
             bltfront(BufferMain, x1, y1, x2, y2);
@@ -2330,18 +2330,18 @@ void setviewoptions(void) {
             Mouy = ujy;
             pop();
             // Most nezzuk meg, hogy hova kattintott:
-            if (boxban(ujx, ujy, boxok)) {
+            if (is_in_box(ujx, ujy, boxok)) {
                 return;
             }
-            if (boxban(ujx, ujy, boxpoligon)) {
+            if (is_in_box(ujx, ujy, boxpoligon)) {
                 Rajzolpoligon = !Rajzolpoligon;
                 invalid = 1;
             }
-            if (boxban(ujx, ujy, boxkoveto)) {
+            if (is_in_box(ujx, ujy, boxkoveto)) {
                 Rajzolkoveto = !Rajzolkoveto;
                 invalid = 1;
             }
-            if (boxban(ujx, ujy, boxkepek)) {
+            if (is_in_box(ujx, ujy, boxkepek)) {
                 Rajzolkepek = !Rajzolkepek;
                 invalid = 1;
             }
@@ -2350,14 +2350,14 @@ void setviewoptions(void) {
             invalid = 0;
             push();
             // Kirajzoljuk, mivel valtozott kep:
-            kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
+            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             // Most jonnek gombok:
             // OK:
-            kirajzbox(BufferMain, boxok, Buttonszin, Dialogszelszin);
+            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
 
             Pabc2->write(BufferMain, szovx, boxpoligon.y1 + 15, "View Polygons");
-            kirajzbox(BufferMain, boxpoligon, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxpoligon, Feherszin, DIALOG_BORDER_PALETTE_ID);
             if (Rajzolpoligon) {
                 boxbair(BufferMain, boxpoligon, Feherszin, "Yes");
             } else {
@@ -2365,7 +2365,7 @@ void setviewoptions(void) {
             }
 
             Pabc2->write(BufferMain, szovx, boxkoveto.y1 + 15, "View Grass");
-            kirajzbox(BufferMain, boxkoveto, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxkoveto, Feherszin, DIALOG_BORDER_PALETTE_ID);
             if (Rajzolkoveto) {
                 boxbair(BufferMain, boxkoveto, Feherszin, "Yes");
             } else {
@@ -2373,7 +2373,7 @@ void setviewoptions(void) {
             }
 
             Pabc2->write(BufferMain, szovx, boxkepek.y1 + 15, "View Pictures");
-            kirajzbox(BufferMain, boxkepek, Feherszin, Dialogszelszin);
+            render_box(BufferMain, boxkepek, Feherszin, DIALOG_BORDER_PALETTE_ID);
             if (Rajzolkepek) {
                 boxbair(BufferMain, boxkepek, Feherszin, "Yes");
             } else {

@@ -122,7 +122,7 @@ void handle_events() {
         switch (event.type) {
         case SDL_QUIT:
             // Exit request probably sent by user to terminate program
-            if (Editorban_dialnak && Valtozott) {
+            if (InEditor && Valtozott) {
                 // Disallow exiting if unsaved changes in editor
                 break;
             }

@@ -370,11 +370,11 @@ void mainmenu(void) {
         }
 
         if (eredmeny == 6) {
-            Editorban_dialnak = 1;
+            InEditor = 1;
             hide_cursor();
             editor();
             show_cursor();
-            Editorban_dialnak = 0;
+            InEditor = 0;
             MenuPal->set();
         }
 

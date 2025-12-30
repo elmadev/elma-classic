@@ -1,27 +1,27 @@
 #include "ALL.H"
 
 // Ez igaz, ha editorban van vezerles:
-int Editorban_dialnak = 0;
+int InEditor = 0;
 
-unsigned char Dialogszin = 4;
-unsigned char Dialogszelszin = 0;
-unsigned char Buttonszin = 8;
+unsigned char DIALOG_PALETTE_ID = 4;
+unsigned char DIALOG_BORDER_PALETTE_ID = 0;
+unsigned char BUTTON_PALETTE_ID = 8;
 
-void kirajzbox(pic8* ppic, int x1, int y1, int x2, int y2, unsigned char felulet,
-               unsigned char szele) {
-    ppic->fill_box(x1, y1, x2, y2, felulet);
-    ppic->line(x1, y1, x2, y1, szele);
-    ppic->line(x1, y2, x2, y2, szele);
-    ppic->line(x1, y1, x1, y2, szele);
-    ppic->line(x2, y1, x2, y2, szele);
+void render_box(pic8* pic, int x1, int y1, int x2, int y2, unsigned char fill_id,
+                unsigned char border_id) {
+    pic->fill_box(x1, y1, x2, y2, fill_id);
+    pic->line(x1, y1, x2, y1, border_id);
+    pic->line(x1, y2, x2, y2, border_id);
+    pic->line(x1, y1, x1, y2, border_id);
+    pic->line(x2, y1, x2, y2, border_id);
 }
 
-void kirajzbox(pic8* ppic, box boxa, unsigned char felulet, unsigned char szele) {
-    kirajzbox(ppic, boxa.x1, boxa.y1, boxa.x2, boxa.y2, felulet, szele);
+void render_box(pic8* pic, box bx, unsigned char fill_id, unsigned char border_id) {
+    render_box(pic, bx.x1, bx.y1, bx.x2, bx.y2, fill_id, border_id);
 }
 
-int boxban(int x, int y, box boxa) {
-    if (x >= boxa.x1 && x <= boxa.x2 && y >= boxa.y1 && y <= boxa.y2) {
+int is_in_box(int x, int y, box bx) {
+    if (x >= bx.x1 && x <= bx.x2 && y >= bx.y1 && y <= bx.y2) {
         return 1;
     } else {
         return 0;
@@ -79,7 +79,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
 
     // Beallitottuk tomboket!!!
 
-    if (Editorban_dialnak) {
+    if (InEditor) {
         push(); // Leszedjuk egeret keprol
     } else {
         Moux = 320;
@@ -101,7 +101,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     int y1 = 240 - ysize / 2;
     int x2 = 320 + xsize / 2;
     int y2 = 240 + ysize / 2;
-    kirajzbox(BufferMain, x1, y1, x2, y2, Dialogszin, Dialogszelszin);
+    render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
     for (int i = 0; i < textszam; i++) {
         Pabc2->write_centered(BufferMain, 320, y1 + 22 + i * dy, texttomb[i]);
     }
@@ -128,7 +128,8 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         int xs = Pabc2->len(gombtomb[i]) + 10;
         gx2tomb[i] = gx1tomb[i] + xs / 2;
         gx1tomb[i] = gx1tomb[i] - xs / 2;
-        kirajzbox(BufferMain, gx1tomb[i], gy1, gx2tomb[i], gy2, Buttonszin, Dialogszelszin);
+        render_box(BufferMain, gx1tomb[i], gy1, gx2tomb[i], gy2, BUTTON_PALETTE_ID,
+                   DIALOG_BORDER_PALETTE_ID);
         Pabc2->write_centered(BufferMain, (gx2tomb[i] + gx1tomb[i]) / 2, gy1 + 14, gombtomb[i]);
     }
 
@@ -136,7 +137,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     pop();
 
     if (visszater) {
-        if (!Editorban_dialnak) {
+        if (!InEditor) {
             push(); // Leszedjuk egeret keprol
         }
         return 0;
@@ -153,7 +154,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             int c = mk_getextchar();
             if (gombszam == 1) {
                 if (c == MK_ESC || c == MK_ENTER) {
-                    if (!Editorban_dialnak) {
+                    if (!InEditor) {
                         push(); // Leszedjuk egeret keprol
                     }
                     return 0;
@@ -161,7 +162,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             }
             for (int i = 0; i < gombszam; i++) {
                 if (c == tolower(*(gombtomb[i]))) {
-                    if (!Editorban_dialnak) {
+                    if (!InEditor) {
                         push(); // Leszedjuk egeret keprol
                     }
                     return i;
@@ -171,7 +172,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         // Megnezzuk eger gombok lemenetelet:
         if (right_mouse_clicked()) {
             if (gombszam == 1) {
-                if (!Editorban_dialnak) {
+                if (!InEditor) {
                     push(); // Leszedjuk egeret keprol
                 }
                 return 0;
@@ -188,7 +189,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             // Most nezzuk meg, hogy hova kattintott:
             for (int i = 0; i < gombszam; i++) {
                 if (ujx >= gx1tomb[i] && ujx <= gx2tomb[i] && ujy >= gy1 && ujy <= gy2) {
-                    if (!Editorban_dialnak) {
+                    if (!InEditor) {
                         push(); // Leszedjuk egeret keprol
                     }
                     return i;

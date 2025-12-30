@@ -2,7 +2,7 @@
 #define DIALOG_H
 
 // Ez igaz, ha editorban van vezerles:
-extern int Editorban_dialnak;
+extern int InEditor;
 
 // Visszaadja, hogy hanyadik gombot nyomtak:
 int dialog(const char* text1, const char* text2 = NULL, const char* text3 = NULL,
@@ -14,18 +14,18 @@ int dialog(const char* text1, const char* text2 = NULL, const char* text3 = NULL
            const char* text19 = NULL, const char* text20 = NULL, const char* text21 = NULL,
            const char* text22 = NULL, const char* text23 = NULL, const char* text24 = NULL);
 
-extern unsigned char Dialogszin;
-extern unsigned char Dialogszelszin;
-extern unsigned char Buttonszin;
+extern unsigned char DIALOG_PALETTE_ID;
+extern unsigned char DIALOG_BORDER_PALETTE_ID;
+extern unsigned char BUTTON_PALETTE_ID;
 
 struct box {
     int x1, y1, x2, y2;
 };
 
-int boxban(int x, int y, box boxa);
+int is_in_box(int x, int y, box bx);
 
-void kirajzbox(pic8* ppic, int x1, int y1, int x2, int y2, unsigned char felulet,
-               unsigned char szele);
-void kirajzbox(pic8* ppic, box boxa, unsigned char felulet, unsigned char szele);
+void render_box(pic8* pic, int x1, int y1, int x2, int y2, unsigned char fill_id,
+                unsigned char border_id);
+void render_box(pic8* pic, box bx, unsigned char fill_id, unsigned char border_id);
 
 #endif

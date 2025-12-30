@@ -56,7 +56,7 @@ void loadlgrfile(const char* nev) {
         blit8(BufferBall, BufferMain);
         BufferMain->fill_box(Hatterindex);
         bltfront(BufferMain);
-        if (!Editorban_dialnak) {
+        if (!InEditor) {
             Pal_editor->set();
         }
         dialog(
@@ -64,7 +64,7 @@ void loadlgrfile(const char* nev) {
             "The level file uses the pictures that are stored in this LGR file:", nevtmp,
             "This file doesn't exist in the LGR directory, so the DEFAULT.LGR file will be loaded.",
             "This level file will look now different from that it was designed to look.");
-        if (!Editorban_dialnak) {
+        if (!InEditor) {
             MenuPal->set();
         }
         blit8(BufferMain, BufferBall);

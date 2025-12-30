@@ -1,10 +1,6 @@
 #include "ALL.H"
 
-int InEditor = 0;
-
-unsigned char DIALOG_PALETTE_ID = 4;
-unsigned char DIALOG_BORDER_PALETTE_ID = 0;
-unsigned char BUTTON_PALETTE_ID = 8;
+bool InEditor = false;
 
 // Draw a box with a 1-pixel border
 void render_box(pic8* pic, int x1, int y1, int x2, int y2, unsigned char fill_id,
@@ -22,12 +18,8 @@ void render_box(pic8* pic, box bx, unsigned char fill_id, unsigned char border_i
 }
 
 // Return true if the coordinates are within the specified box
-int is_in_box(int x, int y, box bx) {
-    if (x >= bx.x1 && x <= bx.x2 && y >= bx.y1 && y <= bx.y2) {
-        return 1;
-    } else {
-        return 0;
-    }
+bool is_in_box(int x, int y, box bx) {
+    return x >= bx.x1 && x <= bx.x2 && y >= bx.y1 && y <= bx.y2;
 }
 
 // Show a dialog (editor-style).
@@ -58,11 +50,11 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     // Count buttons
     const char* button_array[30];
     for (int i = 0; i < 24; i++) {
-        button_array[i] = NULL;
+        button_array[i] = nullptr;
     }
     int button_length = 0;
     for (int i = 0; i < text_length; i++) {
-        if (strcmp(text_array[i], "GOMBOK") == 0) {
+        if (strcmp(text_array[i], DIALOG_BUTTONS) == 0) {
             button_length = text_length - i - 1;
             if (button_length <= 0) {
                 internal_error("dialog button_length <= 0!");
@@ -80,10 +72,10 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         button_array[0] = "OK";
     }
     // No buttons option
-    int immediately_return = 0;
-    if (button_length == 1 && strcmpi(button_array[0], "VISSZATER") == 0) {
+    bool immediately_return = false;
+    if (button_length == 1 && strcmpi(button_array[0], DIALOG_RETURN) == 0) {
         button_length = 0;
-        immediately_return = 1;
+        immediately_return = true;
     }
     if (text_length < 1) {
         internal_error("dialog text_length < 1");
@@ -101,8 +93,9 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     // Determine max width of the dialog box
     int width = 0;
     for (int i = 0; i < text_length; i++) {
-        if (width < Pabc2->len(text_array[i]) + 16) {
-            width = Pabc2->len(text_array[i]) + 16;
+        int text_width = Pabc2->len(text_array[i]) + 16;
+        if (width < text_width) {
+            width = text_width;
         }
     }
     // Draw dialog box
@@ -120,7 +113,10 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     }
 
     // Determine button positions
-    int button_array_x1[15], button_array_x2[15], button_y1 = y2 - 30, button_y2 = y2 - 10;
+    int button_array_x1[15];
+    int button_array_x2[15];
+    int button_y1 = y2 - 30;
+    int button_y2 = y2 - 10;
     int button_dx = 80;
     if (button_length == 1) {
         button_array_x1[0] = 320;
@@ -162,7 +158,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     // Await input
     left_mouse_clicked();
     right_mouse_clicked();
-    while (1) {
+    while (true) {
         while (mk_kbhit()) {
             int c = mk_getextchar();
             // ESC/ENTER only valid if 1 button exists
@@ -213,7 +209,8 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             continue;
         }
         // Update mouse position
-        int mouse_x = 0, mouse_y = 0;
+        int mouse_x = 0;
+        int mouse_y = 0;
         get_mouse_position(&mouse_x, &mouse_y);
         if (mouse_x == Moux && mouse_y == Mouy) {
             continue;

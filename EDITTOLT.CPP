@@ -122,7 +122,7 @@ void tolt_open(void) {
     if (Valtozott) {
         if (dialog("There are unsaved changes in the level file.",
                    "If you open another file, you will loose these changes.",
-                   "Do you still want to continue?", "GOMBOK", "Yes", "No") == 1) {
+                   "Do you still want to continue?", DIALOG_BUTTONS, "Yes", "No") == 1) {
             return;
         }
     }
@@ -506,7 +506,7 @@ void tolt_new(void) {
     invalidateegesz();
     if (Valtozott) {
         if (dialog("There are unsaved changes in the level file.", "Do you still want to continue?",
-                   "GOMBOK", "Yes", "No") == 1) {
+                   DIALOG_BUTTONS, "Yes", "No") == 1) {
             return;
         }
     }
@@ -601,7 +601,7 @@ int tolt_save_as(int lokkolhato) {
                 strcpy(tmpnev, "lev/");
                 strcat(tmpnev, nev);
                 if (access(tmpnev, 0) == 0) {
-                    if (dialog("File exists, overwrite?", nev, "GOMBOK", "Yes", "No") == 1) {
+                    if (dialog("File exists, overwrite?", nev, DIALOG_BUTTONS, "Yes", "No") == 1) {
                         return 0;
                     }
                 }
@@ -681,7 +681,7 @@ int tolt_save_as(int lokkolhato) {
                 strcpy(tmpnev, "lev/");
                 strcat(tmpnev, nev);
                 if (access(tmpnev, 0) == 0) {
-                    if (dialog("File exists, overwrite?", nev, "GOMBOK", "Yes", "No") == 1) {
+                    if (dialog("File exists, overwrite?", nev, DIALOG_BUTTONS, "Yes", "No") == 1) {
                         return 0;
                     }
                 }
@@ -714,14 +714,14 @@ int tolt_save_as(int lokkolhato) {
                         "the original.",
                         "", "Do you want to continue?",
 
-                        "GOMBOK", "Yes", "No") == 1) {
+                        DIALOG_BUTTONS, "Yes", "No") == 1) {
                     return 0;
                 }
                 char tmpnev[40];
                 strcpy(tmpnev, "lev/");
                 strcat(tmpnev, nev);
                 if (access(tmpnev, 0) == 0) {
-                    if (dialog("File exists, overwrite?", nev, "GOMBOK", "Yes", "No") == 1) {
+                    if (dialog("File exists, overwrite?", nev, DIALOG_BUTTONS, "Yes", "No") == 1) {
                         return 0;
                     }
                 }

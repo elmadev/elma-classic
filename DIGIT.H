@@ -3,9 +3,9 @@
 
 // extern int Digitxsize, Digitysize;
 
-void kidigit(const char* time1, double fogoido, double time2d, pic8* ppic, int kepxsize,
-             int ykepysize);
+void draw_timers(const char* best_time_text, double flag_tag_time, double current_time, pic8* dest,
+                 int dest_width, int dest_height);
 
-extern const double Idod2lszorzo;
+extern const double TimeToCentiseconds;
 
 #endif

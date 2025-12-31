@@ -1,17 +1,17 @@
 #include "ALL.H"
 
-static int Vonalvizhossz, Vonalfugghossz;
+static int DigitLineWidth, DigitLineHeight;
 
-static int Digdx, Kozdx, Koztesdx;
+static int DigitSpacing, DigitAndColonSpacing, Koztesdx;
 
 static int Digitxsize, Digitysize;
 
-static int Ketpx, Ketpy1, Ketpy2;
+static int ColonOffsetX, ColonOffsetY1, ColonOffsetY2;
 
-static pic8* Ppic8 = NULL;
-static unsigned char* Lookup = NULL;
+static pic8* Dest = NULL;
+static unsigned char* ReferencePaletteMap = NULL;
 
-const double Idod2lszorzo = 100.0 / (182.0 * 0.0024);
+const double TimeToCentiseconds = 100.0 / (182.0 * 0.0024);
 
 // Draw horizontal line for the ingame timer, using the provided palette map
 static void horizontal_line(pic8* dest, int x, int y, int size, unsigned char* lookup) {
@@ -39,185 +39,188 @@ static void vertical_line(pic8* dest, int x, int y, int size, unsigned char* loo
     }
 }
 
-static void kikettospont(int x, int y) {
-    horizontal_line(Ppic8, x + Ketpx, y + Ketpy1, 2, Lookup);
-    horizontal_line(Ppic8, x + Ketpx, y + Ketpy1 + 1, 2, Lookup);
+static void draw_colon(int x, int y) {
+    horizontal_line(Dest, x + ColonOffsetX, y + ColonOffsetY1, 2, ReferencePaletteMap);
+    horizontal_line(Dest, x + ColonOffsetX, y + ColonOffsetY1 + 1, 2, ReferencePaletteMap);
 
-    horizontal_line(Ppic8, x + Ketpx, y + Ketpy2, 2, Lookup);
-    horizontal_line(Ppic8, x + Ketpx, y + Ketpy2 + 1, 2, Lookup);
+    horizontal_line(Dest, x + ColonOffsetX, y + ColonOffsetY2, 2, ReferencePaletteMap);
+    horizontal_line(Dest, x + ColonOffsetX, y + ColonOffsetY2 + 1, 2, ReferencePaletteMap);
 }
 
-static void kiszegmens(int szam, int x, int y) {
-    switch (szam) {
+static void draw_digit_segment(int segment, int x, int y) {
+    switch (segment) {
     case 0:
-        vertical_line(Ppic8, x, y + 1, Vonalfugghossz, Lookup);
+        vertical_line(Dest, x, y + 1, DigitLineHeight, ReferencePaletteMap);
         break;
     case 1:
-        vertical_line(Ppic8, x + Vonalvizhossz + 1, y + 1, Vonalfugghossz, Lookup);
+        vertical_line(Dest, x + DigitLineWidth + 1, y + 1, DigitLineHeight, ReferencePaletteMap);
         break;
     case 2:
-        vertical_line(Ppic8, x, y + Vonalfugghossz + 2, Vonalfugghossz, Lookup);
+        vertical_line(Dest, x, y + DigitLineHeight + 2, DigitLineHeight, ReferencePaletteMap);
         break;
     case 3:
-        vertical_line(Ppic8, x + Vonalvizhossz + 1, y + Vonalfugghossz + 2, Vonalfugghossz, Lookup);
+        vertical_line(Dest, x + DigitLineWidth + 1, y + DigitLineHeight + 2, DigitLineHeight,
+                      ReferencePaletteMap);
         break;
     case 4:
-        horizontal_line(Ppic8, x + 1, y, Vonalvizhossz, Lookup);
+        horizontal_line(Dest, x + 1, y, DigitLineWidth, ReferencePaletteMap);
         break;
     case 5:
-        horizontal_line(Ppic8, x + 1, y + Vonalfugghossz + 1, Vonalvizhossz, Lookup);
+        horizontal_line(Dest, x + 1, y + DigitLineHeight + 1, DigitLineWidth, ReferencePaletteMap);
         break;
     case 6:
-        horizontal_line(Ppic8, x + 1, y + Vonalfugghossz + Vonalfugghossz + 2, Vonalvizhossz,
-                        Lookup);
+        horizontal_line(Dest, x + 1, y + DigitLineHeight + DigitLineHeight + 2, DigitLineWidth,
+                        ReferencePaletteMap);
         break;
     default:
-        hiba("kiszegmens-ben szegmens out of range!");
+        hiba("draw_digit_segment segment out of range!");
         break;
     }
 }
 
-static void kiegydigit(int c, int x, int y) {
+static void draw_digit(int c, int x, int y) {
     switch (c) {
     case '0':
-        kiszegmens(4, x, y);
-        kiszegmens(0, x, y);
-        kiszegmens(1, x, y);
-        kiszegmens(2, x, y);
-        kiszegmens(3, x, y);
-        kiszegmens(6, x, y);
+        draw_digit_segment(4, x, y);
+        draw_digit_segment(0, x, y);
+        draw_digit_segment(1, x, y);
+        draw_digit_segment(2, x, y);
+        draw_digit_segment(3, x, y);
+        draw_digit_segment(6, x, y);
         break;
     case '1':
-        kiszegmens(1, x, y);
-        kiszegmens(3, x, y);
+        draw_digit_segment(1, x, y);
+        draw_digit_segment(3, x, y);
         break;
     case '2':
-        kiszegmens(4, x, y);
-        kiszegmens(0, x, y);
-        kiszegmens(5, x, y);
-        kiszegmens(3, x, y);
-        kiszegmens(6, x, y);
+        draw_digit_segment(4, x, y);
+        draw_digit_segment(0, x, y);
+        draw_digit_segment(5, x, y);
+        draw_digit_segment(3, x, y);
+        draw_digit_segment(6, x, y);
         break;
     case '3':
-        kiszegmens(4, x, y);
-        kiszegmens(1, x, y);
-        kiszegmens(5, x, y);
-        kiszegmens(3, x, y);
-        kiszegmens(6, x, y);
+        draw_digit_segment(4, x, y);
+        draw_digit_segment(1, x, y);
+        draw_digit_segment(5, x, y);
+        draw_digit_segment(3, x, y);
+        draw_digit_segment(6, x, y);
         break;
     case '4':
-        kiszegmens(1, x, y);
-        kiszegmens(5, x, y);
-        kiszegmens(2, x, y);
-        kiszegmens(3, x, y);
+        draw_digit_segment(1, x, y);
+        draw_digit_segment(5, x, y);
+        draw_digit_segment(2, x, y);
+        draw_digit_segment(3, x, y);
         break;
     case '5':
-        kiszegmens(4, x, y);
-        kiszegmens(1, x, y);
-        kiszegmens(5, x, y);
-        kiszegmens(2, x, y);
-        kiszegmens(6, x, y);
+        draw_digit_segment(4, x, y);
+        draw_digit_segment(1, x, y);
+        draw_digit_segment(5, x, y);
+        draw_digit_segment(2, x, y);
+        draw_digit_segment(6, x, y);
         break;
     case '6':
-        kiszegmens(4, x, y);
-        kiszegmens(0, x, y);
-        kiszegmens(1, x, y);
-        kiszegmens(5, x, y);
-        kiszegmens(2, x, y);
-        kiszegmens(6, x, y);
+        draw_digit_segment(4, x, y);
+        draw_digit_segment(0, x, y);
+        draw_digit_segment(1, x, y);
+        draw_digit_segment(5, x, y);
+        draw_digit_segment(2, x, y);
+        draw_digit_segment(6, x, y);
         break;
     case '7':
-        kiszegmens(1, x, y);
-        kiszegmens(3, x, y);
-        kiszegmens(6, x, y);
+        draw_digit_segment(1, x, y);
+        draw_digit_segment(3, x, y);
+        draw_digit_segment(6, x, y);
         break;
     case '8':
-        kiszegmens(4, x, y);
-        kiszegmens(0, x, y);
-        kiszegmens(1, x, y);
-        kiszegmens(5, x, y);
-        kiszegmens(2, x, y);
-        kiszegmens(3, x, y);
-        kiszegmens(6, x, y);
+        draw_digit_segment(4, x, y);
+        draw_digit_segment(0, x, y);
+        draw_digit_segment(1, x, y);
+        draw_digit_segment(5, x, y);
+        draw_digit_segment(2, x, y);
+        draw_digit_segment(3, x, y);
+        draw_digit_segment(6, x, y);
         break;
     case '9':
-        kiszegmens(4, x, y);
-        kiszegmens(1, x, y);
-        kiszegmens(5, x, y);
-        kiszegmens(2, x, y);
-        kiszegmens(3, x, y);
-        kiszegmens(6, x, y);
+        draw_digit_segment(4, x, y);
+        draw_digit_segment(1, x, y);
+        draw_digit_segment(5, x, y);
+        draw_digit_segment(2, x, y);
+        draw_digit_segment(3, x, y);
+        draw_digit_segment(6, x, y);
         break;
     default:
-        hiba("kiegydigit-ben c out of range!");
+        hiba("draw_digit c out of range!");
     }
 }
 
-static void kiegyszam(const char* time, int x, int y) {
-    kiegydigit(time[0], x, y);
-    x += Digdx;
-    kiegydigit(time[1], x, y);
-    kikettospont(x, y);
-    x += Kozdx;
-    kiegydigit(time[3], x, y);
-    x += Digdx;
-    kiegydigit(time[4], x, y);
-    kikettospont(x, y);
-    x += Kozdx;
-    kiegydigit(time[6], x, y);
-    x += Digdx;
-    kiegydigit(time[7], x, y);
+static void draw_timer(const char* time_text, int x, int y) {
+    draw_digit(time_text[0], x, y);
+    x += DigitSpacing;
+    draw_digit(time_text[1], x, y);
+    draw_colon(x, y);
+    x += DigitAndColonSpacing;
+    draw_digit(time_text[3], x, y);
+    x += DigitSpacing;
+    draw_digit(time_text[4], x, y);
+    draw_colon(x, y);
+    x += DigitAndColonSpacing;
+    draw_digit(time_text[6], x, y);
+    x += DigitSpacing;
+    draw_digit(time_text[7], x, y);
 }
 
-void kidigit(const char* time1, double fogoido, double time2d, pic8* ppic8, int kepxsize,
-             int kepysize) {
+void draw_timers(const char* best_time_text, double flag_tag_time, double current_time, pic8* dest,
+                 int dest_width, int dest_height) {
 
-    Ppic8 = ppic8;
-    Lookup = Plgr->idonegtomb;
+    Dest = dest;
+    ReferencePaletteMap = Plgr->idonegtomb;
 
-    double kepmeretx = kepxsize / 640.0;
-    double kepmerety = kepysize / 480.0;
+    double width_ratio = dest_width / 640.0;
+    double height_ratio = dest_height / 480.0;
 
     // unsigned char szin1 = Plgr->idoszin1;
     // unsigned char szin2 = Plgr->idoszin2;
 
-    int xtav = 28 * kepmeretx;
-    int x = xtav;
-    int y = 420 * kepmerety;
+    int edge_width = 28 * width_ratio;
+    int x = edge_width;
+    int y = 420 * height_ratio;
 
-    Vonalvizhossz = 10 * kepmerety, Vonalfugghossz = 16 * kepmerety;
+    DigitLineWidth = 10 * height_ratio, DigitLineHeight = 16 * height_ratio;
 
-    Digdx = 16 * kepmerety, Kozdx = 24 * kepmerety, Koztesdx = 364 * kepmeretx;
+    DigitSpacing = 16 * height_ratio, DigitAndColonSpacing = 24 * height_ratio,
+    Koztesdx = 364 * width_ratio;
 
-    Digitxsize = Digdx * 7 + Kozdx * 4 + Koztesdx, Digitysize = 2 * Vonalfugghossz + 5;
+    Digitxsize = DigitSpacing * 7 + DigitAndColonSpacing * 4 + Koztesdx,
+    Digitysize = 2 * DigitLineHeight + 5;
 
-    Ketpx = 17 * kepmerety;
-    Ketpy1 = 9 * kepmerety;
-    Ketpy2 = 23 * kepmerety;
+    ColonOffsetX = 17 * height_ratio;
+    ColonOffsetY1 = 9 * height_ratio;
+    ColonOffsetY2 = 23 * height_ratio;
 
-    long l2 = time2d * Idod2lszorzo;
-    char time2[20];
-    centiseconds_to_string(l2, time2);
+    long current_time_centiseconds = current_time * TimeToCentiseconds;
+    char current_time_text[20];
+    centiseconds_to_string(current_time_centiseconds, current_time_text);
 
     // Elso:
-    int xelso = x;
-    if (time1[0] != 0) {
-        kiegyszam(time1, xelso, y);
+    int best_time_x = x;
+    if (best_time_text[0] != 0) {
+        draw_timer(best_time_text, best_time_x, y);
     }
 
-    x += Digdx * 3 + Kozdx * 2;
+    x += DigitSpacing * 3 + DigitAndColonSpacing * 2;
 
     x += Koztesdx;
-    x = kepxsize - (xtav + Digdx * 3 + Kozdx * 3);
+    x = dest_width - (edge_width + DigitSpacing * 3 + DigitAndColonSpacing * 3);
 
     // Masodik:
-    kiegyszam(time2, x, y);
+    draw_timer(current_time_text, x, y);
 
     // Kirakjuk meg kozepre fogoido-t is:
-    if (fogoido >= 0) {
-        long lf = fogoido * Idod2lszorzo;
-        char fogo[20];
-        centiseconds_to_string(lf, fogo);
-        kiegyszam(fogo, (xelso + x) >> 1, y);
+    if (flag_tag_time >= 0) {
+        long flag_tag_time_centiseconds = flag_tag_time * TimeToCentiseconds;
+        char flag_tag_time_text[20];
+        centiseconds_to_string(flag_tag_time_centiseconds, flag_tag_time_text);
+        draw_timer(flag_tag_time_text, (best_time_x + x) >> 1, y);
     }
 }

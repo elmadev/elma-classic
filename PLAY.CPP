@@ -616,7 +616,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
             Idoszovegek[2].y = ya;
 
             if (tagisvan) {
-                long longido = Afogoido * Idod2lszorzo;
+                long longido = Afogoido * TimeToCentiseconds;
                 centiseconds_to_string(longido, Idoszovegek[3].text);
                 Idoszovegek[3].x = 440 + dx;
                 Idoszovegek[3].y = ya;
@@ -640,7 +640,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
             Idoszovegek[5].y = yb;
 
             if (tagisvan) {
-                long longido = Bfogoido * Idod2lszorzo;
+                long longido = Bfogoido * TimeToCentiseconds;
                 centiseconds_to_string(longido, Idoszovegek[6].text);
                 Idoszovegek[6].x = 440 + dx;
                 Idoszovegek[6].y = yb;

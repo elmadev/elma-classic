@@ -718,13 +718,13 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             darabok[6] = darabok[4];
             darabok[4] = darabok[3];
             darabok[3] = darabok[2];
-            kidigit( darabok, fogoido, t, ppic, Cxsize, Cysize );
+            draw_timers( darabok, fogoido, t, ppic, Cxsize, Cysize );
         }
         else*/
         if (Tag) {
-            kidigit(Ezenlegjobbido, fogoido, t, ppic, Cxsize, Cysize);
+            draw_timers(Ezenlegjobbido, fogoido, t, ppic, Cxsize, Cysize);
         } else {
-            kidigit(Ezenlegjobbido, -1.0, t, ppic, Cxsize, Cysize);
+            draw_timers(Ezenlegjobbido, -1.0, t, ppic, Cxsize, Cysize);
         }
     }
 }

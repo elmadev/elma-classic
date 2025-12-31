@@ -1,5 +1,5 @@
-#ifndef DIGIT_H
-#define DIGIT_H
+#ifndef TIMER_H
+#define TIMER_H
 
 constexpr double TimeToCentiseconds = 100.0 / (182.0 * 0.0024);
 

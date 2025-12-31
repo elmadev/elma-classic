@@ -1,17 +1,21 @@
 #include "ALL.H"
 
-static int DigitLineWidth, DigitLineHeight;
+static int DigitLineWidth;
+static int DigitLineHeight;
 
-static int DigitSpacing, DigitAndColonSpacing, Koztesdx;
+static int DigitSpacing;
+static int DigitAndColonSpacing;
+static int Koztesdx;
 
-static int Digitxsize, Digitysize;
+static int Digitxsize;
+static int Digitysize;
 
-static int ColonOffsetX, ColonOffsetY1, ColonOffsetY2;
+static int ColonOffsetX;
+static int ColonOffsetY1;
+static int ColonOffsetY2;
 
-static pic8* Dest = NULL;
-static unsigned char* ReferencePaletteMap = NULL;
-
-const double TimeToCentiseconds = 100.0 / (182.0 * 0.0024);
+static pic8* Dest = nullptr;
+static unsigned char* ReferencePaletteMap = nullptr;
 
 // Draw horizontal line for the ingame timer, using the provided palette map
 static void horizontal_line(pic8* dest, int x, int y, int size, unsigned char* lookup) {
@@ -184,23 +188,25 @@ void draw_timers(const char* best_time_text, double flag_tag_time, double curren
     double width_ratio = dest_width / 640.0;
     double height_ratio = dest_height / 480.0;
 
-    int edge_width = 28 * width_ratio;
+    int edge_width = (int)(28.0 * width_ratio);
     int x = edge_width;
-    int y = 420 * height_ratio;
+    int y = (int)(420.0 * height_ratio);
 
-    DigitLineWidth = 10 * height_ratio, DigitLineHeight = 16 * height_ratio;
+    DigitLineWidth = (int)(10.0 * height_ratio);
+    DigitLineHeight = (int)(16.0 * height_ratio);
 
-    DigitSpacing = 16 * height_ratio, DigitAndColonSpacing = 24 * height_ratio,
-    Koztesdx = 364 * width_ratio;
+    DigitSpacing = (int)(16.0 * height_ratio);
+    DigitAndColonSpacing = (int)(24.0 * height_ratio);
+    Koztesdx = (int)(364.0 * width_ratio);
 
-    Digitxsize = DigitSpacing * 7 + DigitAndColonSpacing * 4 + Koztesdx,
+    Digitxsize = DigitSpacing * 7 + DigitAndColonSpacing * 4 + Koztesdx;
     Digitysize = 2 * DigitLineHeight + 5;
 
-    ColonOffsetX = 17 * height_ratio;
-    ColonOffsetY1 = 9 * height_ratio;
-    ColonOffsetY2 = 23 * height_ratio;
+    ColonOffsetX = (int)(17.0 * height_ratio);
+    ColonOffsetY1 = (int)(9.0 * height_ratio);
+    ColonOffsetY2 = (int)(23.0 * height_ratio);
 
-    long current_time_centiseconds = current_time * TimeToCentiseconds;
+    int current_time_centiseconds = (int)(current_time * TimeToCentiseconds);
     char current_time_text[20];
     centiseconds_to_string(current_time_centiseconds, current_time_text);
 
@@ -217,7 +223,7 @@ void draw_timers(const char* best_time_text, double flag_tag_time, double curren
     draw_timer(current_time_text, x, y);
 
     if (flag_tag_time >= 0) {
-        long flag_tag_time_centiseconds = flag_tag_time * TimeToCentiseconds;
+        int flag_tag_time_centiseconds = (int)(flag_tag_time * TimeToCentiseconds);
         char flag_tag_time_text[20];
         centiseconds_to_string(flag_tag_time_centiseconds, flag_tag_time_text);
         draw_timer(flag_tag_time_text, (best_time_x + x) >> 1, y);

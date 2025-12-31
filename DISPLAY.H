@@ -5,29 +5,29 @@
 // tehat le kell takarni Sav-okat.
 
 // Konvertalasok:
-double konvx_i2d(int x);
-double konvy_i2d(int y);
-int konvx_d2i(double x);
-int konvy_d2i(double y);
+double pixel_to_meter_x(int x);
+double pixel_to_meter_y(int y);
+int meter_to_pixel_x(double x);
+int meter_to_pixel_y(double y);
 
-vect2 konv(int x, int y);
-int konvx(vect2 v);
-int konvy(vect2 v);
+vect2 pixel_to_meter(int x, int y);
+int meter_to_pixel_x(vect2 v);
+int meter_to_pixel_y(vect2 v);
 
 // Minden zoom-ot ez allit (csak indokolt esetben szabad hasznalni):
-void zoom(vect2 kozep, double xsize);
-void zoomout(void);
-void zoomin(int x1, int y1, int x2, int y2);
-void kitolt(void); // Palya pont beleferjen kepbe
+void zoom(vect2 center, double width);
+void zoom_out(void);
+void zoom_in(int x1, int y1, int x2, int y2);
+void zoom_fill(void); // Palya pont beleferjen kepbe
 
-double getzoomvalue(void);
+double get_zoom(void);
 // Visszaadja kepernyon tiz pixel tavolsagat double leptekben:
-double display_double_kozeltav(void);
+double max_grab_distance(void);
 
-extern int Vonalcsakeditbe;
-void vonalrajz(vect2 p1, vect2 p2, int szaggatott);
+extern int RedrawingEditor;
+void render_line(vect2 v1, vect2 v2, int dotted);
 
-extern int Savx;
-extern int Savy;
+extern int EDITOR_MENU_X;
+extern int EDITOR_MENU_Y;
 
 #endif

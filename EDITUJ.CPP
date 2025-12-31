@@ -137,15 +137,15 @@ static void elintezegymousepixelt(int x, int y) {
 static void egeretrajzolja(void) {
     /*if( Tool == T_MOVE && !Pgy && !Pker && !Psp && Kurzornegyzet ) {
         //internal_error( "Most itt van benn!" );
-        vect2 r = konv( Moux, Mouy );
+        vect2 r = pixel_to_meter( Moux, Mouy );
         double x1 = r.x;
         double y1 = r.y;
         double x2 = x1+640.0/MetersToPixels;
         double y2 = y1+480.0/MetersToPixels;
-        vonalrajz( vect2( x1, y1 ), vect2( x1, y2 ), 0 );
-        vonalrajz( vect2( x1, y2 ), vect2( x2, y2 ), 0 );
-        vonalrajz( vect2( x2, y2 ), vect2( x2, y1 ), 0 );
-        vonalrajz( vect2( x2, y1 ), vect2( x1, y1 ), 0 );
+        render_line( vect2( x1, y1 ), vect2( x1, y2 ), 0 );
+        render_line( vect2( x1, y2 ), vect2( x2, y2 ), 0 );
+        render_line( vect2( x2, y2 ), vect2( x2, y1 ), 0 );
+        render_line( vect2( x2, y1 ), vect2( x1, y1 ), 0 );
         return;
     } */
 
@@ -214,7 +214,7 @@ void toolhelp(const char* text) {
         }
         strcpy(Toolhelpszoveg, text);
     }
-    int x1 = 1, y1 = 18, x2 = SCREEN_WIDTH - 2, y2 = Savy - 2;
+    int x1 = 1, y1 = 18, x2 = SCREEN_WIDTH - 2, y2 = EDITOR_MENU_Y - 2;
     BufferMain->fill_box(x1, y1, x2, y2, Hatterindex);
     Pabc1->write(BufferMain, 10, y1 + 12, Toolhelpszoveg);
     bltfront(BufferMain, x1, y1, x2, y2);
@@ -269,40 +269,41 @@ static void editbe_balmenu(void) {
     BufferMain->line(0, 0, 0, SCREEN_HEIGHT - 1, Menulineszin);
     BufferMain->line(SCREEN_WIDTH - 1, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
     // Meg ket belso vonal:
-    BufferMain->line(0, Savy - 1, SCREEN_WIDTH - 1, Savy - 1, Menulineszin);
-    BufferMain->line(Savx - 1, Savy, Savx - 1, SCREEN_HEIGHT - 1, Menulineszin);
+    BufferMain->line(0, EDITOR_MENU_Y - 1, SCREEN_WIDTH - 1, EDITOR_MENU_Y - 1, Menulineszin);
+    BufferMain->line(EDITOR_MENU_X - 1, EDITOR_MENU_Y, EDITOR_MENU_X - 1, SCREEN_HEIGHT - 1,
+                     Menulineszin);
     for (int i = 0; i < Menuszam; i++) {
         // x1... stb a belso reszt jelenti:
         int x1 = 1;
-        int y1 = Savy + i * Menudy + 1;
-        int x2 = Savx - 2;
-        int y2 = Savy + (i + 1) * Menudy - 1;
+        int y1 = EDITOR_MENU_Y + i * Menudy + 1;
+        int x2 = EDITOR_MENU_X - 2;
+        int y2 = EDITOR_MENU_Y + (i + 1) * Menudy - 1;
         if (i == Elsotool + Tool) {
             BufferMain->fill_box(x1, y1, x2, y2, Menu_nyomottszin);
         }
         BufferMain->line(x1, y2 + 1, x2, y2 + 1, Menulineszin);
-        Pabc1->write(BufferMain, 5, Savy + i * Menudy + 14, Menuszovegek[i]);
+        Pabc1->write(BufferMain, 5, EDITOR_MENU_Y + i * Menudy + 14, Menuszovegek[i]);
     }
     // Meg benyomunk par felirat ala vonalakat:
     // Save and Play felirat P-je ala:
     int x = 66;
-    int y = Savy + 5 * Menudy + 15;
+    int y = EDITOR_MENU_Y + 5 * Menudy + 15;
     BufferMain->line(x, y, x + 6, y, 247);
     // Exit felirat x-e ala:
     x = 13;
-    y = Savy + 0 * Menudy + 15;
+    y = EDITOR_MENU_Y + 0 * Menudy + 15;
     BufferMain->line(x, y, x + 7, y, 247);
     // Open felirat o-ja ala:
     x = 5;
-    y = Savy + 2 * Menudy + 15;
+    y = EDITOR_MENU_Y + 2 * Menudy + 15;
     BufferMain->line(x, y, x + 6, y, 247);
     // Zoom Out felirat z-je ala:
     x = 5;
-    y = Savy + 8 * Menudy + 15;
+    y = EDITOR_MENU_Y + 8 * Menudy + 15;
     BufferMain->line(x, y, x + 7, y, 247);
     // Save felirat s-e ala:
     x = 4;
-    y = Savy + 4 * Menudy + 15;
+    y = EDITOR_MENU_Y + 4 * Menudy + 15;
     BufferMain->line(x, y, x + 7, y, 247);
 }
 
@@ -433,8 +434,9 @@ static void ujrarajzol(int egesz) {
         editbe_balmenu();
     }
 
-    BufferMain->fill_box(Savx, Savy, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2, Hatterindex);
-    BufferMain->fill_box(1, 1, SCREEN_WIDTH - 2, Savy - 2, Hatterindex);
+    BufferMain->fill_box(EDITOR_MENU_X, EDITOR_MENU_Y, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2,
+                         Hatterindex);
+    BufferMain->fill_box(1, 1, SCREEN_WIDTH - 2, EDITOR_MENU_Y - 2, Hatterindex);
     // Kiirjuk file nevet:
     Pabc1->write(BufferMain, 6, 15, "File:");
     strupr(State->editor_filename);
@@ -462,7 +464,7 @@ static void ujrarajzol(int egesz) {
     // Kiirjuk zoomot:
     Pabc1->write(BufferMain, 543, 15, "Zoom:");
     char text[30];
-    sprintf(text, "%lf", getzoomvalue());
+    sprintf(text, "%lf", get_zoom());
     // Tizedespont utani jegyek szamat maximaljuk 2-re:
     if (*strstr(text, ".")) {
         *(strstr(text, ".") + 5) = 0; // + 3
@@ -473,7 +475,7 @@ static void ujrarajzol(int egesz) {
         Pabc2->write(BufferMain, 580, 15, text); // 10000.0
     }
 
-    Vonalcsakeditbe = 1; // Csak edit bufferbe rajzoljon kirajzol
+    RedrawingEditor = 1; // Csak edit bufferbe rajzoljon kirajzol
 
     Ptop->kirajzol();
     if (Pgy) {
@@ -482,7 +484,7 @@ static void ujrarajzol(int egesz) {
         Pgy->kirajz(K, Fel, 1);
     }
 
-    Vonalcsakeditbe = 0;
+    RedrawingEditor = 0;
 
     bltfront(BufferMain);
 
@@ -514,8 +516,8 @@ static void beallitkozelvane(int mx, int my) {
         return;
     }
 
-    double x = konvx_i2d(mx);
-    double y = konvy_i2d(my);
+    double x = pixel_to_meter_x(mx);
+    double y = pixel_to_meter_y(my);
 
     Kozelvan = 0;
     double tav = 1000000.0;
@@ -637,7 +639,7 @@ void editor(void) {
     Tool = T_MOVE;
     alaphelp();
 
-    kitolt();
+    zoom_fill();
     ujrarajzol(1);
 
     left_mouse_clicked();
@@ -734,12 +736,12 @@ void editor(void) {
 
             int ujx = 0, ujy = 0;
             get_mouse_position(&ujx, &ujy);
-            if (ujy < Savy) {
-                ujy = Savy;
+            if (ujy < EDITOR_MENU_Y) {
+                ujy = EDITOR_MENU_Y;
             }
-            if ((Pgy || Pker || Psp || Zoomfogva || Egypont) && ujx < Savx) {
+            if ((Pgy || Pker || Psp || Zoomfogva || Egypont) && ujx < EDITOR_MENU_X) {
                 // Ha meg van valami fogva, nem mehetunk gombok fole:
-                ujx = Savx;
+                ujx = EDITOR_MENU_X;
                 set_mouse_position(ujx, ujy);
             }
             if (ujx != Moux || ujy != Mouy) {
@@ -748,10 +750,11 @@ void editor(void) {
                 Mouy = ujy;
                 pop();
             }
-            if (ujx < Savx) {
+            if (ujx < EDITOR_MENU_X) {
                 // Billentyuk folott tortent lenyomas:
                 for (int i = 0; i < Menuszam; i++) {
-                    if (Savy + i * Menudy <= ujy && ujy < Savy + (i + 1) * Menudy) {
+                    if (EDITOR_MENU_Y + i * Menudy <= ujy &&
+                        ujy < EDITOR_MENU_Y + (i + 1) * Menudy) {
                         // i-edik gombot lenyomtak menuben:
                         if (i == 0 && balnyomva) {
                             if (menu_exit()) {
@@ -823,7 +826,7 @@ void editor(void) {
 
                         if (i == 9 && balnyomva) {
                             // Zoom Fill:
-                            kitolt();
+                            zoom_fill();
                             invalidate();
                         }
                         if (i == 9 && jobbnyomva) {
@@ -945,12 +948,12 @@ void editor(void) {
 
         int ujx = 0, ujy = 0;
         get_mouse_position(&ujx, &ujy);
-        if (ujy < Savy) {
-            ujy = Savy;
+        if (ujy < EDITOR_MENU_Y) {
+            ujy = EDITOR_MENU_Y;
         }
-        if ((Pgy || Pker || Psp || Zoomfogva || Egypont) && ujx < Savx) {
+        if ((Pgy || Pker || Psp || Zoomfogva || Egypont) && ujx < EDITOR_MENU_X) {
             // Ha meg van valami fogva, nem mehetunk gombok fole:
-            ujx = Savx;
+            ujx = EDITOR_MENU_X;
             set_mouse_position(ujx, ujy);
         }
         if (ujx == Moux && ujy == Mouy) {

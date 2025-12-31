@@ -51,7 +51,7 @@ static void betolt(const char* nev) {
         State->editor_filename[0] = 0;
     }
 
-    kitolt();
+    zoom_fill();
 }
 
 static void igazit(int* pkur, int* pfelso, int nevszam, int helyszam) {
@@ -494,7 +494,7 @@ void tolt_new(void) {
     Valtozott = 0;
     floadlevel_e("_uj_topol_");
     State->editor_filename[0] = 0;
-    kitolt();
+    zoom_fill();
 }
 
 // Ha sikeresen mentett, akkor igaz:

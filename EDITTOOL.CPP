@@ -60,14 +60,14 @@ void t_move_nyomva(int mx, int my) {
             if (Pker) {
                 internal_error("iuofiuceyhbuc");
             }
-            Pgy->ponttomb[K] = konv(mx, my);
+            Pgy->ponttomb[K] = pixel_to_meter(mx, my);
             Pgy = NULL;
         } else {
             if (Pker) {
-                Pker->r = konv(mx, my);
+                Pker->r = pixel_to_meter(mx, my);
                 Pker = NULL;
             } else {
-                Psp->r = konv(mx, my);
+                Psp->r = pixel_to_meter(mx, my);
                 Psp = NULL;
             }
         }
@@ -76,8 +76,8 @@ void t_move_nyomva(int mx, int my) {
         invalidate();
     } else {
         // Most probalunk megfogni egy pontot:
-        double x = konvx_i2d(mx);
-        double y = konvy_i2d(my);
+        double x = pixel_to_meter_x(mx);
+        double y = pixel_to_meter_y(my);
 
         double tavpont, tavkerek, tavsprite;
         Pgy = Ptop->legkozpont(x, y, &K, &tavpont);
@@ -120,23 +120,23 @@ void t_move_nyomva(int mx, int my) {
                      "button to cancel.");
             Moveorigx = Pgy->ponttomb[K].x;
             Moveorigy = Pgy->ponttomb[K].y;
-            mx = konvx_d2i(Moveorigx);
-            my = konvy_d2i(Moveorigy);
+            mx = meter_to_pixel_x(Moveorigx);
+            my = meter_to_pixel_y(Moveorigy);
         } else {
             if (Pker) {
                 toolhelp("Move the object and press the left button to place it. Press ESC or "
                          "right button to cancel.");
                 Moveorigx = Pker->r.x;
                 Moveorigy = Pker->r.y;
-                mx = konvx_d2i(Moveorigx);
-                my = konvy_d2i(Moveorigy);
+                mx = meter_to_pixel_x(Moveorigx);
+                my = meter_to_pixel_y(Moveorigy);
             } else {
                 toolhelp("Move the picture and press the left button to place it. Press ESC or "
                          "right button to cancel.");
                 Moveorigx = Psp->r.x;
                 Moveorigy = Psp->r.y;
-                mx = konvx_d2i(Moveorigx);
-                my = konvy_d2i(Moveorigy);
+                mx = meter_to_pixel_x(Moveorigx);
+                my = meter_to_pixel_y(Moveorigy);
             }
         }
         set_mouse_position(mx, my);
@@ -154,8 +154,8 @@ void gany_move_jobb(int mx, int my) {
     }
     // Meg van fogva egy pont, melyik van ehhez legkozelebb:
     double tav;
-    double x = konvx_i2d(mx);
-    double y = konvy_i2d(my);
+    double x = pixel_to_meter_x(mx);
+    double y = pixel_to_meter_y(my);
     int ujk = 0;
     gyuru* pujgy = Ptop->legkozpont(x, y, &ujk, &tav, Pgy);
     if (!pujgy) {
@@ -177,8 +177,8 @@ void t_move_nyomva_jobb(int mx, int my) {
     }
     // Nincs megfogva semmi. Ilyenkor attributumot lehet allitani:
     double tavsp = 0.0, tavgy = 0.0, tavker = 0.0;
-    double x = konvx_i2d(mx);
-    double y = konvy_i2d(my);
+    double x = pixel_to_meter_x(mx);
+    double y = pixel_to_meter_y(my);
     sprite* psp = Ptop->legkozsprite(x, y, &tavsp);
     int semmi = 0;
     gyuru* pgy = Ptop->legkozpont(x, y, &semmi, &tavgy);
@@ -272,8 +272,8 @@ void t_move_mmove(int mx, int my) {
         Pgy->kirajz(K, Fel, 0);
         Pgy->kirajz(K, !Fel, 0);
         // Uj koord:
-        double dx = konvx_i2d(mx);
-        double dy = konvy_i2d(my);
+        double dx = pixel_to_meter_x(mx);
+        double dy = pixel_to_meter_y(my);
         Pgy->ujkoord(K, dx, dy);
         // Visszarajzoljuk oket:
         Pgy->kirajz(K, Fel, 0);
@@ -281,15 +281,15 @@ void t_move_mmove(int mx, int my) {
     } else {
         if (Pker) {
             Pker->kirajzol();
-            double dx = konvx_i2d(mx);
-            double dy = konvy_i2d(my);
+            double dx = pixel_to_meter_x(mx);
+            double dy = pixel_to_meter_y(my);
             Pker->r.x = dx;
             Pker->r.y = dy;
             Pker->kirajzol();
         } else {
             Psp->kirajzol();
-            double dx = konvx_i2d(mx);
-            double dy = konvy_i2d(my);
+            double dx = pixel_to_meter_x(mx);
+            double dy = pixel_to_meter_y(my);
             Psp->r.x = dx;
             Psp->r.y = dy;
             Psp->kirajzol();
@@ -317,8 +317,8 @@ void t_create_vert_nyomva(int mx, int my) {
     Valtozott = 1;
     if (!Pgy && !Egypont) {
         // Most probalunk megfogni egy pontot:
-        double x = konvx_i2d(mx);
-        double y = konvy_i2d(my);
+        double x = pixel_to_meter_x(mx);
+        double y = pixel_to_meter_y(my);
 
         Pgy = Ptop->legkozpont(x, y, &K);
         if (!Pgy) {
@@ -347,8 +347,8 @@ void t_create_vert_nyomva(int mx, int my) {
             toolhelp("Click the left button to place point. SPACE and ENTER swaps. ESC or right "
                      "button cancels.");
             push();
-            Moux = konvx_d2i(Pgy->ponttomb[K].x);
-            Mouy = konvy_d2i(Pgy->ponttomb[K].y);
+            Moux = meter_to_pixel_x(Pgy->ponttomb[K].x);
+            Mouy = meter_to_pixel_y(Pgy->ponttomb[K].y);
             pop();
         }
     }
@@ -379,9 +379,9 @@ void t_create_vert_nyomva(int mx, int my) {
             if (!Ptop->ptomb[i]) {
                 Pgy = Ptop->ptomb[i] = new gyuru;
                 Pgy->pontszam = 3;
-                Pgy->ponttomb[0] = konv(Epontx, Eponty);
-                Pgy->ponttomb[1] = konv(mx, my);
-                Pgy->ponttomb[2] = konv(mx, my);
+                Pgy->ponttomb[0] = pixel_to_meter(Epontx, Eponty);
+                Pgy->ponttomb[1] = pixel_to_meter(mx, my);
+                Pgy->ponttomb[2] = pixel_to_meter(mx, my);
                 K = 2;
                 Fel = 1;
                 Egypont = 0;
@@ -476,8 +476,8 @@ void t_create_vert_space(void) {
     }
     Pgy->ponttomb[K] = Pgy->ponttomb[kkov];
     K = kkov;
-    Moux = konvx(Pgy->ponttomb[K]);
-    Mouy = konvy(Pgy->ponttomb[K]);
+    Moux = meter_to_pixel_x(Pgy->ponttomb[K]);
+    Mouy = meter_to_pixel_y(Pgy->ponttomb[K]);
     set_mouse_position(Moux, Mouy);
     Fel = !Fel;
     invalidate();
@@ -495,8 +495,8 @@ void t_create_vert_mmove(int mx, int my) {
         Pgy->kirajz(K, Fel, 1); // szaggatott
         Pgy->kirajz(K, !Fel, 0);
         // Uj koord:
-        double dx = konvx_i2d(mx);
-        double dy = konvy_i2d(my);
+        double dx = pixel_to_meter_x(mx);
+        double dy = pixel_to_meter_y(my);
         Pgy->ujkoord(K, dx, dy);
         // Visszarajzoljuk oket:
         Pgy->kirajz(K, Fel, 1); // szaggatott
@@ -507,10 +507,10 @@ void t_create_vert_mmove(int mx, int my) {
         if (!Egypont) {
             internal_error("!Egypont (yifeye)");
         }
-        vonalrajz(konv(Epontx, Eponty), konv(Kpontx, Kponty), 0);
+        render_line(pixel_to_meter(Epontx, Eponty), pixel_to_meter(Kpontx, Kponty), 0);
         Moux = Kpontx = mx;
         Mouy = Kponty = my;
-        vonalrajz(konv(Epontx, Eponty), konv(Kpontx, Kponty), 0);
+        render_line(pixel_to_meter(Epontx, Eponty), pixel_to_meter(Kpontx, Kponty), 0);
     }
     unlockfrontbuffer_pic();
     pop();
@@ -526,8 +526,8 @@ void t_delete_vert_nyomva(int mx, int my) {
         internal_error("yffwiye");
     }
     // Most probalunk megfogni egy pontot:
-    double x = konvx_i2d(mx);
-    double y = konvy_i2d(my);
+    double x = pixel_to_meter_x(mx);
+    double y = pixel_to_meter_y(my);
 
     int k = 0;
     gyuru* pgy = Ptop->legkozpont(x, y, &k);
@@ -555,8 +555,8 @@ void t_delete_poly_nyomva(int mx, int my) {
         internal_error("oiutrgiuot");
     }
     // Most probalunk megfogni egy pontot:
-    double x = konvx_i2d(mx);
-    double y = konvy_i2d(my);
+    double x = pixel_to_meter_x(mx);
+    double y = pixel_to_meter_y(my);
 
     int k = 0;
     gyuru* pgy = Ptop->legkozpont(x, y, &k);
@@ -617,8 +617,8 @@ void t_create_kerek_nyomva(int mx, int my, int food) {
 
     for (int i = 0; i < MAXKEREK; i++) {
         if (!Ptop->kerektomb[i]) {
-            double x = konvx_i2d(mx);
-            double y = konvy_i2d(my);
+            double x = pixel_to_meter_x(mx);
+            double y = pixel_to_meter_y(my);
             int tipus = T_KAJA;
             if (!food) {
                 tipus = T_HALALOS;
@@ -642,8 +642,8 @@ void t_create_kerek_nyomva(int mx, int my, int food) {
 // DELETE_KEREK DELETE_KEREK DELETE_KEREK DELETE_KEREK DELETE_KEREK
 
 void t_delete_kerek_nyomva(int mx, int my) {
-    double x = konvx_i2d(mx);
-    double y = konvy_i2d(my);
+    double x = pixel_to_meter_x(mx);
+    double y = pixel_to_meter_y(my);
     kerek* pker = Ptop->legkozkerek(x, y);
     if (!pker) {
         return;
@@ -681,7 +681,7 @@ void t_zoomin_nyomva(int x, int y) {
     if (Zoomfogva) {
         // Megvan masodik pont is:
         alaphelp();
-        zoomin(Zoomx1, Zoomy1, x, y);
+        zoom_in(Zoomx1, Zoomy1, x, y);
         Zoomfogva = 0;
         invalidate();
     } else {
@@ -801,8 +801,8 @@ void t_create_sprite_nyomva(int mx, int my) {
 
     for (int i = 0; i < MAXSPRITE; i++) {
         if (!Ptop->spritetomb[i]) {
-            double x = konvx_i2d(mx);
-            double y = konvy_i2d(my);
+            double x = pixel_to_meter_x(mx);
+            double y = pixel_to_meter_y(my);
             Ptop->spritetomb[i] =
                 new sprite(x, y, Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev);
             invalidate();
@@ -814,8 +814,8 @@ void t_create_sprite_nyomva(int mx, int my) {
 }
 
 void t_delete_sprite_nyomva(int mx, int my) {
-    double x = konvx_i2d(mx);
-    double y = konvy_i2d(my);
+    double x = pixel_to_meter_x(mx);
+    double y = pixel_to_meter_y(my);
     sprite* psp = Ptop->legkozsprite(x, y);
     if (!psp) {
         return;

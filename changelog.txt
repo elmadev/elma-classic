@@ -21,6 +21,7 @@
 * Background menu balls would sometimes vanish on the "Please do not distribute" screen
 * Improve some slightly buggy/inconsistent mouse click behaviour in internal editor
 * Red helmet animation will no longer skip frames after the intro scrolling animation
+* The 3 timers (best time, flag tag time, current time) are now properly centered on screen
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

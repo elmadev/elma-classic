@@ -218,8 +218,8 @@ void draw_timers(const char* best_time_text, double flag_tag_time, double curren
     ColonOffsetY1 = (int)(COLON_Y1 * height_ratio);
     ColonOffsetY2 = (int)(COLON_Y2 * height_ratio);
 
-    int edge_width = (int)(28.0 * width_ratio);
-    int timer_width = 3 * DigitSpacing + 3 * DigitAndColonSpacing; // Some right-sided whitespace
+    int edge_width = (int)(34.0 * width_ratio);
+    int timer_width = 3 * DigitSpacing + 2 * DigitAndColonSpacing + digit_width;
     int y = (int)(420.0 * height_ratio);
 
     // Draw best time

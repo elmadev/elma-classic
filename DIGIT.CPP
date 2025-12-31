@@ -1,5 +1,15 @@
 #include "ALL.H"
 
+enum class DigitSegment {
+    VERTICAL_BOTTOMLEFT,
+    VERTICAL_BOTTOMRIGHT,
+    VERTICAL_TOPLEFT,
+    VERTICAL_TOPRIGHT,
+    HORIZONTAL_BOTTOM,
+    HORIZONTAL_MIDDLE,
+    HORIZONTAL_TOP,
+};
+
 static int DigitLineWidth;
 static int DigitLineHeight;
 
@@ -53,28 +63,28 @@ static void draw_colon(int x, int y) {
 }
 
 // Draw one line in the seven segment digit display
-static void draw_digit_segment(int segment, int x, int y) {
+static void draw_digit_segment(DigitSegment segment, int x, int y) {
     switch (segment) {
-    case 0:
+    case DigitSegment::VERTICAL_BOTTOMLEFT:
         vertical_line(Dest, x, y + 1, DigitLineHeight, ReferencePaletteMap);
         break;
-    case 1:
+    case DigitSegment::VERTICAL_BOTTOMRIGHT:
         vertical_line(Dest, x + DigitLineWidth + 1, y + 1, DigitLineHeight, ReferencePaletteMap);
         break;
-    case 2:
+    case DigitSegment::VERTICAL_TOPLEFT:
         vertical_line(Dest, x, y + DigitLineHeight + 2, DigitLineHeight, ReferencePaletteMap);
         break;
-    case 3:
+    case DigitSegment::VERTICAL_TOPRIGHT:
         vertical_line(Dest, x + DigitLineWidth + 1, y + DigitLineHeight + 2, DigitLineHeight,
                       ReferencePaletteMap);
         break;
-    case 4:
+    case DigitSegment::HORIZONTAL_BOTTOM:
         horizontal_line(Dest, x + 1, y, DigitLineWidth, ReferencePaletteMap);
         break;
-    case 5:
+    case DigitSegment::HORIZONTAL_MIDDLE:
         horizontal_line(Dest, x + 1, y + DigitLineHeight + 1, DigitLineWidth, ReferencePaletteMap);
         break;
-    case 6:
+    case DigitSegment::HORIZONTAL_TOP:
         horizontal_line(Dest, x + 1, y + DigitLineHeight + DigitLineHeight + 2, DigitLineWidth,
                         ReferencePaletteMap);
         break;
@@ -88,73 +98,73 @@ static void draw_digit_segment(int segment, int x, int y) {
 static void draw_digit(int c, int x, int y) {
     switch (c) {
     case '0':
-        draw_digit_segment(4, x, y);
-        draw_digit_segment(0, x, y);
-        draw_digit_segment(1, x, y);
-        draw_digit_segment(2, x, y);
-        draw_digit_segment(3, x, y);
-        draw_digit_segment(6, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_BOTTOM, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMLEFT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMRIGHT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPLEFT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_TOP, x, y);
         break;
     case '1':
-        draw_digit_segment(1, x, y);
-        draw_digit_segment(3, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMRIGHT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPRIGHT, x, y);
         break;
     case '2':
-        draw_digit_segment(4, x, y);
-        draw_digit_segment(0, x, y);
-        draw_digit_segment(5, x, y);
-        draw_digit_segment(3, x, y);
-        draw_digit_segment(6, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_BOTTOM, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMLEFT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_MIDDLE, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_TOP, x, y);
         break;
     case '3':
-        draw_digit_segment(4, x, y);
-        draw_digit_segment(1, x, y);
-        draw_digit_segment(5, x, y);
-        draw_digit_segment(3, x, y);
-        draw_digit_segment(6, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_BOTTOM, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_MIDDLE, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_TOP, x, y);
         break;
     case '4':
-        draw_digit_segment(1, x, y);
-        draw_digit_segment(5, x, y);
-        draw_digit_segment(2, x, y);
-        draw_digit_segment(3, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_MIDDLE, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPLEFT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPRIGHT, x, y);
         break;
     case '5':
-        draw_digit_segment(4, x, y);
-        draw_digit_segment(1, x, y);
-        draw_digit_segment(5, x, y);
-        draw_digit_segment(2, x, y);
-        draw_digit_segment(6, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_BOTTOM, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_MIDDLE, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPLEFT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_TOP, x, y);
         break;
     case '6':
-        draw_digit_segment(4, x, y);
-        draw_digit_segment(0, x, y);
-        draw_digit_segment(1, x, y);
-        draw_digit_segment(5, x, y);
-        draw_digit_segment(2, x, y);
-        draw_digit_segment(6, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_BOTTOM, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMLEFT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_MIDDLE, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPLEFT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_TOP, x, y);
         break;
     case '7':
-        draw_digit_segment(1, x, y);
-        draw_digit_segment(3, x, y);
-        draw_digit_segment(6, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMRIGHT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_TOP, x, y);
         break;
     case '8':
-        draw_digit_segment(4, x, y);
-        draw_digit_segment(0, x, y);
-        draw_digit_segment(1, x, y);
-        draw_digit_segment(5, x, y);
-        draw_digit_segment(2, x, y);
-        draw_digit_segment(3, x, y);
-        draw_digit_segment(6, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_BOTTOM, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMLEFT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_MIDDLE, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPLEFT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_TOP, x, y);
         break;
     case '9':
-        draw_digit_segment(4, x, y);
-        draw_digit_segment(1, x, y);
-        draw_digit_segment(5, x, y);
-        draw_digit_segment(2, x, y);
-        draw_digit_segment(3, x, y);
-        draw_digit_segment(6, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_BOTTOM, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_BOTTOMRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_MIDDLE, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPLEFT, x, y);
+        draw_digit_segment(DigitSegment::VERTICAL_TOPRIGHT, x, y);
+        draw_digit_segment(DigitSegment::HORIZONTAL_TOP, x, y);
         break;
     default:
         hiba("draw_digit c out of range!");

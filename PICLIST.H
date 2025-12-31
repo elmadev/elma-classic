@@ -1,32 +1,25 @@
 #ifndef PICLIST_H
 #define PICLIST_H
 
-#define MAXPICLISTKEPSZAM (3000)
+#define MAX_PICLIST_LENGTH (3000)
 
 class piclist {
   public:
-    enum {
-        ATLAT_NEMATLATSZO = 10,
-        ATLAT_0,
-        ATLAT_TOPLEFT,
-        ATLAT_TOPRIGHT,
-        ATLAT_BOTTOMLEFT,
-        ATLAT_BOTTOMRIGHT
-    };
+    enum { None = 10, Palette0, TopLeft, TopRight, BottomLeft, BottomRight };
 
-    enum { PLTIP_KEP = 100, PLTIP_TEXT, PLTIP_MINTA };
+    enum { Picture = 100, Texture, Mask };
 
-    int kepszam;
-    char nevek[(MAXPICLISTKEPSZAM + 10) * 10];
-    int tipusok[MAXPICLISTKEPSZAM + 10];
+    int length;
+    char name[(MAX_PICLIST_LENGTH + 10) * 10];
+    int type[MAX_PICLIST_LENGTH + 10];
     // Ha igaz, border texturanak szamit es kellhet tetejere tenni foltot:
-    int tavolsagok[MAXPICLISTKEPSZAM + 10];
-    int hatarolok[MAXPICLISTKEPSZAM + 10];
-    int atlatszosagok[MAXPICLISTKEPSZAM + 10];
+    int default_distance[MAX_PICLIST_LENGTH + 10];
+    int default_clipping[MAX_PICLIST_LENGTH + 10];
+    int transparency[MAX_PICLIST_LENGTH + 10];
 
     piclist(FILE* h); // Binaris formatumbol
 
-    int getnevindex(const char* nev); // vagy -1
+    int get_index(const char* pic_name); // vagy -1
 };
 
 #endif

@@ -160,17 +160,17 @@ static unsigned char* getnewpalfromh(FILE* h) {
 
 static int getatlatszosag(int tipus, pic8* ppic) {
     switch (tipus) {
-    case piclist::ATLAT_NEMATLATSZO:
+    case piclist::None:
         return -1;
-    case piclist::ATLAT_0:
+    case piclist::Palette0:
         return 0;
-    case piclist::ATLAT_TOPLEFT:
+    case piclist::TopLeft:
         return ppic->gpixel(0, 0);
-    case piclist::ATLAT_TOPRIGHT:
+    case piclist::TopRight:
         return ppic->gpixel(ppic->get_width() - 1, 0);
-    case piclist::ATLAT_BOTTOMLEFT:
+    case piclist::BottomLeft:
         return ppic->gpixel(0, ppic->get_height() - 1);
-    case piclist::ATLAT_BOTTOMRIGHT:
+    case piclist::BottomRight:
         return ppic->gpixel(ppic->get_width() - 1, ppic->get_height() - 1);
     }
     hiba("getatlatszosag");
@@ -188,9 +188,9 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
 
     kep* pkep = &kepek[kepszam];
 
-    strcpy(pkep->nev, &ppiclist->nevek[index * 10]);
-    pkep->tavolsag = ppiclist->tavolsagok[index];
-    pkep->hatarol = ppiclist->hatarolok[index];
+    strcpy(pkep->nev, &ppiclist->name[index * 10]);
+    pkep->tavolsag = ppiclist->default_distance[index];
+    pkep->hatarol = ppiclist->default_clipping[index];
 
     // Beetetjuk kepadatokat:
     pkep->xsize = ppic->get_width();
@@ -200,7 +200,7 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
         uzenet("Picture xsize is too big!", pkep->nev);
     }
 
-    int atlatszo = getatlatszosag(ppiclist->atlatszosagok[index], ppic);
+    int atlatszo = getatlatszosag(ppiclist->transparency[index], ppic);
     if (atlatszo < 0) {
         uzenet("Picture must be transparent in lgr file!", pkep->nev);
     }
@@ -285,10 +285,10 @@ void lgrfile::beirtexturat(pic8* ppic, piclist* ppiclist, int index) {
     textura* ptext = &texturak[texturaszam];
 
     if (ppiclist) {
-        strcpy(ptext->nev, &ppiclist->nevek[index * 10]);
+        strcpy(ptext->nev, &ppiclist->name[index * 10]);
         ptext->ppic = ppic;
-        ptext->tavolsag = ppiclist->tavolsagok[index];
-        ptext->hatarol = ppiclist->hatarolok[index];
+        ptext->tavolsag = ppiclist->default_distance[index];
+        ptext->hatarol = ppiclist->default_clipping[index];
         ptext->foltos = 0;
     } else {
         // Csak fu eseten:
@@ -312,13 +312,13 @@ void lgrfile::beirmaszkot(pic8* ppic, piclist* ppiclist, int index) {
 
     maszk* pm = &maszkok[maszkszam];
 
-    strcpy(pm->nev, &ppiclist->nevek[index * 10]);
+    strcpy(pm->nev, &ppiclist->name[index * 10]);
     pm->xsize = ppic->get_width();
     pm->ysize = ppic->get_height();
 
     // Most beeszi adatokat:
     int i = 0;
-    int atlatszo = getatlatszosag(ppiclist->atlatszosagok[index], ppic);
+    int atlatszo = getatlatszosag(ppiclist->transparency[index], ppic);
     if (atlatszo >= 0) {
         // Van atlatszosag:
         for (int y = 0; y < pm->ysize; y++) {
@@ -343,7 +343,7 @@ void lgrfile::beirmaszkot(pic8* ppic, piclist* ppiclist, int index) {
                 Melemtomb[i].hossz = size;
                 i++;
                 if (i > MAXMASZKELEM - 10) {
-                    uzenet("Mask picture is too complicated!:", &ppiclist->nevek[index * 10]);
+                    uzenet("Mask picture is too complicated!:", &ppiclist->name[index * 10]);
                 }
 
                 x += size;
@@ -702,21 +702,21 @@ lgrfile::lgrfile(const char* lgrnev) {
             continue;
         }
 
-        int index = ppiclist->getnevindex(nev);
+        int index = ppiclist->get_index(nev);
         if (index < 0) {
             uzenet("There is no line in PICTURES.LST corresponding to picture:", nev);
         }
-        if (ppiclist->tipusok[index] == piclist::PLTIP_KEP) {
+        if (ppiclist->type[index] == piclist::Picture) {
             beirkepet(ppic, ppiclist, index);
             delete ppic; // Kepre mar nincsen tobbe szuksegunk
             ppic = NULL;
             continue;
         }
-        if (ppiclist->tipusok[index] == piclist::PLTIP_TEXT) {
+        if (ppiclist->type[index] == piclist::Texture) {
             beirtexturat(ppic, ppiclist, index);
             continue;
         }
-        if (ppiclist->tipusok[index] == piclist::PLTIP_MINTA) {
+        if (ppiclist->type[index] == piclist::Mask) {
             // delete-li ppic-et:
             beirmaszkot(ppic, ppiclist, index);
             ppic = NULL;

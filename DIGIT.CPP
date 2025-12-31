@@ -39,6 +39,7 @@ static void vertical_line(pic8* dest, int x, int y, int size, unsigned char* loo
     }
 }
 
+// Draw the ":" character
 static void draw_colon(int x, int y) {
     horizontal_line(Dest, x + ColonOffsetX, y + ColonOffsetY1, 2, ReferencePaletteMap);
     horizontal_line(Dest, x + ColonOffsetX, y + ColonOffsetY1 + 1, 2, ReferencePaletteMap);
@@ -47,6 +48,7 @@ static void draw_colon(int x, int y) {
     horizontal_line(Dest, x + ColonOffsetX, y + ColonOffsetY2 + 1, 2, ReferencePaletteMap);
 }
 
+// Draw one line in the seven segment digit display
 static void draw_digit_segment(int segment, int x, int y) {
     switch (segment) {
     case 0:
@@ -78,6 +80,7 @@ static void draw_digit_segment(int segment, int x, int y) {
     }
 }
 
+// Draw one timer digit
 static void draw_digit(int c, int x, int y) {
     switch (c) {
     case '0':
@@ -154,6 +157,7 @@ static void draw_digit(int c, int x, int y) {
     }
 }
 
+// Draw one timer (00:00:00)
 static void draw_timer(const char* time_text, int x, int y) {
     draw_digit(time_text[0], x, y);
     x += DigitSpacing;
@@ -170,6 +174,7 @@ static void draw_timer(const char* time_text, int x, int y) {
     draw_digit(time_text[7], x, y);
 }
 
+// Draw the 3 times: Best Time, Flag Tag Time, Current Time
 void draw_timers(const char* best_time_text, double flag_tag_time, double current_time, pic8* dest,
                  int dest_width, int dest_height) {
 
@@ -202,7 +207,6 @@ void draw_timers(const char* best_time_text, double flag_tag_time, double curren
     char current_time_text[20];
     centiseconds_to_string(current_time_centiseconds, current_time_text);
 
-    // Elso:
     int best_time_x = x;
     if (best_time_text[0] != 0) {
         draw_timer(best_time_text, best_time_x, y);
@@ -213,10 +217,8 @@ void draw_timers(const char* best_time_text, double flag_tag_time, double curren
     x += Koztesdx;
     x = dest_width - (edge_width + DigitSpacing * 3 + DigitAndColonSpacing * 3);
 
-    // Masodik:
     draw_timer(current_time_text, x, y);
 
-    // Kirakjuk meg kozepre fogoido-t is:
     if (flag_tag_time >= 0) {
         long flag_tag_time_centiseconds = flag_tag_time * TimeToCentiseconds;
         char flag_tag_time_text[20];

@@ -118,8 +118,6 @@ class lgrfile {
     unsigned char viewegsor[SCREEN_WIDTH];
     unsigned char viewmotorindex1;
     unsigned char viewmotorindex2;
-    unsigned char idoszin1; // Ezt torolni lehet
-    unsigned char idoszin2; // Ezt torolni lehet
     unsigned char keretindex;
     unsigned char viewexit[3];
     unsigned char viewfood;

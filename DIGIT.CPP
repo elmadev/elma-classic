@@ -184,9 +184,6 @@ void draw_timers(const char* best_time_text, double flag_tag_time, double curren
     double width_ratio = dest_width / 640.0;
     double height_ratio = dest_height / 480.0;
 
-    // unsigned char szin1 = Plgr->idoszin1;
-    // unsigned char szin2 = Plgr->idoszin2;
-
     int edge_width = 28 * width_ratio;
     int x = edge_width;
     int y = 420 * height_ratio;

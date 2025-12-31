@@ -841,7 +841,6 @@ lgrfile::lgrfile(const char* lgrnev) {
     viewfoldsor[0] = pcolors->gpixel(6, 6 + 0 * 12);
     viewegsor[0] = pcolors->gpixel(6, 6 + 1 * 12);
     keretindex = pcolors->gpixel(6, 6 + 2 * 12);
-    idoszin1 = idoszin2 = pcolors->gpixel(6, 6 + 3 * 12);
     viewmotorindex1 = pcolors->gpixel(6, 6 + 4 * 12);
     viewmotorindex2 = pcolors->gpixel(6, 6 + 5 * 12);
     viewexit[0] = pcolors->gpixel(6, 6 + 6 * 12);

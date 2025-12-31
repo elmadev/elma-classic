@@ -15,10 +15,6 @@ static int DigitLineHeight;
 
 static int DigitSpacing;
 static int DigitAndColonSpacing;
-static int Koztesdx;
-
-static int Digitxsize;
-static int Digitysize;
 
 static int ColonOffsetX;
 static int ColonOffsetY1;
@@ -191,51 +187,59 @@ static void draw_timer(const char* time_text, int x, int y) {
 // Draw the 3 times: Best Time, Flag Tag Time, Current Time
 void draw_timers(const char* best_time_text, double flag_tag_time, double current_time, pic8* dest,
                  int dest_width, int dest_height) {
-
+    // Store globals
     Dest = dest;
     ReferencePaletteMap = Plgr->idonegtomb;
 
+    // Base timer size
+    constexpr double LINE_HEIGHT = 16.0;
+    constexpr double LINE_WIDTH = 10.0;
+    constexpr double LINE_THICKNESS = 1.0; // Approximation since this doesn't actually scale
+    constexpr double SPACE_WIDTH = 4.0;
+    constexpr double COLON_WIDTH = 4.0;
+
+    constexpr double DIGIT_WIDTH = LINE_THICKNESS + LINE_WIDTH + LINE_THICKNESS; // Approximation
+    constexpr double DIGIT_SPACING = DIGIT_WIDTH + SPACE_WIDTH;
+    constexpr double COLON_Y1 = (LINE_HEIGHT * 0.5 + 1.0);
+    constexpr double COLON_Y2 = (LINE_HEIGHT * 1.5 - 1.0);
+    constexpr double COLON_SPACING = COLON_WIDTH + SPACE_WIDTH;
+
+    // Resize timer based on screen size
     double width_ratio = dest_width / 640.0;
     double height_ratio = dest_height / 480.0;
 
+    DigitLineWidth = (int)(LINE_WIDTH * height_ratio);
+    DigitLineHeight = (int)(LINE_HEIGHT * height_ratio);
+    int digit_width = 1 + DigitLineWidth + 1; // True digit width
+    DigitSpacing = (int)(DIGIT_SPACING * height_ratio);
+
+    DigitAndColonSpacing = (int)((DIGIT_SPACING + COLON_SPACING) * height_ratio);
+    ColonOffsetX = (int)((DIGIT_SPACING + 1.0) * height_ratio);
+    ColonOffsetY1 = (int)(COLON_Y1 * height_ratio);
+    ColonOffsetY2 = (int)(COLON_Y2 * height_ratio);
+
     int edge_width = (int)(28.0 * width_ratio);
-    int x = edge_width;
+    int timer_width = 3 * DigitSpacing + 3 * DigitAndColonSpacing; // Some right-sided whitespace
     int y = (int)(420.0 * height_ratio);
 
-    DigitLineWidth = (int)(10.0 * height_ratio);
-    DigitLineHeight = (int)(16.0 * height_ratio);
-
-    DigitSpacing = (int)(16.0 * height_ratio);
-    DigitAndColonSpacing = (int)(24.0 * height_ratio);
-    Koztesdx = (int)(364.0 * width_ratio);
-
-    Digitxsize = DigitSpacing * 7 + DigitAndColonSpacing * 4 + Koztesdx;
-    Digitysize = 2 * DigitLineHeight + 5;
-
-    ColonOffsetX = (int)(17.0 * height_ratio);
-    ColonOffsetY1 = (int)(9.0 * height_ratio);
-    ColonOffsetY2 = (int)(23.0 * height_ratio);
-
-    int current_time_centiseconds = (int)(current_time * TimeToCentiseconds);
-    char current_time_text[20];
-    centiseconds_to_string(current_time_centiseconds, current_time_text);
-
-    int best_time_x = x;
-    if (best_time_text[0] != 0) {
+    // Draw best time
+    int best_time_x = edge_width;
+    if (best_time_text[0]) {
         draw_timer(best_time_text, best_time_x, y);
     }
 
-    x += DigitSpacing * 3 + DigitAndColonSpacing * 2;
+    // Draw current time
+    int current_time_x = dest_width - edge_width - timer_width;
+    int current_time_centiseconds = (int)(current_time * TimeToCentiseconds);
+    char current_time_text[20];
+    centiseconds_to_string(current_time_centiseconds, current_time_text);
+    draw_timer(current_time_text, current_time_x, y);
 
-    x += Koztesdx;
-    x = dest_width - (edge_width + DigitSpacing * 3 + DigitAndColonSpacing * 3);
-
-    draw_timer(current_time_text, x, y);
-
+    // Draw flag tag time
     if (flag_tag_time >= 0) {
         int flag_tag_time_centiseconds = (int)(flag_tag_time * TimeToCentiseconds);
         char flag_tag_time_text[20];
         centiseconds_to_string(flag_tag_time_centiseconds, flag_tag_time_text);
-        draw_timer(flag_tag_time_text, (best_time_x + x) >> 1, y);
+        draw_timer(flag_tag_time_text, (best_time_x + current_time_x) / 2, y);
     }
 }

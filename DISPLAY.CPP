@@ -285,39 +285,3 @@ double get_zoom(void) {
 
 // Visszaadja kepernyon tiz pixel tavolsagat double leptekben:
 double max_grab_distance(void) { return fabs(pixel_to_meter_x(110) - pixel_to_meter_x(100)); }
-
-// Ezek csak debughoz kellettek (nincsen h-juk):
-/*void saveallapot( void ) {
-    FILE* h = fopen( "display.sta", "wb" );
-    if( !h )
-        internal_error( "Nem nyilik display.sta!" );
-
-    fwrite( &Dw1.x, 1, sizeof( Dw1.x ), h );
-    fwrite( &Dw2.x, 1, sizeof( Dw2.x ), h );
-    fwrite( &Dw1.y, 1, sizeof( Dw1.y ), h );
-    fwrite( &Dw2.y, 1, sizeof( Dw2.y ), h );
-
-    fwrite( &Nagyitas, 1, sizeof( Nagyitas ), h );
-    fwrite( &Nagyitas_rec, 1, sizeof( Nagyitas_rec ), h );
-    fwrite( &Vonalkozep, 1, sizeof( Vonalkozep ), h );
-    fwrite( &Vonalsugar, 1, sizeof( Vonalsugar ), h );
-
-    fclose( h );
-}
-void loadallapot( void ) {
-    FILE* h = fopen( "display.sta", "rb" );
-    if( !h )
-        internal_error( "Nem nyilik display.sta!" );
-
-    fread( &Dw1.x, 1, sizeof( Dw1.x ), h );
-    fread( &Dw2.x, 1, sizeof( Dw2.x ), h );
-    fread( &Dw1.y, 1, sizeof( Dw1.y ), h );
-    fread( &Dw2.y, 1, sizeof( Dw2.y ), h );
-
-    fread( &Nagyitas, 1, sizeof( Nagyitas ), h );
-    fread( &Nagyitas_rec, 1, sizeof( Nagyitas_rec ), h );
-    fread( &Vonalkozep, 1, sizeof( Vonalkozep ), h );
-    fread( &Vonalsugar, 1, sizeof( Vonalsugar ), h );
-
-    fclose( h );
-}*/

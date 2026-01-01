@@ -266,12 +266,15 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
 
         // Draw from y1 + 0.5 to y2 + 0.5
         // but remove the last pixel of the line to avoid double-drawing where two lines connect
+        int ystart = y1 + 0.5;
         int yend = y2 + 0.5;
-        if (!inverted) {
+        if (inverted) {
+            ystart++;
+        } else {
             yend--;
         }
         // Draw the line
-        for (int y = y1 + 0.5; y <= yend; y++) {
+        for (int y = ystart; y <= yend; y++) {
             if (dotted && y % 4) {
                 continue;
             }

@@ -3,19 +3,19 @@
 
 #define MAXPICLISTKEPSZAM (3000)
 
-enum {
-    ATLAT_NEMATLATSZO = 10,
-    ATLAT_0,
-    ATLAT_TOPLEFT,
-    ATLAT_TOPRIGHT,
-    ATLAT_BOTTOMLEFT,
-    ATLAT_BOTTOMRIGHT
-};
-
-enum { PLTIP_KEP = 100, PLTIP_TEXT, PLTIP_MINTA };
-
 class piclist {
   public:
+    enum {
+        ATLAT_NEMATLATSZO = 10,
+        ATLAT_0,
+        ATLAT_TOPLEFT,
+        ATLAT_TOPRIGHT,
+        ATLAT_BOTTOMLEFT,
+        ATLAT_BOTTOMRIGHT
+    };
+
+    enum { PLTIP_KEP = 100, PLTIP_TEXT, PLTIP_MINTA };
+
     int kepszam;
     char nevek[(MAXPICLISTKEPSZAM + 10) * 10];
     int tipusok[MAXPICLISTKEPSZAM + 10];

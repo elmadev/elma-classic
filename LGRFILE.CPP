@@ -160,17 +160,17 @@ static unsigned char* getnewpalfromh(FILE* h) {
 
 static int getatlatszosag(int tipus, pic8* ppic) {
     switch (tipus) {
-    case ATLAT_NEMATLATSZO:
+    case piclist::ATLAT_NEMATLATSZO:
         return -1;
-    case ATLAT_0:
+    case piclist::ATLAT_0:
         return 0;
-    case ATLAT_TOPLEFT:
+    case piclist::ATLAT_TOPLEFT:
         return ppic->gpixel(0, 0);
-    case ATLAT_TOPRIGHT:
+    case piclist::ATLAT_TOPRIGHT:
         return ppic->gpixel(ppic->get_width() - 1, 0);
-    case ATLAT_BOTTOMLEFT:
+    case piclist::ATLAT_BOTTOMLEFT:
         return ppic->gpixel(0, ppic->get_height() - 1);
-    case ATLAT_BOTTOMRIGHT:
+    case piclist::ATLAT_BOTTOMRIGHT:
         return ppic->gpixel(ppic->get_width() - 1, ppic->get_height() - 1);
     }
     hiba("getatlatszosag");
@@ -706,17 +706,17 @@ lgrfile::lgrfile(const char* lgrnev) {
         if (index < 0) {
             uzenet("There is no line in PICTURES.LST corresponding to picture:", nev);
         }
-        if (ppiclist->tipusok[index] == PLTIP_KEP) {
+        if (ppiclist->tipusok[index] == piclist::PLTIP_KEP) {
             beirkepet(ppic, ppiclist, index);
             delete ppic; // Kepre mar nincsen tobbe szuksegunk
             ppic = NULL;
             continue;
         }
-        if (ppiclist->tipusok[index] == PLTIP_TEXT) {
+        if (ppiclist->tipusok[index] == piclist::PLTIP_TEXT) {
             beirtexturat(ppic, ppiclist, index);
             continue;
         }
-        if (ppiclist->tipusok[index] == PLTIP_MINTA) {
+        if (ppiclist->tipusok[index] == piclist::PLTIP_MINTA) {
             // delete-li ppic-et:
             beirmaszkot(ppic, ppiclist, index);
             ppic = NULL;

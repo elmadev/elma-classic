@@ -7,11 +7,9 @@ int RedrawingEditor = 0;
 int EDITOR_MENU_X = 107;
 int EDITOR_MENU_Y = 36;
 
-static int Fxsize = SCREEN_WIDTH;
-static int Fysize = SCREEN_HEIGHT;
-
 static double ZOOM_OUT_LIMIT = 170.0;
-static double AspectRatio = double((Fxsize - EDITOR_MENU_X - 1)) / (Fysize - EDITOR_MENU_Y - 1);
+static double AspectRatio =
+    double((SCREEN_WIDTH - EDITOR_MENU_X - 1)) / (SCREEN_HEIGHT - EDITOR_MENU_Y - 1);
 static double ZOOM_OUT_LIMIT_HEIGHT = ZOOM_OUT_LIMIT / AspectRatio;
 
 static vect2 CanvasTopLeft(-10.0, -10.0);
@@ -71,7 +69,8 @@ void zoom(vect2 center, double width) {
     CanvasBottomRight.y = center.y + height * 0.5;
 
     // Calculate conversion ratio between pixels and meters
-    CanvasMetersToPixels = (Fxsize - EDITOR_MENU_X - 1) / (CanvasBottomRight.x - CanvasTopLeft.x);
+    CanvasMetersToPixels =
+        (SCREEN_WIDTH - EDITOR_MENU_X - 1) / (CanvasBottomRight.x - CanvasTopLeft.x);
     CanvasPixelsToMeters = 1.0 / CanvasMetersToPixels;
 
     // Disallow zooming too far away from the level.
@@ -237,7 +236,7 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
             // Calculate the y position and draw it if it is within the internal editor render box
             double yd = y0 + slope * x;
             int y = yd + 0.5;
-            if (x >= EDITOR_MENU_X && y >= EDITOR_MENU_Y && x < Fxsize && y < Fysize) {
+            if (x >= EDITOR_MENU_X && y >= EDITOR_MENU_Y && x < SCREEN_WIDTH && y < SCREEN_HEIGHT) {
                 // Invert the palette ID
                 unsigned char pal_index = BufferMain->gpixel(x, y);
                 pal_index += 128;
@@ -283,7 +282,7 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
             // Calculate the x position and draw it if it is within the internal editor render box
             double xd = x0 + slope * y;
             int x = xd + 0.5;
-            if (x >= EDITOR_MENU_X && y >= EDITOR_MENU_Y && x < Fxsize && y < Fysize) {
+            if (x >= EDITOR_MENU_X && y >= EDITOR_MENU_Y && x < SCREEN_WIDTH && y < SCREEN_HEIGHT) {
                 // Invert the palette ID
                 unsigned char pal_index = BufferMain->gpixel(x, y);
                 pal_index += 128;

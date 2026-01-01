@@ -83,7 +83,7 @@
 #include "ED_CHECK.H"
 
 #include "grass.h"
-#include "PICLIST.H"
+#include "piclist.h"
 #include "LGRFILE.H"
 
 #include "LOAD.H"

@@ -48,7 +48,7 @@ void cheatplayer(void) {
 static void mergestatedat(void);
 
 void teljes(void) {
-    initqopen();
+    init_qopen();
 
     mk_init();
 

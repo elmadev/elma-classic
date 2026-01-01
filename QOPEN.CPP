@@ -38,7 +38,7 @@ static void titkosit(void) {
 
 static int Qopeninited = 0;
 
-void initqopen(void) {
+void init_qopen(void) {
     if (Qopeninited) {
         internal_error("initqopen tobbszor hivva!");
     }
@@ -87,21 +87,21 @@ static int Indextomb[MAXNYITVA];
 
 static int Nyitva = 0;
 
-FILE* qopen(const char* nev, const char* paramok) {
+FILE* qopen(const char* filename, const char* mode) {
     if (!Qopeninited) {
         internal_error("qopen initqopen nelkul!");
     }
     if (Nyitva == MAXNYITVA) {
         internal_error("qopen-ben Nyitva == MAXNYITVA!");
     }
-    if (strcmp(paramok, "rb") != 0 && strcmp(paramok, "rt")) {
-        internal_error("qopen-ben sem rb, sem rt!: ", nev);
+    if (strcmp(mode, "rb") != 0 && strcmp(mode, "rt")) {
+        internal_error("qopen-ben sem rb, sem rt!: ", filename);
     }
 
     if (Egybol) {
         for (int i = 0; i < Fileszam; i++) {
-            if (strcmpi(nev, Leirotomb[i].nev) == 0) {
-                Htomb[Nyitva] = fopen(Nagyfilenev, paramok);
+            if (strcmpi(filename, Leirotomb[i].nev) == 0) {
+                Htomb[Nyitva] = fopen(Nagyfilenev, mode);
                 Indextomb[Nyitva] = i;
                 if (!Htomb[Nyitva]) {
                     internal_error("Nem sikerult nagy tombot megnyitni!: ", Nagyfilenev);
@@ -114,16 +114,16 @@ FILE* qopen(const char* nev, const char* paramok) {
                 return Htomb[Nyitva - 1];
             }
         }
-        internal_error("qopen nem talalta meg nagyfileban file-t!: ", nev);
+        internal_error("qopen nem talalta meg nagyfileban file-t!: ", filename);
         return NULL;
     } else {
         Nyitva++;
         char tmp[30] = "files/";
-        if (strlen(nev) > 12 || nev[0] == '.') {
-            internal_error("Hibas nev qopen-ben!: ", nev);
+        if (strlen(filename) > 12 || filename[0] == '.') {
+            internal_error("Hibas nev qopen-ben!: ", filename);
         }
-        strcat(tmp, nev);
-        return fopen(tmp, paramok);
+        strcat(tmp, filename);
+        return fopen(tmp, mode);
     }
 }
 

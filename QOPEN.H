@@ -1,11 +1,10 @@
 #ifndef QOPEN_H
 #define QOPEN_H
 
-FILE* qopen(const char* nev, const char* paramok);
+FILE* qopen(const char* filename, const char* mode);
 void qclose(FILE* h);
 int qseek(FILE* stream, long offset, int whence);
 
-void initqopen(void);
-void becsomagol(void);
+void init_qopen(void);
 
 #endif

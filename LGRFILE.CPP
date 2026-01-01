@@ -158,19 +158,19 @@ static unsigned char* getnewpalfromh(FILE* h) {
     return pal;
 }
 
-static int getatlatszosag(int tipus, pic8* ppic) {
+static int getatlatszosag(piclist::Transparency tipus, pic8* ppic) {
     switch (tipus) {
-    case piclist::None:
+    case piclist::Transparency::None:
         return -1;
-    case piclist::Palette0:
+    case piclist::Transparency::Palette0:
         return 0;
-    case piclist::TopLeft:
+    case piclist::Transparency::TopLeft:
         return ppic->gpixel(0, 0);
-    case piclist::TopRight:
+    case piclist::Transparency::TopRight:
         return ppic->gpixel(ppic->get_width() - 1, 0);
-    case piclist::BottomLeft:
+    case piclist::Transparency::BottomLeft:
         return ppic->gpixel(0, ppic->get_height() - 1);
-    case piclist::BottomRight:
+    case piclist::Transparency::BottomRight:
         return ppic->gpixel(ppic->get_width() - 1, ppic->get_height() - 1);
     }
     hiba("getatlatszosag");
@@ -706,17 +706,17 @@ lgrfile::lgrfile(const char* lgrnev) {
         if (index < 0) {
             uzenet("There is no line in PICTURES.LST corresponding to picture:", nev);
         }
-        if (ppiclist->type[index] == piclist::Picture) {
+        if (ppiclist->type[index] == piclist::Type::Picture) {
             beirkepet(ppic, ppiclist, index);
             delete ppic; // Kepre mar nincsen tobbe szuksegunk
             ppic = NULL;
             continue;
         }
-        if (ppiclist->type[index] == piclist::Texture) {
+        if (ppiclist->type[index] == piclist::Type::Texture) {
             beirtexturat(ppic, ppiclist, index);
             continue;
         }
-        if (ppiclist->type[index] == piclist::Mask) {
+        if (ppiclist->type[index] == piclist::Type::Mask) {
             // delete-li ppic-et:
             beirmaszkot(ppic, ppiclist, index);
             ppic = NULL;

@@ -1,33 +1,33 @@
 #include "ALL.H"
 
-constexpr int Egybol = 1;
+constexpr int USE_RES_FILE = 1;
 
-static char Nagyfilenev[] = "elma.res";
+static char RES_FILENAME[] = "elma.res";
 
-struct fileleiro {
-    char nev[16];
+struct res_file {
+    char filename[16];
     // In Shareware the order of these two fields is reversed.
-    int hossz;
-    int kezdet;
+    int length;
+    int offset;
 };
 
-static fileleiro* Leirotomb = NULL;
+static res_file* ResFiles = NULL;
 
-#define FILESZAM (150)
+#define RES_MAX_FILES (150)
 
-#define AZONNUMBER (1347839l)
+#define RES_MAGIC_NUMBER (1347839l)
 
-static long Fileszam = 0;
+static long FileCount = 0;
 
-static void titkosit(void) {
+static void decrypt(void) {
     short a = 23, b = 9982, c = 3391; // In Shareware, b is 9882
 
-    if (!Leirotomb) {
+    if (!ResFiles) {
         internal_error("titkosit-ban !Leirotomb!");
     }
-    for (int i = 0; i < FILESZAM; i++) {
-        unsigned char* pc = (unsigned char*)(&Leirotomb[i]);
-        for (int j = 0; j < sizeof(fileleiro); j++) {
+    for (int i = 0; i < RES_MAX_FILES; i++) {
+        unsigned char* pc = (unsigned char*)(&ResFiles[i]);
+        for (int j = 0; j < sizeof(res_file); j++) {
             pc[j] ^= a;
             a %= c;
             b += a * c;
@@ -36,88 +36,88 @@ static void titkosit(void) {
     }
 }
 
-static int Qopeninited = 0;
+static int QOpenInitialized = 0;
 
 void init_qopen(void) {
-    if (Qopeninited) {
+    if (QOpenInitialized) {
         internal_error("initqopen tobbszor hivva!");
     }
-    Qopeninited = 1;
+    QOpenInitialized = 1;
 
-    if (!Egybol) {
+    if (!USE_RES_FILE) {
         return;
     }
 
-    Leirotomb = new fileleiro[FILESZAM];
-    if (!Leirotomb) {
+    ResFiles = new res_file[RES_MAX_FILES];
+    if (!ResFiles) {
         external_error("initqopen-ben memory!");
     }
-    FILE* h = fopen(Nagyfilenev, "rb");
+    FILE* h = fopen(RES_FILENAME, "rb");
     if (!h) {
-        external_error("Missing file!: ", Nagyfilenev);
+        external_error("Missing file!: ", RES_FILENAME);
     }
 
-    if (fread(&Fileszam, 1, 4, h) != 4) {
+    if (fread(&FileCount, 1, 4, h) != 4) {
         internal_error("initqopen-ben nem sikerult olvasni!");
     }
-    if (Fileszam <= 0 || Fileszam > FILESZAM) {
-        internal_error("Fileszam <= 0 || Fileszam > FILESZAM!");
+    if (FileCount <= 0 || FileCount > RES_MAX_FILES) {
+        internal_error("FileCount <= 0 || FileCount > RES_MAX_FILES!");
     }
 
-    long hossz = sizeof(fileleiro[FILESZAM]);
-    if (fread(Leirotomb, 1, unsigned(hossz), h) != hossz) {
+    long size = sizeof(res_file[RES_MAX_FILES]);
+    if (fread(ResFiles, 1, unsigned(size), h) != size) {
         internal_error("initqopen-ben nem sikerult olvasni!");
     }
-    titkosit();
+    decrypt();
 
-    long magicnumber = 0;
-    if (fread(&magicnumber, 1, 4, h) != 4) {
+    long magic_number = 0;
+    if (fread(&magic_number, 1, 4, h) != 4) {
         internal_error("initqopen-ben nem sikerult olvasni!");
     }
-    if (magicnumber != AZONNUMBER) {
+    if (magic_number != RES_MAGIC_NUMBER) {
         internal_error("initqopen-ben nem stimmel magicnumber!");
     }
 
     fclose(h);
 }
 
-#define MAXNYITVA (3)
-static FILE* Htomb[MAXNYITVA];
-static int Indextomb[MAXNYITVA];
+#define MAX_HANDLES (3)
+static FILE* Handles[MAX_HANDLES];
+static int HandleOffset[MAX_HANDLES];
 
-static int Nyitva = 0;
+static int NumHandles = 0;
 
 FILE* qopen(const char* filename, const char* mode) {
-    if (!Qopeninited) {
+    if (!QOpenInitialized) {
         internal_error("qopen initqopen nelkul!");
     }
-    if (Nyitva == MAXNYITVA) {
+    if (NumHandles == MAX_HANDLES) {
         internal_error("qopen-ben Nyitva == MAXNYITVA!");
     }
     if (strcmp(mode, "rb") != 0 && strcmp(mode, "rt")) {
         internal_error("qopen-ben sem rb, sem rt!: ", filename);
     }
 
-    if (Egybol) {
-        for (int i = 0; i < Fileszam; i++) {
-            if (strcmpi(filename, Leirotomb[i].nev) == 0) {
-                Htomb[Nyitva] = fopen(Nagyfilenev, mode);
-                Indextomb[Nyitva] = i;
-                if (!Htomb[Nyitva]) {
-                    internal_error("Nem sikerult nagy tombot megnyitni!: ", Nagyfilenev);
+    if (USE_RES_FILE) {
+        for (int i = 0; i < FileCount; i++) {
+            if (strcmpi(filename, ResFiles[i].filename) == 0) {
+                Handles[NumHandles] = fopen(RES_FILENAME, mode);
+                HandleOffset[NumHandles] = i;
+                if (!Handles[NumHandles]) {
+                    internal_error("Nem sikerult nagy tombot megnyitni!: ", RES_FILENAME);
                 }
-                if (fseek(Htomb[Nyitva], Leirotomb[i].kezdet, SEEK_SET) != 0) {
+                if (fseek(Handles[NumHandles], ResFiles[i].offset, SEEK_SET) != 0) {
                     internal_error("Nem mukodik fseek qopen-ben!");
                 }
 
-                Nyitva++;
-                return Htomb[Nyitva - 1];
+                NumHandles++;
+                return Handles[NumHandles - 1];
             }
         }
         internal_error("qopen nem talalta meg nagyfileban file-t!: ", filename);
         return NULL;
     } else {
-        Nyitva++;
+        NumHandles++;
         char tmp[30] = "files/";
         if (strlen(filename) > 12 || filename[0] == '.') {
             internal_error("Hibas nev qopen-ben!: ", filename);
@@ -128,27 +128,27 @@ FILE* qopen(const char* filename, const char* mode) {
 }
 
 void qclose(FILE* h) {
-    if (!Qopeninited) {
+    if (!QOpenInitialized) {
         internal_error("qclose initqopen nelkul!");
     }
-    if (!Nyitva) {
+    if (!NumHandles) {
         internal_error("qclose-ban !Nyitva!");
     }
-    if (Egybol) {
-        for (int i = 0; i < Nyitva; i++) {
-            if (Htomb[i] == h) {
+    if (USE_RES_FILE) {
+        for (int i = 0; i < NumHandles; i++) {
+            if (Handles[i] == h) {
                 fclose(h);
-                for (int j = i; j < Nyitva - 1; j++) {
-                    Htomb[j] = Htomb[j + 1];
-                    Indextomb[j] = Indextomb[j + 1];
+                for (int j = i; j < NumHandles - 1; j++) {
+                    Handles[j] = Handles[j + 1];
+                    HandleOffset[j] = HandleOffset[j + 1];
                 }
-                Nyitva--;
+                NumHandles--;
                 return;
             }
         }
         internal_error("qclose nem talalta meg h-t!");
     } else {
-        Nyitva--;
+        NumHandles--;
         fclose(h);
     }
 }
@@ -157,19 +157,19 @@ int qseek(FILE* h, long offset, int whence) {
     if (whence != SEEK_SET && whence != SEEK_END && whence != SEEK_CUR) {
         internal_error("whence != SEEK_SET && whence != SEEK_END && whence != SEEK_CUR!");
     }
-    if (Egybol) {
-        for (int i = 0; i < Nyitva; i++) {
-            if (Htomb[i] == h) {
-                int index = Indextomb[i];
+    if (USE_RES_FILE) {
+        for (int i = 0; i < NumHandles; i++) {
+            if (Handles[i] == h) {
+                int index = HandleOffset[i];
                 if (whence == SEEK_SET) {
-                    return fseek(Htomb[i], Leirotomb[index].kezdet + offset, SEEK_SET);
+                    return fseek(Handles[i], ResFiles[index].offset + offset, SEEK_SET);
                 }
                 if (whence == SEEK_END) {
-                    return fseek(Htomb[i],
-                                 Leirotomb[index].kezdet + Leirotomb[index].hossz + offset,
+                    return fseek(Handles[i],
+                                 ResFiles[index].offset + ResFiles[index].length + offset,
                                  SEEK_SET);
                 }
-                return fseek(Htomb[i], offset, SEEK_CUR);
+                return fseek(Handles[i], offset, SEEK_CUR);
             }
         }
         internal_error("qclose nem talalta meg h-t!");

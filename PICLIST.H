@@ -5,9 +5,16 @@
 
 class piclist {
   public:
-    enum class Transparency { None = 10, Palette0, TopLeft, TopRight, BottomLeft, BottomRight };
+    enum class Transparency {
+        None = 10,
+        Palette0 = 11,
+        TopLeft = 12,
+        TopRight = 13,
+        BottomLeft = 14,
+        BottomRight = 15
+    };
 
-    enum class Type { Picture = 100, Texture, Mask };
+    enum class Type { Picture = 100, Texture = 101, Mask = 102 };
 
     int length;
     char name[(MAX_PICLIST_LENGTH + 10) * 10];

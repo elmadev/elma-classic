@@ -485,8 +485,8 @@ void render_error(const char* text1, const char* text2, const char* text3) {
         MenuFont->write_centered(BufferMain, SCREEN_WIDTH / 2, y, ErrorLines[i]);
     }
     // Display the error message
-    bltfront(BufferMain);
     if (MenuPal) {
         MenuPal->set();
     }
+    bltfront(BufferMain);
 }

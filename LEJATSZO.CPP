@@ -511,13 +511,12 @@ long lejatszo(const char* filenev) {
                       meghalt2);
         }
 
-        kirajzol320(eddig, &valt1, &valt2, Viewtime1.viewkinplay, Viewtime1.timekinplay,
-                    Viewtime2.viewkinplay, Viewtime2.timekinplay);
-
         if (palmegnincs) {
             palmegnincs = 0;
             Plgr->pal->set();
         }
+        kirajzol320(eddig, &valt1, &valt2, Viewtime1.viewkinplay, Viewtime1.timekinplay,
+                    Viewtime2.viewkinplay, Viewtime2.timekinplay);
 
         // Egy par kozos toggle:
         // Plusz elintezes:
@@ -809,13 +808,12 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         }
 
         // KIRAJZOLAS:
-        kirajzol320(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
-                    Viewtime2.viewkinreplay, Viewtime2.timekinreplay);
-
         if (palmegnincs) {
             palmegnincs = 0;
             Plgr->pal->set();
         }
+        kirajzol320(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
+                    Viewtime2.viewkinreplay, Viewtime2.timekinreplay);
 
         // Egy par kozos toggle:
         // Plusz elintezes:

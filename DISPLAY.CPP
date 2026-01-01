@@ -1,7 +1,8 @@
 #include "ALL.H"
 #include "pic8.h"
 
-int RedrawingEditor = 0; // vonalrajzolashoz
+// If false, when drawing lines, immediately update the screen
+int RedrawingEditor = 0;
 
 int EDITOR_MENU_X = 107;
 int EDITOR_MENU_Y = 36;
@@ -9,36 +10,39 @@ int EDITOR_MENU_Y = 36;
 static int Fxsize = SCREEN_WIDTH;
 static int Fysize = SCREEN_HEIGHT;
 
-// static double ZOOM_OUT_LIMIT = 150.0;
 static double ZOOM_OUT_LIMIT = 170.0;
 static double AspectRatio = double((Fxsize - EDITOR_MENU_X - 1)) / (Fysize - EDITOR_MENU_Y - 1);
 static double ZOOM_OUT_LIMIT_HEIGHT = ZOOM_OUT_LIMIT / AspectRatio;
 
-static vect2 CanvasTopLeft(-10.0, -10.0); // CanvasTopLeft a savnelkuli kep bal-felso sarka
+static vect2 CanvasTopLeft(-10.0, -10.0);
 static vect2 CanvasBottomRight(-10.0 + 20.0 * AspectRatio, 10.0);
 
-static double CanvasMetersToPixels =
-    1.0; // (Fxsize-EDITOR_MENU_X-1)/(CanvasBottomRight.x-CanvasTopLeft.x), zoom allitja
-static double CanvasPixelsToMeters = 1.0; // Reciprok
+static double CanvasMetersToPixels = 1.0;
+static double CanvasPixelsToMeters = 1.0;
 
+// Convert editor canvas pixel to in-game meters
 double pixel_to_meter_x(int x) {
     return (x - EDITOR_MENU_X) * CanvasPixelsToMeters + CanvasTopLeft.x;
 }
 
+// Convert editor canvas pixel to in-game meters
 double pixel_to_meter_y(int y) {
     return (y - EDITOR_MENU_Y) * CanvasPixelsToMeters + CanvasTopLeft.y;
 }
 
+// Convert in-game meter to editor canvas pixels
 int meter_to_pixel_x(double x) {
     double pixel_x = (x - CanvasTopLeft.x) * CanvasMetersToPixels;
     return pixel_x + 0.5 + EDITOR_MENU_X;
 }
 
+// Convert in-game meter to editor canvas pixels
 int meter_to_pixel_y(double y) {
     double pixel_y = (y - CanvasTopLeft.y) * CanvasMetersToPixels;
     return pixel_y + 0.5 + EDITOR_MENU_Y;
 }
 
+// Convert editor canvas pixel to in-game meters
 vect2 pixel_to_meter(int x, int y) { return vect2(pixel_to_meter_x(x), pixel_to_meter_y(y)); }
 
 int meter_to_pixel_x(vect2 v) { return meter_to_pixel_x(v.x); }
@@ -46,26 +50,32 @@ int meter_to_pixel_x(vect2 v) { return meter_to_pixel_x(v.x); }
 int meter_to_pixel_y(vect2 v) { return meter_to_pixel_y(v.y); }
 
 static vect2 CanvasCenter;
-static double CanvasDiagonalLength = 1.0; // Egy kicsit nagyobb  tenyleges sugarnal
+static double CanvasDiagonalLength = 1.0;
 
 static double ZOOM_IN_LIMIT = 0.017;
 
-// Minden zoom-ot ez allit:
+// Zoom to specified size
 void zoom(vect2 center, double width) {
+    // Bound min/max zoom
     if (width < ZOOM_IN_LIMIT) {
         width = ZOOM_IN_LIMIT;
     }
     if (width > ZOOM_OUT_LIMIT) {
         width = ZOOM_OUT_LIMIT;
     }
+    // Calculate top-left and bottom-right screen corners
     CanvasTopLeft.x = center.x - width * 0.5;
     CanvasBottomRight.x = center.x + width * 0.5;
     double height = width / AspectRatio;
     CanvasTopLeft.y = center.y - height * 0.5;
     CanvasBottomRight.y = center.y + height * 0.5;
+
+    // Calculate conversion ratio between pixels and meters
     CanvasMetersToPixels = (Fxsize - EDITOR_MENU_X - 1) / (CanvasBottomRight.x - CanvasTopLeft.x);
     CanvasPixelsToMeters = 1.0 / CanvasMetersToPixels;
-    // Ha palya kilog, kicsit arrebbhelyezzuk:
+
+    // Disallow zooming too far away from the level.
+    // Nudge the view back towards the center if needed
     double x1, y1, x2, y2;
     Ptop->getminmax(&x1, &y1, &x2, &y2, 1);
     double dx = 0.0;
@@ -86,9 +96,9 @@ void zoom(vect2 center, double width) {
     CanvasTopLeft.y += dy;
     CanvasBottomRight.x += dx;
     CanvasBottomRight.y += dy;
-    // Beallitjuk meg vonalrajzolohoz szukseges paramokat:
+
+    // Recalculate center of display and diagonal length from center to corner of display
     CanvasCenter = (CanvasTopLeft + CanvasBottomRight) * 0.5;
-    // Kicsit nagyobbra vesszuk:
     CanvasDiagonalLength = (CanvasBottomRight.x - CanvasTopLeft.x) * sqrt(2.0) / 2.0 * 1.01;
 }
 
@@ -97,7 +107,9 @@ void zoom_out(void) {
          fabs(CanvasBottomRight.x - CanvasTopLeft.x) * 1.5);
 }
 
+// Zoom in with meters as input
 static void zoom_in(double x1, double y1, double x2, double y2) {
+    // Normalize so x1, y1 are smaller than x2, y2
     if (x2 < x1) {
         double tmp = x1;
         x1 = x2;
@@ -108,19 +120,20 @@ static void zoom_in(double x1, double y1, double x2, double y2) {
         y1 = y2;
         y2 = tmp;
     }
+    // Don't zoom if zero width or height
     if (x2 - x1 < 0.0000001 || y2 - y1 < 0.0000001) {
         return;
     }
+    // Use either the width or height to zoom. Use the dimension that allows you to see everything
     vect2 center((x2 + x1) * 0.5, (y2 + y1) * 0.5);
     if ((x2 - x1) / (y2 - y1) > AspectRatio) {
-        // Vizszintesen hosszukasabb:
         zoom(center, x2 - x1);
     } else {
-        // Fuggolegesen hosszukasabb:
         zoom(center, (y2 - y1) * AspectRatio);
     }
 }
 
+// Zoom in with pixels as input
 void zoom_in(int x1, int y1, int x2, int y2) {
     zoom_in(pixel_to_meter_x(x1), pixel_to_meter_y(y1), pixel_to_meter_x(x2), pixel_to_meter_y(y2));
 }
@@ -139,17 +152,13 @@ void zoom_fill(void) {
     zoom_in(x1, y1, x2, y2);
 }
 
-// VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL
-// VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL
-// VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL
-// VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL VONAL
-
+// Draw one line into the editor canvas from v1 to v2
 void render_line(vect2 v1, vect2 v2, int dotted) {
+    // Skip very short lines
     if ((v2 - v1).length() < 0.00000001) {
         return;
     }
-    // Eloszor is levagjuk p1-p2 szakaszt, ha kilog CanvasCenter es CanvasDiagonalLength
-    // altal meghatarozott korbol:
+    // Check to see if the endpoints are outside of the screen render zone
     int v1_off_screen = 0;
     if ((v1 - CanvasCenter).length() > CanvasDiagonalLength * 0.999) {
         v1_off_screen = 1;
@@ -158,12 +167,17 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
     if ((v2 - CanvasCenter).length() > CanvasDiagonalLength * 0.999) {
         v2_off_screen = 1;
     }
+    // If both points are outside the screen render zone, calculate the closest distance between the
+    // center of the screen and the line. If this line isn't within the radius of the screen render
+    // zone, we don't need to render the line at all
     if (v1_off_screen && v2_off_screen) {
         if (point_segment_distance(CanvasCenter, v1, v2 - v1) / CanvasDiagonalLength > 0.998) {
             return;
         }
     }
-    // Most mar biztos hogy legalabb belelog korbe szakasz
+    // For each point that is out of screen, shorten the line to only be near the screen render zone
+    // Shorten the line assuming the screen is a circle, and getting the intersection between this
+    // circle and the line
     if (v1_off_screen) {
         vect2 new_v1;
         if (!line_circle_intersection(v1, v2 - v1, CanvasCenter, CanvasDiagonalLength, &new_v1)) {
@@ -178,31 +192,19 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
         }
         v2 = new_v2;
     }
-    // Most mar minden pont jo kozel van
-    // Most atkonvertalunk int-es koordinata rendszerbe, de
-    // floating pointnal maradunk es meg 0.5-ot is csak vegen adjuk hozza:
-    // (savot viszont mar le kell takarni):
+    // Convert line coordinates to pixels
     double x1 = (v1.x - CanvasTopLeft.x) * CanvasMetersToPixels + EDITOR_MENU_X;
     double y1 = (v1.y - CanvasTopLeft.y) * CanvasMetersToPixels + EDITOR_MENU_Y;
     double x2 = (v2.x - CanvasTopLeft.x) * CanvasMetersToPixels + EDITOR_MENU_X;
     double y2 = (v2.y - CanvasTopLeft.y) * CanvasMetersToPixels + EDITOR_MENU_Y;
-    // Beallitjuk helyes sorrendet:
-    /*if( x2 < x1 ) {
-        double tmp = x1;
-        x1 = x2;
-        x2 = tmp;
-    }
-    if( y2 < y1 ) {
-        double tmp = y1;
-        y1 = y2;
-        y2 = tmp;
-    } */
+    // Draw along the longest axis
     if (fabs(x2 - x1) > fabs(y2 - y1)) {
-        // Vonal inkabb vizszintes:
+        // Draw along x
         if (x2 == x1) {
             internal_error("render_line x2 == x1!");
         }
 
+        // Invert the points so x1 < x2 if needed
         int inverted = 0;
         if (x2 < x1) {
             inverted = 1;
@@ -214,10 +216,12 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
             y2 = tmp;
         }
 
-        // Egyenes parametereinek meghatarozasa:
+        // Calculate slope and y-intercept
         double slope = (y2 - y1) / (x2 - x1);
         double y0 = y1 - slope * x1;
 
+        // Draw from x1 + 0.5 to x2 + 0.5
+        // but remove the last pixel of the line to avoid double-drawing where two lines connect
         int xstart = x1 + 0.5;
         int xend = x2 + 0.5;
         if (inverted) {
@@ -225,13 +229,16 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
         } else {
             xend--;
         }
+        // Draw the line
         for (int x = xstart; x <= xend; x++) {
             if (dotted && x % 4) {
                 continue;
             }
+            // Calculate the y position and draw it if it is within the internal editor render box
             double yd = y0 + slope * x;
             int y = yd + 0.5;
             if (x >= EDITOR_MENU_X && y >= EDITOR_MENU_Y && x < Fxsize && y < Fysize) {
+                // Invert the palette ID
                 unsigned char pal_index = BufferMain->gpixel(x, y);
                 pal_index += 128;
                 BufferMain->ppixel(x, y, pal_index);
@@ -241,11 +248,12 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
             }
         }
     } else {
-        // Vonal inkabb fuggoleges:
+        // Draw along y
         if (y2 == y1) {
             internal_error("render_line y2 == y1!");
         }
 
+        // Invert the points so y1 < y2 if needed
         int inverted = 0;
         if (y2 < y1) {
             inverted = 1;
@@ -257,21 +265,26 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
             y2 = tmp;
         }
 
-        // Egyenes parametereinek meghatarozasa:
+        // Calculate slope and x-intercept
         double slope = (x2 - x1) / (y2 - y1);
         double x0 = x1 - slope * y1;
 
+        // Draw from y1 + 0.5 to y2 + 0.5
+        // but remove the last pixel of the line to avoid double-drawing where two lines connect
         int yend = y2 + 0.5;
         if (!inverted) {
             yend--;
         }
+        // Draw the line
         for (int y = y1 + 0.5; y <= yend; y++) {
             if (dotted && y % 4) {
                 continue;
             }
+            // Calculate the x position and draw it if it is within the internal editor render box
             double xd = x0 + slope * y;
             int x = xd + 0.5;
             if (x >= EDITOR_MENU_X && y >= EDITOR_MENU_Y && x < Fxsize && y < Fysize) {
+                // Invert the palette ID
                 unsigned char pal_index = BufferMain->gpixel(x, y);
                 pal_index += 128;
                 BufferMain->ppixel(x, y, pal_index);
@@ -283,6 +296,7 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
     }
 }
 
+// Get a number representing our zoom, where 1.000 represents the most you can zoom out in Elma 1.11
 double get_zoom(void) {
     if (fabs(CanvasBottomRight.x - CanvasTopLeft.x) == 0.0) {
         internal_error("get_zoom 0!");
@@ -290,5 +304,5 @@ double get_zoom(void) {
     return ZOOM_OUT_LIMIT / fabs(CanvasBottomRight.x - CanvasTopLeft.x);
 }
 
-// Visszaadja kepernyon tiz pixel tavolsagat double leptekben:
+// Convert a length of 10 pixels to elmameters, as 10 pixels is the max grab distance for the cursor
 double max_grab_distance(void) { return fabs(pixel_to_meter_x(110) - pixel_to_meter_x(100)); }

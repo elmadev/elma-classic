@@ -43,10 +43,6 @@ int meter_to_pixel_y(double y) {
 // Convert editor canvas pixel to in-game meters
 vect2 pixel_to_meter(int x, int y) { return vect2(pixel_to_meter_x(x), pixel_to_meter_y(y)); }
 
-int meter_to_pixel_x(vect2 v) { return meter_to_pixel_x(v.x); }
-
-int meter_to_pixel_y(vect2 v) { return meter_to_pixel_y(v.y); }
-
 static vect2 CanvasCenter;
 static double CanvasDiagonalLength = 1.0;
 

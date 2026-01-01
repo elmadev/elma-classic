@@ -476,8 +476,8 @@ void t_create_vert_space(void) {
     }
     Pgy->ponttomb[K] = Pgy->ponttomb[kkov];
     K = kkov;
-    Moux = meter_to_pixel_x(Pgy->ponttomb[K]);
-    Mouy = meter_to_pixel_y(Pgy->ponttomb[K]);
+    Moux = meter_to_pixel_x(Pgy->ponttomb[K].x);
+    Mouy = meter_to_pixel_y(Pgy->ponttomb[K].y);
     set_mouse_position(Moux, Mouy);
     Fel = !Fel;
     invalidate();

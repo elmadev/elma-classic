@@ -1,14 +1,11 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+vect2 pixel_to_meter(int x, int y);
 double pixel_to_meter_x(int x);
 double pixel_to_meter_y(int y);
 int meter_to_pixel_x(double x);
 int meter_to_pixel_y(double y);
-
-vect2 pixel_to_meter(int x, int y);
-int meter_to_pixel_x(vect2 v);
-int meter_to_pixel_y(vect2 v);
 
 void zoom(vect2 center, double width);
 void zoom_out(void);

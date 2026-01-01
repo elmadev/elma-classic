@@ -12,14 +12,13 @@ class piclist {
     int length;
     char name[(MAX_PICLIST_LENGTH + 10) * 10];
     int type[MAX_PICLIST_LENGTH + 10];
-    // Ha igaz, border texturanak szamit es kellhet tetejere tenni foltot:
     int default_distance[MAX_PICLIST_LENGTH + 10];
     int default_clipping[MAX_PICLIST_LENGTH + 10];
     int transparency[MAX_PICLIST_LENGTH + 10];
 
-    piclist(FILE* h); // Binaris formatumbol
+    piclist(FILE* h);
 
-    int get_index(const char* pic_name); // vagy -1
+    int get_index(const char* pic_name);
 };
 
 #endif

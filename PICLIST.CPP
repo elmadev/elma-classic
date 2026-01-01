@@ -1,13 +1,13 @@
 #include "ALL.H"
 
-// Binaris formatumbol:
+constexpr int PICLIST_VERSION = 1002;
+
 piclist::piclist(FILE* h) {
-    // Elso verzio 1002
     int version = 0;
     if (fread(&version, 1, 4, h) != 4) {
         uzenet("Cannot read pictures.lst information!");
     }
-    if (version != 1002) {
+    if (version != PICLIST_VERSION) {
         uzenet("In LGR file the pictures.lst information has incorrect version!");
     }
     if (fread(&length, 1, 4, h) != 4) {

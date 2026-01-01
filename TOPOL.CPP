@@ -209,41 +209,41 @@ void kerek::kirajzol(void) {
         double alfa2 = (i + 1) * elfordulas;
         vect2 r1(sugar * sin(alfa1), sugar * cos(alfa1));
         vect2 r2(sugar * sin(alfa2), sugar * cos(alfa2));
-        render_line(r + r1, r + r2, 0);
+        render_line(r + r1, r + r2, false);
     }
 
     // Kis jel kor kozepere:
     double meret = 0.02;
-    render_line(r + vect2(-meret, -meret), r + vect2(meret, meret), 0);
-    render_line(r + vect2(meret, -meret), r + vect2(-meret, meret), 0);
+    render_line(r + vect2(-meret, -meret), r + vect2(meret, meret), false);
+    render_line(r + vect2(meret, -meret), r + vect2(-meret, meret), false);
 
     // Beleirjuk betut korbe:
     if (tipus == T_CEL) {
-        render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), 0);
-        render_line(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), 0);
-        render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), 0);
-        render_line(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), 0);
+        render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
+        render_line(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), false);
+        render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), false);
+        render_line(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), false);
         return;
     }
     if (tipus == T_KAJA) {
-        render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), 0);
-        render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), 0);
-        render_line(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), 0);
+        render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
+        render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), false);
+        render_line(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), false);
         return;
     }
     if (tipus == T_KEZDO) {
-        render_line(r + vect2(0.15, 0.3), r + vect2(0.15, 0.0), 0);
-        render_line(r + vect2(-0.15, -0.3), r + vect2(-0.15, 0.0), 0);
+        render_line(r + vect2(0.15, 0.3), r + vect2(0.15, 0.0), false);
+        render_line(r + vect2(-0.15, -0.3), r + vect2(-0.15, 0.0), false);
 
-        render_line(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), 0);
-        render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), 0);
-        render_line(r + vect2(-0.15, 0.0), r + vect2(0.15, 0.0), 0);
+        render_line(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), false);
+        render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), false);
+        render_line(r + vect2(-0.15, 0.0), r + vect2(0.15, 0.0), false);
         return;
     }
     if (tipus == T_HALALOS) {
-        render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), 0);
-        render_line(r + vect2(-0.15, 0.07), r + vect2(0.15, -0.3), 0);
-        render_line(r + vect2(Hal_eltol, 0.0), r + vect2(0.15, 0.3), 0);
+        render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
+        render_line(r + vect2(-0.15, 0.07), r + vect2(0.15, -0.3), false);
+        render_line(r + vect2(Hal_eltol, 0.0), r + vect2(0.15, 0.3), false);
         return;
     }
     internal_error("iugiffiif");
@@ -371,11 +371,11 @@ sprite::sprite(double x, double y, char* kepnev_p, char* texturanev_p, char* mas
 }
 
 void sprite::kirajzol(void) {
-    render_line(r, r + vect2(xsize, 0.0), 0);
-    render_line(r, r + vect2(0.0, ysize), 0);
+    render_line(r, r + vect2(xsize, 0.0), false);
+    render_line(r, r + vect2(0.0, ysize), false);
     vect2 r2(xsize + r.x, ysize + r.y);
-    render_line(r2, r2 - vect2(xsize, 0.0), 0);
-    render_line(r2, r2 - vect2(0.0, ysize), 0);
+    render_line(r2, r2 - vect2(xsize, 0.0), false);
+    render_line(r2, r2 - vect2(0.0, ysize), false);
 }
 
 sprite::sprite(FILE* h) {

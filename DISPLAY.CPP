@@ -2,12 +2,10 @@
 #include "pic8.h"
 
 // If false, when drawing lines, immediately update the screen
-int RedrawingEditor = 0;
+bool RedrawingEditor = false;
 
-int EDITOR_MENU_X = 107;
-int EDITOR_MENU_Y = 36;
-
-static double ZOOM_OUT_LIMIT = 170.0;
+constexpr double ZOOM_IN_LIMIT = 0.017;
+constexpr double ZOOM_OUT_LIMIT = 170.0;
 static double AspectRatio =
     double((SCREEN_WIDTH - EDITOR_MENU_X - 1)) / (SCREEN_HEIGHT - EDITOR_MENU_Y - 1);
 static double ZOOM_OUT_LIMIT_HEIGHT = ZOOM_OUT_LIMIT / AspectRatio;
@@ -45,8 +43,6 @@ vect2 pixel_to_meter(int x, int y) { return vect2(pixel_to_meter_x(x), pixel_to_
 
 static vect2 CanvasCenter;
 static double CanvasDiagonalLength = 1.0;
-
-static double ZOOM_IN_LIMIT = 0.017;
 
 // Zoom to specified size
 void zoom(vect2 center, double width) {
@@ -97,7 +93,7 @@ void zoom(vect2 center, double width) {
     CanvasDiagonalLength = (CanvasBottomRight.x - CanvasTopLeft.x) * sqrt(2.0) / 2.0 * 1.01;
 }
 
-void zoom_out(void) {
+void zoom_out() {
     zoom((CanvasTopLeft + CanvasBottomRight) * 0.5,
          fabs(CanvasBottomRight.x - CanvasTopLeft.x) * 1.5);
 }
@@ -133,7 +129,7 @@ void zoom_in(int x1, int y1, int x2, int y2) {
     zoom_in(pixel_to_meter_x(x1), pixel_to_meter_y(y1), pixel_to_meter_x(x2), pixel_to_meter_y(y2));
 }
 
-void zoom_fill(void) {
+void zoom_fill() {
     double x1, y1, x2, y2;
     Ptop->getminmax(&x1, &y1, &x2, &y2, 1);
     double x_center = (x1 + x2) * 0.5;
@@ -148,20 +144,14 @@ void zoom_fill(void) {
 }
 
 // Draw one line into the editor canvas from v1 to v2
-void render_line(vect2 v1, vect2 v2, int dotted) {
+void render_line(vect2 v1, vect2 v2, bool dotted) {
     // Skip very short lines
     if ((v2 - v1).length() < 0.00000001) {
         return;
     }
     // Check to see if the endpoints are outside of the screen render zone
-    int v1_off_screen = 0;
-    if ((v1 - CanvasCenter).length() > CanvasDiagonalLength * 0.999) {
-        v1_off_screen = 1;
-    }
-    int v2_off_screen = 0;
-    if ((v2 - CanvasCenter).length() > CanvasDiagonalLength * 0.999) {
-        v2_off_screen = 1;
-    }
+    bool v1_off_screen = (v1 - CanvasCenter).length() > CanvasDiagonalLength * 0.999;
+    bool v2_off_screen = (v2 - CanvasCenter).length() > CanvasDiagonalLength * 0.999;
     // If both points are outside the screen render zone, calculate the closest distance between the
     // center of the screen and the line. If this line isn't within the radius of the screen render
     // zone, we don't need to render the line at all
@@ -174,18 +164,14 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
     // Shorten the line assuming the screen is a circle, and getting the intersection between this
     // circle and the line
     if (v1_off_screen) {
-        vect2 new_v1;
-        if (!line_circle_intersection(v1, v2 - v1, CanvasCenter, CanvasDiagonalLength, &new_v1)) {
+        if (!line_circle_intersection(v1, v2 - v1, CanvasCenter, CanvasDiagonalLength, &v1)) {
             internal_error("vonal !line_circle_intersection!");
         }
-        v1 = new_v1;
     }
     if (v2_off_screen) {
-        vect2 new_v2;
-        if (!line_circle_intersection(v2, v1 - v2, CanvasCenter, CanvasDiagonalLength, &new_v2)) {
+        if (!line_circle_intersection(v2, v1 - v2, CanvasCenter, CanvasDiagonalLength, &v2)) {
             internal_error("vonal !line_circle_intersection!");
         }
-        v2 = new_v2;
     }
     // Convert line coordinates to pixels
     double x1 = (v1.x - CanvasTopLeft.x) * CanvasMetersToPixels + EDITOR_MENU_X;
@@ -200,9 +186,9 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
         }
 
         // Invert the points so x1 < x2 if needed
-        int inverted = 0;
+        bool inverted = false;
         if (x2 < x1) {
-            inverted = 1;
+            inverted = true;
             double tmp = x1;
             x1 = x2;
             x2 = tmp;
@@ -249,9 +235,9 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
         }
 
         // Invert the points so y1 < y2 if needed
-        int inverted = 0;
+        bool inverted = false;
         if (y2 < y1) {
-            inverted = 1;
+            inverted = true;
             double tmp = x1;
             x1 = x2;
             x2 = tmp;
@@ -295,7 +281,7 @@ void render_line(vect2 v1, vect2 v2, int dotted) {
 }
 
 // Get a number representing our zoom, where 1.000 represents the most you can zoom out in Elma 1.11
-double get_zoom(void) {
+double get_zoom() {
     if (fabs(CanvasBottomRight.x - CanvasTopLeft.x) == 0.0) {
         internal_error("get_zoom 0!");
     }
@@ -303,4 +289,7 @@ double get_zoom(void) {
 }
 
 // Convert a length of 10 pixels to elmameters, as 10 pixels is the max grab distance for the cursor
-double max_grab_distance(void) { return fabs(pixel_to_meter_x(110) - pixel_to_meter_x(100)); }
+double max_grab_distance() {
+    constexpr int MAX_GRAB_DISTANCE = 10;
+    return fabs(pixel_to_meter_x(100 + MAX_GRAB_DISTANCE) - pixel_to_meter_x(100));
+}

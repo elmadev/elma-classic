@@ -507,10 +507,10 @@ void t_create_vert_mmove(int mx, int my) {
         if (!Egypont) {
             internal_error("!Egypont (yifeye)");
         }
-        render_line(pixel_to_meter(Epontx, Eponty), pixel_to_meter(Kpontx, Kponty), 0);
+        render_line(pixel_to_meter(Epontx, Eponty), pixel_to_meter(Kpontx, Kponty), false);
         Moux = Kpontx = mx;
         Mouy = Kponty = my;
-        render_line(pixel_to_meter(Epontx, Eponty), pixel_to_meter(Kpontx, Kponty), 0);
+        render_line(pixel_to_meter(Epontx, Eponty), pixel_to_meter(Kpontx, Kponty), false);
     }
     unlockfrontbuffer_pic();
     pop();

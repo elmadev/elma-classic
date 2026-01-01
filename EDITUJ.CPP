@@ -142,10 +142,10 @@ static void egeretrajzolja(void) {
         double y1 = r.y;
         double x2 = x1+640.0/MetersToPixels;
         double y2 = y1+480.0/MetersToPixels;
-        render_line( vect2( x1, y1 ), vect2( x1, y2 ), 0 );
-        render_line( vect2( x1, y2 ), vect2( x2, y2 ), 0 );
-        render_line( vect2( x2, y2 ), vect2( x2, y1 ), 0 );
-        render_line( vect2( x2, y1 ), vect2( x1, y1 ), 0 );
+        render_line( vect2( x1, y1 ), vect2( x1, y2 ), false );
+        render_line( vect2( x1, y2 ), vect2( x2, y2 ), false );
+        render_line( vect2( x2, y2 ), vect2( x2, y1 ), false );
+        render_line( vect2( x2, y1 ), vect2( x1, y1 ), false );
         return;
     } */
 

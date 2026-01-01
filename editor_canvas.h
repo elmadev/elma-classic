@@ -1,5 +1,5 @@
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef EDITOR_CANVAS_H
+#define EDITOR_CANVAS_H
 
 constexpr int EDITOR_MENU_X = 107;
 constexpr int EDITOR_MENU_Y = 36;

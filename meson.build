@@ -16,7 +16,7 @@ elma_sources = files(
     'editor_dialog.cpp',
     'menu_dialog.cpp',
     'timer.cpp',
-    'DISPLAY.CPP',
+    'editor_canvas.cpp',
     'DOBOZ.CPP',
     'D_PIC.CPP',
     'ECSET.CPP',

@@ -25,10 +25,9 @@ static void titkosit(void) {
     if (!Leirotomb) {
         internal_error("titkosit-ban !Leirotomb!");
     }
-    int leiromeret = sizeof(fileleiro);
     for (int i = 0; i < FILESZAM; i++) {
         unsigned char* pc = (unsigned char*)(&Leirotomb[i]);
-        for (int j = 0; j < leiromeret; j++) {
+        for (int j = 0; j < sizeof(fileleiro); j++) {
             pc[j] ^= a;
             a %= c;
             b += a * c;

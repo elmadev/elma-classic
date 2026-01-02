@@ -4,7 +4,7 @@
 void centiseconds_to_string(long time, char* text, bool show_hours) {
     // Calculate time
     if (time < 0) {
-        hiba("centiseconds_to_string time < 0!");
+        internal_error("centiseconds_to_string time < 0!");
     }
     int centiseconds = int(time % 100);
     time /= 100;

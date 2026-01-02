@@ -5,28 +5,28 @@ constexpr int PICLIST_VERSION = 1002;
 piclist::piclist(FILE* h) {
     int version = 0;
     if (fread(&version, 1, 4, h) != 4) {
-        uzenet("Cannot read pictures.lst information!");
+        external_error("Cannot read pictures.lst information!");
     }
     if (version != PICLIST_VERSION) {
-        uzenet("In LGR file the pictures.lst information has incorrect version!");
+        external_error("In LGR file the pictures.lst information has incorrect version!");
     }
     if (fread(&length, 1, 4, h) != 4) {
-        uzenet("Cannot read pictures.lst information!");
+        external_error("Cannot read pictures.lst information!");
     }
     if (fread(name, 1, length * 10, h) != length * 10) {
-        uzenet("Cannot read pictures.lst information!");
+        external_error("Cannot read pictures.lst information!");
     }
     if (fread(type, 1, length * 4, h) != length * 4) {
-        uzenet("Cannot read pictures.lst information!");
+        external_error("Cannot read pictures.lst information!");
     }
     if (fread(default_distance, 1, length * 4, h) != length * 4) {
-        uzenet("Cannot read pictures.lst information!");
+        external_error("Cannot read pictures.lst information!");
     }
     if (fread(default_clipping, 1, length * 4, h) != length * 4) {
-        uzenet("Cannot read pictures.lst information!");
+        external_error("Cannot read pictures.lst information!");
     }
     if (fread(transparency, 1, length * 4, h) != length * 4) {
-        uzenet("Cannot read pictures.lst information!");
+        external_error("Cannot read pictures.lst information!");
     }
 }
 

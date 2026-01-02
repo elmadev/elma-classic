@@ -53,7 +53,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         if (strcmp(texttomb[i], "GOMBOK") == 0) {
             gombszam = textszam - i - 1;
             if (gombszam <= 0) {
-                hiba("dialog-ban gombszam <= 0!");
+                internal_error("dialog-ban gombszam <= 0!");
             }
             textszam = i;
             for (int j = 0; j < gombszam; j++) {
@@ -74,7 +74,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     }
 
     if (textszam < 1) {
-        hiba("iuofrf");
+        internal_error("iuofrf");
     }
 
     // Beallitottuk tomboket!!!
@@ -122,7 +122,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         gx1tomb[2] = 320 + gdx;
     }
     if (gombszam > 3) {
-        hiba("uofiufriufr");
+        internal_error("uofiufriufr");
     }
     for (int i = 0; i < gombszam; i++) {
         int xs = Pabc2->len(gombtomb[i]) + 10;

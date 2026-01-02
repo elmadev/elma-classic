@@ -14,13 +14,13 @@ static void init_dik_to_ascii(void);
 
 void mk_init(void) {
     if (KeyBuffer) {
-        hiba("mk_init() called twice!");
+        internal_error("mk_init() called twice!");
     }
 
     KeyState1 = new char[MaxKeycode];
     KeyState2 = new char[MaxKeycode];
     if (!KeyState1 || !KeyState2) {
-        hiba("KeyState allocation failed in mk_init!()");
+        internal_error("KeyState allocation failed in mk_init!()");
     }
     for (int i = 0; i < MaxKeycode; i++) {
         KeyState1[i] = KeyState2[i] = 0;
@@ -28,7 +28,7 @@ void mk_init(void) {
 
     KeyBuffer = new int[KeyBufferSize];
     if (!KeyBuffer) {
-        hiba("KeyBuffer allocation failed in mk_init!()");
+        internal_error("KeyBuffer allocation failed in mk_init!()");
     }
     KeyBufferCount = 0;
     UseKeyState2 = true;
@@ -62,7 +62,7 @@ int mk_kbhit(void) {
 
 int mk_getstate(int code) {
     if (code < 0 || code > MaxKeycode) {
-        hiba("code out of range in mk_getstate()!");
+        internal_error("code out of range in mk_getstate()!");
         return 0;
     }
     if (UseKeyState2) {
@@ -74,7 +74,7 @@ int mk_getstate(int code) {
 
 void mkw_getDIstate(void) {
     if (!KeyBuffer) {
-        hiba("Buffer is NULL in mkw_getDIstate()");
+        internal_error("Buffer is NULL in mkw_getDIstate()");
     }
 
     if (UseKeyState2) {

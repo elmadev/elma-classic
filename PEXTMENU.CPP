@@ -78,7 +78,7 @@ static int afterplayext( char* filenev, long ido ) {
             saveplay( belyeg ); // Save play
             continue;
         }
-        hiba( "Itt nem szabadna lennie (afterplayext)!" );
+        internal_error( "Itt nem szabadna lennie (afterplayext)!" );
     }
 } */
 
@@ -152,7 +152,7 @@ void playextmenu(void) {
 
         char filenev[20];
         if (strlen(val.entries_left[eredmeny]) > 15) {
-            hiba("playextmenu-ben val.entries_left[eredmeny] ) > 15!");
+            internal_error("playextmenu-ben val.entries_left[eredmeny] ) > 15!");
         }
         strcpy(filenev, val.entries_left[eredmeny]);
 

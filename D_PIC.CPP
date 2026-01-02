@@ -6,7 +6,7 @@ static int Backpiclocked = 0, Frontpiclocked = 0;
 
 pic8* lockbackbuffer_pic(bool flipped) {
     if (Backpiclocked || Frontpiclocked) {
-        hiba("lbb_p lock!");
+        internal_error("lbb_p lock!");
     }
     Backpiclocked = 1;
 
@@ -22,7 +22,7 @@ pic8* lockbackbuffer_pic(bool flipped) {
 
 void unlockbackbuffer_pic(void) {
     if (!Backpiclocked || Frontpiclocked) {
-        hiba("ulbb_p lock!");
+        internal_error("ulbb_p lock!");
     }
     Backpiclocked = 0;
 
@@ -32,7 +32,7 @@ void unlockbackbuffer_pic(void) {
 
 void lockfrontbuffer_pic(bool flipped) {
     if (Frontpiclocked || Backpiclocked) {
-        hiba("lfb_pw lock!");
+        internal_error("lfb_pw lock!");
     }
     Frontpiclocked = 1;
 
@@ -48,7 +48,7 @@ void lockfrontbuffer_pic(bool flipped) {
 
 void unlockfrontbuffer_pic(void) {
     if (!Frontpiclocked || Backpiclocked) {
-        hiba("ulfb_pw lock!");
+        internal_error("ulfb_pw lock!");
     }
     Frontpiclocked = 0;
     unlock_frontbuffer();
@@ -56,7 +56,7 @@ void unlockfrontbuffer_pic(void) {
 
 void ppixelfront(int x, int y, unsigned char szin) {
     if (!Frontpiclocked) {
-        hiba("u53e983w");
+        internal_error("u53e983w");
     }
     Lockbuff->ppixel(x, y, szin);
 }

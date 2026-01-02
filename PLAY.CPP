@@ -116,7 +116,7 @@ static void konvoda(char* text) {
             sorszam += Eltolas;
             sorszam %= betuszam;
             if (sorszam < 0 || sorszam >= betuszam) {
-                hiba("B508976!");
+                internal_error("B508976!");
             }
             *text = (char)('A' + sorszam);
         }
@@ -134,7 +134,7 @@ static void konvback(char* text) {
             sorszam %= betuszam;
             sorszam = betuszam - 1 - sorszam; // Megforditjuk sorrendet
             if (sorszam < 0 || sorszam >= betuszam) {
-                hiba("B508976!");
+                internal_error("B508976!");
             }
             *text = (char)('A' + sorszam);
         }
@@ -484,7 +484,7 @@ void replayprec(void) {
         Prec2->rewind();
         if (lejatszo_r(Prec1->palyanev, !elso)) {
             if (Ptop->kerekekfejjellefele) {
-                hiba("replayprec-ben Ptop->kerekekfejjellefel!");
+                internal_error("replayprec-ben Ptop->kerekekfejjellefel!");
             }
             return;
         }
@@ -502,12 +502,12 @@ void replayjelenlegi(const char* filenev) {
         Prec2->rewind();
         if (lejatszo_r(filenev, !elso)) {
             if (Ptop->kerekekfejjellefele) {
-                hiba("replayjelenlegi-ben Ptop->kerekekfejjellefel!");
+                internal_error("replayjelenlegi-ben Ptop->kerekekfejjellefel!");
             }
             return;
         }
         if (Ptop->kerekekfejjellefele) {
-            hiba("replayjelenlegi-ben Ptop->kerekekfejjellefel!");
+            internal_error("replayjelenlegi-ben Ptop->kerekekfejjellefel!");
         }
         elso = 0;
     }
@@ -540,10 +540,10 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         kurrens = nextdefault;
         // Ellenorzes:
         if (nextdefault && !nextisvan) {
-            hiba("nextdefault && !nextisvan!");
+            internal_error("nextdefault && !nextisvan!");
         }
         if (skipisvan && nextisvan) {
-            hiba("skipisvan && nextisvan!");
+            internal_error("skipisvan && nextisvan!");
         }
     }
 
@@ -551,7 +551,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         char fejlec[100] = "";
         if (extlev) {
             if (strlen(Ptop->levelname) > LEVELNAMEHOSSZ) {
-                hiba("67834767");
+                internal_error("67834767");
             }
             sprintf(fejlec, "External: %s", Ptop->levelname);
             if (MenuFont->len(fejlec) > 630) {
@@ -713,7 +713,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         if (eredmeny == 1) {
             // Next, vagy skip:
             if (!nextisvan && !skipisvan) {
-                hiba("Itt nem kene lennie (!nextisvan && !skipisvan)!");
+                internal_error("Itt nem kene lennie (!nextisvan && !skipisvan)!");
             }
             if (nextisvan) {
                 return 2;
@@ -770,7 +770,7 @@ static void playlevel(int level) {
         long ido = lejatszo(tmpnev);
         MenuPal->set();
         if (Ptop->kerekekfejjellefele) {
-            hiba("playlevel-ben Ptop->kerekekfejjellefel!");
+            internal_error("playlevel-ben Ptop->kerekekfejjellefel!");
         }
         char valasz[100] = "";
         idoelintezes(ido, valasz, level, NULL);
@@ -806,7 +806,7 @@ static void playlevel(int level) {
         if (eredmeny == 3) {
             // Skip level:
             if (level != pjatekos->levels_completed) {
-                hiba("level != pjatekos->levels_completed! 674");
+                internal_error("level != pjatekos->levels_completed! 674");
             }
             pjatekos->skipped[level] = 1;
             level++;
@@ -851,7 +851,7 @@ void play(void) {
                 // strcat( tmp, "Nincs level nev!" );
             }
             if (strlen(tmp) > NAV_ENTRY_TEXT_MAX_LENGTH - 5) {
-                hiba("play-ben! strlen( tmp ) > NAV_ENTRY_TEXT_MAX_LENGTH-5!");
+                internal_error("play-ben! strlen( tmp ) > NAV_ENTRY_TEXT_MAX_LENGTH-5!");
             }
             strcpy(NavEntriesLeft[i + 1], tmp);
         }

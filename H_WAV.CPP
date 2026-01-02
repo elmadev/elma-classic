@@ -2,11 +2,11 @@
 
 void wav::lefoglal(void) {
     if (size > 1000000) {
-        hiba("wav::alloc-ban size > 1000000!");
+        internal_error("wav::alloc-ban size > 1000000!");
     }
     tomb = new signed short[size];
     if (!tomb) {
-        uzenet("wav::alloc-ban memory!");
+        external_error("wav::alloc-ban memory!");
     }
 }
 
@@ -18,12 +18,12 @@ static void nevwavtest(const char* nev) {
             if (strcmpi(".wav", &nev[i]) == 0) {
                 return;
             } else {
-                hiba("nevrawtest-ben nincs .raw!");
+                internal_error("nevrawtest-ben nincs .raw!");
             }
         }
         i--;
     }
-    hiba("nevwavtest-ben nincs .wav!");
+    internal_error("nevwavtest-ben nincs .wav!");
 }
 
 struct wavheader {
@@ -49,17 +49,17 @@ wav::wav(const char* nev, double maxamplitudo, int start, int ucsoutani) {
     // Lemeri file hosszat:
     FILE* h = qopen(nev, "rb");
     if (!h) {
-        hiba("Nem tudta megnyitni file-t: ", nev);
+        internal_error("Nem tudta megnyitni file-t: ", nev);
     }
 
     wavheader header;
     int negyvennegy = 44;
     if (sizeof(wavheader) != negyvennegy) {
-        hiba("sizeof( wavheader ) != 44!");
+        internal_error("sizeof( wavheader ) != 44!");
     }
 
     if (fread(&header, 1, 44, h) != 44) {
-        hiba("Nem sikerult beolvasni wav-ot!");
+        internal_error("Nem sikerult beolvasni wav-ot!");
     }
 
     long hossz = header.hossz;
@@ -81,32 +81,32 @@ wav::wav(const char* nev, double maxamplitudo, int start, int ucsoutani) {
     }
 
     if (header.channel != 1) {
-        hiba("Wav file nem mono!: ", nev);
+        internal_error("Wav file nem mono!: ", nev);
     }
 
     if (bit16) {
         // 16 bites uncompressed:
         if (hossz % 2) {
-            hiba("16 bites wav-nal nem paros byteszam! (abcd)");
+            internal_error("16 bites wav-nal nem paros byteszam! (abcd)");
         }
         size = reszhossz;
         if (start + reszhossz > hossz / 2) {
-            hiba("Reszlet kilog wav-bol!");
+            internal_error("Reszlet kilog wav-bol!");
         }
         lefoglal();
         qseek(h, start * 2, SEEK_CUR);
         if (fread(tomb, 1, size * 2, h) != size * 2) {
-            hiba("Nem sikerult beolvasni wav-ot!: ", nev);
+            internal_error("Nem sikerult beolvasni wav-ot!: ", nev);
         }
     } else {
         // 8 bites uncompressed:
         if (reszlet) {
-            hiba("8 bitre meg nincs megirva reszlet!");
+            internal_error("8 bitre meg nincs megirva reszlet!");
         }
         size = hossz;
         lefoglal();
         if (fread(tomb, 1, hossz, h) != hossz) {
-            hiba("Nem sikerult beolvasni wav-ot!: ", nev);
+            internal_error("Nem sikerult beolvasni wav-ot!: ", nev);
         }
         unsigned char* bytetomb = (unsigned char*)tomb;
         for (int i = size - 1; i >= 0; i--) {
@@ -139,7 +139,7 @@ wav::wav(const char* nev, double maxamplitudo, int start, int ucsoutani) {
 // Elejere tesz egy loopot a vegebol, amit aztan le is vag:
 void wav::loopol(int n) {
     if (n >= size) {
-        hiba("n >= size!");
+        internal_error("n >= size!");
     }
     for (int i = 0; i < n; i++) {
         double arany = ((double)i) / n;
@@ -151,10 +151,10 @@ void wav::loopol(int n) {
 // pwav elejet rateszi vegere:
 void wav::vegereilleszt(wav* pwav, int n) {
     if (n >= size) {
-        hiba("n >= size!");
+        internal_error("n >= size!");
     }
     if (n >= pwav->size) {
-        hiba("n >= pwav->size!");
+        internal_error("n >= pwav->size!");
     }
     for (int i = 0; i < n; i++) {
         double arany = ((double)i) / n;
@@ -175,11 +175,11 @@ wav2::wav2(wav* pwav) {
     mtomb = NULL;
     tomb = pwav->tomb;
     if (pwav->size > 64000) {
-        hiba("wav2-ben size > 64000!");
+        internal_error("wav2-ben size > 64000!");
     }
     mtomb = new short[pwav->size];
     if (!mtomb) {
-        uzenet("memory");
+        external_error("memory");
     }
     for (int i = 0; i < pwav->size - 1; i++) {
         mtomb[i] = tomb[i + 1] - tomb[i];

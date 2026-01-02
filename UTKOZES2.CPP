@@ -3,7 +3,7 @@
 int utkozikesprite(vect2 r, double sugar) {
     int balalsox, balalsoy;
     if (!Pecsetalso) {
-        hiba("uovruor");
+        internal_error("uovruor");
     }
     Pecsetalso->getbalalso_int(r, &balalsox, &balalsoy);
     int objminx = balalsox - 200;

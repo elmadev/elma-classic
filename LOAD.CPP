@@ -12,10 +12,10 @@ void invalidate_level() { Volttopsave = 1; }
 // Hamissal ter vissza, ha hibas topologiaju level:
 int floadlevel_p(const char* nev) {
     if (!nev) {
-        hiba("floadlevel_p-ben !nev!");
+        internal_error("floadlevel_p-ben !nev!");
     }
     if (strlen(nev) > 12 || !nev[0]) {
-        hiba("floadlevel_p-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
+        internal_error("floadlevel_p-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
     }
     if (Volttopsave || !Ptop || !Pszak || strcmpi(nev, Bentlevelnev) != 0) {
         Volttopsave = 0;
@@ -71,10 +71,10 @@ int floadlevel_e(const char* nev, int forceload) {
     int levoltzarva = 0;
 
     if (!nev) {
-        hiba("floadlevel_e-ben !nev!");
+        internal_error("floadlevel_e-ben !nev!");
     }
     if (strlen(nev) > 12 || !nev[0]) {
-        hiba("floadlevel_e-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
+        internal_error("floadlevel_e-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
     }
     if (forceload || Volttopsave || !Ptop || Ptop->lezart || strcmpi(nev, Bentlevelnev) != 0) {
         Volttopsave = 0;

@@ -45,16 +45,16 @@ recorder::recorder(void) {
     // Ellenorzes:
     long hossz = sizeof(float);
     if (hossz != 4) {
-        hiba("float hossz != 4!");
+        internal_error("float hossz != 4!");
     }
     hossz = long(Darabszam) * sizeof(float);
     if (hossz > 64000l) {
-        hiba("Darabszam*sizeof( float )!");
+        internal_error("Darabszam*sizeof( float )!");
     }
 
     hossz = long(Hangdarabszam) * sizeof(egyhang);
     if (hossz > 64000l) {
-        hiba("Hangdarabszam*sizeof( egyhang )!");
+        internal_error("Hangdarabszam*sizeof( egyhang )!");
     }
 
     pk1rx = new float[Darabszam];
@@ -76,7 +76,7 @@ recorder::recorder(void) {
 
     if (!pk1rx || !pk1ry || !pk2rx || !pk2ry || !pk4rx || !pk4ry || !pvezrx || !pvezry ||
         !pk2alfa || !pk1alfa || !pk4alfa || !pfrekvencia || !pgazhatra || !phangok || !psurlero) {
-        uzenet("memory");
+        external_error("memory");
     }
 }
 
@@ -86,7 +86,7 @@ recorder::~recorder(void) {
 
 void recorder::erase(char* palyanev_p) {
     if (strlen(palyanev_p) > 12) {
-        hiba("875h8uyf");
+        internal_error("875h8uyf");
     }
     strcpy(palyanev, palyanev_p);
     betoltve = 0;
@@ -150,7 +150,7 @@ static double Surlszorzo = 250 / 2.0, Surlszorzo_rec = 1.0 / Surlszorzo;
 static void filebair( float d1, float d2, float d3 ) {
     FILE* h = fopen( "log.txt", "at" );
     if( !h )
-        hiba( "filebair-ban nem nyilik!" );
+        internal_error( "filebair-ban nem nyilik!" );
 
     fprintf( h, "%d %f %f %f\n", Filebairsorszam, d1, d2, d3 );
 
@@ -161,7 +161,7 @@ static void filebair( float d1, float d2, float d3 ) {
 
 int recorder::recall(motorst* pmot, double ido, hanginfo* phinfo) {
     if (betoltve <= 0) {
-        hiba("recall-ban betoltve <= 0!");
+        internal_error("recall-ban betoltve <= 0!");
     }
 
     int index1 = Recorderszorzo * ido;
@@ -279,7 +279,7 @@ int recorder::recall(motorst* pmot, double ido, hanginfo* phinfo) {
         char tmp[100];
         int tmpfreki = pfrekvencia[index1];
         sprintf( tmp, "f:%d, index1:%d", tmpfreki, index1 );
-        hiba( "Itt van eredmeny:", tmp );
+        internal_error( "Itt van eredmeny:", tmp );
     }*/
 
     phinfo->frekvencia = Frekvszorzo_rec * pfrekvencia[index1] + 1.0;
@@ -305,7 +305,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
     while (1) {
 #ifdef DEBUG
         if (ido - ucsot == 0.0) {
-            hiba("ido-ucsot == 0.0!");
+            internal_error("ido-ucsot == 0.0!");
         }
 #endif
         vect2 kor1r = (pmot->bike.r - ucso_r) * ((legkozt - ucsot) / (ido - ucsot)) + ucso_r;
@@ -392,7 +392,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         // betelt:
         return;
     if( index < betoltve-1 )
-        hiba( "recorder::store-ban index < betoltve-1!" );
+        internal_error( "recorder::store-ban index < betoltve-1!" );
 
     for( int i = betoltve; i <= index; i++ ) {
         pk1rx[i] = pmot->bike.r.x;
@@ -408,10 +408,10 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         //int hatar = 2000;
         //if( pk2rx[i] > hatar || pk4rx[i] > hatar ||
         //	pk2ry[i] > hatar || pk4ry[i] > hatar )
-        //	uzenet( "Nagyobb 5000-nel!" );
+        //	external_error( "Nagyobb 5000-nel!" );
         //if( pk2rx[i] < -hatar || pk4rx[i] < -hatar ||
         //	pk2ry[i] < -hatar || pk4ry[i] < -hatar )
-        //	uzenet( "Kisebb -5000-nel!" );
+        //	external_error( "Kisebb -5000-nel!" );
 
         // Alfak:
         double alfa1 = pmot->bike.rotation;
@@ -461,8 +461,8 @@ void recorder::addhang(double t, char wavindex, double hangero, int objszam) {
             char tmp[50];
             double t2 = phangok[unsigned(hangbetoltve - 1)].t;
             sprintf(tmp, "t1: kulonbseg: %f\n", float(t - t2));
-            hiba(tmp);
-            // hiba( "recorder::addhang-ban ido forditott sorrendben!" );
+            internal_error(tmp);
+            // internal_error( "recorder::addhang-ban ido forditott sorrendben!" );
         }
     }
     phangok[unsigned(hangbetoltve)].t = t;
@@ -486,7 +486,9 @@ int recorder::gethang(double t, char* pwavindex, double* phangero, int* pobjszam
     return 0;
 }
 
-static void olvhiba(const char* nev) { hiba("Nem sikerult olvasni recorded file-bol!: ", nev); }
+static void olvhiba(const char* nev) {
+    internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
+}
 
 // demo eseten resource file-bol nyit:
 // belyeg-et adja vissza, vagy 0-at:
@@ -500,14 +502,14 @@ long recorder::load(const char* nev, FILE* h, int demo) {
         if (demo) {
             h = qopen(nev, "rb");
             if (!h) {
-                hiba("Nem sikerult megnyitni recorded file-t!: ", nev);
+                internal_error("Nem sikerult megnyitni recorded file-t!: ", nev);
             }
         } else {
             char tmpnev[40];
             sprintf(tmpnev, "rec/%s", nev);
             h = fopen(tmpnev, "rb");
             if (!h) {
-                uzenet("Could not open for reading record file!:", tmpnev);
+                external_error("Could not open for reading record file!:", tmpnev);
             }
         }
     }
@@ -517,34 +519,34 @@ long recorder::load(const char* nev, FILE* h, int demo) {
         olvhiba(nev);
     }
     if (betoltve <= 0) {
-        hiba("Nem stimmel betoltve recorded file-ban!: ", nev);
+        internal_error("Nem stimmel betoltve recorded file-ban!: ", nev);
     }
 
     if (betoltve > Darabszam) {
-        hiba("recorder load-ban betoltve > Darabszam!");
+        internal_error("recorder load-ban betoltve > Darabszam!");
     }
 
     long verzio = 0;
     if (fread(&verzio, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
 
     // Ezt loadrecekben is igazitani kell:
     if (verzio < 131) {
-        uzenet("Recorded file version is too old!", nev);
+        external_error("Recorded file version is too old!", nev);
     }
 
     if (verzio > 131) {
-        uzenet("Recorded file version is too new!", nev);
+        external_error("Recorded file version is too new!", nev);
     }
 
     int tmp = 0; // Multirec, de ezt mar elintezte loadrecek, aki ezt hivta
     if (fread(&tmp, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
 
     if (fread(&tag, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
 
     long belyeg = 0;
@@ -610,17 +612,17 @@ long recorder::load(const char* nev, FILE* h, int demo) {
         olvhiba(nev);
     }
     if (hangbetoltve < 0) {
-        hiba("hangbetoltve nem stimmel loadban!");
+        internal_error("hangbetoltve nem stimmel loadban!");
     }
     if (hangbetoltve > Hangdarabszam) {
-        hiba("rec load-ban hangbetoltve > Hangdarabszam!");
+        internal_error("rec load-ban hangbetoltve > Hangdarabszam!");
     }
 
     /*static int elsoszam = 0;
     if( elsoszam ) {
         char tmp11[50];
         sprintf( tmp11, "1.: %d, 2.: %d", hangbetoltve, elsoszam );
-        uzenet( tmp11 );
+        external_error( tmp11 );
     }
     elsoszam = hangbetoltve;*/
 
@@ -634,7 +636,7 @@ long recorder::load(const char* nev, FILE* h, int demo) {
         olvhiba(nev);
     }
     if (magic != MAGICNUMBER) {
-        hiba("magic != MAGICNUMBER");
+        internal_error("magic != MAGICNUMBER");
     }
 
     if (!megvoltnyitva) {
@@ -646,28 +648,30 @@ long recorder::load(const char* nev, FILE* h, int demo) {
     }
 
     // if( !frame_count_integrity( this ) )
-    //	hiba( "recorder::load-ban !frame_count_integrity( this )!" );
+    //	internal_error( "recorder::load-ban !frame_count_integrity( this )!" );
     return belyeg;
 }
 
 /* 1.0 es 1.1 eseten ez volt:
     h = fopen( nev, "wb" );
     if( !h )
-        hiba( "Nem sikerult megnyitni irasra recorded file-t!: ", nev );
+        internal_error( "Nem sikerult megnyitni irasra recorded file-t!: ", nev );
 
     if( fwrite( &betoltve, 1, 4, h ) != 4 )
-        hiba( "Nem sikerult irni recorded file-ba!: ", nev );
+        internal_error( "Nem sikerult irni recorded file-ba!: ", nev );
     if( fwrite( &level, 1, 4, h ) != 4 )
-        hiba( "Nem sikerult irni recorded file-ba!: ", nev );
+        internal_error( "Nem sikerult irni recorded file-ba!: ", nev );
 
 
     long hossz = betoltve*sizeof( float );
 
     if( fwrite( pk1rx, 1, unsigned(hossz), h ) != hossz )
-        hiba( "Nem sikerult irni recorded file-ba!: ", nev );
+        internal_error( "Nem sikerult irni recorded file-ba!: ", nev );
 */
 
-static void irhiba(const char* nev) { hiba("Nem sikerult irni recorded file-ba!: ", nev); }
+static void irhiba(const char* nev) {
+    internal_error("Nem sikerult irni recorded file-ba!: ", nev);
+}
 
 void recorder::save(const char* nev, FILE* h, long belyeg, int tag_p) {
     tag = tag_p;
@@ -678,7 +682,7 @@ void recorder::save(const char* nev, FILE* h, long belyeg, int tag_p) {
     }
 
     if (betoltve == 0) {
-        hiba("save-ben betoltve == 0!");
+        internal_error("save-ben betoltve == 0!");
     }
 
     if (!h) {
@@ -687,7 +691,7 @@ void recorder::save(const char* nev, FILE* h, long belyeg, int tag_p) {
         sprintf(tmpnev, "rec/%s", nev);
         h = fopen(tmpnev, "wb");
         if (!h) {
-            hiba("Could not open for writing record file!: ", tmpnev);
+            internal_error("Could not open for writing record file!: ", tmpnev);
         }
     }
 
@@ -796,37 +800,37 @@ long loadrecek(const char* nev, int demo) {
     if (demo) {
         h = qopen(nev, "rb");
         if (!h) {
-            uzenet("Could not open for reading record file!: !: ", nev);
+            external_error("Could not open for reading record file!: !: ", nev);
         }
     } else {
         char tmpnev[40];
         sprintf(tmpnev, "rec/%s", nev);
         h = fopen(tmpnev, "rb");
         if (!h) {
-            uzenet("Could not open for reading record file!:", tmpnev);
+            external_error("Could not open for reading record file!:", tmpnev);
         }
     }
     int tmp = 0; // betoltve (bejegyzes darabszam)
     if (fread(&tmp, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
 
     long verzio = 0;
     if (fread(&verzio, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
 
     if (verzio < 131) {
-        uzenet("Recorded file version is too old!", nev);
+        external_error("Recorded file version is too old!", nev);
     }
 
     if (verzio > 131) {
-        uzenet("Recorded file version is too new!", nev);
+        external_error("Recorded file version is too new!", nev);
     }
 
     // Betoltjuk Multirec-et:
     if (fread(&Multirec, 1, 4, h) != 4) {
-        hiba("Nem sikerult olvasni recorded file-bol!: ", nev);
+        internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
 
     if (demo) {
@@ -842,14 +846,14 @@ long loadrecek(const char* nev, int demo) {
         if (demo) {
             h = qopen(nev, "rb");
             if (!h) {
-                uzenet("Could not open for reading demo record file!:", nev);
+                external_error("Could not open for reading demo record file!:", nev);
             }
         } else {
             char tmpnev[40];
             sprintf(tmpnev, "rec\\%s", nev);
             h = fopen(tmpnev, "rb");
             if (!h) {
-                uzenet("Could not open for reading record file!:", tmpnev);
+                external_error("Could not open for reading record file!:", tmpnev);
             }
         }
 
@@ -875,7 +879,7 @@ void saverecek(const char* nev, long belyeg, int tag) {
         sprintf(tmpnev, "rec/%s", nev);
         FILE* h = fopen(tmpnev, "wb");
         if (!h) {
-            uzenet("Could not open for writing record file!: !: ", tmpnev);
+            external_error("Could not open for writing record file!: !: ", tmpnev);
         }
 
         // Multirec alapjan tudjak, hogy mit kell rec file multirec

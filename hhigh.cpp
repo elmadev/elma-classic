@@ -33,7 +33,7 @@ static int Elsostart = 1;
 
 void starthanghigh(void) {
     if (!Elsostart) {
-        hiba("starthanghigh-ban !Elsostart!");
+        internal_error("starthanghigh-ban !Elsostart!");
     }
     Elsostart = 0;
     if (!Hangenabled) {
@@ -46,7 +46,7 @@ void starthanghigh(void) {
         return;
     }*/
     if (Hanghighbevoltkapcsolva) {
-        hiba("Hanghighbevoltkapcsolva igaz starthanghigh-ban!");
+        internal_error("Hanghighbevoltkapcsolva igaz starthanghigh-ban!");
     }
     Hanghighbevoltkapcsolva = 1;
     for (int i = 0; i < WAVBANKSZAM; i++) {
@@ -107,7 +107,7 @@ static mothangstruct Moth1, Moth2;
 // frekvencia 1.0-tol 2.0-ig valtozik csak:
 void setmotor(int mot1, double frekvencia, int gaz) {
     // if( gaz )
-    //	hiba( "setmotor-ban gaz igaz!" );
+    //	internal_error( "setmotor-ban gaz igaz!" );
 
     if (!Hangenabled) {
         return;
@@ -154,7 +154,7 @@ void startwave(int wavazonosito, double hangero) {
     }
 
     if (hangero <= 0.0 || hangero >= 1.0) {
-        hiba("wav: hangero <= 0.0 || hangero >= 1.0!");
+        internal_error("wav: hangero <= 0.0 || hangero >= 1.0!");
     }
 
     wav* pwav = Wavbank[wavazonosito];
@@ -174,12 +174,12 @@ void startwave(int wavazonosito, double hangero) {
             Hangerok[i] = hangero * 65536.0;
             //_enable();
             // if( Wavevolt )
-            //	uzenet( "Wavevolt utan!" );
+            //	external_error( "Wavevolt utan!" );
             return;
         }
     }
     //_enable();
-    hiba("Wavszam szerint meg van csat, de nincs!");
+    internal_error("Wavszam szerint meg van csat, de nincs!");
 }
 
 // hangero meg van szorozva 65536-tal:
@@ -427,7 +427,7 @@ static void surlodaselintezes(short* sbuff, int buffsize) {
 // buffsize valojaban minta szam, vagyis = 2*byteszam:
 void callbackhang(short* sbuff, int buffsize) {
     if (!Hangenabled) {
-        hiba("callbackhang, pedig !Hangenabled!");
+        internal_error("callbackhang, pedig !Hangenabled!");
     }
 
     memset(sbuff, 0, buffsize * 2);
@@ -446,7 +446,7 @@ void callbackhang(short* sbuff, int buffsize) {
         Atmenet = buffsize - 1;
     }
     if (Atmenet < 20) {
-        hiba("callbackhang-ban buffsize < 20!");
+        internal_error("callbackhang-ban buffsize < 20!");
     }
 
     // mothangstruct megymotorbol tudjak melyik jar meg:
@@ -463,7 +463,7 @@ void callbackhang(short* sbuff, int buffsize) {
                 Ezmegy[i] = 0;
                 Wavszam--;
                 if (Wavszam < 0) {
-                    hiba("Wavszam < 0 !");
+                    internal_error("Wavszam < 0 !");
                 }
             }
             wavadd(sbuff, &Pwavok[i]->tomb[Kovhang[i]], darab, Hangerok[i]);
@@ -474,8 +474,8 @@ void callbackhang(short* sbuff, int buffsize) {
 
 void hangosdelay(int t) {
     // 182*sec-et adja vissza idot tortresszel egyutt!
-    double kezdo = mv_stopperido();
-    while (mv_stopperido() / 182.0 < kezdo / 182.0 + t / 1000.0) {
+    double kezdo = stopwatch();
+    while (stopwatch() / 182.0 < kezdo / 182.0 + t / 1000.0) {
         handle_events();
     }
 }

@@ -19,14 +19,14 @@ void message_box(const char* text) {
 
 void platform_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-        hiba(SDL_GetError());
+        internal_error(SDL_GetError());
         return;
     }
 
     SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                  SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (!SDLWindow) {
-        hiba(SDL_GetError());
+        internal_error(SDL_GetError());
         return;
     }
 
@@ -35,13 +35,13 @@ void platform_init() {
 
     SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
     if (!SDLSurfaceMain) {
-        hiba(SDL_GetError());
+        internal_error(SDL_GetError());
         return;
     }
     SDLSurfacePaletted = SDL_CreateRGBSurfaceWithFormat(0, SDLSurfaceMain->w, SDLSurfaceMain->h, 0,
                                                         SDL_PIXELFORMAT_INDEX8);
     if (!SDLSurfacePaletted) {
-        hiba(SDL_GetError());
+        internal_error(SDL_GetError());
         return;
     }
 }
@@ -51,7 +51,7 @@ static bool SurfaceLocked = false;
 
 unsigned char** lock_backbuffer(bool flipped) {
     if (SurfaceLocked) {
-        hiba("lock_backbuffer SurfaceLocked!");
+        internal_error("lock_backbuffer SurfaceLocked!");
     }
     SurfaceLocked = true;
 
@@ -75,7 +75,7 @@ unsigned char** lock_backbuffer(bool flipped) {
 
 void unlock_backbuffer() {
     if (!SurfaceLocked) {
-        hiba("unlock_backbuffer !SurfaceLocked!");
+        internal_error("unlock_backbuffer !SurfaceLocked!");
     }
     SurfaceLocked = false;
 
@@ -85,7 +85,7 @@ void unlock_backbuffer() {
 
 unsigned char** lock_frontbuffer(bool flipped) {
     if (SurfaceLocked) {
-        hiba("lock_frontbuffer SurfaceLocked!");
+        internal_error("lock_frontbuffer SurfaceLocked!");
     }
 
     return lock_backbuffer(flipped);
@@ -93,7 +93,7 @@ unsigned char** lock_frontbuffer(bool flipped) {
 
 void unlock_frontbuffer() {
     if (!SurfaceLocked) {
-        hiba("unlock_frontbuffer !SurfaceLocked!");
+        internal_error("unlock_frontbuffer !SurfaceLocked!");
     }
 
     unlock_backbuffer();
@@ -197,7 +197,7 @@ static void audio_callback(void* udata, Uint8* stream, int len) {
 
 void init_sound() {
     if (SoundInitialized) {
-        hiba("Sound already initialized!");
+        internal_error("Sound already initialized!");
     }
     SoundInitialized = true;
 
@@ -210,15 +210,15 @@ void init_sound() {
     desired_spec.format = AUDIO_S16LSB;
 
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
-        hiba("Failed to initialize audio subsystem", SDL_GetError());
+        internal_error("Failed to initialize audio subsystem", SDL_GetError());
     }
     SDL_AudioSpec obtained_spec;
     SDLAudioDevice = SDL_OpenAudioDevice(NULL, 0, &desired_spec, &obtained_spec, 0);
     if (SDLAudioDevice == 0) {
-        hiba("Failed to open audio device", SDL_GetError());
+        internal_error("Failed to open audio device", SDL_GetError());
     }
     if (obtained_spec.format != desired_spec.format) {
-        hiba("Failed to get correct audio format");
+        internal_error("Failed to get correct audio format");
     }
     Hangenabled = 1;
     SDL_PauseAudioDevice(SDLAudioDevice, 0);

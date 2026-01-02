@@ -63,11 +63,11 @@ static int bevesznevet(char* nev, int visszater) {
 void newjatekos(int A, int visszater) {
     // Ellenorzes:
     if (State->player_count >= MAX_PLAYERS - 1) {
-        uzenet("Sorry, no more players can get onto the list!");
+        external_error("Sorry, no more players can get onto the list!");
     }
     int maxrub = NavEntriesLeftMaxLength;
     if (MAX_PLAYERS > maxrub) {
-        hiba("MAX_PLAYERS > NavEntriesLeftMaxLength!");
+        internal_error("MAX_PLAYERS > NavEntriesLeftMaxLength!");
     }
 
     if (bevesznevet(State->players[int(State->player_count)].name, visszater)) {
@@ -115,7 +115,7 @@ void jatekosvalasztas(int A, int visszater) {
     pval->selected_index = 0;
     for (int i = 0; i < State->player_count; i++) {
         if (strlen(State->players[i].name) > NAV_ENTRY_TEXT_MAX_LENGTH) {
-            hiba("Tul hosszu nev jatekosvalasztas-ban!");
+            internal_error("Tul hosszu nev jatekosvalasztas-ban!");
         }
         strcpy(NavEntriesLeft[i + 1], State->players[i].name);
 

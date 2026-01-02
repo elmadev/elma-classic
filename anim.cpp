@@ -10,16 +10,16 @@ anim::anim(pic8* source_sheet, const char* error_filename) {
     if (source_sheet->get_width() % ANIM_WIDTH) {
         char tmp[80];
         sprintf(tmp, "Picture xsize must be a multiple of %d!", ANIM_WIDTH);
-        uzenet(tmp, error_filename);
+        external_error(tmp, error_filename);
     }
     frame_count = source_sheet->get_width() / ANIM_WIDTH;
     if (frame_count < 0) {
-        hiba("anim::anim frame_count < 0");
+        internal_error("anim::anim frame_count < 0");
     }
     if (frame_count > ANIM_MAX_FRAMES) {
         char tmp[80];
         sprintf(tmp, "Too many frames in picture! Max frame is %d!", ANIM_MAX_FRAMES);
-        uzenet(tmp, error_filename);
+        external_error(tmp, error_filename);
     }
 
     // Split the source picture into individual frames
@@ -53,7 +53,7 @@ pic8* anim::get_frame_by_time(double time) {
 
 pic8* anim::get_frame_by_index(int index) {
     if (index < 0 || index >= frame_count) {
-        hiba("get_frame_by_index out of range");
+        internal_error("get_frame_by_index out of range");
     }
     return frames[index];
 }

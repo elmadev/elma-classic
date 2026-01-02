@@ -7,7 +7,7 @@ eol_settings* EolSettings = nullptr;
 void cheatplayer(void) {
     // Egyetlen jatekosnak sem szabad lennie:
     if (State->player_count != 0) {
-        hiba("cheatplayer-ben mar van valaki bejegyezve!");
+        internal_error("cheatplayer-ben mar van valaki bejegyezve!");
     }
 
     State->player_count = 1;
@@ -23,7 +23,7 @@ void cheatplayer(void) {
     for (int i = 0; i < hanypalya; i++) {
         topten* pidok = &State->toptens[i].single;
         if (pidok->times_count != 0) {
-            hiba("cheatplayer-ben bug!");
+            internal_error("cheatplayer-ben bug!");
         }
         pidok->times_count = 1;
         pidok->times[0] = 180000l;
@@ -56,7 +56,7 @@ void teljes(void) {
 
     State = new state;
     if (!State) {
-        uzenet("memory");
+        external_error("memory");
     }
 
     EolSettings = new eol_settings();
@@ -135,7 +135,7 @@ void teljes(void) {
     Mouy = mmy;
 
     // Csak hogy mindig menjen stopper:
-    mv_startstopper();
+    stopwatch_reset();
 
     // Intro keppel varunk, amig nem toltodik be minden:
     while (1) {
@@ -179,7 +179,7 @@ void teljes(void) {
     } else {
         jatekosvalasztas(1, 0); // Innen nem jon vissza
     }
-    hiba("Ide nem kellett volna jonnie!");
+    internal_error("Ide nem kellett volna jonnie!");
 }
 
 /* Regi kilepes
@@ -192,7 +192,7 @@ void kilep( void ) {
     while( 1 ) {
         int c = mk_getextchar();
         if( c == ' ' || c == MK_ENTER || c == MK_ESC ) {
-            mv_exit();
+            quit();
         }
     }
 } */
@@ -203,14 +203,14 @@ void kilep(void) {
     pszovlist->add_line_centered("Thank you for registering the game!", 320, 220);
     pszovlist->add_line_centered("Please do not distribute!", 320, 300);
 
-    double kezdoido = mv_stopperido();
+    double kezdoido = stopwatch();
     while (1) {
         pszovlist->render();
         double idovaras = 50.0;
-        if ((mv_stopperido() > (kezdoido + idovaras)) && mk_kbhit()) {
+        if ((stopwatch() > (kezdoido + idovaras)) && mk_kbhit()) {
             int c = mk_getextchar();
             if (c == ' ' || c == MK_ENTER || c == MK_ESC) {
-                mv_exit();
+                quit();
             }
         }
     }
@@ -352,7 +352,7 @@ static void mergestatedat(void) {
 
     state* pmerge = new state(nev);
     if (!pmerge) {
-        uzenet("memory");
+        external_error("memory");
     }
 
     State->reload_toptens();

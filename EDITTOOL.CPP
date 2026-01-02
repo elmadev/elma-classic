@@ -52,12 +52,12 @@ static double Moveorigx = 0, Moveorigy = 0;
 void t_move_nyomva(int mx, int my) {
     if (Pgy || Pker || Psp) {
         if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-            hiba("t_move_nyomva-ban (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+            internal_error("t_move_nyomva-ban (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
         }
         // Most fogjuk elengedni pontot:
         if (Pgy) {
             if (Pker) {
-                hiba("iuofiuceyhbuc");
+                internal_error("iuofiuceyhbuc");
             }
             Pgy->ponttomb[K] = konv(mx, my);
             Pgy = NULL;
@@ -110,8 +110,8 @@ void t_move_nyomva(int mx, int my) {
         }
         // Kis ellenorzes:
         if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-            hiba("t_move_nyomva-ban legtav utan:",
-                 "(Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+            internal_error("t_move_nyomva-ban legtav utan:",
+                           "(Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
         }
         // Talaltunk egy pontot:
         if (Pgy) {
@@ -149,7 +149,7 @@ void t_move_nyomva(int mx, int my) {
 // Gany, mar megfogott ponttal raugrik kozeli pontra:
 void gany_move_jobb(int mx, int my) {
     if (!Pgy) {
-        hiba("uirw");
+        internal_error("uirw");
     }
     // Meg van fogva egy pont, melyik van ehhez legkozelebb:
     double tav;
@@ -213,7 +213,7 @@ void t_move_nyomva_jobb(int mx, int my) {
     }
 
     if ((pgy && psp) || (pgy && pk) || (pk && psp)) {
-        hiba("ycggyuegcfuye54354");
+        internal_error("ycggyuegcfuye54354");
     }
 
     if (psp) {
@@ -257,10 +257,10 @@ void t_move_esc(void) {
 void t_move_mmove(int mx, int my) {
     // Ellenorzes:
     if (!Pgy && !Pker && !Psp) {
-        hiba("t_move_mmove-ban !Pgy && !Pker!");
+        internal_error("t_move_mmove-ban !Pgy && !Pker!");
     }
     if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-        hiba("t_move_mmove-ban:", "(Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+        internal_error("t_move_mmove-ban:", "(Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
     }
 
     push();
@@ -372,7 +372,7 @@ void t_create_vert_nyomva(int mx, int my) {
         toolhelp("Click the left button to place point. SPACE and ENTER swaps. ESC or right button "
                  "cancels.");
         if (!Egypont) {
-            hiba("!Egypont, pedig annak kene lennie (ffdsgiu)!");
+            internal_error("!Egypont, pedig annak kene lennie (ffdsgiu)!");
         }
         for (int i = 0; i < MAXGYURU; i++) {
             if (!Ptop->ptomb[i]) {
@@ -388,7 +388,7 @@ void t_create_vert_nyomva(int mx, int my) {
                 return;
             }
         };
-        hiba("Tul sok gyuru (iycriyfd)!");
+        internal_error("Tul sok gyuru (iycriyfd)!");
     }
 }
 
@@ -413,7 +413,7 @@ void t_create_vert_esc(void) {
                 }
             }
             if (gyuruszam <= 1) {
-                hiba("t_create_vert_nyomva_esc-ban gyuruszam <= 1 (7pq4)!");
+                internal_error("t_create_vert_nyomva_esc-ban gyuruszam <= 1 (7pq4)!");
             }
 
             int talalt = 0;
@@ -430,7 +430,7 @@ void t_create_vert_esc(void) {
                 }
             }
             if (!talalt) {
-                hiba("Gyuru torlesekor !talalt!");
+                internal_error("Gyuru torlesekor !talalt!");
             }
         } else {
             // Csak a pontot toroljuk:
@@ -441,7 +441,7 @@ void t_create_vert_esc(void) {
         }
     } else {
         if (!Egypont) {
-            hiba("!Egypont (jygfeuye)!");
+            internal_error("!Egypont (jygfeuye)!");
         }
         Egypont = 0;
         invalidate();
@@ -485,7 +485,7 @@ void t_create_vert_space(void) {
 void t_create_vert_mmove(int mx, int my) {
     if (!Pgy && !Egypont) {
         // Teljesen normalis kurzor mozgatas:
-        hiba("Ezt most edituj.cpp-nek kellene csinalnia!");
+        internal_error("Ezt most edituj.cpp-nek kellene csinalnia!");
     }
     push();
     lockfrontbuffer_pic();
@@ -504,7 +504,7 @@ void t_create_vert_mmove(int mx, int my) {
         Mouy = my;
     } else {
         if (!Egypont) {
-            hiba("!Egypont (yifeye)");
+            internal_error("!Egypont (yifeye)");
         }
         vonalrajz(konv(Epontx, Eponty), konv(Kpontx, Kponty), 0);
         Moux = Kpontx = mx;
@@ -522,7 +522,7 @@ void t_create_vert_mmove(int mx, int my) {
 
 void t_delete_vert_nyomva(int mx, int my) {
     if (Pgy) {
-        hiba("yffwiye");
+        internal_error("yffwiye");
     }
     // Most probalunk megfogni egy pontot:
     double x = konvx_i2d(mx);
@@ -535,7 +535,7 @@ void t_delete_vert_nyomva(int mx, int my) {
     }
     // Talaltunk egy pontot, amit le kene torolni:
     if (pgy->pontszam < 3) {
-        hiba("yigfdsyhifeiu");
+        internal_error("yigfdsyhifeiu");
     }
     if (pgy->pontszam == 3) {
         // dialog( "You cannot delete this polygon, because every" );
@@ -551,7 +551,7 @@ void t_delete_vert_nyomva(int mx, int my) {
 
 void t_delete_poly_nyomva(int mx, int my) {
     if (Pgy) {
-        hiba("oiutrgiuot");
+        internal_error("oiutrgiuot");
     }
     // Most probalunk megfogni egy pontot:
     double x = konvx_i2d(mx);
@@ -570,7 +570,7 @@ void t_delete_poly_nyomva(int mx, int my) {
         }
     }
     if (szam == 0) {
-        hiba("oufeifwe");
+        internal_error("oufeifwe");
     }
     if (szam == 1) {
         dialog("This is the only polygon, so you cannot delete it.");
@@ -585,7 +585,7 @@ void t_delete_poly_nyomva(int mx, int my) {
             return;
         }
     }
-    hiba("fdsiyfdfei");
+    internal_error("fdsiyfdfei");
 }
 
 // CREATE_KEREK CREATE_KEREK CREATE_KEREK CREATE_KEREK CREATE_KEREK
@@ -632,7 +632,7 @@ void t_create_kerek_nyomva(int mx, int my, int food) {
             return;
         }
     }
-    hiba("yer8yryfryfr!");
+    internal_error("yer8yryfryfr!");
 }
 
 // DELETE_KEREK DELETE_KEREK DELETE_KEREK DELETE_KEREK DELETE_KEREK
@@ -664,7 +664,7 @@ void t_delete_kerek_nyomva(int mx, int my) {
             return;
         }
     }
-    hiba("iufewifewiyfweiyhfewiyh");
+    internal_error("iufewifewiyfweiyhfewiyh");
 }
 
 // ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM
@@ -759,7 +759,7 @@ void t_zoomin_mmove(int x, int y) {
 void t_create_sprite_nyomva_jobb(void) {
     // Plgr-en vegzi muveleteit:
     if (!Plgr) {
-        hiba("grtyy");
+        internal_error("grtyy");
     }
     if (Plgr->kepszam <= 0) {
         dialog("There are not any pictures in the LGR file!");
@@ -767,7 +767,7 @@ void t_create_sprite_nyomva_jobb(void) {
     }
     tolt_pickasprite();
     /*if( Plgr->aktivindex >= Plgr->kepszam )
-        hiba( "[op0fijh" );
+        internal_error( "[op0fijh" );
     kispritenev( Plgr->nevek[Plgr->aktivindex],
                  Plgr->tavolsagok[Plgr->aktivindex],
                  Plgr->hatarolok[Plgr->aktivindex] );*/
@@ -775,7 +775,7 @@ void t_create_sprite_nyomva_jobb(void) {
 
 void t_create_sprite_nyomva(int mx, int my) {
     if (!Plgr) {
-        hiba("987g45");
+        internal_error("987g45");
     }
     if (Plgr->kepszam <= 0) {
         dialog("There are not any pictures in the LGR file!");
@@ -809,7 +809,7 @@ void t_create_sprite_nyomva(int mx, int my) {
             return;
         }
     }
-    hiba("oihhgffc!");
+    internal_error("oihhgffc!");
 }
 
 void t_delete_sprite_nyomva(int mx, int my) {
@@ -828,5 +828,5 @@ void t_delete_sprite_nyomva(int mx, int my) {
             return;
         }
     }
-    hiba("uytyttyrtrtdf");
+    internal_error("uytyttyrtrtdf");
 }

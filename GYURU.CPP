@@ -33,7 +33,7 @@ gyuru::~gyuru(void) {
 
 void gyuru::ujkoord(int k, double x, double y) {
     if (k < 0 || k >= pontszam) {
-        hiba("gyuru::ujkoord-ban k < 0 || k >= pontszam!");
+        internal_error("gyuru::ujkoord-ban k < 0 || k >= pontszam!");
     }
     ponttomb[k].x = x;
     ponttomb[k].y = y;
@@ -41,7 +41,7 @@ void gyuru::ujkoord(int k, double x, double y) {
 
 void gyuru::kirajz(int k, int fel, int szaggatott) {
     if (k < 0 || k >= pontszam) {
-        hiba("gyuru::kirajz-ban k < 0 || k >= pontszam!");
+        internal_error("gyuru::kirajz-ban k < 0 || k >= pontszam!");
     }
     if ((fel && k == pontszam - 1) || (!fel && k == 0)) {
         // Elejet a vegevel kell osszekotni:
@@ -58,7 +58,7 @@ void gyuru::kirajz(int k, int fel, int szaggatott) {
 
 void gyuru::osszrajz(void) {
     if (pontszam < 3 || pontszam > MAXPONT) {
-        hiba("gyuru::osszrajz-ban pontszam < 3 || pontszam > MAXPONT!");
+        internal_error("gyuru::osszrajz-ban pontszam < 3 || pontszam > MAXPONT!");
     }
     for (int i = 0; i < pontszam; i++) {
         kirajz(i, 1, 0);
@@ -72,7 +72,7 @@ int gyuru::beszur(int k) {
         return 0;
     }
     if (k >= pontszam) {
-        hiba("gyuru::beszur-ban k >= pontszam!");
+        internal_error("gyuru::beszur-ban k >= pontszam!");
     }
 
     if (pontszam >= lefoglaltmaxpont) {
@@ -101,7 +101,7 @@ int gyuru::beszur(int k) {
 
 void gyuru::torol(int k) {
     if (k < 0 || k >= pontszam) {
-        hiba("gyuru::torol-ben k < 0 || k >= pontszam!");
+        internal_error("gyuru::torol-ben k < 0 || k >= pontszam!");
     }
     if (pontszam <= 3) {
         return;
@@ -131,7 +131,7 @@ double gyuru::legkozpont(double x, double y, int* pk) {
 int gyuru::metszesszam(vect2 r1, vect2 v1) {
 #ifdef DEBUG
     if (koveto) {
-        hiba("89yy");
+        internal_error("89yy");
     }
 #endif
 
@@ -161,7 +161,7 @@ int gyuru::metszesszam(vect2 r1, vect2 v1) {
 int gyuru::metszeshely(vect2 r1, vect2 v1, int kihagy, vect2* phely) {
 #ifdef DEBUG
     if (koveto) {
-        hiba("0i9p9");
+        internal_error("0i9p9");
     }
 #endif
 
@@ -271,34 +271,34 @@ gyuru::gyuru(FILE* h, int verzio) {
 
     if (kovetos) {
         if (fread(&koveto, 1, 4, h) != 4) {
-            hiba("86t6yt!");
+            internal_error("86t6yt!");
         }
         if (!kiskoveto && koveto) {
             char semmi[20];
             if (fread(semmi, 1, 10, h) != 10) {
-                hiba("86t6yt!");
+                internal_error("86t6yt!");
             }
             if (fread(semmi, 1, 10, h) != 10) {
-                hiba("86t6yt!");
+                internal_error("86t6yt!");
             }
             if (fread(semmi, 1, 10, h) != 10) {
-                hiba("86t6yt!");
+                internal_error("86t6yt!");
             }
             if (fread(semmi, 1, 4, h) != 4) {
-                hiba("86t6yt!");
+                internal_error("86t6yt!");
             }
             if (fread(semmi, 1, 4, h) != 4) {
-                hiba("86t6yt!");
+                internal_error("86t6yt!");
             }
         }
     }
 
     if (fread(&pontszam, 1, sizeof(pontszam), h) != sizeof(pontszam)) {
-        hiba("gyuru::gyuru-ben nem megy file olvasas!");
+        internal_error("gyuru::gyuru-ben nem megy file olvasas!");
     }
 
     if (pontszam < 3 || pontszam > MAXPONT) {
-        hiba("gyuru::gyuru-ben pontszam < 3 || pontszam > MAXPONT!");
+        internal_error("gyuru::gyuru-ben pontszam < 3 || pontszam > MAXPONT!");
     }
 
     lefoglaltmaxpont = pontszam + 10;
@@ -308,14 +308,14 @@ gyuru::gyuru(FILE* h, int verzio) {
         ponttomb[i].y = 0;
     }
     if (fread(ponttomb, 1, sizeof(vect2) * pontszam, h) != sizeof(vect2) * pontszam) {
-        hiba("gyuru::gyuru-ben nem megy file olvasasa!");
+        internal_error("gyuru::gyuru-ben nem megy file olvasasa!");
     }
 }
 
 void gyuru::save(FILE* h, topol* ptop) {
     // Koveto reszek:
     if (fwrite(&koveto, 1, 4, h) != 4) {
-        hiba("96t6yt!");
+        internal_error("96t6yt!");
     }
 
     if (!koveto) {
@@ -345,10 +345,10 @@ void gyuru::save(FILE* h, topol* ptop) {
 
     // Itt jon a mentes lenyegeben:
     if (fwrite(&pontszam, 1, sizeof(pontszam), h) != sizeof(pontszam)) {
-        hiba("gyuru::save-ben nem megy file-ba iras!");
+        internal_error("gyuru::save-ben nem megy file-ba iras!");
     }
     if (fwrite(ponttomb, 1, sizeof(vect2) * pontszam, h) != sizeof(vect2) * pontszam) {
-        hiba("gyuru::save-ben nem megy file-ba iras!");
+        internal_error("gyuru::save-ben nem megy file-ba iras!");
     }
 }
 
@@ -360,14 +360,14 @@ static double balszog(vect2* pa, vect2 b, vect2 c) {
         double dx1 = pa->x - b.x;
         if (dy1 == 0.0 && dx1 == 0) {
             // Ezt mar topologia check-ben meg kellett volna szuntetni:
-            hiba("balszog-ben ket pont egybe esik!");
+            internal_error("balszog-ben ket pont egybe esik!");
         }
         double alfa = atan2(dy1, dx1);
         double dy2 = c.y - b.y;
         double dx2 = c.x - b.x;
         if (dy2 == 0.0 && dx2 == 0) {
             // Ezt mar topologia check-ben meg kellett volna szuntetni:
-            hiba("balszog-ben ket pont egybe esik!");
+            internal_error("balszog-ben ket pont egybe esik!");
         }
         double beta = atan2(dy2, dx2);
         double szog = alfa - beta;
@@ -396,8 +396,8 @@ static void szetvalaszt_fv(vect2* pa, vect2* pb) {
     constexpr double egytav = 0.0002;
     if (fabs(pa->x - pb->x) < 0.0000002 && fabs(pa->y - pb->y) < 0.0000002) {
         // Egy helyen vannak:
-        pa->x += egytav + egytav * s_random(1000) / 1200.0;
-        pa->y += egytav + egytav * s_random(1000) / 1200.0;
+        pa->x += egytav + egytav * random_range(1000) / 1200.0;
+        pa->y += egytav + egytav * random_range(1000) / 1200.0;
     }
 }
 
@@ -415,7 +415,7 @@ void gyuru::szetvalaszt(void) {
 int gyuru::pozitivkorjaras(void) {
 #ifdef DEBUG
     if (koveto) {
-        hiba("d6f65");
+        internal_error("d6f65");
     }
 #endif
 

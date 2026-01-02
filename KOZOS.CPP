@@ -18,7 +18,7 @@ static bool FindInProgress = false;
 
 int fifirst(const char* minta, char* filenev) {
     if (FindInProgress) {
-        hiba("Called fifirst while a find is already in progress!");
+        internal_error("Called fifirst while a find is already in progress!");
     }
 
     FindInProgress = true;
@@ -35,7 +35,7 @@ int fifirst(const char* minta, char* filenev) {
 
 int finext(char* filenev) {
     if (!FindInProgress) {
-        hiba("Called finext while no find is in progress!");
+        internal_error("Called finext while no find is in progress!");
     }
 
     while (CurrentIterator != EndIterator) {
@@ -61,7 +61,7 @@ int finext(char* filenev) {
 
 void ficlose(void) {
     if (!FindInProgress) {
-        hiba("Called ficlose while no find is in progress!");
+        internal_error("Called ficlose while no find is in progress!");
     }
     FindInProgress = false;
     CurrentIterator = EndIterator;

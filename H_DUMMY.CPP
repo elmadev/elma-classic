@@ -29,8 +29,8 @@ void nullazhangot(void) {}
 
 void hangosdelay(long t) {
     // 182*sec-et adja vissza idot tortresszel egyutt!
-    double kezdo = mv_stopperido();
-    while (mv_stopperido() / 182.0 < kezdo / 182.0 + t / 1000.0) {
+    double kezdo = stopwatch();
+    while (stopwatch() / 182.0 < kezdo / 182.0 + t / 1000.0) {
         handle_events();
     }
 }

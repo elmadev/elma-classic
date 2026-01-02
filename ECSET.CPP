@@ -26,7 +26,7 @@ ecset* Pecsetview = NULL;
     int i = 0;
     while( futo ) {
         if( i > 38 )
-            hiba( "i > 38!" );
+            internal_error( "i > 38!" );
 
         xtomb[i] = kurx;
         muttomb[i] = (int)futo->pixelek;
@@ -39,8 +39,8 @@ ecset* Pecsetview = NULL;
 }*/
 
 static void hibanincsmem(void) {
-    uzenet("You do not have enough memory to load this level!",
-           "Try to set the graphic detail to low at the options.");
+    external_error("You do not have enough memory to load this level!",
+                   "Try to set the graphic detail to low at the options.");
 }
 
 mdarab* ecset::newmdarab(void) {
@@ -74,7 +74,7 @@ void ecset::getorigoandsize(void) {
     Pszak->felsorolasresetszak();
     vonal* psz = Pszak->getnextszak();
     if (!psz) {
-        hiba("Nincs egyetlen szakasz sem definialva!");
+        internal_error("Nincs egyetlen szakasz sem definialva!");
     }
     double minx = psz->r.x;
     double maxx = psz->r.x;
@@ -164,9 +164,9 @@ void ecset::addszakasz(vonal* psz) {
 
     /*double kozelseg = 0.000001;
     if( fabs( double( y1 )-(r.y+1) ) < kozelseg )
-            hiba( "Nagyon kozeli pont!" );
+            internal_error( "Nagyon kozeli pont!" );
     if( fabs( double( y2 )-(r.y+v.y) ) < kozelseg )
-            hiba( "Nagyon kozeli pont!" );*/
+            internal_error( "Nagyon kozeli pont!" );*/
 
     // Egyenes egyenletenek parameterei:
     double m = v.x / v.y;
@@ -178,14 +178,14 @@ void ecset::addszakasz(vonal* psz) {
     for (int y = y1; y <= y2; y++) {
         int x = m * y + a + 1.0;
         // if( fabs( double(x)-m*y+a+1.0 ) < kozelseg )
-        //	hiba( "Nagyon kozeli pont!" );
+        //	internal_error( "Nagyon kozeli pont!" );
 
         // Hozzacsapjuk hatar pontot sorhoz:
         if (y < 10 || y >= sorszam) {
-            hiba("ecset::addszakasz y < 10 || y >= sorszam!");
+            internal_error("ecset::addszakasz y < 10 || y >= sorszam!");
         }
         if (x < 10 || x > maxx) {
-            hiba("ecset::addszakasz x < 10 || x > maxx!");
+            internal_error("ecset::addszakasz x < 10 || x > maxx!");
         }
 
         mdarab* pmd = newmdarab();
@@ -199,7 +199,7 @@ void ecset::addszakasz(vonal* psz) {
 
         mdarab* pfut = msorok[y];
         if (!pfut) {
-            hiba("ecset::addszakasz !pfut!");
+            internal_error("ecset::addszakasz !pfut!");
         }
         while (pfut->pkov) {
             pfut = pfut->pkov;
@@ -232,7 +232,7 @@ static void rendez(mdarab* elso) {
         szam++;
     }
     if (szam <= 0) {
-        hiba("(ecset) rendez-ben szam <= 0!");
+        internal_error("(ecset) rendez-ben szam <= 0!");
     }
 
     if (szam < 2) {
@@ -304,7 +304,7 @@ void ecset::foldmutatocsere(void) {
         mdarab* fut = msorok[i];
         int xpos = kurxposok_A[i];
         if (xpos > 100) {
-            hiba("ecset::foldmutatocsere xpos > 100!");
+            internal_error("ecset::foldmutatocsere xpos > 100!");
         }
         while (fut) {
             if ((pixelek_t)fut->pixelek == PX_FOLD && fut->xsize < SCREEN_WIDTH) {
@@ -346,7 +346,7 @@ void ecset::textura2mutato(void) {
         mdarab* fut = msorok[y];
         int xpos = kurxposok_A[y];
         if (xpos > 100) {
-            hiba("9865fd");
+            internal_error("9865fd");
         }
         while (fut) {
             int hozzaad = fut->xsize;
@@ -357,10 +357,10 @@ void ecset::textura2mutato(void) {
 // Itt van maszk, le kell cserelni:
 #ifdef DEBUG
                 if (kepindex >= Plgr->texturaszam) {
-                    hiba("ecset::maszkokkitoltese kepindex >= Plgr->kepszam!");
+                    internal_error("ecset::maszkokkitoltese kepindex >= Plgr->kepszam!");
                 }
                 if (Plgr->texturak[kepindex].origxsize <= 0) {
-                    hiba("7ywijohg!");
+                    internal_error("7ywijohg!");
                 }
 #endif
                 textura* pt = &Plgr->texturak[kepindex];
@@ -387,7 +387,7 @@ void ecset::textura2mutato(void) {
                     fut->xsize = size;
                     fut->pixelek = ppic->get_row(y % ppic->get_height()) + x;
                     if (((pixelek_t)fut->pixelek & PIXELMASZK) == 0) {
-                        uzenet("Memory address is less than 2048 (723)!");
+                        external_error("Memory address is less than 2048 (723)!");
                     }
 
                     x += size;
@@ -409,7 +409,7 @@ static int megszamol(mdarab* elso) {
         szam++;
     }
     if (szam <= 0) {
-        hiba("(ecset) megszamol-ban szam <= 0!");
+        internal_error("(ecset) megszamol-ban szam <= 0!");
     }
     return szam;
 }
@@ -468,12 +468,12 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
                                     int fazis) {
 
     if ((pixelek_t)ujpixelek == PX_URES) {
-        hiba("ecset::beepitegymadarabnyit-ban nem lehet ureset rarakni!");
+        internal_error("ecset::beepitegymadarabnyit-ban nem lehet ureset rarakni!");
     }
 
     if ((pixelek_t)pmd->pixelek == PX_URES && fazis != FAZIS_URESRE) {
-        hiba("ecset::beepitegymadarabnyit-ban",
-             "(int)ujpixelek == PX_URES && fazis != FAZIS_URESRE!");
+        internal_error("ecset::beepitegymadarabnyit-ban",
+                       "(int)ujpixelek == PX_URES && fazis != FAZIS_URESRE!");
     }
 
     // Eldontjuk, hogy ki kell-e egyaltalan rakni:
@@ -504,7 +504,8 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
 
     if (fazis == FAZIS_URESRE) {
         if ((pixelek_t)pmd->pixelek == PX_FOLD || (pixelek_t)pmd->pixelek == PX_EG) {
-            hiba("ecset::beepitegymadarabnyit fazis == FAZIS_LYUKRA, megis fold vagy eg!");
+            internal_error(
+                "ecset::beepitegymadarabnyit fazis == FAZIS_LYUKRA, megis fold vagy eg!");
         }
         if ((pixelek_t)pmd->pixelek == PX_URES) {
             regitav = 1000000;
@@ -526,7 +527,7 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
         ujx2 = x2;
     }
     if (ujx2 < x1 || ujx1 > x2) {
-        hiba("ecset::beepitegymadarabnyit ujx2 < x1 || ujx1 > x2!");
+        internal_error("ecset::beepitegymadarabnyit ujx2 < x1 || ujx1 > x2!");
     }
 
     // Most kivalasztjuk melyik esettel allunk szemben:
@@ -555,7 +556,7 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
 
     if (x1 == ujx1 && x2 != ujx2) {
         if (!vege) {
-            hiba("8796kuyg76");
+            internal_error("8796kuyg76");
         }
         // Ha minden megfelel, atallitjuk *pujavege-t:
         if (!(*pujavege) && vege->tavolsag == ujtavolsag &&
@@ -598,7 +599,7 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
 
     if (x1 == ujx1 && x2 == ujx2) {
         if (!vege) {
-            hiba("6fg67r57fu6t");
+            internal_error("6fg67r57fu6t");
         }
         // Ha minden megfelel, atallitjuk *pujavege-t:
         if (!(*pujavege) && vege->tavolsag == ujtavolsag &&
@@ -649,7 +650,7 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
         return puj2;
     }
 
-    hiba("ecset::beepitegymadarabnyit nem talalta meg esetet!");
+    internal_error("ecset::beepitegymadarabnyit nem talalta meg esetet!");
     return NULL;
 }
 
@@ -666,7 +667,7 @@ void ecset::addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int u
     // Pmddd = pmd;
     int xpos = kurxposok_A[y];
     if (xpos > 10) {
-        hiba("ecset::addbytesor xpos > 10!");
+        internal_error("ecset::addbytesor xpos > 10!");
     }
     // Elorelepunk amig kell:
     mdarab* vege = NULL;
@@ -675,19 +676,19 @@ void ecset::addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int u
         vege = pmd;
         pmd = pmd->pkov;
         if (!pmd) {
-            hiba("ecset::addbytesor !pmd (1)!");
+            internal_error("ecset::addbytesor !pmd (1)!");
         }
     }
     // Most rajta allunk elso mdarabon:
     int ujavege = 0;
     while (1) {
         if (!pmd) {
-            hiba("ecset::addbytesor !pmd (2)!");
+            internal_error("ecset::addbytesor !pmd (2)!");
         }
         int x1 = xpos;
         int x2 = xpos + pmd->xsize - 1;
         if (ujx2 < x1) {
-            hiba("ecset::addbytesor ujx2 < x1!");
+            internal_error("ecset::addbytesor ujx2 < x1!");
         }
 
         // Beallitjuk kovetkezo ertekeket:
@@ -799,11 +800,11 @@ void ecset::addspriteok(int fazis) {
             }
             int index_t = Plgr->gettexturaindex(psp->texturanev);
             if (index_t < 0) {
-                hiba("tgferg");
+                internal_error("tgferg");
             }
             int index_m = Plgr->getmaszkindex(psp->maszknev);
             if (index_m < 0) {
-                hiba("6t7ffrge");
+                internal_error("6t7ffrge");
             }
 
             // Ez egy maszk, innentol teljesen kulon intezzuk el:
@@ -813,12 +814,12 @@ void ecset::addspriteok(int fazis) {
 
         // Ez egy kep:
         if (psp->texturanev[0] || psp->maszknev[0]) {
-            hiba("gkuhlij");
+            internal_error("gkuhlij");
         }
 
         int index = Plgr->getkepindex(psp->kepnev);
         if (index < 0) {
-            hiba("kjhhgfchg");
+            internal_error("kjhhgfchg");
         }
         kep* pkep = &Plgr->kepek[index];
 
@@ -838,7 +839,7 @@ void ecset::addspriteok(int fazis) {
         unsigned char* tomb = pkep->adatok;
 
         if (((pixelek_t)tomb & PIXELMASZK) == 0) {
-            uzenet("Memory address is less than 2048 (987)!");
+            external_error("Memory address is less than 2048 (987)!");
         }
 
         // Vegigmegyunk kepen:
@@ -906,7 +907,7 @@ constexpr int Keltolas = 20;
 
 void ecset::kovetotextura(grass* pkov, int index, int xo, int yo, int fazis) {
     if (!BufferMain) {
-        hiba("6dejuhfe");
+        internal_error("6dejuhfe");
     }
 
     // Most mindig felso:
@@ -919,7 +920,7 @@ void ecset::kovetotextura(grass* pkov, int index, int xo, int yo, int fazis) {
     // Kikeressuk textura indexet:
     int textindex = Plgr->gettexturaindex(texturanev);
     if (textindex < 0) {
-        hiba("iygtyrt");
+        internal_error("iygtyrt");
     }
 
     pic8* ppic = pkov->pics[index];
@@ -967,7 +968,7 @@ void ecset::kovetotextura(grass* pkov, int index, int xo, int yo, int fazis) {
             }
             int anyagszam = getanyagszam(sor, x, xsize, 0);
             if (anyagszam <= 0) {
-                hiba("8toiurtg");
+                internal_error("8toiurtg");
             }
             addbytesor((unsigned char*)(textindex + 10), tavolsag, xo + x, xo + x + anyagszam - 1,
                        yo + y, fazis);
@@ -1016,7 +1017,7 @@ void ecset::kiegykovetokep(grass* pkov, int index, int xo, int yo, int fazis) {
             }
             int anyagszam = getanyagszam(sor, x, xsize, atlatszo);
             if (anyagszam <= 0) {
-                hiba("8toiurtg");
+                internal_error("8toiurtg");
             }
             addbytesor(&sor[x], tavolsag, xo + x, xo + x + anyagszam - 1, yo + y, fazis);
             x += anyagszam;
@@ -1025,7 +1026,7 @@ void ecset::kiegykovetokep(grass* pkov, int index, int xo, int yo, int fazis) {
 
     if (xsize > 640 || ysize > 480) {
 #ifdef DEBUG
-        hiba("7yfg4");
+        internal_error("7yfg4");
 #endif
         return;
     }
@@ -1037,7 +1038,7 @@ void ecset::kiegykovetokep(grass* pkov, int index, int xo, int yo, int fazis) {
 void ecset::kikovetokepek(grass* pkov, int* ytomb, int hossz, int x0, int fazis) {
 #ifdef DEBUG
     if (hossz < 1) {
-        hiba("dd387d3e");
+        internal_error("dd387d3e");
     }
 #else
     if (hossz < 1) {
@@ -1060,7 +1061,7 @@ void ecset::kikovetokepek(grass* pkov, int* ytomb, int hossz, int x0, int fazis)
             if (dy < 2 * Keltolas + 1) {
                 char tmp[60];
                 sprintf(tmp, "picture's y size is less than %d!", 2 * Keltolas + 1);
-                uzenet("In grass picture ", tmp);
+                external_error("In grass picture ", tmp);
             }
             dy -= 2 * Keltolas + 1;
             if (!pkov->is_up[i]) {
@@ -1086,7 +1087,7 @@ void ecset::kikovetokepek(grass* pkov, int* ytomb, int hossz, int x0, int fazis)
 
         // Megvan legjobb kep:
         if (joindex < 0) {
-            hiba("7f908ur5tg");
+            internal_error("7f908ur5tg");
         }
 
         kiegykovetokep(pkov, joindex, curx, cury, fazis);
@@ -1130,7 +1131,7 @@ void ecset::addkovetok(int fazis) {
             continue;
         }
         if (vonalhossz > KOVVONALHOSSZ) {
-            hiba("uh9fdw");
+            internal_error("uh9fdw");
         }
 
         // Kirajzolunk egy minta vonalat kepre:
@@ -1204,7 +1205,7 @@ void ecset::addobjektumok(void) {
             // Kep egy soranak elintezese:
             unsigned char* sor = ppic->get_row( ysize - 1 - y );
             if( ((int)sor & PIXELMASZK) == 0 )
-                uzenet( "Memory address is less than 2048 (654)!" );
+                external_error( "Memory address is less than 2048 (654)!" );
 
             // Atugorja elso ures pixeleket:
             int x = uresszam( 0, xsize, sor, atlatszo );
@@ -1212,7 +1213,7 @@ void ecset::addobjektumok(void) {
                 // Keresi kis szakaszokat:
                 int size = teliszam( x, xsize, sor, atlatszo );
                 if( size <= 0 )
-                    hiba( "ecset::addspriteok teliszam utan size <= 0!" );
+                    internal_error( "ecset::addspriteok teliszam utan size <= 0!" );
 
                 // Negativ iranyban haladunk y-on (y1-y):
                 if( y1-y >= 0 && y1-y < sorszam )
@@ -1263,12 +1264,12 @@ ecset::ecset(int view_p) {
     maxx = sorszam = 0;
 
     if (!Ptop || !Pszak) {
-        hiba("ecset::ecset !Ptop || !Pszak!");
+        internal_error("ecset::ecset !Ptop || !Pszak!");
     }
 
     elsotomb = new mdarabtomb;
     if (!elsotomb) {
-        hiba("Nincs eleg memoria ecset::ecset!");
+        internal_error("Nincs eleg memoria ecset::ecset!");
     }
     elsotomb->kovtomb = NULL;
     kurtomb = elsotomb;
@@ -1285,7 +1286,7 @@ ecset::ecset(int view_p) {
     }
 
     if (sorszam - 10 > MAXECSETSOR) {
-        hiba("ecset::ecset sorszam-10 > MAXECSETSOR!");
+        internal_error("ecset::ecset sorszam-10 > MAXECSETSOR!");
     }
 
     // Inicializaljuk minden sor elejet foldre:
@@ -1301,7 +1302,7 @@ ecset::ecset(int view_p) {
     Pszak->felsorolasresetszak();
     vonal* psz = Pszak->getnextszak();
     if (!psz) {
-        hiba("Nincs egyetlen szakasz sem definialva!");
+        internal_error("Nincs egyetlen szakasz sem definialva!");
     }
     while (psz) {
         addszakasz(psz);
@@ -1360,12 +1361,12 @@ ecset::ecset(ecset* pold) {
     maxx = sorszam = 0;
 
     if (!Ptop || !Pszak) {
-        hiba("ecset::ecset !Ptop || !Pszak!");
+        internal_error("ecset::ecset !Ptop || !Pszak!");
     }
 
     elsotomb = new mdarabtomb;
     if (!elsotomb) {
-        hiba("Nincs eleg memoria ecset::ecset!");
+        internal_error("Nincs eleg memoria ecset::ecset!");
     }
     elsotomb->kovtomb = NULL;
     kurtomb = elsotomb;
@@ -1393,10 +1394,10 @@ ecset::ecset(ecset* pold) {
 
 ecset::~ecset(void) {
     if (elsotomb) {
-        hiba("ecset::~ecset elsotomb");
+        internal_error("ecset::~ecset elsotomb");
     }
     if (!nagydarabtomb) {
-        hiba("ecset::~ecset !nagydarabtomb!");
+        internal_error("ecset::~ecset !nagydarabtomb!");
     }
     delete nagydarabtomb;
     nagydarabtomb = NULL;
@@ -1404,7 +1405,7 @@ ecset::~ecset(void) {
 
 void ecset::deletemdarabok(void) {
     if (!elsotomb) {
-        hiba("ecset::deletemdarabok !elsotomb!");
+        internal_error("ecset::deletemdarabok !elsotomb!");
     }
     mdarabtomb* cur = elsotomb;
     while (cur) {
@@ -1462,7 +1463,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
-                    hiba("(pixelek_t)pda->pixelek != PX_URES iueghyreg!");
+                    internal_error("(pixelek_t)pda->pixelek != PX_URES iueghyreg!");
                 }
 #endif
             }
@@ -1485,7 +1486,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
-                    hiba("(pixelek_t)pda->pixelek != PX_URES iygvfrgiyvr!");
+                    internal_error("(pixelek_t)pda->pixelek != PX_URES iygvfrgiyvr!");
                 }
 #endif
             }
@@ -1518,7 +1519,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
             }
 #ifdef DEBUG
             if ((pixelek_t)pda->pixelek != PX_URES) {
-                hiba("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
+                internal_error("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
             }
 #endif
         }
@@ -1536,7 +1537,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
                 } else {
 #ifdef DEBUG
                     if ((pixelek_t)pda->pixelek != PX_URES) {
-                        hiba("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
+                        internal_error("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
                     }
 #endif
                 }
@@ -1589,7 +1590,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
-                    hiba("(pixelek_t)pda->pixelek != PX_URES iueghyreg!");
+                    internal_error("(pixelek_t)pda->pixelek != PX_URES iueghyreg!");
                 }
 #endif
             }
@@ -1612,7 +1613,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
-                    hiba("(pixelek_t)pda->pixelek != PX_URES iygvfrgiyvr!");
+                    internal_error("(pixelek_t)pda->pixelek != PX_URES iygvfrgiyvr!");
                 }
 #endif
             }
@@ -1645,7 +1646,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
             }
 #ifdef DEBUG
             if ((pixelek_t)pda->pixelek != PX_URES) {
-                hiba("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
+                internal_error("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
             }
 #endif
         }
@@ -1663,7 +1664,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
                 } else {
 #ifdef DEBUG
                     if ((pixelek_t)pda->pixelek != PX_URES) {
-                        hiba("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
+                        internal_error("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
                     }
 #endif
                 }
@@ -1737,7 +1738,7 @@ static void egetkeszit( pic8* peg, int xhely, int xkezd, int xmodulus ) {
 
 void ecset::kitesz(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int x2, int y2) {
     if (x1 >= x2 || y1 >= y2) {
-        hiba("ecset::kitesz x1 >= x2 || y1 >= y2!");
+        internal_error("ecset::kitesz x1 >= x2 || y1 >= y2!");
     }
 
     int ye1 = 0;
@@ -1746,7 +1747,7 @@ void ecset::kitesz(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int 
     int ye2 = ye1 + y2 - y1;
 
     if (Xe1 < 20 || Xe2 > maxx - 20 || ye1 < 20 || ye2 > sorszam - 20) {
-        hiba("ecset::kitesz Xe1 < 20 || Xe2 > maxx-20 || ye1 < 20 || ye2 > sorszam-20!");
+        internal_error("ecset::kitesz Xe1 < 20 || Xe2 > maxx-20 || ye1 < 20 || ye2 > sorszam-20!");
     }
 
     int foldymodulus = Plgr->pfold->get_height();
@@ -1789,7 +1790,7 @@ void ecset::kiteszview(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, 
     Egsor = Plgr->viewegsor;
 
     if (x1 >= x2 || y1 >= y2) {
-        hiba("ecset::kitesz x1 >= x2 || y1 >= y2!");
+        internal_error("ecset::kitesz x1 >= x2 || y1 >= y2!");
     }
 
     int ye1 = 0;
@@ -1798,7 +1799,7 @@ void ecset::kiteszview(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, 
     int ye2 = ye1 + y2 - y1 + 1;
 
     if (Xe1 < 20 || Xe2 > maxx - 20 || ye1 < 20 || ye2 > sorszam - 20) {
-        hiba("ecset::kitesz Xe1 < 20 || Xe2 > maxx-20 || ye1 < 20 || ye2 > sorszam-20!");
+        internal_error("ecset::kitesz Xe1 < 20 || Xe2 > maxx-20 || ye1 < 20 || ye2 > sorszam-20!");
     }
 
     int yadd = ye1 - y1;
@@ -1819,7 +1820,7 @@ static mdarab* Glb_pfoltdarab = NULL;
 
 static int ezfolt(int x, int y, mdbiter* piter1) {
     if (!Glb_pfoltdarab) {
-        hiba("65rw5r7twe");
+        internal_error("65rw5r7twe");
     }
 
     // Felette levo sort vizsgaljuk:
@@ -1880,7 +1881,7 @@ void ecset::foltoz(void) {
         mdarab* pmd = msorok[y];
         int xpos = kurxposok_A[y];
         if (xpos > 10) {
-            hiba("uih67f");
+            internal_error("uih67f");
         }
 
         while (pmd) {
@@ -1895,7 +1896,7 @@ void ecset::foltoz(void) {
 // Itt van maszk, le kell cserelni:
 #ifdef DEBUG
                 if (kepindex >= Plgr->texturaszam) {
-                    hiba("egryiegr");
+                    internal_error("egryiegr");
                 }
 #endif
                 textura* pt = &Plgr->texturak[kepindex];
@@ -1954,7 +1955,7 @@ void betoltecseteket(void) {
 
     Pecsetalso = new ecset(0);
     if (!Pecsetalso) {
-        hiba("Nincs eleg memoria Pecsetalso-nak!");
+        internal_error("Nincs eleg memoria Pecsetalso-nak!");
     }
 
     if (!EolSettings->pictures_in_background) {
@@ -1963,7 +1964,7 @@ void betoltecseteket(void) {
 
     Pecsetfelso = new ecset(Pecsetalso);
     if (!Pecsetfelso) {
-        hiba("Nincs eleg memoria Pecsetfelso-nak!");
+        internal_error("Nincs eleg memoria Pecsetfelso-nak!");
     }
 
     if (!EolSettings->pictures_in_background) {
@@ -1973,7 +1974,7 @@ void betoltecseteket(void) {
             mdarab* pmd = Pecsetalso->msorok[i];
             int xpos = Pecsetalso->kurxposok_A[i];
             if (xpos > 100) {
-                hiba("betoltecseteket xpos > 100!");
+                internal_error("betoltecseteket xpos > 100!");
             }
             while (pmd) {
                 if (pmd->tavolsag < 500) {
@@ -2006,7 +2007,7 @@ void betoltecseteket(void) {
     // View ecset:
     Pecsetview = new ecset(1);
     if (!Pecsetview) {
-        hiba("Nincs eleg memoria Pecsetview-nak!");
+        internal_error("Nincs eleg memoria Pecsetview-nak!");
     }
     Pecsetview->mutatotlanit();
     Pecsetview->deletemdarabok();
@@ -2039,13 +2040,13 @@ mdarab* mdbiter::getpmd(int x, int y) {
     } else {
         // Ujra kell olvasni:
         if (y < 0 || y >= pecset->sorszam) {
-            hiba("789eygrq");
+            internal_error("789eygrq");
         }
         ybent = y;
         pmd = pecset->msorok[y];
         xposbent = pecset->kurxposok_A[y];
         if (xposbent > 10) {
-            hiba("y7fjksd");
+            internal_error("y7fjksd");
         }
         while (x >= xposbent + pmd->xsize) {
             xposbent += pmd->xsize;

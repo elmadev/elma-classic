@@ -38,7 +38,7 @@ static void create_balls(void) {
     }
     // Choose a random starting angle for the top-left ball
     srand((unsigned int)time(nullptr));
-    double angle = s_random(1000);
+    double angle = random_range(1000);
     angle *= K_pip2 / 1000.0;
     angle *= 0.999;
     angle += 0.0005;
@@ -56,7 +56,7 @@ void balls_init(void) {
     NextCollisionTime = UNKNOWN_COLLISION_TIME;
     ElapsedTimeSinceKeyframe = 0.0;
     if (BallsInitialized) {
-        hiba("Balls already initialized!");
+        internal_error("Balls already initialized!");
     }
     bool allocation_success = true;
     CollisionTimeGrid = new double*[BallCount + 4];
@@ -91,7 +91,7 @@ void balls_init(void) {
             delete CollisionTimeGrid;
             CollisionTimeGrid = nullptr;
         }
-        hiba("Out of memory!");
+        internal_error("Out of memory!");
     }
     BallsInitialized = true;
 }
@@ -107,7 +107,7 @@ void balls_simulate(double dt) {
         dt = 0.00000000001;
     }
     if (!BallsInitialized) {
-        hiba("balls_simulate - balls not initialized!");
+        internal_error("balls_simulate - balls not initialized!");
         return;
     }
 

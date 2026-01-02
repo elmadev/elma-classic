@@ -158,14 +158,14 @@ void vonalrajz(vect2 p1, vect2 p2, int szaggatott) {
     if (p1kilog) {
         vect2 ujp1;
         if (!line_circle_intersection(p1, p2 - p1, Vonalkozep, Vonalsugar, &ujp1)) {
-            hiba("vonal-ban !line_circle_intersection!");
+            internal_error("vonal-ban !line_circle_intersection!");
         }
         p1 = ujp1;
     }
     if (p2kilog) {
         vect2 ujp2;
         if (!line_circle_intersection(p2, p1 - p2, Vonalkozep, Vonalsugar, &ujp2)) {
-            hiba("vonal-ban !line_circle_intersection!");
+            internal_error("vonal-ban !line_circle_intersection!");
         }
         p2 = ujp2;
     }
@@ -191,7 +191,7 @@ void vonalrajz(vect2 p1, vect2 p2, int szaggatott) {
     if (fabs(x2 - x1) > fabs(y2 - y1)) {
         // Vonal inkabb vizszintes:
         if (x2 == x1) {
-            hiba("vonal-ban x2 == x1!");
+            internal_error("vonal-ban x2 == x1!");
         }
 
         int forditott = 0;
@@ -234,7 +234,7 @@ void vonalrajz(vect2 p1, vect2 p2, int szaggatott) {
     } else {
         // Vonal inkabb fuggoleges:
         if (y2 == y1) {
-            hiba("vonal-ban y2 == y1!");
+            internal_error("vonal-ban y2 == y1!");
         }
 
         int forditott = 0;
@@ -276,7 +276,7 @@ void vonalrajz(vect2 p1, vect2 p2, int szaggatott) {
 
 double getzoomvalue(void) {
     if (fabs(Dw2.x - Dw1.x) == 0.0) {
-        hiba("getzoomvalue-ban 0-val osztas!");
+        internal_error("getzoomvalue-ban 0-val osztas!");
     }
     return Maxxmeret / fabs(Dw2.x - Dw1.x);
 }
@@ -288,7 +288,7 @@ double display_double_kozeltav(void) { return fabs(konvx_i2d(110) - konvx_i2d(10
 /*void saveallapot( void ) {
     FILE* h = fopen( "display.sta", "wb" );
     if( !h )
-        hiba( "Nem nyilik display.sta!" );
+        internal_error( "Nem nyilik display.sta!" );
 
     fwrite( &Dw1.x, 1, sizeof( Dw1.x ), h );
     fwrite( &Dw2.x, 1, sizeof( Dw2.x ), h );
@@ -305,7 +305,7 @@ double display_double_kozeltav(void) { return fabs(konvx_i2d(110) - konvx_i2d(10
 void loadallapot( void ) {
     FILE* h = fopen( "display.sta", "rb" );
     if( !h )
-        hiba( "Nem nyilik display.sta!" );
+        internal_error( "Nem nyilik display.sta!" );
 
     fread( &Dw1.x, 1, sizeof( Dw1.x ), h );
     fread( &Dw2.x, 1, sizeof( Dw2.x ), h );

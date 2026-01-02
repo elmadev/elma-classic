@@ -24,7 +24,7 @@ szakaszok::szakaszok(topol* ptop) {
 
     tomb = new vonal[Szakaszmaxszam];
     if (!tomb) {
-        uzenet("memory szakaszoknak!");
+        external_error("memory szakaszoknak!");
         return;
     }
     maxszam = Szakaszmaxszam;
@@ -43,7 +43,7 @@ szakaszok::szakaszok(topol* ptop) {
         }
         for (int j = 0; j < pgy->pontszam; j++) {
             if (szam >= Szakaszmaxszam) {
-                hiba("szakaszok::szakaszok-ban z >= Szakaszmaxszam!");
+                internal_error("szakaszok::szakaszok-ban z >= Szakaszmaxszam!");
             }
             vect2 r1, r2;
             if (j < pgy->pontszam - 1) {
@@ -78,7 +78,7 @@ vonalnode* szakaszok::getnewnode(void) {
     if (!pelsocsomag) {
         pelsocsomag = new soknodecsomag;
         if (!pelsocsomag) {
-            uzenet("memory!");
+            external_error("memory!");
         }
         pelsocsomag->nextcsomag = NULL;
         csomagbanbetelt = 0;
@@ -91,7 +91,7 @@ vonalnode* szakaszok::getnewnode(void) {
         curcsomag->nextcsomag = new soknodecsomag;
         curcsomag = curcsomag->nextcsomag;
         if (!curcsomag) {
-            uzenet("memory!");
+            external_error("memory!");
         }
         curcsomag->nextcsomag = NULL;
         csomagbanbetelt = 0;
@@ -114,7 +114,7 @@ void szakaszok::deleteallnodes(void) {
 void szakaszok::bekot(int cellax, int cellay, vonal* pv) {
 #ifdef DEBUG
     if (cellax < 0 || cellay < 0) {
-        hiba("cellax < 0 || cellay < 0!");
+        internal_error("cellax < 0 || cellay < 0!");
     }
 #endif
     if (cellax >= xdim || cellay >= ydim) {
@@ -140,7 +140,7 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
     // Kitolti vonal egyseg es hossz rubrikait:
     pv->hossz = pv->v.length();
     if (pv->hossz < 0.00000001) {
-        hiba("Vonal hossza tul kicsi!");
+        internal_error("Vonal hossza tul kicsi!");
     }
     pv->egyseg = unit_vector(pv->v);
 
@@ -177,7 +177,7 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
         cellax = xkezdo;
     }
     if (r.x + v.x + maxtav < 0) {
-        hiba("szakaszok::beindexelvonalat-ban r.x+v.x+maxtav < 0!");
+        internal_error("szakaszok::beindexelvonalat-ban r.x+v.x+maxtav < 0!");
     }
     int ucsocellax = r.x + v.x + maxtav;
     while (cellax <= ucsocellax) {
@@ -193,11 +193,11 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
         y2 += maxtav;
 #ifdef DEBUG
         if (y1 > y2) {
-            hiba("Bug!");
+            internal_error("Bug!");
         }
 #endif
         if (y2 < 0.0) {
-            hiba("Bug!");
+            internal_error("Bug!");
         }
         int cellay = 0;
         if (y1 > 0) {
@@ -221,10 +221,10 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
 void szakaszok::rendez(double maxtav) {
     // Ellenorzes:
     if (szam <= 0) {
-        hiba("szakaszok::rendez-ben szam <= 0!");
+        internal_error("szakaszok::rendez-ben szam <= 0!");
     }
     if (tertomb) {
-        hiba("szakaszok::rendez-ban nodetomb != NULL!");
+        internal_error("szakaszok::rendez-ban nodetomb != NULL!");
     }
 
     cellameret = 1.0;
@@ -233,7 +233,7 @@ void szakaszok::rendez(double maxtav) {
     felsorolasresetszak();
     vonal* psz = getnextszak();
     if (!psz) {
-        hiba("Nincs egyetlen szakasz sem definialva!");
+        internal_error("Nincs egyetlen szakasz sem definialva!");
     }
     double minx = psz->r.x;
     double maxx = psz->r.x;
@@ -284,17 +284,17 @@ void szakaszok::rendez(double maxtav) {
     xdim = xsized / cellameret + 1;
     ydim = ysized / cellameret + 1;
     if (xdim < 0 || ydim < 0) {
-        hiba("xdim < 0 || ydim < 0!");
+        internal_error("xdim < 0 || ydim < 0!");
     }
     if (xdim > 200 || ydim > 200) {
-        hiba("xdim > 200 || ydim > 200!");
+        internal_error("xdim > 200 || ydim > 200!");
     }
 
     // Lefoglalja tombot:
     unsigned tombmeret = xdim * ydim;
     tertomb = new pvonalnode[tombmeret];
     if (!tertomb) {
-        uzenet("memory!");
+        external_error("memory!");
     }
     int hatar = xdim * ydim;
     for (int i = 0; i < hatar; i++) {
@@ -312,7 +312,7 @@ void szakaszok::rendez(double maxtav) {
 
 void szakaszok::felsorolasreset(vect2 r) {
     if (!tertomb) {
-        hiba("szakaszok::felsorolasreset-ban !tertomb!");
+        internal_error("szakaszok::felsorolasreset-ban !tertomb!");
     }
     r = (r - origo) * (1 / cellameret);
     int cellax = 0;
@@ -325,13 +325,13 @@ void szakaszok::felsorolasreset(vect2 r) {
     }
 
     if (cellax > xdim) {
-        hiba("szakaszok::felsorolasreset-ben cellax > xdim!");
+        internal_error("szakaszok::felsorolasreset-ben cellax > xdim!");
     }
     if (cellax == xdim) {
         cellax = xdim - 1;
     }
     if (cellay > ydim) {
-        hiba("szakaszok::felsorolasreset-ben cellay > ydim!");
+        internal_error("szakaszok::felsorolasreset-ben cellay > ydim!");
     }
     if (cellay == ydim) {
         cellay = ydim - 1;
@@ -345,7 +345,7 @@ vonal* szakaszok::getnext(void) {
     }
 #ifdef DEBUG
     if (!nextnode->pvonal) {
-        hiba("szakaszok::getnext-ben !nextnode->pvonal");
+        internal_error("szakaszok::getnext-ben !nextnode->pvonal");
     }
 #endif
     vonal* pret = nextnode->pvonal;
@@ -366,7 +366,7 @@ vonal* szakaszok::getnextszak(void) {
 
 vonal* szakaszok::getptrszakasz(int sorszam) {
     if (sorszam >= szam) {
-        hiba("szakaszok::getptrszakasz-ban sorszam >= szam!");
+        internal_error("szakaszok::getptrszakasz-ban sorszam >= szam!");
     }
     return &tomb[sorszam];
 }

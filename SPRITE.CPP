@@ -28,7 +28,7 @@ unsigned char* spriteadat8(pic8* ppic, unsigned char szin, unsigned short* pspri
     unsigned char* buffer = NULL;
     buffer = new unsigned char[MAXBUFFER];
     if (!buffer) {
-        uzenet("spriteadat8-ban memory!");
+        external_error("spriteadat8-ban memory!");
         return NULL;
     }
     int xsize = ppic->get_width();
@@ -52,7 +52,7 @@ unsigned char* spriteadat8(pic8* ppic, unsigned char szin, unsigned short* pspri
                 buffer[buf++] = nemkellhossz;
             }
             if (buf >= MAXBUFFER) {
-                hiba("Nem fer be egy szegmensbe spriteadat!");
+                internal_error("Nem fer be egy szegmensbe spriteadat!");
                 delete buffer;
                 return NULL;
             }
@@ -64,7 +64,7 @@ unsigned char* spriteadat8(pic8* ppic, unsigned char szin, unsigned short* pspri
     unsigned char* jobuffer = NULL;
     jobuffer = new unsigned char[buf];
     if (!jobuffer) {
-        uzenet("spriteadat8-ban memory!");
+        external_error("spriteadat8-ban memory!");
         delete buffer;
         return NULL;
     }

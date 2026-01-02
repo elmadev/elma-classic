@@ -33,10 +33,10 @@ static viewtimest Viewtime2 = {1, 0, 1, 0};
 // 0-meghalt, 1-megnyerte, 2-semmi kulonos:
 static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
     if (sorszam < 0 || sorszam >= MAXKEREK) {
-        hiba("spritefeldolgoz-ban sorszam < 0 || sorszam >= MAXKEREK!");
+        internal_error("spritefeldolgoz-ban sorszam < 0 || sorszam >= MAXKEREK!");
     }
     if (!Ptop->kerektomb[sorszam]) {
-        hiba("spritefeldolgoz-ban !Ptop->kerektomb[sorszam]!");
+        internal_error("spritefeldolgoz-ban !Ptop->kerektomb[sorszam]!");
     }
 
     int tipus = Ptop->kerektomb[sorszam]->tipus;
@@ -76,7 +76,7 @@ static double Fordido = 0.5;
 static double baljobbszamol(double eltelt, int hatra) {
 #ifdef DEBUG
     if (eltelt < 0) {
-        hiba("baljobbszamol-ban eltelt < 0!");
+        internal_error("baljobbszamol-ban eltelt < 0!");
     }
 #endif
     if (hatra) {
@@ -243,7 +243,7 @@ static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig,
     pvalt->forgas = (eddig - pvalt->ucsoforgas) / Forgasido;
 #ifdef DEBUG
     if (pvalt->forgas < 0.0) {
-        hiba("lejatszo-ban forgas < 0.0!");
+        internal_error("lejatszo-ban forgas < 0.0!");
     }
 #endif
     if (pvalt->forgas > 1.0) {
@@ -282,7 +282,7 @@ static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     }
 #ifdef DEBUG
     if (pvalt->ugrasnagysag > 1.00001) {
-        hiba("pvalt->ugrasnagysag > 1.00001!");
+        internal_error("pvalt->ugrasnagysag > 1.00001!");
     }
 #endif
 }
@@ -299,7 +299,8 @@ int Masodikmenet = 0;
 
 // Idot adja vissza szazadmasodpercben:
 long lejatszo(const char* filenev) {
-    // hiba( "Ezegyhosszusor,szetkellvagnibiztosanhibaEzegy hosszu sor, szet kell vagni biztosan!",
+    // internal_error( "Ezegyhosszusor,szetkellvagnibiztosanhibaEzegy hosszu sor, szet kell vagni
+    // biztosan!",
     //	"Ez egy masik hosszu sor, szet kell vagni biztosan!" );
 
     // Azert allitom 1-be, hogy mindenkeppen eszrevegyem, ha nem allitom
@@ -324,7 +325,7 @@ long lejatszo(const char* filenev) {
     int palmegnincs = 1;
     init_physics_data();
     if (!Ptop) {
-        hiba("lejatszo-ban !Ptop!");
+        internal_error("lejatszo-ban !Ptop!");
     }
     Ptop->kereklefejjel();
     Ptop->kitoltiszineket();
@@ -342,7 +343,7 @@ long lejatszo(const char* filenev) {
     int plussznyomva = 0;
     int minusznyomva = 0;
     int snapnyomva = 0;
-    mv_startstopper();
+    stopwatch_reset();
 
     // Valtozok inicializalasa:
     valtozok valt1; // Inicializalni kell !!!!!!!!!!!!
@@ -379,7 +380,7 @@ long lejatszo(const char* filenev) {
     int mindjar = 1;
     while (1) {
         // Kiszamolja mennyit kell leptetni:
-        double cel = mv_stopperido() * 0.0024;
+        double cel = stopwatch() * 0.0024;
         if (cel < 0.000001) {
             cel = 0.000001;
         }
@@ -391,14 +392,14 @@ long lejatszo(const char* filenev) {
 
         /* Most nincs idoellenorzes:
         if( cel - eddig > 2.0*0.432 && idoszerint ) // Maximum 2 sec a turelem!
-            uzenet( "System not fast enough!" );
+            external_error( "System not fast enough!" );
         */
 
         handle_events(); // Billentyut itt olvassuk be
         while (eddig <= cel - 0.000001) {
             // char tmp[10];
             // sprintf( tmp, "Gaz kodja: %d", (int)State->keys1.gas );
-            // uzenet( tmp );
+            // external_error( tmp );
             // double dt = 0.003; // Ez it 1.2-es verzionak megfelelo
             // double dt = 0.006; // Ez itt uj lepeskoz (jol mukodik regen)
 
@@ -539,7 +540,7 @@ long lejatszo(const char* filenev) {
         // Vizsgalat kilepesre:
         if (mk_getstate(MK_ESC)) {
             MeghalteloszorAB = 0;
-            double eltelido = mv_stopperido();
+            double eltelido = stopwatch();
             // Motor hangjat kikapcsolja:
             stopmotor(1);
             stopmotor(0);
@@ -554,7 +555,7 @@ long lejatszo(const char* filenev) {
                 // igyhagyni fopen-t!:
                 FILE* h = fopen("f_rate.inf", "wt");
                 if (!h) {
-                    hiba("framerate nem nyilik!");
+                    internal_error("framerate nem nyilik!");
                 }
                 fprintf(h, "%d", framerate);
                 fclose(h);
@@ -677,7 +678,7 @@ static int replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, recor
     }
 #ifdef DEBUG
     if (pvalt->ugrasnagysag > 1.00001) {
-        hiba("pvalt->ugrasnagysag > 1.00001!");
+        internal_error("pvalt->ugrasnagysag > 1.00001!");
     }
 #endif
 
@@ -697,7 +698,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     int palmegnincs = 1;
     init_physics_data();
     if (!Ptop) {
-        hiba("lejatszo-ban !Ptop!");
+        internal_error("lejatszo-ban !Ptop!");
     }
     Ptop->kereklefejjel();
     Ptop->kitoltiszineket();
@@ -710,7 +711,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     Kitoltestmegrak = Kitoltestmegrakkezd;
 
     resetwavegyujto();
-    mv_startstopper();
+    stopwatch_reset();
 
     int plussznyomva = 0;
     int minusznyomva = 0;
@@ -754,7 +755,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     while (1) {
         handle_events(); // Billentyut itt olvassuk be
         // Kiszamolja mennyit kell leptetni:
-        double eddig = mv_stopperido() * 0.0024;
+        double eddig = stopwatch() * 0.0024;
         // recall koordokat es Hatra-t is beallitja:
         int befejezte1 =
             !replaymag(Motor1, &State->keys1, &valt1, Prec1, eddig, &Viewtime1, &valt2.showkep);
@@ -800,7 +801,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         if (Single) {
             setmotor(1, valt1.inf.frekvencia, valt1.inf.gaz);
             // if( valt1.inf.frekvencia > 1.5 )
-            //	hiba( "> 1.5!" );
+            //	internal_error( "> 1.5!" );
             setsurlodas(valt1.inf.surlero);
         } else {
             setmotor(1, valt1.inf.frekvencia, valt1.inf.gaz);
@@ -839,7 +840,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         // Vizsgalat kilepesre:
         if (mk_getstate(MK_ESC)) {
-            double eltelido = mv_stopperido();
+            double eltelido = stopwatch();
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;
             tpl *= 182;
@@ -848,7 +849,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
                 // igyhagyni fopen-t!:
                 FILE* h = fopen("f_rate.inf", "wt");
                 if (!h) {
-                    hiba("framerate nem nyilik!");
+                    internal_error("framerate nem nyilik!");
                 }
                 fprintf(h, "%d", framerate);
                 fclose(h);

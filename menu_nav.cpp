@@ -9,7 +9,7 @@ nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 // maximum column length
 void menu_nav_entries_init() {
     if (NavEntriesLeft) {
-        hiba("menu_nav_entries_init already called!");
+        internal_error("menu_nav_entries_init already called!");
     }
 
     // Count level files
@@ -43,11 +43,11 @@ void menu_nav_entries_init() {
 
     NavEntriesLeft = new nav_entry[max_count + 10];
     if (!NavEntriesLeft) {
-        hiba("menu_nav_entries_init out of memory!");
+        internal_error("menu_nav_entries_init out of memory!");
     }
     NavEntriesLeftMaxLength = max_count;
     if (NavEntriesLeftMaxLength < 200) {
-        hiba("menu_nav_entries_init max count invalid!");
+        internal_error("menu_nav_entries_init max count invalid!");
     }
 }
 
@@ -90,35 +90,36 @@ menu_nav::~menu_nav() {
 // Load the menu with data from NavEntriesLeft and, if two columns, NavEntriesRight
 void menu_nav::setup(int len, bool two_col) {
     if (entries_left) {
-        hiba("menu_nav::setup called twice!");
+        internal_error("menu_nav::setup called twice!");
     }
     length = len;
     two_columns = two_col;
     if (length < 1 || length > NavEntriesLeftMaxLength) {
-        hiba("menu_nav::setup length too long!");
+        internal_error("menu_nav::setup length too long!");
     }
     if (two_columns && length > NAV_ENTRIES_RIGHT_MAX_LENGTH) {
-        hiba("menu_nav::setup length too long (two_columns)!");
+        internal_error("menu_nav::setup length too long (two_columns)!");
     }
     entries_left = new nav_entry[length];
     if (!entries_left) {
-        hiba("menu_nav::setup out of memory!");
+        internal_error("menu_nav::setup out of memory!");
     }
     entries_right = nullptr;
     if (two_columns) {
         entries_right = new nav_entry[length];
         if (!entries_right) {
-            hiba("menu_nav::setup out of memory!");
+            internal_error("menu_nav::setup out of memory!");
         }
     }
     for (int i = 0; i < length; i++) {
         if (strlen(NavEntriesLeft[i]) > NAV_ENTRY_TEXT_MAX_LENGTH) {
-            hiba("menu_nav::setup text length too long!: ", NavEntriesLeft[i]);
+            internal_error("menu_nav::setup text length too long!: ", NavEntriesLeft[i]);
         }
         strcpy(entries_left[i], NavEntriesLeft[i]);
         if (two_columns) {
             if (strlen(NavEntriesRight[i]) > NAV_ENTRY_TEXT_MAX_LENGTH) {
-                hiba("menu_nav::setup text length too long (two_columns)!:", NavEntriesRight[i]);
+                internal_error("menu_nav::setup text length too long (two_columns)!:",
+                               NavEntriesRight[i]);
             }
             strcpy(entries_right[i], NavEntriesRight[i]);
         }
@@ -146,7 +147,7 @@ int menu_nav::calculate_visible_entries(int extra_lines_length) {
 // Render menu and return selected index (or -1 if Esc)
 int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool render_only) {
     if (length < 1) {
-        hiba("menu_nav::navigate invalid setup!");
+        internal_error("menu_nav::navigate invalid setup!");
     }
 
     // Bound current selection
@@ -266,7 +267,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
 
 void menu_nav::render() {
     if (!menu) {
-        hiba("menu_nav::render !menu");
+        internal_error("menu_nav::render !menu");
     }
     menu->render();
 }

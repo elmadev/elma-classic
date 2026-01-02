@@ -58,10 +58,10 @@ void beallitmereteket(int splitscreen) {
     }
 #ifdef DEBUG
     if (Cx2 >= SCREEN_WIDTH) {
-        hiba("beallitmereteket Cx2 >= SCREEN_WIDTH!");
+        internal_error("beallitmereteket Cx2 >= SCREEN_WIDTH!");
     }
     if (Cy2 >= SCREEN_HEIGHT) {
-        hiba("beallitmereteket Cy2 >= SCREEN_HEIGHT!");
+        internal_error("beallitmereteket Cy2 >= SCREEN_HEIGHT!");
     }
 #endif
 
@@ -153,7 +153,7 @@ static void kitag(pic8* ppic8, kiskep* pk, kisbox* pb) {
 static void kigyuru(pic8* ppic8, int x, int y, unsigned char szin) {
 #ifdef DEBUG
     if (x < 1 || x >= ppic8->get_width() - 1 || y < 1 || y >= ppic8->get_height() - 1) {
-        hiba("kigyuru-ben x, vagy y lelog!");
+        internal_error("kigyuru-ben x, vagy y lelog!");
     }
 #endif
     unsigned char* sor = ppic8->get_row(y - 1);
@@ -324,19 +324,19 @@ static void kitolthatteret(pic8* ppic) {
     while (y < SCREEN_HEIGHT) {
         int x = 0;
         while (x < SCREEN_WIDTH) {
-            // hiba( "Itt van 14!" ); idejott
-            // hiba( tmp ); (16) kiirja koordokat szepen
+            // internal_error( "Itt van 14!" ); idejott
+            // internal_error( tmp ); (16) kiirja koordokat szepen
 
             // extern int Debugblt;
             // Debugblt = 1;
             blit8(ppic, Plgr->pkimarad, x, y);
             // Debugblt = 0;
-            //  hiba( "Itt van 20!" ); idejott
+            //  internal_error( "Itt van 20!" ); idejott
             x += Plgr->pkimarad->get_width();
 
-            // hiba( tmp ); (21) kiirja x-et 207-nek
+            // internal_error( tmp ); (21) kiirja x-et 207-nek
         }
-        // hiba( "Itt van 15!" );
+        // internal_error( "Itt van 15!" );
         y += Plgr->pkimarad->get_height();
     }
 }
@@ -353,9 +353,9 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     double forgas = pvalt->baljobbv_f.forgas;
 
     // if( pvalt->baljobb < 0 || pvalt->baljobb > 1.0 )
-    //     hiba( "pvalt->baljobb < 0 || pvalt->baljobb > 1.0!" );
+    //     internal_error( "pvalt->baljobb < 0 || pvalt->baljobb > 1.0!" );
     // if( forgas < 0.0 || forgas > 1.0 )
-    //     hiba( "forgas < 0.0 || forgas > 1.0!" );
+    //     internal_error( "forgas < 0.0 || forgas > 1.0!" );
 
     // Ha kell affinitassal torodni:
     int vanforgas = 0;
@@ -639,7 +639,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
                 pobjpic = Plgr->pkiller->get_frame_by_time(t);
                 break;
             default:
-                hiba("HIBA6751353");
+                internal_error("HIBA6751353");
             }
         } else {
             // Elso frame-et adja vissza mindig:
@@ -654,7 +654,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
                 pobjpic = Plgr->pkiller->get_frame_by_index(0);
                 break;
             default:
-                hiba("6754783");
+                internal_error("6754783");
             }
         }
 
@@ -742,7 +742,7 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
     if (!Single) {
         // Multiplayer modban:
         if (!pvalt1->showkep && !pvalt2->showkep) {
-            hiba("g45jnuhbvfr");
+            internal_error("g45jnuhbvfr");
         }
         if (pvalt1->showkep && pvalt2->showkep) {
             splitscreen = 1;
@@ -762,18 +762,18 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
         Bpic = new pic8(10, SCREEN_HEIGHT);
     }
 
-    // hiba( "Itt van 11!" ); idejott
+    // internal_error( "Itt van 11!" ); idejott
 
     if (Kitoltestmegrak > 0) {
         Kitoltestmegrak--;
         beallitmereteket(splitscreen);
 
-        // hiba( "Itt van 13!" ); idejott
+        // internal_error( "Itt van 13!" ); idejott
 
         kitolthatteret(npic);
     }
 
-    // hiba( "Itt van 12!" ); ide nemjon
+    // internal_error( "Itt van 12!" ); ide nemjon
 
     if (splitscreen) {
         // 1. Jatekos:

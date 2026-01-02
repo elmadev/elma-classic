@@ -66,7 +66,7 @@ int abcbenelobb(const char* text1, const char* text2) {
                 }
             }
         } else {
-            // hiba( "Itt van!" );
+            // internal_error( "Itt van!" );
             if (betu1 < betu2) {
                 return 1;
             }
@@ -111,7 +111,7 @@ void replay(void) {
         int i = 0;
         while (nev[i] != '.') {
             if (!nev[i]) {
-                hiba("replay-ban nincs pont nevben!: ", nev);
+                internal_error("replay-ban nincs pont nevben!: ", nev);
             }
             i++;
         }
@@ -270,11 +270,11 @@ static void demo(void) {
         kiirloading();
         long belyeg = loadrecek(demonevek[demo], 1);
         if (access_topol(Prec1->palyanev) != 0) {
-            hiba("783654");
+            internal_error("783654");
         }
         floadlevel_p(Prec1->palyanev);
         if (Ptop->belyeg != belyeg) {
-            hiba("6734654");
+            internal_error("6734654");
         }
         Prec1->rewind();
         Prec2->rewind();
@@ -343,7 +343,7 @@ void mainmenu(void) {
 
         // Kimenti menut pcx file-ba:
         // BufferMain->save( "menu.pcx", Menupaltomb );
-        // uzenet( "Menut mentett menu.pcx file-ba!" );
+        // external_error( "Menut mentett menu.pcx file-ba!" );
 
         if (eredmeny == 0) {
             play();

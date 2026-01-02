@@ -40,7 +40,7 @@ int talppontkereses(vect2 r, double sugar, vect2* pt1, vect2* pt2, vonal** ppv1,
         vect2 t;
         if (gombszakasz(r, sugar, pv, &t)) {
             if (talppontszam == 2) {
-                hiba("Egyszerre kettonel tobb talppontszam is van");
+                internal_error("Egyszerre kettonel tobb talppontszam is van");
             }
             if (talppontszam == 1) {
                 *pt2 = t;

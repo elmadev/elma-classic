@@ -2,7 +2,7 @@
 
 void pic8::allocate(int w, int h) {
     if (rows || pixels) {
-        hiba("pic8 already allocated!");
+        internal_error("pic8 already allocated!");
         return;
     }
     width = short(w);
@@ -11,14 +11,14 @@ void pic8::allocate(int w, int h) {
         w += 4 - w % 4;
     }
     if (w <= 0 || h <= 0) {
-        hiba("pic8 invalid width/height!");
+        internal_error("pic8 invalid width/height!");
         return;
     }
     // Allocate pixels and rows
     pixels = new unsigned char[w * h];
     rows = new unsigned char*[(unsigned int)(h)];
     if (!rows || !pixels) {
-        uzenet("pic8::alloc memory!");
+        external_error("pic8::alloc memory!");
         return;
     }
     memset(pixels, 0, sizeof(unsigned char) * w * h);
@@ -66,12 +66,12 @@ pic8::pic8(const char* filename, FILE* h) {
                 pcx_open(filename, h);
                 return;
             }
-            hiba("pic8 unknown file extension: ", filename);
+            internal_error("pic8 unknown file extension: ", filename);
             return;
         }
         i--;
     }
-    hiba("pic8 could not find file extension: ", filename);
+    internal_error("pic8 could not find file extension: ", filename);
 }
 
 bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
@@ -84,12 +84,12 @@ bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
             if (strcmpi(filename + i, ".pcx") == 0) {
                 return pcx_save(filename, pal);
             }
-            hiba("pic8::save unknown file extension: ", filename);
+            internal_error("pic8::save unknown file extension: ", filename);
             return false;
         }
         i++;
     }
-    hiba("pic8::save could not find file extension: ", filename);
+    internal_error("pic8::save could not find file extension: ", filename);
     return false;
 }
 
@@ -111,7 +111,7 @@ unsigned char pic8::gpixel(int x, int y) {
 #ifdef DEBUG
 unsigned char* pic8::get_row(int y) {
     if (y < 0 || y >= height) {
-        hiba("pic8::get_row y out of bounds!");
+        internal_error("pic8::get_row y out of bounds!");
         return 0;
     }
     return rows[y];
@@ -168,21 +168,21 @@ void pic8::spr_open(const char* filename, FILE* h) {
         h_provided = false;
         h = qopen(filename, "rb");
         if (!h) {
-            hiba("Failed to open sprite file!: ", filename);
+            internal_error("Failed to open sprite file!: ", filename);
             return;
         }
     }
     // Header
     unsigned char c = 0;
     if (fread(&c, 1, 1, h) != 1) {
-        hiba("Error reading sprite file: ", filename);
+        internal_error("Error reading sprite file: ", filename);
         if (!h_provided) {
             qclose(h);
         }
         return;
     }
     if (c != 0x2d) {
-        hiba("Sprite file header invalid:", filename);
+        internal_error("Sprite file header invalid:", filename);
         if (!h_provided) {
             qclose(h);
         }
@@ -192,7 +192,7 @@ void pic8::spr_open(const char* filename, FILE* h) {
     unsigned short sprite_width = -1;
     unsigned short sprite_height = -1;
     if (fread(&sprite_width, 2, 1, h) != 1 || fread(&sprite_height, 2, 1, h) != 1) {
-        hiba("Error reading sprite file: ", filename);
+        internal_error("Error reading sprite file: ", filename);
         if (!h_provided) {
             qclose(h);
         }
@@ -201,7 +201,7 @@ void pic8::spr_open(const char* filename, FILE* h) {
     width = sprite_width;
     height = sprite_height;
     if (width < 1 || height < 1) {
-        hiba("Sprite file width/height invalid: ", filename);
+        internal_error("Sprite file width/height invalid: ", filename);
         if (!h_provided) {
             qclose(h);
         }
@@ -210,7 +210,7 @@ void pic8::spr_open(const char* filename, FILE* h) {
     allocate(width, height);
     for (int y = 0; y < height; y++) {
         if (fread(rows[y], width, 1, h) != 1) {
-            hiba("Error reading sprite file: ", filename);
+            internal_error("Error reading sprite file: ", filename);
             if (!h_provided) {
                 qclose(h);
             }
@@ -220,14 +220,14 @@ void pic8::spr_open(const char* filename, FILE* h) {
     // Transparency data header
     char tmp[10] = "";
     if (fread(tmp, 7, 1, h) != 1) {
-        hiba("Error reading sprite file: ", filename);
+        internal_error("Error reading sprite file: ", filename);
         if (!h_provided) {
             qclose(h);
         }
         return;
     }
     if (strcmp(tmp, "SPRITE") != 0) {
-        hiba("Sprite file data header invalid: ", filename);
+        internal_error("Sprite file data header invalid: ", filename);
         if (!h_provided) {
             qclose(h);
         }
@@ -236,14 +236,14 @@ void pic8::spr_open(const char* filename, FILE* h) {
     // Transparency data
     transparency_data_length = -1;
     if (fread(&transparency_data_length, 2, 1, h) != 1) {
-        hiba("Error reading sprite file: ", filename);
+        internal_error("Error reading sprite file: ", filename);
         if (!h_provided) {
             qclose(h);
         }
         return;
     }
     if (transparency_data_length < 1) {
-        hiba("Sprite file transparency data length invalid: ", filename);
+        internal_error("Sprite file transparency data length invalid: ", filename);
         if (!h_provided) {
             qclose(h);
         }
@@ -251,14 +251,14 @@ void pic8::spr_open(const char* filename, FILE* h) {
     }
     transparency_data = new unsigned char[transparency_data_length];
     if (!transparency_data) {
-        hiba("Could not allocate memory for sprite file: ", filename);
+        internal_error("Could not allocate memory for sprite file: ", filename);
         if (!h_provided) {
             qclose(h);
         }
         return;
     }
     if (fread(transparency_data, transparency_data_length, 1, h) != 1) {
-        hiba("Error reading sprite file transparency data: ", filename);
+        internal_error("Error reading sprite file transparency data: ", filename);
         if (!h_provided) {
             qclose(h);
         }
@@ -275,13 +275,13 @@ bool pic8::spr_save(const char* filename, FILE* h) {
         h_provided = false;
         h = fopen(filename, "wb");
         if (!h) {
-            hiba("pic8::spr_save failed to open file: ", filename);
+            internal_error("pic8::spr_save failed to open file: ", filename);
             return false;
         }
     }
     unsigned char c = 0x2d;
     if (fwrite(&c, 1, 1, h) != 1 || fwrite(&width, 2, 1, h) != 1 || fwrite(&height, 2, 1, h) != 1) {
-        hiba("pic8::spr_save failed to write to file: ", filename);
+        internal_error("pic8::spr_save failed to write to file: ", filename);
         if (!h_provided) {
             fclose(h);
         }
@@ -289,7 +289,7 @@ bool pic8::spr_save(const char* filename, FILE* h) {
     }
     for (int y = 0; y < height; y++) {
         if (fwrite(rows[y], width, 1, h) != 1) {
-            hiba("pic8::spr_save failed to write to file: ", filename);
+            internal_error("pic8::spr_save failed to write to file: ", filename);
             if (!h_provided) {
                 fclose(h);
             }
@@ -298,7 +298,7 @@ bool pic8::spr_save(const char* filename, FILE* h) {
     }
     if (fwrite("SPRITE", 7, 1, h) != 1 || fwrite(&transparency_data_length, 2, 1, h) != 1 ||
         fwrite(transparency_data, transparency_data_length, 1, h) != 1) {
-        hiba("pic8::spr_save failed to write to file: ", filename);
+        internal_error("pic8::spr_save failed to write to file: ", filename);
         if (!h_provided) {
             fclose(h);
         }
@@ -325,17 +325,17 @@ void pic8::pcx_open(const char* filename, FILE* h) {
         h_not_provided = true;
         h = qopen(filename, "rb");
         if (!h) {
-            hiba("Failed to open PCX file!: ", filename);
+            internal_error("Failed to open PCX file!: ", filename);
         }
     }
     // Header
     pcxdescriptor desc;
     if (fread(&desc, sizeof(desc), 1, h) != 1) {
-        hiba("Failed to read PCX file: ", filename);
+        internal_error("Failed to read PCX file: ", filename);
     }
     if ((desc.VersionNum != 5) || (desc.ManufactId != 10) || (desc.EncodingTech != 1) ||
         (desc.BitsPerPlane != 8) || (desc.NumberOfBitPlanes != 1)) {
-        hiba("PCX file header invalid or not supported: ", filename);
+        internal_error("PCX file header invalid or not supported: ", filename);
     }
     allocate(desc.Xmax - desc.Xmin + 1, desc.Ymax - desc.Ymin + 1);
     // Pixel data
@@ -347,7 +347,7 @@ void pic8::pcx_open(const char* filename, FILE* h) {
             int l = fread(&index, 1, 1, h);
             ccc = index;
             if (l != 1) {
-                hiba("Failed to read PCX file: ", filename);
+                internal_error("Failed to read PCX file: ", filename);
             }
 
             if ((ccc & 0xc0) == 0xc0) {
@@ -355,7 +355,7 @@ void pic8::pcx_open(const char* filename, FILE* h) {
                 l = fread(&index, 1, 1, h);
                 ccc = index;
                 if (l != 1) {
-                    hiba("Failed to read PCX file: ", filename);
+                    internal_error("Failed to read PCX file: ", filename);
                 }
 
                 while (iii--) {
@@ -394,7 +394,7 @@ static int pcx_count_repeats(pic8* ppic, int x, int y, int width) {
 bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     FILE* h = fopen(filename, "wb");
     if (!h) {
-        hiba("pcx_save failed to open file: ", filename);
+        internal_error("pcx_save failed to open file: ", filename);
         return false;
     }
     // Header
@@ -413,7 +413,7 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     desc.BytesPerScanLine = (unsigned short)width;
     desc.PaletteInf = 1;
     if (fwrite(&desc, sizeof(desc), 1, h) != 1) {
-        hiba("pcx_save failed to write header to file: ", filename);
+        internal_error("pcx_save failed to write header to file: ", filename);
         fclose(h);
         return false;
     }
@@ -428,13 +428,13 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
                 }
                 unsigned char controll = (unsigned char)(i + 192);
                 if (fwrite(&controll, 1, 1, h) != 1) {
-                    hiba("pcx_save failed to write to file: ", filename);
+                    internal_error("pcx_save failed to write to file: ", filename);
                     fclose(h);
                     return false;
                 }
                 unsigned char index = gpixel(x, y);
                 if (fwrite(&index, 1, 1, h) != 1) {
-                    hiba("pcx_save failed to write to file: ", filename);
+                    internal_error("pcx_save failed to write to file: ", filename);
                     fclose(h);
                     return false;
                 }
@@ -443,20 +443,20 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
                 unsigned char index = gpixel(x, y);
                 if (index < 64) {
                     if (fwrite(&index, 1, 1, h) != 1) {
-                        hiba("pcx_save failed to write to file: ", filename);
+                        internal_error("pcx_save failed to write to file: ", filename);
                         fclose(h);
                         return false;
                     }
                 } else {
                     unsigned char controll = 193;
                     if (fwrite(&controll, 1, 1, h) != 1) {
-                        hiba("pcx_save failed to write to file: ", filename);
+                        internal_error("pcx_save failed to write to file: ", filename);
                         fclose(h);
                         return false;
                     }
                     index = gpixel(x, y);
                     if (fwrite(&index, 1, 1, h) != 1) {
-                        hiba("pcx_save failed to write to file: ", filename);
+                        internal_error("pcx_save failed to write to file: ", filename);
                         fclose(h);
                         return false;
                     }
@@ -468,14 +468,14 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     // Palette
     unsigned char palette_header = 0x0c;
     if (fwrite(&palette_header, 1, 1, h) != 1) {
-        hiba("pcx_save failed to write to file: ", filename);
+        internal_error("pcx_save failed to write to file: ", filename);
         fclose(h);
         return false;
     }
     if (pal) {
         for (int i = 0; i < 768; i++) {
             if (fwrite(&pal[i], 1, 1, h) != 1) {
-                hiba("pcx_save failed to write to file: ", filename);
+                internal_error("pcx_save failed to write to file: ", filename);
                 fclose(h);
                 return false;
             }
@@ -486,7 +486,7 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
             unsigned char c = (unsigned char)i;
             for (int j = 0; j < 3; j++) {
                 if (fwrite(&c, 1, 1, h) != 1) {
-                    hiba("pcx_save failed to write to file: ", filename);
+                    internal_error("pcx_save failed to write to file: ", filename);
                     fclose(h);
                     return false;
                 }
@@ -501,12 +501,12 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
 void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2) {
 #ifdef DEBUG
     if (!dest || !source) {
-        hiba("blit8 missing dest or source!");
+        internal_error("blit8 missing dest or source!");
         return;
     }
 #endif
     if (dest->transparency_data) {
-        hiba("blit8 destination has transparency_data!");
+        internal_error("blit8 destination has transparency_data!");
         return;
     }
     if (x2 < x1) {
@@ -599,7 +599,7 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
                     sx += buffer[buf++];
                     break;
                 default:
-                    hiba("Sprite blit8 unknown data block!");
+                    internal_error("Sprite blit8 unknown data block!");
                     return;
                 }
             }
@@ -620,7 +620,7 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
 void blit8(pic8* dest, pic8* source, int x, int y) {
 #ifdef DEBUG
     if (!dest || !source) {
-        hiba("blit8 missing dest or source!");
+        internal_error("blit8 missing dest or source!");
         return;
     }
 #endif
@@ -634,29 +634,29 @@ void blit8(pic8* dest, pic8* source, int x, int y) {
 bool get_pcx_pal(const char* filename, unsigned char* pal) {
     FILE* h = qopen(filename, "rb");
     if (!h) {
-        hiba("get_pcx_pal failed to open file: ", filename);
+        internal_error("get_pcx_pal failed to open file: ", filename);
         return false;
     }
     int l = -769;
     if (qseek(h, l, SEEK_END) != 0) {
-        hiba("get_pcx_pal failed to seek to palette data: ", filename);
+        internal_error("get_pcx_pal failed to seek to palette data: ", filename);
         qclose(h);
         return false;
     }
     char palette_header;
     l = fread(&palette_header, 1, 1, h);
     if (l != 1) {
-        hiba("get_pcx_pal failed to read file: ", filename);
+        internal_error("get_pcx_pal failed to read file: ", filename);
         qclose(h);
         return false;
     }
     if (palette_header != 0x0c) {
-        hiba("get_pcx_pal invalid palette data header:", filename);
+        internal_error("get_pcx_pal invalid palette data header:", filename);
         qclose(h);
         return false;
     }
     if (fread(pal, 768, 1, h) != 1) {
-        hiba("get_pcx_pal failed to read file: ", filename);
+        internal_error("get_pcx_pal failed to read file: ", filename);
         qclose(h);
         return false;
     }
@@ -679,7 +679,7 @@ bool get_pcx_pal(const char* filename, palette** pal) {
 void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2) {
 #ifdef DEBUG
     if (!dest || !source) {
-        hiba("blit_scale8 !dest || !source!");
+        internal_error("blit_scale8 !dest || !source!");
     }
 #endif
     if (x1 > x2) {
@@ -694,7 +694,7 @@ void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2) {
     }
 #ifdef DEBUG
     if (x1 < 0 || y1 < 0 || x2 >= dest->get_width() || y2 >= dest->get_height()) {
-        hiba("pic8::blit_scale x1 < 0 || y1 < 0 || x2 >= width || y2 >= height!");
+        internal_error("pic8::blit_scale x1 < 0 || y1 < 0 || x2 >= width || y2 >= height!");
     }
 #endif
     int xsd = x2 - x1 + 1;
@@ -742,7 +742,7 @@ void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
         }
         return;
     }
-    hiba("pic8::line diagonal lines not implemented!");
+    internal_error("pic8::line diagonal lines not implemented!");
 }
 
 // Make this picture point by reference of a subview of the source picture
@@ -751,7 +751,7 @@ void pic8::subview(int x1, int y1, int x2, int y2, pic8* source) {
     height = y2 - y1 + 1;
 #ifdef DEBUG
     if (x1 < 0 || x2 >= SCREEN_WIDTH || y1 < 0 || y2 >= SCREEN_HEIGHT) {
-        hiba("pic8::subview!");
+        internal_error("pic8::subview!");
     }
 #endif
     for (int y = 0; y < height; y++) {

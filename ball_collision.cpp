@@ -151,7 +151,7 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
                 ball1->v = new_v1;
                 ball2->v = new_v2;
                 if (fabs(new_energy - initial_energy) > 0.001) {
-                    hiba("fabs( new_energy - initial_energy ) > 0.001!");
+                    internal_error("fabs( new_energy - initial_energy ) > 0.001!");
                 }
                 break;
             }

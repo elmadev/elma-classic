@@ -5,7 +5,7 @@ int skippelheto(int level) {
 
     player* pjatekos = State->get_player(State->player1);
     if (pjatekos->levels_completed != level) {
-        hiba("skippelheto-ben pjatekos->sikerespalyakszam != level!");
+        internal_error("skippelheto-ben pjatekos->sikerespalyakszam != level!");
     }
     int eddigskippelt = 0;
     for (int i = 0; i < level; i++) {
@@ -14,7 +14,7 @@ int skippelheto(int level) {
         }
     }
     if (eddigskippelt > maxskippelheto) {
-        hiba("eddigskippelt > maxskippelheto!");
+        internal_error("eddigskippelt > maxskippelheto!");
     }
     int skippelheto = eddigskippelt < maxskippelheto;
 

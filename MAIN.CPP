@@ -5,13 +5,13 @@
 #include <timeapi.h>
 #endif
 
-static double Startido = 0;
+static double StopwatchStartTime = 0;
 
 // 182*sec-et adja vissza idot tortresszel egyutt!
 // d_stoppe.cpp-ben vannak megvalositva:
-double mv_stopperido(void) { return timeGetTime() * 0.182 - Startido; }
+double stopwatch(void) { return timeGetTime() * 0.182 - StopwatchStartTime; }
 
-void mv_startstopper(void) { Startido = timeGetTime() * 0.182; }
+void stopwatch_reset(void) { StopwatchStartTime = timeGetTime() * 0.182; }
 
 int main() {
     platform_init();
@@ -19,11 +19,11 @@ int main() {
     teljes();
 }
 
-void mv_exit() { exit(0); }
+void quit() { exit(0); }
 
-int s_random(int maximum) { return rand() % maximum; }
+int random_range(int maximum) { return rand() % maximum; }
 
-bool Margrafikus = false;
+bool ErrorGraphicsLoaded = false;
 static int Hibaban = 0;
 static char Tmphibatext[500];
 
@@ -58,7 +58,7 @@ static void directhiba(const char* text1, const char* text2, const char* text3, 
     }
     Hibaban = 1;
 
-    if (Margrafikus) {
+    if (ErrorGraphicsLoaded) {
         if (text4) {
             if (strlen(text3) + strlen(text4) < 490) {
                 strcpy(Tmphibatext, text3);
@@ -92,17 +92,17 @@ static void directhiba(const char* text1, const char* text2, const char* text3, 
         }
         message_box(text);
     }
-    mv_exit();
+    quit();
 }
 
-void hiba(const char* text1, const char* text2, const char* text3) {
+void internal_error(const char* text1, const char* text2, const char* text3) {
     if (access("message.inf", 0) == 0) {
         directhiba("<<message.inf accessed>>", text1, text2, text3);
     }
     directhiba("Sorry, internal error.", NULL, NULL, NULL);
 }
 
-void uzenet(const char* text1, const char* text2, const char* text3) {
+void external_error(const char* text1, const char* text2, const char* text3) {
     // about azert kell, hogy kezdo memchecknel ne agazzon el:
     if (strstr(text1, "memory")) {
         // Ha memory szerepel text1-ben:

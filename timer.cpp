@@ -27,7 +27,7 @@ static unsigned char* ReferencePaletteMap = nullptr;
 static void horizontal_line(pic8* dest, int x, int y, int size, unsigned char* lookup) {
 #ifdef DEBUG
     if (x < 0 || y < 0 || x + size - 1 >= dest->get_width() || y >= dest->get_height()) {
-        hiba("horizontal_line x/y out of range!");
+        internal_error("horizontal_line x/y out of range!");
     }
 #endif
     unsigned char* row = dest->get_row(y);
@@ -40,7 +40,7 @@ static void horizontal_line(pic8* dest, int x, int y, int size, unsigned char* l
 static void vertical_line(pic8* dest, int x, int y, int size, unsigned char* lookup) {
 #ifdef DEBUG
     if (x < 0 || y < 0 || x >= dest->get_width() || y + size - 1 >= dest->get_height()) {
-        hiba("vertical_line x/y out of range!");
+        internal_error("vertical_line x/y out of range!");
     }
 #endif
     for (int i = 0; i < size; i++) {
@@ -85,7 +85,7 @@ static void draw_digit_segment(DigitSegment segment, int x, int y) {
                         ReferencePaletteMap);
         break;
     default:
-        hiba("draw_digit_segment segment out of range!");
+        internal_error("draw_digit_segment segment out of range!");
         break;
     }
 }
@@ -163,7 +163,7 @@ static void draw_digit(int c, int x, int y) {
         draw_digit_segment(DigitSegment::HORIZONTAL_TOP, x, y);
         break;
     default:
-        hiba("draw_digit c out of range!");
+        internal_error("draw_digit c out of range!");
     }
 }
 

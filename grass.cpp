@@ -10,7 +10,7 @@ grass::grass() {
 
 void grass::add(pic8* pic, bool up) {
     if (length >= MAX_GRASS_PICS) {
-        uzenet("Too many grass pictures in lgr file!");
+        external_error("Too many grass pictures in lgr file!");
     }
     pics[length] = pic;
     is_up[length] = up;
@@ -37,7 +37,7 @@ grass::~grass() {
 static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, int* heightmap,
                                 int max_heightmap_length, vect2* origin) {
     if (v1 < 0 || v1 >= poly->pontszam || v2 < 0 || v2 >= poly->pontszam) {
-        hiba("grass_line_heightmap vertex out of bounds!");
+        internal_error("grass_line_heightmap vertex out of bounds!");
     }
 
     vect2 r1 = poly->ponttomb[v1];
@@ -54,14 +54,14 @@ static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, i
     double y2 = (-r2.y - origin->y) * MetersToPixels;
 
     if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0) {
-        hiba("grass_line_heightmap coordinate out of bounds!");
+        internal_error("grass_line_heightmap coordinate out of bounds!");
     }
 
     if (cur < 0) {
         // First line segment, initialise `x0`.
         cur = x1;
         if (*x0 >= 0) {
-            hiba("grass_line_heightmap x0 already initialised!");
+            internal_error("grass_line_heightmap x0 already initialised!");
         }
         *x0 = x1;
         heightmap[0] = y1;
@@ -80,7 +80,7 @@ static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, i
     // Skip if we've somehow jumped forward to the right.
     if (cur < x1 - 1) {
 #ifdef DEBUG
-        hiba("grass_line_heightmap skipped forwards!");
+        internal_error("grass_line_heightmap skipped forwards!");
 #endif
         return cur;
     }

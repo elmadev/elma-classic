@@ -208,7 +208,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
     if (ugrik1) {
         // Csak azert van kikomentezve, mert egyszer elojott:
         // if( Ugrasban1 || Ugrasban2 )
-        //  hiba( "Ugrasban!" );
+        //  internal_error( "Ugrasban!" );
         pmot->volting_right = 1;
         pmot->angular_velocity_pre_right_volt = pmot->bike.angular_velocity;
         pmot->right_volt_time = most;
@@ -216,7 +216,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
     }
     if (ugrik2) {
         // if( Ugrasban1 || Ugrasban2 )
-        //   hiba( "Ugrasban!" );
+        //   internal_error( "Ugrasban!" );
         pmot->volting_left = 1;
         pmot->angular_velocity_pre_left_volt = pmot->bike.angular_velocity;
         pmot->left_volt_time = most;

@@ -96,7 +96,7 @@ void seteditorpal(void) {
     }
 
     if (Pal_editor) {
-        hiba("uvcguyew");
+        internal_error("uvcguyew");
     }
     Pal_editor = new palette(pal);
 }
@@ -134,7 +134,7 @@ static void elintezegymousepixelt(int x, int y) {
 
 static void egeretrajzolja(void) {
     /*if( Tool == T_MOVE && !Pgy && !Pker && !Psp && Kurzornegyzet ) {
-        //hiba( "Most itt van benn!" );
+        //internal_error( "Most itt van benn!" );
         vect2 r = konv( Moux, Mouy );
         double x1 = r.x;
         double y1 = r.y;
@@ -169,7 +169,7 @@ static void egeretrajzolja(void) {
 // Egeret leveszi kepernyorol:
 void push(void) {
     if (!Egerkint) {
-        hiba("push-ban !Egerkint!");
+        internal_error("push-ban !Egerkint!");
     }
     Egerkint = 0;
 
@@ -179,7 +179,7 @@ void push(void) {
 // Egeret felteszi kepernyore:
 void pop(void) {
     if (Egerkint) {
-        hiba("pop-ban Egerkint!");
+        internal_error("pop-ban Egerkint!");
     }
     Egerkint = 1;
 
@@ -196,7 +196,7 @@ static char Toolhelpszoveg[110] = "";
 void toolhelp(const char* text) {
     if (text) {
         if (strlen(text) > 100) {
-            hiba("toolhelp-ben strlen( text ) > 100!", text);
+            internal_error("toolhelp-ben strlen( text ) > 100!", text);
         }
         strcpy(Toolhelpszoveg, text);
     }
@@ -315,7 +315,7 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
     // Pspritenevbuffer->fill_box( 70 );
 
     if (kepnev[0] && (texturanev[0] || maszknev[0])) {
-        hiba("89hukjk");
+        internal_error("89hukjk");
     }
 
     if (kepnev[0]) {
@@ -481,7 +481,7 @@ static void ujrarajzol(int egesz) {
 
     if (Tool == T_CREATE_SPRITE) {
         if (!Plgr) {
-            hiba("89u5t4");
+            internal_error("89u5t4");
         }
         kispritenev(Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev, 0, 0);
     }
@@ -494,7 +494,7 @@ static void beallitkozelvane(int mx, int my) {
     }
     if (Tool == T_CREATE_SPRITE) {
         if (!Plgr) {
-            hiba("7896675");
+            internal_error("7896675");
         }
         kispritenev(Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev, 0, 0);
         return;
@@ -540,9 +540,9 @@ static void beallitkozelvane(int mx, int my) {
 
     /*if( Tool == T_CREATE_SPRITE ) {
         if( !Plgr )
-            hiba( "89u5t4" );
+            internal_error( "89u5t4" );
         if( Plgr->aktivindex >= Plgr->kepszam )
-            hiba( "89045t308u" );
+            internal_error( "89045t308u" );
         kispritenev( Plgr->nevek[Plgr->aktivindex],
                      Plgr->tavolsagok[Plgr->aktivindex] );
     } */
@@ -574,7 +574,7 @@ static void toolvaltas(int t) {
 
 void editor(void) {
     if (!BufferMain) {
-        hiba("editor-ban !BufferMain!");
+        internal_error("editor-ban !BufferMain!");
     }
 
     Pal_editor->set();

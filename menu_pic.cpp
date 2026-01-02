@@ -20,7 +20,7 @@ palette* MenuPal = nullptr;
 
 void init_menu_pictures() {
     if (BufferMain) {
-        hiba("init_menu_pictures already called!");
+        internal_error("init_menu_pictures already called!");
     }
     BufferMain = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     BufferBall = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -29,7 +29,7 @@ void init_menu_pictures() {
     MenuFont = new abc8("menu.abc");
     MenuFont->set_spacing(2);
 
-    Margrafikus = true;
+    ErrorGraphicsLoaded = true;
 
     pic8* helmet_tmp = new pic8("sisak.pcx"); // "helmet"
     forditkepet(helmet_tmp);
@@ -51,13 +51,13 @@ menu_pic::menu_pic(bool center_vert) {
     image_valid = false;
     lines = new text_line[MENU_MAX_LINES];
     if (!lines) {
-        hiba("menu_pic memory!");
+        internal_error("menu_pic memory!");
     }
 }
 
 menu_pic::~menu_pic() {
     if (!lines) {
-        hiba("menu_pic::~menu_pic !lines!");
+        internal_error("menu_pic::~menu_pic !lines!");
     }
     delete lines;
     lines = nullptr;
@@ -65,10 +65,10 @@ menu_pic::~menu_pic() {
 
 void menu_pic::add_line(const char* text, int x, int y) {
     if (strlen(text) > MENU_LINE_LENGTH) {
-        hiba("menu::add_line strlen(text) > MENU_LINE_LENGTH");
+        internal_error("menu::add_line strlen(text) > MENU_LINE_LENGTH");
     }
     if (line_count >= MENU_MAX_LINES) {
-        hiba("menu::add_line linecount >= MENU_MAX_LINES");
+        internal_error("menu::add_line linecount >= MENU_MAX_LINES");
     }
     strcpy(lines[line_count].text, text);
     lines[line_count].x = x;
@@ -220,7 +220,7 @@ void menu_pic::render(bool skip_balls_helmet) {
         }
     }
 
-    double time = mv_stopperido();
+    double time = stopwatch();
     if (IntroAnimation) {
         MenuPal->set();
         IntroAnimation = false;
@@ -235,7 +235,7 @@ void menu_pic::render(bool skip_balls_helmet) {
             if (!render_intro_anim(time)) {
                 break;
             }
-            time = mv_stopperido();
+            time = stopwatch();
             BallsStartTime = time;
         }
         ScrollingAnimationY = 0;
@@ -377,7 +377,7 @@ bool menu_pic::render_intro_anim(double time) {
     for (int i = 0; i < line_count; i++) {
         int x = lines[i].x + SCREEN_WIDTH / 2 - 320;
         if (center_vertically) {
-            hiba("menu_pic::render_intro_anim should not center vertically!");
+            internal_error("menu_pic::render_intro_anim should not center vertically!");
         }
         MenuFont->write(ScreenBuffer, x, lines[i].y + frame - SCREEN_HEIGHT, lines[i].text);
     }

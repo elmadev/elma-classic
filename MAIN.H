@@ -1,16 +1,16 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-extern bool Margrafikus;
+extern bool ErrorGraphicsLoaded;
 
-void mv_exit();
+void quit();
 
-double mv_stopperido(void);
-void mv_startstopper(void);
+double stopwatch(void);
+void stopwatch_reset(void);
 
-void hiba(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
-void uzenet(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
+void internal_error(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
+void external_error(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
 
-int s_random(int);
+int random_range(int);
 
 #endif

@@ -28,19 +28,19 @@ static void abcberendez(int nevszam) {
 
 static void betolt(const char* nev) {
     if (!Ptop) {
-        hiba("uoiwfiufre");
+        internal_error("uoiwfiufre");
     }
     if (!*nev) {
-        hiba("oiufewguyxygxw");
+        internal_error("oiufewguyxygxw");
     }
     char tmp[15];
     if (strlen(nev) > 8) {
-        hiba("iovffiufi");
+        internal_error("iovffiufi");
     }
     strcpy(tmp, nev);
     strcat(tmp, ".lev");
     if (strlen(tmp) > 12) {
-        hiba("betolt-ben strlen( tmp ) > 12!");
+        internal_error("betolt-ben strlen( tmp ) > 12!");
     }
     strcpy(State->editor_filename, tmp);
 
@@ -129,7 +129,7 @@ void tolt_open(void) {
     if (!Soknev) {
         Soknev = new char[Maxnev * 10 + 100];
         if (!Soknev) {
-            hiba("Nincs eleg memoria tolt_open-ben (hjfdf)!");
+            internal_error("Nincs eleg memoria tolt_open-ben (hjfdf)!");
         }
     }
     for (int i = 0; i < Maxnev * 10 + 10; i++) {
@@ -140,7 +140,7 @@ void tolt_open(void) {
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
-            hiba("ijhfiyewpp");
+            internal_error("ijhfiyewpp");
         }
         char* nev = &Soknev[nevszam * 10];
         strcpy(nev, fname);
@@ -148,13 +148,13 @@ void tolt_open(void) {
         int i = 0;
         while (nev[i] != '.') {
             if (!nev[i]) {
-                hiba("Nincs pont nevben! (yewruyrewuy): ", nev);
+                internal_error("Nincs pont nevben! (yewruyrewuy): ", nev);
             }
             i++;
         }
         nev[i] = 0;
         if (strlen(nev) > 8) {
-            hiba("iuoriureiur");
+            internal_error("iuoriureiur");
         }
 
         done = finext(fname);
@@ -311,7 +311,7 @@ void kivalasztkezdetit(void) {
     if (!Soknev) {
         Soknev = new char[Maxnev * 10 + 100];
         if (!Soknev) {
-            hiba("Nincs eleg memoria tolt_open-ben (hjfdf)!");
+            internal_error("Nincs eleg memoria tolt_open-ben (hjfdf)!");
         }
     }
     for (int i = 0; i < Maxnev * 10 + 10; i++) {
@@ -322,7 +322,7 @@ void kivalasztkezdetit(void) {
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
-            hiba("ijhfiyewpp");
+            internal_error("ijhfiyewpp");
         }
         char* nev = &Soknev[nevszam * 10];
         strcpy(nev, fname);
@@ -331,13 +331,13 @@ void kivalasztkezdetit(void) {
         int i = 0;
         while (nev[i] != '.') {
             if (!nev[i]) {
-                hiba("Nincs pont nevben! (yewruyrewuy): ", nev);
+                internal_error("Nincs pont nevben! (yewruyrewuy): ", nev);
             }
             i++;
         }
         nev[i] = 0;
         if (strlen(nev) > 8) {
-            hiba("iuoriureiur");
+            internal_error("iuoriureiur");
         }
 
         done = finext(fname);
@@ -403,7 +403,7 @@ void kivalasztkezdetit(void) {
                 igazit(&kur, &felso, nevszam, helyszam);
                 char* nev = &Soknev[kur * 10];
                 if (strlen(nev) > 8) {
-                    hiba("iovfgsdgffiufi");
+                    internal_error("iovfgsdgffiufi");
                 }
                 strcpy(State->editor_filename, nev);
                 strcat(State->editor_filename, ".lev");
@@ -451,7 +451,7 @@ void kivalasztkezdetit(void) {
                     if (index < nevszam) {
                         char* nev = &Soknev[index * 10];
                         if (strlen(nev) > 8) {
-                            hiba("iovfgsdgffiufi");
+                            internal_error("iovfgsdgffiufi");
                         }
                         strcpy(State->editor_filename, nev);
                         strcat(State->editor_filename, ".lev");
@@ -755,7 +755,7 @@ static void makeszinkonvtomb(unsigned char* pal) {
         b >>= 4;
         int szin = r * 16 + g * 4 + b;
         if (szin < 0 || szin >= 64) {
-            hiba("897 648u9");
+            internal_error("897 648u9");
         }
         Szinkonvtomb[i] = (unsigned char)(szin + 64);
         // Szinkonvtomb[i] = (unsigned char)(63 + 64);
@@ -765,7 +765,7 @@ static void makeszinkonvtomb(unsigned char* pal) {
 // Szimpla
 static void vegyesblt(pic8* dest, kep* pkep, int x0, int y0) {
     if (x0 < 0 || y0 < 0 || x0 >= dest->get_width() || y0 >= dest->get_height()) {
-        hiba("7r79yffuew");
+        internal_error("7r79yffuew");
     }
 
     int xsize = pkep->xsize;
@@ -824,7 +824,7 @@ static void vegyesblt(pic8* dest, kep* pkep, int x0, int y0) {
 // Maszkos:
 static void vegyesblt(pic8* dest, textura* pt, maszk* pm, int x0, int y0) {
     if (x0 < 0 || y0 < 0 || x0 >= dest->get_width() || y0 >= dest->get_height()) {
-        hiba("7r79yffuew");
+        internal_error("7r79yffuew");
     }
 
     pic8* source = pt->ppic;
@@ -887,7 +887,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     }
 
     if (!nev) {
-        hiba("liytg");
+        internal_error("liytg");
     }
 
     if (nevszam < 1) {
@@ -896,7 +896,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
 
     char orignev[10];
     if (strlen(nev) > 8) {
-        hiba("8guiojg");
+        internal_error("8guiojg");
     }
     strcpy(orignev, nev);
 
@@ -953,7 +953,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     push();
     blit8(BufferBall, BufferMain);
     // BufferBall->save( "golyo.pcx" );
-    // hiba( "golyo mentve!" );
+    // internal_error( "golyo mentve!" );
     pop();
 
     // Azert hogy ha mar le volt nyomva, ne nyomodjon ujra:
@@ -1056,14 +1056,14 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
             blit8(BufferMain, BufferBall, 0, 0, 0, 0, buffervaltozottx, buffervaltozotty);
 
             if (kepnev[0] && (texturanev[0] || maszknev[0])) {
-                hiba("iugriurg");
+                internal_error("iugriurg");
             }
 
             if (kepnev[0]) {
                 // Ez egy kep:
                 int index = Plgr->getkepindex(kepnev);
                 if (index < 0) {
-                    hiba("hjguyt");
+                    internal_error("hjguyt");
                 }
                 kep* pkep = &Plgr->kepek[index];
                 vegyesblt(BufferMain, pkep, 10, 10);
@@ -1075,13 +1075,13 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
                 // Ez egy texturas maszk:
                 int index = Plgr->gettexturaindex(texturanev);
                 if (index < 0) {
-                    hiba(";lgrtijo");
+                    internal_error(";lgrtijo");
                 }
                 textura* ptextura = &Plgr->texturak[index];
 
                 index = Plgr->getmaszkindex(maszknev);
                 if (index < 0) {
-                    hiba("lkjefrg");
+                    internal_error("lkjefrg");
                 }
                 maszk* pmaszk = &Plgr->maszkok[index];
 
@@ -1175,7 +1175,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
 
 void tolt_pickasprite(void) {
     if (!Plgr) {
-        hiba("tolt_pickasprite-ban !Plgr!");
+        internal_error("tolt_pickasprite-ban !Plgr!");
     }
 
     makeszinkonvtomb(Plgr->paltomb);
@@ -1328,7 +1328,7 @@ int tolt_picklgrfile(char* lgrnev) {
     if (!Soknev) {
         Soknev = new char[Maxnev * 10 + 100];
         if (!Soknev) {
-            hiba("Nincs eleg memoria tolt_picklgrfile-ban!");
+            internal_error("Nincs eleg memoria tolt_picklgrfile-ban!");
         }
     }
     for (int i = 0; i < Maxnev * 10 + 10; i++) {
@@ -1339,7 +1339,7 @@ int tolt_picklgrfile(char* lgrnev) {
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
-            hiba("876759989");
+            internal_error("876759989");
         }
         char* nev = &Soknev[nevszam * 10];
         strcpy(nev, fname);
@@ -1347,13 +1347,13 @@ int tolt_picklgrfile(char* lgrnev) {
         int i = 0;
         while (nev[i] != '.') {
             if (!nev[i]) {
-                hiba("Nincs pont nevben! (454534): ", nev);
+                internal_error("Nincs pont nevben! (454534): ", nev);
             }
             i++;
         }
         nev[i] = 0;
         if (strlen(nev) > 8) {
-            hiba("3875665");
+            internal_error("3875665");
         }
 
         done = finext(fname);
@@ -1368,7 +1368,7 @@ int tolt_picklgrfile(char* lgrnev) {
     ficlose();
 
     if (nevszam < 1) {
-        uzenet("There is not any LGR files (*.lgr) in LGR directory!");
+        external_error("There is not any LGR files (*.lgr) in LGR directory!");
     }
 
     abcberendez(nevszam);
@@ -1662,7 +1662,7 @@ void setspritetav(sprite* psp) {
             if (psp->kepnev[0]) {
                 int index = Plgr->getkepindex(psp->kepnev);
                 if (index < 0) {
-                    hiba("iohdiuyde");
+                    internal_error("iohdiuyde");
                 }
                 deftav = Plgr->kepek[index].tavolsag;
                 defhatarol = Plgr->kepek[index].hatarol;
@@ -1670,7 +1670,7 @@ void setspritetav(sprite* psp) {
             if (psp->texturanev[0]) {
                 int index = Plgr->gettexturaindex(psp->texturanev);
                 if (index < 0) {
-                    hiba("u6ythggf");
+                    internal_error("u6ythggf");
                 }
                 deftav = Plgr->texturak[index].tavolsag;
                 defhatarol = Plgr->texturak[index].hatarol;
@@ -1886,7 +1886,7 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
             Pabc2->write_centered(BufferMain, lx, ly, "Gravity Right");
             break;
         default:
-            hiba("yuiwegfyjkweg");
+            internal_error("yuiwegfyjkweg");
         }
         boxlista.y1 += dy;
         boxlista.y2 += dy;
@@ -1966,7 +1966,7 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
                     *pkajatipus = KT_RIGHT;
                     break;
                 default:
-                    hiba("0893ytpoerhg");
+                    internal_error("0893ytpoerhg");
                 }
                 return;
             }
@@ -2242,7 +2242,7 @@ void change_level_properties(void) {
             /*static int nyomasszam = 0;
             nyomasszam++;
             if( nyomasszam > 10 )
-                uzenet( "nyomasszam >" );*/
+                external_error( "nyomasszam >" );*/
 
             invalid = 0;
 

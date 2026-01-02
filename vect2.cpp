@@ -29,7 +29,7 @@ void vect2::rotate(double rotation) {
 
 static double square_root(double a) {
     if (a < 0) {
-        hiba("square_root() of a negative number!");
+        internal_error("square_root() of a negative number!");
         return 1;
     }
     double x1 = sqrt(a);

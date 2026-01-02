@@ -31,10 +31,10 @@ kisbox KisboxD = {272, 181, 353, 244};
 // Ha nincs ilyen nevu file, akkor default-ot olvassa:
 void loadlgrfile(const char* nev) {
     // tesztloadlgr();
-    // hiba( "A" );
+    // internal_error( "A" );
 
     if (strlen(nev) > 8) {
-        hiba("loadlgrfile-ban strlen( nev ) > 8!");
+        internal_error("loadlgrfile-ban strlen( nev ) > 8!");
     }
 
     if (strcmpi(nev, Bentlgrnev) == 0) {
@@ -45,7 +45,7 @@ void loadlgrfile(const char* nev) {
     sprintf(lgrtmp, "lgr/%s.lgr", nev);
     if (access(lgrtmp, 0) != 0) {
         if (!Ptop) {
-            hiba("loadlgrfile-ban !Ptop!");
+            internal_error("loadlgrfile-ban !Ptop!");
         }
 
         char nevtmp[20];
@@ -83,7 +83,7 @@ void loadlgrfile(const char* nev) {
 
         Ptop->nincslgrje = 1;
         if (access(lgrtmp, 0) != 0) {
-            uzenet("Could not open file LGR\\DEFAULT.LGR!");
+            external_error("Could not open file LGR\\DEFAULT.LGR!");
         }
     }
 
@@ -143,17 +143,17 @@ static unsigned char* getnewpalfromh(FILE* h) {
     unsigned char* pal = new unsigned char[768];
 
     if (fseek(h, -769, SEEK_CUR) != 0) {
-        hiba("Nem tud visszalepni palettahoz 768-at LGR-ben!: ");
+        internal_error("Nem tud visszalepni palettahoz 768-at LGR-ben!: ");
     }
     char c;
     if (fread(&c, 1, 1, h) != 1) {
-        hiba("Nem tud olvasni pal byte-ot LGR-ben!:");
+        internal_error("Nem tud olvasni pal byte-ot LGR-ben!:");
     }
     if (c != 0x0c) {
-        hiba("Nem 0x0C a paletta elotti byte LGR-ben!: ");
+        internal_error("Nem 0x0C a paletta elotti byte LGR-ben!: ");
     }
     if (fread(pal, 1, 768, h) != 768) {
-        hiba("Nem tud olvasni palettat LGR-ben!: ");
+        internal_error("Nem tud olvasni palettat LGR-ben!: ");
     }
     return pal;
 }
@@ -173,7 +173,7 @@ static int getatlatszosag(piclist::Transparency tipus, pic8* ppic) {
     case piclist::Transparency::BottomRight:
         return ppic->gpixel(ppic->get_width() - 1, ppic->get_height() - 1);
     }
-    hiba("getatlatszosag");
+    internal_error("getatlatszosag");
     return -1;
 }
 
@@ -183,7 +183,7 @@ static unsigned char* Tmptomb = NULL;
 
 void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
     if (kepszam >= MAXKEPSZAM) {
-        uzenet("Too many pictures in lgr file!");
+        external_error("Too many pictures in lgr file!");
     }
 
     kep* pkep = &kepek[kepszam];
@@ -197,19 +197,19 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
     pkep->ysize = ppic->get_height();
 
     if (pkep->xsize > 60000) {
-        uzenet("Picture xsize is too big!", pkep->nev);
+        external_error("Picture xsize is too big!", pkep->nev);
     }
 
     int atlatszo = getatlatszosag(ppiclist->transparency[index], ppic);
     if (atlatszo < 0) {
-        uzenet("Picture must be transparent in lgr file!", pkep->nev);
+        external_error("Picture must be transparent in lgr file!", pkep->nev);
     }
 
     if (!Tmptomb) {
         Tmptomb = new unsigned char[PICTOMBMERET + 10];
     }
     if (!Tmptomb) {
-        hiba("Not enough memory!");
+        internal_error("Not enough memory!");
     }
 
     int i = 0;
@@ -217,14 +217,14 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
         // Egy sor elintezese:
         unsigned char* sor = ppic->get_row(y);
         if (i > PICTOMBMERET) {
-            uzenet("Picture is too big in lgr file! Picture name:", pkep->nev);
+            external_error("Picture is too big in lgr file! Picture name:", pkep->nev);
         }
         int x = 0;
         while (1) {
             // Beirjuk uresek szamat:
             int uresx = uresszam(x, pkep->xsize, sor, (unsigned char)atlatszo);
             if (uresx > 60000) {
-                hiba("ghuieg");
+                internal_error("ghuieg");
             }
             int uresx1 = uresx / 256;
             int uresx2 = uresx % 256;
@@ -243,10 +243,10 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
             // Beirjuk telik szamat:
             int telix = teliszam(x, pkep->xsize, sor, (unsigned char)atlatszo);
             if (telix <= 0) {
-                hiba("grgpior");
+                internal_error("grgpior");
             }
             if (telix > 60000) {
-                hiba("89grwe");
+                internal_error("89grwe");
             }
             int telix1 = telix / 256;
             int telix2 = telix % 256;
@@ -256,7 +256,7 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
 
             // Bemasoljuk kep byte-okat:
             if (i + telix > PICTOMBMERET) {
-                uzenet("Picture is too big in lgr file! Picture name:", pkep->nev);
+                external_error("Picture is too big in lgr file! Picture name:", pkep->nev);
             }
             memcpy(&Tmptomb[i], &sor[x], telix);
 
@@ -267,7 +267,7 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
 
     pkep->adatok = new unsigned char[i + 10];
     if (!pkep->adatok) {
-        hiba("Not enough memory!");
+        internal_error("Not enough memory!");
     }
     memcpy(pkep->adatok, Tmptomb, i);
 
@@ -276,7 +276,7 @@ void lgrfile::beirkepet(pic8* ppic, piclist* ppiclist, int index) {
 
 void lgrfile::beirtexturat(pic8* ppic, piclist* ppiclist, int index) {
     if (texturaszam >= MAXTEXTURASZAM) {
-        uzenet("Too many textures in lgr file!");
+        external_error("Too many textures in lgr file!");
     }
 
     // Megforditjuk textura kepet fejjel lefele:
@@ -307,7 +307,7 @@ static maszkelem Melemtomb[MAXMASZKELEM];
 
 void lgrfile::beirmaszkot(pic8* ppic, piclist* ppiclist, int index) {
     if (maszkszam >= MAXMASZKSZAM) {
-        uzenet("Too many masks in lgr file!");
+        external_error("Too many masks in lgr file!");
     }
 
     maszk* pm = &maszkok[maszkszam];
@@ -336,14 +336,15 @@ void lgrfile::beirmaszkot(pic8* ppic, piclist* ppiclist, int index) {
                 // Keresi kis szakaszokat:
                 int size = teliszam(x, pm->xsize, sor, (unsigned char)atlatszo);
                 if (size <= 0) {
-                    hiba("745gh8g5");
+                    internal_error("745gh8g5");
                 }
 
                 Melemtomb[i].tipus = ME_TELI;
                 Melemtomb[i].hossz = size;
                 i++;
                 if (i > MAXMASZKELEM - 10) {
-                    uzenet("Mask picture is too complicated!:", &ppiclist->name[index * 10]);
+                    external_error("Mask picture is too complicated!:",
+                                   &ppiclist->name[index * 10]);
                 }
 
                 x += size;
@@ -377,7 +378,7 @@ void lgrfile::beirmaszkot(pic8* ppic, piclist* ppiclist, int index) {
     // Most betesszuk lefoglalt helyre atlatszosag infot:
     pm->adatok = new maszkelem[i];
     if (!pm->adatok) {
-        hiba("Memory!");
+        internal_error("Memory!");
     }
     for (int j = 0; j < i; j++) {
         pm->adatok[j] = Melemtomb[j];
@@ -392,7 +393,7 @@ void lgrfile::beirmaszkot(pic8* ppic, piclist* ppiclist, int index) {
 static unsigned char* makenegalttomb(unsigned char* pal) {
     unsigned char* lookuptomb = new unsigned char[260];
     if (!lookuptomb) {
-        hiba("memory (h34252)");
+        internal_error("memory (h34252)");
     }
 
     // Megkeressuk legvilagosabb szint:
@@ -472,35 +473,35 @@ lgrfile::lgrfile(const char* lgrnev) {
     sprintf(lgrtmp, "lgr/%s.lgr", lgrnev);
     FILE* h = fopen(lgrtmp, "rb");
     if (!h) {
-        uzenet("Cannot find file:", lgrtmp);
+        external_error("Cannot find file:", lgrtmp);
     }
 
     char tmp2[10];
     if (fread(tmp2, 1, 5, h) != 5) {
-        uzenet("Corrupt LGR file!:", lgrtmp);
+        external_error("Corrupt LGR file!:", lgrtmp);
     }
     tmp2[5] = 0;
     if (strncmp(tmp2, "LGR", 3) != 0) {
-        uzenet("This is not an LGR file!:", lgrtmp);
+        external_error("This is not an LGR file!:", lgrtmp);
     }
     if (strcmp(tmp2 + 3, "12") != 0) {
-        uzenet("LGR file's version is too new!:", lgrtmp);
+        external_error("LGR file's version is too new!:", lgrtmp);
     }
 
     // Most osszes kep szamat taroljuk kepszam-ban, kesobb csak indexeseket:
     int osszkepszam;
     if (fread(&osszkepszam, 1, 4, h) != 4) {
-        uzenet("Corrupt LGR file!:", lgrtmp);
+        external_error("Corrupt LGR file!:", lgrtmp);
     }
 
     if (osszkepszam < 10 || osszkepszam > 3500) {
-        uzenet("Corrupt LGR file!:", lgrtmp);
+        external_error("Corrupt LGR file!:", lgrtmp);
     }
 
     // Most beolvassuk pictures.lst file binaris valtozatat:
     piclist* ppiclist = new piclist(h);
     if (!ppiclist) {
-        hiba("Nincs eleg memoria!");
+        internal_error("Nincs eleg memoria!");
     }
 
     // Vegigmegy kepeken:
@@ -511,14 +512,14 @@ lgrfile::lgrfile(const char* lgrnev) {
         // Egy kep:
         char nev[30];
         if (fread(nev, 1, 20, h) != 20) {
-            uzenet("Corrupt LGR file!:", lgrtmp);
+            external_error("Corrupt LGR file!:", lgrtmp);
         }
         int hossz = 0;
         if (fread(&hossz, 1, 4, h) != 4) {
-            uzenet("Corrupt LGR file!:", lgrtmp);
+            external_error("Corrupt LGR file!:", lgrtmp);
         }
         if (hossz < 1 || hossz > 10000000) {
-            uzenet("Corrupt LGR file!:", lgrtmp);
+            external_error("Corrupt LGR file!:", lgrtmp);
         }
 
         // Beolvassuk kepet:
@@ -688,12 +689,12 @@ lgrfile::lgrfile(const char* lgrnev) {
         // Most mar csak piclistben szereplo kep lehet:
         // Leszedjuk kiterjesztest:
         if (!strchr(nev, '.')) {
-            uzenet("Cannot find dot in name:", nev);
+            external_error("Cannot find dot in name:", nev);
         }
         *strchr(nev, '.') = 0;
 
         if (strlen(nev) > 8) {
-            uzenet("Filename is long in LGR file!:", nev, lgrtmp);
+            external_error("Filename is long in LGR file!:", nev, lgrtmp);
         }
 
         // Grass:
@@ -704,7 +705,7 @@ lgrfile::lgrfile(const char* lgrnev) {
 
         int index = ppiclist->get_index(nev);
         if (index < 0) {
-            uzenet("There is no line in PICTURES.LST corresponding to picture:", nev);
+            external_error("There is no line in PICTURES.LST corresponding to picture:", nev);
         }
         if (ppiclist->type[index] == piclist::Type::Picture) {
             beirkepet(ppic, ppiclist, index);
@@ -723,15 +724,15 @@ lgrfile::lgrfile(const char* lgrnev) {
             continue;
         }
         // Ismeretlen tipus:
-        uzenet("Corrupt LGR file!:", lgrtmp);
+        external_error("Corrupt LGR file!:", lgrtmp);
     }
 
     int checknumber = 0;
     if (fread(&checknumber, 1, 4, h) != 4) {
-        uzenet("Corrupt LGR file!:", lgrtmp);
+        external_error("Corrupt LGR file!:", lgrtmp);
     }
     if (checknumber != Checknumber_lgr) {
-        uzenet("Corrupt LGR file!:", lgrtmp);
+        external_error("Corrupt LGR file!:", lgrtmp);
     }
 
     fclose(h);
@@ -741,91 +742,91 @@ lgrfile::lgrfile(const char* lgrnev) {
     // Most csinalunk egy kis ellenorzest:
 
     if (texturaszam < 2) {
-        uzenet("There must be at least two textures in LGR file!", lgrnev);
+        external_error("There must be at least two textures in LGR file!", lgrnev);
     }
 
     // 1. motoros:
     if (!mkepek1.pkisvezeto) {
-        uzenet("Picture not found in LGR file!: ", "q1body.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1body.pcx", lgrtmp);
     }
     if (!mkepek1.pkiscomb) {
-        uzenet("Picture not found in LGR file!: ", "q1thigh.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1thigh.pcx", lgrtmp);
     }
     if (!mkepek1.pkislabszar) {
-        uzenet("Picture not found in LGR file!: ", "q1leg.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1leg.pcx", lgrtmp);
     }
 
     if (!p1biker) {
-        uzenet("Picture not found in LGR file!: ", "q1bike.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1bike.pcx", lgrtmp);
     }
     if (!mkepek1.pkiskerek) {
-        uzenet("Picture not found in LGR file!: ", "q1wheel.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1wheel.pcx", lgrtmp);
     }
     if (!mkepek1.pkiselsorud) {
-        uzenet("Picture not found in LGR file!: ", "q1susp1.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1susp1.pcx", lgrtmp);
     }
     if (!mkepek1.pkishatsorud) {
-        uzenet("Picture not found in LGR file!: ", "q1susp2.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1susp2.pcx", lgrtmp);
     }
     if (!mkepek1.pkisalkar) {
-        uzenet("Picture not found in LGR file!: ", "q1forarm.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1forarm.pcx", lgrtmp);
     }
     if (!mkepek1.pkisfelkar) {
-        uzenet("Picture not found in LGR file!: ", "q1up_arm.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1up_arm.pcx", lgrtmp);
     }
     if (!mkepek1.pkisfej) {
-        uzenet("Picture not found in LGR file!: ", "q1head.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q1head.pcx", lgrtmp);
     }
 
     // 2. motoros:
     if (!mkepek2.pkisvezeto) {
-        uzenet("Picture not found in LGR file!: ", "q2body.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2body.pcx", lgrtmp);
     }
     if (!mkepek2.pkiscomb) {
-        uzenet("Picture not found in LGR file!: ", "q2thigh.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2thigh.pcx", lgrtmp);
     }
     if (!mkepek2.pkislabszar) {
-        uzenet("Picture not found in LGR file!: ", "q2leg.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2leg.pcx", lgrtmp);
     }
 
     if (!p2biker) {
-        uzenet("Picture not found in LGR file!: ", "q2bike.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2bike.pcx", lgrtmp);
     }
     if (!mkepek2.pkiskerek) {
-        uzenet("Picture not found in LGR file!: ", "q2wheel.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2wheel.pcx", lgrtmp);
     }
     if (!mkepek2.pkiselsorud) {
-        uzenet("Picture not found in LGR file!: ", "q2susp1.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2susp1.pcx", lgrtmp);
     }
     if (!mkepek2.pkishatsorud) {
-        uzenet("Picture not found in LGR file!: ", "q2susp2.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2susp2.pcx", lgrtmp);
     }
     if (!mkepek2.pkisalkar) {
-        uzenet("Picture not found in LGR file!: ", "q2forarm.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2forarm.pcx", lgrtmp);
     }
     if (!mkepek2.pkisfelkar) {
-        uzenet("Picture not found in LGR file!: ", "q2up_arm.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2up_arm.pcx", lgrtmp);
     }
     if (!mkepek2.pkisfej) {
-        uzenet("Picture not found in LGR file!: ", "q2head.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "q2head.pcx", lgrtmp);
     }
 
     if (!pkiszaszlo) {
-        uzenet("Picture not found in LGR file!: ", "qflag.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "qflag.pcx", lgrtmp);
     }
 
     if (!pkiller) {
-        uzenet("Picture not found in LGR file!: ", "qkiller.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "qkiller.pcx", lgrtmp);
     }
     if (!pexit) {
-        uzenet("Picture not found in LGR file!: ", "qexit.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "qexit.pcx", lgrtmp);
     }
 
     if (!pkimarad) {
-        uzenet("Picture not found in LGR file!: ", "qframe.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "qframe.pcx", lgrtmp);
     }
     if (!pcolors) {
-        uzenet("Picture not found in LGR file!: ", "qcolors.pcx", lgrtmp);
+        external_error("Picture not found in LGR file!: ", "qcolors.pcx", lgrtmp);
     }
 
     // Elintezzuk biker picture-oket:
@@ -860,7 +861,7 @@ lgrfile::lgrfile(const char* lgrnev) {
     for (int i = 0; i < texturaszam; i++) {
         textura* pt = &texturak[i];
         if (!pt->ppic) {
-            hiba("iuo4gt");
+            internal_error("iuo4gt");
         }
         pt->origxsize = pt->ppic->get_width();
         int minxmintasize = 600;
@@ -884,7 +885,7 @@ lgrfile::lgrfile(const char* lgrnev) {
     for (int i = 0; i < kepszam + 2; i++) {
         for (int j = 0; j < kepszam - 1; j++) {
             if (strcmpi(kepek[j].nev, kepek[j + 1].nev) == 0) {
-                uzenet("Picture name is duplicated in LGR file!: ", kepek[j].nev);
+                external_error("Picture name is duplicated in LGR file!: ", kepek[j].nev);
             }
 
             if (strcmpi(kepek[j].nev, kepek[j + 1].nev) > 0) {
@@ -900,7 +901,7 @@ lgrfile::lgrfile(const char* lgrnev) {
     for (int i = 0; i < maszkszam + 2; i++) {
         for (int j = 0; j < maszkszam - 1; j++) {
             if (strcmpi(maszkok[j].nev, maszkok[j + 1].nev) == 0) {
-                uzenet("Mask name is duplicated in LGR file!: ", maszkok[j].nev);
+                external_error("Mask name is duplicated in LGR file!: ", maszkok[j].nev);
             }
 
             if (strcmpi(maszkok[j].nev, maszkok[j + 1].nev) > 0) {
@@ -916,7 +917,7 @@ lgrfile::lgrfile(const char* lgrnev) {
     for (int i = 0; i < texturaszam + 2; i++) {
         for (int j = 0; j < texturaszam - 1; j++) {
             if (strcmpi(texturak[j].nev, texturak[j + 1].nev) == 0) {
-                uzenet("Texture name is duplicated in LGR file!: ", texturak[j].nev);
+                external_error("Texture name is duplicated in LGR file!: ", texturak[j].nev);
             }
 
             if (strcmpi(texturak[j + 1].nev, "qgrass") != 0 &&
@@ -953,7 +954,7 @@ lgrfile::lgrfile(const char* lgrnev) {
         }
     }
     if (foodszam < 1) {
-        uzenet("Picture is missing from LGR file:", "qfood1.pcx", lgrtmp);
+        external_error("Picture is missing from LGR file:", "qfood1.pcx", lgrtmp);
     }
 
     vanfu = 1;
@@ -963,7 +964,7 @@ lgrfile::lgrfile(const char* lgrnev) {
         opentextkimarad = 0;
     }
     if (pkoveto->length < 2) {
-        // uzenet( "Picture not found in LGR file!: ", "qgrass.pcx", lgrtmp );
+        // external_error( "Picture not found in LGR file!: ", "qgrass.pcx", lgrtmp );
         vanfu = 0;
     }
 }
@@ -972,7 +973,7 @@ static void deletemkepekstruct(motkepek* pk) {
     if (!pk->pkisvezeto || !pk->pkiscomb || !pk->pkislabszar || !pk->pkisa || !pk->pkisb ||
         !pk->pkisc || !pk->pkisd || !pk->pkiskerek || !pk->pkiselsorud || !pk->pkishatsorud ||
         !pk->pkisalkar || !pk->pkisfelkar || !pk->pkisfej) {
-        hiba("deletemkepekstruct-ban ervenytelen valamelyik kiskep!");
+        internal_error("deletemkepekstruct-ban ervenytelen valamelyik kiskep!");
     }
 
     delete pk->pkisvezeto;
@@ -993,28 +994,28 @@ static void deletemkepekstruct(motkepek* pk) {
 lgrfile::~lgrfile(void) {
     for (int i = 0; i < kepszam; i++) {
         if (!kepek[i].adatok) {
-            hiba("987ty7");
+            internal_error("987ty7");
         }
         delete kepek[i].adatok;
         kepek[i].adatok = NULL;
     }
     for (int i = 0; i < maszkszam; i++) {
         if (!maszkok[i].adatok) {
-            hiba("gk7u6tk");
+            internal_error("gk7u6tk");
         }
         delete maszkok[i].adatok;
         maszkok[i].adatok = NULL;
     }
     for (int i = 0; i < texturaszam; i++) {
         if (!texturak[i].ppic) {
-            hiba("6r5uy");
+            internal_error("6r5uy");
         }
         delete texturak[i].ppic;
         texturak[i].ppic = NULL;
     }
 
     if (!pkoveto) {
-        hiba(";oihki");
+        internal_error(";oihki");
     }
     delete pkoveto;
     pkoveto = NULL;
@@ -1022,7 +1023,7 @@ lgrfile::~lgrfile(void) {
     kepszam = maszkszam = texturaszam = 0;
 
     if (!pal || !paltomb || !idonegtomb) {
-        hiba("lgrfile::~lgrfile-ban !pal || !paltomb || !idonegtomb!");
+        internal_error("lgrfile::~lgrfile-ban !pal || !paltomb || !idonegtomb!");
     }
     delete pal;
     delete paltomb;
@@ -1034,7 +1035,7 @@ lgrfile::~lgrfile(void) {
     deletemkepekstruct(&mkepek1);
     deletemkepekstruct(&mkepek2);
     if (!pkiszaszlo || !pkimarad) {
-        hiba("7246426!");
+        internal_error("7246426!");
     }
     delete pkiszaszlo;
     delete pkimarad;
@@ -1042,7 +1043,7 @@ lgrfile::~lgrfile(void) {
     pkimarad = NULL;
 
     if (!pkiller || !pexit) {
-        hiba("lgrfile::~lgrfile-ban ervenytelen valamelyik kep!");
+        internal_error("lgrfile::~lgrfile-ban ervenytelen valamelyik kep!");
     }
 
     delete pkiller;
@@ -1070,7 +1071,7 @@ lgrfile::~lgrfile(void) {
 // Ezt betoltecseteket hivja (Ptop-bol szedi kep neveket):
 void lgrfile::betolthattereket(void) {
     if (!Ptop->fgnev[0] || !Ptop->bgnev[0]) {
-        hiba("ydsgyhi");
+        internal_error("ydsgyhi");
     }
 
     if (strcmpi(bgnevbent, Ptop->bgnev) != 0) {
@@ -1083,7 +1084,7 @@ void lgrfile::betolthattereket(void) {
 
         int index = gettexturaindex(bgnevbent);
         if (index < 0) {
-            hiba("oijhoe");
+            internal_error("oijhoe");
         }
         textura* pt = &texturak[index];
         egxmodulus = pt->origxsize;
@@ -1100,7 +1101,7 @@ void lgrfile::betolthattereket(void) {
 
         int index = gettexturaindex(fgnevbent);
         if (index < 0) {
-            hiba("879grtjoi");
+            internal_error("879grtjoi");
         }
         textura* pt = &texturak[index];
         foldxmodulus = pt->origxsize;

@@ -90,17 +90,17 @@ void rigidbody_movement(rigidbody* rb, vect2 force, double torque, double dt, bo
         switch (anchor_point_count) {
         case 0:
             if (line1 || line2) {
-                hiba("rigidbody_movement: 0 anchor_point_count assertion fail!");
+                internal_error("rigidbody_movement: 0 anchor_point_count assertion fail!");
             }
             break;
         case 1:
             if (!line1 || line2) {
-                hiba("rigidbody_movement: 1 anchor_point_count assertion fail!");
+                internal_error("rigidbody_movement: 1 anchor_point_count assertion fail!");
             }
             break;
         case 2:
             if (!line1 || !line2) {
-                hiba("rigidbody_movement: 2 anchor_point_count assertion fail!");
+                internal_error("rigidbody_movement: 2 anchor_point_count assertion fail!");
             }
             break;
         }

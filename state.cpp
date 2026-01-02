@@ -10,7 +10,7 @@ constexpr char STATE_FILENAME[] = "state.dat";
 
 static void read_encrypted(void* buffer, int length, FILE* h, const char* filename) {
     if (fread(buffer, 1, length, h) != length) {
-        uzenet("Corrupt file, please delete it!", filename);
+        external_error("Corrupt file, please delete it!", filename);
     }
     unsigned char* pc = (unsigned char*)buffer;
     short a = 23;
@@ -38,7 +38,7 @@ static void write_encrypted(void* buffer, int length, FILE* h) {
         a = 31 * b + c;
     }
     if (fwrite(buffer, 1, length, h) != length) {
-        hiba("Unable to write to state.dat file!");
+        internal_error("Unable to write to state.dat file!");
     }
     a = 23;
     b = 9782;
@@ -82,13 +82,13 @@ state::state(const char* filename) {
 
     FILE* h = fopen(filename, "rb");
     if (!h) {
-        hiba("Cannot open state file!: ", filename);
+        internal_error("Cannot open state file!: ", filename);
     }
 
     int version = 0;
     read_encrypted(&version, sizeof(version), h, filename);
     if (version != STATE_VERSION) {
-        uzenet("File version is incorrect!", "Please rename it!", filename);
+        external_error("File version is incorrect!", "Please rename it!", filename);
     }
     read_encrypted(toptens, sizeof(toptens), h, filename);
     read_encrypted(players, sizeof(players), h, filename);
@@ -113,11 +113,11 @@ state::state(const char* filename) {
 
     int magic_number = 0;
     if (fread(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
-        uzenet("Corrupt file, please rename it!", filename);
+        external_error("Corrupt file, please rename it!", filename);
     }
     if (magic_number != STATE_MAGICNUMBER_SHAREWARE &&
         magic_number != STATE_MAGICNUMBER_REGISTERED) {
-        uzenet("Corrupt file, please rename it!", filename);
+        external_error("Corrupt file, please rename it!", filename);
     }
     fclose(h);
 }
@@ -135,7 +135,7 @@ void state::reload_toptens() {
     int version = 0;
     read_encrypted(&version, 4, h, filename);
     if (version != STATE_VERSION) {
-        uzenet("File version is incorrect!", "Please rename it!", filename);
+        external_error("File version is incorrect!", "Please rename it!", filename);
     }
 
     read_encrypted(toptens, sizeof(toptens), h, filename);
@@ -146,7 +146,7 @@ void state::reload_toptens() {
 void state::save() {
     FILE* h = fopen(STATE_FILENAME, "wb");
     if (!h) {
-        uzenet("Could not open for write file!: ", STATE_FILENAME);
+        external_error("Could not open for write file!: ", STATE_FILENAME);
     }
 
     int version = STATE_VERSION;
@@ -174,7 +174,7 @@ void state::save() {
 
     int magic_number = STATE_MAGICNUMBER_REGISTERED;
     if (fwrite(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
-        hiba("Cannot write to state file: ", STATE_FILENAME);
+        internal_error("Cannot write to state file: ", STATE_FILENAME);
     }
 
     fclose(h);
@@ -282,7 +282,7 @@ void state::write_stats_player_total_time(FILE* h, const char* player_name, bool
 void state::write_stats() {
     FILE* h = fopen("stats.txt", "wt");
     if (!h) {
-        uzenet("Could not open STATS.TXT for writing!");
+        external_error("Could not open STATS.TXT for writing!");
     }
 
     fprintf(h, "This text file is generated automatically each time you quit the\n");
@@ -379,6 +379,6 @@ player* state::get_player(const char* player_name) {
             return cur_player;
         }
     }
-    hiba("get_player cannot find name!");
+    internal_error("get_player cannot find name!");
     return nullptr;
 }

@@ -12,7 +12,7 @@ abc8::abc8(const char* filename) {
     y_offset = NULL;
     ppsprite = new ptrpic8[256];
     if (!ppsprite) {
-        uzenet("memory");
+        external_error("memory");
         return;
     }
     for (int i = 0; i < 256; i++) {
@@ -20,7 +20,7 @@ abc8::abc8(const char* filename) {
     }
     y_offset = new short[256];
     if (!y_offset) {
-        uzenet("memory");
+        external_error("memory");
         return;
     }
     for (int i = 0; i < 256; i++) {
@@ -28,53 +28,53 @@ abc8::abc8(const char* filename) {
     }
     FILE* h = qopen(filename, "rb");
     if (!h) {
-        hiba("Could not open abc8 file:: ", filename);
+        internal_error("Could not open abc8 file:: ", filename);
         return;
     }
     char tmp[20];
     if (fread(tmp, 4, 1, h) != 1) {
-        hiba("Could not read abc8 file: ", filename);
+        internal_error("Could not read abc8 file: ", filename);
         qclose(h);
         return;
     }
     if (strcmp(tmp, "RA1") != 0) {
-        hiba("Invalid abc8 file header: ", filename);
+        internal_error("Invalid abc8 file header: ", filename);
         qclose(h);
         return;
     }
     short sprite_count = 0;
     if (fread(&sprite_count, 2, 1, h) != 1) {
-        hiba("Could not read abc8 file: ", filename);
+        internal_error("Could not read abc8 file: ", filename);
         qclose(h);
         return;
     }
     if (sprite_count <= 0 || sprite_count > 256) {
-        hiba("Invalid codepoint count for abc8 file: ", filename);
+        internal_error("Invalid codepoint count for abc8 file: ", filename);
     }
     for (int i = 0; i < sprite_count; i++) {
         if (fread(tmp, 7, 1, h) != 1) {
-            hiba("Could not read abc8 file: ", filename);
+            internal_error("Could not read abc8 file: ", filename);
             qclose(h);
             return;
         }
         if (strcmp(tmp, "EGYMIX") != 0) {
-            hiba("Invalid sprite header in abc8 file: ", filename);
+            internal_error("Invalid sprite header in abc8 file: ", filename);
             qclose(h);
             return;
         }
         unsigned char c = -1;
         if (fread(&c, 1, 1, h) != 1) {
-            hiba("Could not read abc8 file: ", filename);
+            internal_error("Could not read abc8 file: ", filename);
             qclose(h);
             return;
         }
         if (fread(&y_offset[c], 2, 1, h) != 1) {
-            hiba("Could not read abc8 file: ", filename);
+            internal_error("Could not read abc8 file: ", filename);
             qclose(h);
             return;
         }
         if (ppsprite[c]) {
-            hiba("Duplicate codepoint in abc8 file: ", filename);
+            internal_error("Duplicate codepoint in abc8 file: ", filename);
             return;
         }
         ppsprite[c] = new pic8(".spr", h);
@@ -119,7 +119,7 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
         }
         if (!ppsprite[index]) {
             if (ErrorOnMissingCodepoint) {
-                hiba("Missing codepoint in abc8!", error_text);
+                internal_error("Missing codepoint in abc8!", error_text);
                 return;
             } else {
                 text++;
@@ -150,7 +150,7 @@ int abc8::len(const char* text) {
                 continue;
             }
             if (ErrorOnMissingCodepoint) {
-                hiba("Missing codepoint in abc8!", error_text);
+                internal_error("Missing codepoint in abc8!", error_text);
                 return 0;
             } else {
                 text++;

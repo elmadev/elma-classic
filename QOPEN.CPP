@@ -1,9 +1,5 @@
 #include "ALL.H"
 
-constexpr bool USE_RES_FILE = true;
-
-constexpr char RES_FILENAME[] = "elma.res";
-
 struct res_file {
     char filename[16];
     // In Shareware the order of these two fields is reversed.
@@ -11,12 +7,12 @@ struct res_file {
     int offset;
 };
 
-static res_file* ResFiles = nullptr;
-
-constexpr int RES_MAX_FILES = 150;
-
+constexpr char RES_FILENAME[] = "elma.res";
 constexpr int RES_MAGIC_NUMBER = 1347839;
+constexpr int RES_MAX_FILES = 150;
+constexpr bool USE_RES_FILE = true;
 
+static res_file* ResFiles = nullptr;
 static int FileCount = 0;
 
 static void decrypt() {

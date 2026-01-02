@@ -23,7 +23,7 @@ static void decrypt(void) {
     short a = 23, b = 9982, c = 3391; // In Shareware, b is 9882
 
     if (!ResFiles) {
-        internal_error("titkosit-ban !Leirotomb!");
+        internal_error("ResFiles is NULL!");
     }
     for (int i = 0; i < RES_MAX_FILES; i++) {
         unsigned char* pc = (unsigned char*)(&ResFiles[i]);
@@ -40,7 +40,7 @@ static int QOpenInitialized = 0;
 
 void init_qopen(void) {
     if (QOpenInitialized) {
-        internal_error("initqopen tobbszor hivva!");
+        internal_error("init_qopen() already called!");
     }
     QOpenInitialized = 1;
 
@@ -58,7 +58,7 @@ void init_qopen(void) {
     }
 
     if (fread(&FileCount, 1, 4, h) != 4) {
-        internal_error("initqopen-ben nem sikerult olvasni!");
+        internal_error("init_qopen() cannot read FileCount!");
     }
     if (FileCount <= 0 || FileCount > RES_MAX_FILES) {
         internal_error("FileCount <= 0 || FileCount > RES_MAX_FILES!");
@@ -66,16 +66,16 @@ void init_qopen(void) {
 
     long size = sizeof(res_file[RES_MAX_FILES]);
     if (fread(ResFiles, 1, unsigned(size), h) != size) {
-        internal_error("initqopen-ben nem sikerult olvasni!");
+        internal_error("init_qopen() cannot read files!");
     }
     decrypt();
 
     long magic_number = 0;
     if (fread(&magic_number, 1, 4, h) != 4) {
-        internal_error("initqopen-ben nem sikerult olvasni!");
+        internal_error("init_qopen() cannot read magic_number!");
     }
     if (magic_number != RES_MAGIC_NUMBER) {
-        internal_error("initqopen-ben nem stimmel magicnumber!");
+        internal_error("init_qopen() invalid magic_number!");
     }
 
     fclose(h);
@@ -89,13 +89,13 @@ static int NumHandles = 0;
 
 FILE* qopen(const char* filename, const char* mode) {
     if (!QOpenInitialized) {
-        internal_error("qopen initqopen nelkul!");
+        internal_error("qopen() called before init_qopen()!");
     }
     if (NumHandles == MAX_HANDLES) {
-        internal_error("qopen-ben Nyitva == MAXNYITVA!");
+        internal_error("NumHandles == MAX_HANDLES!");
     }
     if (strcmp(mode, "rb") != 0 && strcmp(mode, "rt")) {
-        internal_error("qopen-ben sem rb, sem rt!: ", filename);
+        internal_error("qopen() mode is not \"rb\ or \"rt\""!: ", filename);
     }
 
     if (USE_RES_FILE) {
@@ -104,23 +104,23 @@ FILE* qopen(const char* filename, const char* mode) {
                 Handles[NumHandles] = fopen(RES_FILENAME, mode);
                 HandleOffset[NumHandles] = i;
                 if (!Handles[NumHandles]) {
-                    internal_error("Nem sikerult nagy tombot megnyitni!: ", RES_FILENAME);
+                    internal_error("qopen() failed to open: ", RES_FILENAME);
                 }
                 if (fseek(Handles[NumHandles], ResFiles[i].offset, SEEK_SET) != 0) {
-                    internal_error("Nem mukodik fseek qopen-ben!");
+                    internal_error("qopen() failed to fseek!");
                 }
 
                 NumHandles++;
                 return Handles[NumHandles - 1];
             }
         }
-        internal_error("qopen nem talalta meg nagyfileban file-t!: ", filename);
+        internal_error("qopen() failed to find file: ", filename);
         return NULL;
     } else {
         NumHandles++;
         char tmp[30] = "files/";
         if (strlen(filename) > 12 || filename[0] == '.') {
-            internal_error("Hibas nev qopen-ben!: ", filename);
+            internal_error("qopen() malformed filename!: ", filename);
         }
         strcat(tmp, filename);
         return fopen(tmp, mode);
@@ -129,10 +129,10 @@ FILE* qopen(const char* filename, const char* mode) {
 
 void qclose(FILE* h) {
     if (!QOpenInitialized) {
-        internal_error("qclose initqopen nelkul!");
+        internal_error("init_qopen() not yet called!");
     }
     if (!NumHandles) {
-        internal_error("qclose-ban !Nyitva!");
+        internal_error("qclose() no handles open!");
     }
     if (USE_RES_FILE) {
         for (int i = 0; i < NumHandles; i++) {
@@ -146,7 +146,7 @@ void qclose(FILE* h) {
                 return;
             }
         }
-        internal_error("qclose nem talalta meg h-t!");
+        internal_error("qclose() cannot find handle!");
     } else {
         NumHandles--;
         fclose(h);
@@ -172,7 +172,7 @@ int qseek(FILE* h, long offset, int whence) {
                 return fseek(Handles[i], offset, SEEK_CUR);
             }
         }
-        internal_error("qclose nem talalta meg h-t!");
+        internal_error("qseek() can't find handle!");
         return 0;
     } else {
         return fseek(h, offset, whence);

@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -95,21 +96,17 @@ static void handle_error(const char* text1, const char* text2, const char* text3
             }
         }
     } else {
-        char text[200];
-        strcpy(text, text1);
+        std::string text = text1;
         if (text2) {
-            strcat(text, "\n");
-            strcat(text, text2);
+            text = text + "\n" + text2;
         }
         if (text3) {
-            strcat(text, "\n");
-            strcat(text, text3);
+            text = text + "\n" + text3;
         }
         if (text4) {
-            strcat(text, "\n");
-            strcat(text, text4);
+            text = text + "\n" + text4;
         }
-        message_box(text);
+        message_box(text.c_str());
     }
     quit();
 }

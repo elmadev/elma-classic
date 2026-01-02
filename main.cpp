@@ -95,18 +95,12 @@ static void handle_error(const char* text1, const char* text2, const char* text3
 }
 
 void internal_error(const char* text1, const char* text2, const char* text3) {
-    if (access("message.inf", 0) == 0) {
-        handle_error("<<message.inf accessed>>", text1, text2, text3);
-    }
-    handle_error("Sorry, internal error.", nullptr, nullptr, nullptr);
+    handle_error("Sorry, internal error.", text1, text2, text3);
 }
 
 void external_error(const char* text1, const char* text2, const char* text3) {
     if (strstr(text1, "memory")) {
-        if (access("message.inf", 0) == 0) {
-            handle_error("message.inf accessed\n", text1, text2, text3);
-        }
-        handle_error("Sorry, out of memory!", nullptr, nullptr, nullptr);
+        handle_error("Sorry, out of memory!", text1, text2, text3);
     }
-    handle_error(text1, text2, text3, nullptr);
+    handle_error("External error encountered:", text1, text2, text3);
 }

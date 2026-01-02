@@ -3,8 +3,8 @@
 
 FILE* qopen(const char* filename, const char* mode);
 void qclose(FILE* h);
-int qseek(FILE* stream, long offset, int whence);
+int qseek(FILE* stream, int offset, int whence);
 
-void init_qopen(void);
+void init_qopen();
 
 #endif

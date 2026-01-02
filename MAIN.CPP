@@ -7,8 +7,6 @@
 
 static double StopwatchStartTime = 0;
 
-// 182*sec-et adja vissza idot tortresszel egyutt!
-// d_stoppe.cpp-ben vannak megvalositva:
 double stopwatch(void) { return timeGetTime() * 0.182 - StopwatchStartTime; }
 
 void stopwatch_reset(void) { StopwatchStartTime = timeGetTime() * 0.182; }
@@ -24,13 +22,14 @@ void quit() { exit(0); }
 int random_range(int maximum) { return rand() % maximum; }
 
 bool ErrorGraphicsLoaded = false;
-static int Hibaban = 0;
-static char Tmphibatext[500];
+static int InError = 0;
+static char ErrorTextTmp[500];
 
-static void directhiba(const char* text1, const char* text2, const char* text3, const char* text4) {
+static void handle_error(const char* text1, const char* text2, const char* text3,
+                         const char* text4) {
     ErrorOnMissingCodepoint = false;
     FILE* h;
-    if (Hibaban) {
+    if (InError) {
         h = fopen("error_b.txt", "wt");
     } else {
         h = fopen("error.txt", "wt");
@@ -46,26 +45,26 @@ static void directhiba(const char* text1, const char* text2, const char* text3, 
         if (text4) {
             fprintf(h, "%s\n", text4);
         }
-        if (Hibaban) {
+        if (InError) {
             fprintf(h, "Two errors while processing!\n");
         }
 
         fclose(h);
     }
 
-    if (Hibaban) {
+    if (InError) {
         return;
     }
-    Hibaban = 1;
+    InError = 1;
 
     if (ErrorGraphicsLoaded) {
         if (text4) {
             if (strlen(text3) + strlen(text4) < 490) {
-                strcpy(Tmphibatext, text3);
-                strcat(Tmphibatext, " ");
-                strcat(Tmphibatext, text4);
+                strcpy(ErrorTextTmp, text3);
+                strcat(ErrorTextTmp, " ");
+                strcat(ErrorTextTmp, text4);
 
-                text3 = Tmphibatext;
+                text3 = ErrorTextTmp;
             }
         }
         render_error(text1, text2, text3);
@@ -97,19 +96,17 @@ static void directhiba(const char* text1, const char* text2, const char* text3, 
 
 void internal_error(const char* text1, const char* text2, const char* text3) {
     if (access("message.inf", 0) == 0) {
-        directhiba("<<message.inf accessed>>", text1, text2, text3);
+        handle_error("<<message.inf accessed>>", text1, text2, text3);
     }
-    directhiba("Sorry, internal error.", NULL, NULL, NULL);
+    handle_error("Sorry, internal error.", NULL, NULL, NULL);
 }
 
 void external_error(const char* text1, const char* text2, const char* text3) {
-    // about azert kell, hogy kezdo memchecknel ne agazzon el:
     if (strstr(text1, "memory")) {
-        // Ha memory szerepel text1-ben:
-        if (access("message.inf", 0) == 0) { // Most mem-et is csak inf-re adja:
-            directhiba("message.inf accessed\n", text1, text2, text3);
+        if (access("message.inf", 0) == 0) {
+            handle_error("message.inf accessed\n", text1, text2, text3);
         }
-        directhiba("Sorry, out of memory!", NULL, NULL, NULL);
+        handle_error("Sorry, out of memory!", NULL, NULL, NULL);
     }
-    directhiba(text1, text2, text3, NULL);
+    handle_error(text1, text2, text3, NULL);
 }

@@ -1,9 +1,17 @@
 #include "ALL.H"
 #include <string>
+
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <timeapi.h>
+#else
+#include <sys/time.h>
+static inline long long timeGetTime() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+}
 #endif
 
 static double StopwatchStartTime = 0;

@@ -29,3 +29,4 @@
 * noretrac.inf (software backbuffer) is no longer supported
 * fordit.inf (invert volt buttons) is no longer supported
 * nemmem.inf (Across memory check) is no longer supported
+* files.inf (files are read from ../files, instead of elma.res) is no longer supported

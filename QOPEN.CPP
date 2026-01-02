@@ -1,6 +1,6 @@
 #include "ALL.H"
 
-static int Egybol = 1;
+constexpr int Egybol = 1;
 
 static char Nagyfilenev[] = "elma.res";
 
@@ -43,11 +43,6 @@ void initqopen(void) {
         internal_error("initqopen tobbszor hivva!");
     }
     Qopeninited = 1;
-
-    Egybol = 1;
-    if (access("files.inf", 0) == 0) {
-        Egybol = 0;
-    }
 
     if (!Egybol) {
         return;
@@ -123,7 +118,7 @@ FILE* qopen(const char* nev, const char* paramok) {
         return NULL;
     } else {
         Nyitva++;
-        char tmp[30] = "..\\files\\";
+        char tmp[30] = "files/";
         if (strlen(nev) > 12 || nev[0] == '.') {
             internal_error("Hibas nev qopen-ben!: ", nev);
         }

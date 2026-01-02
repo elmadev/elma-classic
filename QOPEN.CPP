@@ -93,8 +93,8 @@ FILE* qopen(const char* filename, const char* mode) {
     if (NumHandles == MAX_HANDLES) {
         internal_error("NumHandles == MAX_HANDLES!");
     }
-    if (strcmp(mode, "rb") != 0 && strcmp(mode, "rt")) {
-        internal_error("qopen() mode is not \"rb\ or \"rt\""!: ", filename);
+    if (strcmp(mode, "rb") != 0 && strcmp(mode, "r") != 0) {
+        internal_error("qopen() mode is not \"rb\" or \"r\"!: ", filename, mode);
     }
 
     if (USE_RES_FILE) {

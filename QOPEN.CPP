@@ -70,9 +70,6 @@ void initqopen(void) {
     }
 
     long hossz = sizeof(fileleiro[FILESZAM]);
-    if (hossz > 64000l) {
-        internal_error("Tul hosszu Leirotomb initqopen-ben!");
-    }
     if (fread(Leirotomb, 1, unsigned(hossz), h) != hossz) {
         internal_error("initqopen-ben nem sikerult olvasni!");
     }

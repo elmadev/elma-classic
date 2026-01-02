@@ -126,7 +126,7 @@ void handle_events() {
                 // Disallow exiting if unsaved changes in editor
                 break;
             }
-            exit(0);
+            quit();
             break;
         case SDL_WINDOWEVENT:
             // Force editor redraw if focus gained/lost to fix editor sometimes blanking

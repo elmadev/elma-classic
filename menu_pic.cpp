@@ -417,7 +417,7 @@ constexpr int ERROR_MAX_ROW_LENGTH = 34;
 constexpr int ERROR_MAX_ROWS = 10;
 static char ErrorLines[ERROR_MAX_ROWS][ERROR_MAX_ROW_LENGTH + 4];
 
-void render_error(const char* text1, const char* text2, const char* text3) {
+void render_error(const char* text1, const char* text2, const char* text3, const char* text4) {
     // Tile the background vertically
     int y = 0;
     int odd_row = 0;
@@ -443,13 +443,16 @@ void render_error(const char* text1, const char* text2, const char* text3) {
     // ERROR_ROW_MAX_LENGTH We break it up on the last ' ' character, or if none exists, then we
     // just break the word We can have a total of ERROR_MAX_ROWS segments
     int line_count = 0;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         const char* text = text1;
         if (i == 1) {
             text = text2;
         }
         if (i == 2) {
             text = text3;
+        }
+        if (i == 3) {
+            text = text4;
         }
         if (!text) {
             break;

@@ -44,7 +44,6 @@ int random_range(int maximum) { return rand() % maximum; }
 
 bool ErrorGraphicsLoaded = false;
 static bool InError = false;
-static char ErrorTextTmp[500];
 
 static void handle_error(const char* text1, const char* text2, const char* text3,
                          const char* text4) {
@@ -79,16 +78,7 @@ static void handle_error(const char* text1, const char* text2, const char* text3
     InError = true;
 
     if (ErrorGraphicsLoaded) {
-        if (text4) {
-            if (strlen(text3) + strlen(text4) < 490) {
-                strcpy(ErrorTextTmp, text3);
-                strcat(ErrorTextTmp, " ");
-                strcat(ErrorTextTmp, text4);
-
-                text3 = ErrorTextTmp;
-            }
-        }
-        render_error(text1, text2, text3);
+        render_error(text1, text2, text3, text4);
         while (true) {
             int c = get_keypress();
             if (c == KEY_ESC || c == KEY_ENTER) {

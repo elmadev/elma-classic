@@ -43,6 +43,6 @@ class menu_pic {
 };
 
 void init_menu_pictures();
-void render_error(const char* text1, const char* text2, const char* text3);
+void render_error(const char* text1, const char* text2, const char* text3, const char* text4);
 
 #endif

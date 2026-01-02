@@ -152,7 +152,7 @@ static int titkoswrite(void* mut, int hossz, FILE* h) {
 const char* getleveldescription(int level) {
     if (!Leveldescinited) {
         Leveldescinited = 1;
-        FILE* h = qopen("desclist.txt", "rt");
+        FILE* h = qopen("desclist.txt", "r");
         if (!h) {
             kiirdesceket(); // ki is lep
         }
@@ -904,7 +904,7 @@ static void makelgrtabla(void) {
     }
 
     // Most fel van toltve default ertekekkel, beolvassuk file-t:
-    FILE* h = fopen("lgr/lgrlist.txt", "rt");
+    FILE* h = fopen("lgr/lgrlist.txt", "r");
     if (!h) {
         return;
     }

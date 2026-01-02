@@ -5,12 +5,12 @@ extern bool ErrorGraphicsLoaded;
 
 void quit();
 
-double stopwatch(void);
-void stopwatch_reset(void);
+double stopwatch();
+void stopwatch_reset();
 
-void internal_error(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
-void external_error(const char* text1, const char* text2 = NULL, const char* text3 = NULL);
+void internal_error(const char* text1, const char* text2 = nullptr, const char* text3 = nullptr);
+void external_error(const char* text1, const char* text2 = nullptr, const char* text3 = nullptr);
 
-int random_range(int);
+int random_range(int maximum);
 
 #endif

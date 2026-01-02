@@ -7,9 +7,9 @@
 
 static double StopwatchStartTime = 0;
 
-double stopwatch(void) { return timeGetTime() * 0.182 - StopwatchStartTime; }
+double stopwatch() { return timeGetTime() * 0.182 - StopwatchStartTime; }
 
-void stopwatch_reset(void) { StopwatchStartTime = timeGetTime() * 0.182; }
+void stopwatch_reset() { StopwatchStartTime = timeGetTime() * 0.182; }
 
 int main() {
     platform_init();
@@ -22,7 +22,7 @@ void quit() { exit(0); }
 int random_range(int maximum) { return rand() % maximum; }
 
 bool ErrorGraphicsLoaded = false;
-static int InError = 0;
+static bool InError = false;
 static char ErrorTextTmp[500];
 
 static void handle_error(const char* text1, const char* text2, const char* text3,
@@ -55,7 +55,7 @@ static void handle_error(const char* text1, const char* text2, const char* text3
     if (InError) {
         return;
     }
-    InError = 1;
+    InError = true;
 
     if (ErrorGraphicsLoaded) {
         if (text4) {
@@ -68,7 +68,7 @@ static void handle_error(const char* text1, const char* text2, const char* text3
             }
         }
         render_error(text1, text2, text3);
-        while (1) {
+        while (true) {
             int c = mk_getextchar();
             if (c == MK_ESC || c == MK_ENTER) {
                 break;
@@ -98,7 +98,7 @@ void internal_error(const char* text1, const char* text2, const char* text3) {
     if (access("message.inf", 0) == 0) {
         handle_error("<<message.inf accessed>>", text1, text2, text3);
     }
-    handle_error("Sorry, internal error.", NULL, NULL, NULL);
+    handle_error("Sorry, internal error.", nullptr, nullptr, nullptr);
 }
 
 void external_error(const char* text1, const char* text2, const char* text3) {
@@ -106,7 +106,7 @@ void external_error(const char* text1, const char* text2, const char* text3) {
         if (access("message.inf", 0) == 0) {
             handle_error("message.inf accessed\n", text1, text2, text3);
         }
-        handle_error("Sorry, out of memory!", NULL, NULL, NULL);
+        handle_error("Sorry, out of memory!", nullptr, nullptr, nullptr);
     }
-    handle_error(text1, text2, text3, NULL);
+    handle_error(text1, text2, text3, nullptr);
 }

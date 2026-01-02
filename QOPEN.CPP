@@ -1,8 +1,8 @@
 #include "ALL.H"
 
-constexpr int USE_RES_FILE = 1;
+constexpr bool USE_RES_FILE = true;
 
-static char RES_FILENAME[] = "elma.res";
+constexpr char RES_FILENAME[] = "elma.res";
 
 struct res_file {
     char filename[16];
@@ -11,16 +11,19 @@ struct res_file {
     int offset;
 };
 
-static res_file* ResFiles = NULL;
+static res_file* ResFiles = nullptr;
 
-#define RES_MAX_FILES (150)
+constexpr int RES_MAX_FILES = 150;
 
-#define RES_MAGIC_NUMBER (1347839l)
+constexpr int RES_MAGIC_NUMBER = 1347839;
 
-static long FileCount = 0;
+static int FileCount = 0;
 
-static void decrypt(void) {
-    short a = 23, b = 9982, c = 3391; // In Shareware, b is 9882
+static void decrypt() {
+    short a = 23;
+    // In Shareware, b is 9882
+    short b = 9982;
+    short c = 3391;
 
     if (!ResFiles) {
         internal_error("ResFiles is NULL!");
@@ -36,13 +39,13 @@ static void decrypt(void) {
     }
 }
 
-static int QOpenInitialized = 0;
+static bool QOpenInitialized = false;
 
-void init_qopen(void) {
+void init_qopen() {
     if (QOpenInitialized) {
         internal_error("init_qopen() already called!");
     }
-    QOpenInitialized = 1;
+    QOpenInitialized = true;
 
     if (!USE_RES_FILE) {
         return;
@@ -57,21 +60,21 @@ void init_qopen(void) {
         external_error("Missing file!: ", RES_FILENAME);
     }
 
-    if (fread(&FileCount, 1, 4, h) != 4) {
+    if (fread(&FileCount, 1, sizeof(FileCount), h) != 4) {
         internal_error("init_qopen() cannot read FileCount!");
     }
     if (FileCount <= 0 || FileCount > RES_MAX_FILES) {
         internal_error("FileCount <= 0 || FileCount > RES_MAX_FILES!");
     }
 
-    long size = sizeof(res_file[RES_MAX_FILES]);
-    if (fread(ResFiles, 1, unsigned(size), h) != size) {
+    int size = sizeof(res_file[RES_MAX_FILES]);
+    if (fread(ResFiles, 1, size, h) != size) {
         internal_error("init_qopen() cannot read files!");
     }
     decrypt();
 
-    long magic_number = 0;
-    if (fread(&magic_number, 1, 4, h) != 4) {
+    int magic_number = 0;
+    if (fread(&magic_number, 1, sizeof(magic_number), h) != 4) {
         internal_error("init_qopen() cannot read magic_number!");
     }
     if (magic_number != RES_MAGIC_NUMBER) {
@@ -81,7 +84,7 @@ void init_qopen(void) {
     fclose(h);
 }
 
-#define MAX_HANDLES (3)
+constexpr int MAX_HANDLES = 3;
 static FILE* Handles[MAX_HANDLES];
 static int HandleOffset[MAX_HANDLES];
 
@@ -115,7 +118,7 @@ FILE* qopen(const char* filename, const char* mode) {
             }
         }
         internal_error("qopen() failed to find file: ", filename);
-        return NULL;
+        return nullptr;
     } else {
         NumHandles++;
         char tmp[30] = "files/";
@@ -153,7 +156,7 @@ void qclose(FILE* h) {
     }
 }
 
-int qseek(FILE* h, long offset, int whence) {
+int qseek(FILE* h, int offset, int whence) {
     if (whence != SEEK_SET && whence != SEEK_END && whence != SEEK_CUR) {
         internal_error("whence != SEEK_SET && whence != SEEK_END && whence != SEEK_CUR!");
     }

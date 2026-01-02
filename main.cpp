@@ -24,32 +24,28 @@ int random_range(int maximum) { return rand() % maximum; }
 
 bool ErrorGraphicsLoaded = false;
 static bool InError = false;
+static FILE* ErrorHandle;
 
 static void handle_error(const char* text1, const char* text2, const char* text3,
                          const char* text4) {
     ErrorOnMissingCodepoint = false;
-    FILE* h;
-    if (InError) {
-        h = fopen("error_b.txt", "wt");
-    } else {
-        h = fopen("error.txt", "wt");
+    if (!InError) {
+        ErrorHandle = fopen("error.txt", "wt");
     }
-    if (h) {
-        fprintf(h, "%s\n", text1);
+    if (ErrorHandle) {
+        if (InError) {
+            fprintf(ErrorHandle, "\nTwo errors while processing!\n");
+        }
+        fprintf(ErrorHandle, "%s\n", text1);
         if (text2) {
-            fprintf(h, "%s\n", text2);
+            fprintf(ErrorHandle, "%s\n", text2);
         }
         if (text3) {
-            fprintf(h, "%s\n", text3);
+            fprintf(ErrorHandle, "%s\n", text3);
         }
         if (text4) {
-            fprintf(h, "%s\n", text4);
+            fprintf(ErrorHandle, "%s\n", text4);
         }
-        if (InError) {
-            fprintf(h, "Two errors while processing!\n");
-        }
-
-        fclose(h);
     }
 
     if (InError) {
@@ -78,6 +74,8 @@ static void handle_error(const char* text1, const char* text2, const char* text3
         }
         message_box(text.c_str());
     }
+
+    fclose(ErrorHandle);
     quit();
 }
 

@@ -1,7 +1,7 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
 
-const char* dik_to_string(DIK_Code keycode) {
+const char* dik_to_string(DikScancode keycode) {
     switch (keycode) {
     case DIK_1:
         return "1";
@@ -246,7 +246,7 @@ const char* dik_to_string(DIK_Code keycode) {
 }
 
 // A list of pointers to where the keys are stored (somewhere in a state class object)
-typedef DIK_Code* key_pointers[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
+typedef DikScancode* key_pointers[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
 static key_pointers UniversalKeys; // +/- and Screenshot
 static key_pointers Player1Keys;
@@ -290,7 +290,7 @@ static void prompt_control(int length, key_pointers keys, int index) {
     nav.navigate(nullptr, 0, true);
     while (true) {
         handle_events();
-        for (DIK_Code keycode = 1; keycode < MaxKeycode; keycode++) {
+        for (DikScancode keycode = 1; keycode < MaxKeycode; keycode++) {
             if (is_key_down(DIK_ESCAPE)) {
                 return;
             }

@@ -20,7 +20,7 @@
     betuki( 0, '_' );
     while( 1 ) {
         empty_keypress_buffer();
-        int c = get_keypress();
+        Codepoint c = get_keypress();
         if( c == KEY_ESC )
             return 0;
         if( c == KEY_ENTER ) {
@@ -61,7 +61,7 @@ static int bevesznevet(char* nev) {
     nev[0] = 0;
     while (1) {
         while (has_keypress()) {
-            int c = get_keypress();
+            Codepoint c = get_keypress();
             if (c == KEY_ESC) {
                 return 0;
             }
@@ -162,7 +162,7 @@ static void konvback(char* text) {
     lassufizre( Korny->picbuffer, Korny->pal_fomenu );
     while( 1 ) {
         empty_keypress_buffer();
-        int c = get_keypress();
+        Codepoint c = get_keypress();
         if( c == 'c' || c == 'C' )
             return;
     }
@@ -344,7 +344,7 @@ void saveplay(long belyeg) {
         empty_keypress_buffer();
         while (1) {
             if (has_keypress()) {
-                int c = get_keypress();
+                Codepoint c = get_keypress();
                 if (c == KEY_ESC) {
                     return;
                 }

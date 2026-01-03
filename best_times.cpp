@@ -101,7 +101,7 @@ static void render_topten(topten* tten, const char* header, int single) {
     empty_keypress_buffer();
     while (true) {
         if (has_keypress()) {
-            int c = get_keypress();
+            Codepoint c = get_keypress();
             if (c == KEY_ESC || c == KEY_ENTER) {
                 return;
             }

@@ -2,13 +2,13 @@
 #include "directinput_scancodes.h"
 
 constexpr int KeyBufferSize = 30;
-static int KeyBuffer[KeyBufferSize];
+static Codepoint KeyBuffer[KeyBufferSize];
 static int KeyBufferCount = 0;
 
 static char KeyState1[MaxKeycode];
 static char KeyState2[MaxKeycode];
 static bool UseKeyState2 = true;
-static int DIKToAscii[MaxKeycode];
+static Codepoint DIKToAscii[MaxKeycode];
 
 // Map DIK codes to ascii (+ a few extra codepoints for special keys)
 void keys_init() {
@@ -81,11 +81,11 @@ void keys_init() {
     DIKToAscii[DIK_ADD] = KEY_RIGHT;
 }
 
-int get_keypress() {
+Codepoint get_keypress() {
     while (true) {
         handle_events();
         if (KeyBufferCount > 0) {
-            int c = KeyBuffer[0];
+            Codepoint c = KeyBuffer[0];
             for (int i = 0; i < KeyBufferCount - 1; i++) {
                 KeyBuffer[i] = KeyBuffer[i + 1];
             }
@@ -105,7 +105,7 @@ bool has_keypress() {
     return KeyBufferCount > 0;
 }
 
-bool is_key_down(int code) {
+bool is_key_down(DikScancode code) {
     if (code < 0 || code >= MaxKeycode) {
         internal_error("code out of range in is_key_down()!");
         return false;

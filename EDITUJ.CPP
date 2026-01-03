@@ -644,7 +644,7 @@ void editor(void) {
     right_mouse_clicked();
     while (1) {
         while (has_keypress()) {
-            int c = get_keypress();
+            Codepoint c = get_keypress();
             if (c == KEY_ESC) {
                 if (Tool == T_MOVE) {
                     t_move_esc();

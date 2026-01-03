@@ -230,7 +230,7 @@ void menu_pic::render(bool skip_balls_helmet) {
         empty_keypress_buffer();
         while (true) {
             if (has_keypress()) {
-                int c = get_keypress();
+                Codepoint c = get_keypress();
                 if (c == KEY_ESC || c == KEY_ENTER) {
                     break;
                 }

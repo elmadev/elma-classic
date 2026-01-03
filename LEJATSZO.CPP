@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "LGRFILE.H"
 #include "physics_init.h"
 
 // Jatek modja ket fele lehet:

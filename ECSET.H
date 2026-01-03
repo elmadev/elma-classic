@@ -2,6 +2,7 @@
 #define ECSET_H
 
 class ecset;
+class grass;
 struct mdarab;
 
 // Egy iterator class (inkabb cache) ecsethez (foltoz hasznalja oket):

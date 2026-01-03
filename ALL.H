@@ -69,8 +69,6 @@
 #include "EDITPLAY.H"
 #include "ED_CHECK.H"
 
-#include "LGRFILE.H"
-
 #include "LOAD.H"
 #include "ECSET.H"
 

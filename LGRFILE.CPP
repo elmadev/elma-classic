@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "LGRFILE.H"
 #include "anim.h"
 #include "grass.h"
 #include "M_PIC.H"

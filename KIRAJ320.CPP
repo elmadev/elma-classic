@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "anim.h"
 #include "eol_settings.h"
+#include "LGRFILE.H"
 #include "M_PIC.H"
 #include "pic8.h"
 #include "physics_init.h"

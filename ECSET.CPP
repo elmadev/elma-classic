@@ -2,6 +2,7 @@
 #include "anim.h"
 #include "eol_settings.h"
 #include "grass.h"
+#include "LGRFILE.H"
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "pic8.h"

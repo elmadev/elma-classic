@@ -54,7 +54,6 @@
 #include "MAINMENU.H"
 #include "PLAY.H"
 #include "SKIP.H"
-#include "best_times.h"
 
 #include "KOZOS.H"
 

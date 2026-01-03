@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "best_times.h"
 #include "directinput_scancodes.h"
 
 constexpr int STATE_VERSION = 200;

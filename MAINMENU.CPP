@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "best_times.h"
 
 /*void showinstruct( void ) {
     blit8( Korny->picbuffer, Korny->ppic_help );

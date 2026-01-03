@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "best_times.h"
 #include "LGRFILE.H"
+#include "LOAD.H"
 #include "physics_init.h"
 #include "qopen.h"
 

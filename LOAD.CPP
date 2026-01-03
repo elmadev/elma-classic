@@ -1,3 +1,4 @@
+#include "LOAD.H"
 #include "ALL.H"
 #include "LGRFILE.H"
 #include "menu_pic.h"

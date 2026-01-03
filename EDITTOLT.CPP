@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "abc8.h"
+#include "LOAD.H"
 #include "LGRFILE.H"
 #include "M_PIC.H"
 #include "menu_pic.h"

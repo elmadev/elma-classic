@@ -38,7 +38,7 @@ static void handle_error(const char* text1, const char* text2, const char* text3
                          const char* text4) {
     ErrorOnMissingCodepoint = false;
     if (!InError) {
-        ErrorHandle = fopen("error.txt", "wt");
+        ErrorHandle = fopen("error.txt", "w");
     }
     if (ErrorHandle) {
         if (InError) {

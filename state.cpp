@@ -280,7 +280,7 @@ void state::write_stats_player_total_time(FILE* h, const char* player_name, bool
 }
 
 void state::write_stats() {
-    FILE* h = fopen("stats.txt", "wt");
+    FILE* h = fopen("stats.txt", "w");
     if (!h) {
         external_error("Could not open STATS.TXT for writing!");
     }

@@ -552,7 +552,7 @@ long lejatszo(const char* filenev) {
             int framerate = tpl;
             if (access("f_rate.inf", 0) == 0) {
                 // igyhagyni fopen-t!:
-                FILE* h = fopen("f_rate.inf", "wt");
+                FILE* h = fopen("f_rate.inf", "w");
                 if (!h) {
                     internal_error("framerate nem nyilik!");
                 }
@@ -845,7 +845,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             int framerate = tpl;
             if (access("f_rate.inf", 0) == 0) {
                 // igyhagyni fopen-t!:
-                FILE* h = fopen("f_rate.inf", "wt");
+                FILE* h = fopen("f_rate.inf", "w");
                 if (!h) {
                     internal_error("framerate nem nyilik!");
                 }

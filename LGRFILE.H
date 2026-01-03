@@ -5,6 +5,7 @@ class anim;
 class grass;
 class palette;
 class pic8;
+class piclist;
 
 enum { ME_URES, ME_TELI, ME_SOREMELES };
 

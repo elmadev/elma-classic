@@ -3,16 +3,16 @@
 
 typedef int DIK_Code;
 
-const static int MaxKeycode = 256;
+constexpr int MaxKeycode = 256;
 
 void update_keypress_buffer();
 void update_key_state();
-void keys_init(void);
-int get_keypress(void);
-void empty_keypress_buffer(void);
-int has_keypress(void);
-int is_key_down(int kod);
-int is_ctrl_alt_down(void);
+void keys_init();
+int get_keypress();
+void empty_keypress_buffer();
+bool has_keypress();
+bool is_key_down(int code);
+bool is_ctrl_alt_down();
 
 #define KEY_ESC (1)
 #define KEY_ENTER (400)

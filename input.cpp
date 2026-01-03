@@ -1,18 +1,18 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
 
-const static int KeyBufferSize = 30;
-static int* KeyBuffer = NULL;
+constexpr int KeyBufferSize = 30;
+static int* KeyBuffer = nullptr;
 static int KeyBufferCount = 0;
 
-static char* KeyState1 = NULL;
-static char* KeyState2 = NULL;
+static char* KeyState1 = nullptr;
+static char* KeyState2 = nullptr;
 static bool UseKeyState2 = true;
-static int* DIKToAscii = NULL;
+static int* DIKToAscii = nullptr;
 
-static void init_dik_to_ascii(void);
+static void init_dik_to_ascii();
 
-void keys_init(void) {
+void keys_init() {
     if (KeyBuffer) {
         internal_error("keys_init() called twice!");
     }
@@ -36,8 +36,8 @@ void keys_init(void) {
     init_dik_to_ascii();
 }
 
-int get_keypress(void) {
-    while (1) {
+int get_keypress() {
+    while (true) {
         handle_events();
         if (KeyBufferCount > 0) {
             int c = KeyBuffer[0];
@@ -50,20 +50,20 @@ int get_keypress(void) {
     }
 }
 
-void empty_keypress_buffer(void) {
+void empty_keypress_buffer() {
     handle_events();
     KeyBufferCount = 0;
 }
 
-int has_keypress(void) {
+bool has_keypress() {
     handle_events();
     return KeyBufferCount > 0;
 }
 
-int is_key_down(int code) {
+bool is_key_down(int code) {
     if (code < 0 || code > MaxKeycode) {
         internal_error("code out of range in is_key_down()!");
-        return 0;
+        return false;
     }
     if (UseKeyState2) {
         return KeyState2[code];
@@ -73,9 +73,9 @@ int is_key_down(int code) {
 }
 
 // Update whether keys are pressed down or not
-void update_key_state(void) {
+void update_key_state() {
     if (!KeyBuffer) {
-        internal_error("Buffer is NULL in update_key_state()");
+        internal_error("Buffer is nullptr in update_key_state()");
     }
 
     if (UseKeyState2) {
@@ -88,9 +88,9 @@ void update_key_state(void) {
 
 // Add keys to the keypress buffer
 // Only DIK codes defined in init_dik_to_ascii will be added to the buffer
-void update_keypress_buffer(void) {
-    const char* prev = NULL;
-    const char* current = NULL;
+void update_keypress_buffer() {
+    const char* prev = nullptr;
+    const char* current = nullptr;
     if (UseKeyState2) {
         prev = KeyState1;
         current = KeyState2;
@@ -116,8 +116,8 @@ void update_keypress_buffer(void) {
 }
 
 // Map DIK codes to ascii (+ a few extra codepoints for special keys)
-static void init_dik_to_ascii(void) {
-    DIKToAscii = new int[260];
+static void init_dik_to_ascii() {
+    DIKToAscii = new int[MaxKeycode];
     for (int i = 0; i < MaxKeycode; i++) {
         DIKToAscii[i] = 0;
     }
@@ -189,10 +189,4 @@ static void init_dik_to_ascii(void) {
     DIKToAscii[DIK_ADD] = KEY_RIGHT;
 }
 
-int is_ctrl_alt_down(void) {
-    if (is_key_down(DIK_LMENU) && is_key_down(DIK_LCONTROL)) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
+bool is_ctrl_alt_down() { return is_key_down(DIK_LMENU) && is_key_down(DIK_LCONTROL); }

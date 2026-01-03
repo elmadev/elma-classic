@@ -5,12 +5,14 @@ typedef int DIK_Code;
 
 constexpr int MaxKeycode = 256;
 
+void keys_init();
 void update_keypress_buffer();
 void update_key_state();
-void keys_init();
+
 int get_keypress();
 void empty_keypress_buffer();
 bool has_keypress();
+
 bool is_key_down(int code);
 bool is_ctrl_alt_down();
 

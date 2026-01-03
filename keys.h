@@ -1,5 +1,5 @@
-#ifndef M_K_H
-#define M_K_H
+#ifndef KEYS_H
+#define KEYS_H
 
 // DIK_ Windows scancode
 typedef int DikScancode;

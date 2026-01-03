@@ -1,3 +1,4 @@
+#include "menu_controls.h"
 #include "ALL.H"
 #include "directinput_scancodes.h"
 #include "menu_nav.h"

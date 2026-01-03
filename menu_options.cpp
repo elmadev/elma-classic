@@ -1,6 +1,7 @@
 #include "menu_options.h"
 #include "ALL.H"
 #include "eol_settings.h"
+#include "menu_controls.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
 

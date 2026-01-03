@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "ball_handler.h"
 
 int BallCount = 0;
 ball* Balls = nullptr;

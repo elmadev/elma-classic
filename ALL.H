@@ -83,7 +83,6 @@
 #include "menu_dialog.h"
 
 #include "ball.h"
-#include "ball_handler.h"
 
 #include "M_K.H"
 #include "M_PIC.H"

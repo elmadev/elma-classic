@@ -16,6 +16,6 @@ int menu_exit(void) {
 }
 
 void menu_zoomout(void) {
-    zoomout();
+    zoom_out();
     invalidate();
 }

@@ -45,13 +45,13 @@ void gyuru::kirajz(int k, int fel, int szaggatott) {
     }
     if ((fel && k == pontszam - 1) || (!fel && k == 0)) {
         // Elejet a vegevel kell osszekotni:
-        vonalrajz(ponttomb[pontszam - 1], ponttomb[0], szaggatott);
+        render_line(ponttomb[pontszam - 1], ponttomb[0], szaggatott);
     } else {
         // Normal osszekotes:
         if (fel) {
-            vonalrajz(ponttomb[k], ponttomb[k + 1], szaggatott);
+            render_line(ponttomb[k], ponttomb[k + 1], szaggatott);
         } else {
-            vonalrajz(ponttomb[k - 1], ponttomb[k], szaggatott);
+            render_line(ponttomb[k - 1], ponttomb[k], szaggatott);
         }
     }
 }

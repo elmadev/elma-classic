@@ -23,6 +23,7 @@
 * Improve some slightly buggy/inconsistent mouse click behaviour in internal editor
 * Red helmet animation will no longer skip frames after the intro scrolling animation
 * In internal editor, improve mouse lag and fix bug where mouse cursor would sometimes leave visual artifacts when left-clicking in empty space
+* Sometimes there was a missing pixel in the internal editor where two lines touch each other
 * The 3 timers (best time, flag tag time, current time) are now properly centered on screen
 
 ## Removed Legacy Features

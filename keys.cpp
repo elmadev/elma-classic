@@ -11,111 +11,6 @@ static char* KeyState2 = nullptr;
 static bool UseKeyState2 = true;
 static int* DIKToAscii = nullptr;
 
-static void init_dik_to_ascii();
-
-void keys_init() {
-    if (KeyBuffer) {
-        internal_error("keys_init() called twice!");
-    }
-
-    KeyState1 = new char[MaxKeycode];
-    KeyState2 = new char[MaxKeycode];
-    if (!KeyState1 || !KeyState2) {
-        internal_error("KeyState allocation failed in keys_init!()");
-    }
-    for (int i = 0; i < MaxKeycode; i++) {
-        KeyState1[i] = KeyState2[i] = 0;
-    }
-
-    KeyBuffer = new int[KeyBufferSize];
-    if (!KeyBuffer) {
-        internal_error("KeyBuffer allocation failed in keys_init!()");
-    }
-    KeyBufferCount = 0;
-    UseKeyState2 = true;
-
-    init_dik_to_ascii();
-}
-
-int get_keypress() {
-    while (true) {
-        handle_events();
-        if (KeyBufferCount > 0) {
-            int c = KeyBuffer[0];
-            for (int i = 0; i < KeyBufferCount - 1; i++) {
-                KeyBuffer[i] = KeyBuffer[i + 1];
-            }
-            KeyBufferCount--;
-            return c;
-        }
-    }
-}
-
-void empty_keypress_buffer() {
-    handle_events();
-    KeyBufferCount = 0;
-}
-
-bool has_keypress() {
-    handle_events();
-    return KeyBufferCount > 0;
-}
-
-bool is_key_down(int code) {
-    if (code < 0 || code > MaxKeycode) {
-        internal_error("code out of range in is_key_down()!");
-        return false;
-    }
-    if (UseKeyState2) {
-        return KeyState2[code];
-    } else {
-        return KeyState1[code];
-    }
-}
-
-// Update whether keys are pressed down or not
-void update_key_state() {
-    if (!KeyBuffer) {
-        internal_error("Buffer is nullptr in update_key_state()");
-    }
-
-    if (UseKeyState2) {
-        fill_key_state(KeyState1);
-    } else {
-        fill_key_state(KeyState2);
-    }
-    UseKeyState2 = !UseKeyState2;
-}
-
-// Add keys to the keypress buffer
-// Only DIK codes defined in init_dik_to_ascii will be added to the buffer
-void update_keypress_buffer() {
-    const char* prev = nullptr;
-    const char* current = nullptr;
-    if (UseKeyState2) {
-        prev = KeyState1;
-        current = KeyState2;
-    } else {
-        prev = KeyState2;
-        current = KeyState1;
-    }
-    for (int i = 0; i < MaxKeycode; i++) {
-        if (!prev[i] && current[i]) {
-            if (DIKToAscii[i]) {
-                if (KeyBufferCount < KeyBufferSize) {
-                    if (DIKToAscii[i] >= 'a' && DIKToAscii[i] <= 'z' &&
-                        (current[DIK_LSHIFT] || current[DIK_RSHIFT])) {
-                        KeyBuffer[KeyBufferCount] = DIKToAscii[i] + 'A' - 'a';
-                    } else {
-                        KeyBuffer[KeyBufferCount] = DIKToAscii[i];
-                    }
-                    KeyBufferCount++;
-                }
-            }
-        }
-    }
-}
-
 // Map DIK codes to ascii (+ a few extra codepoints for special keys)
 static void init_dik_to_ascii() {
     DIKToAscii = new int[MaxKeycode];
@@ -190,4 +85,107 @@ static void init_dik_to_ascii() {
     DIKToAscii[DIK_ADD] = KEY_RIGHT;
 }
 
+void keys_init() {
+    if (KeyBuffer) {
+        internal_error("keys_init() called twice!");
+    }
+
+    KeyState1 = new char[MaxKeycode];
+    KeyState2 = new char[MaxKeycode];
+    if (!KeyState1 || !KeyState2) {
+        internal_error("KeyState allocation failed in keys_init!()");
+    }
+    for (int i = 0; i < MaxKeycode; i++) {
+        KeyState1[i] = KeyState2[i] = 0;
+    }
+
+    KeyBuffer = new int[KeyBufferSize];
+    if (!KeyBuffer) {
+        internal_error("KeyBuffer allocation failed in keys_init!()");
+    }
+    KeyBufferCount = 0;
+    UseKeyState2 = true;
+
+    init_dik_to_ascii();
+}
+
+int get_keypress() {
+    while (true) {
+        handle_events();
+        if (KeyBufferCount > 0) {
+            int c = KeyBuffer[0];
+            for (int i = 0; i < KeyBufferCount - 1; i++) {
+                KeyBuffer[i] = KeyBuffer[i + 1];
+            }
+            KeyBufferCount--;
+            return c;
+        }
+    }
+}
+
+void empty_keypress_buffer() {
+    handle_events();
+    KeyBufferCount = 0;
+}
+
+bool has_keypress() {
+    handle_events();
+    return KeyBufferCount > 0;
+}
+
+bool is_key_down(int code) {
+    if (code < 0 || code > MaxKeycode) {
+        internal_error("code out of range in is_key_down()!");
+        return false;
+    }
+    if (UseKeyState2) {
+        return KeyState2[code];
+    } else {
+        return KeyState1[code];
+    }
+}
+
 bool is_ctrl_alt_down() { return is_key_down(DIK_LMENU) && is_key_down(DIK_LCONTROL); }
+
+// Update whether keys are pressed down or not
+void update_key_state() {
+    if (!KeyBuffer) {
+        internal_error("Buffer is nullptr in update_key_state()");
+    }
+
+    if (UseKeyState2) {
+        fill_key_state(KeyState1);
+    } else {
+        fill_key_state(KeyState2);
+    }
+    UseKeyState2 = !UseKeyState2;
+}
+
+// Add keys to the keypress buffer
+// Only DIK codes defined in init_dik_to_ascii will be added to the buffer
+void update_keypress_buffer() {
+    const char* prev = nullptr;
+    const char* current = nullptr;
+    if (UseKeyState2) {
+        prev = KeyState1;
+        current = KeyState2;
+    } else {
+        prev = KeyState2;
+        current = KeyState1;
+    }
+    for (int i = 0; i < MaxKeycode; i++) {
+        if (!prev[i] && current[i]) {
+            if (DIKToAscii[i]) {
+                if (KeyBufferCount < KeyBufferSize) {
+                    if (DIKToAscii[i] >= 'a' && DIKToAscii[i] <= 'z' &&
+                        (current[DIK_LSHIFT] || current[DIK_RSHIFT])) {
+                        KeyBuffer[KeyBufferCount] = DIKToAscii[i] + 'A' - 'a';
+                    } else {
+                        KeyBuffer[KeyBufferCount] = DIKToAscii[i];
+                    }
+                    KeyBufferCount++;
+                }
+            }
+        }
+    }
+}

@@ -2,6 +2,7 @@
 #define LGRFILE_H
 
 class anim;
+class grass;
 class palette;
 class pic8;
 

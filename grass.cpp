@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "grass.h"
 #include "physics_init.h"
 #include "pic8.h"
 

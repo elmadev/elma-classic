@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "anim.h"
 #include "pic8.h"
+#include "grass.h"
 
 /*void tesztloadlgr( void ) {
     int a = 1, b = 2, c = 4;

@@ -22,7 +22,6 @@
 
 #include "main.h"
 #include "SPRITE.H"
-#include "anim.h"
 
 #include "vect2.h"
 #include "physics_init.h"

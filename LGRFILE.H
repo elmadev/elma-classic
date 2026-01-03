@@ -1,6 +1,7 @@
 #ifndef LGRFILE_H
 #define LGRFILE_H
 
+class anim;
 class palette;
 class pic8;
 

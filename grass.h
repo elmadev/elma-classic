@@ -1,6 +1,8 @@
 #ifndef GRASS_H
 #define GRASS_H
 
+class pic8;
+
 #define MAX_GRASS_PICS (100)
 
 #define QGRASS_EXTRA_HEIGHT (20)

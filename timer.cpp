@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "pic8.h"
 
 enum class DigitSegment {
     VERTICAL_BOTTOMLEFT,

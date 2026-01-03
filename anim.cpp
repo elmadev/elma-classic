@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "pic8.h"
 
 anim::anim(pic8* source_sheet, const char* error_filename) {
     frame_count = 0;

@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "pic8.h"
 
 static pic8* Lockbuff = NULL;
 

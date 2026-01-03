@@ -1,6 +1,8 @@
 #ifndef KISKEP_H
 #define KISKEP_H
 
+class pic8;
+
 // Egy szegmensben tarolja kepeket, maximalis meretei 256-nal kissebbek, es
 // sorok pont 256 byte-onkent kovetkeznek!
 

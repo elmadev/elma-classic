@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "abc8.h"
+#include "pic8.h"
 
 bool InEditor = false;
 

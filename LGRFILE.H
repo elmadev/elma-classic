@@ -1,6 +1,9 @@
 #ifndef LGRFILE_H
 #define LGRFILE_H
 
+class palette;
+class pic8;
+
 enum { ME_URES, ME_TELI, ME_SOREMELES };
 
 struct maszkelem {

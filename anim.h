@@ -1,6 +1,8 @@
 #ifndef ANIM_H
 #define ANIM_H
 
+class pic8;
+
 constexpr int ANIM_MAX_FRAMES = 1000;
 constexpr int ANIM_WIDTH = 40;
 

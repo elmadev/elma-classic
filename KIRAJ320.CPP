@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include <algorithm>
 #include "eol_settings.h"
+#include "pic8.h"
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
 

@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "pic8.h"
 
 #define MAXBUFFER (20000u)
 static int Maxegybefuggo = 255;

@@ -7,19 +7,19 @@ static int bevesznevet(char* nev, int visszater) {
     menu_pic szovlist;
 
     int i = 0;
-    mk_emptychar();
+    empty_keypress_buffer();
     int valtozott = 1;
     nev[0] = 0;
     while (1) {
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            int c = get_keypress();
+            if (c == KEY_ESC) {
                 if (visszater) {
                     return 0;
                 }
                 kilep();
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 // ENTER
                 if (i > 0) {
                     return 1;
@@ -34,7 +34,7 @@ static int bevesznevet(char* nev, int visszater) {
                 i++;
                 valtozott = 1;
             }
-            if (c == MK_BACKSPACE) {
+            if (c == KEY_BACKSPACE) {
                 // <- (torles):
                 if (i > 0) {
                     i--;

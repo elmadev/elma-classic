@@ -291,13 +291,13 @@ static void prompt_control(int length, key_pointers keys, int index) {
     while (true) {
         handle_events();
         for (DIK_Code keycode = 1; keycode < MaxKeycode; keycode++) {
-            if (mk_getstate(DIK_ESCAPE)) {
+            if (is_key_down(DIK_ESCAPE)) {
                 return;
             }
             if (keycode == DIK_RETURN || keycode == DIK_ESCAPE) {
                 continue;
             }
-            if (!mk_getstate(keycode)) {
+            if (!is_key_down(keycode)) {
                 continue;
             }
             // Disallow multiple controls being mapped to the same key

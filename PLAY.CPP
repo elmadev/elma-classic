@@ -19,11 +19,11 @@
     int i = 0;
     betuki( 0, '_' );
     while( 1 ) {
-        mk_emptychar();
-        int c = mk_getextchar();
-        if( c == MK_ESC )
+        empty_keypress_buffer();
+        int c = get_keypress();
+        if( c == KEY_ESC )
             return 0;
-        if( c == MK_ENTER ) {
+        if( c == KEY_ENTER ) {
             // ENTER
             if( i > 0 ) {
                 nev[i] = 0;
@@ -40,7 +40,7 @@
             i++;
             betuki( i, '_' );
         }
-        if( c == MK_BACKSPACE ) {
+        if( c == KEY_BACKSPACE ) {
             // <- (torles):
             if( i > 0 ) {
                 betuki( i, ' ' );
@@ -56,16 +56,16 @@ static int bevesznevet(char* nev) {
     menu_pic szovlist;
 
     int i = 0;
-    mk_emptychar();
+    empty_keypress_buffer();
     int valtozott = 1;
     nev[0] = 0;
     while (1) {
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            int c = get_keypress();
+            if (c == KEY_ESC) {
                 return 0;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 // ENTER
                 if (i > 0) {
                     return 1;
@@ -80,7 +80,7 @@ static int bevesznevet(char* nev) {
                 i++;
                 valtozott = 1;
             }
-            if (c == MK_BACKSPACE) {
+            if (c == KEY_BACKSPACE) {
                 // <- (torles):
                 if (i > 0) {
                     i--;
@@ -161,8 +161,8 @@ static void konvback(char* text) {
 
     lassufizre( Korny->picbuffer, Korny->pal_fomenu );
     while( 1 ) {
-        mk_emptychar();
-        int c = mk_getextchar();
+        empty_keypress_buffer();
+        int c = get_keypress();
         if( c == 'c' || c == 'C' )
             return;
     }
@@ -341,11 +341,11 @@ void saveplay(long belyeg) {
         konvback(sor3);
         konvback(sor4);
 
-        mk_emptychar();
+        empty_keypress_buffer();
         while (1) {
-            if (mk_kbhit()) {
-                int c = mk_getextchar();
-                if (c == MK_ESC) {
+            if (has_keypress()) {
+                int c = get_keypress();
+                if (c == KEY_ESC) {
                     return;
                 }
             }

@@ -18,10 +18,10 @@
 
     lassufizre( Korny->picbuffer, Korny->pal_help );
     int done = 0;
-    mk_emptychar();
+    empty_keypress_buffer();
     while( !done ) {
-        mk_getextchar();
-        //if( c == MK_ESC || c == MK_ENTER )
+        get_keypress();
+        //if( c == KEY_ESC || c == KEY_ENTER )
         done = 1;
     }
 } */
@@ -191,7 +191,7 @@ void replay(void) {
                 if (access_topol(Prec1->palyanev) != 0) {
                     int c = menu_dialog("Cannot find the lev file that corresponds",
                                         "to the record file!", tmp, Prec1->palyanev);
-                    if (c == MK_ESC) {
+                    if (c == KEY_ESC) {
                         return;
                     }
                 } else {
@@ -199,7 +199,7 @@ void replay(void) {
                     if (Ptop->belyeg != belyeg) {
                         int c = menu_dialog("The level file has changed since the",
                                             "saving of the record file!", tmp, Prec1->palyanev);
-                        if (c == MK_ESC) {
+                        if (c == KEY_ESC) {
                             return;
                         }
                     } else {

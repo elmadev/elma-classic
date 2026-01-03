@@ -12,15 +12,15 @@ static int* DIKToAscii = NULL;
 
 static void init_dik_to_ascii(void);
 
-void mk_init(void) {
+void keys_init(void) {
     if (KeyBuffer) {
-        internal_error("mk_init() called twice!");
+        internal_error("keys_init() called twice!");
     }
 
     KeyState1 = new char[MaxKeycode];
     KeyState2 = new char[MaxKeycode];
     if (!KeyState1 || !KeyState2) {
-        internal_error("KeyState allocation failed in mk_init!()");
+        internal_error("KeyState allocation failed in keys_init!()");
     }
     for (int i = 0; i < MaxKeycode; i++) {
         KeyState1[i] = KeyState2[i] = 0;
@@ -28,7 +28,7 @@ void mk_init(void) {
 
     KeyBuffer = new int[KeyBufferSize];
     if (!KeyBuffer) {
-        internal_error("KeyBuffer allocation failed in mk_init!()");
+        internal_error("KeyBuffer allocation failed in keys_init!()");
     }
     KeyBufferCount = 0;
     UseKeyState2 = true;
@@ -36,7 +36,7 @@ void mk_init(void) {
     init_dik_to_ascii();
 }
 
-int mk_getextchar(void) {
+int get_keypress(void) {
     while (1) {
         handle_events();
         if (KeyBufferCount > 0) {
@@ -50,19 +50,19 @@ int mk_getextchar(void) {
     }
 }
 
-void mk_emptychar(void) {
+void empty_keypress_buffer(void) {
     handle_events();
     KeyBufferCount = 0;
 }
 
-int mk_kbhit(void) {
+int has_keypress(void) {
     handle_events();
     return KeyBufferCount > 0;
 }
 
-int mk_getstate(int code) {
+int is_key_down(int code) {
     if (code < 0 || code > MaxKeycode) {
-        internal_error("code out of range in mk_getstate()!");
+        internal_error("code out of range in is_key_down()!");
         return 0;
     }
     if (UseKeyState2) {
@@ -72,9 +72,9 @@ int mk_getstate(int code) {
     }
 }
 
-void mkw_getDIstate(void) {
+void update_key_state(void) {
     if (!KeyBuffer) {
-        internal_error("Buffer is NULL in mkw_getDIstate()");
+        internal_error("Buffer is NULL in update_key_state()");
     }
 
     if (UseKeyState2) {
@@ -85,7 +85,7 @@ void mkw_getDIstate(void) {
     UseKeyState2 = !UseKeyState2;
 }
 
-void mkw_setkeydown(void) {
+void update_keypress_buffer(void) {
     const char* prev = NULL;
     const char* current = NULL;
     if (UseKeyState2) {
@@ -161,34 +161,34 @@ static void init_dik_to_ascii(void) {
     DIKToAscii[DIK_SUBTRACT] = '-';
     DIKToAscii[DIK_PERIOD] = '.';
 
-    DIKToAscii[DIK_ESCAPE] = MK_ESC;
-    DIKToAscii[DIK_RETURN] = MK_ENTER;
-    DIKToAscii[DIK_NUMPADENTER] = MK_ENTER;
-    DIKToAscii[DIK_UP] = MK_UP;
-    DIKToAscii[DIK_NUMPAD8] = MK_UP;
-    DIKToAscii[DIK_DOWN] = MK_DOWN;
-    DIKToAscii[DIK_NUMPAD2] = MK_DOWN;
-    DIKToAscii[DIK_LEFT] = MK_LEFT;
-    DIKToAscii[DIK_NUMPAD4] = MK_LEFT;
-    DIKToAscii[DIK_RIGHT] = MK_RIGHT;
-    DIKToAscii[DIK_NUMPAD6] = MK_RIGHT;
-    DIKToAscii[DIK_PRIOR] = MK_PGUP;
-    DIKToAscii[DIK_NUMPAD9] = MK_PGUP;
-    DIKToAscii[DIK_NEXT] = MK_PGDOWN;
-    DIKToAscii[DIK_NUMPAD3] = MK_PGDOWN;
-    DIKToAscii[DIK_DELETE] = MK_DEL;
-    DIKToAscii[DIK_DECIMAL] = MK_DEL;
-    DIKToAscii[DIK_BACK] = MK_BACKSPACE;
+    DIKToAscii[DIK_ESCAPE] = KEY_ESC;
+    DIKToAscii[DIK_RETURN] = KEY_ENTER;
+    DIKToAscii[DIK_NUMPADENTER] = KEY_ENTER;
+    DIKToAscii[DIK_UP] = KEY_UP;
+    DIKToAscii[DIK_NUMPAD8] = KEY_UP;
+    DIKToAscii[DIK_DOWN] = KEY_DOWN;
+    DIKToAscii[DIK_NUMPAD2] = KEY_DOWN;
+    DIKToAscii[DIK_LEFT] = KEY_LEFT;
+    DIKToAscii[DIK_NUMPAD4] = KEY_LEFT;
+    DIKToAscii[DIK_RIGHT] = KEY_RIGHT;
+    DIKToAscii[DIK_NUMPAD6] = KEY_RIGHT;
+    DIKToAscii[DIK_PRIOR] = KEY_PGUP;
+    DIKToAscii[DIK_NUMPAD9] = KEY_PGUP;
+    DIKToAscii[DIK_NEXT] = KEY_PGDOWN;
+    DIKToAscii[DIK_NUMPAD3] = KEY_PGDOWN;
+    DIKToAscii[DIK_DELETE] = KEY_DEL;
+    DIKToAscii[DIK_DECIMAL] = KEY_DEL;
+    DIKToAscii[DIK_BACK] = KEY_BACKSPACE;
 
-    DIKToAscii[DIK_MINUS] = MK_LEFT;
-    DIKToAscii[DIK_SUBTRACT] = MK_LEFT;
-    DIKToAscii[DIK_EQUALS] = MK_RIGHT;
-    DIKToAscii[DIK_ADD] = MK_RIGHT;
+    DIKToAscii[DIK_MINUS] = KEY_LEFT;
+    DIKToAscii[DIK_SUBTRACT] = KEY_LEFT;
+    DIKToAscii[DIK_EQUALS] = KEY_RIGHT;
+    DIKToAscii[DIK_ADD] = KEY_RIGHT;
 }
 
 // menu_nav-ben meg van irve DOS-os verziohoz:
-int controlaltnyomva(void) {
-    if (mk_getstate(DIK_LMENU) && mk_getstate(DIK_LCONTROL)) {
+int is_ctrl_alt_down(void) {
+    if (is_key_down(DIK_LMENU) && is_key_down(DIK_LCONTROL)) {
         return 1;
     } else {
         return 0;

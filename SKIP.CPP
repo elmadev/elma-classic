@@ -69,10 +69,10 @@ int skippelheto(int level) {
     }
 
     // Kep kiteves:
-    mk_emptychar();
+    empty_keypress_buffer();
     while (1) {
-        if (mk_kbhit()) {
-            mk_getextchar();
+        if (has_keypress()) {
+            get_keypress();
             return skippelheto;
         }
         szl.render();

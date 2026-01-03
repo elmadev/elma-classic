@@ -643,9 +643,9 @@ void editor(void) {
     left_mouse_clicked();
     right_mouse_clicked();
     while (1) {
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            int c = get_keypress();
+            if (c == KEY_ESC) {
                 if (Tool == T_MOVE) {
                     t_move_esc();
                 }
@@ -663,7 +663,7 @@ void editor(void) {
                 // if( Tool == T_MOVE ) Kurzor negyzette valik merethez
                 //	t_move_space();
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 if (Tool == T_CREATE_VERT) {
                     t_create_vert_enter();
                 }

@@ -98,11 +98,11 @@ static void render_topten(topten* tten, const char* header, int single) {
         men.add_line(time_text, time_x, 110 + i * (SM + 19));
     }
 
-    mk_emptychar();
+    empty_keypress_buffer();
     while (true) {
-        if (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC || c == MK_ENTER) {
+        if (has_keypress()) {
+            int c = get_keypress();
+            if (c == KEY_ESC || c == KEY_ENTER) {
                 return;
             }
         }

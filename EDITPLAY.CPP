@@ -18,7 +18,7 @@ void editplay(void) {
     Prec2->erase(State->editor_filename);
     lejatszo(State->editor_filename);
 
-    mk_emptychar();
+    empty_keypress_buffer();
 
     // Visszaallitjuk eredeti allapotot:
     Pal_editor->set();

@@ -36,11 +36,11 @@ void cheatplayer(void) {
 /*static void kiraklogot( void ) {
     menu_pic szl;
 
-    mk_emptychar();
+    empty_keypress_buffer();
     while( 1 ) {
-        if( mk_kbhit() ) {
-            int c = mk_getextchar();
-            //if( c == MK_ESC || c == MK_ENTER )
+        if( has_keypress() ) {
+            int c = get_keypress();
+            //if( c == KEY_ESC || c == KEY_ENTER )
                 return;
         }
         szl.render( 1, 1 );
@@ -52,7 +52,7 @@ static void mergestatedat(void);
 void teljes(void) {
     init_qopen();
 
-    mk_init();
+    keys_init();
 
     init_menu_pictures();
 
@@ -141,8 +141,8 @@ void teljes(void) {
 
     // Intro keppel varunk, amig nem toltodik be minden:
     while (1) {
-        if (mk_kbhit()) {
-            mk_getextchar();
+        if (has_keypress()) {
+            get_keypress();
             break;
         }
         bltfront(tmpintro);
@@ -152,7 +152,7 @@ void teljes(void) {
 
     /*delete tmpintro;
     tmpintro = new pic8( "torol.pcx" );
-    mk_getextchar();
+    get_keypress();
     for( int i = 1; i < 480; i += 5  ) {
         pbuffer->fill_box( BLACK_PALETTE_ID );
         //blit8( pbuffer, tmpintro, 0, -240+i, 0, 0, 639, 239 );
@@ -192,8 +192,8 @@ void kilep( void ) {
     pvegepal->set();
     bltfront( ppic );
     while( 1 ) {
-        int c = mk_getextchar();
-        if( c == ' ' || c == MK_ENTER || c == MK_ESC ) {
+        int c = get_keypress();
+        if( c == ' ' || c == KEY_ENTER || c == KEY_ESC ) {
             quit();
         }
     }
@@ -209,9 +209,9 @@ void kilep(void) {
     while (1) {
         pszovlist->render();
         double idovaras = 50.0;
-        if ((stopwatch() > (kezdoido + idovaras)) && mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == ' ' || c == MK_ENTER || c == MK_ESC) {
+        if ((stopwatch() > (kezdoido + idovaras)) && has_keypress()) {
+            int c = get_keypress();
+            if (c == ' ' || c == KEY_ENTER || c == KEY_ESC) {
                 quit();
             }
         }

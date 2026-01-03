@@ -59,7 +59,6 @@
 #include "qopen.h"
 
 #include "KOZOS.H"
-#include "timer.h"
 
 #include "menu_controls.h"
 #include "menu_options.h"

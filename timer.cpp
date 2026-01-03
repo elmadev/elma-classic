@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "pic8.h"
+#include "timer.h"
 
 enum class DigitSegment {
     VERTICAL_BOTTOMLEFT,

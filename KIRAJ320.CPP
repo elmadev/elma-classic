@@ -4,6 +4,7 @@
 #include "eol_settings.h"
 #include "pic8.h"
 #include "physics_init.h"
+#include "timer.h"
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
 

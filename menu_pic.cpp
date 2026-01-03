@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "abc8.h"
+#include "ball.h"
 #include "anim.h"
 #include "pic8.h"
 

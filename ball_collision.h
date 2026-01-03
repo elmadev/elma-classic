@@ -1,6 +1,8 @@
 #ifndef BALL_COLLISION_H
 #define BALL_COLLISION_H
 
+struct ball;
+
 enum class WallId {
     Top = 0,
     Bottom = 1,

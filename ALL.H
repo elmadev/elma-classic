@@ -69,6 +69,4 @@
 #include "EDITPLAY.H"
 #include "ED_CHECK.H"
 
-#include "ECSET.H"
-
 #include "platform_impl.h"

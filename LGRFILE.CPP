@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "LGRFILE.H"
 #include "anim.h"
+#include "ECSET.H"
 #include "grass.h"
 #include "M_PIC.H"
 #include "menu_pic.h"

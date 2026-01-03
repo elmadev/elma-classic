@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include <algorithm>
 #include "anim.h"
+#include "ECSET.H"
 #include "eol_settings.h"
 #include "LGRFILE.H"
 #include "M_PIC.H"

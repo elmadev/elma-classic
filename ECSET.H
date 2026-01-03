@@ -1,9 +1,14 @@
 #ifndef ECSET_H
 #define ECSET_H
 
+#include "vect2.h"
+
 class ecset;
 class grass;
 struct mdarab;
+class pic8;
+class sprite;
+struct vonal;
 
 // Egy iterator class (inkabb cache) ecsethez (foltoz hasznalja oket):
 class mdbiter {

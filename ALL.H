@@ -77,7 +77,6 @@
 #include "LOAD.H"
 #include "ECSET.H"
 
-#include "menu_nav.h"
 #include "menu_dialog.h"
 
 #include "M_K.H"

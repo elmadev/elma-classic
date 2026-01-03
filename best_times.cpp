@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "abc8.h"
 #include "best_times.h"
+#include "menu_nav.h"
 #include "menu_pic.h"
 
 // Format time as 00:00:00 (or 00:00:00:00 if hours are allowed)

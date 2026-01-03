@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "menu_nav.h"
 #include "menu_pic.h"
 
 /*static egyszovsor Idoszovegek[4];

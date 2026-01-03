@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "best_times.h"
+#include "menu_nav.h"
 #include "menu_pic.h"
 
 /*void showinstruct( void ) {

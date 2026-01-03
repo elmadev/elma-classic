@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "eol_settings.h"
+#include "menu_nav.h"
 #include "menu_pic.h"
 
 void menu_help() {

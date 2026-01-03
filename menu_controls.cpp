@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
+#include "menu_nav.h"
 
 const char* dik_to_string(DIK_Code keycode) {
     switch (keycode) {

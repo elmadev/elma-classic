@@ -188,6 +188,11 @@ bool right_mouse_clicked() {
     return click;
 }
 
+bool is_fullscreen() {
+    Uint32 flags = SDL_GetWindowFlags(SDLWindow);
+    return flags & SDL_WINDOW_FULLSCREEN;
+}
+
 static SDL_AudioDeviceID SDLAudioDevice;
 static bool SoundInitialized = false;
 

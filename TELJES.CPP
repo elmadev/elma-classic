@@ -3,6 +3,7 @@
 #include "eol_settings.h"
 #include "physics_init.h"
 #include "pic8.h"
+#include "qopen.h"
 
 state* State = NULL;
 eol_settings* EolSettings = nullptr;

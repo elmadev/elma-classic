@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "qopen.h"
 
 void wav::lefoglal(void) {
     if (size > 1000000) {

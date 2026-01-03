@@ -56,8 +56,6 @@
 #include "SKIP.H"
 #include "best_times.h"
 
-#include "qopen.h"
-
 #include "KOZOS.H"
 
 #include "menu_controls.h"

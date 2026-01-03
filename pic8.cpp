@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "pic8.h"
+#include "qopen.h"
 
 void pic8::allocate(int w, int h) {
     if (rows || pixels) {

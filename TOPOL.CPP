@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "physics_init.h"
+#include "qopen.h"
 
 #define DEFAULTSIZE (20.0)
 

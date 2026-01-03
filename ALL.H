@@ -73,7 +73,6 @@
 #include "EDITPLAY.H"
 #include "ED_CHECK.H"
 
-#include "piclist.h"
 #include "LGRFILE.H"
 
 #include "LOAD.H"

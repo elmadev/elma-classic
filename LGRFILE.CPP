@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "anim.h"
 #include "pic8.h"
+#include "piclist.h"
 #include "grass.h"
 
 /*void tesztloadlgr( void ) {

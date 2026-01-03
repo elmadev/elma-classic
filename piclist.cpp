@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "piclist.h"
 
 constexpr int PICLIST_VERSION = 1002;
 

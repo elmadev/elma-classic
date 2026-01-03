@@ -135,6 +135,7 @@ void menu_options() {
         choice = nav.navigate();
 
         if (choice < 0) {
+            eol_settings::write_settings();
             return;
         }
 

@@ -5,6 +5,8 @@ enum class MapAlignment : unsigned char { None = 0, Left = 1, Middle = 2, Right 
 
 struct eol_settings {
     eol_settings();
+    static void read_settings();
+    static void write_settings();
 
     bool pictures_in_background;
     bool center_camera;

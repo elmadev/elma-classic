@@ -68,6 +68,7 @@ void teljes(void) {
     }
 
     EolSettings = new eol_settings();
+    eol_settings::read_settings();
 
     mergestatedat();
 

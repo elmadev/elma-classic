@@ -100,11 +100,13 @@ sdl2_dep = dependency('sdl2',
     }
 )
 
+nlohmann_json_dep = dependency('nlohmann_json')
+
 elma = executable(
     'elma',
     elma_sources,
     cpp_args: cpp_args,
     link_args: link_args,
-    dependencies: [sdl2_dep],
+    dependencies: [nlohmann_json_dep, sdl2_dep],
     win_subsystem: win_subsystem,
 )

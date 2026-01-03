@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "KISKEP.H"
 #include "pic8.h"
 
 kiskep::kiskep(const char* pic8nev, pic8* ppic) {

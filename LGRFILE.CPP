@@ -3,6 +3,7 @@
 #include "anim.h"
 #include "ECSET.H"
 #include "grass.h"
+#include "KISKEP.H"
 #include "M_PIC.H"
 #include "menu_pic.h"
 #include "pic8.h"

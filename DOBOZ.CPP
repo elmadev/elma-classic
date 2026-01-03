@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "KISKEP.H"
 #include "pic8.h"
 
 // Affinitassal kapcsolatos dolgok:

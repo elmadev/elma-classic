@@ -3,6 +3,7 @@
 
 class anim;
 class grass;
+class kiskep;
 class palette;
 class pic8;
 class piclist;

@@ -43,7 +43,6 @@
 #include "HANG.H"
 #include "HANGHIGH.H"
 
-#include "KISKEP.H"
 #include "DOBOZ.H"
 
 #include "state.h"

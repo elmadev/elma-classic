@@ -62,7 +62,7 @@
 #include "SKIP.H"
 #include "best_times.h"
 
-#include "QOPEN.H"
+#include "qopen.h"
 
 #include "KOZOS.H"
 #include "timer.h"

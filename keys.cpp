@@ -107,7 +107,7 @@ bool has_keypress() {
 }
 
 bool is_key_down(int code) {
-    if (code < 0 || code > MaxKeycode) {
+    if (code < 0 || code >= MaxKeycode) {
         internal_error("code out of range in is_key_down()!");
         return false;
     }

@@ -5,6 +5,7 @@
 #include "menu_nav.h"
 #include "menu_pic.h"
 #include "physics_init.h"
+#include "SKIP.H"
 #include "timer.h"
 
 /*static void betuki( int oszlop, char c ) {

@@ -1,3 +1,4 @@
+#include "SKIP.H"
 #include "ALL.H"
 #include "menu_pic.h"
 

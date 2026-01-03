@@ -52,7 +52,6 @@
 #include "JATEKOS.H"
 #include "MAINMENU.H"
 #include "PLAY.H"
-#include "SKIP.H"
 
 #include "KOZOS.H"
 

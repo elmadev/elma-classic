@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "menu_pic.h"
 
 // Display the menu with the provided text, then return the key pressed by the user.
 // Unused feature:

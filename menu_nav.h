@@ -1,6 +1,9 @@
 #ifndef MENU_NAV_H
 #define MENU_NAV_H
 
+class menu_pic;
+struct text_line;
+
 #define MENU_CENTER_TEXT "*$$^&|@"
 
 constexpr int NAV_ENTRY_TEXT_MAX_LENGTH = 40;

@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "menu_pic.h"
 #include "pic8.h"
 
 // If false, when drawing lines, immediately update the screen

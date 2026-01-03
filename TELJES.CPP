@@ -2,6 +2,7 @@
 #include "abc8.h"
 #include "ball_collision.h"
 #include "eol_settings.h"
+#include "menu_pic.h"
 #include "physics_init.h"
 #include "pic8.h"
 #include "qopen.h"

@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "abc8.h"
+#include "menu_pic.h"
 #include "pic8.h"
 
 constexpr unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;

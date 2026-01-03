@@ -76,7 +76,6 @@
 
 #include "LOAD.H"
 #include "ECSET.H"
-#include "menu_pic.h"
 
 #include "menu_nav.h"
 #include "menu_dialog.h"

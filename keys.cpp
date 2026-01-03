@@ -52,13 +52,12 @@ void keys_init() {
     DIKToAscii[DIK_Z] = 'z';
 
     DIKToAscii[DIK_SPACE] = ' ';
-    DIKToAscii[DIK_MINUS] = '-';
-    DIKToAscii[DIK_SUBTRACT] = '-';
     DIKToAscii[DIK_PERIOD] = '.';
 
     DIKToAscii[DIK_ESCAPE] = KEY_ESC;
     DIKToAscii[DIK_RETURN] = KEY_ENTER;
     DIKToAscii[DIK_NUMPADENTER] = KEY_ENTER;
+
     DIKToAscii[DIK_UP] = KEY_UP;
     DIKToAscii[DIK_NUMPAD8] = KEY_UP;
     DIKToAscii[DIK_DOWN] = KEY_DOWN;
@@ -67,10 +66,12 @@ void keys_init() {
     DIKToAscii[DIK_NUMPAD4] = KEY_LEFT;
     DIKToAscii[DIK_RIGHT] = KEY_RIGHT;
     DIKToAscii[DIK_NUMPAD6] = KEY_RIGHT;
+
     DIKToAscii[DIK_PRIOR] = KEY_PGUP;
     DIKToAscii[DIK_NUMPAD9] = KEY_PGUP;
     DIKToAscii[DIK_NEXT] = KEY_PGDOWN;
     DIKToAscii[DIK_NUMPAD3] = KEY_PGDOWN;
+
     DIKToAscii[DIK_DELETE] = KEY_DEL;
     DIKToAscii[DIK_DECIMAL] = KEY_DEL;
     DIKToAscii[DIK_BACK] = KEY_BACKSPACE;

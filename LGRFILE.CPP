@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "pic8.h"
 
 /*void tesztloadlgr( void ) {
     int a = 1, b = 2, c = 4;

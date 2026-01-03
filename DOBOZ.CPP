@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "pic8.h"
 
 // Affinitassal kapcsolatos dolgok:
 int Affinitas = 0;

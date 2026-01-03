@@ -1,6 +1,8 @@
 #ifndef KIRAJZOL_H
 #define KIRAJZOL_H
 
+class pic8;
+
 extern int Voltkilogas; // Csak tesztelesre
 
 // Annak eldontesere, hogy kirajzolando doboz nem log-e ki:

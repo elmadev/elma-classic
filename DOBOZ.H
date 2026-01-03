@@ -1,6 +1,8 @@
 #ifndef DOBOZ_H
 #define DOBOZ_H
 
+class pic8;
+
 void dobozki(pic8* ppic8, kiskep* pkiskep, vect2 u, vect2 v, vect2 r);
 
 extern int Affinitas;

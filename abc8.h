@@ -1,6 +1,7 @@
 #ifndef ABC8_H
 #define ABC8_H
 
+class pic8;
 typedef pic8* ptrpic8;
 
 extern bool ErrorOnMissingCodepoint;

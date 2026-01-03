@@ -21,7 +21,6 @@
 // #include	<graph.h>
 
 #include "main.h"
-#include "pic8.h"
 #include "SPRITE.H"
 #include "anim.h"
 

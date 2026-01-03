@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "physics_init.h"
 
 static int gombszakasz(vect2 r, double sugar, vonal* pv, vect2* pt) {
     vect2 rel = r - pv->r;

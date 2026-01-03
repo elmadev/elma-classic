@@ -1,4 +1,6 @@
 #include "ALL.H"
+#include "physics_init.h"
+#include "physics_move.h"
 
 // Push the wheel out from the ground so it is standing on the anchor point
 static void move_wheel_out_of_ground(rigidbody* rb, vect2* point) {

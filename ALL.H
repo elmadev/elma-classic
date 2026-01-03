@@ -24,8 +24,6 @@
 #include "SPRITE.H"
 
 #include "vect2.h"
-#include "physics_init.h"
-#include "physics_move.h"
 #include "LEPTET.H"
 #include "UTKOZES.H"
 #include "FOGOCSKA.H"

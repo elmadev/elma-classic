@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "abc8.h"
+#include "physics_init.h"
 
 /*static void betuki( int oszlop, char c ) {
     int x = 50+oszlop*19;

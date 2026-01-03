@@ -3,6 +3,7 @@
 #include "anim.h"
 #include "eol_settings.h"
 #include "pic8.h"
+#include "physics_init.h"
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
 

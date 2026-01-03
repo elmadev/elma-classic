@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "abc8.h"
 #include "eol_settings.h"
+#include "physics_init.h"
 #include "pic8.h"
 
 state* State = NULL;

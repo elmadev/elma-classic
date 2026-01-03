@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "physics_init.h"
 
 int Aafogo = 0, Kozelvannak = 0;
 int Aleszfogo = 1; // Legkozelebbi jateknal

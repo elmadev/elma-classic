@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "physics_init.h"
 #include "pic8.h"
 
 grass::grass() {

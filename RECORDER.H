@@ -1,6 +1,8 @@
 #ifndef RECORDER_H
 #define RECORDER_H
 
+struct motorst;
+
 struct hanginfo {
     double frekvencia;
     char gaz;

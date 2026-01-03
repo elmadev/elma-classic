@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "physics_init.h"
 
 recorder *Prec1 = NULL, *Prec2 = NULL;
 int Multirec = 0; // Ha multiplayer, akkor ez igaz

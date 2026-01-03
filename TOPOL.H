@@ -1,6 +1,8 @@
 #ifndef TOPOL_H
 #define TOPOL_H
 
+struct motorst;
+
 #define MAXPONT (1000) // Ennyit csak akkor foglal le, ha kell
 
 class topol;

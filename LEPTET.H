@@ -1,6 +1,8 @@
 #ifndef LEPTET_H
 #define LEPTET_H
 
+struct motorst;
+
 void resetleptet(motorst* pmot);
 void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1, int ugrik2);
 

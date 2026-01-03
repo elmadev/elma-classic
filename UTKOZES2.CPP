@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "physics_init.h"
 
 int utkozikesprite(vect2 r, double sugar) {
     int balalsox, balalsoy;

@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "ball_collision.h"
 
 static WallId wall_id(int collider) { return static_cast<WallId>(collider - BallCount); }
 

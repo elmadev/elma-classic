@@ -84,7 +84,6 @@
 
 #include "ball.h"
 #include "ball_handler.h"
-#include "ball_collision.h"
 
 #include "M_K.H"
 #include "M_PIC.H"

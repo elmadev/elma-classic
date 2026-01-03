@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "ball_collision.h"
 
 bool WallsDisabled = false;
 

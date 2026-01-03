@@ -42,7 +42,7 @@ elma_sources = files(
     'LEPTET.CPP',
     'LGRFILE.CPP',
     'LOAD.CPP',
-    'MAIN.CPP',
+    'main.cpp',
     'MAINMENU.CPP',
     'menu_pic.cpp',
     'menu_options.cpp',

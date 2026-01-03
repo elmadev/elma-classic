@@ -20,7 +20,7 @@
 
 // #include	<graph.h>
 
-#include "MAIN.H"
+#include "main.h"
 #include "pic8.h"
 #include "SPRITE.H"
 #include "anim.h"

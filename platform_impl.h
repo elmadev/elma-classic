@@ -31,4 +31,6 @@ bool right_mouse_clicked();
 void show_cursor();
 void hide_cursor();
 
+bool is_fullscreen();
+
 #endif

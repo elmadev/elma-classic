@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "directinput_scancodes.h"
 
 // Jatek modja ket fele lehet:
 int Single = 1;
@@ -537,7 +538,7 @@ long lejatszo(const char* filenev) {
         snapnyomva = is_key_down(State->key_screenshot);
 
         // Vizsgalat kilepesre:
-        if (is_key_down(KEY_ESC)) {
+        if (is_key_down(DIK_ESCAPE)) {
             MeghalteloszorAB = 0;
             double eltelido = stopwatch();
             // Motor hangjat kikapcsolja:
@@ -837,7 +838,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         snapnyomva = is_key_down(State->key_screenshot);
 
         // Vizsgalat kilepesre:
-        if (is_key_down(KEY_ESC)) {
+        if (is_key_down(DIK_ESCAPE)) {
             double eltelido = stopwatch();
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;

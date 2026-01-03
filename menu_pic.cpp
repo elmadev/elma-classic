@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "abc8.h"
 
 // Drawing of the screen when there is no ball. Also used as generic buffer by editor.
 pic8* BufferMain = nullptr;

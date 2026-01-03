@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "abc8.h"
 
 /*static void betuki( int oszlop, char c ) {
     int x = 50+oszlop*19;

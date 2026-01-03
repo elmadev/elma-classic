@@ -7,6 +7,8 @@ constexpr unsigned char GREEN_PALETTE_ID = 248;
 constexpr int MENU_LINE_LENGTH = 100;
 constexpr int MENU_MAX_LINES = 200;
 
+class abc8;
+
 extern pic8* BufferMain;
 extern pic8* BufferBall;
 extern abc8* MenuFont;

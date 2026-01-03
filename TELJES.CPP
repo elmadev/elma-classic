@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "abc8.h"
 #include "eol_settings.h"
 
 state* State = NULL;

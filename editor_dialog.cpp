@@ -169,7 +169,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     // Immediate exit if DIALOG_RETURN
     while (!immediately_return) {
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             // ESC/ENTER only valid if 1 button exists
             if (button_length == 1) {
                 if (c == KEY_ESC || c == KEY_ENTER) {

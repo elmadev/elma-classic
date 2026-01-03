@@ -228,7 +228,7 @@ void tolt_open(void) {
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 return;
             }
@@ -399,7 +399,7 @@ void kivalasztkezdetit(void) {
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 return;
             }
@@ -580,7 +580,7 @@ int tolt_save_as(int lokkolhato) {
             bltfront(BufferMain, ex1, ey1, ex2, ey2);
         }
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 return 0;
             }
@@ -943,7 +943,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 strcpy(nev, orignev);
                 return;
@@ -1178,7 +1178,7 @@ void tolt_pickasprite(void) {
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 return;
             }
@@ -1363,7 +1363,7 @@ int tolt_picklgrfile(char* lgrnev) {
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 return 0;
             }
@@ -1466,7 +1466,7 @@ static int tavolsagbeir(pic8* ppic, box abox, int tavolsag) {
             boxbair(ppic, abox, Feherszin, tmp, 1);
             bltfront(ppic, abox.x1, abox.y1, abox.x2, abox.y2);
         }
-        int c = get_keypress();
+        Keycode c = get_keypress();
         if (c == KEY_ESC) {
             pop();
             return oldtavolsag;
@@ -1497,7 +1497,7 @@ static int hatarolbeir(pic8* ppic, box abox, int hatarol) {
     bltfront(ppic, abox.x1, abox.y1, abox.x2, abox.y2);
     empty_keypress_buffer();
     while (1) {
-        int c = get_keypress();
+        Keycode c = get_keypress();
         if (c == KEY_ESC) {
             pop();
             return hatarol;
@@ -1538,7 +1538,7 @@ void setspritetav(sprite* psp) {
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 return;
             }
@@ -1686,7 +1686,7 @@ void set_gyuru_attributes(polygon* pgy) {
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 return;
             }
@@ -1824,7 +1824,7 @@ void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoo
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 return;
             }
@@ -1847,7 +1847,7 @@ void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoo
                 empty_keypress_buffer();
                 while (1) {
                     // Kirajzolta dobozba kurzort, most 1..9, vagy ESC-et var:
-                    int c = get_keypress();
+                    Keycode c = get_keypress();
                     if (c == KEY_ESC) {
                         break;
                     }
@@ -1927,7 +1927,7 @@ static void change_level_name(char* nev) {
         Pabc2->write(BufferMain, kezdes + Pabc1->len(tmp), 255, "-");
         bltfront(BufferMain, x1, y1, x2, y2);
 
-        int c = get_keypress();
+        Keycode c = get_keypress();
         if (c == KEY_ESC) {
             strcpy(nev, orignev);
             pop();
@@ -2024,7 +2024,7 @@ void change_level_properties(void) {
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 return;
             }
@@ -2187,7 +2187,7 @@ void setviewoptions(void) {
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC || c == KEY_ENTER) {
                 return;
             }

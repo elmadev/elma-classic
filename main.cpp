@@ -71,7 +71,7 @@ static void handle_error(const char* text1, const char* text2, const char* text3
     if (ErrorGraphicsLoaded) {
         render_error(text1, text2, text3, text4);
         while (true) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC || c == KEY_ENTER) {
                 break;
             }

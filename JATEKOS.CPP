@@ -19,7 +19,7 @@ static int bevesznevet(char* nev, int visszater) {
     nev[0] = 0;
     while (1) {
         while (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC) {
                 if (visszater) {
                     return 0;

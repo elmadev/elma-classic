@@ -32,14 +32,14 @@ struct topten_set {
 };
 
 struct player_keys {
-    DIK_Code gas;
-    DIK_Code brake;
-    DIK_Code right_volt;
-    DIK_Code left_volt;
-    DIK_Code turn;
-    DIK_Code toggle_minimap;
-    DIK_Code toggle_timer;
-    DIK_Code toggle_visibility; // Toggle Player
+    DikScancode gas;
+    DikScancode brake;
+    DikScancode right_volt;
+    DikScancode left_volt;
+    DikScancode turn;
+    DikScancode toggle_minimap;
+    DikScancode toggle_timer;
+    DikScancode toggle_visibility; // Toggle Player
 };
 
 class state {
@@ -61,9 +61,9 @@ class state {
 
     player_keys keys1;
     player_keys keys2;
-    DIK_Code key_increase_screen_size;
-    DIK_Code key_decrease_screen_size;
-    DIK_Code key_screenshot;
+    DikScancode key_increase_screen_size;
+    DikScancode key_decrease_screen_size;
+    DikScancode key_screenshot;
 
     char editor_filename[20];
     char external_filename[20];

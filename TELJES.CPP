@@ -51,7 +51,7 @@ void cheatplayer(void) {
     empty_keypress_buffer();
     while( 1 ) {
         if( has_keypress() ) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             //if( c == KEY_ESC || c == KEY_ENTER )
                 return;
         }
@@ -202,7 +202,7 @@ void kilep( void ) {
     pvegepal->set();
     bltfront( ppic );
     while( 1 ) {
-        int c = get_keypress();
+        Keycode c = get_keypress();
         if( c == ' ' || c == KEY_ENTER || c == KEY_ESC ) {
             quit();
         }
@@ -220,7 +220,7 @@ void kilep(void) {
         pszovlist->render();
         double idovaras = 50.0;
         if ((stopwatch() > (kezdoido + idovaras)) && has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == ' ' || c == KEY_ENTER || c == KEY_ESC) {
                 quit();
             }

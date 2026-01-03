@@ -41,7 +41,7 @@ int menu_dialog(const char* text1, const char* text2, const char* text3, const c
     empty_keypress_buffer();
     while (true) {
         if (has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (esc_only) {
                 if (c == KEY_ESC) {
                     return c;

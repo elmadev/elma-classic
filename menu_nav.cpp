@@ -182,7 +182,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     bool rerender = true;
     while (true) {
         while (!render_only && has_keypress()) {
-            int c = get_keypress();
+            Keycode c = get_keypress();
             if (c == KEY_ESC && enable_esc) {
                 CtrlAltPressed = false;
                 return -1;

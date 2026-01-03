@@ -157,8 +157,8 @@ void handle_events() {
         }
     }
 
-    mkw_getDIstate();
-    mkw_setkeydown();
+    update_key_state();
+    update_keypress_buffer();
 }
 
 void fill_key_state(char* buffer) {

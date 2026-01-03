@@ -159,11 +159,11 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     right_mouse_clicked();
     // Immediate exit if DIALOG_RETURN
     while (!immediately_return) {
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
             // ESC/ENTER only valid if 1 button exists
             if (button_length == 1) {
-                if (c == MK_ESC || c == MK_ENTER) {
+                if (c == KEY_ESC || c == KEY_ENTER) {
                     goto exit;
                 }
             }

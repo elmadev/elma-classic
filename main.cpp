@@ -70,8 +70,8 @@ static void handle_error(const char* text1, const char* text2, const char* text3
         }
         render_error(text1, text2, text3);
         while (true) {
-            int c = mk_getextchar();
-            if (c == MK_ESC || c == MK_ENTER) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC || c == KEY_ENTER) {
                 break;
             }
         }

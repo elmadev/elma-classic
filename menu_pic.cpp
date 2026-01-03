@@ -227,11 +227,11 @@ void menu_pic::render(bool skip_balls_helmet) {
     if (IntroAnimation) {
         MenuPal->set();
         IntroAnimation = false;
-        mk_emptychar();
+        empty_keypress_buffer();
         while (true) {
-            if (mk_kbhit()) {
-                int c = mk_getextchar();
-                if (c == MK_ESC || c == MK_ENTER) {
+            if (has_keypress()) {
+                Codepoint c = get_keypress();
+                if (c == KEY_ESC || c == KEY_ENTER) {
                     break;
                 }
             }

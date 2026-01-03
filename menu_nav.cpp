@@ -172,20 +172,20 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     }
     menu = new menu_pic(false);
 
-    mk_emptychar();
+    empty_keypress_buffer();
     bool rerender = true;
     while (true) {
-        while (!render_only && mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC && enable_esc) {
+        while (!render_only && has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC && enable_esc) {
                 CtrlAltPressed = false;
                 return -1;
             }
-            if (c == MK_ENTER) {
-                CtrlAltPressed = controlaltnyomva();
+            if (c == KEY_ENTER) {
+                CtrlAltPressed = is_ctrl_alt_down();
                 return selected_index;
             }
-            if (c == MK_UP) {
+            if (c == KEY_UP) {
                 if (selected_index > 0) {
                     selected_index--;
                     if (selected_index < view_index) {
@@ -194,7 +194,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
                     }
                 }
             }
-            if (c == MK_PGUP) {
+            if (c == KEY_PGUP) {
                 if (selected_index > 0) {
                     selected_index -= max_visible_entries;
                     if (selected_index < 0) {
@@ -206,7 +206,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
                     }
                 }
             }
-            if (c == MK_DOWN) {
+            if (c == KEY_DOWN) {
                 if (selected_index < length - 1) {
                     selected_index++;
                     if (selected_index > view_index + max_visible_entries - 1) {
@@ -215,7 +215,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
                     }
                 }
             }
-            if (c == MK_PGDOWN) {
+            if (c == KEY_PGDOWN) {
                 if (selected_index < length - 1) {
                     selected_index += max_visible_entries;
                     if (selected_index >= length) {

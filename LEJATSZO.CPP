@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "directinput_scancodes.h"
 
 // Jatek modja ket fele lehet:
 int Single = 1;
@@ -102,13 +103,13 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
     if (eddig > pvalt->utolsougras + VoltDelay) {
-        if (mk_getstate(popciok->right_volt)) {
+        if (is_key_down(popciok->right_volt)) {
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
             startwavegyujto(WAV_UGRAS1, 0.99, -1);
         }
-        if (mk_getstate(popciok->left_volt)) {
+        if (is_key_down(popciok->left_volt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;
@@ -118,7 +119,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // LEPTET!!!!!!!:
     // 0-meghalt, 1-megnyerte, 2-semmi kulonos
-    leptet(pmot, eddig, dt, mk_getstate(popciok->gas), mk_getstate(popciok->brake), ugrik1, ugrik2);
+    leptet(pmot, eddig, dt, is_key_down(popciok->gas), is_key_down(popciok->brake), ugrik1, ugrik2);
 
     int eredmeny = vizsgalat(pmot);
     if (eredmeny == 0) {
@@ -171,7 +172,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     }
     pvalt->inf.frekvencia = 2.0 - exp(-pvalt->inf.frekvencia);
 
-    pvalt->inf.gaz = (char)mk_getstate(popciok->gas);
+    pvalt->inf.gaz = (char)is_key_down(popciok->gas);
     prec->store(pmot, eddig, &pvalt->inf);
 
     // Egyedi hangok:
@@ -198,7 +199,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int* ptimekin,
                        int* pmasikshow) {
     // Showkep:
-    if (!pvalt->showkepnyomva && mk_getstate(popciok->toggle_visibility)) {
+    if (!pvalt->showkepnyomva && is_key_down(popciok->toggle_visibility)) {
         Kitoltestmegrak = Kitoltestmegrakkezd;
         if (!*pmasikshow) {
             // Ha masik jatekos ablaka nem latszott, mindegyik fog latszani:
@@ -208,17 +209,17 @@ static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int
             pvalt->showkep = !pvalt->showkep;
         }
     }
-    pvalt->showkepnyomva = mk_getstate(popciok->toggle_visibility);
+    pvalt->showkepnyomva = is_key_down(popciok->toggle_visibility);
     // View ablak:
-    if (!pvalt->viewnyomva && mk_getstate(popciok->toggle_minimap)) {
+    if (!pvalt->viewnyomva && is_key_down(popciok->toggle_minimap)) {
         *pviewkin = !*pviewkin;
     }
-    pvalt->viewnyomva = mk_getstate(popciok->toggle_minimap);
+    pvalt->viewnyomva = is_key_down(popciok->toggle_minimap);
     // Ido kint legyen vagy ne:
-    if (!pvalt->timenyomva && mk_getstate(popciok->toggle_timer)) {
+    if (!pvalt->timenyomva && is_key_down(popciok->toggle_timer)) {
         *ptimekin = !*ptimekin;
     }
-    pvalt->timenyomva = mk_getstate(popciok->toggle_timer);
+    pvalt->timenyomva = is_key_down(popciok->toggle_timer);
 }
 
 static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig, int hatra) {
@@ -259,11 +260,11 @@ static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // Hatra fordulas elintezes:
     if (!meghalt) {
-        if (!pvalt->hatranyomva && mk_getstate(popciok->turn)) {
+        if (!pvalt->hatranyomva && is_key_down(popciok->turn)) {
             pmot->flipped_bike = !pmot->flipped_bike;
             szamitfejr(pmot);
         }
-        pvalt->hatranyomva = mk_getstate(popciok->turn);
+        pvalt->hatranyomva = is_key_down(popciok->turn);
     }
     baljobbelintez(&pvalt->baljobbv_f, prec, eddig, pmot->flipped_bike);
 
@@ -521,23 +522,23 @@ long lejatszo(const char* filenev) {
 
         // Egy par kozos toggle:
         // Plusz elintezes:
-        if (!plussznyomva && mk_getstate(State->key_increase_screen_size)) {
+        if (!plussznyomva && is_key_down(State->key_increase_screen_size)) {
             novelkepmeret();
         }
-        plussznyomva = mk_getstate(State->key_increase_screen_size);
+        plussznyomva = is_key_down(State->key_increase_screen_size);
         // Minusz elintezes:
-        if (!minusznyomva && mk_getstate(State->key_decrease_screen_size)) {
+        if (!minusznyomva && is_key_down(State->key_decrease_screen_size)) {
             csokkentkepmeret();
         }
-        minusznyomva = mk_getstate(State->key_decrease_screen_size);
+        minusznyomva = is_key_down(State->key_decrease_screen_size);
         // Snap nyomas elintezese:
-        if (!snapnyomva && mk_getstate(State->key_screenshot)) {
+        if (!snapnyomva && is_key_down(State->key_screenshot)) {
             Legkozment = 1;
         }
-        snapnyomva = mk_getstate(State->key_screenshot);
+        snapnyomva = is_key_down(State->key_screenshot);
 
         // Vizsgalat kilepesre:
-        if (mk_getstate(MK_ESC)) {
+        if (is_key_down(DIK_ESCAPE)) {
             MeghalteloszorAB = 0;
             double eltelido = stopwatch();
             // Motor hangjat kikapcsolja:
@@ -818,26 +819,26 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         // Egy par kozos toggle:
         // Plusz elintezes:
-        if (!plussznyomva && mk_getstate(State->key_increase_screen_size)) {
+        if (!plussznyomva && is_key_down(State->key_increase_screen_size)) {
             novelkepmeret();
 
             // extern int Mostirdki;
             // Mostirdki = 1;
         }
-        plussznyomva = mk_getstate(State->key_increase_screen_size);
+        plussznyomva = is_key_down(State->key_increase_screen_size);
         // Minusz elintezes:
-        if (!minusznyomva && mk_getstate(State->key_decrease_screen_size)) {
+        if (!minusznyomva && is_key_down(State->key_decrease_screen_size)) {
             csokkentkepmeret();
         }
-        minusznyomva = mk_getstate(State->key_decrease_screen_size);
+        minusznyomva = is_key_down(State->key_decrease_screen_size);
         // Snap nyomas elintezese:
-        if (!snapnyomva && mk_getstate(State->key_screenshot)) {
+        if (!snapnyomva && is_key_down(State->key_screenshot)) {
             Legkozment = 1;
         }
-        snapnyomva = mk_getstate(State->key_screenshot);
+        snapnyomva = is_key_down(State->key_screenshot);
 
         // Vizsgalat kilepesre:
-        if (mk_getstate(MK_ESC)) {
+        if (is_key_down(DIK_ESCAPE)) {
             double eltelido = stopwatch();
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;

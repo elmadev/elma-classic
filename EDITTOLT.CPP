@@ -207,32 +207,32 @@ void tolt_open(void) {
     int felso = 0;
     int eddigfelso = -1;
     int eddigkur = 0;
-    mk_emptychar();
+    empty_keypress_buffer();
     // Azert 1, hogy ha lenyomott gombbal erkezett,
     // ne tekintse lenyomottnak:
     left_mouse_clicked();
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 return;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 igazit(&kur, &felso, nevszam, helyszam);
                 betolt(&Soknev[kur * 10]);
                 return;
             }
-            if (c == MK_UP) {
+            if (c == KEY_UP) {
                 kur--;
             }
-            if (c == MK_PGUP) {
+            if (c == KEY_PGUP) {
                 kur -= helyszam - 1;
             }
-            if (c == MK_DOWN) {
+            if (c == KEY_DOWN) {
                 kur++;
             }
-            if (c == MK_PGDOWN) {
+            if (c == KEY_PGDOWN) {
                 kur += helyszam - 1;
             }
         }
@@ -380,16 +380,16 @@ void kivalasztkezdetit(void) {
     int eddigfelso = -1;
 
     int eddigkur = 0;
-    mk_emptychar();
+    empty_keypress_buffer();
     left_mouse_clicked();
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 return;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 igazit(&kur, &felso, nevszam, helyszam);
                 char* nev = &Soknev[kur * 10];
                 if (strlen(nev) > 8) {
@@ -399,16 +399,16 @@ void kivalasztkezdetit(void) {
                 strcat(State->editor_filename, ".lev");
                 return;
             }
-            if (c == MK_UP) {
+            if (c == KEY_UP) {
                 kur--;
             }
-            if (c == MK_PGUP) {
+            if (c == KEY_PGUP) {
                 kur -= helyszam - 1;
             }
-            if (c == MK_DOWN) {
+            if (c == KEY_DOWN) {
                 kur++;
             }
-            if (c == MK_PGDOWN) {
+            if (c == KEY_PGDOWN) {
                 kur += helyszam - 1;
             }
         }
@@ -543,7 +543,7 @@ int tolt_save_as(int lokkolhato) {
     bltfront(BufferMain, boxnagy.x1, boxnagy.y1, boxnagy.x2, boxnagy.y2);
     pop();
 
-    mk_emptychar();
+    empty_keypress_buffer();
     char nev[20] = "";
     int i = 0;
     left_mouse_clicked();
@@ -565,12 +565,12 @@ int tolt_save_as(int lokkolhato) {
             Pabc2->write(BufferMain, 290 + Pabc1->len(tmp), 255, "-");
             bltfront(BufferMain, ex1, ey1, ex2, ey2);
         }
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 return 0;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 if (nev[0] == 0) {
                     continue;
                 }
@@ -602,7 +602,7 @@ int tolt_save_as(int lokkolhato) {
                 nev[i] = (char)c;
                 i++;
             }
-            if (c == MK_BACKSPACE) {
+            if (c == KEY_BACKSPACE) {
 
                 // Torles:
                 int ikesebbnulla = 0;
@@ -619,7 +619,7 @@ int tolt_save_as(int lokkolhato) {
                 }
                 i--;
             }
-            if (c == MK_DEL) {
+            if (c == KEY_DEL) {
                 // Torles:
                 if ((nev[0] == 0) || (i >= (int)strlen(nev))) {
                     continue;
@@ -630,11 +630,11 @@ int tolt_save_as(int lokkolhato) {
                     nev[j] = nev[j + 1];
                 }
             }
-            if (c == MK_LEFT && i > 0) {
+            if (c == KEY_LEFT && i > 0) {
                 i--;
                 eddignev[0] = 0;
             }
-            if (c == MK_RIGHT && i < (int)strlen(nev)) {
+            if (c == KEY_RIGHT && i < (int)strlen(nev)) {
                 i++;
                 eddignev[0] = 0;
             }
@@ -913,7 +913,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     int felso = 0;
     int eddigfelso = -1;
     int eddigkur = 0;
-    mk_emptychar();
+    empty_keypress_buffer();
 
     // Masodik bufferben mindig ilyenkor benne van eredeti kep:
     int buffervaltozottx = 0;
@@ -928,13 +928,13 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     left_mouse_clicked();
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 strcpy(nev, orignev);
                 return;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 igazit(&kur, &felso, nevszam, helyszam);
                 if (tipus == 1) {
                     strcpy(nev, Plgr->kepek[kur].nev);
@@ -947,16 +947,16 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
                 }
                 return;
             }
-            if (c == MK_UP) {
+            if (c == KEY_UP) {
                 kur--;
             }
-            if (c == MK_PGUP) {
+            if (c == KEY_PGUP) {
                 kur -= helyszam - 1;
             }
-            if (c == MK_DOWN) {
+            if (c == KEY_DOWN) {
                 kur++;
             }
-            if (c == MK_PGDOWN) {
+            if (c == KEY_PGDOWN) {
                 kur += helyszam - 1;
             }
         }
@@ -1157,18 +1157,18 @@ void tolt_pickasprite(void) {
     box boxok = {x1 + 50, y2 - 30, x1 + 100, y2 - 10};
     box boxcancel = {x1 + 130, y2 - 30, x1 + 180, y2 - 10};
 
-    mk_emptychar();
+    empty_keypress_buffer();
 
     left_mouse_clicked();
     int invalid = 1;
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 return;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 strcpy(Plgr->aktiv_kepnev, kepnev);
                 strcpy(Plgr->aktiv_texturanev, texturanev);
                 strcpy(Plgr->aktiv_maszknev, maszknev);
@@ -1344,30 +1344,30 @@ int tolt_picklgrfile(char* lgrnev) {
     int felso = 0;
     int eddigfelso = -1;
     int eddigkur = 0;
-    mk_emptychar();
+    empty_keypress_buffer();
     left_mouse_clicked();
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 return 0;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 igazit(&kur, &felso, nevszam, helyszam);
                 strcpy(lgrnev, &Soknev[kur * 10]);
                 return 1;
             }
-            if (c == MK_UP) {
+            if (c == KEY_UP) {
                 kur--;
             }
-            if (c == MK_PGUP) {
+            if (c == KEY_PGUP) {
                 kur -= helyszam - 1;
             }
-            if (c == MK_DOWN) {
+            if (c == KEY_DOWN) {
                 kur++;
             }
-            if (c == MK_PGDOWN) {
+            if (c == KEY_PGDOWN) {
                 kur += helyszam - 1;
             }
         }
@@ -1441,7 +1441,7 @@ int tolt_picklgrfile(char* lgrnev) {
 static int tavolsagbeir(pic8* ppic, box abox, int tavolsag) {
     push();
 
-    mk_emptychar();
+    empty_keypress_buffer();
     int valtozott = 1;
     int oldtavolsag = tavolsag;
     while (1) {
@@ -1452,12 +1452,12 @@ static int tavolsagbeir(pic8* ppic, box abox, int tavolsag) {
             boxbair(ppic, abox, Feherszin, tmp, 1);
             bltfront(ppic, abox.x1, abox.y1, abox.x2, abox.y2);
         }
-        int c = mk_getextchar();
-        if (c == MK_ESC) {
+        Codepoint c = get_keypress();
+        if (c == KEY_ESC) {
             pop();
             return oldtavolsag;
         }
-        if (c == MK_ENTER) {
+        if (c == KEY_ENTER) {
             pop();
             return tavolsag;
         }
@@ -1468,7 +1468,7 @@ static int tavolsagbeir(pic8* ppic, box abox, int tavolsag) {
                 valtozott = 1;
             }
         }
-        if (c == MK_BACKSPACE) {
+        if (c == KEY_BACKSPACE) {
             if (tavolsag > 0) {
                 tavolsag /= 10;
                 valtozott = 1;
@@ -1481,10 +1481,10 @@ static int hatarolbeir(pic8* ppic, box abox, int hatarol) {
     push();
     boxbair(ppic, abox, Feherszin, "", 1);
     bltfront(ppic, abox.x1, abox.y1, abox.x2, abox.y2);
-    mk_emptychar();
+    empty_keypress_buffer();
     while (1) {
-        int c = mk_getextchar();
-        if (c == MK_ESC) {
+        Codepoint c = get_keypress();
+        if (c == KEY_ESC) {
             pop();
             return hatarol;
         }
@@ -1523,12 +1523,12 @@ void setspritetav(sprite* psp) {
     int hatarol = psp->hatarol;
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 return;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 if (psp->tavolsag != tavolsag || psp->hatarol != hatarol) {
                     Valtozott = 1;
                 }
@@ -1671,12 +1671,12 @@ void set_gyuru_attributes(gyuru* pgy) {
 
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 return;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 // Meg van ismetelve OK-nal is lejjebb:
                 if (pgy->koveto != koveto) {
                     Valtozott = 1;
@@ -1809,9 +1809,9 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
     left_mouse_clicked();
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 return;
             }
         }
@@ -1830,11 +1830,11 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
                                       boxanimszam.y1 + 18, "-");
                 bltfront(BufferMain, x1, y1, x2, y2);
 
-                mk_emptychar();
+                empty_keypress_buffer();
                 while (1) {
                     // Kirajzolta dobozba kurzort, most 1..9, vagy ESC-et var:
-                    int c = mk_getextchar();
-                    if (c == MK_ESC) {
+                    Codepoint c = get_keypress();
+                    if (c == KEY_ESC) {
                         break;
                     }
                     if (c >= '1' && c <= '9') {
@@ -1893,7 +1893,7 @@ static void change_level_name(char* nev) {
     int x2 = 600;
     int y2 = 280;
 
-    mk_emptychar();
+    empty_keypress_buffer();
     int i = 0;
     while (1) {
         // Kiir:
@@ -1913,13 +1913,13 @@ static void change_level_name(char* nev) {
         Pabc2->write(BufferMain, kezdes + Pabc1->len(tmp), 255, "-");
         bltfront(BufferMain, x1, y1, x2, y2);
 
-        int c = mk_getextchar();
-        if (c == MK_ESC) {
+        Codepoint c = get_keypress();
+        if (c == KEY_ESC) {
             strcpy(nev, orignev);
             pop();
             return;
         }
-        if (c == MK_ENTER) {
+        if (c == KEY_ENTER) {
             if (nev[0] == 0) {
                 continue;
             }
@@ -1944,7 +1944,7 @@ static void change_level_name(char* nev) {
             nev[i] = (char)c;
             i++;
         }
-        if (c == MK_BACKSPACE) {
+        if (c == KEY_BACKSPACE) {
             // Torles:
             if (nev[0] == 0 || i <= 0) {
                 continue;
@@ -1956,7 +1956,7 @@ static void change_level_name(char* nev) {
             }
             i--;
         }
-        if (c == MK_DEL) {
+        if (c == KEY_DEL) {
             // Torles:
             if (nev[0] == 0 || i >= (int)strlen(nev)) {
                 continue;
@@ -1967,10 +1967,10 @@ static void change_level_name(char* nev) {
                 nev[j] = nev[j + 1];
             }
         }
-        if (c == MK_LEFT && i > 0) {
+        if (c == KEY_LEFT && i > 0) {
             i--;
         }
-        if (c == MK_RIGHT && i < (int)strlen(nev)) {
+        if (c == KEY_RIGHT && i < (int)strlen(nev)) {
             i++;
         }
     }
@@ -2009,12 +2009,12 @@ void change_level_properties(void) {
     int invalid = 1;
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC) {
                 return;
             }
-            if (c == MK_ENTER) {
+            if (c == KEY_ENTER) {
                 if (strcmpi(Ptop->fgnev, fgnev) != 0 || strcmpi(Ptop->bgnev, bgnev) != 0 ||
                     strcmp(Ptop->levelname, levelname) != 0) {
                     Valtozott = 1;
@@ -2172,9 +2172,9 @@ void setviewoptions(void) {
     int invalid = 1;
     while (1) {
         // Nezzuk gombokat:
-        while (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC || c == MK_ENTER) {
+        while (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC || c == KEY_ENTER) {
                 return;
             }
         }

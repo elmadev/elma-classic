@@ -34,11 +34,11 @@ void menu_help() {
     menu.add_line_centered("After you have eaten all the fruits,", 320, y0 + dy * 9);
     menu.add_line_centered("touch the flower!", 320, y0 + dy * 10);
 
-    mk_emptychar();
+    empty_keypress_buffer();
     while (true) {
-        if (mk_kbhit()) {
-            int c = mk_getextchar();
-            if (c == MK_ESC || c == MK_ENTER) {
+        if (has_keypress()) {
+            Codepoint c = get_keypress();
+            if (c == KEY_ESC || c == KEY_ENTER) {
                 return;
             }
         }

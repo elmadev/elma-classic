@@ -30,11 +30,11 @@ int floadlevel_p(const char* nev) {
             menu_pic szl;
             szl.add_line_centered("Level file has some topology errors!", 320, 190);
             szl.add_line_centered("Use the editor to fix them!", 320, 240);
-            mk_emptychar();
+            empty_keypress_buffer();
             while (1) {
-                if (mk_kbhit()) {
-                    int c = mk_getextchar();
-                    if (c == MK_ESC || c == MK_ENTER) {
+                if (has_keypress()) {
+                    Codepoint c = get_keypress();
+                    if (c == KEY_ESC || c == KEY_ENTER) {
                         break;
                     }
                 }

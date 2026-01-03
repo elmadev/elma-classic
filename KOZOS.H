@@ -1,10 +1,6 @@
 #ifndef KOZOS_H
 #define KOZOS_H
 
-#ifndef _WIN32
-#include <sys/time.h>
-#endif
-
 extern double K_pi;
 extern double K_pip2;
 extern double K_2pi;
@@ -34,12 +30,6 @@ int strnicmp(const char* a, const char* b, size_t len);
 
 void strupr(char* str);
 void strlwr(char* str);
-
-static inline long long timeGetTime() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
-}
 #endif
 
 #endif

@@ -1,8 +1,17 @@
 #include "ALL.H"
+#include <string>
+
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <timeapi.h>
+#else
+#include <sys/time.h>
+static inline long long timeGetTime() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+}
 #endif
 
 static double StopwatchStartTime = 0;
@@ -23,33 +32,28 @@ int random_range(int maximum) { return rand() % maximum; }
 
 bool ErrorGraphicsLoaded = false;
 static bool InError = false;
-static char ErrorTextTmp[500];
+static FILE* ErrorHandle;
 
 static void handle_error(const char* text1, const char* text2, const char* text3,
                          const char* text4) {
     ErrorOnMissingCodepoint = false;
-    FILE* h;
-    if (InError) {
-        h = fopen("error_b.txt", "wt");
-    } else {
-        h = fopen("error.txt", "wt");
+    if (!InError) {
+        ErrorHandle = fopen("error.txt", "w");
     }
-    if (h) {
-        fprintf(h, "%s\n", text1);
+    if (ErrorHandle) {
+        if (InError) {
+            fprintf(ErrorHandle, "\nTwo errors while processing!\n");
+        }
+        fprintf(ErrorHandle, "%s\n", text1);
         if (text2) {
-            fprintf(h, "%s\n", text2);
+            fprintf(ErrorHandle, "%s\n", text2);
         }
         if (text3) {
-            fprintf(h, "%s\n", text3);
+            fprintf(ErrorHandle, "%s\n", text3);
         }
         if (text4) {
-            fprintf(h, "%s\n", text4);
+            fprintf(ErrorHandle, "%s\n", text4);
         }
-        if (InError) {
-            fprintf(h, "Two errors while processing!\n");
-        }
-
-        fclose(h);
     }
 
     if (InError) {
@@ -58,16 +62,7 @@ static void handle_error(const char* text1, const char* text2, const char* text3
     InError = true;
 
     if (ErrorGraphicsLoaded) {
-        if (text4) {
-            if (strlen(text3) + strlen(text4) < 490) {
-                strcpy(ErrorTextTmp, text3);
-                strcat(ErrorTextTmp, " ");
-                strcat(ErrorTextTmp, text4);
-
-                text3 = ErrorTextTmp;
-            }
-        }
-        render_error(text1, text2, text3);
+        render_error(text1, text2, text3, text4);
         while (true) {
             int c = mk_getextchar();
             if (c == MK_ESC || c == MK_ENTER) {
@@ -75,38 +70,30 @@ static void handle_error(const char* text1, const char* text2, const char* text3
             }
         }
     } else {
-        char text[200];
-        strcpy(text, text1);
+        std::string text = text1;
         if (text2) {
-            strcat(text, "\n");
-            strcat(text, text2);
+            text = text + "\n" + text2;
         }
         if (text3) {
-            strcat(text, "\n");
-            strcat(text, text3);
+            text = text + "\n" + text3;
         }
         if (text4) {
-            strcat(text, "\n");
-            strcat(text, text4);
+            text = text + "\n" + text4;
         }
-        message_box(text);
+        message_box(text.c_str());
     }
+
+    fclose(ErrorHandle);
     quit();
 }
 
 void internal_error(const char* text1, const char* text2, const char* text3) {
-    if (access("message.inf", 0) == 0) {
-        handle_error("<<message.inf accessed>>", text1, text2, text3);
-    }
-    handle_error("Sorry, internal error.", nullptr, nullptr, nullptr);
+    handle_error("Sorry, internal error.", text1, text2, text3);
 }
 
 void external_error(const char* text1, const char* text2, const char* text3) {
     if (strstr(text1, "memory")) {
-        if (access("message.inf", 0) == 0) {
-            handle_error("message.inf accessed\n", text1, text2, text3);
-        }
-        handle_error("Sorry, out of memory!", nullptr, nullptr, nullptr);
+        handle_error("Sorry, out of memory!", text1, text2, text3);
     }
-    handle_error(text1, text2, text3, nullptr);
+    handle_error("External error encountered:", text1, text2, text3);
 }

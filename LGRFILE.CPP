@@ -1,9 +1,10 @@
 #include "ALL.H"
 #include "anim.h"
+#include "grass.h"
+#include "M_PIC.H"
 #include "menu_pic.h"
 #include "pic8.h"
 #include "piclist.h"
-#include "grass.h"
 
 /*void tesztloadlgr( void ) {
     int a = 1, b = 2, c = 4;

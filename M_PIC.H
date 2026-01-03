@@ -1,6 +1,8 @@
 #ifndef M_PIC_H
 #define M_PIC_H
 
+class pic8;
+
 pic8* lockbackbuffer_pic(bool flipped = true);
 void unlockbackbuffer_pic(void);
 

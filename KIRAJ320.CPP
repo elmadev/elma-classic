@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include <algorithm>
+#include "anim.h"
 #include "eol_settings.h"
 #include "pic8.h"
 

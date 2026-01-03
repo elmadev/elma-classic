@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "anim.h"
 #include "eol_settings.h"
 #include "pic8.h"
 #include <cstdint>

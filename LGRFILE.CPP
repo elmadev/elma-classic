@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "anim.h"
 #include "pic8.h"
 
 /*void tesztloadlgr( void ) {

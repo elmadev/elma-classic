@@ -58,7 +58,6 @@
 #include "KOZOS.H"
 
 #include "menu_controls.h"
-#include "menu_options.h"
 
 #include "TOPOL.H"
 #include "EDITUJ.H"

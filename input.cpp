@@ -2,20 +2,16 @@
 #include "directinput_scancodes.h"
 
 constexpr int KeyBufferSize = 30;
-static int* KeyBuffer = nullptr;
+static int KeyBuffer[KeyBufferSize];
 static int KeyBufferCount = 0;
 
-static char* KeyState1 = nullptr;
-static char* KeyState2 = nullptr;
+static char KeyState1[MaxKeycode];
+static char KeyState2[MaxKeycode];
 static bool UseKeyState2 = true;
-static int* DIKToAscii = nullptr;
+static int DIKToAscii[MaxKeycode];
 
 // Map DIK codes to ascii (+ a few extra codepoints for special keys)
-static void init_dik_to_ascii() {
-    DIKToAscii = new int[MaxKeycode];
-    for (int i = 0; i < MaxKeycode; i++) {
-        DIKToAscii[i] = 0;
-    }
+void keys_init() {
     DIKToAscii[DIK_1] = '1';
     DIKToAscii[DIK_2] = '2';
     DIKToAscii[DIK_3] = '3';
@@ -82,30 +78,6 @@ static void init_dik_to_ascii() {
     DIKToAscii[DIK_SUBTRACT] = KEY_LEFT;
     DIKToAscii[DIK_EQUALS] = KEY_RIGHT;
     DIKToAscii[DIK_ADD] = KEY_RIGHT;
-}
-
-void keys_init() {
-    if (KeyBuffer) {
-        internal_error("keys_init() called twice!");
-    }
-
-    KeyState1 = new char[MaxKeycode];
-    KeyState2 = new char[MaxKeycode];
-    if (!KeyState1 || !KeyState2) {
-        internal_error("KeyState allocation failed in keys_init!()");
-    }
-    for (int i = 0; i < MaxKeycode; i++) {
-        KeyState1[i] = KeyState2[i] = 0;
-    }
-
-    KeyBuffer = new int[KeyBufferSize];
-    if (!KeyBuffer) {
-        internal_error("KeyBuffer allocation failed in keys_init!()");
-    }
-    KeyBufferCount = 0;
-    UseKeyState2 = true;
-
-    init_dik_to_ascii();
 }
 
 int get_keypress() {

@@ -3,20 +3,16 @@
 #include "directinput_scancodes.h"
 
 constexpr int KeyBufferSize = 30;
-static int* KeyBuffer = nullptr;
+static int KeyBuffer[KeyBufferSize];
 static int KeyBufferCount = 0;
 
-static char* KeyState1 = nullptr;
-static char* KeyState2 = nullptr;
+static char KeyState1[MaxKeycode];
+static char KeyState2[MaxKeycode];
 static bool UseKeyState2 = true;
-static int* DIKToAscii = nullptr;
+static int DIKToAscii[MaxKeycode];
 
 // Map DIK codes to ascii (+ a few extra codepoints for special keys)
-static void init_dik_to_ascii() {
-    DIKToAscii = new int[MaxKeycode];
-    for (int i = 0; i < MaxKeycode; i++) {
-        DIKToAscii[i] = 0;
-    }
+void keys_init() {
     DIKToAscii[DIK_1] = '1';
     DIKToAscii[DIK_2] = '2';
     DIKToAscii[DIK_3] = '3';
@@ -85,30 +81,6 @@ static void init_dik_to_ascii() {
     DIKToAscii[DIK_ADD] = KEY_RIGHT;
 }
 
-void keys_init() {
-    if (KeyBuffer) {
-        internal_error("keys_init() called twice!");
-    }
-
-    KeyState1 = new char[MaxKeycode];
-    KeyState2 = new char[MaxKeycode];
-    if (!KeyState1 || !KeyState2) {
-        internal_error("KeyState allocation failed in keys_init!()");
-    }
-    for (int i = 0; i < MaxKeycode; i++) {
-        KeyState1[i] = KeyState2[i] = 0;
-    }
-
-    KeyBuffer = new int[KeyBufferSize];
-    if (!KeyBuffer) {
-        internal_error("KeyBuffer allocation failed in keys_init!()");
-    }
-    KeyBufferCount = 0;
-    UseKeyState2 = true;
-
-    init_dik_to_ascii();
-}
-
 int get_keypress() {
     while (true) {
         handle_events();
@@ -149,10 +121,6 @@ bool is_ctrl_alt_down() { return is_key_down(DIK_LMENU) && is_key_down(DIK_LCONT
 
 // Update whether keys are pressed down or not
 void update_key_state() {
-    if (!KeyBuffer) {
-        internal_error("Buffer is nullptr in update_key_state()");
-    }
-
     if (UseKeyState2) {
         fill_key_state(KeyState1);
     } else {

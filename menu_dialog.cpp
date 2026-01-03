@@ -1,3 +1,4 @@
+#include "menu_dialog.h"
 #include "ALL.H"
 #include "menu_pic.h"
 

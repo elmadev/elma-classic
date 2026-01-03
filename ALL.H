@@ -77,8 +77,6 @@
 #include "LOAD.H"
 #include "ECSET.H"
 
-#include "menu_dialog.h"
-
 #include "M_K.H"
 #include "M_PIC.H"
 #include "platform_impl.h"

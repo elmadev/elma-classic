@@ -14,7 +14,7 @@ int has_keypress(void);
 int is_key_down(int kod);
 int is_ctrl_alt_down(void);
 
-#define KEY_ESC (1) // DIK_ESCAPE
+#define KEY_ESC (1)
 #define KEY_ENTER (400)
 #define KEY_UP (401)
 #define KEY_DOWN (402)

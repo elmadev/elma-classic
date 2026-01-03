@@ -72,6 +72,7 @@ int is_key_down(int code) {
     }
 }
 
+// Update whether keys are pressed down or not
 void update_key_state(void) {
     if (!KeyBuffer) {
         internal_error("Buffer is NULL in update_key_state()");
@@ -85,6 +86,8 @@ void update_key_state(void) {
     UseKeyState2 = !UseKeyState2;
 }
 
+// Add keys to the keypress buffer
+// Only DIK codes defined in init_dik_to_ascii will be added to the buffer
 void update_keypress_buffer(void) {
     const char* prev = NULL;
     const char* current = NULL;
@@ -112,12 +115,12 @@ void update_keypress_buffer(void) {
     }
 }
 
+// Map DIK codes to ascii (+ a few extra codepoints for special keys)
 static void init_dik_to_ascii(void) {
     DIKToAscii = new int[260];
     for (int i = 0; i < MaxKeycode; i++) {
         DIKToAscii[i] = 0;
     }
-    // Most beirjuk billentyuket:
     DIKToAscii[DIK_1] = '1';
     DIKToAscii[DIK_2] = '2';
     DIKToAscii[DIK_3] = '3';
@@ -186,7 +189,6 @@ static void init_dik_to_ascii(void) {
     DIKToAscii[DIK_ADD] = KEY_RIGHT;
 }
 
-// menu_nav-ben meg van irve DOS-os verziohoz:
 int is_ctrl_alt_down(void) {
     if (is_key_down(DIK_LMENU) && is_key_down(DIK_LCONTROL)) {
         return 1;

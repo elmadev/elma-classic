@@ -3,11 +3,10 @@
 
 void flagtag_reset(void);
 void flagtag(double time);
-// FlagTagAHasFlag alapjan csak idoket allitja:
 void flagtag_replay(double time);
 
 extern int FlagTagAHasFlag, FlagTagImmunity;
-extern int FlagTagAStarts; // Legkozelebbi jateknal
+extern int FlagTagAStarts;
 extern double FlagTimeA, FlagTimeB;
 
 #endif

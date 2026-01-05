@@ -1,12 +1,14 @@
 #ifndef FOGOCSKA_H
 #define FOGOCSKA_H
 
-void flagtag_reset(void);
+extern bool FlagTagAHasFlag;
+extern bool FlagTagImmunity;
+extern bool FlagTagAStarts;
+extern double FlagTimeA;
+extern double FlagTimeB;
+
+void flagtag_reset();
 void flagtag(double time);
 void flagtag_replay(double time);
-
-extern int FlagTagAHasFlag, FlagTagImmunity;
-extern int FlagTagAStarts;
-extern double FlagTimeA, FlagTimeB;
 
 #endif

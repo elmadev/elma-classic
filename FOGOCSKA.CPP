@@ -1,32 +1,31 @@
 #include "ALL.H"
 #include "physics_init.h"
 
-int FlagTagAHasFlag = 0, FlagTagImmunity = 0;
-int FlagTagAStarts = 1;
-double FlagTimeA = 0.0, FlagTimeB = 0.0;
+constexpr double WHEEL_DIST_SQURAED = 0.64;
+constexpr double IMMUNITY_DIST_SQUARED = 1.44;
+
+bool FlagTagAHasFlag = false;
+bool FlagTagImmunity = false;
+bool FlagTagAStarts = true;
+double FlagTimeA = 0.0;
+double FlagTimeB = 0.0;
 
 double FlagTagElapsedTime = -1.0;
 
-void flagtag_reset(void) {
+void flagtag_reset() {
     FlagTagAHasFlag = FlagTagAStarts;
     FlagTagAStarts = !FlagTagAStarts;
-    FlagTagImmunity = 1;
-    FlagTimeA = 0.0, FlagTimeB = 0.0;
+    FlagTagImmunity = true;
+    FlagTimeA = 0.0;
+    FlagTimeB = 0.0;
     FlagTagElapsedTime = 0.0;
 }
 
-static int points_within_distance(vect2* v1, vect2* v2, double distance_squared) {
+static bool points_within_distance(vect2* v1, vect2* v2, double distance_squared) {
     double dx = v1->x - v2->x;
     double dy = v1->y - v2->y;
-    if (dx * dx + dy * dy < distance_squared) {
-        return 1;
-    } else {
-        return 0;
-    }
+    return dx * dx + dy * dy < distance_squared;
 }
-
-static double WHEEL_DIST_SQURAED = 0.64;
-static double IMMUNITY_DIST_SQUARED = 1.44;
 
 void flagtag(double time) {
     if (FlagTagImmunity) {

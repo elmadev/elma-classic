@@ -1,5 +1,5 @@
-#ifndef FOGOCSKA_H
-#define FOGOCSKA_H
+#ifndef FLAGTAG_H
+#define FLAGTAG_H
 
 extern bool FlagTagAHasFlag;
 extern bool FlagTagImmunity;

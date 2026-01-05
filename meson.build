@@ -27,7 +27,7 @@ elma_sources = files(
     'EDITTOOL.CPP',
     'EDITUJ.CPP',
     'ED_CHECK.CPP',
-    'FOGOCSKA.CPP',
+    'flagtag.cpp',
     'ball_handler.cpp',
     'ball.cpp',
     'ball_collision.cpp',

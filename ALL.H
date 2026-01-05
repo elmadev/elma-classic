@@ -26,7 +26,7 @@
 #include "vect2.h"
 #include "LEPTET.H"
 #include "UTKOZES.H"
-#include "FOGOCSKA.H"
+#include "flagtag.h"
 
 #include "RECORDER.H"
 

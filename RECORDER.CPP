@@ -274,8 +274,8 @@ int recorder::recall(motorst* pmot, double ido, hanginfo* phinfo) {
     // filebair( index2, pk2alfa[index2], pmot->left_wheel.rotation );
     phinfo->gaz = char(pgazhatra[index1] & 1);
     pmot->flipped_bike = (pgazhatra[index1] & 2) >> 1;
-    Aafogo = (pgazhatra[index1] & 4) >> 2;
-    Kozelvannak = (pgazhatra[index1] & 8) >> 3;
+    FlagTagAHasFlag = (pgazhatra[index1] & 4) >> 2;
+    FlagTagImmunity = (pgazhatra[index1] & 8) >> 3;
 
     /*if( Mostirdki ) {
         char tmp[100];
@@ -360,10 +360,10 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
         if (pmot->flipped_bike) {
             pgazhatra[i] += 2;
         }
-        if (Aafogo) {
+        if (FlagTagAHasFlag) {
             pgazhatra[i] += 4;
         }
-        if (Kozelvannak) {
+        if (FlagTagImmunity) {
             pgazhatra[i] += 8;
         }
 
@@ -439,9 +439,9 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
 
         if( pmot->hatra )
             pgazhatra[i] += 2;
-        if( Aafogo )
+        if( FlagTagAHasFlag )
             pgazhatra[i] += 4;
-        if( Kozelvannak )
+        if( FlagTagImmunity )
             pgazhatra[i] += 8;
 
         //pgazhatra[i] = char( phinfo->gaz + (pmot->hatra<<1) );

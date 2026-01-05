@@ -59,7 +59,7 @@ class recorder {
     void erase(char* palyanev);
     void rewind(void);
     // Ez a ket fuggveny  meg ezt a ket globalis valtozot is
-    // beveszi es allitja: Aafogo Kozelvannak:
+    // beveszi es allitja: FlagTagAHasFlag FlagTagImmunity:
     int recall(motorst* pmot, double ido, hanginfo* phinfo);
     void store(motorst* pmot, double ido, hanginfo* phinfo);
 

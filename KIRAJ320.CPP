@@ -438,11 +438,11 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     // Ha kell zaszlot rajzol:
     int flages = 0;
     if (!Single && Tag) {
-        if ((ajatekos && Aafogo) || (!ajatekos && !Aafogo)) {
+        if ((ajatekos && FlagTagAHasFlag) || (!ajatekos && !FlagTagAHasFlag)) {
             flages = 1;
         }
 
-        if (!flages && Kozelvannak) {
+        if (!flages && FlagTagImmunity) {
             int egeszido = t * 30.0;
             if (egeszido % 2) {
                 flages = 1;
@@ -705,9 +705,9 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     double fogoido = -1.0;
     if (!Single) {
         if (ajatekos) {
-            fogoido = Afogoido;
+            fogoido = FlagTimeA;
         } else {
-            fogoido = Bfogoido;
+            fogoido = FlagTimeB;
         }
     }
 

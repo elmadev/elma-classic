@@ -575,7 +575,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         }
 
         if (!Single && Tag) {
-            if (Aleszfogo) {
+            if (FlagTagAStarts) {
                 sprintf(Idoszovegek[0].text, MENU_CENTER_TEXT "A start with the flag next.");
             } else {
                 sprintf(Idoszovegek[0].text, MENU_CENTER_TEXT "B start with the flag next.");
@@ -624,7 +624,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
             Idoszovegek[2].y = ya;
 
             if (tagisvan) {
-                long longido = Afogoido * TimeToCentiseconds;
+                long longido = FlagTimeA * TimeToCentiseconds;
                 centiseconds_to_string(longido, Idoszovegek[3].text);
                 Idoszovegek[3].x = 440 + dx;
                 Idoszovegek[3].y = ya;
@@ -648,7 +648,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
             Idoszovegek[5].y = yb;
 
             if (tagisvan) {
-                long longido = Bfogoido * TimeToCentiseconds;
+                long longido = FlagTimeB * TimeToCentiseconds;
                 centiseconds_to_string(longido, Idoszovegek[6].text);
                 Idoszovegek[6].x = 440 + dx;
                 Idoszovegek[6].y = yb;

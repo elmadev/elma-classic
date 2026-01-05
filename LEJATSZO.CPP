@@ -148,9 +148,9 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
             pvalt->utolsougras = -100.0;
             pvalt->showkep = showkep;
 
-            if ((pmot == Motor1 && Aafogo) || (pmot == Motor2 && !Aafogo)) {
+            if ((pmot == Motor1 && FlagTagAHasFlag) || (pmot == Motor2 && !FlagTagAHasFlag)) {
                 // Nala volt zaszlo
-                Aafogo = !Aafogo;
+                FlagTagAHasFlag = !FlagTagAHasFlag;
             }
         } else {
             *pmeghalt = 1;
@@ -375,7 +375,7 @@ long lejatszo(const char* filenev) {
         startmotor(0);
     }
 
-    fogocskareset();
+    flagtag_reset();
 
     Motor1->apple_count = Motor2->apple_count = 0;
     long l = 0;
@@ -494,7 +494,7 @@ long lejatszo(const char* filenev) {
 
         // Fogocska elintezes:
         if (!Single && Tag) {
-            fogocska(eddig);
+            flagtag(eddig);
         }
 
         if (Single) {
@@ -748,7 +748,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         startmotor(0);
     }
 
-    fogocskareset();
+    flagtag_reset();
 
     // Motor1->apple_count = Motor2->apple_count = 0;
     long l = 0;
@@ -795,7 +795,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             }
 
             // Fogocska:
-            fogocska_r(eddig);
+            flagtag_replay(eddig);
         }
 
         // HANG ELINTEZES:

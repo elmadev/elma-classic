@@ -1,13 +1,13 @@
 #ifndef FOGOCSKA_H
 #define FOGOCSKA_H
 
-void fogocskareset(void);
-void fogocska(double t);
-// Aafogo alapjan csak idoket allitja:
-void fogocska_r(double t);
+void flagtag_reset(void);
+void flagtag(double time);
+// FlagTagAHasFlag alapjan csak idoket allitja:
+void flagtag_replay(double time);
 
-extern int Aafogo, Kozelvannak;
-extern int Aleszfogo; // Legkozelebbi jateknal
-extern double Afogoido, Bfogoido;
+extern int FlagTagAHasFlag, FlagTagImmunity;
+extern int FlagTagAStarts; // Legkozelebbi jateknal
+extern double FlagTimeA, FlagTimeB;
 
 #endif

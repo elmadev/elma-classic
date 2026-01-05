@@ -3,6 +3,7 @@
 #include "anim.h"
 #include "ECSET.H"
 #include "eol_settings.h"
+#include "flagtag.h"
 #include "LGRFILE.H"
 #include "M_PIC.H"
 #include "pic8.h"

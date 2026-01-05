@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "flagtag.h"
 #include "physics_init.h"
 #include "qopen.h"
 

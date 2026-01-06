@@ -1150,7 +1150,7 @@ void topol::loadkulso(const char* filenev) {
         internal_error("topol::topol-ban nem tudta olvasni lebego gyuruszamot!");
     }
 
-    int gyuruszam = gyuruolvszam;
+    int gyuruszam = (int)(gyuruolvszam);
     if (gyuruszam > MAXGYURU) {
         internal_error("topol::topol-ban gyuruszam > MAXGYURU!: ");
     }
@@ -1169,7 +1169,7 @@ void topol::loadkulso(const char* filenev) {
         internal_error("topol::topol-ban nem tudta olvasni lebego kerekszamot!");
     }
 
-    int kerekszam = kerekolvszam;
+    int kerekszam = (int)(kerekolvszam);
     if (kerekszam > MAXKEREK) {
         internal_error("topol::topol-ban kerekszam > MAXKEREK!: ");
     }
@@ -1190,7 +1190,7 @@ void topol::loadkulso(const char* filenev) {
             internal_error("topol::topol-ban nem tudta olvasni lebego spriteszamot!");
         }
 
-        int spriteszam = spriteolvszam;
+        int spriteszam = (int)(spriteolvszam);
         if (spriteszam > MAXSPRITE) {
             internal_error("topol::topol-ban spriteszam > MAXSPRITE!: ");
         }
@@ -1390,7 +1390,7 @@ void topol::loadbelso(const char* filenev) {
         internal_error("topol::topol-ban nem tudta olvasni lebego gyuruszamot!");
     }
 
-    int gyuruszam = gyuruolvszam;
+    int gyuruszam = (int)(gyuruolvszam);
     if (gyuruszam > MAXGYURU) {
         internal_error("topol::topol-ban gyuruszam > MAXGYURU!: ");
     }
@@ -1404,7 +1404,7 @@ void topol::loadbelso(const char* filenev) {
         internal_error("topol::topol-ban nem tudta olvasni lebego kerekszamot!");
     }
 
-    int kerekszam = kerekolvszam;
+    int kerekszam = (int)(kerekolvszam);
     if (kerekszam > MAXKEREK) {
         internal_error("topol::topol-ban kerekszam > MAXKEREK!: ");
     }
@@ -1430,7 +1430,7 @@ void topol::loadbelso(const char* filenev) {
             internal_error("topol::topol-ban nem tudta olvasni lebego spriteszamot!");
         }
 
-        int spriteszam = spriteolvszam;
+        int spriteszam = (int)(spriteolvszam);
         if (spriteszam > MAXSPRITE) {
             internal_error("topol::topol-ban spriteszam > MAXSPRITE!: ");
         }

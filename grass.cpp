@@ -51,9 +51,9 @@ static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, i
     }
 
     // Convert coordinates into pixel positions
-    int x1 = (r1.x - origin->x) * MetersToPixels;
+    int x1 = (int)((r1.x - origin->x) * MetersToPixels);
     double y1 = (-r1.y - origin->y) * MetersToPixels;
-    int x2 = (r2.x - origin->x) * MetersToPixels;
+    int x2 = (int)((r2.x - origin->x) * MetersToPixels);
     double y2 = (-r2.y - origin->y) * MetersToPixels;
 
     if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0) {
@@ -67,7 +67,7 @@ static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, i
             internal_error("grass_line_heightmap x0 already initialised!");
         }
         *x0 = x1;
-        heightmap[0] = y1;
+        heightmap[0] = (int)(y1);
     }
 
     // Skip lines of length 0.
@@ -108,7 +108,7 @@ static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, i
         // With:
         // t = (x - x1) / (x2 - x1)
         double y = y1 + (y2 - y1) * ((double)x - x1) / (x2 - x1);
-        heightmap[x - *x0] = y;
+        heightmap[x - *x0] = (int)(y);
         cur = x;
     }
     return cur;

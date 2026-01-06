@@ -255,8 +255,8 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
     //	return;
 
     // Kivalasztjuk egesz kezdopontot:
-    int xbal = csucs.x;
-    int ybal = csucs.y;
+    int xbal = (int)(csucs.x);
+    int ybal = (int)(csucs.y);
     double szint = ybal;
 
     // Kiszamolja hatarolo egyenesek parametereit:

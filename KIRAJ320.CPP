@@ -51,8 +51,8 @@ static int Viewxorig, Viewxtolas;
 void beallitmereteket(int splitscreen) {
     Cy1Bplayer = 100, Cy2Bplayer = 200;
 
-    Cxsize = SCREEN_WIDTH * (Kepmeret * 1.001);
-    Cysize = SCREEN_HEIGHT * (Kepmeret * 1.001);
+    Cxsize = (int)(SCREEN_WIDTH * (Kepmeret * 1.001));
+    Cysize = (int)(SCREEN_HEIGHT * (Kepmeret * 1.001));
     Cx1 = (SCREEN_WIDTH - Cxsize) / 2;
     Cy1 = (SCREEN_HEIGHT - Cysize) / 2;
     Cx2 = Cx1 + Cxsize - 1;
@@ -84,9 +84,9 @@ void beallitmereteket(int splitscreen) {
     Mo_dx = Cxsize / MetersToPixels - 2.0 * Mo_bal;
     Mo_y = Cysize / MetersToPixels / 2.0;
 
-    Viewxsize = 140 * sqrt(double(Cysize) / double(SCREEN_HEIGHT)); // 200
-    Viewysize = 70 * sqrt(double(Cysize) / double(SCREEN_HEIGHT));  // 80
-    Viewxorig = 40 * (Kepmeret - 0.6) / 0.4;
+    Viewxsize = (int)(140.0 * sqrt(double(Cysize) / double(SCREEN_HEIGHT))); // 200
+    Viewysize = (int)(70.0 * sqrt(double(Cysize) / double(SCREEN_HEIGHT)));  // 80
+    Viewxorig = (int)(40.0 * (Kepmeret - 0.6) / 0.4);
     Viewxtolas = Cxsize - 2 * Viewxorig - Viewxsize;
 }
 
@@ -223,7 +223,7 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
         align = 1.0;
         break;
     }
-    int vx1 = Viewxorig + align * Viewxtolas;
+    int vx1 = (int)(Viewxorig + align * Viewxtolas);
     int vx2 = vx1 + Viewxsize - 1;
     int vy1 = 1;
     int vy2 = vy1 + Viewysize - 1;
@@ -277,16 +277,16 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
     // Most kirajzoljuk masik (hatso) motorost:
     if (pmot2) {
         vect2 sarokrel = pmot2->bike.r - sarok;
-        int mx = sarokrel.x * MetersToPixels / MinimapScaleFactor + vx1;
-        int my = sarokrel.y * MetersToPixels / MinimapScaleFactor + vy1;
+        int mx = (int)(sarokrel.x * MetersToPixels / MinimapScaleFactor + vx1);
+        int my = (int)(sarokrel.y * MetersToPixels / MinimapScaleFactor + vy1);
         if (mx >= vx1 && mx <= vx2 && my >= vy1 && my <= vy2) {
             kigyuru(ppic, mx, my, viewindex2);
         }
     }
 
     // Most kirajzoljuk elso motorost:
-    int mx = sarokbolkozepre.x * MetersToPixels / MinimapScaleFactor;
-    int my = sarokbolkozepre.y * MetersToPixels / MinimapScaleFactor;
+    int mx = (int)(sarokbolkozepre.x * MetersToPixels / MinimapScaleFactor);
+    int my = (int)(sarokbolkozepre.y * MetersToPixels / MinimapScaleFactor);
     kigyuru(ppic, vx1 + mx, vy1 + my, viewindex1);
 
     // Kirajzoljuk keretet:
@@ -444,7 +444,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
         }
 
         if (!flages && FlagTagImmunity) {
-            int egeszido = t * 30.0;
+            int egeszido = (int)(t * 30.0);
             if (egeszido % 2) {
                 flages = 1;
             }
@@ -637,11 +637,11 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             switch (pker->tipus) {
             case T_KAJA:
                 pobjpic = Plgr->foodtomb[pker->foodsorszam % Plgr->foodszam]->get_frame_by_time(t);
-                dy = 5 * sin(t * 15.5 + pker->sinfazis);
+                dy = (int)(5.0 * sin(t * 15.5 + pker->sinfazis));
                 break;
             case T_CEL:
                 pobjpic = Plgr->pexit->get_frame_by_time(t);
-                dy = 5 * sin(t * 15.5 + pker->sinfazis);
+                dy = (int)(5.0 * sin(t * 15.5 + pker->sinfazis));
                 break;
             case T_HALALOS:
                 pobjpic = Plgr->pkiller->get_frame_by_time(t);

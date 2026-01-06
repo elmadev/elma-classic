@@ -471,7 +471,7 @@ long lejatszo(const char* filenev) {
                 } else {
                     startwave(WAV_TORES, 0.999);
                 }
-                hangosdelay(LevelEndDelay * 1000.0);
+                hangosdelay((int)(LevelEndDelay * 1000.0));
 
                 stopmotor(1);
                 stopmotor(0);
@@ -552,7 +552,7 @@ long lejatszo(const char* filenev) {
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;
             tpl *= 182;
-            int framerate = tpl;
+            int framerate = (int)(tpl);
             if (access("f_rate.inf", 0) == 0) {
                 // igyhagyni fopen-t!:
                 FILE* h = fopen("f_rate.inf", "wt");
@@ -775,7 +775,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             stopmotor(1);
             stopmotor(0);
             setsurlodas(0);
-            hangosdelay(LevelEndDelay * 400.0);
+            hangosdelay((int)(LevelEndDelay * 400.0));
 
             Mute = 1;
             Ptop->kerekjolalljon();
@@ -845,7 +845,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;
             tpl *= 182;
-            int framerate = tpl;
+            int framerate = (int)(tpl);
             if (access("f_rate.inf", 0) == 0) {
                 // igyhagyni fopen-t!:
                 FILE* h = fopen("f_rate.inf", "wt");
@@ -861,7 +861,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             stopmotor(1);
             stopmotor(0);
             setsurlodas(0);
-            hangosdelay(LevelEndDelay * 400.0);
+            hangosdelay((int)(LevelEndDelay * 400.0));
 
             Mute = 1;
 

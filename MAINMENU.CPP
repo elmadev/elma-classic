@@ -231,7 +231,7 @@ void replay(void) {
                     ido = Prec2->betoltve;
                 }
 
-                ido *= 3.3333333333333;
+                ido = (int)(ido * 3.3333333333333);
                 ido -= 2;
                 if (ido < 1) {
                     ido = 1;

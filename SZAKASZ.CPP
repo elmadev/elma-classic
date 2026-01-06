@@ -174,12 +174,12 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
     double xkezdo = r.x - maxtav;
     int cellax = 0;
     if (xkezdo > 0) {
-        cellax = xkezdo;
+        cellax = (int)(xkezdo);
     }
     if (r.x + v.x + maxtav < 0) {
         internal_error("szakaszok::beindexelvonalat-ban r.x+v.x+maxtav < 0!");
     }
-    int ucsocellax = r.x + v.x + maxtav;
+    int ucsocellax = (int)(r.x + v.x + maxtav);
     while (cellax <= ucsocellax) {
         double y1 = m * cellax + y0;
         double y2 = m * (cellax + 1) + y0;
@@ -201,9 +201,9 @@ void szakaszok::beindexelvonalat(vonal* pv, double maxtav) {
         }
         int cellay = 0;
         if (y1 > 0) {
-            cellay = y1;
+            cellay = (int)(y1);
         }
-        int ucsocellay = y2;
+        int ucsocellay = (int)(y2);
         while (cellay <= ucsocellay) {
             if (invertalt) {
                 bekot(cellay, cellax, pv);
@@ -281,8 +281,8 @@ void szakaszok::rendez(double maxtav) {
     double ysized = maxy - miny;
 
     // Kiszamolja dimenziot:
-    xdim = xsized / cellameret + 1;
-    ydim = ysized / cellameret + 1;
+    xdim = (int)(xsized / cellameret + 1.0);
+    ydim = (int)(ysized / cellameret + 1.0);
     if (xdim < 0 || ydim < 0) {
         internal_error("xdim < 0 || ydim < 0!");
     }
@@ -317,11 +317,11 @@ void szakaszok::felsorolasreset(vect2 r) {
     r = (r - origo) * (1 / cellameret);
     int cellax = 0;
     if (r.x > 0) {
-        cellax = r.x;
+        cellax = (int)(r.x);
     }
     int cellay = 0;
     if (r.y > 0) {
-        cellay = r.y;
+        cellay = (int)(r.y);
     }
 
     if (cellax > xdim) {

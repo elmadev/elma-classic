@@ -167,7 +167,7 @@ int recorder::recall(motorst* pmot, double ido, hanginfo* phinfo) {
         internal_error("recall-ban betoltve <= 0!");
     }
 
-    int index1 = Recorderszorzo * ido;
+    int index1 = (int)(Recorderszorzo * ido);
     double suly2 = Recorderszorzo * ido - index1;
     if (suly2 < 0.0) {
         suly2 = 0.0;

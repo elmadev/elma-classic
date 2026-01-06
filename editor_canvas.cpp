@@ -31,13 +31,13 @@ double pixel_to_meter_y(int y) {
 // Convert in-game meter to editor canvas pixels
 int meter_to_pixel_x(double x) {
     double pixel_x = (x - CanvasTopLeft.x) * CanvasMetersToPixels;
-    return pixel_x + 0.5 + EDITOR_MENU_X;
+    return (int)(pixel_x + 0.5 + EDITOR_MENU_X);
 }
 
 // Convert in-game meter to editor canvas pixels
 int meter_to_pixel_y(double y) {
     double pixel_y = (y - CanvasTopLeft.y) * CanvasMetersToPixels;
-    return pixel_y + 0.5 + EDITOR_MENU_Y;
+    return (int)(pixel_y + 0.5 + EDITOR_MENU_Y);
 }
 
 // Convert editor canvas pixel to in-game meters
@@ -205,8 +205,8 @@ void render_line(vect2 v1, vect2 v2, bool dotted) {
 
         // Draw from x1 + 0.5 to x2 + 0.5
         // but remove the last pixel of the line to avoid double-drawing where two lines connect
-        int xstart = x1 + 0.5;
-        int xend = x2 + 0.5;
+        int xstart = (int)(x1 + 0.5);
+        int xend = (int)(x2 + 0.5);
         if (inverted) {
             xstart++;
         } else {
@@ -219,7 +219,7 @@ void render_line(vect2 v1, vect2 v2, bool dotted) {
             }
             // Calculate the y position and draw it if it is within the internal editor render box
             double yd = y0 + slope * x;
-            int y = yd + 0.5;
+            int y = (int)(yd + 0.5);
             if (x >= EDITOR_MENU_X && y >= EDITOR_MENU_Y && x < SCREEN_WIDTH && y < SCREEN_HEIGHT) {
                 // Invert the palette ID
                 unsigned char pal_index = BufferMain->gpixel(x, y);
@@ -254,8 +254,8 @@ void render_line(vect2 v1, vect2 v2, bool dotted) {
 
         // Draw from y1 + 0.5 to y2 + 0.5
         // but remove the last pixel of the line to avoid double-drawing where two lines connect
-        int ystart = y1 + 0.5;
-        int yend = y2 + 0.5;
+        int ystart = (int)(y1 + 0.5);
+        int yend = (int)(y2 + 0.5);
         if (inverted) {
             ystart++;
         } else {
@@ -268,7 +268,7 @@ void render_line(vect2 v1, vect2 v2, bool dotted) {
             }
             // Calculate the x position and draw it if it is within the internal editor render box
             double xd = x0 + slope * y;
-            int x = xd + 0.5;
+            int x = (int)(xd + 0.5);
             if (x >= EDITOR_MENU_X && y >= EDITOR_MENU_Y && x < SCREEN_WIDTH && y < SCREEN_HEIGHT) {
                 // Invert the palette ID
                 unsigned char pal_index = BufferMain->gpixel(x, y);

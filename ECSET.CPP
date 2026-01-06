@@ -72,7 +72,7 @@ mdarab* ecset::newmdarab(void) {
 }
 
 static void meghelyez(double* pd) {
-    int pixel = *pd * MetersToPixels;
+    int pixel = (int)(*pd * MetersToPixels);
     *pd = (pixel + 0.5) / MetersToPixels;
 }
 
@@ -166,8 +166,8 @@ void ecset::addszakasz(vonal* psz) {
     if (v.y < 0.001) {
         return;
     }
-    int y1 = r.y + 1;
-    int y2 = r.y + v.y;
+    int y1 = (int)(r.y + 1.0);
+    int y2 = (int)(r.y + v.y);
 
     /*double kozelseg = 0.000001;
     if( fabs( double( y1 )-(r.y+1) ) < kozelseg )
@@ -183,7 +183,7 @@ void ecset::addszakasz(vonal* psz) {
     double dx2 = r.x + v.x;
     double a = (dx2 * dy1 - dx1 * dy2) / (dy1 - dy2);
     for (int y = y1; y <= y2; y++) {
-        int x = m * y + a + 1.0;
+        int x = (int)(m * y + a + 1.0);
         // if( fabs( double(x)-m*y+a+1.0 ) < kozelseg )
         //	internal_error( "Nagyon kozeli pont!" );
 
@@ -459,11 +459,11 @@ void ecset::kitoltfoodkoordokat(void) {
             continue;
         }
         if (view) {
-            pker->rxint_v = (pker->r.x - origo.x) * MetersToPixels / MinimapScaleFactor;
-            pker->ryint_v = (-pker->r.y - origo.y) * MetersToPixels / MinimapScaleFactor;
+            pker->rxint_v = (int)((pker->r.x - origo.x) * MetersToPixels / MinimapScaleFactor);
+            pker->ryint_v = (int)((-pker->r.y - origo.y) * MetersToPixels / MinimapScaleFactor);
         } else {
-            pker->rxint = (pker->r.x - origo.x) * MetersToPixels - ANIM_WIDTH / 2;
-            pker->ryint = (-pker->r.y - origo.y) * MetersToPixels - ANIM_WIDTH / 2;
+            pker->rxint = (int)((pker->r.x - origo.x) * MetersToPixels - (double)(ANIM_WIDTH / 2));
+            pker->ryint = (int)((-pker->r.y - origo.y) * MetersToPixels - (double)(ANIM_WIDTH / 2));
         }
     }
 }
@@ -751,8 +751,8 @@ int teliszam(int x, int xsize, unsigned char* sor, unsigned char lyuk) {
 // addspriteok hivja:
 void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
     // Egy kep berakasa:
-    int x1 = (psp->r.x - origo.x) * MetersToPixels;
-    int y1 = (-psp->r.y - origo.y) * MetersToPixels;
+    int x1 = (int)((psp->r.x - origo.x) * MetersToPixels);
+    int y1 = (int)((-psp->r.y - origo.y) * MetersToPixels);
 
     maszk* pm = &Plgr->maszkok[index_m];
 
@@ -831,8 +831,8 @@ void ecset::addspriteok(int fazis) {
         kep* pkep = &Plgr->kepek[index];
 
         // Egy kep berakasa:
-        int x1 = (psp->r.x - origo.x) * MetersToPixels;
-        int y1 = (-psp->r.y - origo.y) * MetersToPixels;
+        int x1 = (int)((psp->r.x - origo.x) * MetersToPixels);
+        int y1 = (int)((-psp->r.y - origo.y) * MetersToPixels);
 
         int ujtavolsag = psp->tavolsag;
 
@@ -1175,8 +1175,8 @@ void ecset::addobjektumok(void) {
                 mut = Plgr->viewkiller;
                 ujtavolsag = 499;
             }
-            int x1 = (pk->r.x - origo.x) * (MetersToPixels / MinimapScaleFactor);
-            int y1 = (-pk->r.y - origo.y) * (MetersToPixels / MinimapScaleFactor);
+            int x1 = (int)((pk->r.x - origo.x) * (MetersToPixels / MinimapScaleFactor));
+            int y1 = (int)((-pk->r.y - origo.y) * (MetersToPixels / MinimapScaleFactor));
             // Kirakja kis 3x3-as gyurut:
             addbytesor(mut, ujtavolsag, x1 - 1, x1 + 1, y1 - 1, FAZIS_NEMFOLDEG);
             addbytesor(mut, ujtavolsag, x1 - 1, x1 - 1, y1, FAZIS_NEMFOLDEG);
@@ -1285,11 +1285,11 @@ ecset::ecset(int view_p) {
 
     if (view) {
         // VIEW VIEW VIEW:
-        maxx = xsizedb * (MetersToPixels / MinimapScaleFactor);
-        sorszam = ysizedb * (MetersToPixels / MinimapScaleFactor);
+        maxx = (int)(xsizedb * (MetersToPixels / MinimapScaleFactor));
+        sorszam = (int)(ysizedb * (MetersToPixels / MinimapScaleFactor));
     } else {
-        maxx = xsizedb * MetersToPixels;
-        sorszam = ysizedb * MetersToPixels;
+        maxx = (int)(xsizedb * MetersToPixels);
+        sorszam = (int)(ysizedb * MetersToPixels);
     }
 
     if (sorszam - 10 > MAXECSETSOR) {
@@ -1687,11 +1687,11 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
 void ecset::getbalalso_int(vect2 balalso, int* px, int* py) {
     vect2 relat = balalso - origo;
     if (view) {
-        *px = relat.x * (MetersToPixels / MinimapScaleFactor); // Ecset egesz koordinatak
-        *py = relat.y * (MetersToPixels / MinimapScaleFactor); // Ecset egesz koordinatak
+        *px = (int)(relat.x * (MetersToPixels / MinimapScaleFactor)); // Ecset egesz koordinatak
+        *py = (int)(relat.y * (MetersToPixels / MinimapScaleFactor)); // Ecset egesz koordinatak
     } else {
-        *px = relat.x * MetersToPixels; // Ecset egesz koordinatak
-        *py = relat.y * MetersToPixels; // Ecset egesz koordinatak
+        *px = (int)(relat.x * MetersToPixels); // Ecset egesz koordinatak
+        *py = (int)(relat.y * MetersToPixels); // Ecset egesz koordinatak
     }
 }
 

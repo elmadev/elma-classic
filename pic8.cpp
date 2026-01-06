@@ -709,7 +709,7 @@ void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2) {
         double sy = (y + 0.5) * s_per_d_y;
         for (int x = 0; x < xsd; x++) {
             double sx = (x + 0.5) * s_per_d_x;
-            unsigned char c = source->gpixel(sx, sy);
+            unsigned char c = source->gpixel((int)(sx), (int)(sy));
             dest->ppixel(x1 + x, y1 + y, c);
         }
     }

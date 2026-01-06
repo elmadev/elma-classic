@@ -9,7 +9,7 @@ class topol;
 #define POLYGON_MAX_VERTICES (1000) // Ennyit csak akkor foglal le, ha kell
 
 class polygon {
-    int lefoglaltmaxpont;
+    int allocated_vertex_count;
 
   public:
     int vertex_count;

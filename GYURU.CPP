@@ -3,13 +3,13 @@
 
 polygon::polygon(void) {
     vertex_count = 0;
-    lefoglaltmaxpont = 10;
+    allocated_vertex_count = 10;
 
     // Koveto valtozok:
     is_grass = 0;
 
-    vertices = new vect2[lefoglaltmaxpont];
-    for (int i = 0; i < lefoglaltmaxpont; i++) {
+    vertices = new vect2[allocated_vertex_count];
+    for (int i = 0; i < allocated_vertex_count; i++) {
         vertices[i].x = 0;
         vertices[i].y = 0;
     }
@@ -34,7 +34,7 @@ polygon::~polygon(void) {
 
 void polygon::set_vertex(int v, double x, double y) {
     if (v < 0 || v >= vertex_count) {
-        internal_error("polygon::set_vertex-ban v < 0 || v >= vertex_count!");
+        internal_error("polygon::set_vertex v < 0 || v >= vertex_count!");
     }
     vertices[v].x = x;
     vertices[v].y = y;
@@ -42,7 +42,7 @@ void polygon::set_vertex(int v, double x, double y) {
 
 void polygon::render_one_line(int v, int forward, int dotted) {
     if (v < 0 || v >= vertex_count) {
-        internal_error("polygon::render_one_line-ban v < 0 || v >= vertex_count!");
+        internal_error("polygon::render_one_line v < 0 || v >= vertex_count!");
     }
     if ((forward && v == vertex_count - 1) || (!forward && v == 0)) {
         // Elejet a vegevel kell osszekotni:
@@ -60,7 +60,7 @@ void polygon::render_one_line(int v, int forward, int dotted) {
 void polygon::render_outline(void) {
     if (vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES) {
         internal_error(
-            "polygon::render_outline-ban vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES!");
+            "polygon::render_outline vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES!");
     }
     for (int i = 0; i < vertex_count; i++) {
         render_one_line(i, 1, 0);
@@ -74,23 +74,23 @@ int polygon::insert_vertex(int v) {
         return 0;
     }
     if (v >= vertex_count) {
-        internal_error("polygon::insert_vertex-ban v >= vertex_count!");
+        internal_error("polygon::insert_vertex v >= vertex_count!");
     }
 
-    if (vertex_count >= lefoglaltmaxpont) {
+    if (vertex_count >= allocated_vertex_count) {
         // Ujra fel kell venni pontok tombjet, csak most tobb ponttal:
-        lefoglaltmaxpont += 10;
-        vect2* ujponttomb = new vect2[lefoglaltmaxpont];
-        for (int i = 0; i < lefoglaltmaxpont; i++) {
-            ujponttomb[i].x = 0;
-            ujponttomb[i].y = 0;
+        allocated_vertex_count += 10;
+        vect2* new_vertices = new vect2[allocated_vertex_count];
+        for (int i = 0; i < allocated_vertex_count; i++) {
+            new_vertices[i].x = 0;
+            new_vertices[i].y = 0;
         }
         for (int i = 0; i < vertex_count; i++) {
-            ujponttomb[i].x = vertices[i].x;
-            ujponttomb[i].y = vertices[i].y;
+            new_vertices[i].x = vertices[i].x;
+            new_vertices[i].y = vertices[i].y;
         }
         delete vertices;
-        vertices = ujponttomb;
+        vertices = new_vertices;
     }
 
     for (int i = vertex_count - 1; i >= v; i--) {
@@ -103,7 +103,7 @@ int polygon::insert_vertex(int v) {
 
 void polygon::delete_vertex(int v) {
     if (v < 0 || v >= vertex_count) {
-        internal_error("polygon::delete_vertex-ben v < 0 || v >= vertex_count!");
+        internal_error("polygon::delete_vertex v < 0 || v >= vertex_count!");
     }
     if (vertex_count <= 3) {
         return;
@@ -116,28 +116,28 @@ void polygon::delete_vertex(int v) {
 }
 
 double polygon::get_closest_vertex(double x, double y, int* v) {
-    double tav = 1000000000000000.0;
+    double distance = 1000000000000000.0;
     *v = 0;
     for (int i = 0; i < vertex_count; i++) {
         double dx = vertices[i].x - x;
         double dy = vertices[i].y - y;
-        double ujtav = dx * dx + dy * dy;
-        if (ujtav < tav) {
-            tav = ujtav;
+        double new_distance = dx * dx + dy * dy;
+        if (new_distance < distance) {
+            distance = new_distance;
             *v = i;
         }
     }
-    return sqrt(tav);
+    return sqrt(distance);
 }
 
 int polygon::count_intersections(vect2 r1, vect2 v1) {
 #ifdef DEBUG
     if (is_grass) {
-        internal_error("89yy");
+        internal_error("polygon::count_intersections grass cannot intersect!");
     }
 #endif
 
-    int metszes = 0;
+    int intersections = 0;
     for (int i = 0; i < vertex_count; i++) {
         double x1 = vertices[i].x;
         double y1 = vertices[i].y;
@@ -154,16 +154,16 @@ int polygon::count_intersections(vect2 r1, vect2 v1) {
         vect2 r2(x1, y1);
         vect2 v2 = vect2(x2, y2) - r2;
         if (segments_intersect(r1, v1, r2, v2)) {
-            metszes++;
+            intersections++;
         }
     }
-    return metszes;
+    return intersections;
 }
 
 int polygon::intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect_point) {
 #ifdef DEBUG
     if (is_grass) {
-        internal_error("0i9p9");
+        internal_error("polygon::intersection_point grass cannot intersect!");
     }
 #endif
 
@@ -257,83 +257,82 @@ int polygon::get_vertex_count(void) { return vertex_count; }
 
 polygon::polygon(FILE* h, int version) {
     vertex_count = 0;
-    lefoglaltmaxpont = 0;
+    allocated_vertex_count = 0;
     vertices = NULL;
     is_grass = 0;
 
     // Koveto valtozok:
-    int kovetos = 0;
-    int kiskoveto = 0;
+    int deprecated_grass_feature = 0;
+    int grass_feature = 0;
     if (version >= 8) {
-        kovetos = 1;
+        deprecated_grass_feature = 1;
     }
     if (version >= 12) {
-        kiskoveto = 1;
+        grass_feature = 1;
     }
 
-    if (kovetos) {
+    if (deprecated_grass_feature) {
         if (fread(&is_grass, 1, 4, h) != 4) {
-            internal_error("86t6yt!");
+            internal_error("polygon::polygon: Failed to read file!");
         }
-        if (!kiskoveto && is_grass) {
-            char semmi[20];
-            if (fread(semmi, 1, 10, h) != 10) {
-                internal_error("86t6yt!");
+        if (!grass_feature && is_grass) {
+            char unused[20];
+            if (fread(unused, 1, 10, h) != 10) {
+                internal_error("polygon::polygon: Failed to read file!");
             }
-            if (fread(semmi, 1, 10, h) != 10) {
-                internal_error("86t6yt!");
+            if (fread(unused, 1, 10, h) != 10) {
+                internal_error("polygon::polygon: Failed to read file!");
             }
-            if (fread(semmi, 1, 10, h) != 10) {
-                internal_error("86t6yt!");
+            if (fread(unused, 1, 10, h) != 10) {
+                internal_error("polygon::polygon: Failed to read file!");
             }
-            if (fread(semmi, 1, 4, h) != 4) {
-                internal_error("86t6yt!");
+            if (fread(unused, 1, 4, h) != 4) {
+                internal_error("polygon::polygon: Failed to read file!");
             }
-            if (fread(semmi, 1, 4, h) != 4) {
-                internal_error("86t6yt!");
+            if (fread(unused, 1, 4, h) != 4) {
+                internal_error("polygon::polygon: Failed to read file!");
             }
         }
     }
 
     if (fread(&vertex_count, 1, sizeof(vertex_count), h) != sizeof(vertex_count)) {
-        internal_error("polygon::polygon-ben nem megy file olvasas!");
+        internal_error("polygon::polygon: Failed to read file!");
     }
 
     if (vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES) {
-        internal_error(
-            "polygon::polygon-ben vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES!");
+        internal_error("polygon::polygon vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES!");
     }
 
-    lefoglaltmaxpont = vertex_count + 10;
-    vertices = new vect2[lefoglaltmaxpont];
-    for (int i = 0; i < lefoglaltmaxpont; i++) {
+    allocated_vertex_count = vertex_count + 10;
+    vertices = new vect2[allocated_vertex_count];
+    for (int i = 0; i < allocated_vertex_count; i++) {
         vertices[i].x = 0;
         vertices[i].y = 0;
     }
     if (fread(vertices, 1, sizeof(vect2) * vertex_count, h) != sizeof(vect2) * vertex_count) {
-        internal_error("polygon::polygon-ben nem megy file olvasasa!");
+        internal_error("polygon::polygon: Failed to read file!");
     }
 }
 
 void polygon::save(FILE* h, topol* lev) {
     // Koveto reszek:
     if (fwrite(&is_grass, 1, 4, h) != 4) {
-        internal_error("96t6yt!");
+        internal_error("polygon::polygon: Failed to write file!");
     }
 
     if (!is_grass) {
         // Ugy kell elmenteni, hogy ha sorban megyunk vegig pontokon,
         // akkor mindig baloldalon legyen fold:
         // Eloszor megnezzuk, hogy vonal ureg, vagy folddarab-e:
-        int levegoben = lev->levegoben(this); // Ha levegoben, akkor folddarab
+        int sky = lev->levegoben(this); // Ha levegoben, akkor folddarab
 
-        int pozitivjaras = is_clockwise();
+        int clockwise = is_clockwise();
 
-        int csere = (levegoben && !pozitivjaras) || (!levegoben && pozitivjaras);
+        int swap_orientation = (sky && !clockwise) || (!sky && clockwise);
 
-        csere = !csere; // mivel fejjel lefele fogjuk beolvasni
+        swap_orientation = !swap_orientation; // mivel fejjel lefele fogjuk beolvasni
 
-        if (csere) {
+        if (swap_orientation) {
             // dialog( "Most cserel." );
 
             // Meg kell cserelni pontok sorrendjet:
@@ -348,68 +347,68 @@ void polygon::save(FILE* h, topol* lev) {
 
     // Itt jon a mentes lenyegeben:
     if (fwrite(&vertex_count, 1, sizeof(vertex_count), h) != sizeof(vertex_count)) {
-        internal_error("polygon::save-ben nem megy file-ba iras!");
+        internal_error("polygon::polygon: Failed to write file!");
     }
     if (fwrite(vertices, 1, sizeof(vect2) * vertex_count, h) != sizeof(vect2) * vertex_count) {
-        internal_error("polygon::save-ben nem megy file-ba iras!");
+        internal_error("polygon::polygon: Failed to write file!");
     }
 }
 
 // Visszaadja b pontban fekvo belso szoget, ha belso oldal bal oldal a, b, c
 // haladas eseten:
-static double balszog(vect2* pa, vect2 b, vect2 c) {
+static double get_and_fix_angle(vect2* a, vect2 b, vect2 c) {
     while (1) {
-        double dy1 = pa->y - b.y;
-        double dx1 = pa->x - b.x;
+        double dy1 = a->y - b.y;
+        double dx1 = a->x - b.x;
         if (dy1 == 0.0 && dx1 == 0) {
             // Ezt mar topologia check-ben meg kellett volna szuntetni:
-            internal_error("balszog-ben ket pont egybe esik!");
+            internal_error("get_and_fix_angle dx1 and dy1 == 0.0!");
         }
-        double alfa = atan2(dy1, dx1);
+        double angle1 = atan2(dy1, dx1);
         double dy2 = c.y - b.y;
         double dx2 = c.x - b.x;
         if (dy2 == 0.0 && dx2 == 0) {
             // Ezt mar topologia check-ben meg kellett volna szuntetni:
-            internal_error("balszog-ben ket pont egybe esik!");
+            internal_error("get_and_fix_angle dx2 and dy2 == 0.0!");
         }
-        double beta = atan2(dy2, dx2);
-        double szog = alfa - beta;
-        if (szog < 0) {
-            szog += 2 * K_pi;
+        double angle2 = atan2(dy2, dx2);
+        double angle = angle1 - angle2;
+        if (angle < 0) {
+            angle += 2 * K_pi;
         }
-        if (szog > 2 * K_pi - 0.0000001) {
-            szog -= 2 * K_pi;
+        if (angle > 2 * K_pi - 0.0000001) {
+            angle -= 2 * K_pi;
         }
-        if (szog < 0.0000002) {
+        if (angle < 0.0000002) {
             // Szog tul hegyes, egyik pontjat arrebb rakjuk:
-            constexpr double egytav = 0.0002;
-            vect2 meroleges = *pa - b;
-            meroleges = rotate_90deg(meroleges);
-            meroleges.normalize();
-            *pa = *pa + meroleges * egytav;
+            constexpr double displacement = 0.0002;
+            vect2 perpendicular = *a - b;
+            perpendicular = rotate_90deg(perpendicular);
+            perpendicular.normalize();
+            *a = *a + perpendicular * displacement;
             // dialog( "Arrebb raktuk!" );
 
             continue;
         }
-        return szog;
+        return angle;
     }
 }
 
-static void szetvalaszt_fv(vect2* pa, vect2* pb) {
-    constexpr double egytav = 0.0002;
-    if (fabs(pa->x - pb->x) < 0.0000002 && fabs(pa->y - pb->y) < 0.0000002) {
+static void separate_two_stacked_vertices(vect2* a, vect2* b) {
+    constexpr double displacement = 0.0002;
+    if (fabs(a->x - b->x) < 0.0000002 && fabs(a->y - b->y) < 0.0000002) {
         // Egy helyen vannak:
-        pa->x += egytav + egytav * random_range(1000) / 1200.0;
-        pa->y += egytav + egytav * random_range(1000) / 1200.0;
+        a->x += displacement + displacement * random_range(1000) / 1200.0;
+        a->y += displacement + displacement * random_range(1000) / 1200.0;
     }
 }
 
 void polygon::separate_stacked_vertices(void) {
     for (int i = 0; i < vertex_count; i++) {
         if (i < vertex_count - 1) {
-            szetvalaszt_fv(&vertices[i], &vertices[i + 1]);
+            separate_two_stacked_vertices(&vertices[i], &vertices[i + 1]);
         } else {
-            szetvalaszt_fv(&vertices[i], &vertices[0]);
+            separate_two_stacked_vertices(&vertices[i], &vertices[0]);
         }
     }
 }
@@ -418,25 +417,25 @@ void polygon::separate_stacked_vertices(void) {
 int polygon::is_clockwise(void) {
 #ifdef DEBUG
     if (is_grass) {
-        internal_error("d6f65");
+        internal_error("polygon::is_clockwise grass has no orientation!");
     }
 #endif
 
     // Sorban osszeadjuk belso szogeket:
     double sum = 0.0;
     for (int i = 0; i < vertex_count - 2; i++) {
-        sum += balszog(&vertices[i], vertices[i + 1], vertices[i + 2]);
+        sum += get_and_fix_angle(&vertices[i], vertices[i + 1], vertices[i + 2]);
     }
-    sum += balszog(&vertices[vertex_count - 2], vertices[vertex_count - 1], vertices[0]);
-    sum += balszog(&vertices[vertex_count - 1], vertices[0], vertices[1]);
-    double maradek = sum - vertex_count * K_pi;
-    if (fabs(fabs(maradek) - 2 * K_pi) > 0.1) {
+    sum += get_and_fix_angle(&vertices[vertex_count - 2], vertices[vertex_count - 1], vertices[0]);
+    sum += get_and_fix_angle(&vertices[vertex_count - 1], vertices[0], vertices[1]);
+    double normalized_angle = sum - vertex_count * K_pi;
+    if (fabs(fabs(normalized_angle) - 2 * K_pi) > 0.1) {
         /*char tmp[100];
-        sprintf( tmp, "Nagy az elteres, x100 = %d!", int(fabs( fabs( maradek ) - 2*K_pi )*100) );
-        dialog( tmp );*/
+        sprintf( tmp, "Nagy az elteres, x100 = %d!", int(fabs( fabs( normalized_angle ) - 2*K_pi
+        )*100) ); dialog( tmp );*/
         return 0; // Ilyenkor biztos hogy van egymast metszo ket vonal
     }
-    if (maradek > 0.0) {
+    if (normalized_angle > 0.0) {
         return 0;
     } else {
         return 1;
@@ -444,12 +443,12 @@ int polygon::is_clockwise(void) {
 }
 
 vect2 polygon::center(void) {
-    vect2 suly(0.0, 0.0);
+    vect2 centerpoint(0.0, 0.0);
     for (int i = 0; i < vertex_count; i++) {
-        suly = suly + vertices[i];
+        centerpoint = centerpoint + vertices[i];
     }
-    suly = suly * (1.0 / vertex_count);
-    return suly;
+    centerpoint = centerpoint * (1.0 / vertex_count);
+    return centerpoint;
 }
 
 void polygon::update_boundaries(double* x1, double* y1, double* x2, double* y2) {
@@ -472,12 +471,12 @@ void polygon::update_boundaries(double* x1, double* y1, double* x2, double* y2) 
 }
 
 double polygon::checksum(void) {
-    double belyeg = 0;
+    double sum = 0;
     for (int i = 0; i < vertex_count; i++) {
-        belyeg += vertices[i].x;
-        belyeg += vertices[i].y;
+        sum += vertices[i].x;
+        sum += vertices[i].y;
     }
-    return belyeg;
+    return sum;
 }
 
 /*void set_gyuru_attributes( polygon* pgy ) {

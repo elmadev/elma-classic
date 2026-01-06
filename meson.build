@@ -35,7 +35,7 @@ elma_sources = files(
     'H_WAV.CPP',
     'JATEKOS.CPP',
     'KIRAJ320.CPP',
-    'KISKEP.CPP',
+    'affine_pic.cpp',
     'grass.cpp',
     'KOZOS.CPP',
     'LEJATSZO.CPP',

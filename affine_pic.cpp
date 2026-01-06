@@ -1,5 +1,5 @@
+#include "affine_pic.h"
 #include "ALL.H"
-#include "KISKEP.H"
 #include "pic8.h"
 
 // Create a picture that may be rotated and stretched.

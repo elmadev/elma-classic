@@ -1,5 +1,5 @@
-#ifndef KISKEP_H
-#define KISKEP_H
+#ifndef AFFINE_PIC_H
+#define AFFINE_PIC_H
 
 class pic8;
 

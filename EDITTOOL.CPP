@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "GYURU.H"
 #include "LGRFILE.H"
 #include "M_PIC.H"
 #include "menu_pic.h"

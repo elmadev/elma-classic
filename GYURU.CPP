@@ -1,3 +1,4 @@
+#include "GYURU.H"
 #include "ALL.H"
 
 gyuru::gyuru(void) {

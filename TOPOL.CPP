@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "best_times.h"
+#include "GYURU.H"
 #include "LGRFILE.H"
 #include "LOAD.H"
 #include "physics_init.h"

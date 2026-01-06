@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "GYURU.H"
 
 // Visszaadja, hogy volt-e hiba:
 int check_topology(int kelldialog) {

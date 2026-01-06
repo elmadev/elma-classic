@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "GYURU.H"
 
 static int Szakaszmaxszam = 5130;
 

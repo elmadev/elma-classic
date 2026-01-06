@@ -17,7 +17,7 @@ extern abc8 *Pabc1, *Pabc2;
 
 extern polygon* Pgy;
 extern int K;
-extern int Fel;
+extern bool Fel;
 
 extern kerek* Pker;
 

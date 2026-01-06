@@ -59,7 +59,7 @@ int check_topology(int kelldialog) {
                 for (int k = 0; k < MAXGYURU; k++) {
                     polygon* pgy2 = Ptop->ptomb[k];
                     if (pgy2 && !pgy2->is_grass) {
-                        int vanmetszes = 0;
+                        bool vanmetszes = false;
                         vect2 m;
                         if (pgy == pgy2) {
                             vanmetszes = pgy2->intersection_point(r, v, j, &m);

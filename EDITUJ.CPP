@@ -13,7 +13,7 @@ abc8 *Pabc1 = NULL, *Pabc2 = NULL;
 
 polygon* Pgy = NULL;
 int K = 0;
-int Fel = 0;
+bool Fel = false;
 
 kerek* Pker = NULL;
 
@@ -485,8 +485,8 @@ static void ujrarajzol(int egesz) {
     Ptop->kirajzol();
     if (Pgy) {
         // Atalakitjuk szaggatotta amit kell:
-        Pgy->render_one_line(K, Fel, 0);
-        Pgy->render_one_line(K, Fel, 1);
+        Pgy->render_one_line(K, Fel, false);
+        Pgy->render_one_line(K, Fel, true);
     }
 
     RedrawingEditor = 0;
@@ -636,7 +636,7 @@ void editor(void) {
     // Alaphelyzetbe allitunk egy-ket valtozot:
     Pgy = NULL;
     K = 0;
-    Fel = 0;
+    Fel = false;
 
     Pker = NULL;
     Psp = NULL;

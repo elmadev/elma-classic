@@ -6,7 +6,7 @@
 
 class topol;
 
-#define POLYGON_MAX_VERTICES (1000)
+constexpr int POLYGON_MAX_VERTICES = 1000;
 
 class polygon {
     int allocated_vertex_count;
@@ -17,18 +17,18 @@ class polygon {
     int is_grass; // int for read/write compatibility
 
     // Create a default polygon (New level polygon).
-    polygon(void);
+    polygon();
     polygon(FILE* h, int version);
-    ~polygon(void);
+    ~polygon();
 
-    int get_vertex_count(void);
+    int get_vertex_count();
     void save(FILE* h, topol* lev);
     void set_vertex(int v, double x, double y);
-    void render_one_line(int v, int forward, int dotted = 0);
-    void render_outline(void);
+    void render_one_line(int v, bool forward, bool dotted);
+    void render_outline();
     // Inserts a new vertex at `v`, duplicating the vertex at `v`.
     // Returns true if successful.
-    int insert_vertex(int v);
+    bool insert_vertex(int v);
     void delete_vertex(int v);
     // Return the distance of the closest vertex to
     // coordinates `x`, `y` and store the vertex number in
@@ -40,19 +40,19 @@ class polygon {
     // and stores in the intersection point in
     // `intersect_point`. Ignore the lines that connect to
     // index skip_v.
-    int intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect_point);
+    bool intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect_point);
     // Return true if a polygon is clockwise, or false if clockwise.
     // Returns false if polygon is self-intersecting.
     // This will also move vertices to fix angles that are too small.
-    int is_clockwise(void);
+    bool is_clockwise();
     // Return the centerpoint of a polygon.
-    vect2 center(void);
+    vect2 center();
     // Update the bounding box [x1, y1, x2, y2] so that it
     // contains all the points of this polygon.
     void update_boundaries(double* x1, double* y1, double* x2, double* y2);
-    double checksum(void);
+    double checksum();
     // Ensure that vertices are not stacked upon each other too closely.
-    void separate_stacked_vertices(void);
+    void separate_stacked_vertices();
 };
 
 #endif

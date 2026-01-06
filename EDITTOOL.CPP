@@ -273,15 +273,15 @@ void t_move_mmove(int mx, int my) {
     lockfrontbuffer_pic();
     if (Pgy) {
         // Letoroljuk oket:
-        Pgy->render_one_line(K, Fel, 0);
-        Pgy->render_one_line(K, !Fel, 0);
+        Pgy->render_one_line(K, Fel, false);
+        Pgy->render_one_line(K, !Fel, false);
         // Uj koord:
         double dx = pixel_to_meter_x(mx);
         double dy = pixel_to_meter_y(my);
         Pgy->set_vertex(K, dx, dy);
         // Visszarajzoljuk oket:
-        Pgy->render_one_line(K, Fel, 0);
-        Pgy->render_one_line(K, !Fel, 0);
+        Pgy->render_one_line(K, Fel, false);
+        Pgy->render_one_line(K, !Fel, false);
     } else {
         if (Pker) {
             Pker->kirajzol();
@@ -387,7 +387,7 @@ void t_create_vert_nyomva(int mx, int my) {
                 Pgy->vertices[1] = pixel_to_meter(mx, my);
                 Pgy->vertices[2] = pixel_to_meter(mx, my);
                 K = 2;
-                Fel = 1;
+                Fel = true;
                 Egypont = 0;
                 invalidate();
                 return;
@@ -496,15 +496,15 @@ void t_create_vert_mmove(int mx, int my) {
     lockfrontbuffer_pic();
     if (Pgy) {
         // Letoroljuk oket:
-        Pgy->render_one_line(K, Fel, 1); // szaggatott
-        Pgy->render_one_line(K, !Fel, 0);
+        Pgy->render_one_line(K, Fel, true); // szaggatott
+        Pgy->render_one_line(K, !Fel, false);
         // Uj koord:
         double dx = pixel_to_meter_x(mx);
         double dy = pixel_to_meter_y(my);
         Pgy->set_vertex(K, dx, dy);
         // Visszarajzoljuk oket:
-        Pgy->render_one_line(K, Fel, 1); // szaggatott
-        Pgy->render_one_line(K, !Fel, 0);
+        Pgy->render_one_line(K, Fel, true); // szaggatott
+        Pgy->render_one_line(K, !Fel, false);
         Moux = mx;
         Mouy = my;
     } else {

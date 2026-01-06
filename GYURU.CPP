@@ -4,8 +4,6 @@
 polygon::polygon(void) {
     vertex_count = 0;
     allocated_vertex_count = 10;
-
-    // Koveto valtozok:
     is_grass = 0;
 
     vertices = new vect2[allocated_vertex_count];
@@ -13,7 +11,6 @@ polygon::polygon(void) {
         vertices[i].x = 0;
         vertices[i].y = 0;
     }
-    // Most csak beteszunk harom pontot:
     vertices[0].x = -24;
     vertices[0].y = -8;
     vertices[1].x = 24;
@@ -45,10 +42,10 @@ void polygon::render_one_line(int v, int forward, int dotted) {
         internal_error("polygon::render_one_line v < 0 || v >= vertex_count!");
     }
     if ((forward && v == vertex_count - 1) || (!forward && v == 0)) {
-        // Elejet a vegevel kell osszekotni:
+        // Wrap around the first and last vertices
         render_line(vertices[vertex_count - 1], vertices[0], dotted);
     } else {
-        // Normal osszekotes:
+        // Normal case
         if (forward) {
             render_line(vertices[v], vertices[v + 1], dotted);
         } else {
@@ -67,7 +64,6 @@ void polygon::render_outline(void) {
     }
 }
 
-// k pont utan beszur egyet ugyanolyan koordokkal
 int polygon::insert_vertex(int v) {
     if (vertex_count + 1 > POLYGON_MAX_VERTICES) {
         dialog("You cannot add more points to this polygon!");
@@ -77,8 +73,8 @@ int polygon::insert_vertex(int v) {
         internal_error("polygon::insert_vertex v >= vertex_count!");
     }
 
+    // Reallocate more memory for new vertices
     if (vertex_count >= allocated_vertex_count) {
-        // Ujra fel kell venni pontok tombjet, csak most tobb ponttal:
         allocated_vertex_count += 10;
         vect2* new_vertices = new vect2[allocated_vertex_count];
         for (int i = 0; i < allocated_vertex_count; i++) {
@@ -93,6 +89,7 @@ int polygon::insert_vertex(int v) {
         vertices = new_vertices;
     }
 
+    // Duplicate the vertex
     for (int i = vertex_count - 1; i >= v; i--) {
         vertices[i + 1].x = vertices[i].x;
         vertices[i + 1].y = vertices[i].y;
@@ -143,11 +140,9 @@ int polygon::count_intersections(vect2 r1, vect2 v1) {
         double y1 = vertices[i].y;
         double x2, y2;
         if (i < vertex_count - 1) {
-            // Nem az utolso pont:
             x2 = vertices[i + 1].x;
             y2 = vertices[i + 1].y;
         } else {
-            // Az utolso pont:
             x2 = vertices[0].x;
             y2 = vertices[0].y;
         }
@@ -167,7 +162,7 @@ int polygon::intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect
     }
 #endif
 
-    // Eloszor felvesszuk allando szakasz min es max pontjait:
+    // Approximate the line r1->v1 as a box
     double minx;
     if (v1.x >= 0) {
         minx = r1.x;
@@ -180,7 +175,6 @@ int polygon::intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect
     } else {
         maxx = r1.x;
     }
-    // Y:
     double miny;
     if (v1.y >= 0) {
         miny = r1.y;
@@ -193,14 +187,13 @@ int polygon::intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect
     } else {
         maxy = r1.y;
     }
-
-    // Vegigmegyunk polygon pontjain:
+    // Check each line of the polygon for an intersection
     for (int i = 0; i < vertex_count; i++) {
+        // Skip index skip_v
         if (i == skip_v) {
             continue;
         }
-
-        // Szomszedos szakaszokat nem vizsgalunk:
+        // Skip index skip_v +- 1
         if (skip_v >= 0) {
             if (skip_v == 0) {
                 if (i == vertex_count - 1) {
@@ -227,22 +220,21 @@ int polygon::intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect
         double y1 = vertices[i].y;
         double x2, y2;
         if (i < vertex_count - 1) {
-            // Nem az utolso pont:
             x2 = vertices[i + 1].x;
             y2 = vertices[i + 1].y;
         } else {
-            // Az utolso pont:
             x2 = vertices[0].x;
             y2 = vertices[0].y;
         }
 
-        // Eloalltak masodik szakasz pontjai is, megnezzuk hatha annyira
-        // kilognak egymasbol, hogy rogton kizarhatjuk metszest:
+        // If the box of line x1y1 x2y2 doesn't intersect with the box of r1->v1, don't even bother
+        // checking for intersections
         if ((x1 < minx && x2 < minx) || (x1 > maxx && x2 > maxx) || (y1 < miny && y2 < miny) ||
             (y1 > maxy && y2 > maxy)) {
             continue;
         }
 
+        // Do a proper intersection check
         vect2 r2(x1, y1);
         vect2 v2 = vect2(x2, y2) - r2;
         if (segments_intersect_inexact(r1, v1, r2, v2)) {
@@ -261,7 +253,6 @@ polygon::polygon(FILE* h, int version) {
     vertices = NULL;
     is_grass = 0;
 
-    // Koveto valtozok:
     int deprecated_grass_feature = 0;
     int grass_feature = 0;
     if (version >= 8) {
@@ -276,6 +267,8 @@ polygon::polygon(FILE* h, int version) {
             internal_error("polygon::polygon: Failed to read file!");
         }
         if (!grass_feature && is_grass) {
+            // POT08-POT11 - no longer used - discard this data
+            // https://gitlab.com/sunlelma/VerzioPOTXX
             char unused[20];
             if (fread(unused, 1, 10, h) != 10) {
                 internal_error("polygon::polygon: Failed to read file!");
@@ -315,27 +308,21 @@ polygon::polygon(FILE* h, int version) {
 }
 
 void polygon::save(FILE* h, topol* lev) {
-    // Koveto reszek:
     if (fwrite(&is_grass, 1, 4, h) != 4) {
         internal_error("polygon::polygon: Failed to write file!");
     }
 
     if (!is_grass) {
-        // Ugy kell elmenteni, hogy ha sorban megyunk vegig pontokon,
-        // akkor mindig baloldalon legyen fold:
-        // Eloszor megnezzuk, hogy vonal ureg, vagy folddarab-e:
-        int sky = lev->levegoben(this); // Ha levegoben, akkor folddarab
+        // Swap orientation of polygon if necessary to correctly display as a ground or sky polygon
+        int sky = lev->levegoben(this);
 
         int clockwise = is_clockwise();
 
         int swap_orientation = (sky && !clockwise) || (!sky && clockwise);
 
-        swap_orientation = !swap_orientation; // mivel fejjel lefele fogjuk beolvasni
+        swap_orientation = !swap_orientation;
 
         if (swap_orientation) {
-            // dialog( "Most cserel." );
-
-            // Meg kell cserelni pontok sorrendjet:
             for (int i = 0; i < vertex_count / 2; i++) {
                 int j = vertex_count - 1 - i;
                 vect2 tmpv = vertices[i];
@@ -345,7 +332,6 @@ void polygon::save(FILE* h, topol* lev) {
         }
     }
 
-    // Itt jon a mentes lenyegeben:
     if (fwrite(&vertex_count, 1, sizeof(vertex_count), h) != sizeof(vertex_count)) {
         internal_error("polygon::polygon: Failed to write file!");
     }
@@ -354,24 +340,28 @@ void polygon::save(FILE* h, topol* lev) {
     }
 }
 
-// Visszaadja b pontban fekvo belso szoget, ha belso oldal bal oldal a, b, c
-// haladas eseten:
+// Disallow angle a->b->c to be less than 0.0000002 radians.
+// Move point a until the angle is greater than 0.0000002.
+// Returns the angle.
 static double get_and_fix_angle(vect2* a, vect2 b, vect2 c) {
     while (1) {
+        // a->b angle
         double dy1 = a->y - b.y;
         double dx1 = a->x - b.x;
         if (dy1 == 0.0 && dx1 == 0) {
-            // Ezt mar topologia check-ben meg kellett volna szuntetni:
+            // Unable to calculate angle of a line of length 0
             internal_error("get_and_fix_angle dx1 and dy1 == 0.0!");
         }
         double angle1 = atan2(dy1, dx1);
+        // c->b angle
         double dy2 = c.y - b.y;
         double dx2 = c.x - b.x;
         if (dy2 == 0.0 && dx2 == 0) {
-            // Ezt mar topologia check-ben meg kellett volna szuntetni:
+            // Unable to calculate angle of a line of length 0
             internal_error("get_and_fix_angle dx2 and dy2 == 0.0!");
         }
         double angle2 = atan2(dy2, dx2);
+        // Real angle
         double angle = angle1 - angle2;
         if (angle < 0) {
             angle += 2 * K_pi;
@@ -380,24 +370,24 @@ static double get_and_fix_angle(vect2* a, vect2 b, vect2 c) {
             angle -= 2 * K_pi;
         }
         if (angle < 0.0000002) {
-            // Szog tul hegyes, egyik pontjat arrebb rakjuk:
+            // Move a perpendicularly to the line
             constexpr double displacement = 0.0002;
             vect2 perpendicular = *a - b;
             perpendicular = rotate_90deg(perpendicular);
             perpendicular.normalize();
             *a = *a + perpendicular * displacement;
-            // dialog( "Arrebb raktuk!" );
-
             continue;
         }
         return angle;
     }
 }
 
+// If two points are too close, randomly move the first
+// point until minimum separation is achieved This is
+// because lines of length 0 result in undefined angles.
 static void separate_two_stacked_vertices(vect2* a, vect2* b) {
     constexpr double displacement = 0.0002;
     if (fabs(a->x - b->x) < 0.0000002 && fabs(a->y - b->y) < 0.0000002) {
-        // Egy helyen vannak:
         a->x += displacement + displacement * random_range(1000) / 1200.0;
         a->y += displacement + displacement * random_range(1000) / 1200.0;
     }
@@ -413,31 +403,34 @@ void polygon::separate_stacked_vertices(void) {
     }
 }
 
-// akkor ad igazat, ha korbejaraskor poligon belseje bal oldalon van;
+// The function would seem like it actually checks if a
+// polygon is counter-clockwise, but the y-axis is inverted
+// (negative y is up).
 int polygon::is_clockwise(void) {
 #ifdef DEBUG
     if (is_grass) {
         internal_error("polygon::is_clockwise grass has no orientation!");
     }
 #endif
-
-    // Sorban osszeadjuk belso szogeket:
+    // Calculate the sum of all angles (fixing too narrow angles at the same time)
     double sum = 0.0;
     for (int i = 0; i < vertex_count - 2; i++) {
         sum += get_and_fix_angle(&vertices[i], vertices[i + 1], vertices[i + 2]);
     }
     sum += get_and_fix_angle(&vertices[vertex_count - 2], vertices[vertex_count - 1], vertices[0]);
     sum += get_and_fix_angle(&vertices[vertex_count - 1], vertices[0], vertices[1]);
+    // Check the orientation of the polygon
     double normalized_angle = sum - vertex_count * K_pi;
     if (fabs(fabs(normalized_angle) - 2 * K_pi) > 0.1) {
-        /*char tmp[100];
-        sprintf( tmp, "Nagy az elteres, x100 = %d!", int(fabs( fabs( normalized_angle ) - 2*K_pi
-        )*100) ); dialog( tmp );*/
-        return 0; // Ilyenkor biztos hogy van egymast metszo ket vonal
+        // Angle !~= 2*Pi
+        // Probably a self-intersecting polygon, return false for fun
+        return 0;
     }
     if (normalized_angle > 0.0) {
+        // Angle ~= 2*Pi, counter-clockwise
         return 0;
     } else {
+        // Angle ~= -2*Pi, clockwise
         return 1;
     }
 }
@@ -478,18 +471,3 @@ double polygon::checksum(void) {
     }
     return sum;
 }
-
-/*void set_gyuru_attributes( polygon* pgy ) {
-    Valtozott = 1;
-    if( pgy->is_grass ) {
-        pgy->is_grass = 0;
-    }
-    else {
-        pgy->is_grass = 1;
-        strcpy( pgy->kovetonev, "noname" );
-        strcpy( pgy->alsotexturanev, "diam1_1" );
-        strcpy( pgy->felsotexturanev, "elso_n_1" );
-        pgy->tavolsag = 100;
-        pgy->hatarol = 0; // Nem hatarolt
-    }
-}*/

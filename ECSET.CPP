@@ -1110,11 +1110,11 @@ void ecset::addkovetok(int fazis) {
         return;
     }
     for (int i = 0; i < MAXGYURU; i++) {
-        gyuru* pgy = Ptop->ptomb[i];
+        polygon* pgy = Ptop->ptomb[i];
         if (!pgy) {
             return;
         }
-        if (!pgy->koveto) {
+        if (!pgy->is_grass) {
             continue;
         }
 

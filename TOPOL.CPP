@@ -511,7 +511,7 @@ topol::topol(void) {
 
     memset(&idok, 0, sizeof(idok));
 
-    ptomb[0] = new gyuru;
+    ptomb[0] = new polygon;
     kerektomb[0] = new kerek(-2, 0.5, T_CEL);
     kerektomb[1] = new kerek(2, 0.5, T_KEZDO);
     strcpy(levelname, "Unnamed");
@@ -651,13 +651,13 @@ int topol::pic_selejtez(lgrfile* plgr) {
     return volttorles;
 }
 
-gyuru* topol::legkozpont(double x, double y, int* pk, double* ptav, gyuru* kimarad) {
+polygon* topol::legkozpont(double x, double y, int* pk, double* ptav, polygon* kimarad) {
     if (ptav) {
         *ptav = 1000000000.0;
     }
 
     double tav = 1000000.0;
-    gyuru* pgy = NULL;
+    polygon* pgy = NULL;
     for (int i = 0; i < MAXGYURU; i++) {
         if (!ptomb[i]) {
             continue;
@@ -665,15 +665,15 @@ gyuru* topol::legkozpont(double x, double y, int* pk, double* ptav, gyuru* kimar
         if (ptomb[i] == kimarad) {
             continue;
         }
-        if (ptomb[i]->koveto && !Rajzolkoveto) {
+        if (ptomb[i]->is_grass && !Rajzolkoveto) {
             continue;
         }
-        if (!ptomb[i]->koveto && !Rajzolpoligon) {
+        if (!ptomb[i]->is_grass && !Rajzolpoligon) {
             continue;
         }
 
         int ujk;
-        double ujtav = ptomb[i]->legkozpont(x, y, &ujk);
+        double ujtav = ptomb[i]->get_closest_vertex(x, y, &ujk);
         if (ujtav < tav) {
             tav = ujtav;
             *pk = ujk;
@@ -750,15 +750,15 @@ sprite* topol::legkozsprite(double x, double y, double* ptav) {
 void topol::kirajzol(void) {
     for (int i = 0; i < MAXGYURU; i++) {
         if (ptomb[i]) {
-            if (ptomb[i]->koveto) {
+            if (ptomb[i]->is_grass) {
                 // Kovetok:
                 if (Rajzolkoveto) {
-                    ptomb[i]->osszrajz();
+                    ptomb[i]->render_outline();
                 }
             } else {
                 // Normal poligonok:
                 if (Rajzolpoligon) {
-                    ptomb[i]->osszrajz();
+                    ptomb[i]->render_outline();
                 }
             }
         }
@@ -778,14 +778,14 @@ void topol::kirajzol(void) {
 }
 
 // Igaz, ha bent van:
-int topol::levegoben(gyuru* pgy, vect2* pr) {
+int topol::levegoben(polygon* pgy, vect2* pr) {
     if ((pgy && pr) || (!pgy && !pr)) {
         internal_error("topol::levegoben-ben paramok nem stimmelnek!");
     }
 
     vect2 r;
     if (pgy) {
-        r = pgy->ponttomb[0]; // pgy->sulypont();
+        r = pgy->vertices[0]; // pgy->center();
     } else {
         r = *pr;
     }
@@ -793,8 +793,8 @@ int topol::levegoben(gyuru* pgy, vect2* pr) {
     // Vegigmegyunk az egeszen:
     int metszes = 0;
     for (int i = 0; i < MAXGYURU; i++) {
-        if (ptomb[i] && !ptomb[i]->koveto && ptomb[i] != pgy) {
-            metszes += ptomb[i]->metszesszam(r, v);
+        if (ptomb[i] && !ptomb[i]->is_grass && ptomb[i] != pgy) {
+            metszes += ptomb[i]->count_intersections(r, v);
         }
     }
     if (metszes % 2) {
@@ -1161,7 +1161,7 @@ void topol::loadkulso(const char* filenev) {
 
     // Beolvassa sok gyurut:
     for (int i = 0; i < gyuruszam; i++) {
-        ptomb[i] = new gyuru(h, verzio);
+        ptomb[i] = new polygon(h, verzio);
     }
 
     // Kerekek szama:
@@ -1415,7 +1415,7 @@ void topol::loadbelso(const char* filenev) {
 
     // Beolvassa sok gyurut:
     for (int i = 0; i < gyuruszam; i++) {
-        ptomb[i] = new gyuru(h, verzio);
+        ptomb[i] = new polygon(h, verzio);
     }
 
     // Beolvassa sok kereket:
@@ -1693,7 +1693,7 @@ void topol::getminmax(double* px1, double* py1, double* px2, double* py2, int ke
     *py2 = -100000000000.0;
     for (int i = 0; i < MAXGYURU; i++) {
         if (ptomb[i]) {
-            ptomb[i]->getminmax(px1, py1, px2, py2);
+            ptomb[i]->update_boundaries(px1, py1, px2, py2);
         }
     }
     if (kerekkel) {
@@ -1736,7 +1736,7 @@ double topol::belyegszamitas(int kellspriteis) {
     double belyeg = 0.0;
     for (int i = 0; i < MAXGYURU; i++) {
         if (ptomb[i]) {
-            belyeg += ptomb[i]->belyegszamitas();
+            belyeg += ptomb[i]->checksum();
         }
     }
     for (int i = 0; i < MAXKEREK; i++) {

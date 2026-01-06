@@ -1654,7 +1654,7 @@ void setspritetav(sprite* psp) {
     }
 }
 
-void set_gyuru_attributes(gyuru* pgy) {
+void set_gyuru_attributes(polygon* pgy) {
     invalidateegesz();
 
     // Koordok megadasa:
@@ -1672,7 +1672,7 @@ void set_gyuru_attributes(gyuru* pgy) {
     int kepvaltozott = 1;
     left_mouse_clicked();
 
-    int koveto = pgy->koveto;
+    int koveto = pgy->is_grass;
 
     while (1) {
         // Nezzuk gombokat:
@@ -1683,10 +1683,10 @@ void set_gyuru_attributes(gyuru* pgy) {
             }
             if (c == KEY_ENTER) {
                 // Meg van ismetelve OK-nal is lejjebb:
-                if (pgy->koveto != koveto) {
+                if (pgy->is_grass != koveto) {
                     Valtozott = 1;
                 }
-                pgy->koveto = koveto;
+                pgy->is_grass = koveto;
                 return;
             }
         }
@@ -1696,10 +1696,10 @@ void set_gyuru_attributes(gyuru* pgy) {
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
                 // Meg van ismetelve ENTER-nel is feljebb:
-                if (pgy->koveto != koveto) {
+                if (pgy->is_grass != koveto) {
                     Valtozott = 1;
                 }
-                pgy->koveto = koveto;
+                pgy->is_grass = koveto;
                 return;
             }
             if (is_in_box(Moux, Mouy, boxcancel)) {

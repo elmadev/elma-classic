@@ -1,10 +1,10 @@
 #ifndef TOPOL_H
 #define TOPOL_H
 
-class gyuru;
+class polygon;
 struct motorst;
 
-void set_gyuru_attributes(gyuru* pgy);
+void set_gyuru_attributes(polygon* pgy);
 
 #define MAXKEREK (52)
 
@@ -58,7 +58,7 @@ class sprite {
 
 #define MAXGYURU (300)
 
-typedef gyuru* ptrgyuru;
+typedef polygon* ptrgyuru;
 #define LEVELNAMEHOSSZ (50) // 13-as verzioig (14) volt
 
 class lgrfile;
@@ -100,7 +100,7 @@ class topol {
 
     // Igazzal ter vissza, ha volt valtozas:
     int pic_selejtez(lgrfile* plgr);
-    gyuru* legkozpont(double x, double y, int* pk, double* ptav = NULL, gyuru* kimarad = NULL);
+    polygon* legkozpont(double x, double y, int* pk, double* ptav = NULL, polygon* kimarad = NULL);
     kerek* legkozkerek(double x, double y, double* ptav = NULL);
     sprite* legkozsprite(double x, double y, double* ptav = NULL);
     // Ha saveidok hivja meg, csak akkor nem kell check:
@@ -109,7 +109,7 @@ class topol {
     void saveidok(const char* filenev);
     void kirajzol(void);
     // pgy levegoben van-e. Akkor folddarab:
-    int levegoben(gyuru* pgy, vect2* pr = NULL);
+    int levegoben(polygon* pgy, vect2* pr = NULL);
     void getminmax(double* px1, double* py1, double* px2, double* py2, int kerekkel);
 
     // Kerekkel kapcsolatos dolgok:

@@ -64,7 +64,7 @@ void t_move_nyomva(int mx, int my) {
             if (Pker) {
                 internal_error("iuofiuceyhbuc");
             }
-            Pgy->ponttomb[K] = pixel_to_meter(mx, my);
+            Pgy->vertices[K] = pixel_to_meter(mx, my);
             Pgy = NULL;
         } else {
             if (Pker) {
@@ -122,8 +122,8 @@ void t_move_nyomva(int mx, int my) {
         if (Pgy) {
             toolhelp("Move the vertex and press the left button to place it. Press ESC or right "
                      "button to cancel.");
-            Moveorigx = Pgy->ponttomb[K].x;
-            Moveorigy = Pgy->ponttomb[K].y;
+            Moveorigx = Pgy->vertices[K].x;
+            Moveorigy = Pgy->vertices[K].y;
             mx = meter_to_pixel_x(Moveorigx);
             my = meter_to_pixel_y(Moveorigy);
         } else {
@@ -161,11 +161,11 @@ void gany_move_jobb(int mx, int my) {
     double x = pixel_to_meter_x(mx);
     double y = pixel_to_meter_y(my);
     int ujk = 0;
-    gyuru* pujgy = Ptop->legkozpont(x, y, &ujk, &tav, Pgy);
+    polygon* pujgy = Ptop->legkozpont(x, y, &ujk, &tav, Pgy);
     if (!pujgy) {
         return;
     }
-    Pgy->ponttomb[K] = pujgy->ponttomb[ujk];
+    Pgy->vertices[K] = pujgy->vertices[ujk];
     Pgy = NULL;
     invalidate();
 }
@@ -185,7 +185,7 @@ void t_move_nyomva_jobb(int mx, int my) {
     double y = pixel_to_meter_y(my);
     sprite* psp = Ptop->legkozsprite(x, y, &tavsp);
     int semmi = 0;
-    gyuru* pgy = Ptop->legkozpont(x, y, &semmi, &tavgy);
+    polygon* pgy = Ptop->legkozpont(x, y, &semmi, &tavgy);
     kerek* pk = Ptop->legkozkerek(x, y, &tavker);
 
     if (!psp && !pgy && !pk) {
@@ -235,8 +235,8 @@ void t_move_nyomva_jobb(int mx, int my) {
 
 void t_move_esc(void) {
     if (Pgy) {
-        Pgy->ponttomb[K].x = Moveorigx;
-        Pgy->ponttomb[K].y = Moveorigy;
+        Pgy->vertices[K].x = Moveorigx;
+        Pgy->vertices[K].y = Moveorigy;
         Pgy = NULL;
         invalidate();
     }
@@ -273,15 +273,15 @@ void t_move_mmove(int mx, int my) {
     lockfrontbuffer_pic();
     if (Pgy) {
         // Letoroljuk oket:
-        Pgy->kirajz(K, Fel, 0);
-        Pgy->kirajz(K, !Fel, 0);
+        Pgy->render_one_line(K, Fel, 0);
+        Pgy->render_one_line(K, !Fel, 0);
         // Uj koord:
         double dx = pixel_to_meter_x(mx);
         double dy = pixel_to_meter_y(my);
-        Pgy->ujkoord(K, dx, dy);
+        Pgy->set_vertex(K, dx, dy);
         // Visszarajzoljuk oket:
-        Pgy->kirajz(K, Fel, 0);
-        Pgy->kirajz(K, !Fel, 0);
+        Pgy->render_one_line(K, Fel, 0);
+        Pgy->render_one_line(K, !Fel, 0);
     } else {
         if (Pker) {
             Pker->kirajzol();
@@ -351,22 +351,22 @@ void t_create_vert_nyomva(int mx, int my) {
             toolhelp("Click the left button to place point. SPACE and ENTER swaps. ESC or right "
                      "button cancels.");
             push();
-            Moux = meter_to_pixel_x(Pgy->ponttomb[K].x);
-            Mouy = meter_to_pixel_y(Pgy->ponttomb[K].y);
+            Moux = meter_to_pixel_x(Pgy->vertices[K].x);
+            Mouy = meter_to_pixel_y(Pgy->vertices[K].y);
             pop();
         }
     }
 
     if (Pgy) {
         // Most fogunk letenni uj pontot:
-        if (Pgy->getpontszam() >= MAXPONT) {
+        if (Pgy->get_vertex_count() >= POLYGON_MAX_VERTICES) {
             dialog("You cannot create a new vertex, because you have",
                    "already reached the maximum number of vertices in this polygon (1000)!");
             return;
         }
         toolhelp("Click the left button to place point. SPACE and ENTER swaps. ESC or right button "
                  "cancels.");
-        Pgy->beszur(K);
+        Pgy->insert_vertex(K);
         invalidate();
         if (Fel) {
             K++;
@@ -381,11 +381,11 @@ void t_create_vert_nyomva(int mx, int my) {
         }
         for (int i = 0; i < MAXGYURU; i++) {
             if (!Ptop->ptomb[i]) {
-                Pgy = Ptop->ptomb[i] = new gyuru;
-                Pgy->pontszam = 3;
-                Pgy->ponttomb[0] = pixel_to_meter(Epontx, Eponty);
-                Pgy->ponttomb[1] = pixel_to_meter(mx, my);
-                Pgy->ponttomb[2] = pixel_to_meter(mx, my);
+                Pgy = Ptop->ptomb[i] = new polygon;
+                Pgy->vertex_count = 3;
+                Pgy->vertices[0] = pixel_to_meter(Epontx, Eponty);
+                Pgy->vertices[1] = pixel_to_meter(mx, my);
+                Pgy->vertices[2] = pixel_to_meter(mx, my);
                 K = 2;
                 Fel = 1;
                 Egypont = 0;
@@ -393,7 +393,7 @@ void t_create_vert_nyomva(int mx, int my) {
                 return;
             }
         };
-        internal_error("Tul sok gyuru (iycriyfd)!");
+        internal_error("Tul sok polygon (iycriyfd)!");
     }
 }
 
@@ -408,7 +408,7 @@ void t_create_vert_esc(void) {
     alaphelp();
     if (Pgy) {
         // Pgy igaz, tehat egy pont meg van fogva, amit torlunk:
-        if (Pgy->getpontszam() <= 3) {
+        if (Pgy->get_vertex_count() <= 3) {
             // Egesz poligont toroljuk:
             // Eloszor egy kis ellenorzes:
             int gyuruszam = 0;
@@ -439,7 +439,7 @@ void t_create_vert_esc(void) {
             }
         } else {
             // Csak a pontot toroljuk:
-            Pgy->torol(K);
+            Pgy->delete_vertex(K);
             Pgy = NULL;
             K = 0;
             invalidate();
@@ -469,19 +469,19 @@ void t_create_vert_space(void) {
         // Lejjebb maszunk egy pontot:
         kkov--;
         if (kkov < 0) {
-            kkov = Pgy->pontszam - 1;
+            kkov = Pgy->vertex_count - 1;
         }
     } else {
         // Feljebb maszunk egy pontot:
         kkov++;
-        if (kkov >= Pgy->pontszam) {
+        if (kkov >= Pgy->vertex_count) {
             kkov = 0;
         }
     }
-    Pgy->ponttomb[K] = Pgy->ponttomb[kkov];
+    Pgy->vertices[K] = Pgy->vertices[kkov];
     K = kkov;
-    Moux = meter_to_pixel_x(Pgy->ponttomb[K].x);
-    Mouy = meter_to_pixel_y(Pgy->ponttomb[K].y);
+    Moux = meter_to_pixel_x(Pgy->vertices[K].x);
+    Mouy = meter_to_pixel_y(Pgy->vertices[K].y);
     set_mouse_position(Moux, Mouy);
     Fel = !Fel;
     invalidate();
@@ -496,15 +496,15 @@ void t_create_vert_mmove(int mx, int my) {
     lockfrontbuffer_pic();
     if (Pgy) {
         // Letoroljuk oket:
-        Pgy->kirajz(K, Fel, 1); // szaggatott
-        Pgy->kirajz(K, !Fel, 0);
+        Pgy->render_one_line(K, Fel, 1); // szaggatott
+        Pgy->render_one_line(K, !Fel, 0);
         // Uj koord:
         double dx = pixel_to_meter_x(mx);
         double dy = pixel_to_meter_y(my);
-        Pgy->ujkoord(K, dx, dy);
+        Pgy->set_vertex(K, dx, dy);
         // Visszarajzoljuk oket:
-        Pgy->kirajz(K, Fel, 1); // szaggatott
-        Pgy->kirajz(K, !Fel, 0);
+        Pgy->render_one_line(K, Fel, 1); // szaggatott
+        Pgy->render_one_line(K, !Fel, 0);
         Moux = mx;
         Mouy = my;
     } else {
@@ -534,22 +534,22 @@ void t_delete_vert_nyomva(int mx, int my) {
     double y = pixel_to_meter_y(my);
 
     int k = 0;
-    gyuru* pgy = Ptop->legkozpont(x, y, &k);
+    polygon* pgy = Ptop->legkozpont(x, y, &k);
     if (!pgy) {
         return;
     }
     // Talaltunk egy pontot, amit le kene torolni:
-    if (pgy->pontszam < 3) {
+    if (pgy->vertex_count < 3) {
         internal_error("yigfdsyhifeiu");
     }
-    if (pgy->pontszam == 3) {
+    if (pgy->vertex_count == 3) {
         // dialog( "You cannot delete this polygon, because every" );
         dialog("You cannot delete this vertex, because every polygon must",
                "have at least three vertices! If you want to delete the",
                "whole polygon, please select the DEL POLYGON tool!");
         return;
     }
-    pgy->torol(k);
+    pgy->delete_vertex(k);
     Valtozott = 1;
     invalidate();
 }
@@ -563,7 +563,7 @@ void t_delete_poly_nyomva(int mx, int my) {
     double y = pixel_to_meter_y(my);
 
     int k = 0;
-    gyuru* pgy = Ptop->legkozpont(x, y, &k);
+    polygon* pgy = Ptop->legkozpont(x, y, &k);
     if (!pgy) {
         return;
     }

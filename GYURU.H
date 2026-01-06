@@ -6,42 +6,42 @@
 
 class topol;
 
-#define MAXPONT (1000) // Ennyit csak akkor foglal le, ha kell
+#define POLYGON_MAX_VERTICES (1000) // Ennyit csak akkor foglal le, ha kell
 
-class gyuru {
+class polygon {
     int lefoglaltmaxpont;
 
   public:
-    int pontszam;
-    vect2* ponttomb;
+    int vertex_count;
+    vect2* vertices;
 
     // Koveto valtozok:
-    int koveto;
+    int is_grass;
 
     // Fuggvenyek:
-    gyuru(void);
-    gyuru(FILE* h, int kovetos);
-    ~gyuru(void);
+    polygon(void);
+    polygon(FILE* h, int version);
+    ~polygon(void);
 
-    int getpontszam(void);
-    void save(FILE* h, topol* ptop);
-    void ujkoord(int k, double x, double y);
-    void kirajz(int k, int fel, int szaggatott = 0);
-    void osszrajz(void);
+    int get_vertex_count(void);
+    void save(FILE* h, topol* lev);
+    void set_vertex(int v, double x, double y);
+    void render_one_line(int v, int forward, int dotted = 0);
+    void render_outline(void);
     // Sikeres-e azt adja vissza:
-    int beszur(int k); // k pont utan beszur egyet ugyanolyan koordokkal
-    void torol(int k);
-    double legkozpont(double x, double y, int* pk);
-    int metszesszam(vect2 r1, vect2 v1);
+    int insert_vertex(int v); // k pont utan beszur egyet ugyanolyan koordokkal
+    void delete_vertex(int v);
+    double get_closest_vertex(double x, double y, int* v);
+    int count_intersections(vect2 r1, vect2 v1);
     // Ez csak akkor tekinti metszesnek, ha nem csak eppen erintik egymast:
-    int metszeshely(vect2 r1, vect2 v1, int kihagy, vect2* pmetszes);
+    int intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect_point);
     // akkor ad igazat, ha korbejaraskor poligon belseje bal oldalon van;
-    int pozitivkorjaras(void);
-    vect2 sulypont(void);
+    int is_clockwise(void);
+    vect2 center(void);
     // Beadott px1, stb-bol indul ki:
-    void getminmax(double* px1, double* py1, double* px2, double* py2);
-    double belyegszamitas(void);
-    void szetvalaszt(void);
+    void update_boundaries(double* x1, double* y1, double* x2, double* y2);
+    double checksum(void);
+    void separate_stacked_vertices(void);
 };
 
 #endif

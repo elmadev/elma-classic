@@ -15,7 +15,7 @@ void seteditorpal(void); // Pal_editor-t hozza letre es allitja be
 class abc8;
 extern abc8 *Pabc1, *Pabc2;
 
-extern gyuru* Pgy;
+extern polygon* Pgy;
 extern int K;
 extern int Fel;
 

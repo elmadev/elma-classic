@@ -17,7 +17,7 @@ class grass {
     void add(pic8* pic, bool up);
 };
 
-bool create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_length, int* x0,
+bool create_grass_polygon_heightmap(polygon* poly, int* heightmap, int* heightmap_length, int* x0,
                                     int max_heightmap_length, vect2* origin);
 
 #endif

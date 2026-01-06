@@ -35,24 +35,24 @@ szakaszok::szakaszok(topol* ptop) {
 
     // Normal szakaszok beolvasasa:
     for (int i = 0; i < MAXGYURU; i++) {
-        gyuru* pgy = ptop->ptomb[i];
+        polygon* pgy = ptop->ptomb[i];
         if (!pgy) {
             continue;
         }
-        if (pgy->koveto) {
+        if (pgy->is_grass) {
             continue;
         }
-        for (int j = 0; j < pgy->pontszam; j++) {
+        for (int j = 0; j < pgy->vertex_count; j++) {
             if (szam >= Szakaszmaxszam) {
                 internal_error("szakaszok::szakaszok-ban z >= Szakaszmaxszam!");
             }
             vect2 r1, r2;
-            if (j < pgy->pontszam - 1) {
-                r1 = pgy->ponttomb[j];
-                r2 = pgy->ponttomb[j + 1];
+            if (j < pgy->vertex_count - 1) {
+                r1 = pgy->vertices[j];
+                r2 = pgy->vertices[j + 1];
             } else {
-                r1 = pgy->ponttomb[j];
-                r2 = pgy->ponttomb[0];
+                r1 = pgy->vertices[j];
+                r2 = pgy->vertices[0];
             }
             tomb[szam].r = r1;
             tomb[szam].v = r2 - r1;

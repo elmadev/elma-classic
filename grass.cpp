@@ -38,14 +38,14 @@ grass::~grass() {
 //
 // Returns the x value of the last pixel the height was
 // calculated for.
-static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, int* heightmap,
+static int grass_line_heightmap(polygon* poly, int v1, int v2, int* x0, int cur, int* heightmap,
                                 int max_heightmap_length, vect2* origin) {
-    if (v1 < 0 || v1 >= poly->pontszam || v2 < 0 || v2 >= poly->pontszam) {
+    if (v1 < 0 || v1 >= poly->vertex_count || v2 < 0 || v2 >= poly->vertex_count) {
         internal_error("grass_line_heightmap vertex out of bounds!");
     }
 
-    vect2 r1 = poly->ponttomb[v1];
-    vect2 r2 = poly->ponttomb[v2];
+    vect2 r1 = poly->vertices[v1];
+    vect2 r2 = poly->vertices[v2];
     // If the line goes towards the left, don't draw anything.
     if (r1.x > r2.x) {
         return cur;
@@ -116,17 +116,17 @@ static int grass_line_heightmap(gyuru* poly, int v1, int v2, int* x0, int cur, i
 }
 
 // Create a heightmap for `poly`.
-bool create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_length, int* x0,
+bool create_grass_polygon_heightmap(polygon* poly, int* heightmap, int* heightmap_length, int* x0,
                                     int max_heightmap_length, vect2* origin) {
     *heightmap_length = 0;
     double max_vertex_length = 0.0;
     int v1 = 0;
-    for (int i = 0; i < poly->pontszam; i++) {
+    for (int i = 0; i < poly->vertex_count; i++) {
         int j = i + 1;
-        if (j == poly->pontszam) {
+        if (j == poly->vertex_count) {
             j = 0;
         }
-        double length = fabs(poly->ponttomb[i].x - poly->ponttomb[j].x);
+        double length = fabs(poly->vertices[i].x - poly->vertices[j].x);
         if (length > max_vertex_length) {
             v1 = i;
             max_vertex_length = length;
@@ -138,10 +138,10 @@ bool create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_
 
     bool polygon_is_counterclockwise = true;
     int v2 = v1 + 1;
-    if (v2 == poly->pontszam) {
+    if (v2 == poly->vertex_count) {
         v2 = 0;
     }
-    if (poly->ponttomb[v1].x < poly->ponttomb[v2].x) {
+    if (poly->vertices[v1].x < poly->vertices[v2].x) {
         polygon_is_counterclockwise = false;
     }
 
@@ -149,24 +149,24 @@ bool create_grass_polygon_heightmap(gyuru* poly, int* heightmap, int* heightmap_
     int cur = -1;
     // Starting from the longest line, evaluate every line a
     // counterclockwise direction (left to right).
-    for (int i = 0; i < poly->pontszam - 1; i++) {
+    for (int i = 0; i < poly->vertex_count - 1; i++) {
         if (polygon_is_counterclockwise) {
             v1++;
-            if (v1 == poly->pontszam) {
+            if (v1 == poly->vertex_count) {
                 v1 = 0;
             }
             v2++;
-            if (v2 == poly->pontszam) {
+            if (v2 == poly->vertex_count) {
                 v2 = 0;
             }
         } else {
             v1--;
             if (v1 < 0) {
-                v1 = poly->pontszam - 1;
+                v1 = poly->vertex_count - 1;
             }
             v2--;
             if (v2 < 0) {
-                v2 = poly->pontszam - 1;
+                v2 = poly->vertex_count - 1;
             }
         }
 

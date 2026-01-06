@@ -7,26 +7,26 @@ int check_topology(int kelldialog) {
 
     // Eloszor egymason fekvo szomszedos pontokat valasztjuk szet:
     for (int i = 0; i < MAXGYURU; i++) {
-        gyuru* pgy = Ptop->ptomb[i];
+        polygon* pgy = Ptop->ptomb[i];
         if (pgy) {
-            pgy->szetvalaszt();
+            pgy->separate_stacked_vertices();
         }
     }
 
     // Most megszuntetjuk hegyes szogeket:
     for (int i = 0; i < MAXGYURU; i++) {
-        gyuru* pgy = Ptop->ptomb[i];
-        if (pgy && !pgy->koveto) {
-            pgy->pozitivkorjaras(); // Ez automatikusan megcsinalja:
+        polygon* pgy = Ptop->ptomb[i];
+        if (pgy && !pgy->is_grass) {
+            pgy->is_clockwise(); // Ez automatikusan megcsinalja:
         }
     }
 
     // Most megnezzuk, hogy nincs-e tul sok pont osszesen:
     int pontszam = 0;
     for (int i = 0; i < MAXGYURU; i++) {
-        gyuru* pgy = Ptop->ptomb[i];
+        polygon* pgy = Ptop->ptomb[i];
         if (pgy) {
-            pontszam += pgy->pontszam;
+            pontszam += pgy->vertex_count;
         }
     }
     if (pontszam > 5000) {
@@ -44,27 +44,27 @@ int check_topology(int kelldialog) {
 
     // Most megnezzuk, hogy nincsenek-e egymast metszo vonalak:
     for (int i = 0; i < MAXGYURU; i++) {
-        gyuru* pgy = Ptop->ptomb[i];
-        if (pgy && !pgy->koveto) {
-            for (int j = 0; j < pgy->pontszam; j++) {
-                vect2 r = pgy->ponttomb[j];
+        polygon* pgy = Ptop->ptomb[i];
+        if (pgy && !pgy->is_grass) {
+            for (int j = 0; j < pgy->vertex_count; j++) {
+                vect2 r = pgy->vertices[j];
                 vect2 v;
-                if (j == pgy->pontszam - 1) {
-                    v = pgy->ponttomb[0] - r;
+                if (j == pgy->vertex_count - 1) {
+                    v = pgy->vertices[0] - r;
                 } else {
-                    v = pgy->ponttomb[j + 1] - r;
+                    v = pgy->vertices[j + 1] - r;
                 }
                 // Megvan r, v szakasz, amirol el kell donteni, hogy van-e
                 // metszespontja akarmi massal:
                 for (int k = 0; k < MAXGYURU; k++) {
-                    gyuru* pgy2 = Ptop->ptomb[k];
-                    if (pgy2 && !pgy2->koveto) {
+                    polygon* pgy2 = Ptop->ptomb[k];
+                    if (pgy2 && !pgy2->is_grass) {
                         int vanmetszes = 0;
                         vect2 m;
                         if (pgy == pgy2) {
-                            vanmetszes = pgy2->metszeshely(r, v, j, &m);
+                            vanmetszes = pgy2->intersection_point(r, v, j, &m);
                         } else {
-                            vanmetszes = pgy2->metszeshely(r, v, -1, &m);
+                            vanmetszes = pgy2->intersection_point(r, v, -1, &m);
                         }
                         if (vanmetszes) {
                             if (kelldialog) {

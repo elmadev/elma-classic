@@ -11,7 +11,7 @@ topol* Ptop = NULL;
 
 abc8 *Pabc1 = NULL, *Pabc2 = NULL;
 
-gyuru* Pgy = NULL;
+polygon* Pgy = NULL;
 int K = 0;
 int Fel = 0;
 
@@ -485,8 +485,8 @@ static void ujrarajzol(int egesz) {
     Ptop->kirajzol();
     if (Pgy) {
         // Atalakitjuk szaggatotta amit kell:
-        Pgy->kirajz(K, Fel, 0);
-        Pgy->kirajz(K, Fel, 1);
+        Pgy->render_one_line(K, Fel, 0);
+        Pgy->render_one_line(K, Fel, 1);
     }
 
     RedrawingEditor = 0;

@@ -2,35 +2,35 @@
 #include "KISKEP.H"
 #include "pic8.h"
 
-kiskep::kiskep(const char* pic8nev, pic8* ppic) {
-    tomb = NULL;
-    if (!ppic) {
-        ppic = new pic8(pic8nev);
+affine_pic::affine_pic(const char* filename, pic8* pic) {
+    pixels = NULL;
+    if (!pic) {
+        pic = new pic8(filename);
     }
 
-    lyuk = ppic->gpixel(0, 0);
+    transparency = pic->gpixel(0, 0);
 
-    xsize = ppic->get_width();
-    ysize = ppic->get_height();
-    if (xsize > 255 || ysize > 255) {
-        internal_error("kiskepben size > 255!");
+    width = pic->get_width();
+    height = pic->get_height();
+    if (width > 255 || height > 255) {
+        internal_error("affine_pic size > 255!");
     }
-    hossz = ysize * 256l;
-    tomb = new unsigned char[unsigned(hossz)];
-    if (!tomb) {
-        external_error("memory!");
+    length = height * 256l;
+    pixels = new unsigned char[unsigned(length)];
+    if (!pixels) {
+        external_error("affine_pic out of memory!");
     }
-    for (int y = 0; y < ysize; y++) {
-        for (int x = 0; x < xsize; x++) {
-            tomb[y * 256 + x] = ppic->gpixel(x, y);
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            pixels[y * 256 + x] = pic->gpixel(x, y);
         }
     }
 
-    delete ppic;
+    delete pic;
 }
 
-kiskep::~kiskep(void) {
-    if (tomb) {
-        delete tomb;
+affine_pic::~affine_pic(void) {
+    if (pixels) {
+        delete pixels;
     }
 }

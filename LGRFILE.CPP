@@ -105,16 +105,16 @@ void loadlgrfile(const char* nev) {
     return;
 }
 
-static void chopdarab(pic8* pbiker, kiskep** ppkiskep, kisbox* pbox) {
+static void chopdarab(pic8* pbiker, affine_pic** ppkiskep, kisbox* pbox) {
     // kivag nagy.tga a.tga 272 275 347 334
     /*pic8* ppic = new pic8( 347 - 272 + 1, 334 - 275 + 1 );
     blit8( ppic, pbiker, -(272-260), -(275-260) );
-    pkepek->pkisa = new kiskep( NULL, ppic ); // ppic-et ez deleteli is
+    pkepek->pkisa = new affine_pic( NULL, ppic ); // ppic-et ez deleteli is
     */ // Eddig a regi volt
 
     pic8* ppic = new pic8(pbox->x2 - pbox->x1 + 1, pbox->y2 - pbox->y1 + 1);
     blit8(ppic, pbiker, -pbox->x1, -pbox->y1);
-    *ppkiskep = new kiskep(NULL, ppic); // ppic-et ez deleteli is
+    *ppkiskep = new affine_pic(NULL, ppic); // ppic-et ez deleteli is
 }
 
 void lgrfile::chopbiker(pic8* pbiker, motkepek* pkepek) {
@@ -130,7 +130,8 @@ void lgrfile::chopbiker(pic8* pbiker, motkepek* pkepek) {
     chopdarab(pbiker, &pkepek->pkisd, &KisboxD);
 
     // Most atlatszo szint pkisa alapjan osszesre beallitjuk:
-    pkepek->pkisb->lyuk = pkepek->pkisc->lyuk = pkepek->pkisd->lyuk = pkepek->pkisa->lyuk;
+    pkepek->pkisb->transparency = pkepek->pkisc->transparency = pkepek->pkisd->transparency =
+        pkepek->pkisa->transparency;
 }
 
 static pic8* kepetbovitvizszint(textura* pt) {
@@ -564,86 +565,86 @@ lgrfile::lgrfile(const char* lgrnev) {
 
         // 1. motoros reszei:
         if (strcmpi(nev, "q1body.pcx") == 0) {
-            // kiskep konstructor delete-eli ppic-t:
-            mkepek1.pkisvezeto = new kiskep(NULL, ppic);
+            // affine_pic konstructor delete-eli ppic-t:
+            mkepek1.pkisvezeto = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q1thigh.pcx") == 0) {
-            mkepek1.pkiscomb = new kiskep(NULL, ppic);
+            mkepek1.pkiscomb = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q1leg.pcx") == 0) {
-            mkepek1.pkislabszar = new kiskep(NULL, ppic);
+            mkepek1.pkislabszar = new affine_pic(NULL, ppic);
             continue;
         }
 
         if (strcmpi(nev, "q1wheel.pcx") == 0) {
-            mkepek1.pkiskerek = new kiskep(NULL, ppic);
+            mkepek1.pkiskerek = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q1susp1.pcx") == 0) {
-            mkepek1.pkiselsorud = new kiskep(NULL, ppic);
+            mkepek1.pkiselsorud = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q1susp2.pcx") == 0) {
-            mkepek1.pkishatsorud = new kiskep(NULL, ppic);
+            mkepek1.pkishatsorud = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q1forarm.pcx") == 0) {
-            mkepek1.pkisalkar = new kiskep(NULL, ppic);
+            mkepek1.pkisalkar = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q1up_arm.pcx") == 0) {
-            mkepek1.pkisfelkar = new kiskep(NULL, ppic);
+            mkepek1.pkisfelkar = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q1head.pcx") == 0) {
-            mkepek1.pkisfej = new kiskep(NULL, ppic);
+            mkepek1.pkisfej = new affine_pic(NULL, ppic);
             continue;
         }
 
         // 2. motoros reszei:
         if (strcmpi(nev, "q2body.pcx") == 0) {
-            // kiskep konstructor delete-eli ppic-t:
-            mkepek2.pkisvezeto = new kiskep(NULL, ppic);
+            // affine_pic konstructor delete-eli ppic-t:
+            mkepek2.pkisvezeto = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q2thigh.pcx") == 0) {
-            mkepek2.pkiscomb = new kiskep(NULL, ppic);
+            mkepek2.pkiscomb = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q2leg.pcx") == 0) {
-            mkepek2.pkislabszar = new kiskep(NULL, ppic);
+            mkepek2.pkislabszar = new affine_pic(NULL, ppic);
             continue;
         }
 
         if (strcmpi(nev, "q2wheel.pcx") == 0) {
-            mkepek2.pkiskerek = new kiskep(NULL, ppic);
+            mkepek2.pkiskerek = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q2susp1.pcx") == 0) {
-            mkepek2.pkiselsorud = new kiskep(NULL, ppic);
+            mkepek2.pkiselsorud = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q2susp2.pcx") == 0) {
-            mkepek2.pkishatsorud = new kiskep(NULL, ppic);
+            mkepek2.pkishatsorud = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q2forarm.pcx") == 0) {
-            mkepek2.pkisalkar = new kiskep(NULL, ppic);
+            mkepek2.pkisalkar = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q2up_arm.pcx") == 0) {
-            mkepek2.pkisfelkar = new kiskep(NULL, ppic);
+            mkepek2.pkisfelkar = new affine_pic(NULL, ppic);
             continue;
         }
         if (strcmpi(nev, "q2head.pcx") == 0) {
-            mkepek2.pkisfej = new kiskep(NULL, ppic);
+            mkepek2.pkisfej = new affine_pic(NULL, ppic);
             continue;
         }
 
         if (strcmpi(nev, "qflag.pcx") == 0) {
-            pkiszaszlo = new kiskep(NULL, ppic);
+            pkiszaszlo = new affine_pic(NULL, ppic);
             continue;
         }
 
@@ -982,7 +983,7 @@ static void deletemkepekstruct(motkepek* pk) {
     if (!pk->pkisvezeto || !pk->pkiscomb || !pk->pkislabszar || !pk->pkisa || !pk->pkisb ||
         !pk->pkisc || !pk->pkisd || !pk->pkiskerek || !pk->pkiselsorud || !pk->pkishatsorud ||
         !pk->pkisalkar || !pk->pkisfelkar || !pk->pkisfej) {
-        internal_error("deletemkepekstruct-ban ervenytelen valamelyik kiskep!");
+        internal_error("deletemkepekstruct-ban ervenytelen valamelyik affine_pic!");
     }
 
     delete pk->pkisvezeto;

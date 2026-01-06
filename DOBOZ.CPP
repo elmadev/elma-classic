@@ -69,8 +69,8 @@ void setaffinitas(vect2 kozep, vect2 irany, double nagysag, double aranyx, doubl
 
 // static unsigned char Egysor[400];
 
-void dobozki(pic8* ppic8, kiskep* pkiskep, vect2 u, vect2 v, vect2 r) {
-    unsigned char lyuk = pkiskep->lyuk;
+void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
+    unsigned char lyuk = pkiskep->transparency;
 
     // Affinitas:
     if (Affinitas) {
@@ -177,8 +177,8 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vect2 u, vect2 v, vect2 r) {
     }
 
     // Inverz matrix kiszamitasa:
-    vect2 uu = u * (1.0 / (pkiskep->xsize - 1));
-    vect2 vv = v * (1.0 / (pkiskep->ysize - 1));
+    vect2 uu = u * (1.0 / (pkiskep->width - 1));
+    vect2 vv = v * (1.0 / (pkiskep->height - 1));
     double recdet = 1.0 / (uu.x * vv.y - vv.x * uu.y);
     vect2 invi(vv.y * recdet, -uu.y * recdet);
     vect2 invj(-vv.x * recdet, uu.x * recdet);
@@ -366,7 +366,7 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vect2 u, vect2 v, vect2 r) {
                 unsigned char* cim = ppic8->get_row(ybal);
                 cim += xbal;
                 int xhossz = Cxsize - xbal;
-                egysor(lyuk, short(x2 - xbal + 1), cim, pkiskep->tomb, xkiskep, ykiskep, invix,
+                egysor(lyuk, short(x2 - xbal + 1), cim, pkiskep->pixels, xkiskep, ykiskep, invix,
                        inviy, xhossz);
             } else {
                 if (x1 > x2 + 1) {
@@ -415,7 +415,7 @@ void dobozki(pic8* ppic8, kiskep* pkiskep, vect2 u, vect2 v, vect2 r) {
                 }
                 unsigned char* cim = ppic8->get_row(ybal);
                 cim += xbal;
-                egysor(lyuk, short(x2 - x1 + 1), cim, pkiskep->tomb, xkiskep, ykiskep, invix,
+                egysor(lyuk, short(x2 - x1 + 1), cim, pkiskep->pixels, xkiskep, ykiskep, invix,
                        inviy);
             } else {
                 if (x1 > x2 + 1) {

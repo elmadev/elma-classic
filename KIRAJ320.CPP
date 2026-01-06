@@ -111,7 +111,7 @@ void forditkepet(pic8* ppic) {
 } */
 
 // Meg nem affin koordok:
-static void kidoboz(vect2 a, vect2 b, pic8* ppic8, double szelesseg, kiskep* pk, double tulloga,
+static void kidoboz(vect2 a, vect2 b, pic8* ppic8, double szelesseg, affine_pic* pk, double tulloga,
                     double tullogb, int tukor = 0) {
     vect2 vegys = unit_vector(b - a);
     b = b + vegys * tullogb;
@@ -136,7 +136,7 @@ static void kidoboz(vect2 a, vect2 b, pic8* ppic8, double szelesseg, kiskep* pk,
 
 // radius meg nincs megszorozva:
 // Meg nem affin koordok:
-static void kidobozkerek(vect2 r, double radius, double rotation, pic8* ppicbuffer, kiskep* pk,
+static void kidobozkerek(vect2 r, double radius, double rotation, pic8* ppicbuffer, affine_pic* pk,
                          int tukor = 0) {
     vect2 vfel(cos(rotation) * radius, sin(rotation) * radius);
     if (tukor) {
@@ -150,7 +150,7 @@ static double Mx = -1, My = -1;
 static vect2 Mi, Mj, Mr;
 static vect2 Miar, Mjar, Mrar; // Ezek meg vannak szorozva Aranyossaggal
 
-static void kitag(pic8* ppic8, kiskep* pk, kisbox* pb) {
+static void kitag(pic8* ppic8, affine_pic* pk, kisbox* pb) {
     vect2 r = Miar * (pb->x1 + 260 - Mx) + Mjar * (My - (pb->y1 + 260)) + Mrar;
     vect2 u = Miar * (pb->x2 - pb->x1);
     vect2 v = Mjar * (pb->y1 - pb->y2);

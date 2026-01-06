@@ -3,7 +3,7 @@
 
 class anim;
 class grass;
-class kiskep;
+class affine_pic;
 class palette;
 class pic8;
 class piclist;
@@ -48,16 +48,16 @@ struct textura {
 };
 
 struct motkepek {
-    kiskep *pkisa, *pkisb, *pkisc, *pkisd;
-    kiskep* pkisvezeto;
-    kiskep* pkiscomb;
-    kiskep* pkislabszar;
-    kiskep* pkiskerek;
-    kiskep* pkiselsorud;
-    kiskep* pkishatsorud;
-    kiskep* pkisalkar;
-    kiskep* pkisfelkar;
-    kiskep* pkisfej;
+    affine_pic *pkisa, *pkisb, *pkisc, *pkisd;
+    affine_pic* pkisvezeto;
+    affine_pic* pkiscomb;
+    affine_pic* pkislabszar;
+    affine_pic* pkiskerek;
+    affine_pic* pkiselsorud;
+    affine_pic* pkishatsorud;
+    affine_pic* pkisalkar;
+    affine_pic* pkisfelkar;
+    affine_pic* pkisfej;
 };
 
 #define MAXKOVETOK (20)
@@ -104,7 +104,7 @@ class lgrfile {
 
     motkepek mkepek1;
     motkepek mkepek2;
-    kiskep* pkiszaszlo;
+    affine_pic* pkiszaszlo;
 
     anim *pkiller, *pexit; // Nagy objektumok
     int foodszam;

@@ -2,14 +2,19 @@
 #include "KISKEP.H"
 #include "pic8.h"
 
+// Create a picture that may be rotated and stretched.
+// Provide either a filename or a pic8.
 affine_pic::affine_pic(const char* filename, pic8* pic) {
     pixels = NULL;
     if (!pic) {
         pic = new pic8(filename);
     }
 
+    // Transparency is hard-coded to the topleft
     transparency = pic->gpixel(0, 0);
 
+    // We pad each row to a length of 256 for faster rendering,
+    // so the max width is 255
     width = pic->get_width();
     height = pic->get_height();
     if (width > 255 || height > 255) {

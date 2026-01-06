@@ -5,7 +5,6 @@
 // Create a picture that may be rotated and stretched.
 // Provide either a filename or a pic8.
 affine_pic::affine_pic(const char* filename, pic8* pic) {
-    pixels = NULL;
     if (!pic) {
         pic = new pic8(filename);
     }
@@ -20,8 +19,9 @@ affine_pic::affine_pic(const char* filename, pic8* pic) {
     if (width > 255 || height > 255) {
         internal_error("affine_pic size > 255!");
     }
-    length = height * 256l;
-    pixels = new unsigned char[unsigned(length)];
+
+    int length = height * 256;
+    pixels = new unsigned char[length];
     if (!pixels) {
         external_error("affine_pic out of memory!");
     }
@@ -34,7 +34,7 @@ affine_pic::affine_pic(const char* filename, pic8* pic) {
     delete pic;
 }
 
-affine_pic::~affine_pic(void) {
+affine_pic::~affine_pic() {
     if (pixels) {
         delete pixels;
     }

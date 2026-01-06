@@ -7,10 +7,10 @@ class affine_pic {
   public:
     unsigned char transparency;
     unsigned char* pixels; // Every row right-padded to a width of 256
-    int width, height;
-    long length;
-    affine_pic(const char* filename, pic8* pic = NULL);
-    ~affine_pic(void);
+    int width;
+    int height;
+    affine_pic(const char* filename, pic8* pic);
+    ~affine_pic();
 };
 
 #endif

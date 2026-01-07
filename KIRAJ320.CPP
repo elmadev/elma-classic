@@ -631,7 +631,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             continue;
         }
 
-        pic8* pobjpic;
+        pic8* pobjpic = nullptr;
         int dy = 0;
         if (State->animated_objects) {
             switch (pker->tipus) {

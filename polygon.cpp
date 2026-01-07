@@ -245,8 +245,6 @@ bool polygon::intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersec
     return false;
 }
 
-int polygon::get_vertex_count() { return vertex_count; }
-
 // Load a polygon from a file
 polygon::polygon(FILE* h, int version) {
     vertex_count = 0;

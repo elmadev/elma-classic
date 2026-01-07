@@ -19,7 +19,6 @@ class polygon {
     polygon(FILE* h, int version);
     ~polygon();
 
-    int get_vertex_count();
     void save(FILE* h, topol* lev);
     void set_vertex(int v, double x, double y);
     void render_one_line(int v, bool forward, bool dotted);

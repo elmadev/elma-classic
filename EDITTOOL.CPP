@@ -359,7 +359,7 @@ void t_create_vert_nyomva(int mx, int my) {
 
     if (Pgy) {
         // Most fogunk letenni uj pontot:
-        if (Pgy->get_vertex_count() >= MAX_VERTICES) {
+        if (Pgy->vertex_count >= MAX_VERTICES) {
             char tmp[100];
             sprintf(tmp, "already reached the maximum number of vertices in this level! (%d)",
                     MAX_VERTICES);
@@ -410,7 +410,7 @@ void t_create_vert_esc(void) {
     alaphelp();
     if (Pgy) {
         // Pgy igaz, tehat egy pont meg van fogva, amit torlunk:
-        if (Pgy->get_vertex_count() <= 3) {
+        if (Pgy->vertex_count <= 3) {
             // Egesz poligont toroljuk:
             // Eloszor egy kis ellenorzes:
             int gyuruszam = 0;

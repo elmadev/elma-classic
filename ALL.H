@@ -52,7 +52,7 @@
 #include "MAINMENU.H"
 #include "PLAY.H"
 
-#include "KOZOS.H"
+#include "platform_utils.h"
 
 #include "TOPOL.H"
 #include "EDITUJ.H"

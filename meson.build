@@ -37,7 +37,7 @@ elma_sources = files(
     'KIRAJ320.CPP',
     'affine_pic.cpp',
     'grass.cpp',
-    'KOZOS.CPP',
+    'platform_utils.cpp',
     'LEJATSZO.CPP',
     'LEPTET.CPP',
     'LGRFILE.CPP',

@@ -1,5 +1,5 @@
-#ifndef KOZOS_H
-#define KOZOS_H
+#ifndef PLATFORM_UTILS_H
+#define PLATFORM_UTILS_H
 
 #ifndef _WIN32
 #include <cstddef>

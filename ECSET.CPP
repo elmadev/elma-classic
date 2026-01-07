@@ -773,7 +773,7 @@ void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
         // Maszkos eljaras:
         while (pm->adatok[i].tipus != ME_SOREMELES) {
             if (pm->adatok[i].tipus == ME_TELI) {
-                addbytesor((unsigned char*)(index_t + 10), tavolsag, x1 + x,
+                addbytesor((unsigned char*)(pixelek_t)(index_t + 10), tavolsag, x1 + x,
                            x1 + x + pm->adatok[i].hossz - 1, y1 - y, fazis);
             }
             x += pm->adatok[i].hossz;
@@ -978,8 +978,8 @@ void ecset::kovetotextura(grass* pkov, int index, int xo, int yo, int fazis) {
             if (anyagszam <= 0) {
                 internal_error("8toiurtg");
             }
-            addbytesor((unsigned char*)(textindex + 10), tavolsag, xo + x, xo + x + anyagszam - 1,
-                       yo + y, fazis);
+            addbytesor((unsigned char*)(pixelek_t)(textindex + 10), tavolsag, xo + x,
+                       xo + x + anyagszam - 1, yo + y, fazis);
             x += anyagszam;
         }
     }
@@ -987,14 +987,14 @@ void ecset::kovetotextura(grass* pkov, int index, int xo, int yo, int fazis) {
     if (felso) {
         // Felso:
         for (int y = 0; y < QGRASS_EXTRA_HEIGHT; y++) {
-            addbytesor((unsigned char*)(textindex + 10), tavolsag, xo, xo + xsize - 1,
+            addbytesor((unsigned char*)(pixelek_t)(textindex + 10), tavolsag, xo, xo + xsize - 1,
                        yo + ysize + y, fazis);
         }
     } else {
         // Also:
         for (int y = 0; y < QGRASS_EXTRA_HEIGHT; y++) {
-            addbytesor((unsigned char*)(textindex + 10), tavolsag, xo, xo + xsize - 1, yo - 1 - y,
-                       fazis);
+            addbytesor((unsigned char*)(pixelek_t)(textindex + 10), tavolsag, xo, xo + xsize - 1,
+                       yo - 1 - y, fazis);
         }
     }
 }

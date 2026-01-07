@@ -66,6 +66,7 @@ elma_sources = files(
     'eol_settings.cpp',
     'hhigh.cpp',
     'keys.cpp',
+    'fs_utils.cpp',
 )
 
 cpp = meson.get_compiler('cpp')

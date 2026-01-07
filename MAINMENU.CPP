@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "best_times.h"
+#include "fs_utils.h"
 #include "LOAD.H"
 #include "menu_dialog.h"
 #include "menu_nav.h"

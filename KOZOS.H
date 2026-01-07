@@ -2,6 +2,7 @@
 #define KOZOS_H
 
 #ifndef _WIN32
+#include <cstddef>
 #include <sys/time.h>
 #endif
 
@@ -18,11 +19,6 @@ constexpr double TWO_PI = PI * 2.0;
 #define access _access
 #define strupr _strupr
 #endif
-
-typedef char finame[20];
-bool find_first(const char* pattern, char* filename_dest);
-bool find_next(char* filename_dest);
-void find_close();
 
 #ifndef _WIN32
 

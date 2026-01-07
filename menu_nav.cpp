@@ -1,5 +1,6 @@
 #include "menu_nav.h"
 #include "ALL.H"
+#include "fs_utils.h"
 #include "menu_pic.h"
 
 int NavEntriesLeftMaxLength = 1;

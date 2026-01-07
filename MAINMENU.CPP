@@ -106,7 +106,7 @@ void replay(void) {
     strcpy(NavEntriesLeft[0], "Randomizer");
 
     finame fname;
-    int done = find_first("rec/*.rec", fname);
+    bool done = find_first("rec/*.rec", fname);
     // Ez mindig eggyel tobb, mint valosag, mivel az elso
     // rubrika mindig 'Randomizer':
     int szamuk = 1;

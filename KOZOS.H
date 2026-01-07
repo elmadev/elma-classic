@@ -5,9 +5,9 @@
 #include <sys/time.h>
 #endif
 
-extern double PI;
-extern double HALF_PI;
-extern double TWO_PI;
+constexpr double PI = 3.141592;
+constexpr double HALF_PI = PI * 0.5;
+constexpr double TWO_PI = PI * 2.0;
 
 #define _fstrnicmp _strnicmp
 
@@ -20,9 +20,9 @@ extern double TWO_PI;
 #endif
 
 typedef char finame[20];
-int find_first(const char* pattern, char* filename_dest);
-int find_next(char* filename_dest);
-void find_close(void);
+bool find_first(const char* pattern, char* filename_dest);
+bool find_next(char* filename_dest);
+void find_close();
 
 #ifndef _WIN32
 

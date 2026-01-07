@@ -143,7 +143,7 @@ void tolt_open(void) {
         Soknev[i] = 0;
     }
     finame fname;
-    int done = find_first("lev/*.lev", fname);
+    bool done = find_first("lev/*.lev", fname);
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
@@ -313,7 +313,7 @@ void kivalasztkezdetit(void) {
         Soknev[i] = 0;
     }
     finame fname;
-    int done = find_first("lev/*.lev", fname);
+    bool done = find_first("lev/*.lev", fname);
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {
@@ -1284,7 +1284,7 @@ int tolt_picklgrfile(char* lgrnev) {
         Soknev[i] = 0;
     }
     finame fname;
-    int done = find_first("lgr/*.lgr", fname);
+    bool done = find_first("lgr/*.lgr", fname);
     int nevszam = 0;
     while (!done) {
         if (strlen(fname) > 14) {

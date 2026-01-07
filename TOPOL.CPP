@@ -93,7 +93,7 @@ void kiirdesceket(void) {
 void hakellmentbelleveket(void) {
 #ifdef BELSOTIR
     finame fname;
-    int done = find_first("lev/*.lev", fname);
+    bool done = find_first("lev/*.lev", fname);
     // Vegigmegyunk osszes lev file-on es kimentjuk oket belsokent:
     while (!done) {
         topol* ptop = new topol(fname);

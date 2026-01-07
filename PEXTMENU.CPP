@@ -108,7 +108,7 @@ static void abcberendez(int szam) {
 void playextmenu(void) {
     // Kiirjuk osszes lev file nevet ide:
     finame fname;
-    int done = find_first("lev/*.lev", fname);
+    bool done = find_first("lev/*.lev", fname);
     int szam = 0;
     while (!done) {
         char* filenev = fname;
@@ -118,7 +118,7 @@ void playextmenu(void) {
         done = find_next(fname);
         szam++;
         if (szam >= NavEntriesLeftMaxLength - 4) {
-            done = 1;
+            done = true;
         }
     }
 

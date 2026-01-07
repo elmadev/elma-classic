@@ -6,17 +6,13 @@
 #include <string>
 #endif
 
-double PI = 3.141592;
-double HALF_PI = PI * 0.5;
-double TWO_PI = PI * 2.0;
-
 constexpr int MAX_FILENAME_LEN = 8;
 static std::filesystem::directory_iterator CurrentIterator;
 static std::filesystem::directory_iterator EndIterator;
 static std::string CurrentExt;
 static bool FindInProgress = false;
 
-int find_first(const char* pattern, char* filename_dest) {
+bool find_first(const char* pattern, char* filename_dest) {
     if (FindInProgress) {
         internal_error("Called find_first while a find is already in progress!");
     }
@@ -27,13 +23,13 @@ int find_first(const char* pattern, char* filename_dest) {
     try {
         CurrentIterator = std::filesystem::directory_iterator(directory);
     } catch (const std::filesystem::filesystem_error&) {
-        return 1;
+        return true;
     }
 
     return find_next(filename_dest);
 }
 
-int find_next(char* filename_dest) {
+bool find_next(char* filename_dest) {
     if (!FindInProgress) {
         internal_error("Called find_next while no find is in progress!");
     }
@@ -48,7 +44,7 @@ int find_next(char* filename_dest) {
                 if (path.stem().generic_string().size() <= MAX_FILENAME_LEN) {
                     strcpy(filename_dest, filename.c_str());
                     ++CurrentIterator;
-                    return 0;
+                    return false;
                 }
             }
         }
@@ -56,10 +52,10 @@ int find_next(char* filename_dest) {
         ++CurrentIterator;
     }
 
-    return 1;
+    return true;
 }
 
-void find_close(void) {
+void find_close() {
     if (!FindInProgress) {
         internal_error("Called ficlose while no find is in progress!");
     }

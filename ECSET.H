@@ -24,7 +24,7 @@ class mdbiter {
 // Elso par strukturat be lehetne majd vinni cpp-be:
 
 #define PX_FOLD (1)
-#define PX_EG (NULL)
+#define PX_EG (0)
 #define PX_URES (2)
 
 struct mdarab {

@@ -1,5 +1,5 @@
 #include "ALL.H"
-#include "GYURU.H"
+#include "polygon.h"
 
 static int Szakaszmaxszam = 5130;
 

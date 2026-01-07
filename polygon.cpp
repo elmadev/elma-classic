@@ -1,4 +1,4 @@
-#include "GYURU.H"
+#include "polygon.h"
 #include "ALL.H"
 
 polygon::polygon(void) {

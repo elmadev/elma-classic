@@ -1,6 +1,6 @@
 #include "ALL.H"
 #include "best_times.h"
-#include "GYURU.H"
+#include "polygon.h"
 #include "LGRFILE.H"
 #include "LOAD.H"
 #include "physics_init.h"

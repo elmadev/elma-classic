@@ -3,7 +3,7 @@
 #include "anim.h"
 #include "eol_settings.h"
 #include "grass.h"
-#include "GYURU.H"
+#include "polygon.h"
 #include "LGRFILE.H"
 #include "menu_pic.h"
 #include "physics_init.h"

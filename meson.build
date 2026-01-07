@@ -31,7 +31,7 @@ elma_sources = files(
     'ball_handler.cpp',
     'ball.cpp',
     'ball_collision.cpp',
-    'GYURU.CPP',
+    'polygon.cpp',
     'H_WAV.CPP',
     'JATEKOS.CPP',
     'KIRAJ320.CPP',

@@ -1,6 +1,6 @@
 #include "ALL.H"
 #include "grass.h"
-#include "GYURU.H"
+#include "polygon.h"
 #include "physics_init.h"
 #include "pic8.h"
 

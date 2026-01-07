@@ -1,5 +1,5 @@
 #include "ALL.H"
-#include "GYURU.H"
+#include "polygon.h"
 
 // Visszaadja, hogy volt-e hiba:
 int check_topology(int kelldialog) {

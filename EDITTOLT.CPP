@@ -1,6 +1,6 @@
 #include "ALL.H"
 #include "abc8.h"
-#include "GYURU.H"
+#include "polygon.h"
 #include "LOAD.H"
 #include "LGRFILE.H"
 #include "M_PIC.H"

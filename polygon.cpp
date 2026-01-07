@@ -253,39 +253,12 @@ polygon::polygon(FILE* h, int version) {
     vertices = nullptr;
     is_grass = 0;
 
-    int deprecated_grass_feature = 0;
-    int grass_feature = 0;
-    if (version >= 8) {
-        deprecated_grass_feature = 1;
-    }
-    if (version >= 12) {
-        grass_feature = 1;
-    }
-
-    if (deprecated_grass_feature) {
+    if (version == 14) {
         if (fread(&is_grass, 1, sizeof(is_grass), h) != 4) {
             internal_error("polygon::polygon: Failed to read file!");
         }
-        if (!grass_feature && is_grass) {
-            // POT08-POT11 - no longer used - discard this data
-            // https://gitlab.com/sunlelma/VerzioPOTXX
-            char unused[20];
-            if (fread(unused, 1, 10, h) != 10) {
-                internal_error("polygon::polygon: Failed to read file!");
-            }
-            if (fread(unused, 1, 10, h) != 10) {
-                internal_error("polygon::polygon: Failed to read file!");
-            }
-            if (fread(unused, 1, 10, h) != 10) {
-                internal_error("polygon::polygon: Failed to read file!");
-            }
-            if (fread(unused, 1, 4, h) != 4) {
-                internal_error("polygon::polygon: Failed to read file!");
-            }
-            if (fread(unused, 1, 4, h) != 4) {
-                internal_error("polygon::polygon: Failed to read file!");
-            }
-        }
+    } else if (version != 6) {
+        internal_error("polygon::polygon unknown version!");
     }
 
     if (fread(&vertex_count, 1, sizeof(vertex_count), h) != 4) {

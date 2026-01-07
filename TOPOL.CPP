@@ -4,6 +4,7 @@
 #include "LGRFILE.H"
 #include "LOAD.H"
 #include "physics_init.h"
+#include "platform_utils.h"
 #include "qopen.h"
 
 #define DEFAULTSIZE (20.0)

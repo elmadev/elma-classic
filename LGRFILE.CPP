@@ -8,6 +8,7 @@
 #include "menu_pic.h"
 #include "pic8.h"
 #include "piclist.h"
+#include "platform_utils.h"
 
 /*void tesztloadlgr( void ) {
     int a = 1, b = 2, c = 4;

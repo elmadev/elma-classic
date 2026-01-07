@@ -7,6 +7,7 @@
 #include "LGRFILE.H"
 #include "M_PIC.H"
 #include "pic8.h"
+#include "platform_utils.h"
 #include "physics_init.h"
 #include "timer.h"
 

@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "pic8.h"
+#include "platform_utils.h"
 #include "qopen.h"
 
 void pic8::allocate(int w, int h) {

@@ -52,8 +52,6 @@
 #include "MAINMENU.H"
 #include "PLAY.H"
 
-#include "platform_utils.h"
-
 #include "TOPOL.H"
 #include "EDITUJ.H"
 #include "editor_dialog.h"

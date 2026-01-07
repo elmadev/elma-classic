@@ -1,6 +1,7 @@
 #include "SKIP.H"
 #include "ALL.H"
 #include "menu_pic.h"
+#include "platform_utils.h"
 
 int skippelheto(int level) {
     int maxskippelheto = 5;

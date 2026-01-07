@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "platform_utils.h"
 #include "qopen.h"
 
 void wav::lefoglal(void) {

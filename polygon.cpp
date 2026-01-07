@@ -1,5 +1,6 @@
 #include "polygon.h"
 #include "ALL.H"
+#include "platform_utils.h"
 
 polygon::polygon() {
     vertex_count = 0;

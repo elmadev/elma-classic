@@ -1,5 +1,8 @@
 * Version 1.4
 
+## Major Features
+* Polygons no longer have a per-polygon max vertex count. There is now only a maximum total vertex count for the entire level.
+
 ## Minor Features
 * Translate error messages to English
 * Improve picture loading speed by allocating all needed memory at once instead of allocating in blocks of 64 KB (DOS-era restriction)

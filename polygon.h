@@ -6,8 +6,6 @@
 
 class topol;
 
-constexpr int POLYGON_MAX_VERTICES = 1000;
-
 class polygon {
     int allocated_vertex_count;
 

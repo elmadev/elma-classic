@@ -1,7 +1,7 @@
 #include "ALL.H"
 #include "polygon.h"
 
-static int Szakaszmaxszam = 5130;
+static int Szakaszmaxszam = MAX_VERTICES + 130;
 
 szakaszok* Pszak = NULL;
 // szakaszok* Pszakt = NULL;

@@ -55,9 +55,8 @@ void polygon::render_one_line(int v, bool forward, bool dotted) {
 }
 
 void polygon::render_outline() {
-    if (vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES) {
-        internal_error(
-            "polygon::render_outline vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES!");
+    if (vertex_count < 3 || vertex_count > MAX_VERTICES) {
+        internal_error("polygon::render_outline vertex_count < 3 || vertex_count > MAX_VERTICES!");
     }
     for (int i = 0; i < vertex_count; i++) {
         render_one_line(i, 1, false);
@@ -65,7 +64,7 @@ void polygon::render_outline() {
 }
 
 bool polygon::insert_vertex(int v) {
-    if (vertex_count + 1 > POLYGON_MAX_VERTICES) {
+    if (vertex_count + 1 > MAX_VERTICES) {
         dialog("You cannot add more points to this polygon!");
         return false;
     }
@@ -292,8 +291,8 @@ polygon::polygon(FILE* h, int version) {
     if (fread(&vertex_count, 1, sizeof(vertex_count), h) != 4) {
         internal_error("polygon::polygon: Failed to read file!");
     }
-    if (vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES) {
-        internal_error("polygon::polygon vertex_count < 3 || vertex_count > POLYGON_MAX_VERTICES!");
+    if (vertex_count < 3 || vertex_count > MAX_VERTICES) {
+        internal_error("polygon::polygon vertex_count < 3 || vertex_count > MAX_VERTICES!");
     }
     allocated_vertex_count = vertex_count + 10;
     vertices = new vect2[allocated_vertex_count];

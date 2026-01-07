@@ -29,12 +29,13 @@ int check_topology(int kelldialog) {
             pontszam += pgy->vertex_count;
         }
     }
-    if (pontszam > 5000) {
+    if (pontszam > MAX_VERTICES) {
         if (kelldialog) {
-            char tmp[100];
-            sprintf(tmp, "There are %d vertices now in the level.", pontszam);
-            dialog("Error: The number of vertices must be less than 5000!", tmp,
-                   "Please delete some vertices or polygons from this level!");
+            char tmp1[100];
+            char tmp2[100];
+            sprintf(tmp1, "Error: The number of vertices must be less than %d!", MAX_VERTICES);
+            sprintf(tmp2, "There are %d vertices now in the level.", pontszam);
+            dialog(tmp1, tmp2, "Please delete some vertices or polygons from this level!");
             invalidateegesz();
             return 1;
         } else {

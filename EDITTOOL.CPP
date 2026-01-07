@@ -359,9 +359,11 @@ void t_create_vert_nyomva(int mx, int my) {
 
     if (Pgy) {
         // Most fogunk letenni uj pontot:
-        if (Pgy->get_vertex_count() >= POLYGON_MAX_VERTICES) {
-            dialog("You cannot create a new vertex, because you have",
-                   "already reached the maximum number of vertices in this polygon (1000)!");
+        if (Pgy->get_vertex_count() >= MAX_VERTICES) {
+            char tmp[100];
+            sprintf(tmp, "already reached the maximum number of vertices in this level! (%d)",
+                    MAX_VERTICES);
+            dialog("You cannot create a new vertex, because you have", tmp);
             return;
         }
         toolhelp("Click the left button to place point. SPACE and ENTER swaps. ESC or right button "

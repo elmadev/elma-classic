@@ -7,6 +7,7 @@ struct motorst;
 void set_gyuru_attributes(polygon* pgy);
 
 #define MAXKEREK (52)
+constexpr int MAX_VERTICES = 5000;
 
 enum { T_CEL = 1, T_KAJA, T_HALALOS, T_KEZDO };
 enum { KT_NORMAL, KT_UP, KT_DOWN, KT_LEFT, KT_RIGHT };

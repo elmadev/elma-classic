@@ -688,11 +688,11 @@ lgrfile::lgrfile(const char* lgrnev) {
         }
 
         // Kovetok:
-        if (_fstrnicmp(nev, "qup_", 4) == 0) {
+        if (strnicmp(nev, "qup_", 4) == 0) {
             pkoveto->add(ppic, true);
             continue;
         }
-        if (_fstrnicmp(nev, "qdown_", 6) == 0) {
+        if (strnicmp(nev, "qdown_", 6) == 0) {
             pkoveto->add(ppic, false);
             continue;
         }

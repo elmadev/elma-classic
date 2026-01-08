@@ -10,11 +10,10 @@ constexpr double PI = 3.141592;
 constexpr double HALF_PI = PI * 0.5;
 constexpr double TWO_PI = PI * 2.0;
 
-#define _fstrnicmp _strnicmp
-
 #ifdef _WIN32
 #define itoa _itoa
 #define strcmpi _strcmpi
+#define strncmpi _strncmpi
 #define strlwr _strlwr
 #define access _access
 #define strupr _strupr
@@ -26,7 +25,6 @@ void itoa(int value, char* str, int base);
 
 int strcmpi(const char* a, const char* b);
 int strnicmp(const char* a, const char* b, size_t len);
-#define _strnicmp strnicmp
 
 void strupr(char* str);
 void strlwr(char* str);

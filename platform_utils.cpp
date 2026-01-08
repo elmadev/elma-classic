@@ -1,11 +1,8 @@
-#include "ALL.H"
 #ifndef _WIN32
 #include <assert.h>
 #include <cstring>
 #include <string>
-#endif
 
-#ifndef _WIN32
 void itoa(int value, char* str, int base) {
     assert(base == 10);
     std::string tmp2 = std::to_string(value);

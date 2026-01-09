@@ -1,6 +1,7 @@
 #include "EDITUJ.H"
 #include "ALL.H"
 #include "abc8.h"
+#include "EDITMENU.H"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
 #include "EDITTOLT.H"

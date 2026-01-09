@@ -53,7 +53,6 @@
 #include "PLAY.H"
 
 #include "TOPOL.H"
-#include "EDITMENU.H"
 
 #include "EDITHELP.H"
 #include "EDITPLAY.H"

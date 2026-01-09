@@ -33,8 +33,6 @@
 #include "HANG.H"
 #include "HANGHIGH.H"
 
-#include "state.h"
-
 #include "TELJES.H"
 
 #include "JATEKOS.H"

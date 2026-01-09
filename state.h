@@ -2,6 +2,7 @@
 #define STATE_H
 
 #include "keys.h"
+#include <stdio.h>
 
 constexpr int MAX_PLAYERS = 50;
 constexpr int MAX_PLAYERNAME_LENGTH = 14;

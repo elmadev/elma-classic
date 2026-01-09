@@ -1,3 +1,4 @@
+#include "state.h"
 #include "ALL.H"
 #include "best_times.h"
 #include "directinput_scancodes.h"

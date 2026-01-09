@@ -1,6 +1,8 @@
 #ifndef TOPOL_H
 #define TOPOL_H
 
+#include "state.h"
+
 class polygon;
 struct motorst;
 

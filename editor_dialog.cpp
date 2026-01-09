@@ -7,6 +7,7 @@
 #include "menu_pic.h"
 #include "pic8.h"
 #include "platform_utils.h"
+#include "state.h"
 
 bool InEditor = false;
 

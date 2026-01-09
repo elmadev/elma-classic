@@ -1,6 +1,7 @@
 #ifndef UTKOZES_H
 #define UTKOZES_H
 
+class vect2;
 struct vonal;
 
 // Talppontszamot adja vissza (0-2):

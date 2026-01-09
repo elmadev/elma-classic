@@ -20,7 +20,6 @@
 
 // #include	<graph.h>
 
-#include "vect2.h"
 #include "UTKOZES.H"
 
 #include "UTKOZES2.H"

@@ -1,3 +1,4 @@
+#include "vect2.h"
 #include "ALL.H"
 #include "main.h"
 

@@ -3,6 +3,7 @@
 #include "EDITUJ.H"
 #include "main.h"
 #include "physics_init.h"
+#include "vect2.h"
 
 int utkozikesprite(vect2 r, double sugar) {
     int balalsox, balalsoy;

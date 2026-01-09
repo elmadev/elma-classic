@@ -20,8 +20,6 @@
 
 // #include	<graph.h>
 
-#include "UTKOZES2.H"
-
 #include "LEJATSZO.H"
 
 // Kozos:

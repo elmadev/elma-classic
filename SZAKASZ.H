@@ -1,6 +1,8 @@
 #ifndef SZAKASZ_H
 #define SZAKASZ_H
 
+#include "vect2.h"
+
 struct vonal;
 
 struct vonalnode {

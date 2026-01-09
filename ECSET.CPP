@@ -10,6 +10,7 @@
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "pic8.h"
+#include "SZAKASZ.H"
 #include <cstdint>
 
 typedef uintptr_t pixelek_t;

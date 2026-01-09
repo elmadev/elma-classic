@@ -23,7 +23,6 @@
 #include "vect2.h"
 #include "UTKOZES.H"
 
-#include "SZAKASZ.H"
 #include "UTKOZES2.H"
 
 #include "LEJATSZO.H"

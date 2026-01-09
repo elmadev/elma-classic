@@ -1,3 +1,4 @@
+#include "SZAKASZ.H"
 #include "ALL.H"
 #include "main.h"
 #include "polygon.h"

@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "LGRFILE.H"
 #include "affine_pic.h"

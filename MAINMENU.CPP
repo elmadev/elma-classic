@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "best_times.h"
+#include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "fs_utils.h"
 #include "LOAD.H"

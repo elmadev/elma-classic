@@ -1,5 +1,6 @@
 #include "EDITTOOL.H"
 #include "ALL.H"
+#include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "polygon.h"
 #include "LGRFILE.H"

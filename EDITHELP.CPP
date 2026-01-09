@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "editor_dialog.h"
 
 void edithelp(void) {
     dialog("GENERAL HELP",

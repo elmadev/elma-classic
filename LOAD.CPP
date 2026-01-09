@@ -1,6 +1,7 @@
 #include "LOAD.H"
 #include "ALL.H"
 #include "ECSET.H"
+#include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "LGRFILE.H"
 #include "menu_pic.h"

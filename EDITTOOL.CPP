@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
+#include "EDITTOLT.H"
 #include "EDITUJ.H"
 #include "polygon.h"
 #include "LGRFILE.H"

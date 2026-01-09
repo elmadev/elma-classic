@@ -3,6 +3,7 @@
 #include "abc8.h"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
+#include "EDITTOLT.H"
 #include "EDITTOOL.H"
 #include "polygon.h"
 #include "LGRFILE.H"

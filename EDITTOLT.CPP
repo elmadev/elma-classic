@@ -1,3 +1,4 @@
+#include "EDITTOLT.H"
 #include "ALL.H"
 #include "abc8.h"
 #include "editor_canvas.h"

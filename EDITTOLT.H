@@ -1,6 +1,8 @@
 #ifndef EDITTOLT_H
 #define EDITTOLT_H
 
+class sprite;
+
 void tolt_open(void);
 // Ha sikeresen mentettek, akkor igazak:
 int tolt_save_as(int lokkolhato);

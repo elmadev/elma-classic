@@ -55,7 +55,6 @@
 #include "TOPOL.H"
 #include "editor_dialog.h"
 #include "editor_canvas.h"
-#include "EDITTOOL.H"
 #include "EDITMENU.H"
 #include "EDITTOLT.H"
 

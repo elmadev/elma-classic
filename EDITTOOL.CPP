@@ -1,3 +1,4 @@
+#include "EDITTOOL.H"
 #include "ALL.H"
 #include "EDITUJ.H"
 #include "polygon.h"

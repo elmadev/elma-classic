@@ -1,6 +1,7 @@
 #include "EDITUJ.H"
 #include "ALL.H"
 #include "abc8.h"
+#include "EDITTOOL.H"
 #include "polygon.h"
 #include "LGRFILE.H"
 #include "LOAD.H"

@@ -11,6 +11,7 @@
 #include "platform_utils.h"
 #include "physics_init.h"
 #include "SKIP.H"
+#include "TELJES.H"
 #include "timer.h"
 
 /*static void betuki( int oszlop, char c ) {

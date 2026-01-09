@@ -26,8 +26,6 @@
 #include "HANG.H"
 #include "HANGHIGH.H"
 
-#include "TELJES.H"
-
 #include "JATEKOS.H"
 #include "MAINMENU.H"
 #include "PLAY.H"

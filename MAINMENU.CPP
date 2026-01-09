@@ -10,6 +10,7 @@
 #include "menu_nav.h"
 #include "menu_options.h"
 #include "menu_pic.h"
+#include "TELJES.H"
 
 /*void showinstruct( void ) {
     blit8( Korny->picbuffer, Korny->ppic_help );

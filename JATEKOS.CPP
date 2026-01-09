@@ -2,6 +2,7 @@
 #include "main.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
+#include "TELJES.H"
 
 static int Maxnevhossz = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-nal!
 

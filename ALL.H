@@ -54,6 +54,4 @@
 
 #include "TOPOL.H"
 
-#include "EDITPLAY.H"
-
 #include "platform_impl.h"

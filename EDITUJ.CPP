@@ -6,6 +6,7 @@
 #include "EDITMENU.H"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
+#include "EDITPLAY.H"
 #include "EDITTOLT.H"
 #include "EDITTOOL.H"
 #include "polygon.h"

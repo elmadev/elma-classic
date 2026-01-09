@@ -24,8 +24,6 @@
 #include "LEPTET.H"
 #include "UTKOZES.H"
 
-#include "RECORDER.H"
-
 #include "SZAKASZ.H"
 #include "UTKOZES2.H"
 

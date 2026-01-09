@@ -1,6 +1,9 @@
 #ifndef RECORDER_H
 #define RECORDER_H
 
+#include "vect2.h"
+#include <stdio.h>
+
 struct motorst;
 
 struct hanginfo {

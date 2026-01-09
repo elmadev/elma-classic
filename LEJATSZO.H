@@ -1,6 +1,8 @@
 #ifndef LEJATSZO_H
 #define LEJATSZO_H
 
+#include "RECORDER.H"
+
 // Jatek modja ket fele lehet:
 extern int Single;
 extern int Tag; // Van-e fogocska

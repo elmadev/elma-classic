@@ -1,6 +1,8 @@
 #ifndef EDITOR_CANVAS_H
 #define EDITOR_CANVAS_H
 
+class vect2;
+
 constexpr int EDITOR_MENU_X = 107;
 constexpr int EDITOR_MENU_Y = 36;
 

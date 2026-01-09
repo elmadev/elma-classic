@@ -1,5 +1,6 @@
 #include "polygon.h"
 #include "ALL.H"
+#include "editor_canvas.h"
 #include "editor_dialog.h"
 #include "platform_utils.h"
 

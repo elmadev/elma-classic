@@ -1,3 +1,4 @@
+#include "editor_canvas.h"
 #include "ALL.H"
 #include "EDITUJ.H"
 #include "M_PIC.H"

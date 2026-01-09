@@ -26,8 +26,6 @@
 #include "HANG.H"
 #include "HANGHIGH.H"
 
-#include "PLAY.H"
-
 #include "TOPOL.H"
 
 #include "platform_impl.h"

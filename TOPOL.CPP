@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "best_times.h"
+#include "ED_CHECK.H"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
 #include "EDITTOLT.H"

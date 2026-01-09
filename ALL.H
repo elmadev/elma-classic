@@ -29,8 +29,6 @@
 
 // Kozos:
 
-#include "KIRAJZOL.H"
-
 #include "WAV.H"
 #include "HANG.H"
 #include "HANGHIGH.H"

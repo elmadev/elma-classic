@@ -6,6 +6,7 @@
 #include "anim.h"
 #include "ECSET.H"
 #include "grass.h"
+#include "KIRAJZOL.H"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"

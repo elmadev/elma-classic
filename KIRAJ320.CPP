@@ -1,3 +1,4 @@
+#include "KIRAJZOL.H"
 #include "ALL.H"
 #include "anim.h"
 #include "DOBOZ.H"

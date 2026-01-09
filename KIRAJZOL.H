@@ -2,6 +2,7 @@
 #define KIRAJZOL_H
 
 class pic8;
+struct valtozok;
 
 extern int Voltkilogas; // Csak tesztelesre
 

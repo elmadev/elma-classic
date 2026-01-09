@@ -4,6 +4,7 @@
 #include "ball_collision.h"
 #include "EDITUJ.H"
 #include "eol_settings.h"
+#include "JATEKOS.H"
 #include "LEJATSZO.H"
 #include "M_PIC.H"
 #include "main.h"

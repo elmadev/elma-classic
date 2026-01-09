@@ -1,6 +1,7 @@
 #include "menu_options.h"
 #include "ALL.H"
 #include "eol_settings.h"
+#include "JATEKOS.H"
 #include "LOAD.H"
 #include "menu_controls.h"
 #include "menu_nav.h"

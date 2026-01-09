@@ -21,7 +21,6 @@
 // #include	<graph.h>
 
 #include "vect2.h"
-#include "LEPTET.H"
 #include "UTKOZES.H"
 
 #include "SZAKASZ.H"

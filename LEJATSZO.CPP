@@ -2,6 +2,7 @@
 #include "directinput_scancodes.h"
 #include "EDITUJ.H"
 #include "flagtag.h"
+#include "LEPTET.H"
 #include "LGRFILE.H"
 #include "main.h"
 #include "physics_init.h"

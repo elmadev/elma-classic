@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "EDITUJ.H"
 #include <SDL.h>
 #include "scancodes_windows.h"
 

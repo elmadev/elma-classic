@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "best_times.h"
+#include "EDITUJ.H"
 #include "polygon.h"
 #include "LGRFILE.H"
 #include "LOAD.H"

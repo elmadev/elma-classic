@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "EDITUJ.H"
 #include "polygon.h"
 
 // Visszaadja, hogy volt-e hiba:

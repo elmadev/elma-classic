@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "EDITUJ.H"
 
 // igaz, ha kilep
 int menu_exit(void) {

@@ -1,7 +1,7 @@
 #include "ALL.H"
-#include <algorithm>
 #include "anim.h"
 #include "ECSET.H"
+#include "EDITUJ.H"
 #include "eol_settings.h"
 #include "flagtag.h"
 #include "LGRFILE.H"
@@ -10,6 +10,7 @@
 #include "platform_utils.h"
 #include "physics_init.h"
 #include "timer.h"
+#include <algorithm>
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
 

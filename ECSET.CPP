@@ -1,6 +1,7 @@
 #include "ECSET.H"
 #include "ALL.H"
 #include "anim.h"
+#include "EDITUJ.H"
 #include "eol_settings.h"
 #include "grass.h"
 #include "polygon.h"

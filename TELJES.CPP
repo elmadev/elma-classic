@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "abc8.h"
 #include "ball_collision.h"
+#include "EDITUJ.H"
 #include "eol_settings.h"
 #include "M_PIC.H"
 #include "menu_nav.h"

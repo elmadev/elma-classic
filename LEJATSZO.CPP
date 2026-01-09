@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
+#include "EDITUJ.H"
 #include "flagtag.h"
 #include "LGRFILE.H"
 #include "physics_init.h"

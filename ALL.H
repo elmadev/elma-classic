@@ -53,7 +53,6 @@
 #include "PLAY.H"
 
 #include "TOPOL.H"
-#include "EDITUJ.H"
 #include "editor_dialog.h"
 #include "editor_canvas.h"
 #include "EDITTOOL.H"

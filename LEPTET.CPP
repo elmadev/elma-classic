@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "EDITUJ.H"
 #include "physics_init.h"
 #include "physics_move.h"
 #include "platform_utils.h"

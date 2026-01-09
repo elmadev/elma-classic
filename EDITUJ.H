@@ -1,7 +1,12 @@
 #ifndef EDITUJ_H
 #define EDITUJ_H
 
+class abc8;
+class kerek;
 class palette;
+class polygon;
+class sprite;
+class topol;
 
 // Uj integralt editor h-ja:
 
@@ -12,7 +17,6 @@ extern topol* Ptop;
 extern palette* Pal_editor;
 void seteditorpal(void); // Pal_editor-t hozza letre es allitja be
 
-class abc8;
 extern abc8 *Pabc1, *Pabc2;
 
 extern polygon* Pgy;
@@ -57,7 +61,7 @@ void invalidateegesz(void);
 
 void editor(void);
 
-void toolhelp(const char* text = NULL);
+void toolhelp(const char* text = nullptr);
 
 #define SZ_ZOOMVONAL (90)
 

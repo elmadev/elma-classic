@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "EDITUJ.H"
 #include "polygon.h"
 #include "LGRFILE.H"
 #include "M_PIC.H"

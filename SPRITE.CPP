@@ -1,3 +1,4 @@
+#include "SPRITE.H"
 #include "ALL.H"
 #include "main.h"
 #include "pic8.h"

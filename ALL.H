@@ -20,8 +20,6 @@
 
 // #include	<graph.h>
 
-#include "SPRITE.H"
-
 #include "vect2.h"
 #include "LEPTET.H"
 #include "UTKOZES.H"

@@ -54,7 +54,6 @@
 
 #include "TOPOL.H"
 
-#include "EDITHELP.H"
 #include "EDITPLAY.H"
 #include "ED_CHECK.H"
 

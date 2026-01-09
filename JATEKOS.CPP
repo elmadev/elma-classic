@@ -10,7 +10,7 @@ static int Maxnevhossz = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-
 
 // Siker eseten igazzal ter vissza:
 static int bevesznevet(char* nev, int visszater) {
-    menu_pic szovlist;
+    menu_pic szovlist(false);
 
     int i = 0;
     empty_keypress_buffer();

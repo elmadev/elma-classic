@@ -3,6 +3,7 @@
 
 class affine_pic;
 class pic8;
+class vect2;
 
 void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r);
 

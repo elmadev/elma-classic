@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "anim.h"
+#include "DOBOZ.H"
 #include "ECSET.H"
 #include "EDITUJ.H"
 #include "eol_settings.h"

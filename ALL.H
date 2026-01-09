@@ -35,8 +35,6 @@
 #include "HANG.H"
 #include "HANGHIGH.H"
 
-#include "DOBOZ.H"
-
 #include "state.h"
 
 #include "TELJES.H"

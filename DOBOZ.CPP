@@ -1,3 +1,4 @@
+#include "DOBOZ.H"
 #include "ALL.H"
 #include "affine_pic.h"
 #include "pic8.h"

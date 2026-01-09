@@ -4,6 +4,7 @@
 #include "physics_init.h"
 #include "physics_move.h"
 #include "platform_utils.h"
+#include "UTKOZES.H"
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi, vect2 sebesseg);
 

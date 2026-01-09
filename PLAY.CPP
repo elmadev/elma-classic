@@ -3,6 +3,7 @@
 #include "best_times.h"
 #include "EDITUJ.H"
 #include "flagtag.h"
+#include "LEJATSZO.H"
 #include "LOAD.H"
 #include "main.h"
 #include "menu_nav.h"

@@ -6,6 +6,7 @@
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "flagtag.h"
+#include "LEJATSZO.H"
 #include "LGRFILE.H"
 #include "M_PIC.H"
 #include "main.h"

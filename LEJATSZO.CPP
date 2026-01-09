@@ -1,3 +1,4 @@
+#include "LEJATSZO.H"
 #include "ALL.H"
 #include "directinput_scancodes.h"
 #include "EDITUJ.H"

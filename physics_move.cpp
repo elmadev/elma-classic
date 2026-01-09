@@ -1,5 +1,6 @@
 #include "physics_move.h"
 #include "ALL.H"
+#include "LEJATSZO.H"
 #include "main.h"
 #include "physics_init.h"
 #include "UTKOZES.H"

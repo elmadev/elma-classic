@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "ECSET.H"
 #include "EDITUJ.H"
+#include "LEJATSZO.H"
 #include "main.h"
 #include "physics_init.h"
 #include "vect2.h"

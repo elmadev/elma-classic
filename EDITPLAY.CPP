@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "EDITTOLT.H"
 #include "EDITUJ.H"
+#include "LEJATSZO.H"
 #include "LOAD.H"
 
 void editplay(void) {

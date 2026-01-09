@@ -3,6 +3,7 @@
 #include "ball_collision.h"
 #include "EDITUJ.H"
 #include "eol_settings.h"
+#include "LEJATSZO.H"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_nav.h"

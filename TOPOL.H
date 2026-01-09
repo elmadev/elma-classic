@@ -2,6 +2,7 @@
 #define TOPOL_H
 
 #include "state.h"
+#include "vect2.h"
 
 class polygon;
 struct motorst;

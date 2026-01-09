@@ -20,8 +20,6 @@
 
 // #include	<graph.h>
 
-#include "LEJATSZO.H"
-
 // Kozos:
 
 #include "WAV.H"

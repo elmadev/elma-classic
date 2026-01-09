@@ -13,6 +13,7 @@
 #include "LGRFILE.H"
 #include "LOAD.H"
 #include "M_PIC.H"
+#include "main.h"
 #include "menu_pic.h"
 #include "pic8.h"
 #include "platform_utils.h"

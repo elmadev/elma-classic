@@ -1,5 +1,6 @@
 #include "menu_dialog.h"
 #include "ALL.H"
+#include "main.h"
 #include "menu_pic.h"
 
 // Display the menu with the provided text, then return the key pressed by the user.

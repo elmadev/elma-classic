@@ -4,6 +4,7 @@
 #include "anim.h"
 #include "ball.h"
 #include "M_PIC.H"
+#include "main.h"
 #include "pic8.h"
 
 // Drawing of the screen when there is no ball. Also used as generic buffer by editor.

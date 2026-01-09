@@ -4,6 +4,7 @@
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "M_PIC.H"
+#include "main.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
 #include "physics_init.h"

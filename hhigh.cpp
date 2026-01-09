@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "main.h"
 
 int Hangenabled = 0;
 

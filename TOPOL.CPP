@@ -8,6 +8,7 @@
 #include "polygon.h"
 #include "LGRFILE.H"
 #include "LOAD.H"
+#include "main.h"
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "qopen.h"

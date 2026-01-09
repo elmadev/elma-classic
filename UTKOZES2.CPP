@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "ECSET.H"
 #include "EDITUJ.H"
+#include "main.h"
 #include "physics_init.h"
 
 int utkozikesprite(vect2 r, double sugar) {

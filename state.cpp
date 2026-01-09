@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "best_times.h"
 #include "directinput_scancodes.h"
+#include "main.h"
 #include "menu_dialog.h"
 
 constexpr int STATE_VERSION = 200;

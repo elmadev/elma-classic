@@ -3,6 +3,7 @@
 #include "EDITUJ.H"
 #include "flagtag.h"
 #include "LGRFILE.H"
+#include "main.h"
 #include "physics_init.h"
 
 // Jatek modja ket fele lehet:

@@ -4,6 +4,7 @@
 #include "EDITUJ.H"
 #include "fs_utils.h"
 #include "LOAD.H"
+#include "main.h"
 #include "menu_dialog.h"
 #include "menu_nav.h"
 #include "menu_options.h"

@@ -4,6 +4,7 @@
 #include "EDITUJ.H"
 #include "flagtag.h"
 #include "LOAD.H"
+#include "main.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
 #include "platform_utils.h"

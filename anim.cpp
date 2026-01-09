@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "anim.h"
+#include "main.h"
 #include "pic8.h"
 
 anim::anim(pic8* source_sheet, const char* error_filename) {

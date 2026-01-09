@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
+#include "main.h"
 #include "platform_utils.h"
 
 polygon::polygon() {

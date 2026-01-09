@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "main.h"
 #include "pic8.h"
 
 #define MAXBUFFER (20000u)

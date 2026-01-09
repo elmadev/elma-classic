@@ -4,6 +4,7 @@
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "LGRFILE.H"
+#include "main.h"
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "platform_utils.h"

@@ -1,6 +1,7 @@
 #include "keys.h"
 #include "ALL.H"
 #include "directinput_scancodes.h"
+#include "main.h"
 
 constexpr int KeyBufferSize = 30;
 static int KeyBuffer[KeyBufferSize];

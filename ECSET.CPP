@@ -6,6 +6,7 @@
 #include "grass.h"
 #include "polygon.h"
 #include "LGRFILE.H"
+#include "main.h"
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "pic8.h"

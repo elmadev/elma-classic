@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "main.h"
 #include "piclist.h"
 #include "platform_utils.h"
 

@@ -7,6 +7,7 @@
 #include "ECSET.H"
 #include "grass.h"
 #include "M_PIC.H"
+#include "main.h"
 #include "menu_pic.h"
 #include "pic8.h"
 #include "piclist.h"

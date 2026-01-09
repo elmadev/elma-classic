@@ -20,7 +20,6 @@
 
 // #include	<graph.h>
 
-#include "main.h"
 #include "SPRITE.H"
 
 #include "vect2.h"

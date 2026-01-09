@@ -1,4 +1,5 @@
 #include "ALL.H"
+#include "main.h"
 #include "platform_utils.h"
 
 struct res_file {

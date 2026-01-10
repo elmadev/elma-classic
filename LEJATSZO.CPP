@@ -34,9 +34,6 @@ static void initsoundlejatszoban(void) {
     static int Hangmarmegy = 0;
     if (State->sound_on && !Hangmarmegy) {
         Hangmarmegy = 1;
-        SoundInitialized = true;
-
-        Mute = true;
         sound_engine_init();
     }
 }

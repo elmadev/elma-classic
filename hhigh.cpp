@@ -5,7 +5,6 @@
 #include "WAV.H"
 #include <cstring>
 
-bool SoundInitialized = false;
 bool Mute = true;
 
 constexpr int WAV_BANK_LENGTH = 20;
@@ -30,23 +29,11 @@ static int WavEventPlaybackIndex[MAX_WAV_EVENTS];
 static unsigned long WavEventVolume[MAX_WAV_EVENTS];
 static wav* WavEventSound[MAX_WAV_EVENTS];
 
-static int SoundEngineUninitialized = 1;
-
 // Load all sounds into memory
 void sound_engine_init() {
-    if (!SoundEngineUninitialized) {
-        internal_error("sound_engine_init !SoundEngineUninitialized!");
-    }
-    SoundEngineUninitialized = 0;
-    if (!SoundInitialized) {
-        return;
-    }
-
-    Mute = true;
     if (SoundEngineInitialized) {
-        internal_error("SoundEngineInitialized igaz sound_engine_init-ban!");
+        internal_error("sound_engine_init already initialized!");
     }
-    SoundEngineInitialized = true;
 
     // Load Wavbank
     for (int i = 0; i < WAV_BANK_LENGTH; i++) {
@@ -97,11 +84,12 @@ void sound_engine_init() {
         WavEventVolume[i] = 0;
         WavEventSound[i] = nullptr;
     }
-    Mute = false;
 
     // Change from across: lower the volume of idle motor
     // We could have directly done this above as the file was loaded, but we didn't
     SoundMotorIdle->hangero(0.4);
+
+    SoundEngineInitialized = true;
 }
 
 // Which sound the motor is currently generating
@@ -130,7 +118,7 @@ static motor_sound MotorSound2;
 
 // Set the playback speed of the bike gassing sound effect (capped between 1.0 and 2.0)
 void set_motor_frequency(bool is_motor1, double frequency, int gas) {
-    if (!SoundInitialized) {
+    if (!SoundEngineInitialized) {
         return;
     }
     motor_sound* mot = is_motor1 ? &MotorSound1 : &MotorSound2;
@@ -161,7 +149,7 @@ void set_friction_volume(double volume) {
 
 // Start a wavbank event
 void start_wav(WavEvent event, double volume) {
-    if (!SoundInitialized || Mute) {
+    if (!SoundEngineInitialized || Mute) {
         return;
     }
 
@@ -415,11 +403,10 @@ static void mix_friction(short* buffer, int buffer_length) {
 }
 
 void sound_mixer(short* buffer, int buffer_length) {
-    if (!SoundInitialized) {
-        internal_error("sound_mixer !SoundInitialized!");
-    }
-
     memset(buffer, 0, buffer_length * 2);
+    if (!SoundEngineInitialized) {
+        return;
+    }
     if (Mute || !State->sound_on) {
         if (ActiveWavEvents > 0) {
             ActiveWavEvents = 0;

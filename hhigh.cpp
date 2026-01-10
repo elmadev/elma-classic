@@ -22,9 +22,6 @@ static int WAV_FADE_LENGTH = 100, HARL_MAX_INDEX_1 = 7526, HARL_MAX_INDEX_2 = 34
 
 static double WAV_FADE_LENGTH_RECIPROCAL = 1.0 / WAV_FADE_LENGTH;
 
-// static int Buffsize = 500;
-static int Atmenet = 499;
-
 static int SoundEngineInitialized = 0;
 
 static int ActiveWavEvents = 0;
@@ -455,13 +452,6 @@ void sound_mixer(short* buffer, int buffer_length) {
             }
         }
         return;
-    }
-
-    if (Atmenet >= buffer_length) {
-        Atmenet = buffer_length - 1;
-    }
-    if (Atmenet < 20) {
-        internal_error("sound_mixer-ban buffer_length < 20!");
     }
 
     // Do both bike motor sounds, and then bike squeak sound

@@ -1,6 +1,8 @@
 #ifndef LGRFILE_H
 #define LGRFILE_H
 
+#include <cstdio>
+
 class anim;
 class grass;
 class affine_pic;

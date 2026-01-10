@@ -7,6 +7,7 @@
 #include "platform_utils.h"
 #include "state.h"
 #include "TELJES.H"
+#include "TOPOL.H"
 #include <stdlib.h>
 #include <string.h>
 

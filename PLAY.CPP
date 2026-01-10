@@ -13,6 +13,7 @@
 #include "physics_init.h"
 #include "SKIP.H"
 #include "TELJES.H"
+#include "TOPOL.H"
 #include "timer.h"
 #include <stdlib.h>
 #include <string.h>

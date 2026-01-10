@@ -13,6 +13,7 @@
 #include "pic8.h"
 #include "piclist.h"
 #include "platform_utils.h"
+#include "TOPOL.H"
 #include <string.h>
 
 /*void tesztloadlgr( void ) {

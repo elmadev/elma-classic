@@ -5,6 +5,7 @@
 #include "main.h"
 #include "menu_pic.h"
 #include "pic8.h"
+#include "TOPOL.H"
 #include <math.h>
 
 // If false, when drawing lines, immediately update the screen

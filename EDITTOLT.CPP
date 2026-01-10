@@ -13,6 +13,7 @@
 #include "pic8.h"
 #include "platform_utils.h"
 #include "polygon.h"
+#include "TOPOL.H"
 #include <string.h>
 
 constexpr unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;

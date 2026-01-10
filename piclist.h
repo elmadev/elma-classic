@@ -1,6 +1,8 @@
 #ifndef PICLIST_H
 #define PICLIST_H
 
+#include <stdio.h>
+
 #define MAX_PICLIST_LENGTH (3000)
 
 class piclist {

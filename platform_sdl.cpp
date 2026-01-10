@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
+#include "keys.h"
 #include "main.h"
 #include <SDL.h>
 #include "scancodes_windows.h"

@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "main.h"
 #include "polygon.h"
+#include "TOPOL.H"
 #include <math.h>
 #include <string.h>
 

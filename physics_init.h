@@ -1,6 +1,8 @@
 #ifndef PHYSICS_INIT_H
 #define PHYSICS_INIT_H
 
+#include "vect2.h"
+
 extern double GroundEscapeVelocity;
 extern double WheelDeformationLength;
 

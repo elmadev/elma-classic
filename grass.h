@@ -2,6 +2,8 @@
 #define GRASS_H
 
 class pic8;
+class polygon;
+class vect2;
 
 #define MAX_GRASS_PICS (100)
 

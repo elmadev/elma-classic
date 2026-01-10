@@ -1,6 +1,8 @@
 #ifndef BALL_H
 #define BALL_H
 
+#include "vect2.h"
+
 constexpr double UNKNOWN_COLLISION_TIME = -2.0;
 constexpr double NO_COLLISION_TIME = 500000000.0;
 

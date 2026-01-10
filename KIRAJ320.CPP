@@ -14,6 +14,7 @@
 #include "platform_utils.h"
 #include "physics_init.h"
 #include "timer.h"
+#include "TOPOL.H"
 #include <algorithm>
 #include <math.h>
 #include <string.h>

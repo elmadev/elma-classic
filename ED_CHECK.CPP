@@ -4,6 +4,7 @@
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "polygon.h"
+#include "TOPOL.H"
 
 // Visszaadja, hogy volt-e hiba:
 int check_topology(int kelldialog) {

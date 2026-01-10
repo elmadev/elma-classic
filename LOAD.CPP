@@ -9,6 +9,7 @@
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "SZAKASZ.H"
+#include "TOPOL.H"
 #include <string.h>
 
 int Volttopsave = 0;

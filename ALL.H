@@ -14,6 +14,4 @@
 #include "HANG.H"
 #include "HANGHIGH.H"
 
-#include "TOPOL.H"
-
 #include "platform_impl.h"

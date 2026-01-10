@@ -10,6 +10,7 @@
 #include "main.h"
 #include "menu_pic.h"
 #include "pic8.h"
+#include "TOPOL.H"
 
 // int Kurzornegyzet = 0;
 

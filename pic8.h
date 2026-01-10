@@ -1,6 +1,8 @@
 #ifndef PIC8_H
 #define PIC8_H
 
+#include <cstdio>
+
 class palette;
 
 class pic8 {

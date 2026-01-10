@@ -34,13 +34,13 @@ static int gombszakasz(vect2 r, double sugar, vonal* pv, vect2* pt) {
 }
 
 int talppontkereses(vect2 r, double sugar, vect2* pt1, vect2* pt2, vonal** ppv1, vonal** ppv2) {
-    *ppv1 = *ppv2 = NULL;
+    *ppv1 = *ppv2 = nullptr;
 
     Pszak->felsorolasreset(r);
     int talppontszam = 0;
-    vonal* pv = NULL;
+    vonal* pv = nullptr;
     // int vegignezett = 0; // tesztelesre!
-    while ((pv = Pszak->getnext()) != NULL) {
+    while ((pv = Pszak->getnext()) != nullptr) {
         // vegignezett++;
         vect2 t;
         if (gombszakasz(r, sugar, pv, &t)) {
@@ -56,7 +56,7 @@ int talppontkereses(vect2 r, double sugar, vect2* pt1, vect2* pt2, vonal** ppv1,
                 if ((*pt1 - *pt2).length() < TwoPointDiscriminationDistance) {
                     *pt1 = (*pt1 + *pt2) * 0.5; // atlagol
                     talppontszam = 1;
-                    *ppv2 = NULL;
+                    *ppv2 = nullptr;
                 } else {
                     // Kettonel tobb talppont mar ugy sem lehet!
                     return talppontszam;

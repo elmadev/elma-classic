@@ -5,6 +5,7 @@
 #include "LEJATSZO.H"
 #include "main.h"
 #include "physics_init.h"
+#include "TOPOL.H"
 #include "vect2.h"
 
 int utkozikesprite(vect2 r, double sugar) {

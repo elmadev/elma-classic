@@ -7,6 +7,7 @@
 #include "menu_pic.h"
 #include "platform_utils.h"
 #include "PLAY.H"
+#include "TOPOL.H"
 #include <string.h>
 
 /*static egyszovsor Idoszovegek[4];

@@ -3,6 +3,7 @@
 #include "editor_canvas.h"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
+#include "TOPOL.H"
 
 // igaz, ha kilep
 int menu_exit(void) {

@@ -236,6 +236,6 @@ void init_sound() {
     if (obtained_spec.format != desired_spec.format) {
         internal_error("Failed to get correct audio format");
     }
-    SoundInitialized = 1;
+    SoundInitialized = true;
     SDL_PauseAudioDevice(SDLAudioDevice, 0);
 }

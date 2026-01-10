@@ -34,9 +34,9 @@ static void initsoundlejatszoban(void) {
     static int Hangmarmegy = 0;
     if (State->sound_on && !Hangmarmegy) {
         Hangmarmegy = 1;
-        SoundInitialized = 1;
+        SoundInitialized = true;
 
-        Mute = 1;
+        Mute = true;
         sound_engine_init();
     }
 }
@@ -381,12 +381,12 @@ long lejatszo(const char* filenev) {
     resetleptet(Motor2);
 
     initsoundlejatszoban();
-    Mute = 0;
+    Mute = false;
     if (Single) {
-        start_motor_sound(1);
+        start_motor_sound(true);
     } else {
-        start_motor_sound(1);
-        start_motor_sound(0);
+        start_motor_sound(true);
+        start_motor_sound(false);
     }
 
     flagtag_reset();
@@ -451,9 +451,9 @@ long lejatszo(const char* filenev) {
                     // Ha meg mindket motor jar,
                     // de mar egyik meghalt:
                     if (meghalt1) {
-                        stop_motor_sound(1);
+                        stop_motor_sound(true);
                     } else {
-                        stop_motor_sound(0);
+                        stop_motor_sound(false);
                     }
                     mindjar = 0;
                 }
@@ -477,8 +477,8 @@ long lejatszo(const char* filenev) {
                     Aerintetteviragot = 0;
                 }
 
-                set_motor_frequency(1, 1.0, 0);
-                set_motor_frequency(0, 1.0, 0);
+                set_motor_frequency(true, 1.0, 0);
+                set_motor_frequency(false, 1.0, 0);
                 if (megvanido) {
                     start_wav(WAV_WIN, 0.999);
                 } else {
@@ -486,10 +486,10 @@ long lejatszo(const char* filenev) {
                 }
                 delay((int)(LevelEndDelay * 1000.0));
 
-                stop_motor_sound(1);
-                stop_motor_sound(0);
+                stop_motor_sound(true);
+                stop_motor_sound(false);
 
-                Mute = 1;
+                Mute = true;
                 if (megvanido) {
                     Ptop->kerekjolalljon();
                     Prec1->encode_frame_count();
@@ -513,11 +513,11 @@ long lejatszo(const char* filenev) {
 
         if (Single) {
             set_friction_volume(valt1.inf.surlero);
-            set_motor_frequency(1, valt1.inf.frekvencia, valt1.inf.gaz);
+            set_motor_frequency(true, valt1.inf.frekvencia, valt1.inf.gaz);
         } else {
             set_friction_volume(valt1.inf.surlero + valt2.inf.surlero);
-            set_motor_frequency(1, valt1.inf.frekvencia, valt1.inf.gaz);
-            set_motor_frequency(0, valt2.inf.frekvencia, valt2.inf.gaz);
+            set_motor_frequency(true, valt1.inf.frekvencia, valt1.inf.gaz);
+            set_motor_frequency(false, valt2.inf.frekvencia, valt2.inf.gaz);
         }
 
         kulsoresz(Motor1, &State->keys1, &valt1, Prec1, &Viewtime1, eddig, &valt2.showkep,
@@ -557,10 +557,10 @@ long lejatszo(const char* filenev) {
             MeghalteloszorAB = 0;
             double eltelido = stopwatch();
             // Motor hangjat kikapcsolja:
-            stop_motor_sound(1);
-            stop_motor_sound(0);
+            stop_motor_sound(true);
+            stop_motor_sound(false);
 
-            Mute = 1;
+            Mute = true;
 
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;
@@ -753,12 +753,12 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     resetleptet(Motor2);
 
     initsoundlejatszoban();
-    Mute = 0;
+    Mute = false;
     if (Single) {
-        start_motor_sound(1);
+        start_motor_sound(true);
     } else {
-        start_motor_sound(1);
-        start_motor_sound(0);
+        start_motor_sound(true);
+        start_motor_sound(false);
     }
 
     flagtag_reset();
@@ -782,14 +782,14 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         if ((Single && befejezte1) || (!Single && befejezte1 && befejezte2)) {
             // Motor hangjat kikapcsolja:
-            set_motor_frequency(1, 1.0, 0);
-            set_motor_frequency(0, 1.0, 0);
-            stop_motor_sound(1);
-            stop_motor_sound(0);
+            set_motor_frequency(true, 1.0, 0);
+            set_motor_frequency(false, 1.0, 0);
+            stop_motor_sound(true);
+            stop_motor_sound(false);
             set_friction_volume(0);
             delay((int)(LevelEndDelay * 400.0));
 
-            Mute = 1;
+            Mute = true;
             Ptop->kerekjolalljon();
 
             Elozoshowkep1 = valt1.showkep;
@@ -799,11 +799,11 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         if (!Single) {
             if (jar1 && befejezte1) {
-                stop_motor_sound(1);
+                stop_motor_sound(true);
                 jar1 = 0;
             }
             if (jar2 && befejezte2) {
-                stop_motor_sound(0);
+                stop_motor_sound(false);
                 jar2 = 0;
             }
 
@@ -813,13 +813,13 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         // HANG ELINTEZES:
         if (Single) {
-            set_motor_frequency(1, valt1.inf.frekvencia, valt1.inf.gaz);
+            set_motor_frequency(true, valt1.inf.frekvencia, valt1.inf.gaz);
             // if( valt1.inf.frekvencia > 1.5 )
             //	internal_error( "> 1.5!" );
             set_friction_volume(valt1.inf.surlero);
         } else {
-            set_motor_frequency(1, valt1.inf.frekvencia, valt1.inf.gaz);
-            set_motor_frequency(0, valt2.inf.frekvencia, valt2.inf.gaz);
+            set_motor_frequency(true, valt1.inf.frekvencia, valt1.inf.gaz);
+            set_motor_frequency(false, valt2.inf.frekvencia, valt2.inf.gaz);
             set_friction_volume(valt1.inf.surlero + valt2.inf.surlero);
         }
 
@@ -868,14 +868,14 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
                 fclose(h);
             }
             // Hang kikapcsolas:
-            set_motor_frequency(1, 1.0, 0);
-            set_motor_frequency(0, 1.0, 0);
-            stop_motor_sound(1);
-            stop_motor_sound(0);
+            set_motor_frequency(true, 1.0, 0);
+            set_motor_frequency(false, 1.0, 0);
+            stop_motor_sound(true);
+            stop_motor_sound(false);
             set_friction_volume(0);
             delay((int)(LevelEndDelay * 400.0));
 
-            Mute = 1;
+            Mute = true;
 
             Ptop->kerekjolalljon();
 

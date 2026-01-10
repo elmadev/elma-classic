@@ -1,4 +1,3 @@
-#include "ALL.H"
 #include "abc8.h"
 #include "best_times.h"
 #include "main.h"

@@ -1,5 +1,4 @@
 #include "ED_CHECK.H"
-#include "ALL.H"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
 #include "EDITUJ.H"

@@ -1,5 +1,4 @@
 #include "keys.h"
-#include "ALL.H"
 #include "directinput_scancodes.h"
 #include "main.h"
 #include "platform_impl.h"

@@ -1,4 +1,3 @@
-#include "ALL.H"
 #include "grass.h"
 #include "main.h"
 #include "polygon.h"

@@ -1,5 +1,4 @@
 #include "EDITPLAY.H"
-#include "ALL.H"
 #include "EDITTOLT.H"
 #include "EDITUJ.H"
 #include "LEJATSZO.H"

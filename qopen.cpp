@@ -1,4 +1,3 @@
-#include "ALL.H"
 #include "main.h"
 #include "platform_utils.h"
 #include <stdio.h>

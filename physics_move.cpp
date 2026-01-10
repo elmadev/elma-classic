@@ -1,5 +1,4 @@
 #include "physics_move.h"
-#include "ALL.H"
 #include "LEJATSZO.H"
 #include "HANGHIGH.H"
 #include "main.h"

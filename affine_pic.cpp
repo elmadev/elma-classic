@@ -1,5 +1,4 @@
 #include "affine_pic.h"
-#include "ALL.H"
 #include "main.h"
 #include "pic8.h"
 

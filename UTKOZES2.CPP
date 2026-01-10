@@ -1,5 +1,4 @@
 #include "UTKOZES2.H"
-#include "ALL.H"
 #include "ECSET.H"
 #include "EDITUJ.H"
 #include "LEJATSZO.H"

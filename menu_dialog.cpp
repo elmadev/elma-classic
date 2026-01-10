@@ -1,5 +1,4 @@
 #include "menu_dialog.h"
-#include "ALL.H"
 #include "main.h"
 #include "menu_pic.h"
 #include "state.h"

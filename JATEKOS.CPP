@@ -1,5 +1,4 @@
 #include "JATEKOS.H"
-#include "ALL.H"
 #include "main.h"
 #include "MAINMENU.H"
 #include "menu_nav.h"

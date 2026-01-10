@@ -1,4 +1,3 @@
-#include "ALL.H"
 #include "physics_init.h"
 
 static motorst Motorst1;

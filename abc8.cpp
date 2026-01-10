@@ -1,4 +1,3 @@
-#include "ALL.H"
 #include "abc8.h"
 #include "main.h"
 #include "menu_pic.h"

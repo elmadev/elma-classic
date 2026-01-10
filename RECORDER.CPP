@@ -1,5 +1,4 @@
 #include "RECORDER.H"
-#include "ALL.H"
 #include "flagtag.h"
 #include "main.h"
 #include "physics_init.h"

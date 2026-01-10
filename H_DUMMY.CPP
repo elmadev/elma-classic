@@ -1,5 +1,3 @@
-#include "ALL.H"
-
 // H_, H_HIGH, H_WAV, H_TULMIN
 
 int Mute = 1;

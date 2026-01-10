@@ -1,5 +1,4 @@
 #include "LEPTET.H"
-#include "ALL.H"
 #include "EDITUJ.H"
 #include "LEJATSZO.H"
 #include "physics_init.h"

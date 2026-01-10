@@ -1,4 +1,3 @@
-#include "ALL.H"
 #include "ball.h"
 #include "ball_collision.h"
 #include "ball_handler.h"

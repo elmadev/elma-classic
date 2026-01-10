@@ -1,4 +1,3 @@
-#include "ALL.H"
 #include "anim.h"
 #include "main.h"
 #include "KIRAJZOL.H"

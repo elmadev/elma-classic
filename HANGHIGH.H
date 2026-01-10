@@ -2,13 +2,13 @@
 #define HANGHIGH_H
 
 enum {
-    WAV_UTODES = 1,
-    WAV_TORES,
-    WAV_SIKER,
-    WAV_EVES,
-    WAV_FORDULAS,
-    WAV_UGRAS1,
-    WAV_UGRAS2,
+    WAV_BUMP = 1,
+    WAV_DEAD,
+    WAV_WIN,
+    WAV_FOOD,
+    WAV_TURN,
+    WAV_RIGHT_VOLT,
+    WAV_LEFT_VOLT,
     WAV_ALAP,
     WAV_GAZ,
     WAV_DORZSOL,
@@ -17,28 +17,28 @@ enum {
 
 // Csak program elejen allithato:
 // Ha hamis, semmi directsound fv.-t nem hiv:
-extern int Hangenabled;
+extern int SoundInitialized;
 // Ha igaz, callback fuggveny 0-kat ir bufferbe:
 extern int Mute;
 
-void starthanghigh(void);
+void sound_engine_init(void);
 void stophanghigh(void);
 
 // Elinditja alapjarat hangot:
-void startmotor(int mot1);
+void start_motor_sound(int is_motor1);
 // Leallitja motor hangjat (ha meghalt):
-void stopmotor(int mot1);
+void stop_motor_sound(int is_motor1);
 // frekvencia 1.0-tol 2.0-ig valtozik csak:
-void setmotor(int mot1, double frekvencia, int gaz);
+void set_motor_frequency(int is_motor1, double frequency, int gas);
 
-void setsurlodas(double ero);
+void set_friction_volume(double volume);
 
-void startwave(int wavazonosito, double hangero);
+void start_wav(int event, double volume);
 int vanmegwav(void);
 
-void hangosdelay(int t);
+void delay(int milliseconds);
 
 // Ezt meg kell irni hozza:
-void callbackhang(short* sbuff, int buffsize);
+void sound_mixer(short* buffer, int buffer_length);
 
 #endif

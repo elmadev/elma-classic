@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "ball.h"
 #include "main.h"
+#include <math.h>
 
 bool WallsDisabled = false;
 

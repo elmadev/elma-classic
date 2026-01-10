@@ -12,6 +12,7 @@
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "qopen.h"
+#include <math.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>

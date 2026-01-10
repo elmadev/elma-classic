@@ -4,6 +4,7 @@
 #include "polygon.h"
 #include "physics_init.h"
 #include "pic8.h"
+#include <math.h>
 
 grass::grass() {
     length = 0;

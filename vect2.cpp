@@ -1,6 +1,7 @@
 #include "vect2.h"
 #include "ALL.H"
 #include "main.h"
+#include <math.h>
 
 vect2 Vect2i(1.0, 0.0), Vect2j(0.0, 1.0), Vect2null(0.0, 0.0);
 

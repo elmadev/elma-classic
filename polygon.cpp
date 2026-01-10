@@ -4,6 +4,7 @@
 #include "editor_dialog.h"
 #include "main.h"
 #include "platform_utils.h"
+#include <math.h>
 
 polygon::polygon() {
     vertex_count = 0;

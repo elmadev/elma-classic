@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "main.h"
 #include "polygon.h"
+#include <math.h>
 #include <string.h>
 
 static int Szakaszmaxszam = MAX_VERTICES + 130;

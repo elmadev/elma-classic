@@ -3,6 +3,7 @@
 #include "affine_pic.h"
 #include "KIRAJZOL.H"
 #include "pic8.h"
+#include <math.h>
 
 // Affinitassal kapcsolatos dolgok:
 int Affinitas = 0;

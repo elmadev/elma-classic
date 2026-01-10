@@ -7,6 +7,7 @@
 #include "platform_utils.h"
 #include "UTKOZES.H"
 #include "UTKOZES2.H"
+#include <math.h>
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi, vect2 sebesseg);
 

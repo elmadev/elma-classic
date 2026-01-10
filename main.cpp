@@ -4,6 +4,7 @@
 #include "menu_pic.h"
 #include "platform_utils.h"
 #include "TELJES.H"
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #ifdef _WIN32

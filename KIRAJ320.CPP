@@ -15,6 +15,7 @@
 #include "physics_init.h"
 #include "timer.h"
 #include <algorithm>
+#include <math.h>
 #include <string.h>
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:

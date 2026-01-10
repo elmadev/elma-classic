@@ -6,7 +6,7 @@
 #include "menu_nav.h"
 #include "menu_pic.h"
 #include "TOPOL.H"
-#include <string.h>
+#include <cstring>
 
 void menu_help() {
     menu_pic menu;

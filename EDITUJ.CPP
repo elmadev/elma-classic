@@ -19,7 +19,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "TOPOL.H"
-#include <string.h>
+#include <cstring>
 
 topol* Ptop = NULL;
 

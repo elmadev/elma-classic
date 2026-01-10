@@ -13,8 +13,8 @@
 #include "SZAKASZ.H"
 #include "TOPOL.H"
 #include <cstdint>
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 typedef uintptr_t pixelek_t;
 

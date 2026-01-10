@@ -2,8 +2,8 @@
 #include "main.h"
 #include "polygon.h"
 #include "TOPOL.H"
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 static int Szakaszmaxszam = MAX_VERTICES + 130;
 

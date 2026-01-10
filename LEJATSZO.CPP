@@ -12,8 +12,8 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "TOPOL.H"
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 // Jatek modja ket fele lehet:
 int Single = 1;

@@ -15,7 +15,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "TOPOL.H"
-#include <string.h>
+#include <cstring>
 
 /*void tesztloadlgr( void ) {
     int a = 1, b = 2, c = 4;

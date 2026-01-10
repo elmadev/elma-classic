@@ -4,8 +4,8 @@
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "qopen.h"
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 recorder *Prec1 = NULL, *Prec2 = NULL;
 int Multirec = 0; // Ha multiplayer, akkor ez igaz

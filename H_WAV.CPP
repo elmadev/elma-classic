@@ -2,7 +2,7 @@
 #include "main.h"
 #include "platform_utils.h"
 #include "qopen.h"
-#include <string.h>
+#include <cstring>
 
 void wav::lefoglal(void) {
     if (size > 1000000) {

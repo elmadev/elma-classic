@@ -16,8 +16,8 @@
 #include "timer.h"
 #include "TOPOL.H"
 #include <algorithm>
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
 

@@ -6,7 +6,7 @@
 #include "menu_pic.h"
 #include "pic8.h"
 #include "TOPOL.H"
-#include <math.h>
+#include <cmath>
 
 // If false, when drawing lines, immediately update the screen
 bool RedrawingEditor = false;

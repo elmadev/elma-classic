@@ -15,7 +15,7 @@
 #include "platform_utils.h"
 #include "polygon.h"
 #include "TOPOL.H"
-#include <string.h>
+#include <cstring>
 
 constexpr unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;
 

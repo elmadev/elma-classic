@@ -3,7 +3,7 @@
 #include "polygon.h"
 #include "physics_init.h"
 #include "pic8.h"
-#include <math.h>
+#include <cmath>
 
 grass::grass() {
     length = 0;

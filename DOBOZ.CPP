@@ -3,7 +3,7 @@
 #include "KIRAJZOL.H"
 #include "pic8.h"
 #include "vect2.h"
-#include <math.h>
+#include <cmath>
 
 // Affinitassal kapcsolatos dolgok:
 int Affinitas = 0;

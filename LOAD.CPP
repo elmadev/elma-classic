@@ -10,7 +10,7 @@
 #include "platform_utils.h"
 #include "SZAKASZ.H"
 #include "TOPOL.H"
-#include <string.h>
+#include <cstring>
 
 int Volttopsave = 0;
 

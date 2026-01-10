@@ -7,7 +7,7 @@
 #include "TOPOL.H"
 #include "UTKOZES.H"
 #include "UTKOZES2.H"
-#include <math.h>
+#include <cmath>
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi, vect2 sebesseg);
 

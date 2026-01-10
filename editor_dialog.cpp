@@ -9,8 +9,8 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "state.h"
-#include <ctype.h>
-#include <string.h>
+#include <cctype>
+#include <cstring>
 
 bool InEditor = false;
 

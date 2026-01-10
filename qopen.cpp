@@ -1,7 +1,7 @@
 #include "main.h"
 #include "platform_utils.h"
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 struct res_file {
     char filename[16];

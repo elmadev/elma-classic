@@ -5,7 +5,7 @@
 #include "menu_pic.h"
 #include "TELJES.H"
 #include "TOPOL.H"
-#include <string.h>
+#include <cstring>
 
 static int Maxnevhossz = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-nal!
 

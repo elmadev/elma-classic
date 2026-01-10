@@ -16,7 +16,7 @@
 #include "platform_utils.h"
 #include "TOPOL.H"
 #include "qopen.h"
-#include <string.h>
+#include <cstring>
 
 state* State = NULL;
 eol_settings* EolSettings = nullptr;

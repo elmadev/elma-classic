@@ -2,7 +2,7 @@
 #define RECORDER_H
 
 #include "vect2.h"
-#include <stdio.h>
+#include <cstdio>
 
 struct motorst;
 

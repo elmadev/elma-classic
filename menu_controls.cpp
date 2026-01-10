@@ -3,7 +3,7 @@
 #include "menu_nav.h"
 #include "platform_impl.h"
 #include "state.h"
-#include <string.h>
+#include <cstring>
 
 const char* dik_to_string(DIK_Code keycode) {
     switch (keycode) {

@@ -2,7 +2,7 @@
 #include "main.h"
 #include "menu_pic.h"
 #include "state.h"
-#include <string.h>
+#include <cstring>
 
 // Display the menu with the provided text, then return the key pressed by the user.
 // Unused feature:

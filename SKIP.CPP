@@ -3,8 +3,8 @@
 #include "menu_pic.h"
 #include "platform_utils.h"
 #include "TOPOL.H"
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 int skippelheto(int level) {
     int maxskippelheto = 5;

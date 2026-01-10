@@ -3,7 +3,7 @@
 #include "menu_pic.h"
 #include "pic8.h"
 #include "qopen.h"
-#include <string.h>
+#include <cstring>
 
 #ifdef DEBUG
 bool ErrorOnMissingCodepoint = true;

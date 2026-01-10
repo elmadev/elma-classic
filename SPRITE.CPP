@@ -1,7 +1,7 @@
 #include "SPRITE.H"
 #include "main.h"
 #include "pic8.h"
-#include <string.h>
+#include <cstring>
 
 #define MAXBUFFER (20000u)
 static int Maxegybefuggo = 255;

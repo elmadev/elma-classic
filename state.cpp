@@ -5,7 +5,7 @@
 #include "menu_dialog.h"
 #include "platform_utils.h"
 #include "TOPOL.H"
-#include <string.h>
+#include <cstring>
 
 constexpr int STATE_VERSION = 200;
 

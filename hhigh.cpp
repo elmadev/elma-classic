@@ -3,7 +3,7 @@
 #include "platform_impl.h"
 #include "TOPOL.H"
 #include "WAV.H"
-#include <string.h>
+#include <cstring>
 
 int Hangenabled = 0;
 

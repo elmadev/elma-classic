@@ -3,9 +3,9 @@
 #include "ball_handler.h"
 #include "main.h"
 #include "platform_utils.h"
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
 
 int BallCount = 0;
 ball* Balls = nullptr;

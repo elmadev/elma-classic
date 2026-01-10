@@ -14,10 +14,10 @@
 #include "PLAY.H"
 #include "TELJES.H"
 #include "TOPOL.H"
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 /*void showinstruct( void ) {
     blit8( Korny->picbuffer, Korny->ppic_help );

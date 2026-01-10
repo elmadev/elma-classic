@@ -4,7 +4,7 @@
 #include "keys.h"
 #include "main.h"
 #include "menu_pic.h"
-#include <string.h>
+#include <cstring>
 
 int NavEntriesLeftMaxLength = 1;
 

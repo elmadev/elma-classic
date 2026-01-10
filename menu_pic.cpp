@@ -9,8 +9,8 @@
 #include "pic8.h"
 #include "platform_impl.h"
 #include "TOPOL.H"
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 // Drawing of the screen when there is no ball. Also used as generic buffer by editor.
 pic8* BufferMain = nullptr;

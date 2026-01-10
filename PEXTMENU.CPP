@@ -8,7 +8,7 @@
 #include "platform_utils.h"
 #include "PLAY.H"
 #include "TOPOL.H"
-#include <string.h>
+#include <cstring>
 
 /*static egyszovsor Idoszovegek[4];
 

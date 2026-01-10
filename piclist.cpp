@@ -1,8 +1,8 @@
 #include "piclist.h"
 #include "main.h"
 #include "platform_utils.h"
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 constexpr int PICLIST_VERSION = 1002;
 

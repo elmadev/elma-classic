@@ -4,7 +4,7 @@
 #include "main.h"
 #include "platform_utils.h"
 #include "TOPOL.H"
-#include <math.h>
+#include <cmath>
 
 polygon::polygon() {
     vertex_count = 0;

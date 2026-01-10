@@ -1,5 +1,5 @@
 #ifndef _WIN32
-#include <assert.h>
+#include <cassert>
 #include <cstring>
 #include <string>
 

@@ -5,10 +5,10 @@
 #include <cmath>
 #include <cstring>
 
-static int Szakaszmaxszam = MAX_VERTICES + 130;
+static int MAX_LINES = MAX_VERTICES + 130;
 
-lines* Lines = NULL;
 // lines* Pszakt = NULL;
+lines* Lines = NULL;
 
 // loadszakasz beleirja ptop->lezart-at ha topologia file-t olvas be:
 // Ezt azutan afterplayext fuggveny hasznalja ki:
@@ -27,36 +27,36 @@ lines::lines(topol* lev) {
     node_array = NULL;
     node_array_index = 0;
 
-    line_list = new line[Szakaszmaxszam];
+    line_list = new line[MAX_LINES];
     if (!line_list) {
-        external_error("memory szakaszoknak!");
+        external_error("lines::lines out of memory!");
         return;
     }
-    line_list_allocated_length = Szakaszmaxszam;
+    line_list_allocated_length = MAX_LINES;
     for (int i = 0; i < line_list_allocated_length; i++) {
         memset(&line_list[i], 0, sizeof(line));
     }
 
     // Normal szakaszok beolvasasa:
     for (int i = 0; i < MAXGYURU; i++) {
-        polygon* pgy = lev->ptomb[i];
-        if (!pgy) {
+        polygon* poly = lev->ptomb[i];
+        if (!poly) {
             continue;
         }
-        if (pgy->is_grass) {
+        if (poly->is_grass) {
             continue;
         }
-        for (int j = 0; j < pgy->vertex_count; j++) {
-            if (line_list_length >= Szakaszmaxszam) {
-                internal_error("lines::lines-ban z >= Szakaszmaxszam!");
+        for (int j = 0; j < poly->vertex_count; j++) {
+            if (line_list_length >= MAX_LINES) {
+                internal_error("lines::lines line_list_length >= MAX_LINES!");
             }
             vect2 r1, r2;
-            if (j < pgy->vertex_count - 1) {
-                r1 = pgy->vertices[j];
-                r2 = pgy->vertices[j + 1];
+            if (j < poly->vertex_count - 1) {
+                r1 = poly->vertices[j];
+                r2 = poly->vertices[j + 1];
             } else {
-                r1 = pgy->vertices[j];
-                r2 = pgy->vertices[0];
+                r1 = poly->vertices[j];
+                r2 = poly->vertices[0];
             }
             line_list[line_list_length].r = r1;
             line_list[line_list_length].v = r2 - r1;
@@ -83,35 +83,35 @@ line_node* lines::get_new_line_node(void) {
     if (!node_array) {
         node_array = new line_node_array;
         if (!node_array) {
-            external_error("memory!");
+            external_error("lines::get_new_line_node out of memory!");
         }
         node_array->next = NULL;
         node_array_index = 0;
     }
-    line_node_array* curcsomag = node_array;
-    while (curcsomag->next) {
-        curcsomag = curcsomag->next;
+    line_node_array* last_array = node_array;
+    while (last_array->next) {
+        last_array = last_array->next;
     }
     if (node_array_index == LINE_NODE_BLOCK_SIZE) {
-        curcsomag->next = new line_node_array;
-        curcsomag = curcsomag->next;
-        if (!curcsomag) {
-            external_error("memory!");
+        last_array->next = new line_node_array;
+        last_array = last_array->next;
+        if (!last_array) {
+            external_error("lines::get_new_line_node out of memory!");
         }
-        curcsomag->next = NULL;
+        last_array->next = NULL;
         node_array_index = 0;
     }
     node_array_index++;
-    return &curcsomag->nodes[node_array_index - 1];
+    return &last_array->nodes[node_array_index - 1];
 }
 
 void lines::delete_all_line_nodes(void) {
-    line_node_array* curcsomag = node_array;
+    line_node_array* current_array = node_array;
     node_array = NULL;
-    while (curcsomag) {
-        line_node_array* elozocsomag = curcsomag;
-        curcsomag = curcsomag->next;
-        delete elozocsomag;
+    while (current_array) {
+        line_node_array* deleted_array = current_array;
+        current_array = current_array->next;
+        delete deleted_array;
     }
 }
 
@@ -119,25 +119,25 @@ void lines::delete_all_line_nodes(void) {
 void lines::add_line_to_cell(int cell_x, int cell_y, line* ln) {
 #ifdef DEBUG
     if (cell_x < 0 || cell_y < 0) {
-        internal_error("cell_x < 0 || cell_y < 0!");
+        internal_error("lines::add_line_to_cell cell_x < 0 || cell_y < 0!");
     }
 #endif
     if (cell_x >= collision_grid_width || cell_y >= collision_grid_height) {
         return;
     }
-    line_node* pujnode = get_new_line_node();
-    pujnode->next = NULL;
-    pujnode->ln = ln;
-    line_node* pn = collision_grid[collision_grid_width * cell_y + cell_x];
-    if (!pn) {
-        collision_grid[collision_grid_width * cell_y + cell_x] = pujnode;
+    line_node* new_node = get_new_line_node();
+    new_node->next = NULL;
+    new_node->ln = ln;
+    line_node* cell_node = collision_grid[collision_grid_width * cell_y + cell_x];
+    if (!cell_node) {
+        collision_grid[collision_grid_width * cell_y + cell_x] = new_node;
         return;
     }
-    while (pn->next) {
-        pn = pn->next;
+    while (cell_node->next) {
+        cell_node = cell_node->next;
     }
     // Most pn az utolso node-ra mutat!
-    pn->next = pujnode;
+    cell_node->next = new_node;
 }
 
 // Egy vonalat hozzarendel osszes olyan cellahoz, amihez koze lehet:
@@ -145,7 +145,7 @@ void lines::add_line_to_collision_grid(line* ln, double max_radius) {
     // Kitolti vonal egyseg es hossz rubrikait:
     ln->length = ln->v.length();
     if (ln->length < 0.00000001) {
-        internal_error("Vonal hossza tul kicsi!");
+        internal_error("lines::add_line_to_collision_grid line too short!");
     }
     ln->unit_vector = unit_vector(ln->v);
 
@@ -156,15 +156,15 @@ void lines::add_line_to_collision_grid(line* ln, double max_radius) {
     r = r * (1 / collision_grid_cell_size);
     max_radius *= 1.5 / collision_grid_cell_size;
     // Ezentul cellameretet lehet 1.0-nak venni!
-    int invertalt = 0;
+    int invert_axis = 0;
     if (fabs(v.y) > fabs(v.x)) {
-        invertalt = 1;
-        double tmpd = v.x;
+        invert_axis = 1;
+        double tmp = v.x;
         v.x = v.y;
-        v.y = tmpd;
-        tmpd = r.x;
+        v.y = tmp;
+        tmp = r.x;
         r.x = r.y;
-        r.y = tmpd;
+        r.y = tmp;
     }
     // Most x iranyban biztosan hosszabb vagy egyenlo y iranynal!
     if (v.x < 0) {
@@ -174,104 +174,104 @@ void lines::add_line_to_collision_grid(line* ln, double max_radius) {
     }
     // Most v x-pozitiv iranyba mutat:
     // Kiszamoljuk y = m*x + y0 fuggveny parametereit:
-    double m = v.y / v.x;
-    double y0 = r.y - m * r.x;
-    double xkezdo = r.x - max_radius;
-    int cellax = 0;
-    if (xkezdo > 0) {
-        cellax = (int)(xkezdo);
+    double slope = v.y / v.x;
+    double y0 = r.y - slope * r.x;
+    double xstart = r.x - max_radius;
+    int cell_x = 0;
+    if (xstart > 0) {
+        cell_x = (int)(xstart);
     }
     if (r.x + v.x + max_radius < 0) {
-        internal_error("lines::add_line_to_collision_grid-ban r.x+v.x+max_radius < 0!");
+        internal_error("lines::add_line_to_collision_grid r.x+v.x+max_radius < 0!");
     }
-    int ucsocellax = (int)(r.x + v.x + max_radius);
-    while (cellax <= ucsocellax) {
-        double y1 = m * cellax + y0;
-        double y2 = m * (cellax + 1) + y0;
+    int xend = (int)(r.x + v.x + max_radius);
+    while (cell_x <= xend) {
+        double y1 = slope * cell_x + y0;
+        double y2 = slope * (cell_x + 1) + y0;
         // y1-nek kissebnek kell lennie y2-nel:
         if (y1 > y2) {
-            double tmpd = y1;
+            double tmp = y1;
             y1 = y2;
-            y2 = tmpd;
+            y2 = tmp;
         }
         y1 -= max_radius;
         y2 += max_radius;
 #ifdef DEBUG
         if (y1 > y2) {
-            internal_error("Bug!");
+            internal_error("lines::add_line_to_collision_grid y1 > y2!");
         }
 #endif
         if (y2 < 0.0) {
-            internal_error("Bug!");
+            internal_error("lines::add_line_to_collision_grid y2 < 0!");
         }
-        int cellay = 0;
+        int cell_y = 0;
         if (y1 > 0) {
-            cellay = (int)(y1);
+            cell_y = (int)(y1);
         }
-        int ucsocellay = (int)(y2);
-        while (cellay <= ucsocellay) {
-            if (invertalt) {
-                add_line_to_cell(cellay, cellax, ln);
+        int yend = (int)(y2);
+        while (cell_y <= yend) {
+            if (invert_axis) {
+                add_line_to_cell(cell_y, cell_x, ln);
             } else {
-                add_line_to_cell(cellax, cellay, ln);
+                add_line_to_cell(cell_x, cell_y, ln);
             }
 
-            cellay++;
+            cell_y++;
         }
 
-        cellax++;
+        cell_x++;
     }
 }
 
 void lines::setup_collision_grid(double max_radius) {
     // Ellenorzes:
     if (line_list_length <= 0) {
-        internal_error("lines::setup_collision_grid-ben line_list_length <= 0!");
+        internal_error("lines::setup_collision_grid has no lines!");
     }
     if (collision_grid) {
-        internal_error("lines::setup_collision_grid-ban nodes != NULL!");
+        internal_error("lines::setup_collision_grid already has a collision grid!");
     }
 
     collision_grid_cell_size = 1.0;
 
     // Megkeresi palya kiterjedeset:
     iterate_all_lines();
-    line* psz = get_line();
-    if (!psz) {
-        internal_error("Nincs egyetlen szakasz sem definialva!");
+    line* cur_line = get_line();
+    if (!cur_line) {
+        internal_error("lines::setup no lines found!");
     }
-    double minx = psz->r.x;
-    double maxx = psz->r.x;
-    double miny = psz->r.y;
-    double maxy = psz->r.y;
-    while (psz) {
-        if (psz->r.x < minx) {
-            minx = psz->r.x;
+    double minx = cur_line->r.x;
+    double maxx = cur_line->r.x;
+    double miny = cur_line->r.y;
+    double maxy = cur_line->r.y;
+    while (cur_line) {
+        if (cur_line->r.x < minx) {
+            minx = cur_line->r.x;
         }
-        if (psz->r.x > maxx) {
-            maxx = psz->r.x;
+        if (cur_line->r.x > maxx) {
+            maxx = cur_line->r.x;
         }
-        if (psz->r.y < miny) {
-            miny = psz->r.y;
+        if (cur_line->r.y < miny) {
+            miny = cur_line->r.y;
         }
-        if (psz->r.y > maxy) {
-            maxy = psz->r.y;
-        }
-
-        if (psz->r.x + psz->v.x < minx) {
-            minx = psz->r.x + psz->v.x;
-        }
-        if (psz->r.x + psz->v.x > maxx) {
-            maxx = psz->r.x + psz->v.x;
-        }
-        if (psz->r.y + psz->v.y < miny) {
-            miny = psz->r.y + psz->v.y;
-        }
-        if (psz->r.y + psz->v.y > maxy) {
-            maxy = psz->r.y + psz->v.y;
+        if (cur_line->r.y > maxy) {
+            maxy = cur_line->r.y;
         }
 
-        psz = get_line();
+        if (cur_line->r.x + cur_line->v.x < minx) {
+            minx = cur_line->r.x + cur_line->v.x;
+        }
+        if (cur_line->r.x + cur_line->v.x > maxx) {
+            maxx = cur_line->r.x + cur_line->v.x;
+        }
+        if (cur_line->r.y + cur_line->v.y < miny) {
+            miny = cur_line->r.y + cur_line->v.y;
+        }
+        if (cur_line->r.y + cur_line->v.y > maxy) {
+            maxy = cur_line->r.y + cur_line->v.y;
+        }
+
+        cur_line = get_line();
     }
 
     // Kicsit kibovitjuk hatarokat:
@@ -282,12 +282,12 @@ void lines::setup_collision_grid(double max_radius) {
 
     // Beallitja kezdopontot:
     collision_grid_origin = vect2(minx, miny);
-    double xsized = maxx - minx;
-    double ysized = maxy - miny;
+    double width = maxx - minx;
+    double height = maxy - miny;
 
     // Kiszamolja dimenziot:
-    collision_grid_width = (int)(xsized / collision_grid_cell_size + 1.0);
-    collision_grid_height = (int)(ysized / collision_grid_cell_size + 1.0);
+    collision_grid_width = (int)(width / collision_grid_cell_size + 1.0);
+    collision_grid_height = (int)(height / collision_grid_cell_size + 1.0);
     if (collision_grid_width < 0 || collision_grid_height < 0) {
         internal_error("collision_grid_width < 0 || collision_grid_height < 0!");
     }
@@ -296,52 +296,52 @@ void lines::setup_collision_grid(double max_radius) {
     }
 
     // Lefoglalja tombot:
-    unsigned tombmeret = collision_grid_width * collision_grid_height;
-    collision_grid = new pline_node[tombmeret];
+    unsigned grid_length = collision_grid_width * collision_grid_height;
+    collision_grid = new pline_node[grid_length];
     if (!collision_grid) {
-        external_error("memory!");
+        external_error("lines::setup out of memory!");
     }
-    int hatar = collision_grid_width * collision_grid_height;
-    for (int i = 0; i < hatar; i++) {
+    int grid_length_signed = collision_grid_width * collision_grid_height;
+    for (int i = 0; i < grid_length_signed; i++) {
         collision_grid[i] = NULL;
     }
 
     // Most vegigmegy szakaszokon es beilleszti oket:
     iterate_all_lines();
-    psz = get_line();
-    while (psz) {
-        add_line_to_collision_grid(psz, max_radius);
-        psz = get_line();
+    cur_line = get_line();
+    while (cur_line) {
+        add_line_to_collision_grid(cur_line, max_radius);
+        cur_line = get_line();
     }
 }
 
 void lines::select_collision_grid_cell(vect2 r) {
     if (!collision_grid) {
-        internal_error("lines::select_collision_grid_cell-ban !collision_grid!");
+        internal_error("lines::select_collision_grid_cell !collision_grid!");
     }
     r = (r - collision_grid_origin) * (1 / collision_grid_cell_size);
-    int cellax = 0;
+    int cell_x = 0;
     if (r.x > 0) {
-        cellax = (int)(r.x);
+        cell_x = (int)(r.x);
     }
-    int cellay = 0;
+    int cell_y = 0;
     if (r.y > 0) {
-        cellay = (int)(r.y);
+        cell_y = (int)(r.y);
     }
 
-    if (cellax > collision_grid_width) {
-        internal_error("lines::select_collision_grid_cell-ben cellax > collision_grid_width!");
+    if (cell_x > collision_grid_width) {
+        internal_error("lines::select_collision_grid_cell cell_x > collision_grid_width!");
     }
-    if (cellax == collision_grid_width) {
-        cellax = collision_grid_width - 1;
+    if (cell_x == collision_grid_width) {
+        cell_x = collision_grid_width - 1;
     }
-    if (cellay > collision_grid_height) {
-        internal_error("lines::select_collision_grid_cell-ben cellay > collision_grid_height!");
+    if (cell_y > collision_grid_height) {
+        internal_error("lines::select_collision_grid_cell cell_y > collision_grid_height!");
     }
-    if (cellay == collision_grid_height) {
-        cellay = collision_grid_height - 1;
+    if (cell_y == collision_grid_height) {
+        cell_y = collision_grid_height - 1;
     }
-    collision_grid_next = collision_grid[collision_grid_width * cellay + cellax];
+    collision_grid_next = collision_grid[collision_grid_width * cell_y + cell_x];
 }
 
 line* lines::get_line_from_collision_grid_cell(void) {
@@ -350,12 +350,12 @@ line* lines::get_line_from_collision_grid_cell(void) {
     }
 #ifdef DEBUG
     if (!collision_grid_next->ln) {
-        internal_error("lines::get_line_from_collision_grid_cell-ben !collision_grid_next->ln");
+        internal_error("lines::get_line_from_collision_grid_cell !collision_grid_next->ln");
     }
 #endif
-    line* pret = collision_grid_next->ln;
+    line* ret = collision_grid_next->ln;
     collision_grid_next = collision_grid_next->next;
-    return pret;
+    return ret;
 }
 
 // Szakaszos kereso:

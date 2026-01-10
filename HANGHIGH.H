@@ -12,8 +12,6 @@ enum class WavEvent : char {
     LEFT_VOLT = 7,
 };
 
-// Main global sound variable
-extern bool SoundInitialized;
 extern bool Mute;
 
 void sound_engine_init();

@@ -4,6 +4,9 @@
 #ifndef _WIN32
 #include <cstddef>
 #include <sys/time.h>
+#include <unistd.h>
+#else
+#include <io.h>
 #endif
 
 constexpr double PI = 3.141592;

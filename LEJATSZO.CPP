@@ -8,6 +8,7 @@
 #include "LGRFILE.H"
 #include "main.h"
 #include "physics_init.h"
+#include "platform_utils.h"
 
 // Jatek modja ket fele lehet:
 int Single = 1;

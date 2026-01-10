@@ -4,11 +4,6 @@
 #include <math.h>
 #include <time.h>
 #include <ctype.h>
-#ifdef _WIN32
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480

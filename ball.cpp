@@ -3,6 +3,7 @@
 #include "ball_handler.h"
 #include "main.h"
 #include "platform_utils.h"
+#include <stdlib.h>
 #include <time.h>
 
 int BallCount = 0;

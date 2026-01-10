@@ -13,6 +13,7 @@
 #include "menu_pic.h"
 #include "PLAY.H"
 #include "TELJES.H"
+#include <stdlib.h>
 #include <time.h>
 
 /*void showinstruct( void ) {

@@ -52,13 +52,13 @@ void sound_engine_init() {
     for (int i = 0; i < WAV_BANK_LENGTH; i++) {
         WavBank[i] = nullptr;
     }
-    WavBank[WAV_BUMP] = new wav("utodes.wav", 0.25);      // collision
-    WavBank[WAV_DEAD] = new wav("torik.wav", 0.34);       // shatter
-    WavBank[WAV_WIN] = new wav("siker.wav", 0.8);         // success
-    WavBank[WAV_FOOD] = new wav("eves.wav", 0.5);         // eating
-    WavBank[WAV_TURN] = new wav("fordul.wav", 0.3);       // turn
-    WavBank[WAV_RIGHT_VOLT] = new wav("ugras.wav", 0.34); // jump
-    WavBank[WAV_LEFT_VOLT] = WavBank[WAV_RIGHT_VOLT];
+    WavBank[(int)WavEvent::Bump] = new wav("utodes.wav", 0.25);     // collision
+    WavBank[(int)WavEvent::Dead] = new wav("torik.wav", 0.34);      // shatter
+    WavBank[(int)WavEvent::Win] = new wav("siker.wav", 0.8);        // success
+    WavBank[(int)WavEvent::Food] = new wav("eves.wav", 0.5);        // eating
+    WavBank[(int)WavEvent::Turn] = new wav("fordul.wav", 0.3);      // turn
+    WavBank[(int)WavEvent::RightVolt] = new wav("ugras.wav", 0.34); // jump
+    WavBank[(int)WavEvent::LeftVolt] = WavBank[(int)WavEvent::RightVolt];
 
     // Bike squeak sound
     SoundFriction = new wav("dorzsol.wav", 0.44); // friction
@@ -160,7 +160,7 @@ void set_friction_volume(double volume) {
 }
 
 // Start a wavbank event
-void start_wav(int event, double volume) {
+void start_wav(WavEvent event, double volume) {
     if (!SoundInitialized || Mute) {
         return;
     }
@@ -169,7 +169,7 @@ void start_wav(int event, double volume) {
         internal_error("start_wav volume <= 0.0 || volume >= 1.0!");
     }
 
-    wav* sound = WavBank[event];
+    wav* sound = WavBank[(int)event];
 
     if (ActiveWavEvents >= MAX_WAV_EVENTS) {
         return;

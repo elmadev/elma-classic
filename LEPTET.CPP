@@ -308,7 +308,7 @@ int vizsgalat(motorst* pmot) {
         sorszamtomb[2] = utkozikesprite(pmot->head_r, HeadRadius);
         for (int i = 0; i < 3; i++) {
             if (sorszamtomb[i] >= 0) {
-                startwavegyujto(0, 0.0, sorszamtomb[i]);
+                startwavegyujto(WavEvent::None, 0.0, sorszamtomb[i]);
                 object* pker = Ptop->getptrkerek(sorszamtomb[i]);
                 if (pker->type == object::Type::Food) {
                     pker->active = false;

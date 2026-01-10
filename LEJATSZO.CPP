@@ -62,7 +62,7 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
     if (tipus == object::Type::Food) {
         Ptop->kerektomb[sorszam]->active = false;
         (*pkajaszam)++;
-        startwavegyujto(WAV_FOOD, 0.99, -1);
+        startwavegyujto(WavEvent::Food, 0.99, -1);
         switch (Ptop->kerektomb[sorszam]->property) {
         case object::Property::None:
             break;
@@ -123,13 +123,13 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
-            startwavegyujto(WAV_RIGHT_VOLT, 0.99, -1);
+            startwavegyujto(WavEvent::RightVolt, 0.99, -1);
         }
         if (is_key_down(popciok->left_volt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;
-            startwavegyujto(WAV_LEFT_VOLT, 0.99, -1);
+            startwavegyujto(WavEvent::LeftVolt, 0.99, -1);
         }
     }
 
@@ -192,7 +192,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     prec->store(pmot, eddig, &pvalt->inf);
 
     // Egyedi hangok:
-    int wavazonosito;
+    WavEvent wavazonosito;
     double hangero;
     int objszam;
     while (getwavegyujto(&wavazonosito, &hangero, &objszam)) {
@@ -208,7 +208,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
         } else {
             start_wav(wavazonosito, hangero);
         }
-        prec->addhang(eddig, (char)wavazonosito, hangero, objszam);
+        prec->addhang(eddig, wavazonosito, hangero, objszam);
     }
 }
 
@@ -251,8 +251,8 @@ static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig,
         // Hang adas:
         if (prec) {
             // Most kihagyjuk wavgyujtot:
-            start_wav(WAV_TURN, 0.99);
-            prec->addhang(eddig, WAV_TURN, 0.99, -1);
+            start_wav(WavEvent::Turn, 0.99);
+            prec->addhang(eddig, WavEvent::Turn, 0.99, -1);
         }
     }
 
@@ -480,9 +480,9 @@ long lejatszo(const char* filenev) {
                 set_motor_frequency(true, 1.0, 0);
                 set_motor_frequency(false, 1.0, 0);
                 if (megvanido) {
-                    start_wav(WAV_WIN, 0.999);
+                    start_wav(WavEvent::Win, 0.999);
                 } else {
-                    start_wav(WAV_DEAD, 0.999);
+                    start_wav(WavEvent::Dead, 0.999);
                 }
                 delay((int)(LevelEndDelay * 1000.0));
 
@@ -656,7 +656,7 @@ static int replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, recor
     int visszaad = prec->recall(pmot, eddig, &pvalt->inf);
     szamitfejr(pmot); // mivel nincs leptet ami kiszamolna
     // HANG ELINTEZES:
-    char wavindex;
+    WavEvent wavindex;
     double hangero;
     int objszam;
     while (prec->gethang(eddig, &wavindex, &hangero, &objszam)) {
@@ -665,11 +665,11 @@ static int replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, recor
             spritefeldolgoz(objszam, &tmpi, pmot);
         } else {
             start_wav(wavindex, hangero);
-            if (wavindex == WAV_RIGHT_VOLT) {
+            if (wavindex == WavEvent::RightVolt) {
                 pvalt->ugras1volt = 1;
                 pvalt->utolsougras = eddig;
             }
-            if (wavindex == WAV_LEFT_VOLT) {
+            if (wavindex == WavEvent::LeftVolt) {
                 pvalt->ugras1volt = 0;
                 pvalt->utolsougras = eddig;
             }

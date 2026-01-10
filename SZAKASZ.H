@@ -72,8 +72,6 @@ class lines {
     void iterate_all_lines();
     // Grab the next line in the level
     line* get_line();
-
-    line* getptrszakasz(int sorszam);
 };
 
 extern lines* Lines;

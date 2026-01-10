@@ -383,10 +383,3 @@ line* lines::get_line() {
     }
     return &line_list[line_list_current_index++];
 }
-
-line* lines::getptrszakasz(int sorszam) {
-    if (sorszam >= line_list_length) {
-        internal_error("lines::getptrszakasz-ban sorszam >= line_list_length!");
-    }
-    return &line_list[sorszam];
-}

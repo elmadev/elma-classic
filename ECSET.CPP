@@ -10,7 +10,7 @@
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "pic8.h"
-#include "SZAKASZ.H"
+#include "lines.h"
 #include "TOPOL.H"
 #include <cstdint>
 #include <cmath>

@@ -23,7 +23,7 @@ constexpr int Darabszam = 8981; // Ot perc
 constexpr int Hangdarabszam = 3900;
 
 static double Valtrate = 30; // 60;
-static double Recorderszorzo = Valtrate / (182.0 * 0.0024);
+static double Recorderszorzo = Valtrate / (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024);
 
 recorder::recorder(void) {
     palyanev[0] = 0;

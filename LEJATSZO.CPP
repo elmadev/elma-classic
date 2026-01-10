@@ -11,6 +11,7 @@
 #include "physics_init.h"
 #include "platform_impl.h"
 #include "platform_utils.h"
+#include "timer.h"
 #include "TOPOL.H"
 #include <cmath>
 #include <cstring>
@@ -199,7 +200,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
                 if (eredmeny == 0) {
                     *pmeghalt = 1;
                 } else {
-                    *pmegvanido = eddig * 100.0 / (182.0 * 0.0024);
+                    *pmegvanido = eddig * TimeToCentiseconds;
                 }
             }
         } else {
@@ -561,7 +562,7 @@ long lejatszo(const char* filenev) {
 
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;
-            tpl *= 182;
+            tpl *= STOPWATCH_MULTIPLIER * 1000.0;
             int framerate = (int)(tpl);
             if (access("f_rate.inf", 0) == 0) {
                 // igyhagyni fopen-t!:
@@ -853,7 +854,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             double eltelido = stopwatch();
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;
-            tpl *= 182;
+            tpl *= STOPWATCH_MULTIPLIER * 1000.0;
             int framerate = (int)(tpl);
             if (access("f_rate.inf", 0) == 0) {
                 // igyhagyni fopen-t!:

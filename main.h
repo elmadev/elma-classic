@@ -1,6 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+constexpr double STOPWATCH_MULTIPLIER = 0.182;
 extern bool ErrorGraphicsLoaded;
 
 void quit();

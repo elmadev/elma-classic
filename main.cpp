@@ -15,9 +15,9 @@
 
 static double StopwatchStartTime = 0.0;
 
-double stopwatch() { return get_milliseconds() * 0.182 - StopwatchStartTime; }
+double stopwatch() { return get_milliseconds() * STOPWATCH_MULTIPLIER - StopwatchStartTime; }
 
-void stopwatch_reset() { StopwatchStartTime = get_milliseconds() * 0.182; }
+void stopwatch_reset() { StopwatchStartTime = get_milliseconds() * STOPWATCH_MULTIPLIER; }
 
 eol_settings* EolSettings = nullptr;
 

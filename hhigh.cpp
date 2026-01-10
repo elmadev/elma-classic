@@ -176,12 +176,6 @@ void start_wav(WavEvent event, double volume) {
     internal_error("start_wav Unable to find free wav slot!");
 }
 
-static void mix_into_buffer(short* buffer, short* source, int buffer_length, unsigned long volume) {
-    for (int i = 0; i < buffer_length; i++) {
-        buffer[i] += short((source[i] * volume) >> 16);
-    }
-}
-
 // Initialize motor sound struct
 void start_motor_sound(bool is_motor1) {
     motor_sound* mot = is_motor1 ? &MotorSound1 : &MotorSound2;
@@ -205,6 +199,12 @@ void stop_motor_sound(bool is_motor1) {
 static void mix_into_buffer(short* buffer, short* source, int buffer_length) {
     for (int i = 0; i < buffer_length; i++) {
         buffer[i] += source[i];
+    }
+}
+
+static void mix_into_buffer(short* buffer, short* source, int buffer_length, unsigned long volume) {
+    for (int i = 0; i < buffer_length; i++) {
+        buffer[i] += short((source[i] * volume) >> 16);
     }
 }
 

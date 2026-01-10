@@ -14,6 +14,7 @@
 #include "qopen.h"
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #define DEFAULTSIZE (20.0)
 

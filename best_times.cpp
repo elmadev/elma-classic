@@ -8,6 +8,7 @@
 #include "state.h"
 #include "TELJES.H"
 #include <stdlib.h>
+#include <string.h>
 
 // Format time as 00:00:00 (or 00:00:00:00 if hours are allowed)
 void centiseconds_to_string(long time, char* text, bool show_hours) {

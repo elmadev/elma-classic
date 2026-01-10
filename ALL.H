@@ -1,4 +1,3 @@
-#include <string.h>
 #include <math.h>
 
 #define SCREEN_WIDTH 640

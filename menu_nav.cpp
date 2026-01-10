@@ -3,6 +3,7 @@
 #include "fs_utils.h"
 #include "main.h"
 #include "menu_pic.h"
+#include <string.h>
 
 int NavEntriesLeftMaxLength = 1;
 

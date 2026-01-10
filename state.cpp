@@ -5,6 +5,7 @@
 #include "main.h"
 #include "menu_dialog.h"
 #include "platform_utils.h"
+#include <string.h>
 
 constexpr int STATE_VERSION = 200;
 

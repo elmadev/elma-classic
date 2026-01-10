@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "main.h"
 #include "platform_utils.h"
+#include <string.h>
 
 struct res_file {
     char filename[16];

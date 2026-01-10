@@ -15,6 +15,7 @@
 #include "TELJES.H"
 #include "timer.h"
 #include <stdlib.h>
+#include <string.h>
 
 /*static void betuki( int oszlop, char c ) {
     int x = 50+oszlop*19;

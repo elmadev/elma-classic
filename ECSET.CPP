@@ -12,6 +12,7 @@
 #include "pic8.h"
 #include "SZAKASZ.H"
 #include <cstdint>
+#include <string.h>
 
 typedef uintptr_t pixelek_t;
 

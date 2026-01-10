@@ -14,6 +14,7 @@
 #include "pic8.h"
 #include "platform_utils.h"
 #include "qopen.h"
+#include <string.h>
 
 state* State = NULL;
 eol_settings* EolSettings = nullptr;

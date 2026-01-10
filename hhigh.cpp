@@ -1,5 +1,6 @@
 #include "ALL.H"
 #include "main.h"
+#include <string.h>
 
 int Hangenabled = 0;
 

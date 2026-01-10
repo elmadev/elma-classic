@@ -9,6 +9,7 @@
 #include "platform_utils.h"
 #include "state.h"
 #include <ctype.h>
+#include <string.h>
 
 bool InEditor = false;
 

@@ -7,6 +7,7 @@
 #include <cstring>
 
 using UnsignedFixed32 = FixedPoint<unsigned int>;
+using SignedFixed32 = FixedPoint<int>;
 
 bool Mute = true;
 
@@ -334,7 +335,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 // Copy until the end of the sound effect, then loop
                 mot->motor_state = MotorState::IDLE;
                 mot->playback_index_idle = WAV_FADE_LENGTH;
-                long previous_dt = 65536.0 * mot->frequency_prev;
+                SignedFixed32 previous_dt = SignedFixed32(mot->frequency_prev);
                 for (int i = 0; i < WAV_FADE_LENGTH; i++) {
                     short gas_sample;
                     if (is_motor1) {
@@ -354,9 +355,9 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 break;
             } else {
                 // Buffer is full
-                long previous_dt = 65536.0 * mot->frequency_prev;
-                long current_dt = 65536.0 * mot->frequency_next;
-                long ddt = 0;
+                SignedFixed32 previous_dt = SignedFixed32(mot->frequency_prev);
+                SignedFixed32 current_dt = SignedFixed32(mot->frequency_next);
+                SignedFixed32 ddt(0);
                 if (source_length > 30) {
                     ddt = (current_dt - previous_dt) / ((double)source_length);
                 }
@@ -366,9 +367,9 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                     } else {
                         buffer[copied_counter + i] += SoundMotorGas2->getnextsample(previous_dt);
                     }
-                    previous_dt += ddt;
+                    previous_dt = previous_dt + ddt;
                 }
-                mot->frequency_prev = ((double)previous_dt) / 65536.0;
+                mot->frequency_prev = (double)(previous_dt);
                 return;
             }
             break;

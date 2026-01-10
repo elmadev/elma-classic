@@ -1,6 +1,10 @@
 #ifndef WAV_H
 #define WAV_H
 
+#include "fixed_point.h"
+
+using SignedFixed32 = FixedPoint<int>;
+
 // enum { W_MONO = 1, W_LEFT, W_RIGHT };
 
 class wav {
@@ -22,14 +26,13 @@ class wav {
 
 class wav2 {
     short *tomb, *mtomb;
-    unsigned long ulsize, ulfuto;
-    unsigned short *plow, *phigh;
+    SignedFixed32 ulsize, ulfuto;
 
   public:
     wav2(wav* pwav);
     void reset(int fazis = -1);
     // dt 65536 szoros:
-    short getnextsample(long dt);
+    short getnextsample(SignedFixed32 dt);
 };
 
 #endif

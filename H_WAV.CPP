@@ -189,25 +189,23 @@ wav2::wav2(wav* pwav) {
         mtomb[i] = tomb[i + 1] - tomb[i];
     }
     mtomb[pwav->size - 1] = tomb[0] - tomb[pwav->size - 1];
-    ulsize = ((unsigned long)pwav->size) * 65536;
-    ulfuto = 0;
-    plow = (unsigned short*)&ulfuto;
-    phigh = plow + 1;
+    ulsize = SignedFixed32(pwav->size);
+    ulfuto = SignedFixed32(0);
 }
 
 void wav2::reset(int fazis) {
     if (fazis < 0) {
-        ulfuto = 0;
+        ulfuto = SignedFixed32(0);
     } else {
-        ulfuto = fazis * 65536;
+        ulfuto = SignedFixed32(fazis);
     }
 }
 
 // dt 65536 szoros:
-short wav2::getnextsample(long dt) {
-    ulfuto += dt;
+short wav2::getnextsample(SignedFixed32 dt) {
+    ulfuto = ulfuto + dt;
     if (ulfuto >= ulsize) {
-        ulfuto -= ulsize;
+        ulfuto = ulfuto - ulsize;
     }
-    return tomb[*phigh] + ((mtomb[*phigh] * (*plow)) >> 16);
+    return tomb[(int)(ulfuto)] + ((int)(mtomb[(int)(ulfuto)] * (ulfuto % SignedFixed32(1))));
 }

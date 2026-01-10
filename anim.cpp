@@ -46,7 +46,7 @@ anim::~anim() {
 
 constexpr double FrameTimestep = 0.014;
 
-// Input time is milliseconds*0.182*0.0024
+// Input time is milliseconds*STOPWATCH_MULTIPLIER*0.0024
 // Therefore framerate is 31.2 fps?
 pic8* anim::get_frame_by_time(double time) {
     int step = (int)(time / FrameTimestep);

@@ -17,9 +17,9 @@
 
 static double StopwatchStartTime = 0;
 
-double stopwatch() { return timeGetTime() * 0.182 - StopwatchStartTime; }
+double stopwatch() { return timeGetTime() * STOPWATCH_MULTIPLIER - StopwatchStartTime; }
 
-void stopwatch_reset() { StopwatchStartTime = timeGetTime() * 0.182; }
+void stopwatch_reset() { StopwatchStartTime = timeGetTime() * STOPWATCH_MULTIPLIER; }
 
 int main() {
     platform_init();

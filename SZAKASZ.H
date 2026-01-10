@@ -3,7 +3,13 @@
 
 #include "vect2.h"
 
-struct line;
+class topol;
+
+// A single line from a polygon
+struct line {
+    vect2 r, v, unit_vector;
+    double length;
+};
 
 // Linked list of level lines
 struct line_node {
@@ -14,13 +20,11 @@ struct line_node {
 typedef line_node* pline_node;
 
 // Memory structure to allocate data for line_node
-#define LINE_NODE_BLOCK_SIZE (500)
+constexpr int LINE_NODE_BLOCK_SIZE = 500;
 struct line_node_array {
     line_node nodes[LINE_NODE_BLOCK_SIZE];
     line_node_array* next;
 };
-
-class topol;
 
 /* This class contains a list of all the lines in a level (line_list).
  * You can iterate through all the lines using iterate_all_lines() and get_line().
@@ -49,12 +53,12 @@ class lines {
     // Memory structures:
     line_node_array* node_array;
     int node_array_index;
-    line_node* get_new_line_node(void);
-    void delete_all_line_nodes(void);
+    line_node* get_new_line_node();
+    void delete_all_line_nodes();
 
   public:
     lines(topol* lev);
-    ~lines(void);
+    ~lines();
 
     // Initialize the collision_grid with the max radius of any interactable bike part
     void setup_collision_grid(double max_radius);
@@ -62,21 +66,14 @@ class lines {
     // to position r
     void select_collision_grid_cell(vect2 r);
     // Get the next line of potential collision from the cell in collision_grid
-    line* get_line_from_collision_grid_cell(void);
+    line* get_line_from_collision_grid_cell();
 
     // Reset to iterate through all lines in the level
-    void iterate_all_lines(void);
+    void iterate_all_lines();
     // Grab the next line in the level
-    line* get_line(void);
+    line* get_line();
 
     line* getptrszakasz(int sorszam);
-    int getsorszam(line* pvonal);
-};
-
-// A single line from a polygon
-struct line {
-    vect2 r, v, unit_vector;
-    double length;
 };
 
 extern lines* Lines;

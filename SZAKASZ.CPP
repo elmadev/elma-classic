@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cstring>
 
-constexpr int MAX_LINES = MAX_VERTICES + 130;
+constexpr int MAX_LINES = MAX_VERTICES;
 
 lines* Lines = nullptr;
 

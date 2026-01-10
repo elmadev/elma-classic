@@ -13,6 +13,7 @@
 #include "menu_pic.h"
 #include "PLAY.H"
 #include "TELJES.H"
+#include <time.h>
 
 /*void showinstruct( void ) {
     blit8( Korny->picbuffer, Korny->ppic_help );

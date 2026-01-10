@@ -253,9 +253,6 @@ void lines::setup_collision_grid(double max_radius) {
     // Get min/max values
     iterate_all_lines();
     line* cur_line = get_line();
-    if (!cur_line) {
-        internal_error("lines::setup no lines found!");
-    }
     double minx = cur_line->r.x;
     double maxx = cur_line->r.x;
     double miny = cur_line->r.y;
@@ -375,7 +372,12 @@ line* lines::get_line_from_collision_grid_cell() {
     return ret;
 }
 
-void lines::iterate_all_lines() { line_list_current_index = 0; }
+void lines::iterate_all_lines() {
+    if (line_list_length == 0) {
+        internal_error("lines::iterate_all_lines there are no lines to iterate!");
+    }
+    line_list_current_index = 0;
+}
 
 line* lines::get_line() {
     if (line_list_current_index >= line_list_length) {

@@ -87,9 +87,6 @@ void ecset::getorigoandsize(void) {
     // Megkeresi burkolokat:
     Lines->iterate_all_lines();
     line* psz = Lines->get_line();
-    if (!psz) {
-        internal_error("Nincs egyetlen szakasz sem definialva!");
-    }
     double minx = psz->r.x;
     double maxx = psz->r.x;
     double miny = psz->r.y;
@@ -1315,9 +1312,6 @@ ecset::ecset(int view_p) {
     // Vegigmegyunk osszes szakaszon:
     Lines->iterate_all_lines();
     line* psz = Lines->get_line();
-    if (!psz) {
-        internal_error("Nincs egyetlen szakasz sem definialva!");
-    }
     while (psz) {
         addszakasz(psz);
         psz = Lines->get_line();

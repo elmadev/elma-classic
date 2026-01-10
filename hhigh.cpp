@@ -105,12 +105,12 @@ void sound_engine_init() {
 }
 
 // Which sound the motor is currently generating
-enum MotorState {
-    MOTOR_IGNITION,
-    MOTOR_IDLE,
-    MOTOR_IDLE_TO_GAS_TRANSITION,
-    MOTOR_GAS_START,
-    MOTOR_GASSING,
+enum class MotorState {
+    Ignition,
+    Idle,
+    IdleToGasTransition,
+    GasStart,
+    Gassing,
 };
 
 // Sound state of one bike
@@ -119,7 +119,7 @@ struct motor_sound {
     double frequency_prev;
     double frequency_next;
     int gas;
-    int motor_state;
+    MotorState motor_state;
     int playback_index_ignition;
     int playback_index_idle;
     int playback_index_gas_start;
@@ -198,7 +198,7 @@ static void mix_into_buffer(short* buffer, short* source, int buffer_length, uns
 void start_motor_sound(bool is_motor1) {
     motor_sound* mot = is_motor1 ? &MotorSound1 : &MotorSound2;
     mot->enabled = 1;
-    mot->motor_state = MOTOR_IGNITION;
+    mot->motor_state = MotorState::Ignition;
     mot->playback_index_ignition = 0;
     mot->frequency_prev = 1.0;
     mot->frequency_next = 1.0;
@@ -208,7 +208,7 @@ void start_motor_sound(bool is_motor1) {
 void stop_motor_sound(bool is_motor1) {
     motor_sound* mot = is_motor1 ? &MotorSound1 : &MotorSound2;
     mot->enabled = 0;
-    mot->motor_state = MOTOR_IGNITION;
+    mot->motor_state = MotorState::Ignition;
     mot->playback_index_ignition = 0;
     mot->frequency_prev = 1.0;
     mot->frequency_next = 1.0;
@@ -233,7 +233,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
     int source_length = -1;
     while (true) {
         switch (mot->motor_state) {
-        case MOTOR_IGNITION:
+        case MotorState::Ignition:
             // Bike turn on sound at start of level
             if (mot->playback_index_ignition + buffer_length > SoundMotorIgnition->size) {
                 // We're finished with the ignition sound. Transition to idle sound
@@ -242,7 +242,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                                 &SoundMotorIgnition->tomb[mot->playback_index_ignition],
                                 source_length);
                 copied_counter += source_length;
-                mot->motor_state = MOTOR_IDLE;
+                mot->motor_state = MotorState::Idle;
                 mot->playback_index_idle = WAV_FADE_LENGTH;
             } else {
                 // We're not finished with the ignition sound, but the buffer is full
@@ -254,11 +254,11 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 return;
             }
             break;
-        case MOTOR_IDLE:
+        case MotorState::Idle:
             // Idle bike sound
             if (mot->gas) {
                 // If we are pressing gas, immediately go to transition sound
-                mot->motor_state = MOTOR_IDLE_TO_GAS_TRANSITION;
+                mot->motor_state = MotorState::IdleToGasTransition;
                 mot->playback_index_gas_start = 0;
             } else {
                 // Otherwise, infinitely loop the idle sound
@@ -279,14 +279,14 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 }
             }
             break;
-        case MOTOR_IDLE_TO_GAS_TRANSITION:
+        case MotorState::IdleToGasTransition:
             // Fade from idle sound effect to start-of-gas sound effect
             source_length = buffer_length - copied_counter;
             source_index_end = mot->playback_index_gas_start + source_length;
             if (source_index_end > WAV_FADE_LENGTH) {
                 // When we are done fading, we will move on to the start-of-gas sound effect
                 source_index_end = WAV_FADE_LENGTH;
-                mot->motor_state = MOTOR_GAS_START;
+                mot->motor_state = MotorState::GasStart;
             }
             // Fade the first WAV_FADE_LENGTH samples
             fade_counter = 0;
@@ -307,7 +307,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 return;
             }
             break;
-        case MOTOR_GAS_START:
+        case MotorState::GasStart:
             // start-of-gas sound effect (sound frequency does not yet depend on speed)
             source_length = buffer_length - copied_counter;
             if (source_length > SoundMotorGasStart->size - mot->playback_index_gas_start) {
@@ -317,7 +317,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                                 &SoundMotorGasStart->tomb[mot->playback_index_gas_start],
                                 source_length);
                 copied_counter += source_length;
-                mot->motor_state = MOTOR_GASSING;
+                mot->motor_state = MotorState::Gassing;
                 if (is_motor1) {
                     SoundMotorGas1->reset(WAV_FADE_LENGTH);
                 } else {
@@ -333,14 +333,14 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 return;
             }
             break;
-        case MOTOR_GASSING:
+        case MotorState::Gassing:
             // Gassing sound effect - variable playback speed based on wheel spin speed
             // We interpolate the playback speed over the buffer length,
             // so sound playback isn't deterministic across platforms
             source_length = buffer_length - copied_counter;
             if (!mot->gas && source_length > WAV_FADE_LENGTH) {
                 // Copy until the end of the sound effect, then loop
-                mot->motor_state = MOTOR_IDLE;
+                mot->motor_state = MotorState::Idle;
                 mot->playback_index_idle = WAV_FADE_LENGTH;
                 long previous_dt = 65536.0 * mot->frequency_prev;
                 for (int i = 0; i < WAV_FADE_LENGTH; i++) {

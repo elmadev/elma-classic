@@ -1,9 +1,12 @@
 #include "HANGHIGH.H"
+#include "fixed_point.h"
 #include "main.h"
 #include "platform_impl.h"
 #include "TOPOL.H"
 #include "WAV.H"
 #include <cstring>
+
+using UnsignedFixed32 = FixedPoint<unsigned int>;
 
 bool Mute = true;
 
@@ -26,7 +29,7 @@ static int ActiveWavEvents = 0;
 constexpr int MAX_WAV_EVENTS = 5;
 static int WavEventActive[MAX_WAV_EVENTS];
 static int WavEventPlaybackIndex[MAX_WAV_EVENTS];
-static unsigned long WavEventVolume[MAX_WAV_EVENTS];
+static UnsignedFixed32 WavEventVolume[MAX_WAV_EVENTS];
 static wav* WavEventSound[MAX_WAV_EVENTS];
 
 // Load all sounds into memory
@@ -81,7 +84,7 @@ void sound_engine_init() {
     for (int i = 0; i < MAX_WAV_EVENTS; i++) {
         WavEventActive[i] = 0;
         WavEventPlaybackIndex[i] = 0;
-        WavEventVolume[i] = 0;
+        WavEventVolume[i] = UnsignedFixed32(0);
         WavEventSound[i] = nullptr;
     }
 
@@ -169,7 +172,7 @@ void start_wav(WavEvent event, double volume) {
             WavEventActive[i] = 1;
             WavEventPlaybackIndex[i] = 0;
             WavEventSound[i] = sound;
-            WavEventVolume[i] = volume * 65536.0;
+            WavEventVolume[i] = UnsignedFixed32(volume);
             return;
         }
     }
@@ -202,9 +205,10 @@ static void mix_into_buffer(short* buffer, short* source, int buffer_length) {
     }
 }
 
-static void mix_into_buffer(short* buffer, short* source, int buffer_length, unsigned long volume) {
+static void mix_into_buffer(short* buffer, short* source, int buffer_length,
+                            UnsignedFixed32 volume) {
     for (int i = 0; i < buffer_length; i++) {
-        buffer[i] += short((source[i] * volume) >> 16);
+        buffer[i] += short(source[i] * volume);
     }
 }
 

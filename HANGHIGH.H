@@ -15,30 +15,27 @@ enum {
     WAV_TURA
 };
 
-// Csak program elejen allithato:
-// Ha hamis, semmi directsound fv.-t nem hiv:
 extern int SoundInitialized;
-// Ha igaz, callback fuggveny 0-kat ir bufferbe:
 extern int Mute;
 
 void sound_engine_init(void);
 void stophanghigh(void);
 
-// Elinditja alapjarat hangot:
 void start_motor_sound(int is_motor1);
-// Leallitja motor hangjat (ha meghalt):
 void stop_motor_sound(int is_motor1);
-// frekvencia 1.0-tol 2.0-ig valtozik csak:
+
+// Set the playback speed of the bike gassing sound effect (capped between 1.0 and 2.0)
 void set_motor_frequency(int is_motor1, double frequency, int gas);
 
+// Set bike squeak sound (0.0 to 1.0)
 void set_friction_volume(double volume);
 
+// Start a wavbank event
 void start_wav(int event, double volume);
 int vanmegwav(void);
 
 void delay(int milliseconds);
 
-// Ezt meg kell irni hozza:
 void sound_mixer(short* buffer, int buffer_length);
 
 #endif

@@ -8,6 +8,7 @@
 #include "pic8.h"
 #include "platform_utils.h"
 #include "state.h"
+#include <ctype.h>
 
 bool InEditor = false;
 

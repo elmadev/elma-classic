@@ -6,6 +6,7 @@
 #include "main.h"
 #include "menu_pic.h"
 #include "pic8.h"
+#include "platform_impl.h"
 #include "platform_utils.h"
 #include "state.h"
 #include <ctype.h>

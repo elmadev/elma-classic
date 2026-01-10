@@ -1,3 +1,4 @@
+#include "platform_impl.h"
 #include "ALL.H"
 #include "editor_dialog.h"
 #include "EDITUJ.H"

@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "directinput_scancodes.h"
 #include "menu_nav.h"
+#include "platform_impl.h"
 #include "state.h"
 #include <string.h>
 

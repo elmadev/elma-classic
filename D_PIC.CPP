@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "main.h"
 #include "pic8.h"
+#include "platform_impl.h"
 
 static pic8* Lockbuff = NULL;
 

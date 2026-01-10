@@ -1,6 +1,7 @@
 #include "ALL.H"
 #include "main.h"
 #include "pic8.h"
+#include "platform_impl.h"
 #include "platform_utils.h"
 #include "qopen.h"
 #include <string.h>

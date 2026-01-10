@@ -5,6 +5,7 @@
 #include "main.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
+#include "platform_impl.h"
 #include "platform_utils.h"
 #include "PLAY.H"
 #include "TOPOL.H"

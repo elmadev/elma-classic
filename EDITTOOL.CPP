@@ -4,6 +4,7 @@
 #include "editor_dialog.h"
 #include "EDITTOLT.H"
 #include "EDITUJ.H"
+#include "platform_impl.h"
 #include "polygon.h"
 #include "LGRFILE.H"
 #include "M_PIC.H"

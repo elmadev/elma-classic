@@ -9,6 +9,7 @@
 #include "LGRFILE.H"
 #include "main.h"
 #include "physics_init.h"
+#include "platform_impl.h"
 #include "platform_utils.h"
 #include "TOPOL.H"
 #include <math.h>

@@ -4,6 +4,7 @@
 #include "EDITUJ.H"
 #include "LEJATSZO.H"
 #include "LOAD.H"
+#include "platform_impl.h"
 #include "TOPOL.H"
 
 void editplay(void) {

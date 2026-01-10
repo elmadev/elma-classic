@@ -11,6 +11,7 @@
 #include "menu_nav.h"
 #include "menu_options.h"
 #include "menu_pic.h"
+#include "platform_impl.h"
 #include "PLAY.H"
 #include "TELJES.H"
 #include "TOPOL.H"

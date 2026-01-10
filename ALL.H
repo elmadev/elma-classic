@@ -9,5 +9,3 @@
 // #include	<graph.h>
 
 // Kozos:
-
-#include "platform_impl.h"

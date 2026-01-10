@@ -1,6 +1,7 @@
 #include "HANGHIGH.H"
 #include "ALL.H"
 #include "main.h"
+#include "platform_impl.h"
 #include "TOPOL.H"
 #include "WAV.H"
 #include <string.h>

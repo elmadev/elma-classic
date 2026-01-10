@@ -10,6 +10,4 @@
 
 // Kozos:
 
-#include "WAV.H"
-
 #include "platform_impl.h"

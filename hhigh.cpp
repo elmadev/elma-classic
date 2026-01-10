@@ -2,6 +2,7 @@
 #include "ALL.H"
 #include "main.h"
 #include "TOPOL.H"
+#include "WAV.H"
 #include <string.h>
 
 int Hangenabled = 0;

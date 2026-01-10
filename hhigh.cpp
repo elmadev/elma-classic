@@ -9,38 +9,40 @@ int SoundInitialized = 0;
 
 int Mute = 1;
 
-#define WAVBANKSZAM (20)
+#define WAV_BANK_LENGTH (20)
 typedef wav* wavramut;
-wavramut Wavbank[WAVBANKSZAM];
+wavramut WavBank[WAV_BANK_LENGTH];
 
 // wav *Pberreg = NULL;
 
-static wav *Pw1 = NULL, *Pw2 = NULL, *Pw3 = NULL, *Pw4 = NULL, *Psurl = NULL;
-static wav2 *Pw42a = NULL, *Pw42b = NULL;
+static wav *SoundMotorIgnition = NULL, *SoundMotorIdle = NULL, *SoundMotorGasStart = NULL,
+           *SoundMotorGas = NULL, *SoundFriction = NULL;
+static wav2 *SoundMotorGas1 = NULL, *SoundMotorGas2 = NULL;
 
-static int Mix = 100, I1 = 7526, I2 = 34648, I3 = 38766, I4 = 14490, I5 = 18906;
+static int WAV_FADE_LENGTH = 100, HARL_MAX_INDEX_1 = 7526, HARL_MAX_INDEX_2 = 34648,
+           HARL_MAX_INDEX_3 = 38766, HARL2_MIN_INDEX = 14490, HARL2_MAX_INDEX = 18906;
 
-static double Egypermix = 1.0 / Mix;
+static double WAV_FADE_LENGTH_RECIPROCAL = 1.0 / WAV_FADE_LENGTH;
 
 // static int Buffsize = 500;
 static int Atmenet = 499;
 
-static int Hanghighbevoltkapcsolva = 0;
+static int SoundEngineInitialized = 0;
 
-static int Wavszam = 0;
-#define MAXWAV (5)
-static int Ezmegy[MAXWAV];
-static int Kovhang[MAXWAV];
-static unsigned long Hangerok[MAXWAV];
-static wav* Pwavok[MAXWAV];
+static int ActiveWavEvents = 0;
+#define MAX_WAV_EVENTS (5)
+static int WavEventActive[MAX_WAV_EVENTS];
+static int WavEventPlaybackIndex[MAX_WAV_EVENTS];
+static unsigned long WavEventVolume[MAX_WAV_EVENTS];
+static wav* WavEventSound[MAX_WAV_EVENTS];
 
-static int Elsostart = 1;
+static int SoundEngineUninitialized = 1;
 
 void sound_engine_init(void) {
-    if (!Elsostart) {
-        internal_error("sound_engine_init-ban !Elsostart!");
+    if (!SoundEngineUninitialized) {
+        internal_error("sound_engine_init !SoundEngineUninitialized!");
     }
-    Elsostart = 0;
+    SoundEngineUninitialized = 0;
     if (!SoundInitialized) {
         return;
     }
@@ -50,64 +52,73 @@ void sound_engine_init(void) {
         SoundInitialized = 0;
         return;
     }*/
-    if (Hanghighbevoltkapcsolva) {
-        internal_error("Hanghighbevoltkapcsolva igaz sound_engine_init-ban!");
+    if (SoundEngineInitialized) {
+        internal_error("SoundEngineInitialized igaz sound_engine_init-ban!");
     }
-    Hanghighbevoltkapcsolva = 1;
-    for (int i = 0; i < WAVBANKSZAM; i++) {
-        Wavbank[i] = NULL;
+    SoundEngineInitialized = 1;
+    for (int i = 0; i < WAV_BANK_LENGTH; i++) {
+        WavBank[i] = NULL;
     }
-    Wavbank[WAV_BUMP] = new wav("utodes.wav", 0.25);
-    Wavbank[WAV_DEAD] = new wav("torik.wav", 0.34);
-    Wavbank[WAV_WIN] = new wav("siker.wav", 0.8);
-    Wavbank[WAV_FOOD] = new wav("eves.wav", 0.5);
-    Wavbank[WAV_TURN] = new wav("fordul.wav", 0.3);
-    Wavbank[WAV_RIGHT_VOLT] = new wav("ugras.wav", 0.34);
-    Wavbank[WAV_LEFT_VOLT] = Wavbank[WAV_RIGHT_VOLT];
-    Psurl = new wav("dorzsol.wav", 0.44);
-    Psurl->loopol(Mix);
+    WavBank[WAV_BUMP] = new wav("utodes.wav", 0.25);      // collision
+    WavBank[WAV_DEAD] = new wav("torik.wav", 0.34);       // shatter
+    WavBank[WAV_WIN] = new wav("siker.wav", 0.8);         // success
+    WavBank[WAV_FOOD] = new wav("eves.wav", 0.5);         // eating
+    WavBank[WAV_TURN] = new wav("fordul.wav", 0.3);       // turn
+    WavBank[WAV_RIGHT_VOLT] = new wav("ugras.wav", 0.34); // jump
+    WavBank[WAV_LEFT_VOLT] = WavBank[WAV_RIGHT_VOLT];
+    SoundFriction = new wav("dorzsol.wav", 0.44); // friction
+    SoundFriction->loopol(WAV_FADE_LENGTH);
 
-    double berregero = 0.26;
-    Pw1 = new wav("harl.wav", berregero, 0, I1 + Mix);
-    Pw2 = new wav("harl.wav", berregero, I1, I2);
-    Pw3 = new wav("harl.wav", berregero, I2 - Mix, I3);
-    Pw4 = new wav("harl2.wav", berregero, I4, I5);
+    double volume = 0.26;
+    // Filename possibly a reference to Harley-Davidson motorcycles
+    SoundMotorIgnition = new wav("harl.wav", volume, 0, HARL_MAX_INDEX_1 + WAV_FADE_LENGTH);
+    SoundMotorIdle = new wav("harl.wav", volume, HARL_MAX_INDEX_1, HARL_MAX_INDEX_2);
+    SoundMotorGasStart =
+        new wav("harl.wav", volume, HARL_MAX_INDEX_2 - WAV_FADE_LENGTH, HARL_MAX_INDEX_3);
+    SoundMotorGas = new wav("harl2.wav", volume, HARL2_MIN_INDEX, HARL2_MAX_INDEX);
 
-    Pw2->loopol(Mix);
-    // Pw2->save( "alacsony.wav" );
-    Pw4->loopol(Mix);
-    Pw3->vegereilleszt(Pw4, Mix);
+    SoundMotorIdle->loopol(WAV_FADE_LENGTH);
+    // SoundMotorIdle->save( "alacsony.wav" );
+    SoundMotorGas->loopol(WAV_FADE_LENGTH);
+    SoundMotorGasStart->vegereilleszt(SoundMotorGas, WAV_FADE_LENGTH);
 
-    Pw42a = new wav2(Pw4);
-    Pw42a->reset();
-    Pw42b = new wav2(Pw4);
-    Pw42b->reset();
+    SoundMotorGas1 = new wav2(SoundMotorGas);
+    SoundMotorGas1->reset();
+    SoundMotorGas2 = new wav2(SoundMotorGas);
+    SoundMotorGas2->reset();
 
-    for (int i = 0; i < MAXWAV; i++) {
-        Ezmegy[i] = 0;
-        Kovhang[i] = 0;
-        Hangerok[i] = 0;
-        Pwavok[i] = NULL;
+    for (int i = 0; i < MAX_WAV_EVENTS; i++) {
+        WavEventActive[i] = 0;
+        WavEventPlaybackIndex[i] = 0;
+        WavEventVolume[i] = 0;
+        WavEventSound[i] = NULL;
     }
     Mute = 0;
 
-    Pw2->hangero(0.4);
+    SoundMotorIdle->hangero(0.4);
 }
 
-enum allapot { A_INDIT = 0, A_ALACSONY, A_ATMENETBE, A_ATMENET, A_MAGAS, A_VISSZAMENET };
-
-struct mothangstruct {
-    int jarmotor;
-    double frekvenciamost;
-    double frekvenciakell;
-    int gaz;
-    int allapot;
-    int i_indit;
-    int i_alacsony;
-    int i_atmenet;
+enum MotorState {
+    MOTOR_IGNITION = 0,
+    MOTOR_IDLE,
+    MOTOR_IDLE_TO_GAS_TRANSITION,
+    MOTOR_GAS_START,
+    MOTOR_GASSING,
+    A_VISSZAMENET
 };
 
-static mothangstruct Moth1, Moth2;
+struct motor_sound {
+    int enabled;
+    double frequency_prev;
+    double frequency_next;
+    int gas;
+    int motor_state;
+    int playback_index_ignition;
+    int playback_index_idle;
+    int playback_index_gas_start;
+};
+
+static motor_sound MotorSound1, MotorSound2;
 
 // frekvencia 1.0-tol 2.0-ig valtozik csak:
 void set_motor_frequency(int is_motor1, double frequency, int gas) {
@@ -118,14 +129,14 @@ void set_motor_frequency(int is_motor1, double frequency, int gas) {
         return;
     }
 
-    mothangstruct* pms;
+    motor_sound* mot;
     if (is_motor1) {
-        pms = &Moth1;
+        mot = &MotorSound1;
     } else {
-        pms = &Moth2;
+        mot = &MotorSound2;
     }
 
-    pms->gaz = gas;
+    mot->gas = gas;
     if (frequency > 2.0) {
         frequency = 2.0;
     }
@@ -133,12 +144,12 @@ void set_motor_frequency(int is_motor1, double frequency, int gas) {
         frequency = 0.0;
     }
 
-    pms->frekvenciakell = frequency;
+    mot->frequency_next = frequency;
     // 2.0 - exp(1.0-frekvencia)
 }
 
-static double Surleromost = 0.0;
-static double Surlerokell = 0.0;
+static double FrictionVolumePrev = 0.0;
+static double FrictionVolumeNext = 0.0;
 
 void set_friction_volume(double volume) {
     if (volume > 1.0) {
@@ -147,7 +158,7 @@ void set_friction_volume(double volume) {
     if (volume < 0) {
         volume = 0;
     }
-    Surlerokell = volume;
+    FrictionVolumeNext = volume;
 }
 
 // int Wavevolt = 0;
@@ -159,24 +170,24 @@ void start_wav(int event, double volume) {
     }
 
     if (volume <= 0.0 || volume >= 1.0) {
-        internal_error("wav: volume <= 0.0 || volume >= 1.0!");
+        internal_error("start_wav volume <= 0.0 || volume >= 1.0!");
     }
 
-    wav* pwav = Wavbank[event];
+    wav* sound = WavBank[event];
 
-    if (Wavszam >= MAXWAV) {
+    if (ActiveWavEvents >= MAX_WAV_EVENTS) {
         return;
     }
 
     //_disable();
-    for (int i = 0; i < MAXWAV; i++) {
-        if (!Ezmegy[i]) {
+    for (int i = 0; i < MAX_WAV_EVENTS; i++) {
+        if (!WavEventActive[i]) {
             // i. csatorna szabad!
-            Wavszam++;
-            Ezmegy[i] = 1;
-            Kovhang[i] = 0;
-            Pwavok[i] = pwav;
-            Hangerok[i] = volume * 65536.0;
+            ActiveWavEvents++;
+            WavEventActive[i] = 1;
+            WavEventPlaybackIndex[i] = 0;
+            WavEventSound[i] = sound;
+            WavEventVolume[i] = volume * 65536.0;
             //_enable();
             // if( Wavevolt )
             //	external_error( "Wavevolt utan!" );
@@ -184,45 +195,46 @@ void start_wav(int event, double volume) {
         }
     }
     //_enable();
-    internal_error("Wavszam szerint meg van csat, de nincs!");
+    internal_error("start_wav Unable to find free wav slot!");
 }
 
 // hangero meg van szorozva 65536-tal:
-static void wavadd(short* buff, short* tomb, long size, unsigned long hangero) {
-    for (unsigned long i = 0; i < size; i++) {
-        buff[i] += short((tomb[i] * hangero) >> 16);
+static void mix_into_buffer(short* buffer, short* source, long buffer_length,
+                            unsigned long volume) {
+    for (unsigned long i = 0; i < buffer_length; i++) {
+        buffer[i] += short((source[i] * volume) >> 16);
     }
 }
 
 void start_motor_sound(int is_motor1) {
-    mothangstruct* pms;
+    motor_sound* mot;
     if (is_motor1) {
-        pms = &Moth1;
+        mot = &MotorSound1;
     } else {
-        pms = &Moth2;
+        mot = &MotorSound2;
     }
 
-    pms->jarmotor = 1;
-    pms->allapot = A_INDIT;
-    pms->i_indit = 0;
-    pms->frekvenciamost = 1.0;
-    pms->frekvenciakell = 1.0;
+    mot->enabled = 1;
+    mot->motor_state = MOTOR_IGNITION;
+    mot->playback_index_ignition = 0;
+    mot->frequency_prev = 1.0;
+    mot->frequency_next = 1.0;
 }
 
 // Leallitja motor hangjat (ha meghalt):
 void stop_motor_sound(int is_motor1) {
-    mothangstruct* pms;
+    motor_sound* mot;
     if (is_motor1) {
-        pms = &Moth1;
+        mot = &MotorSound1;
     } else {
-        pms = &Moth2;
+        mot = &MotorSound2;
     }
 
-    pms->jarmotor = 0;
-    pms->allapot = A_INDIT;
-    pms->i_indit = 0;
-    pms->frekvenciamost = 1.0;
-    pms->frekvenciakell = 1.0;
+    mot->enabled = 0;
+    mot->motor_state = MOTOR_IGNITION;
+    mot->playback_index_ignition = 0;
+    mot->frequency_prev = 1.0;
+    mot->frequency_next = 1.0;
 }
 
 /*static void shortcpy( short* dest, short* sour, int number ) {
@@ -231,159 +243,173 @@ void stop_motor_sound(int is_motor1) {
     memcpy( dest, sour, number*2 );
 }*/
 
-static void shortadd(short* dest, short* sour, int number) {
-    for (int i = 0; i < number; i++) {
-        dest[i] += sour[i];
+static void mix_into_buffer(short* buffer, short* source, int buffer_length) {
+    for (int i = 0; i < buffer_length; i++) {
+        buffer[i] += source[i];
     }
 }
 
-static void motorelintezes(int mot1, short* sbuff, int buffsize) {
-    mothangstruct* pms;
-    if (mot1) {
-        pms = &Moth1;
+static void mix_motor_sounds(int is_motor1, short* buffer, int buffer_length) {
+    motor_sound* mot;
+    if (is_motor1) {
+        mot = &MotorSound1;
     } else {
-        pms = &Moth2;
+        mot = &MotorSound2;
     }
 
-    if (!pms->jarmotor) {
+    if (!mot->enabled) {
         return;
     }
 
     // for( int j = 0; j < Buffsize; j++ )
-    //   sbuff[j] = 0;
+    //   buffer[j] = 0;
     // return;
 
     // Most mindig erre a fv.-hivasra vonatkozik!:
-    int counter = 0;
-    int masolando = -1;
-    int ucsoutani = -1;
-    int novekmeny = -1;
+    int copied_counter = 0;
+    int source_length = -1;
+    int source_index_end = -1;
+    int fade_counter = -1;
     int i = -1;
     while (1) {
-        switch (pms->allapot) {
-        case A_INDIT:
-            if (pms->i_indit + buffsize > Pw1->size) {
-                // Meg most befejezi A_INDIT-ot:
-                int masolando = Pw1->size - pms->i_indit;
-                shortadd(&sbuff[counter], &Pw1->tomb[pms->i_indit], masolando);
-                counter += masolando;
-                pms->allapot = A_ALACSONY;
-                pms->i_alacsony = Mix;
+        switch (mot->motor_state) {
+        case MOTOR_IGNITION:
+            if (mot->playback_index_ignition + buffer_length > SoundMotorIgnition->size) {
+                // Meg most befejezi MOTOR_IGNITION-ot:
+                int source_length2 = SoundMotorIgnition->size - mot->playback_index_ignition;
+                mix_into_buffer(&buffer[copied_counter],
+                                &SoundMotorIgnition->tomb[mot->playback_index_ignition],
+                                source_length2);
+                copied_counter += source_length2;
+                mot->motor_state = MOTOR_IDLE;
+                mot->playback_index_idle = WAV_FADE_LENGTH;
             } else {
                 // Most teljes egeszeben indit-bol megy:
-                int masolando = buffsize - counter;
-                shortadd(&sbuff[counter], &Pw1->tomb[pms->i_indit], masolando);
-                pms->i_indit += masolando;
+                int source_length3 = buffer_length - copied_counter;
+                mix_into_buffer(&buffer[copied_counter],
+                                &SoundMotorIgnition->tomb[mot->playback_index_ignition],
+                                source_length3);
+                mot->playback_index_ignition += source_length3;
                 return;
             }
             break;
-        case A_ALACSONY:
-            if (pms->gaz) {
-                pms->allapot = A_ATMENETBE;
-                pms->i_atmenet = 0;
+        case MOTOR_IDLE:
+            if (mot->gas) {
+                mot->motor_state = MOTOR_IDLE_TO_GAS_TRANSITION;
+                mot->playback_index_gas_start = 0;
             } else {
                 // Korbe-korbe:
-                int masolando = buffsize - counter;
-                if (masolando > Pw2->size - pms->i_alacsony) {
+                int source_length4 = buffer_length - copied_counter;
+                if (source_length4 > SoundMotorIdle->size - mot->playback_index_idle) {
                     // Most ujra elejere kell meg ugrani:
-                    masolando = Pw2->size - pms->i_alacsony;
-                    shortadd(&sbuff[counter], &Pw2->tomb[pms->i_alacsony], masolando);
-                    counter += masolando;
-                    pms->i_alacsony = 0;
+                    source_length4 = SoundMotorIdle->size - mot->playback_index_idle;
+                    mix_into_buffer(&buffer[copied_counter],
+                                    &SoundMotorIdle->tomb[mot->playback_index_idle],
+                                    source_length4);
+                    copied_counter += source_length4;
+                    mot->playback_index_idle = 0;
                 } else {
                     // Most egy darabban lehet masolni alacsonybol:
-                    shortadd(&sbuff[counter], &Pw2->tomb[pms->i_alacsony], masolando);
-                    pms->i_alacsony += masolando;
+                    mix_into_buffer(&buffer[copied_counter],
+                                    &SoundMotorIdle->tomb[mot->playback_index_idle],
+                                    source_length4);
+                    mot->playback_index_idle += source_length4;
                     return;
                 }
             }
             break;
-        case A_ATMENETBE:
+        case MOTOR_IDLE_TO_GAS_TRANSITION:
             // alacsonyt egyre kisebb sullyal veszi,
             // atmenetet pedig egyre nagyobbal:
-            masolando = buffsize - counter;
-            ucsoutani = pms->i_atmenet + masolando;
-            if (ucsoutani > Mix) {
+            source_length = buffer_length - copied_counter;
+            source_index_end = mot->playback_index_gas_start + source_length;
+            if (source_index_end > WAV_FADE_LENGTH) {
                 // Meg most befejezodik mixeles:
-                ucsoutani = Mix;
-                pms->allapot = A_ATMENET;
+                source_index_end = WAV_FADE_LENGTH;
+                mot->motor_state = MOTOR_GAS_START;
             }
-            novekmeny = 0;
-            for (i = pms->i_atmenet; i < ucsoutani; i++) {
-                if (pms->i_alacsony >= Pw2->size) {
-                    pms->i_alacsony = 0;
+            fade_counter = 0;
+            for (i = mot->playback_index_gas_start; i < source_index_end; i++) {
+                if (mot->playback_index_idle >= SoundMotorIdle->size) {
+                    mot->playback_index_idle = 0;
                 }
-                double arany = i * Egypermix;
-                sbuff[counter + novekmeny] +=
-                    arany * Pw3->tomb[i] + (1 - arany) * Pw2->tomb[pms->i_alacsony];
-                pms->i_alacsony++;
-                novekmeny++;
+                double fade_percentage = i * WAV_FADE_LENGTH_RECIPROCAL;
+                buffer[copied_counter + fade_counter] +=
+                    fade_percentage * SoundMotorGasStart->tomb[i] +
+                    (1 - fade_percentage) * SoundMotorIdle->tomb[mot->playback_index_idle];
+                mot->playback_index_idle++;
+                fade_counter++;
             }
-            counter += novekmeny;
-            pms->i_atmenet += novekmeny;
-            if (counter + novekmeny == buffsize) {
+            copied_counter += fade_counter;
+            mot->playback_index_gas_start += fade_counter;
+            if (copied_counter + fade_counter == buffer_length) {
                 return;
             }
             break;
-        case A_ATMENET:
-            masolando = buffsize - counter;
-            if (masolando > Pw3->size - pms->i_atmenet) {
+        case MOTOR_GAS_START:
+            source_length = buffer_length - copied_counter;
+            if (source_length > SoundMotorGasStart->size - mot->playback_index_gas_start) {
                 // Mar most at kell terni magas-ra:
-                masolando = Pw3->size - pms->i_atmenet;
-                shortadd(&sbuff[counter], &Pw3->tomb[pms->i_atmenet], masolando);
-                counter += masolando;
-                pms->allapot = A_MAGAS;
-                if (mot1) {
-                    Pw42a->reset(Mix);
+                source_length = SoundMotorGasStart->size - mot->playback_index_gas_start;
+                mix_into_buffer(&buffer[copied_counter],
+                                &SoundMotorGasStart->tomb[mot->playback_index_gas_start],
+                                source_length);
+                copied_counter += source_length;
+                mot->motor_state = MOTOR_GASSING;
+                if (is_motor1) {
+                    SoundMotorGas1->reset(WAV_FADE_LENGTH);
                 } else {
-                    Pw42b->reset(Mix);
+                    SoundMotorGas2->reset(WAV_FADE_LENGTH);
                 }
-                pms->frekvenciamost = 1.0;
+                mot->frequency_prev = 1.0;
             } else {
                 // Most meg teljes egeszeben atmenet megy ki:
-                shortadd(&sbuff[counter], &Pw3->tomb[pms->i_atmenet], masolando);
-                pms->i_atmenet += masolando;
+                mix_into_buffer(&buffer[copied_counter],
+                                &SoundMotorGasStart->tomb[mot->playback_index_gas_start],
+                                source_length);
+                mot->playback_index_gas_start += source_length;
                 return;
             }
             break;
-        case A_MAGAS:
-            int masolando = buffsize - counter;
-            if (!pms->gaz && masolando > Mix) {
-                pms->allapot = A_ALACSONY;
-                pms->i_alacsony = Mix;
-                long dtmost = 65536.0 * pms->frekvenciamost;
-                for (int i = 0; i < Mix; i++) {
-                    short gazshort;
-                    if (mot1) {
-                        gazshort = Pw42a->getnextsample(dtmost);
+        case MOTOR_GASSING:
+            int source_length5 = buffer_length - copied_counter;
+            if (!mot->gas && source_length5 > WAV_FADE_LENGTH) {
+                mot->motor_state = MOTOR_IDLE;
+                mot->playback_index_idle = WAV_FADE_LENGTH;
+                long previous_dt = 65536.0 * mot->frequency_prev;
+                for (int i = 0; i < WAV_FADE_LENGTH; i++) {
+                    short gas_sample;
+                    if (is_motor1) {
+                        gas_sample = SoundMotorGas1->getnextsample(previous_dt);
                     } else {
-                        gazshort = Pw42b->getnextsample(dtmost);
+                        gas_sample = SoundMotorGas2->getnextsample(previous_dt);
                     }
-                    short alapshort = Pw2->tomb[i];
+                    short idle_sample = SoundMotorIdle->tomb[i];
 
-                    double alapsuly = (double)i / Mix;
-                    double gazsuly = 1.0 - alapsuly;
+                    double fade_percentage = (double)i / WAV_FADE_LENGTH;
+                    double gas_fade_percentage = 1.0 - fade_percentage;
 
-                    sbuff[counter + i] += alapsuly * alapshort + gazsuly * gazshort;
+                    buffer[copied_counter + i] +=
+                        fade_percentage * idle_sample + gas_fade_percentage * gas_sample;
                 }
-                counter += Mix;
+                copied_counter += WAV_FADE_LENGTH;
                 break;
             } else {
-                long dtmost = 65536.0 * pms->frekvenciamost;
-                long dtkell = 65536.0 * pms->frekvenciakell;
+                long previous_dt = 65536.0 * mot->frequency_prev;
+                long current_dt = 65536.0 * mot->frequency_next;
                 long ddt = 0;
-                if (masolando > 30) {
-                    ddt = (dtkell - dtmost) / ((double)masolando);
+                if (source_length5 > 30) {
+                    ddt = (current_dt - previous_dt) / ((double)source_length5);
                 }
-                for (int i = 0; i < masolando; i++) {
-                    if (mot1) {
-                        sbuff[counter + i] += Pw42a->getnextsample(dtmost);
+                for (int i = 0; i < source_length5; i++) {
+                    if (is_motor1) {
+                        buffer[copied_counter + i] += SoundMotorGas1->getnextsample(previous_dt);
                     } else {
-                        sbuff[counter + i] += Pw42b->getnextsample(dtmost);
+                        buffer[copied_counter + i] += SoundMotorGas2->getnextsample(previous_dt);
                     }
-                    dtmost += ddt;
+                    previous_dt += ddt;
                 }
-                pms->frekvenciamost = ((double)dtmost) / 65536.0;
+                mot->frequency_prev = ((double)previous_dt) / 65536.0;
                 return;
             }
             break;
@@ -391,10 +417,10 @@ static void motorelintezes(int mot1, short* sbuff, int buffsize) {
     }
 }
 
-static int Surltart = 0;
+static int SoundFrictionIndex = 0;
 
 // Ennek hozza kell adnia eddigi ertekhez:
-static void surlodaselintezes(short* sbuff, int buffsize) {
+static void mix_friction(short* buffer, int buffer_length) {
     /*if( !Ppic8 ) {
         { Ppic8 = new pic8( 320, 2 ); }
         for( int i = 0; i < 320; i++ ) {
@@ -402,46 +428,46 @@ static void surlodaselintezes(short* sbuff, int buffsize) {
             Ppic8->ppixel( i, 1, 0 );
         }
     }
-    int hatar = Surlerokell*320;
+    int hatar = FrictionVolumeNext*320;
     blit8( Pscr8, Ppic8, hatar, 100 ); */
 
-    if (Surlerokell < 0.1 && Surleromost < 0.1) {
-        Surleromost = 0.0;
+    if (FrictionVolumeNext < 0.1 && FrictionVolumePrev < 0.1) {
+        FrictionVolumePrev = 0.0;
         return;
     }
 
-    long eromost = 65536.0 * Surleromost;
-    long erokell = 65536.0 * Surlerokell;
-    long dero = (erokell - eromost) / ((double)buffsize);
-    int meret = Psurl->size;
-    for (int i = 0; i < buffsize; i++) {
-        long ertek = Psurl->tomb[Surltart];
-        Surltart++;
-        if (Surltart >= meret) {
-            Surltart = 0;
+    long volume_prev = 65536.0 * FrictionVolumePrev;
+    long volume_next = 65536.0 * FrictionVolumeNext;
+    long delta_volume = (volume_next - volume_prev) / ((double)buffer_length);
+    int sample_length = SoundFriction->size;
+    for (int i = 0; i < buffer_length; i++) {
+        long sample = SoundFriction->tomb[SoundFrictionIndex];
+        SoundFrictionIndex++;
+        if (SoundFrictionIndex >= sample_length) {
+            SoundFrictionIndex = 0;
         }
 
-        ertek *= eromost;
-        sbuff[i] += (short)(ertek >> 16);
+        sample *= volume_prev;
+        buffer[i] += (short)(sample >> 16);
 
-        eromost += dero;
+        volume_prev += delta_volume;
     }
-    Surleromost = ((double)eromost) / 65536.0;
+    FrictionVolumePrev = ((double)volume_prev) / 65536.0;
 }
 
 // buffsize valojaban minta szam, vagyis = 2*byteszam:
 void sound_mixer(short* buffer, int buffer_length) {
     if (!SoundInitialized) {
-        internal_error("sound_mixer, pedig !SoundInitialized!");
+        internal_error("sound_mixer !SoundInitialized!");
     }
 
     memset(buffer, 0, buffer_length * 2);
     if (Mute || !State->sound_on) {
         // Nem kell hang:
-        if (Wavszam > 0) {
-            Wavszam = 0;
-            for (int i = 0; i < MAXWAV; i++) {
-                Ezmegy[i] = 0;
+        if (ActiveWavEvents > 0) {
+            ActiveWavEvents = 0;
+            for (int i = 0; i < MAX_WAV_EVENTS; i++) {
+                WavEventActive[i] = 0;
             }
         }
         return;
@@ -454,33 +480,34 @@ void sound_mixer(short* buffer, int buffer_length) {
         internal_error("sound_mixer-ban buffer_length < 20!");
     }
 
-    // mothangstruct megymotorbol tudjak melyik jar meg:
-    motorelintezes(1, buffer, buffer_length);
-    motorelintezes(0, buffer, buffer_length);
-    surlodaselintezes(buffer, buffer_length);
+    // motor_sound megymotorbol tudjak melyik jar meg:
+    mix_motor_sounds(1, buffer, buffer_length);
+    mix_motor_sounds(0, buffer, buffer_length);
+    mix_friction(buffer, buffer_length);
 
     // Wavok lejatszasa:
-    for (int i = 0; i < MAXWAV; i++) {
-        if (Ezmegy[i]) {
-            int darab = buffer_length;
-            if (darab > Pwavok[i]->size - Kovhang[i]) {
-                darab = Pwavok[i]->size - Kovhang[i];
-                Ezmegy[i] = 0;
-                Wavszam--;
-                if (Wavszam < 0) {
-                    internal_error("Wavszam < 0 !");
+    for (int i = 0; i < MAX_WAV_EVENTS; i++) {
+        if (WavEventActive[i]) {
+            int length = buffer_length;
+            if (length > WavEventSound[i]->size - WavEventPlaybackIndex[i]) {
+                length = WavEventSound[i]->size - WavEventPlaybackIndex[i];
+                WavEventActive[i] = 0;
+                ActiveWavEvents--;
+                if (ActiveWavEvents < 0) {
+                    internal_error("ActiveWavEvents < 0 !");
                 }
             }
-            wavadd(buffer, &Pwavok[i]->tomb[Kovhang[i]], darab, Hangerok[i]);
-            Kovhang[i] += darab;
+            mix_into_buffer(buffer, &WavEventSound[i]->tomb[WavEventPlaybackIndex[i]], length,
+                            WavEventVolume[i]);
+            WavEventPlaybackIndex[i] += length;
         }
     }
 }
 
 void delay(int milliseconds) {
     // 182*sec-et adja vissza idot tortresszel egyutt!
-    double kezdo = stopwatch();
-    while (stopwatch() / 182.0 < kezdo / 182.0 + milliseconds / 1000.0) {
+    double current_time = stopwatch();
+    while (stopwatch() / 182.0 < current_time / 182.0 + milliseconds / 1000.0) {
         handle_events();
     }
 }

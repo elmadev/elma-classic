@@ -1,7 +1,7 @@
 #include "UTKOZES.H"
 #include "main.h"
 #include "physics_init.h"
-#include "SZAKASZ.H"
+#include "lines.h"
 #include "vect2.h"
 
 static int gombszakasz(vect2 r, double sugar, line* pv, vect2* pt) {

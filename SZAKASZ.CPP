@@ -5,25 +5,22 @@
 #include <cmath>
 #include <cstring>
 
-static int MAX_LINES = MAX_VERTICES + 130;
+constexpr int MAX_LINES = MAX_VERTICES + 130;
 
-lines* Lines = NULL;
-
-// loadszakasz beleirja ptop->lezart-at ha topologia file-t olvas be:
-// Ezt azutan afterplayext fuggveny hasznalja ki:
-int Ucsoloadszakasz_lezart = 0;
+lines* Lines = nullptr;
 
 // Load a list of all the lines of a level
 lines::lines(topol* lev) {
-    line_list = NULL;
-    line_list_allocated_length = line_list_length = 0;
-    collision_grid = NULL;
+    line_list = nullptr;
+    line_list_allocated_length = 0;
+    line_list_length = 0;
+    collision_grid = nullptr;
     collision_grid_width = 1;
     collision_grid_height = 1;
     collision_grid_cell_size = 1.0;
-    collision_grid_origin = vect2(0, 0);
-    collision_grid_next = NULL;
-    node_array = NULL;
+    collision_grid_origin = vect2(0.0, 0.0);
+    collision_grid_next = nullptr;
+    node_array = nullptr;
     node_array_index = 0;
 
     // Memory
@@ -32,10 +29,8 @@ lines::lines(topol* lev) {
         external_error("lines::lines out of memory!");
         return;
     }
+    memset(line_list, 0, sizeof(line) * MAX_LINES);
     line_list_allocated_length = MAX_LINES;
-    for (int i = 0; i < line_list_allocated_length; i++) {
-        memset(&line_list[i], 0, sizeof(line));
-    }
 
     // Load all solid polygons
     for (int i = 0; i < MAXGYURU; i++) {
@@ -50,7 +45,8 @@ lines::lines(topol* lev) {
             if (line_list_length >= MAX_LINES) {
                 internal_error("lines::lines line_list_length >= MAX_LINES!");
             }
-            vect2 r1, r2;
+            vect2 r1;
+            vect2 r2;
             if (j < poly->vertex_count - 1) {
                 r1 = poly->vertices[j];
                 r2 = poly->vertices[j + 1];
@@ -69,7 +65,7 @@ lines::lines(topol* lev) {
     }
 }
 
-lines::~lines(void) {
+lines::~lines() {
     if (line_list) {
         delete line_list;
     }
@@ -80,14 +76,14 @@ lines::~lines(void) {
 }
 
 // Get an unused line node from memory
-line_node* lines::get_new_line_node(void) {
+line_node* lines::get_new_line_node() {
     // No nodes exist, initialize first node
     if (!node_array) {
         node_array = new line_node_array;
         if (!node_array) {
             external_error("lines::get_new_line_node out of memory!");
         }
-        node_array->next = NULL;
+        node_array->next = nullptr;
         node_array_index = 0;
     }
     // Grab the last memory structure
@@ -102,17 +98,16 @@ line_node* lines::get_new_line_node(void) {
         if (!last_array) {
             external_error("lines::get_new_line_node out of memory!");
         }
-        last_array->next = NULL;
+        last_array->next = nullptr;
         node_array_index = 0;
     }
     // Return the new line_node
-    node_array_index++;
-    return &last_array->nodes[node_array_index - 1];
+    return &last_array->nodes[node_array_index++];
 }
 
-void lines::delete_all_line_nodes(void) {
+void lines::delete_all_line_nodes() {
     line_node_array* current_array = node_array;
-    node_array = NULL;
+    node_array = nullptr;
     while (current_array) {
         line_node_array* deleted_array = current_array;
         current_array = current_array->next;
@@ -137,7 +132,7 @@ void lines::add_line_to_cell(int cell_x, int cell_y, line* ln) {
     }
     // Create a new line_node for the linked list
     line_node* new_node = get_new_line_node();
-    new_node->next = NULL;
+    new_node->next = nullptr;
     new_node->ln = ln;
     line_node* cell_node = collision_grid[collision_grid_width * cell_y + cell_x];
     // Add the line_node to the end of the linked list for the selected cell
@@ -173,9 +168,9 @@ void lines::add_line_to_collision_grid(line* ln, double max_radius) {
     // Let's invert x and y temporarily
     // This way, the slope is always less than 1.0
     // I'm not 100% sure this is necessary
-    int invert_axis = 0;
+    bool invert_axis = false;
     if (fabs(v.y) > fabs(v.x)) {
-        invert_axis = 1;
+        invert_axis = true;
         double tmp = v.x;
         v.x = v.y;
         v.y = tmp;
@@ -316,14 +311,13 @@ void lines::setup_collision_grid(double max_radius) {
     }
 
     // Allocate the collision_grid
-    unsigned grid_length = collision_grid_width * collision_grid_height;
+    int grid_length = collision_grid_width * collision_grid_height;
     collision_grid = new pline_node[grid_length];
     if (!collision_grid) {
         external_error("lines::setup out of memory!");
     }
-    int grid_length_signed = collision_grid_width * collision_grid_height;
-    for (int i = 0; i < grid_length_signed; i++) {
-        collision_grid[i] = NULL;
+    for (int i = 0; i < grid_length; i++) {
+        collision_grid[i] = nullptr;
     }
 
     // Populate the collision_grid
@@ -367,9 +361,9 @@ void lines::select_collision_grid_cell(vect2 r) {
     collision_grid_next = collision_grid[collision_grid_width * cell_y + cell_x];
 }
 
-line* lines::get_line_from_collision_grid_cell(void) {
+line* lines::get_line_from_collision_grid_cell() {
     if (!collision_grid_next) {
-        return NULL;
+        return nullptr;
     }
 #ifdef DEBUG
     if (!collision_grid_next->ln) {
@@ -381,14 +375,13 @@ line* lines::get_line_from_collision_grid_cell(void) {
     return ret;
 }
 
-void lines::iterate_all_lines(void) { line_list_current_index = 0; }
+void lines::iterate_all_lines() { line_list_current_index = 0; }
 
-line* lines::get_line(void) {
+line* lines::get_line() {
     if (line_list_current_index >= line_list_length) {
-        return NULL;
+        return nullptr;
     }
-    line_list_current_index++;
-    return &line_list[line_list_current_index - 1];
+    return &line_list[line_list_current_index++];
 }
 
 line* lines::getptrszakasz(int sorszam) {

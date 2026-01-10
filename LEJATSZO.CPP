@@ -3,6 +3,7 @@
 #include "directinput_scancodes.h"
 #include "EDITUJ.H"
 #include "flagtag.h"
+#include "HANGHIGH.H"
 #include "KIRAJZOL.H"
 #include "LEPTET.H"
 #include "LGRFILE.H"

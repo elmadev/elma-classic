@@ -11,6 +11,5 @@
 // Kozos:
 
 #include "WAV.H"
-#include "HANGHIGH.H"
 
 #include "platform_impl.h"

@@ -3,68 +3,68 @@
 
 #include "vect2.h"
 
-struct vonal;
+struct line;
 
-struct vonalnode {
-    vonal* pvonal;
-    vonalnode* pnext;
+struct line_node {
+    line* ln;
+    line_node* next;
 };
 
-typedef vonalnode* pvonalnode;
+typedef line_node* pline_node;
 
-#define CSOMAGBANNODESZAM (500)
-struct soknodecsomag {
-    vonalnode nodetomb[CSOMAGBANNODESZAM];
-    soknodecsomag* nextcsomag;
+#define LINE_NODE_BLOCK_SIZE (500)
+struct line_node_array {
+    line_node nodes[LINE_NODE_BLOCK_SIZE];
+    line_node_array* next;
 };
 
 class topol;
 
-class szakaszok {
-    vonal* tomb;
-    int maxszam;
-    int szam;
-    int szakfuto;
+class lines {
+    line* line_list;
+    int line_list_allocated_length;
+    int line_list_length;
+    int line_list_current_index;
 
     // Terbeli kereseshez:
-    pvonalnode* tertomb;
-    int xdim, ydim;
-    double cellameret;
-    vect2 origo;
-    vonalnode* nextnode; // getnext ez alapjan dolgozik!
+    pline_node* collision_grid;
+    int collision_grid_width, collision_grid_height;
+    double collision_grid_cell_size;
+    vect2 collision_grid_origin;
+    line_node* collision_grid_next; // getnext ez alapjan dolgozik!
 
-    void beindexelvonalat(vonal* pv, double maxtav);
-    void bekot(int cellax, int cellay, vonal* pv);
+    void add_line_to_collision_grid(line* ln, double max_radius);
+    void add_line_to_cell(int cell_x, int cell_y, line* ln);
 
     // Terbeli kereseshez nodkezeles:
-    soknodecsomag* pelsocsomag;
-    int csomagbanbetelt;
-    vonalnode* getnewnode(void);
-    void deleteallnodes(void);
+    line_node_array* node_array;
+    int node_array_index;
+    line_node* get_new_line_node(void);
+    void delete_all_line_nodes(void);
 
   public:
-    szakaszok(topol* ptop);
-    ~szakaszok(void);
+    lines(topol* lev);
+    ~lines(void);
 
     // Terbeli fv.-ek:
     // rendez-t csak egyszer szabad hivni!
-    void rendez(double maxtav);
-    void felsorolasreset(vect2 r);
-    vonal* getnext(void);
+    void setup_collision_grid(double max_radius);
+    void select_collision_grid_cell(vect2 r);
+    line* get_line_from_collision_grid_cell(void);
 
     // Osszes szakaszon vegigmennek:
-    void felsorolasresetszak(void);
-    vonal* getnextszak(void);
+    void iterate_all_lines(void);
+    line* get_line(void);
 
-    vonal* getptrszakasz(int sorszam);
-    int getsorszam(vonal* pvonal);
+    line* getptrszakasz(int sorszam);
+    int getsorszam(line* pvonal);
 };
 
-struct vonal {
-    vect2 r, v, egyseg;
-    double hossz;
+struct line {
+    vect2 r, v, unit_vector;
+    double length;
 };
 
-extern szakaszok* Pszak;
+extern lines* Lines;
 
 #endif

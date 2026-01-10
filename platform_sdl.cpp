@@ -2,7 +2,6 @@
 #include "ALL.H"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
-#include "HANG.H"
 #include "HANGHIGH.H"
 #include "keys.h"
 #include "main.h"

@@ -38,4 +38,7 @@ int vanmegwav(void);
 
 void hangosdelay(int t);
 
+// Ezt meg kell irni hozza:
+void callbackhang(short* sbuff, int buffsize);
+
 #endif

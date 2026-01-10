@@ -289,10 +289,10 @@ void lines::setup_collision_grid(double max_radius) {
     }
 
     // Add a small margin for safety
-    minx -= 6.0;
-    miny -= 6.0;
-    maxx += 6.0;
-    maxy += 6.0;
+    minx -= LINES_BORDER_SIZE;
+    miny -= LINES_BORDER_SIZE;
+    maxx += LINES_BORDER_SIZE;
+    maxy += LINES_BORDER_SIZE;
     collision_grid_origin = vect2(minx, miny);
     double width = maxx - minx;
     double height = maxy - miny;
@@ -303,8 +303,9 @@ void lines::setup_collision_grid(double max_radius) {
     if (collision_grid_width < 0 || collision_grid_height < 0) {
         internal_error("collision_grid_width < 0 || collision_grid_height < 0!");
     }
-    if (collision_grid_width > 200 || collision_grid_height > 200) {
-        internal_error("collision_grid_width > 200 || collision_grid_height > 200!");
+    constexpr int MAX_SIZE = LEVEL_MAX_SIZE + 2 * LINES_BORDER_SIZE;
+    if (collision_grid_width > MAX_SIZE || collision_grid_height > MAX_SIZE) {
+        internal_error("collision_grid_width > MAX_SIZE || collision_grid_height > MAX_SIZE!");
     }
 
     // Allocate the collision_grid

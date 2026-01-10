@@ -5,6 +5,9 @@
 
 class topol;
 
+constexpr int LEVEL_MAX_SIZE = 188;
+constexpr int LINES_BORDER_SIZE = 6;
+
 // A single line from a polygon
 struct line {
     vect2 r, v, unit_vector;

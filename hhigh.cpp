@@ -5,7 +5,7 @@
 #include "WAV.H"
 #include <cstring>
 
-int Hangenabled = 0;
+int SoundInitialized = 0;
 
 int Mute = 1;
 
@@ -36,34 +36,34 @@ static wav* Pwavok[MAXWAV];
 
 static int Elsostart = 1;
 
-void starthanghigh(void) {
+void sound_engine_init(void) {
     if (!Elsostart) {
-        internal_error("starthanghigh-ban !Elsostart!");
+        internal_error("sound_engine_init-ban !Elsostart!");
     }
     Elsostart = 0;
-    if (!Hangenabled) {
+    if (!SoundInitialized) {
         return;
     }
 
     Mute = 1;
     /*if( !starthang( Buffsize ) ) { Ez mi
-        Hangenabled = 0;
+        SoundInitialized = 0;
         return;
     }*/
     if (Hanghighbevoltkapcsolva) {
-        internal_error("Hanghighbevoltkapcsolva igaz starthanghigh-ban!");
+        internal_error("Hanghighbevoltkapcsolva igaz sound_engine_init-ban!");
     }
     Hanghighbevoltkapcsolva = 1;
     for (int i = 0; i < WAVBANKSZAM; i++) {
         Wavbank[i] = NULL;
     }
-    Wavbank[WAV_UTODES] = new wav("utodes.wav", 0.25);
-    Wavbank[WAV_TORES] = new wav("torik.wav", 0.34);
-    Wavbank[WAV_SIKER] = new wav("siker.wav", 0.8);
-    Wavbank[WAV_EVES] = new wav("eves.wav", 0.5);
-    Wavbank[WAV_FORDULAS] = new wav("fordul.wav", 0.3);
-    Wavbank[WAV_UGRAS1] = new wav("ugras.wav", 0.34);
-    Wavbank[WAV_UGRAS2] = Wavbank[WAV_UGRAS1];
+    Wavbank[WAV_BUMP] = new wav("utodes.wav", 0.25);
+    Wavbank[WAV_DEAD] = new wav("torik.wav", 0.34);
+    Wavbank[WAV_WIN] = new wav("siker.wav", 0.8);
+    Wavbank[WAV_FOOD] = new wav("eves.wav", 0.5);
+    Wavbank[WAV_TURN] = new wav("fordul.wav", 0.3);
+    Wavbank[WAV_RIGHT_VOLT] = new wav("ugras.wav", 0.34);
+    Wavbank[WAV_LEFT_VOLT] = Wavbank[WAV_RIGHT_VOLT];
     Psurl = new wav("dorzsol.wav", 0.44);
     Psurl->loopol(Mix);
 
@@ -110,59 +110,59 @@ struct mothangstruct {
 static mothangstruct Moth1, Moth2;
 
 // frekvencia 1.0-tol 2.0-ig valtozik csak:
-void setmotor(int mot1, double frekvencia, int gaz) {
+void set_motor_frequency(int is_motor1, double frequency, int gas) {
     // if( gaz )
-    //	internal_error( "setmotor-ban gaz igaz!" );
+    //	internal_error( "set_motor_frequency-ban gaz igaz!" );
 
-    if (!Hangenabled) {
+    if (!SoundInitialized) {
         return;
     }
 
     mothangstruct* pms;
-    if (mot1) {
+    if (is_motor1) {
         pms = &Moth1;
     } else {
         pms = &Moth2;
     }
 
-    pms->gaz = gaz;
-    if (frekvencia > 2.0) {
-        frekvencia = 2.0;
+    pms->gaz = gas;
+    if (frequency > 2.0) {
+        frequency = 2.0;
     }
-    if (frekvencia < 1.0) {
-        frekvencia = 0.0;
+    if (frequency < 1.0) {
+        frequency = 0.0;
     }
 
-    pms->frekvenciakell = frekvencia;
+    pms->frekvenciakell = frequency;
     // 2.0 - exp(1.0-frekvencia)
 }
 
 static double Surleromost = 0.0;
 static double Surlerokell = 0.0;
 
-void setsurlodas(double ero) {
-    if (ero > 1.0) {
-        ero = 1.0;
+void set_friction_volume(double volume) {
+    if (volume > 1.0) {
+        volume = 1.0;
     }
-    if (ero < 0) {
-        ero = 0;
+    if (volume < 0) {
+        volume = 0;
     }
-    Surlerokell = ero;
+    Surlerokell = volume;
 }
 
 // int Wavevolt = 0;
 
-void startwave(int wavazonosito, double hangero) {
+void start_wav(int event, double volume) {
     // Wavevolt = 1;
-    if (!Hangenabled || Mute) {
+    if (!SoundInitialized || Mute) {
         return;
     }
 
-    if (hangero <= 0.0 || hangero >= 1.0) {
-        internal_error("wav: hangero <= 0.0 || hangero >= 1.0!");
+    if (volume <= 0.0 || volume >= 1.0) {
+        internal_error("wav: volume <= 0.0 || volume >= 1.0!");
     }
 
-    wav* pwav = Wavbank[wavazonosito];
+    wav* pwav = Wavbank[event];
 
     if (Wavszam >= MAXWAV) {
         return;
@@ -176,7 +176,7 @@ void startwave(int wavazonosito, double hangero) {
             Ezmegy[i] = 1;
             Kovhang[i] = 0;
             Pwavok[i] = pwav;
-            Hangerok[i] = hangero * 65536.0;
+            Hangerok[i] = volume * 65536.0;
             //_enable();
             // if( Wavevolt )
             //	external_error( "Wavevolt utan!" );
@@ -194,9 +194,9 @@ static void wavadd(short* buff, short* tomb, long size, unsigned long hangero) {
     }
 }
 
-void startmotor(int mot1) {
+void start_motor_sound(int is_motor1) {
     mothangstruct* pms;
-    if (mot1) {
+    if (is_motor1) {
         pms = &Moth1;
     } else {
         pms = &Moth2;
@@ -210,9 +210,9 @@ void startmotor(int mot1) {
 }
 
 // Leallitja motor hangjat (ha meghalt):
-void stopmotor(int mot1) {
+void stop_motor_sound(int is_motor1) {
     mothangstruct* pms;
-    if (mot1) {
+    if (is_motor1) {
         pms = &Moth1;
     } else {
         pms = &Moth2;
@@ -430,12 +430,12 @@ static void surlodaselintezes(short* sbuff, int buffsize) {
 }
 
 // buffsize valojaban minta szam, vagyis = 2*byteszam:
-void callbackhang(short* sbuff, int buffsize) {
-    if (!Hangenabled) {
-        internal_error("callbackhang, pedig !Hangenabled!");
+void sound_mixer(short* buffer, int buffer_length) {
+    if (!SoundInitialized) {
+        internal_error("sound_mixer, pedig !SoundInitialized!");
     }
 
-    memset(sbuff, 0, buffsize * 2);
+    memset(buffer, 0, buffer_length * 2);
     if (Mute || !State->sound_on) {
         // Nem kell hang:
         if (Wavszam > 0) {
@@ -447,22 +447,22 @@ void callbackhang(short* sbuff, int buffsize) {
         return;
     }
 
-    if (Atmenet >= buffsize) {
-        Atmenet = buffsize - 1;
+    if (Atmenet >= buffer_length) {
+        Atmenet = buffer_length - 1;
     }
     if (Atmenet < 20) {
-        internal_error("callbackhang-ban buffsize < 20!");
+        internal_error("sound_mixer-ban buffer_length < 20!");
     }
 
     // mothangstruct megymotorbol tudjak melyik jar meg:
-    motorelintezes(1, sbuff, buffsize);
-    motorelintezes(0, sbuff, buffsize);
-    surlodaselintezes(sbuff, buffsize);
+    motorelintezes(1, buffer, buffer_length);
+    motorelintezes(0, buffer, buffer_length);
+    surlodaselintezes(buffer, buffer_length);
 
     // Wavok lejatszasa:
     for (int i = 0; i < MAXWAV; i++) {
         if (Ezmegy[i]) {
-            int darab = buffsize;
+            int darab = buffer_length;
             if (darab > Pwavok[i]->size - Kovhang[i]) {
                 darab = Pwavok[i]->size - Kovhang[i];
                 Ezmegy[i] = 0;
@@ -471,16 +471,16 @@ void callbackhang(short* sbuff, int buffsize) {
                     internal_error("Wavszam < 0 !");
                 }
             }
-            wavadd(sbuff, &Pwavok[i]->tomb[Kovhang[i]], darab, Hangerok[i]);
+            wavadd(buffer, &Pwavok[i]->tomb[Kovhang[i]], darab, Hangerok[i]);
             Kovhang[i] += darab;
         }
     }
 }
 
-void hangosdelay(int t) {
+void delay(int milliseconds) {
     // 182*sec-et adja vissza idot tortresszel egyutt!
     double kezdo = stopwatch();
-    while (stopwatch() / 182.0 < kezdo / 182.0 + t / 1000.0) {
+    while (stopwatch() / 182.0 < kezdo / 182.0 + milliseconds / 1000.0) {
         handle_events();
     }
 }

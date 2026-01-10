@@ -34,10 +34,10 @@ static void initsoundlejatszoban(void) {
     static int Hangmarmegy = 0;
     if (State->sound_on && !Hangmarmegy) {
         Hangmarmegy = 1;
-        Hangenabled = 1;
+        SoundInitialized = 1;
 
         Mute = 1;
-        starthanghigh();
+        sound_engine_init();
     }
 }
 
@@ -62,7 +62,7 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
     if (tipus == object::Type::Food) {
         Ptop->kerektomb[sorszam]->active = false;
         (*pkajaszam)++;
-        startwavegyujto(WAV_EVES, 0.99, -1);
+        startwavegyujto(WAV_FOOD, 0.99, -1);
         switch (Ptop->kerektomb[sorszam]->property) {
         case object::Property::None:
             break;
@@ -123,13 +123,13 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
-            startwavegyujto(WAV_UGRAS1, 0.99, -1);
+            startwavegyujto(WAV_RIGHT_VOLT, 0.99, -1);
         }
         if (is_key_down(popciok->left_volt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;
-            startwavegyujto(WAV_UGRAS2, 0.99, -1);
+            startwavegyujto(WAV_LEFT_VOLT, 0.99, -1);
         }
     }
 
@@ -206,7 +206,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
                 }
             }
         } else {
-            startwave(wavazonosito, hangero);
+            start_wav(wavazonosito, hangero);
         }
         prec->addhang(eddig, (char)wavazonosito, hangero, objszam);
     }
@@ -251,8 +251,8 @@ static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig,
         // Hang adas:
         if (prec) {
             // Most kihagyjuk wavgyujtot:
-            startwave(WAV_FORDULAS, 0.99);
-            prec->addhang(eddig, WAV_FORDULAS, 0.99, -1);
+            start_wav(WAV_TURN, 0.99);
+            prec->addhang(eddig, WAV_TURN, 0.99, -1);
         }
     }
 
@@ -383,10 +383,10 @@ long lejatszo(const char* filenev) {
     initsoundlejatszoban();
     Mute = 0;
     if (Single) {
-        startmotor(1);
+        start_motor_sound(1);
     } else {
-        startmotor(1);
-        startmotor(0);
+        start_motor_sound(1);
+        start_motor_sound(0);
     }
 
     flagtag_reset();
@@ -451,9 +451,9 @@ long lejatszo(const char* filenev) {
                     // Ha meg mindket motor jar,
                     // de mar egyik meghalt:
                     if (meghalt1) {
-                        stopmotor(1);
+                        stop_motor_sound(1);
                     } else {
-                        stopmotor(0);
+                        stop_motor_sound(0);
                     }
                     mindjar = 0;
                 }
@@ -477,17 +477,17 @@ long lejatszo(const char* filenev) {
                     Aerintetteviragot = 0;
                 }
 
-                setmotor(1, 1.0, 0);
-                setmotor(0, 1.0, 0);
+                set_motor_frequency(1, 1.0, 0);
+                set_motor_frequency(0, 1.0, 0);
                 if (megvanido) {
-                    startwave(WAV_SIKER, 0.999);
+                    start_wav(WAV_WIN, 0.999);
                 } else {
-                    startwave(WAV_TORES, 0.999);
+                    start_wav(WAV_DEAD, 0.999);
                 }
-                hangosdelay((int)(LevelEndDelay * 1000.0));
+                delay((int)(LevelEndDelay * 1000.0));
 
-                stopmotor(1);
-                stopmotor(0);
+                stop_motor_sound(1);
+                stop_motor_sound(0);
 
                 Mute = 1;
                 if (megvanido) {
@@ -512,12 +512,12 @@ long lejatszo(const char* filenev) {
         }
 
         if (Single) {
-            setsurlodas(valt1.inf.surlero);
-            setmotor(1, valt1.inf.frekvencia, valt1.inf.gaz);
+            set_friction_volume(valt1.inf.surlero);
+            set_motor_frequency(1, valt1.inf.frekvencia, valt1.inf.gaz);
         } else {
-            setsurlodas(valt1.inf.surlero + valt2.inf.surlero);
-            setmotor(1, valt1.inf.frekvencia, valt1.inf.gaz);
-            setmotor(0, valt2.inf.frekvencia, valt2.inf.gaz);
+            set_friction_volume(valt1.inf.surlero + valt2.inf.surlero);
+            set_motor_frequency(1, valt1.inf.frekvencia, valt1.inf.gaz);
+            set_motor_frequency(0, valt2.inf.frekvencia, valt2.inf.gaz);
         }
 
         kulsoresz(Motor1, &State->keys1, &valt1, Prec1, &Viewtime1, eddig, &valt2.showkep,
@@ -557,8 +557,8 @@ long lejatszo(const char* filenev) {
             MeghalteloszorAB = 0;
             double eltelido = stopwatch();
             // Motor hangjat kikapcsolja:
-            stopmotor(1);
-            stopmotor(0);
+            stop_motor_sound(1);
+            stop_motor_sound(0);
 
             Mute = 1;
 
@@ -664,12 +664,12 @@ static int replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, recor
             int tmpi = 0;
             spritefeldolgoz(objszam, &tmpi, pmot);
         } else {
-            startwave(wavindex, hangero);
-            if (wavindex == WAV_UGRAS1) {
+            start_wav(wavindex, hangero);
+            if (wavindex == WAV_RIGHT_VOLT) {
                 pvalt->ugras1volt = 1;
                 pvalt->utolsougras = eddig;
             }
-            if (wavindex == WAV_UGRAS2) {
+            if (wavindex == WAV_LEFT_VOLT) {
                 pvalt->ugras1volt = 0;
                 pvalt->utolsougras = eddig;
             }
@@ -755,10 +755,10 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     initsoundlejatszoban();
     Mute = 0;
     if (Single) {
-        startmotor(1);
+        start_motor_sound(1);
     } else {
-        startmotor(1);
-        startmotor(0);
+        start_motor_sound(1);
+        start_motor_sound(0);
     }
 
     flagtag_reset();
@@ -782,12 +782,12 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         if ((Single && befejezte1) || (!Single && befejezte1 && befejezte2)) {
             // Motor hangjat kikapcsolja:
-            setmotor(1, 1.0, 0);
-            setmotor(0, 1.0, 0);
-            stopmotor(1);
-            stopmotor(0);
-            setsurlodas(0);
-            hangosdelay((int)(LevelEndDelay * 400.0));
+            set_motor_frequency(1, 1.0, 0);
+            set_motor_frequency(0, 1.0, 0);
+            stop_motor_sound(1);
+            stop_motor_sound(0);
+            set_friction_volume(0);
+            delay((int)(LevelEndDelay * 400.0));
 
             Mute = 1;
             Ptop->kerekjolalljon();
@@ -799,11 +799,11 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         if (!Single) {
             if (jar1 && befejezte1) {
-                stopmotor(1);
+                stop_motor_sound(1);
                 jar1 = 0;
             }
             if (jar2 && befejezte2) {
-                stopmotor(0);
+                stop_motor_sound(0);
                 jar2 = 0;
             }
 
@@ -813,14 +813,14 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         // HANG ELINTEZES:
         if (Single) {
-            setmotor(1, valt1.inf.frekvencia, valt1.inf.gaz);
+            set_motor_frequency(1, valt1.inf.frekvencia, valt1.inf.gaz);
             // if( valt1.inf.frekvencia > 1.5 )
             //	internal_error( "> 1.5!" );
-            setsurlodas(valt1.inf.surlero);
+            set_friction_volume(valt1.inf.surlero);
         } else {
-            setmotor(1, valt1.inf.frekvencia, valt1.inf.gaz);
-            setmotor(0, valt2.inf.frekvencia, valt2.inf.gaz);
-            setsurlodas(valt1.inf.surlero + valt2.inf.surlero);
+            set_motor_frequency(1, valt1.inf.frekvencia, valt1.inf.gaz);
+            set_motor_frequency(0, valt2.inf.frekvencia, valt2.inf.gaz);
+            set_friction_volume(valt1.inf.surlero + valt2.inf.surlero);
         }
 
         // KIRAJZOLAS:
@@ -868,12 +868,12 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
                 fclose(h);
             }
             // Hang kikapcsolas:
-            setmotor(1, 1.0, 0);
-            setmotor(0, 1.0, 0);
-            stopmotor(1);
-            stopmotor(0);
-            setsurlodas(0);
-            hangosdelay((int)(LevelEndDelay * 400.0));
+            set_motor_frequency(1, 1.0, 0);
+            set_motor_frequency(0, 1.0, 0);
+            stop_motor_sound(1);
+            stop_motor_sound(0);
+            set_friction_volume(0);
+            delay((int)(LevelEndDelay * 400.0));
 
             Mute = 1;
 

@@ -205,17 +205,17 @@ bool is_fullscreen() {
 }
 
 static SDL_AudioDeviceID SDLAudioDevice;
-static bool SoundInitialized = false;
+static bool SDLSoundInitialized = false;
 
 static void audio_callback(void* udata, Uint8* stream, int len) {
-    callbackhang((short*)stream, len / 2);
+    sound_mixer((short*)stream, len / 2);
 }
 
 void init_sound() {
-    if (SoundInitialized) {
+    if (SDLSoundInitialized) {
         internal_error("Sound already initialized!");
     }
-    SoundInitialized = true;
+    SDLSoundInitialized = true;
 
     SDL_AudioSpec desired_spec;
     memset(&desired_spec, 0, sizeof(desired_spec));
@@ -236,6 +236,6 @@ void init_sound() {
     if (obtained_spec.format != desired_spec.format) {
         internal_error("Failed to get correct audio format");
     }
-    Hangenabled = 1;
+    SoundInitialized = 1;
     SDL_PauseAudioDevice(SDLAudioDevice, 0);
 }

@@ -1,15 +1,15 @@
 #ifndef HANGHIGH_H
 #define HANGHIGH_H
 
-enum {
-    WAV_NULL = 0,
-    WAV_BUMP = 1,
-    WAV_DEAD = 2,
-    WAV_WIN = 3,
-    WAV_FOOD = 4,
-    WAV_TURN = 5,
-    WAV_RIGHT_VOLT = 6,
-    WAV_LEFT_VOLT = 7,
+enum class WavEvent : char {
+    NONE = 0,
+    BUMP = 1,
+    DEAD = 2,
+    WIN = 3,
+    FOOD = 4,
+    TURN = 5,
+    RIGHT_VOLT = 6,
+    LEFT_VOLT = 7,
 };
 
 // Main global sound variable
@@ -28,7 +28,7 @@ void set_motor_frequency(bool is_motor1, double frequency, int gas);
 void set_friction_volume(double volume);
 
 // Start a wavbank event
-void start_wav(int event, double volume);
+void start_wav(WavEvent event, double volume);
 
 void delay(int milliseconds);
 

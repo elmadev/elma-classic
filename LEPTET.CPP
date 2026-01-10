@@ -307,7 +307,7 @@ int vizsgalat(motorst* pmot) {
         sorszamtomb[2] = utkozikesprite(pmot->head_r, HeadRadius);
         for (int i = 0; i < 3; i++) {
             if (sorszamtomb[i] >= 0) {
-                startwavegyujto(0, 0.0, sorszamtomb[i]);
+                startwavegyujto(WavEvent::NONE, 0.0, sorszamtomb[i]);
                 kerek* pker = Ptop->getptrkerek(sorszamtomb[i]);
                 if (pker->tipus == T_KAJA) {
                     pker->aktiv = 0;

@@ -1,6 +1,7 @@
 #ifndef RECORDER_H
 #define RECORDER_H
 
+#include "HANGHIGH.H"
 #include "vect2.h"
 #include <cstdio>
 
@@ -15,7 +16,7 @@ struct hanginfo {
 struct egyhang {
     double t;
     short objszam;
-    char wavindex;
+    WavEvent wavindex;
     float hangero;
 };
 
@@ -66,9 +67,9 @@ class recorder {
     int recall(motorst* pmot, double ido, hanginfo* phinfo);
     void store(motorst* pmot, double ido, hanginfo* phinfo);
 
-    void addhang(double t, char wavindex, double hangero, int objszam);
+    void addhang(double t, WavEvent wavindex, double hangero, int objszam);
     // Ha van hang, akkor igazzal ter vissza:
-    int gethang(double t, char* pwavindex, double* phangero, int* pobjszam);
+    int gethang(double t, WavEvent* pwavindex, double* phangero, int* pobjszam);
 
     int gettag(void);
     void settag(int tag_p);
@@ -82,9 +83,9 @@ extern recorder *Prec1, *Prec2;
 // long lejatszo( void ) allithatja, vagy loadrecek:
 extern int Multirec;
 
-void startwavegyujto(int wavazonosito, double hangero, int objszam);
+void startwavegyujto(WavEvent wavazonosito, double hangero, int objszam);
 void resetwavegyujto(void);
 // Igaz, ha van bent wav:
-int getwavegyujto(int* pwavazonosito, double* phangero, int* pobjszam);
+int getwavegyujto(WavEvent* pwavazonosito, double* phangero, int* pobjszam);
 
 #endif

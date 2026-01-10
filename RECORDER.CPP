@@ -459,7 +459,7 @@ void recorder::store(motorst* pmot, double ido, hanginfo* phinfo) {
     betoltve = index+1;
 }*/
 
-void recorder::addhang(double t, char wavindex, double hangero, int objszam) {
+void recorder::addhang(double t, WavEvent wavindex, double hangero, int objszam) {
     if (hangbetoltve >= Hangdarabszam) {
         return;
     }
@@ -480,7 +480,7 @@ void recorder::addhang(double t, char wavindex, double hangero, int objszam) {
 }
 
 // Ha van hang, akkor igazzal ter vissza:
-int recorder::gethang(double t, char* pwavindex, double* phangero, int* pobjszam) {
+int recorder::gethang(double t, WavEvent* pwavindex, double* phangero, int* pobjszam) {
     if (hangkov < hangbetoltve) {
         if (phangok[unsigned(hangkov)].t <= t) {
             *pwavindex = phangok[unsigned(hangkov)].wavindex;
@@ -906,11 +906,11 @@ static int Begyujtve = 0;
 
 #define GYUJTODARAB (200)
 
-static int Azonosito[GYUJTODARAB];
+static WavEvent Azonosito[GYUJTODARAB];
 static double Hangero[GYUJTODARAB];
 static int Objszam[GYUJTODARAB];
 
-void startwavegyujto(int wavazonosito, double hangero, int objszam) {
+void startwavegyujto(WavEvent wavazonosito, double hangero, int objszam) {
     if (Begyujtve < GYUJTODARAB) {
         Azonosito[Begyujtve] = wavazonosito;
         Hangero[Begyujtve] = hangero;
@@ -922,7 +922,7 @@ void startwavegyujto(int wavazonosito, double hangero, int objszam) {
 void resetwavegyujto(void) { Begyujtve = 0; }
 
 // Igaz, ha van bent wav:
-int getwavegyujto(int* pwavazonosito, double* phangero, int* pobjszam) {
+int getwavegyujto(WavEvent* pwavazonosito, double* phangero, int* pobjszam) {
     if (Begyujtve == 0) {
         return 0;
     }

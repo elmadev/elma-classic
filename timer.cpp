@@ -1,4 +1,3 @@
-#include "ALL.H"
 #include "best_times.h"
 #include "LGRFILE.H"
 #include "main.h"

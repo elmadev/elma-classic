@@ -1,5 +1,4 @@
 #include "editor_dialog.h"
-#include "ALL.H"
 #include "abc8.h"
 #include "EDITUJ.H"
 #include "M_PIC.H"

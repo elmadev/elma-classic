@@ -1,5 +1,4 @@
 #include "ECSET.H"
-#include "ALL.H"
 #include "anim.h"
 #include "EDITUJ.H"
 #include "eol_settings.h"
@@ -7,6 +6,7 @@
 #include "polygon.h"
 #include "LGRFILE.H"
 #include "main.h"
+#include "M_PIC.H"
 #include "menu_pic.h"
 #include "object.h"
 #include "physics_init.h"

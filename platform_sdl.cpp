@@ -1,11 +1,11 @@
 #include "platform_impl.h"
-#include "ALL.H"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "HANG.H"
 #include "HANGHIGH.H"
 #include "keys.h"
 #include "main.h"
+#include "M_PIC.H"
 #include <SDL.h>
 #include "scancodes_windows.h"
 

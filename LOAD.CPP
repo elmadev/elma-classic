@@ -1,5 +1,4 @@
 #include "LOAD.H"
-#include "ALL.H"
 #include "ECSET.H"
 #include "editor_dialog.h"
 #include "EDITUJ.H"

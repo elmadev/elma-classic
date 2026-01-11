@@ -1,8 +1,8 @@
 #include "menu_nav.h"
-#include "ALL.H"
 #include "fs_utils.h"
 #include "keys.h"
 #include "main.h"
+#include "M_PIC.H"
 #include "menu_pic.h"
 #include <cstring>
 

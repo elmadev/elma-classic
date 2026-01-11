@@ -1,8 +1,10 @@
 #include "M_PIC.H"
-#include "ALL.H"
 #include "main.h"
 #include "pic8.h"
 #include "platform_impl.h"
+
+int SCREEN_WIDTH = 640;
+int SCREEN_HEIGHT = 480;
 
 static pic8* Lockbuff = NULL;
 

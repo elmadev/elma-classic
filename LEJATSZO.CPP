@@ -344,7 +344,6 @@ long lejatszo(const char* filenev) {
         internal_error("lejatszo-ban !Ptop!");
     }
     Ptop->kereklefejjel();
-    Ptop->kitoltiszineket();
     Ptop->killerekelore();
     // setallaktiv allitja be motor kezdeti helyzetet es fazisokat is!:
     Kajakell = Ptop->setallaktiv(Motor1);
@@ -716,7 +715,6 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         internal_error("lejatszo-ban !Ptop!");
     }
     Ptop->kereklefejjel();
-    Ptop->kitoltiszineket();
     Ptop->killerekelore();
     // setallaktiv allitja be motor kezdeti helyzetet is!:
     Kajakell = Ptop->setallaktiv(Motor1);

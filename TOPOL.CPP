@@ -1743,8 +1743,7 @@ int topol::setallaktiv(motorst* pmot) {
     for (int i = 0; i < MAXKEREK; i++) {
         object* pker = Ptop->kerektomb[i];
         if (pker) {
-            pker->sinfazisint = random_range(1000);
-            pker->floating_phase = pker->sinfazisint * 2.0 * PI / 1000.0;
+            pker->floating_phase = random_range(1000) * 2.0 * PI / 1000.0;
 
             pker->active = true;
             if (pker->type == T_KAJA) {
@@ -1823,24 +1822,6 @@ void topol::killerekelore(void) {
                 object tmpker = *Ptop->kerektomb[i];
                 *Ptop->kerektomb[i] = *Ptop->kerektomb[i + 1];
                 *Ptop->kerektomb[i + 1] = tmpker;
-            }
-        }
-    }
-}
-
-// Osszes kerek szinet bejegyzi:
-void topol::kitoltiszineket(void) {
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
-        if (pker) {
-            if (pker->type == T_CEL) {
-                pker->szin = 0;
-            }
-            if (pker->type == T_KAJA) {
-                pker->szin = 0;
-            }
-            if (pker->type == T_HALALOS) {
-                pker->szin = 0;
             }
         }
     }

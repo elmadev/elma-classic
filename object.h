@@ -13,11 +13,9 @@ class object {
     int canvas_x, canvas_y;                 // Position in canvas pixels
     int minimap_canvas_x, minimap_canvas_y; // Position in canvas pixels
     int type;
-    int property;  // Food gravity
-    int animation; // Food animation (0-8)
-    bool active;   // true if visible/interactable
-    unsigned char szin;
-    int sinfazisint;
+    int property;          // Food gravity
+    int animation;         // Food animation (0-8)
+    bool active;           // true if visible/interactable
     double floating_phase; // Floating up/down phase, -Pi to Pi
 
     object(double x, double y, int typ);

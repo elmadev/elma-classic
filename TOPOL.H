@@ -98,7 +98,6 @@ class topol {
     // Motor helyzetet is o allitja be, kajaszamot adja vissza:
     int setallaktiv(motorst* pmot); // eheto kerekeket aktivizalja
     void killerekelore(void);       // kerekeket rendezi
-    void kitoltiszineket(void);     // Osszes kerek szinet bejegyzi
     object* getptrkerek(int index);
 
     // Ha igaz, y negalva van (ez kell lejatszasnal):

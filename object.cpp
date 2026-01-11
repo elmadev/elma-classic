@@ -4,22 +4,18 @@
 #include "platform_utils.h"
 #include <cmath>
 
-// KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK2
-// KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK
-// KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK
-// KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK
-
 object::object(double x, double y, int typ) {
     r.x = x;
     r.y = y;
     type = typ;
-    property = 0; // Ra kell movolni hogy kaja lehessen
+    property = 0;
     animation = 0;
 }
 
 constexpr double LETTER_K_INTERSECTION_POINT = -0.15 + 0.3 * (0.07 / 0.37);
 
 void object::render(void) {
+    // Draw a circle approximated by 16 slices
     int slices = 16;
     double radius = 0.4;
 
@@ -32,13 +28,14 @@ void object::render(void) {
         render_line(r + r1, r + r2, false);
     }
 
-    // Kis jel kor kozepere:
+    // Draw a small X in the middle
     double length = 0.02;
     render_line(r + vect2(-length, -length), r + vect2(length, length), false);
     render_line(r + vect2(length, -length), r + vect2(-length, length), false);
 
-    // Beleirjuk betut korbe:
+    // Draw the letter
     if (type == T_CEL) {
+        // E
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), false);
         render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), false);
@@ -46,23 +43,26 @@ void object::render(void) {
         return;
     }
     if (type == T_KAJA) {
+        // A
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), false);
         return;
     }
     if (type == T_KEZDO) {
+        // S
         render_line(r + vect2(0.15, 0.3), r + vect2(0.15, 0.0), false);
         render_line(r + vect2(-0.15, -0.3), r + vect2(-0.15, 0.0), false);
-
         render_line(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), false);
         render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.0), r + vect2(0.15, 0.0), false);
         return;
     }
     if (type == T_HALALOS) {
+        // K
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.07), r + vect2(0.15, -0.3), false);
+        // Bottom-right leg:
         render_line(r + vect2(LETTER_K_INTERSECTION_POINT, 0.0), r + vect2(0.15, 0.3), false);
         return;
     }

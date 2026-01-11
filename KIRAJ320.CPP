@@ -248,30 +248,30 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
     int objmaxx = balalsox + Viewxsize - 1;
     int objmaxy = balalsoy + Viewysize - 1;
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (!pker) {
             break;
         }
 
-        int kell1 = pker->tipus == T_KAJA && pker->aktiv;
-        int kell2 = (Single || !Tag) && pker->tipus == T_CEL;
+        int kell1 = pker->type == T_KAJA && pker->active;
+        int kell2 = (Single || !Tag) && pker->type == T_CEL;
 
         if (!kell1 && !kell2) {
             continue;
         }
 
-        if (pker->rxint_v < objminx || pker->ryint_v < objminy || pker->rxint_v > objmaxx ||
-            pker->ryint_v > objmaxy) {
+        if (pker->minimap_canvas_x < objminx || pker->minimap_canvas_y < objminy ||
+            pker->minimap_canvas_x > objmaxx || pker->minimap_canvas_y > objmaxy) {
             continue;
         }
 
         // Potty kirajzolasa View ablakba:
-        if (pker->tipus == T_KAJA) {
-            kigyuru(ppic, pker->rxint_v - balalsox + vx1, pker->ryint_v - balalsoy + vy1,
-                    Plgr->viewfood);
+        if (pker->type == T_KAJA) {
+            kigyuru(ppic, pker->minimap_canvas_x - balalsox + vx1,
+                    pker->minimap_canvas_y - balalsoy + vy1, Plgr->viewfood);
         } else {
-            kigyuru(ppic, pker->rxint_v - balalsox + vx1, pker->ryint_v - balalsoy + vy1,
-                    Plgr->viewexit[0]);
+            kigyuru(ppic, pker->minimap_canvas_x - balalsox + vx1,
+                    pker->minimap_canvas_y - balalsoy + vy1, Plgr->viewexit[0]);
         }
     }
 
@@ -626,32 +626,32 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     int objmaxx = balalsox + SCREEN_WIDTH;
     int objmaxy = balalsoy + SCREEN_HEIGHT;
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (!pker) {
             break;
         }
 
-        if (pker->tipus == T_KEZDO || (pker->tipus == T_KAJA && !pker->aktiv) ||
-            (!Single && Tag && pker->tipus == T_CEL)) {
+        if (pker->type == T_KEZDO || (pker->type == T_KAJA && !pker->active) ||
+            (!Single && Tag && pker->type == T_CEL)) {
             continue;
         }
 
-        if (pker->rxint < objminx || pker->ryint < objminy || pker->rxint > objmaxx ||
-            pker->ryint > objmaxy) {
+        if (pker->canvas_x < objminx || pker->canvas_y < objminy || pker->canvas_x > objmaxx ||
+            pker->canvas_y > objmaxy) {
             continue;
         }
 
         pic8* pobjpic = nullptr;
         int dy = 0;
         if (State->animated_objects) {
-            switch (pker->tipus) {
+            switch (pker->type) {
             case T_KAJA:
-                pobjpic = Plgr->foodtomb[pker->foodsorszam % Plgr->foodszam]->get_frame_by_time(t);
-                dy = (int)(5.0 * sin(t * 15.5 + pker->sinfazis));
+                pobjpic = Plgr->foodtomb[pker->animation % Plgr->foodszam]->get_frame_by_time(t);
+                dy = (int)(5.0 * sin(t * 15.5 + pker->floating_phase));
                 break;
             case T_CEL:
                 pobjpic = Plgr->pexit->get_frame_by_time(t);
-                dy = (int)(5.0 * sin(t * 15.5 + pker->sinfazis));
+                dy = (int)(5.0 * sin(t * 15.5 + pker->floating_phase));
                 break;
             case T_HALALOS:
                 pobjpic = Plgr->pkiller->get_frame_by_time(t);
@@ -661,9 +661,9 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             }
         } else {
             // Elso frame-et adja vissza mindig:
-            switch (pker->tipus) {
+            switch (pker->type) {
             case T_KAJA:
-                pobjpic = Plgr->foodtomb[pker->foodsorszam % Plgr->foodszam]->get_frame_by_index(0);
+                pobjpic = Plgr->foodtomb[pker->animation % Plgr->foodszam]->get_frame_by_index(0);
                 break;
             case T_CEL:
                 pobjpic = Plgr->pexit->get_frame_by_index(0);
@@ -676,7 +676,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             }
         }
 
-        blit8(ppic, pobjpic, pker->rxint - balalsox, pker->ryint - balalsoy + dy);
+        blit8(ppic, pobjpic, pker->canvas_x - balalsox, pker->canvas_y - balalsoy + dy);
     }
 
     // Motorosok kirajzolasa:

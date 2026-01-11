@@ -309,9 +309,9 @@ int vizsgalat(motorst* pmot) {
         for (int i = 0; i < 3; i++) {
             if (sorszamtomb[i] >= 0) {
                 startwavegyujto(0, 0.0, sorszamtomb[i]);
-                kerek* pker = Ptop->getptrkerek(sorszamtomb[i]);
-                if (pker->tipus == T_KAJA) {
-                    pker->aktiv = 0;
+                object* pker = Ptop->getptrkerek(sorszamtomb[i]);
+                if (pker->type == T_KAJA) {
+                    pker->active = 0;
                     voltkaja = 1; // Hatha van meg tobb kaja is
                 }
             }

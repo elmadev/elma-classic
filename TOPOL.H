@@ -4,7 +4,7 @@
 #include "state.h"
 #include "vect2.h"
 
-class kerek;
+class object;
 class polygon;
 struct motorst;
 
@@ -70,7 +70,7 @@ class topol {
 
     int hibas, lezart;
     ptrgyuru ptomb[MAXGYURU]; // Ez csak gany miatt public
-    kerek* kerektomb[MAXKEREK];
+    object* kerektomb[MAXKEREK];
     sprite* spritetomb[MAXSPRITE];
     char levelname[LEVELNAMEHOSSZ + 1];
     char lgrnev[16];
@@ -83,7 +83,7 @@ class topol {
     // Igazzal ter vissza, ha volt valtozas:
     int pic_selejtez(lgrfile* plgr);
     polygon* legkozpont(double x, double y, int* pk, double* ptav = NULL, polygon* kimarad = NULL);
-    kerek* legkozkerek(double x, double y, double* ptav = NULL);
+    object* legkozkerek(double x, double y, double* ptav = NULL);
     sprite* legkozsprite(double x, double y, double* ptav = NULL);
     // Ha saveidok hivja meg, csak akkor nem kell check:
     void save(const char* filenev, int nemkellcheck = 0);
@@ -99,7 +99,7 @@ class topol {
     int setallaktiv(motorst* pmot); // eheto kerekeket aktivizalja
     void killerekelore(void);       // kerekeket rendezi
     void kitoltiszineket(void);     // Osszes kerek szinet bejegyzi
-    kerek* getptrkerek(int index);
+    object* getptrkerek(int index);
 
     // Ha igaz, y negalva van (ez kell lejatszasnal):
     int kerekekfejjellefele;

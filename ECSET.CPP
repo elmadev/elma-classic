@@ -462,16 +462,20 @@ void ecset::mutatotlanit(void) {
 // Ptop kerek-jeinek egesz koordinatait kitolti:
 void ecset::kitoltfoodkoordokat(void) {
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (!pker) {
             continue;
         }
         if (view) {
-            pker->rxint_v = (int)((pker->r.x - origo.x) * MetersToPixels / MinimapScaleFactor);
-            pker->ryint_v = (int)((-pker->r.y - origo.y) * MetersToPixels / MinimapScaleFactor);
+            pker->minimap_canvas_x =
+                (int)((pker->r.x - origo.x) * MetersToPixels / MinimapScaleFactor);
+            pker->minimap_canvas_y =
+                (int)((-pker->r.y - origo.y) * MetersToPixels / MinimapScaleFactor);
         } else {
-            pker->rxint = (int)((pker->r.x - origo.x) * MetersToPixels - (double)(ANIM_WIDTH / 2));
-            pker->ryint = (int)((-pker->r.y - origo.y) * MetersToPixels - (double)(ANIM_WIDTH / 2));
+            pker->canvas_x =
+                (int)((pker->r.x - origo.x) * MetersToPixels - (double)(ANIM_WIDTH / 2));
+            pker->canvas_y =
+                (int)((-pker->r.y - origo.y) * MetersToPixels - (double)(ANIM_WIDTH / 2));
         }
     }
 }
@@ -1166,12 +1170,12 @@ void ecset::addobjektumok(void) {
     }
 
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pk = Ptop->kerektomb[i];
+        object* pk = Ptop->kerektomb[i];
         if (!pk) {
             return;
         }
 
-        if (pk->tipus == T_KAJA || pk->tipus == T_KEZDO || pk->tipus == T_CEL) {
+        if (pk->type == T_KAJA || pk->type == T_KEZDO || pk->type == T_CEL) {
             continue;
         }
 
@@ -1179,7 +1183,7 @@ void ecset::addobjektumok(void) {
         if (view) {
             unsigned char* mut = Plgr->viewexit;
             int ujtavolsag = 498;
-            if (pk->tipus == T_HALALOS) {
+            if (pk->type == T_HALALOS) {
                 mut = Plgr->viewkiller;
                 ujtavolsag = 499;
             }
@@ -1203,7 +1207,7 @@ void ecset::addobjektumok(void) {
 
         pic8* ppic = Plgr->pexit;
         int ujtavolsag = 498;
-        if( pk->tipus == T_HALALOS ) {
+        if( pk->type == T_HALALOS ) {
             ppic = Plgr->pkiller;
             ujtavolsag = 499;
         }

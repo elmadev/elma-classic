@@ -55,16 +55,16 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
         internal_error("spritefeldolgoz-ban !Ptop->kerektomb[sorszam]!");
     }
 
-    int tipus = Ptop->kerektomb[sorszam]->tipus;
+    int tipus = Ptop->kerektomb[sorszam]->type;
 
     if (tipus == T_HALALOS) {
         return 0;
     }
     if (tipus == T_KAJA) {
-        Ptop->kerektomb[sorszam]->aktiv = 0;
+        Ptop->kerektomb[sorszam]->active = 0;
         (*pkajaszam)++;
         startwavegyujto(WAV_EVES, 0.99, -1);
-        switch (Ptop->kerektomb[sorszam]->kajatipus) {
+        switch (Ptop->kerektomb[sorszam]->property) {
         case KT_UP:
             pmot->gravity_direction = MotorGravity::Up;
             break;

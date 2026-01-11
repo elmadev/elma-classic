@@ -406,8 +406,8 @@ topol::topol(void) {
     memset(&idok, 0, sizeof(idok));
 
     ptomb[0] = new polygon;
-    kerektomb[0] = new kerek(-2, 0.5, T_CEL);
-    kerektomb[1] = new kerek(2, 0.5, T_KEZDO);
+    kerektomb[0] = new object(-2, 0.5, T_CEL);
+    kerektomb[1] = new object(2, 0.5, T_KEZDO);
     strcpy(levelname, "Unnamed");
     strcpy(lgrnev, "DEFAULT");
     strcpy(fgnev, "ground");
@@ -584,13 +584,13 @@ polygon* topol::legkozpont(double x, double y, int* pk, double* ptav, polygon* k
     return pgy;
 }
 
-kerek* topol::legkozkerek(double x, double y, double* ptav) {
+object* topol::legkozkerek(double x, double y, double* ptav) {
     if (ptav) {
         *ptav = 1000000000.0;
     }
 
     double tav = 1000000.0;
-    kerek* pker = NULL;
+    object* pker = NULL;
     vect2 r(x, y);
     for (int i = 0; i < MAXKEREK; i++) {
         if (kerektomb[i]) {
@@ -659,7 +659,7 @@ void topol::kirajzol(void) {
     }
     for (int i = 0; i < MAXKEREK; i++) {
         if (kerektomb[i]) {
-            kerektomb[i]->kirajzol();
+            kerektomb[i]->render();
         }
     }
     for (int i = 0; i < MAXSPRITE; i++) {
@@ -1074,7 +1074,7 @@ void topol::loadkulso(const char* filenev) {
 
     for (int i = 0; i < kerekszam; i++) {
         // Beolvassa sok kereket:
-        kerektomb[i] = new kerek(h, verzio);
+        kerektomb[i] = new object(h, verzio);
     }
 
     if (verzio > 6) {
@@ -1314,7 +1314,7 @@ void topol::loadbelso(const char* filenev) {
 
     // Beolvassa sok kereket:
     for (int i = 0; i < kerekszam; i++) {
-        kerektomb[i] = new kerek(h, verzio);
+        kerektomb[i] = new object(h, verzio);
     }
 
     if (verzio > 6) {
@@ -1635,7 +1635,7 @@ double topol::belyegszamitas(int kellspriteis) {
     }
     for (int i = 0; i < MAXKEREK; i++) {
         if (kerektomb[i]) {
-            belyeg += kerektomb[i]->belyegszamitas();
+            belyeg += kerektomb[i]->checksum();
         }
     }
     if (kellspriteis) {
@@ -1741,21 +1741,21 @@ int topol::setallaktiv(motorst* pmot) {
     int kajaszam = 0;
     int voltkezdo = 0;
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (pker) {
             pker->sinfazisint = random_range(1000);
-            pker->sinfazis = pker->sinfazisint * 2.0 * PI / 1000.0;
+            pker->floating_phase = pker->sinfazisint * 2.0 * PI / 1000.0;
 
-            pker->aktiv = 1;
-            if (pker->tipus == T_KAJA) {
+            pker->active = 1;
+            if (pker->type == T_KAJA) {
                 kajaszam++;
             }
-            if (pker->tipus == T_KEZDO) {
+            if (pker->type == T_KEZDO) {
                 if (voltkezdo) {
                     internal_error("topol::setallaktiv-ban palyan ket kezdo is van!");
                 }
                 voltkezdo = 1;
-                pker->aktiv = 0;
+                pker->active = 0;
                 Kezdetihelydiff = pker->r - pmot->left_wheel.r;
                 pmot->bike.r = pmot->bike.r + Kezdetihelydiff;
                 pmot->left_wheel.r = pmot->left_wheel.r + Kezdetihelydiff;
@@ -1775,13 +1775,13 @@ int topol::setallaktiv(motorst* pmot) {
 void topol::killerekelore(void) {
     int szam = 0;
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (pker) {
             szam++;
         }
     }
     for (int i = 0; i < szam; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (!pker) {
             internal_error("topol::killerekelore-ben hezagos kerek tomb!");
         }
@@ -1792,8 +1792,8 @@ void topol::killerekelore(void) {
     }
     for (int j = 0; j < szam + 4; j++) {
         for (int i = 0; i < szam - 1; i++) {
-            int tipus1 = Ptop->kerektomb[i]->tipus;
-            int tipus2 = Ptop->kerektomb[i + 1]->tipus;
+            int tipus1 = Ptop->kerektomb[i]->type;
+            int tipus2 = Ptop->kerektomb[i + 1]->type;
 
             // Sullyozzuk tipusokat hogy sorrendiseget lehessen megallapitani:
             int tip1 = 10;
@@ -1820,7 +1820,7 @@ void topol::killerekelore(void) {
 
             if (tip1 > tip2) {
                 // Cserelnunk kell:
-                kerek tmpker = *Ptop->kerektomb[i];
+                object tmpker = *Ptop->kerektomb[i];
                 *Ptop->kerektomb[i] = *Ptop->kerektomb[i + 1];
                 *Ptop->kerektomb[i + 1] = tmpker;
             }
@@ -1831,26 +1831,26 @@ void topol::killerekelore(void) {
 // Osszes kerek szinet bejegyzi:
 void topol::kitoltiszineket(void) {
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (pker) {
-            if (pker->tipus == T_CEL) {
+            if (pker->type == T_CEL) {
                 pker->szin = 0;
             }
-            if (pker->tipus == T_KAJA) {
+            if (pker->type == T_KAJA) {
                 pker->szin = 0;
             }
-            if (pker->tipus == T_HALALOS) {
+            if (pker->type == T_HALALOS) {
                 pker->szin = 0;
             }
         }
     }
 }
 
-kerek* topol::getptrkerek(int index) {
+object* topol::getptrkerek(int index) {
     if (index < 0 || index >= MAXKEREK) {
         internal_error("topol::getptrkerek-ben index < 0 || index >= MAXKEREK!");
     }
-    kerek* pker = Ptop->kerektomb[index];
+    object* pker = Ptop->kerektomb[index];
     if (!pker) {
         internal_error("topol::getptrkerek-ben !pker!");
     }
@@ -1865,7 +1865,7 @@ void topol::kereklefejjel(void) {
     }
     kerekekfejjellefele = 1;
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (pker) {
             pker->r.y = -pker->r.y;
         }
@@ -1878,7 +1878,7 @@ void topol::kerekjolalljon(void) {
     }
     kerekekfejjellefele = 0;
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (pker) {
             pker->r.y = -pker->r.y;
         }

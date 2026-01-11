@@ -2,7 +2,7 @@
 #define EDITUJ_H
 
 class abc8;
-class kerek;
+class object;
 class palette;
 class polygon;
 class sprite;
@@ -23,7 +23,7 @@ extern polygon* Pgy;
 extern int K;
 extern bool Fel;
 
-extern kerek* Pker;
+extern object* Pker;
 
 extern sprite* Psp;
 

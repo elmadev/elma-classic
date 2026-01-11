@@ -195,7 +195,7 @@ void t_move_nyomva_jobb(int mx, int my) {
     sprite* psp = Ptop->legkozsprite(x, y, &tavsp);
     int semmi = 0;
     polygon* pgy = Ptop->legkozpont(x, y, &semmi, &tavgy);
-    kerek* pk = Ptop->legkozkerek(x, y, &tavker);
+    object* pk = Ptop->legkozkerek(x, y, &tavker);
 
     if (!psp && !pgy && !pk) {
         return;
@@ -237,8 +237,8 @@ void t_move_nyomva_jobb(int mx, int my) {
         set_gyuru_attributes(pgy);
     }
     // Csak kaja-nak lehet megvaltoztatni tipusat:
-    if (pk && pk->tipus == T_KAJA) {
-        set_kerek_tipus("Select food subtype!", &pk->kajatipus, &pk->foodsorszam);
+    if (pk && pk->type == T_KAJA) {
+        set_kerek_tipus("Select food subtype!", &pk->property, &pk->animation);
     }
 }
 
@@ -293,12 +293,12 @@ void t_move_mmove(int mx, int my) {
         Pgy->render_one_line(K, !Fel, false);
     } else {
         if (Pker) {
-            Pker->kirajzol();
+            Pker->render();
             double dx = pixel_to_meter_x(mx);
             double dy = pixel_to_meter_y(my);
             Pker->r.x = dx;
             Pker->r.y = dy;
-            Pker->kirajzol();
+            Pker->render();
         } else {
             Psp->kirajzol();
             double dx = pixel_to_meter_x(mx);
@@ -638,10 +638,10 @@ void t_create_kerek_nyomva(int mx, int my, int food) {
             if (!food) {
                 tipus = T_HALALOS;
             }
-            Ptop->kerektomb[i] = new kerek(x, y, tipus);
+            Ptop->kerektomb[i] = new object(x, y, tipus);
             if (food) {
-                Ptop->kerektomb[i]->kajatipus = Food_kajatipus;
-                Ptop->kerektomb[i]->foodsorszam = Food_foodsorszam;
+                Ptop->kerektomb[i]->property = Food_kajatipus;
+                Ptop->kerektomb[i]->animation = Food_foodsorszam;
             }
             invalidate();
             Valtozott = 1;
@@ -659,17 +659,17 @@ void t_create_kerek_nyomva(int mx, int my, int food) {
 void t_delete_kerek_nyomva(int mx, int my) {
     double x = pixel_to_meter_x(mx);
     double y = pixel_to_meter_y(my);
-    kerek* pker = Ptop->legkozkerek(x, y);
+    object* pker = Ptop->legkozkerek(x, y);
     if (!pker) {
         return;
     }
     for (int i = 0; i < MAXKEREK; i++) {
         if (Ptop->kerektomb[i] == pker) {
-            if (pker->tipus == T_CEL) { // T_KEZDO
+            if (pker->type == T_CEL) { // T_KEZDO
                 dialog("You cannot delete the Exit object!");
                 return;
             }
-            if (pker->tipus == T_KEZDO) {
+            if (pker->type == T_KEZDO) {
                 dialog("You cannot delete the Start object!");
                 return;
             }

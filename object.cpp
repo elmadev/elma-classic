@@ -9,17 +9,17 @@
 // KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK
 // KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK KEREK
 
-kerek::kerek(double x, double y, int tipusp) {
+object::object(double x, double y, int typ) {
     r.x = x;
     r.y = y;
-    tipus = tipusp;
-    kajatipus = 0; // Ra kell movolni hogy kaja lehessen
-    foodsorszam = 0;
+    type = typ;
+    property = 0; // Ra kell movolni hogy kaja lehessen
+    animation = 0;
 }
 
 constexpr double Hal_eltol = -0.15 + 0.3 * (0.07 / 0.37);
 
-void kerek::kirajzol(void) {
+void object::render(void) {
     int szegmensszam = 16;
     double sugar = 0.4;
 
@@ -38,20 +38,20 @@ void kerek::kirajzol(void) {
     render_line(r + vect2(meret, -meret), r + vect2(-meret, meret), false);
 
     // Beleirjuk betut korbe:
-    if (tipus == T_CEL) {
+    if (type == T_CEL) {
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), false);
         render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), false);
         return;
     }
-    if (tipus == T_KAJA) {
+    if (type == T_KAJA) {
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), false);
         return;
     }
-    if (tipus == T_KEZDO) {
+    if (type == T_KEZDO) {
         render_line(r + vect2(0.15, 0.3), r + vect2(0.15, 0.0), false);
         render_line(r + vect2(-0.15, -0.3), r + vect2(-0.15, 0.0), false);
 
@@ -60,7 +60,7 @@ void kerek::kirajzol(void) {
         render_line(r + vect2(-0.15, 0.0), r + vect2(0.15, 0.0), false);
         return;
     }
-    if (tipus == T_HALALOS) {
+    if (type == T_HALALOS) {
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.07), r + vect2(0.15, -0.3), false);
         render_line(r + vect2(Hal_eltol, 0.0), r + vect2(0.15, 0.3), false);
@@ -69,56 +69,56 @@ void kerek::kirajzol(void) {
     internal_error("iugiffiif");
 }
 
-kerek::kerek(FILE* h, int verzio) {
+object::object(FILE* h, int version) {
     if (fread(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
         internal_error("Nem olvas file-bol kerek::kerek-ben!");
     }
     if (fread(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
         internal_error("Nem olvas file-bol kerek::kerek-ben!");
     }
-    if (fread(&tipus, 1, sizeof(tipus), h) != sizeof(tipus)) {
+    if (fread(&type, 1, sizeof(type), h) != sizeof(type)) {
         internal_error("Nem olvas file-bol kerek::kerek-ben!");
     }
 
-    kajatipus = 0;
-    if (verzio >= 9) {
-        if (fread(&kajatipus, 1, 4, h) != 4) {
+    property = 0;
+    if (version >= 9) {
+        if (fread(&property, 1, 4, h) != 4) {
             internal_error("Nem olvas file-bol kerek::kerek-ben!");
         }
     }
-    foodsorszam = 0;
-    if (verzio >= 11) {
-        if (fread(&foodsorszam, 1, 4, h) != 4) {
+    animation = 0;
+    if (version >= 11) {
+        if (fread(&animation, 1, 4, h) != 4) {
             internal_error("Nem olvas file-bol kerek::kerek-ben!");
         }
     }
-    if (foodsorszam < 0 || foodsorszam > 8) {
+    if (animation < 0 || animation > 8) {
         internal_error("65767yr");
     }
 }
 
-void kerek::save(FILE* h) {
+void object::save(FILE* h) {
     if (fwrite(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
         internal_error("Nem ir file-ba kerek::save-ben!");
     }
     if (fwrite(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
         internal_error("Nem ir file-ba kerek::save-ben!");
     }
-    if (fwrite(&tipus, 1, sizeof(tipus), h) != sizeof(tipus)) {
+    if (fwrite(&type, 1, sizeof(type), h) != sizeof(type)) {
         internal_error("Nem ir file-ba kerek::save-ben!");
     }
-    if (fwrite(&kajatipus, 1, 4, h) != 4) {
+    if (fwrite(&property, 1, 4, h) != 4) {
         internal_error("Nem ir file-ba kerek::save-ben!");
     }
-    if (fwrite(&foodsorszam, 1, 4, h) != 4) {
+    if (fwrite(&animation, 1, 4, h) != 4) {
         internal_error("Nem ir file-ba kerek::save-ben!");
     }
 }
 
-double kerek::belyegszamitas(void) {
+double object::checksum(void) {
     double belyeg = 0;
     belyeg += r.x;
     belyeg += r.y;
-    belyeg += tipus;
+    belyeg += type;
     return belyeg;
 }

@@ -20,21 +20,21 @@ int utkozikesprite(vect2 r, double sugar) {
     int objmaxy = balalsoy + 200;
 
     for (int i = 0; i < MAXKEREK; i++) {
-        kerek* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->kerektomb[i];
         if (!pker) {
             break;
         }
 
-        if (!pker->aktiv) {
+        if (!pker->active) {
             continue;
         }
 
-        if (pker->tipus == T_CEL && !Single && Tag) {
+        if (pker->type == T_CEL && !Single && Tag) {
             continue; // Flag Tag-ben nincsen cel
         }
 
-        if (pker->rxint < objminx || pker->ryint < objminy || pker->rxint > objmaxx ||
-            pker->ryint > objmaxy) {
+        if (pker->canvas_x < objminx || pker->canvas_y < objminy || pker->canvas_x > objmaxx ||
+            pker->canvas_y > objmaxy) {
             continue;
         }
 

@@ -7,24 +7,24 @@
 enum { T_CEL = 1, T_KAJA, T_HALALOS, T_KEZDO };
 enum { KT_NORMAL, KT_UP, KT_DOWN, KT_LEFT, KT_RIGHT };
 
-class kerek {
+class object {
   public:
     vect2 r;
-    int rxint, ryint;     // Kaja lejatszas kozbeni kirajzolasahoz
-    int rxint_v, ryint_v; // Ugyanez view-ra
-    int tipus;
-    int kajatipus; // Ha kaja, akkor lehet gravitacios is
-    int foodsorszam;
-    int aktiv;          // Lejatszas soran ha kaja, megvan-e meg
-    unsigned char szin; // Csak lejatszasnal kell
-    int sinfazisint;    // 0-tol 999-ig mehet
-    double sinfazis;    // 0-tol 2Pi-ig megy
+    int canvas_x, canvas_y;                 // Kaja lejatszas kozbeni kirajzolasahoz
+    int minimap_canvas_x, minimap_canvas_y; // Ugyanez view-ra
+    int type;
+    int property; // Ha kaja, akkor lehet gravitacios is
+    int animation;
+    int active;            // Lejatszas soran ha kaja, megvan-e meg
+    unsigned char szin;    // Csak lejatszasnal kell
+    int sinfazisint;       // 0-tol 999-ig mehet
+    double floating_phase; // 0-tol 2Pi-ig megy
 
-    kerek(double x, double y, int tipus);
-    kerek(FILE* h, int verzio);
-    void kirajzol(void);
+    object(double x, double y, int typ);
+    object(FILE* h, int version);
+    void render(void);
     void save(FILE* h);
-    double belyegszamitas(void);
+    double checksum(void);
 };
 
 #endif

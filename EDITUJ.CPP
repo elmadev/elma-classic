@@ -30,7 +30,7 @@ polygon* Pgy = NULL;
 int K = 0;
 bool Fel = false;
 
-kerek* Pker = NULL;
+object* Pker = NULL;
 
 sprite* Psp = NULL;
 
@@ -547,7 +547,7 @@ static void beallitkozelvane(int mx, int my) {
             Kozelvan = 1;
         }
     }
-    kerek* pker = NULL;
+    object* pker = NULL;
     if (Tool == T_MOVE || Tool == T_DELETE_KEREK) {
         double ujtav;
         pker = Ptop->legkozkerek(x, y, &ujtav);
@@ -588,7 +588,7 @@ static void beallitkozelvane(int mx, int my) {
     }
 
     if (pker) {
-        kikereknev(pker->tipus, pker->kajatipus, pker->foodsorszam);
+        kikereknev(pker->type, pker->property, pker->animation);
     }
 
     if (!ps && !pker) {

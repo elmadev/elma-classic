@@ -89,9 +89,6 @@ void ecset::getorigoandsize(void) {
     // Megkeresi burkolokat:
     Segments->iterate_all_segments();
     segment* psz = Segments->next_segment();
-    if (!psz) {
-        internal_error("Nincs egyetlen szakasz sem definialva!");
-    }
     double minx = psz->r.x;
     double maxx = psz->r.x;
     double miny = psz->r.y;
@@ -1322,9 +1319,6 @@ ecset::ecset(int view_p) {
     // Vegigmegyunk osszes szakaszon:
     Segments->iterate_all_segments();
     segment* psz = Segments->next_segment();
-    if (!psz) {
-        internal_error("Nincs egyetlen szakasz sem definialva!");
-    }
     while (psz) {
         addszakasz(psz);
         psz = Segments->next_segment();

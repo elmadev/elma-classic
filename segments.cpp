@@ -250,9 +250,6 @@ void segments::setup_collision_grid(double max_radius) {
     // Get min/max values
     iterate_all_segments();
     segment* seg = next_segment();
-    if (!seg) {
-        internal_error("segments::setup_collision_grid no lines found!");
-    }
     double minx = seg->r.x;
     double maxx = seg->r.x;
     double miny = seg->r.y;
@@ -376,7 +373,12 @@ segment* segments::next_collision_grid_segment() {
     return ret;
 }
 
-void segments::iterate_all_segments() { seg_list_iteration_index = 0; }
+void segments::iterate_all_segments() {
+    if (seg_list_length == 0) {
+        internal_error("lines::iterate_all_segments there are no line segments to iterate!");
+    }
+    seg_list_iteration_index = 0;
+}
 
 segment* segments::next_segment() {
     if (seg_list_iteration_index >= seg_list_length) {

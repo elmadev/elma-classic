@@ -24,11 +24,15 @@ void message_box(const char* text) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Message", text, SDLWindow);
 }
 
+static unsigned char** SurfaceBuffer;
+
 void platform_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         internal_error(SDL_GetError());
         return;
     }
+
+    SurfaceBuffer = new unsigned char*[SCREEN_HEIGHT];
 
     SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                  SCREEN_WIDTH, SCREEN_HEIGHT, 0);
@@ -53,7 +57,6 @@ void platform_init() {
     }
 }
 
-static unsigned char* SurfaceBuffer[SCREEN_HEIGHT];
 static bool SurfaceLocked = false;
 
 unsigned char** lock_backbuffer(bool flipped) {

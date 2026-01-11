@@ -3,7 +3,15 @@
 
 #include "vect2.h"
 
-struct segment;
+class topol;
+
+// A single line segment from a polygon
+struct segment {
+    vect2 r;
+    vect2 v;
+    vect2 unit_vector;
+    double length;
+};
 
 // Linked list of level line segments
 struct segment_node {
@@ -14,13 +22,11 @@ struct segment_node {
 typedef segment_node* psegment_node;
 
 // Memory structure to allocate data for segment_node
-#define SEGMENT_NODE_BLOCK_LENGTH (500)
+constexpr int SEGMENT_NODE_BLOCK_LENGTH = 500;
 struct segment_node_array {
     segment_node nodes[SEGMENT_NODE_BLOCK_LENGTH];
     segment_node_array* next;
 };
-
-class topol;
 
 /* This class contains a list of all the lines in a level (line_list).
  * You can iterate through all the lines using iterate_all_segments() and next_segment().
@@ -49,13 +55,13 @@ class segments {
     // Memory management
     segment_node_array* node_array;
     int node_array_index;
-    segment_node* new_node(void);
-    void delete_all_nodes(void);
+    segment_node* new_node();
+    void delete_all_nodes();
 
   public:
     // Load a list of all the line segments of a level.
     segments(topol* lev);
-    ~segments(void);
+    ~segments();
 
     // Initialize the collision_grid with the max radius of any interactable bike part
     void setup_collision_grid(double max_radius);
@@ -63,21 +69,15 @@ class segments {
     // corresponding to position r
     void iterate_collision_grid_cell_segments(vect2 r);
     // Get the next line segment with potential collision from the cell in collision_grid
-    segment* next_collision_grid_segment(void);
+    segment* next_collision_grid_segment();
 
     // Iterate through all line segments in the level
-    void iterate_all_segments(void);
+    void iterate_all_segments();
     // Get the next line segment in the level
-    segment* next_segment(void);
+    segment* next_segment();
 
     segment* getptrszakasz(int sorszam);
     int getsorszam(segment* pvonal);
-};
-
-// A single line segment from a polygon
-struct segment {
-    vect2 r, v, unit_vector;
-    double length;
 };
 
 extern segments* Segments;

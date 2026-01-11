@@ -5,24 +5,21 @@
 #include <cmath>
 #include <cstring>
 
-static int MAX_SEGMENTS = MAX_VERTICES + 130;
+constexpr int MAX_SEGMENTS = MAX_VERTICES + 130;
 
-segments* Segments = NULL;
-
-// loadszakasz beleirja ptop->lezart-at ha topologia file-t olvas be:
-// Ezt azutan afterplayext fuggveny hasznalja ki:
-int Ucsoloadszakasz_lezart = 0;
+segments* Segments = nullptr;
 
 segments::segments(topol* lev) {
-    seg_list = NULL;
-    seg_list_allocated_length = seg_list_length = 0;
-    collision_grid = NULL;
+    seg_list = nullptr;
+    seg_list_allocated_length = 0;
+    seg_list_length = 0;
+    collision_grid = nullptr;
     collision_grid_width = 1;
     collision_grid_height = 1;
     collision_grid_cell_size = 1.0;
     collision_grid_origin = vect2(0, 0);
-    collision_grid_iterable = NULL;
-    node_array = NULL;
+    collision_grid_iterable = nullptr;
+    node_array = nullptr;
     node_array_index = 0;
 
     seg_list = new segment[MAX_SEGMENTS];
@@ -30,10 +27,8 @@ segments::segments(topol* lev) {
         external_error("segments::segments out of memory!");
         return;
     }
+    memset(seg_list, 0, sizeof(segment) * MAX_SEGMENTS);
     seg_list_allocated_length = MAX_SEGMENTS;
-    for (int i = 0; i < seg_list_allocated_length; i++) {
-        memset(&seg_list[i], 0, sizeof(segment));
-    }
 
     // Load all solid polygons
     for (int i = 0; i < MAXGYURU; i++) {
@@ -48,7 +43,8 @@ segments::segments(topol* lev) {
             if (seg_list_length >= MAX_SEGMENTS) {
                 internal_error("segments::segments seg_list_length >= MAX_SEGMENTS!");
             }
-            vect2 r1, r2;
+            vect2 r1;
+            vect2 r2;
             if (j < poly->vertex_count - 1) {
                 r1 = poly->vertices[j];
                 r2 = poly->vertices[j + 1];
@@ -66,7 +62,7 @@ segments::segments(topol* lev) {
     }
 }
 
-segments::~segments(void) {
+segments::~segments() {
     if (seg_list) {
         delete seg_list;
     }
@@ -77,14 +73,14 @@ segments::~segments(void) {
 }
 
 // Get an unused node from memory
-segment_node* segments::new_node(void) {
+segment_node* segments::new_node() {
     // No nodes exist, initialize first node
     if (!node_array) {
         node_array = new segment_node_array;
         if (!node_array) {
             external_error("segments::new_node out of memory!");
         }
-        node_array->next = NULL;
+        node_array->next = nullptr;
         node_array_index = 0;
     }
     // Grab the last memory structure
@@ -99,17 +95,16 @@ segment_node* segments::new_node(void) {
         if (!cur_array) {
             external_error("segments::new_node out of memory!");
         }
-        cur_array->next = NULL;
+        cur_array->next = nullptr;
         node_array_index = 0;
     }
     // Return the new unused node
-    node_array_index++;
-    return &cur_array->nodes[node_array_index - 1];
+    return &cur_array->nodes[node_array_index++];
 }
 
-void segments::delete_all_nodes(void) {
+void segments::delete_all_nodes() {
     segment_node_array* cur_array = node_array;
-    node_array = NULL;
+    node_array = nullptr;
     while (cur_array) {
         segment_node_array* delete_array = cur_array;
         cur_array = cur_array->next;
@@ -136,7 +131,7 @@ void segments::add_node_to_cell(int cell_x, int cell_y, segment* seg) {
     }
     // Create a new node for the linked list
     segment_node* new_n = new_node();
-    new_n->next = NULL;
+    new_n->next = nullptr;
     new_n->seg = seg;
     // Add the node to the end of the linked list for the selected cell
     segment_node* cur_n = collision_grid[collision_grid_width * cell_y + cell_x];
@@ -170,9 +165,9 @@ void segments::add_segment_to_collision_grid(segment* seg, double max_radius) {
     // Check if the line is taller than long.
     // If so, invert x and y temporarily
     // This way, the slope is always less than 1.0
-    int invert_axes = 0;
+    bool invert_axes = false;
     if (fabs(v.y) > fabs(v.x)) {
-        invert_axes = 1;
+        invert_axes = true;
         double tmp = v.x;
         v.x = v.y;
         v.y = tmp;
@@ -315,14 +310,13 @@ void segments::setup_collision_grid(double max_radius) {
     }
 
     // Allocate the collision_grid
-    unsigned grid_size = collision_grid_width * collision_grid_height;
+    int grid_size = collision_grid_width * collision_grid_height;
     collision_grid = new psegment_node[grid_size];
     if (!collision_grid) {
         external_error("segments::setup_collision_grid out of memory!");
     }
-    int grid_size_signed = collision_grid_width * collision_grid_height;
-    for (int i = 0; i < grid_size_signed; i++) {
-        collision_grid[i] = NULL;
+    for (int i = 0; i < grid_size; i++) {
+        collision_grid[i] = nullptr;
     }
 
     // Populate the collision_grid
@@ -368,9 +362,9 @@ void segments::iterate_collision_grid_cell_segments(vect2 r) {
     collision_grid_iterable = collision_grid[collision_grid_width * cell_y + cell_x];
 }
 
-segment* segments::next_collision_grid_segment(void) {
+segment* segments::next_collision_grid_segment() {
     if (!collision_grid_iterable) {
-        return NULL;
+        return nullptr;
     }
 #ifdef DEBUG
     if (!collision_grid_iterable->seg) {
@@ -382,14 +376,13 @@ segment* segments::next_collision_grid_segment(void) {
     return ret;
 }
 
-void segments::iterate_all_segments(void) { seg_list_iteration_index = 0; }
+void segments::iterate_all_segments() { seg_list_iteration_index = 0; }
 
-segment* segments::next_segment(void) {
+segment* segments::next_segment() {
     if (seg_list_iteration_index >= seg_list_length) {
-        return NULL;
+        return nullptr;
     }
-    seg_list_iteration_index++;
-    return &seg_list[seg_list_iteration_index - 1];
+    return &seg_list[seg_list_iteration_index++];
 }
 
 segment* segments::getptrszakasz(int sorszam) {

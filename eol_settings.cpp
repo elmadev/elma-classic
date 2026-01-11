@@ -14,6 +14,8 @@ using json = nlohmann::ordered_json;
 #define SETTINGS_JSON "settings.json"
 
 eol_settings::eol_settings() {
+    screen_width = 640;
+    screen_height = 480;
     pictures_in_background = false;
     center_camera = false;
     center_map = false;
@@ -52,6 +54,8 @@ void from_json(const json& j, MapAlignment& m) {
 }
 
 #define FIELD_LIST                                                                                 \
+    JSON_FIELD(screen_width)                                                                       \
+    JSON_FIELD(screen_height)                                                                      \
     JSON_FIELD(pictures_in_background)                                                             \
     JSON_FIELD(center_camera)                                                                      \
     JSON_FIELD(center_map)                                                                         \

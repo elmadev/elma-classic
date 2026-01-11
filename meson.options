@@ -1,1 +1,3 @@
 option('profile_performance', type : 'boolean', value : false, description: 'enable performance timing checks')
+
+option('static_sdl', type : 'boolean', value : false, description: 'link SDL statically')

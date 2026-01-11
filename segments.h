@@ -56,7 +56,8 @@ class segments {
     void add_node_to_cell(int cell_x, int cell_y, segment* seg);
 
     // Memory management
-    segment_node_array* node_array;
+    segment_node_array* first_node_array;
+    segment_node_array* last_node_array;
     int node_array_index;
     segment_node* new_node();
     void delete_all_nodes();

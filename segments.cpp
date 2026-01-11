@@ -19,7 +19,8 @@ segments::segments(level* lev) {
     collision_grid_cell_size = 1.0;
     collision_grid_origin = vect2(0, 0);
     collision_grid_iterable = nullptr;
-    node_array = nullptr;
+    first_node_array = nullptr;
+    last_node_array = nullptr;
     node_array_index = 0;
 
     seg_list = new segment[MAX_SEGMENTS];
@@ -75,41 +76,37 @@ segments::~segments() {
 // Get an unused node from memory
 segment_node* segments::new_node() {
     // No nodes exist, initialize first node
-    if (!node_array) {
-        node_array = new segment_node_array;
-        if (!node_array) {
+    if (!last_node_array) {
+        last_node_array = first_node_array = new segment_node_array;
+        if (!last_node_array) {
             external_error("segments::new_node out of memory!");
         }
-        node_array->next = nullptr;
+        last_node_array->next = nullptr;
         node_array_index = 0;
-    }
-    // Grab the last memory structure
-    segment_node_array* cur_array = node_array;
-    while (cur_array->next) {
-        cur_array = cur_array->next;
     }
     // If we've hit the end of the array in the last memory structure, create a new memory structure
     if (node_array_index == SEGMENT_NODE_BLOCK_LENGTH) {
-        cur_array->next = new segment_node_array;
-        cur_array = cur_array->next;
-        if (!cur_array) {
+        last_node_array->next = new segment_node_array;
+        last_node_array = last_node_array->next;
+        if (!last_node_array) {
             external_error("segments::new_node out of memory!");
         }
-        cur_array->next = nullptr;
+        last_node_array->next = nullptr;
         node_array_index = 0;
     }
     // Return the new unused node
-    return &cur_array->nodes[node_array_index++];
+    return &last_node_array->nodes[node_array_index++];
 }
 
 void segments::delete_all_nodes() {
-    segment_node_array* cur_array = node_array;
-    node_array = nullptr;
+    segment_node_array* cur_array = first_node_array;
+    first_node_array = nullptr;
     while (cur_array) {
         segment_node_array* delete_array = cur_array;
         cur_array = cur_array->next;
         delete delete_array;
     }
+    last_node_array = nullptr;
 }
 
 // collision_grid is a list representing a grid of the map, where each element represents a zone of

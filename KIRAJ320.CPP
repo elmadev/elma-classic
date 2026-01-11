@@ -253,8 +253,8 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
             break;
         }
 
-        int kell1 = pker->type == T_KAJA && pker->active;
-        int kell2 = (Single || !Tag) && pker->type == T_CEL;
+        int kell1 = pker->type == object::Type::Food && pker->active;
+        int kell2 = (Single || !Tag) && pker->type == object::Type::Exit;
 
         if (!kell1 && !kell2) {
             continue;
@@ -266,7 +266,7 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
         }
 
         // Potty kirajzolasa View ablakba:
-        if (pker->type == T_KAJA) {
+        if (pker->type == object::Type::Food) {
             kigyuru(ppic, pker->minimap_canvas_x - balalsox + vx1,
                     pker->minimap_canvas_y - balalsoy + vy1, Plgr->viewfood);
         } else {
@@ -631,8 +631,9 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             break;
         }
 
-        if (pker->type == T_KEZDO || (pker->type == T_KAJA && !pker->active) ||
-            (!Single && Tag && pker->type == T_CEL)) {
+        if (pker->type == object::Type::Start ||
+            (pker->type == object::Type::Food && !pker->active) ||
+            (!Single && Tag && pker->type == object::Type::Exit)) {
             continue;
         }
 
@@ -645,15 +646,15 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         int dy = 0;
         if (State->animated_objects) {
             switch (pker->type) {
-            case T_KAJA:
+            case object::Type::Food:
                 pobjpic = Plgr->foodtomb[pker->animation % Plgr->foodszam]->get_frame_by_time(t);
                 dy = (int)(5.0 * sin(t * 15.5 + pker->floating_phase));
                 break;
-            case T_CEL:
+            case object::Type::Exit:
                 pobjpic = Plgr->pexit->get_frame_by_time(t);
                 dy = (int)(5.0 * sin(t * 15.5 + pker->floating_phase));
                 break;
-            case T_HALALOS:
+            case object::Type::Killer:
                 pobjpic = Plgr->pkiller->get_frame_by_time(t);
                 break;
             default:
@@ -662,13 +663,13 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         } else {
             // Elso frame-et adja vissza mindig:
             switch (pker->type) {
-            case T_KAJA:
+            case object::Type::Food:
                 pobjpic = Plgr->foodtomb[pker->animation % Plgr->foodszam]->get_frame_by_index(0);
                 break;
-            case T_CEL:
+            case object::Type::Exit:
                 pobjpic = Plgr->pexit->get_frame_by_index(0);
                 break;
-            case T_HALALOS:
+            case object::Type::Killer:
                 pobjpic = Plgr->pkiller->get_frame_by_index(0);
                 break;
             default:

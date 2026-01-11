@@ -237,7 +237,7 @@ void t_move_nyomva_jobb(int mx, int my) {
         set_gyuru_attributes(pgy);
     }
     // Csak kaja-nak lehet megvaltoztatni tipusat:
-    if (pk && pk->type == T_KAJA) {
+    if (pk && pk->type == object::Type::Food) {
         set_kerek_tipus("Select food subtype!", &pk->property, &pk->animation);
     }
 }
@@ -634,9 +634,9 @@ void t_create_kerek_nyomva(int mx, int my, int food) {
         if (!Ptop->kerektomb[i]) {
             double x = pixel_to_meter_x(mx);
             double y = pixel_to_meter_y(my);
-            int tipus = T_KAJA;
+            object::Type tipus = object::Type::Food;
             if (!food) {
-                tipus = T_HALALOS;
+                tipus = object::Type::Killer;
             }
             Ptop->kerektomb[i] = new object(x, y, tipus);
             if (food) {
@@ -665,11 +665,11 @@ void t_delete_kerek_nyomva(int mx, int my) {
     }
     for (int i = 0; i < MAXKEREK; i++) {
         if (Ptop->kerektomb[i] == pker) {
-            if (pker->type == T_CEL) { // T_KEZDO
+            if (pker->type == object::Type::Exit) {
                 dialog("You cannot delete the Exit object!");
                 return;
             }
-            if (pker->type == T_KEZDO) {
+            if (pker->type == object::Type::Start) {
                 dialog("You cannot delete the Start object!");
                 return;
             }

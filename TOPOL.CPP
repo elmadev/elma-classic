@@ -406,8 +406,8 @@ topol::topol(void) {
     memset(&idok, 0, sizeof(idok));
 
     ptomb[0] = new polygon;
-    kerektomb[0] = new object(-2, 0.5, T_CEL);
-    kerektomb[1] = new object(2, 0.5, T_KEZDO);
+    kerektomb[0] = new object(-2, 0.5, object::Type::Exit);
+    kerektomb[1] = new object(2, 0.5, object::Type::Start);
     strcpy(levelname, "Unnamed");
     strcpy(lgrnev, "DEFAULT");
     strcpy(fgnev, "ground");
@@ -1746,10 +1746,10 @@ int topol::setallaktiv(motorst* pmot) {
             pker->floating_phase = random_range(1000) * 2.0 * PI / 1000.0;
 
             pker->active = true;
-            if (pker->type == T_KAJA) {
+            if (pker->type == object::Type::Food) {
                 kajaszam++;
             }
-            if (pker->type == T_KEZDO) {
+            if (pker->type == object::Type::Start) {
                 if (voltkezdo) {
                     internal_error("topol::setallaktiv-ban palyan ket kezdo is van!");
                 }
@@ -1791,29 +1791,29 @@ void topol::killerekelore(void) {
     }
     for (int j = 0; j < szam + 4; j++) {
         for (int i = 0; i < szam - 1; i++) {
-            int tipus1 = Ptop->kerektomb[i]->type;
-            int tipus2 = Ptop->kerektomb[i + 1]->type;
+            object::Type tipus1 = Ptop->kerektomb[i]->type;
+            object::Type tipus2 = Ptop->kerektomb[i + 1]->type;
 
             // Sullyozzuk tipusokat hogy sorrendiseget lehessen megallapitani:
             int tip1 = 10;
-            if (tipus1 == T_HALALOS) {
+            if (tipus1 == object::Type::Killer) {
                 tip1 = 1;
             }
-            if (tipus1 == T_KAJA) {
+            if (tipus1 == object::Type::Food) {
                 tip1 = 2;
             }
-            if (tipus1 == T_CEL) {
+            if (tipus1 == object::Type::Exit) {
                 tip1 = 3;
             }
 
             int tip2 = 10;
-            if (tipus2 == T_HALALOS) {
+            if (tipus2 == object::Type::Killer) {
                 tip2 = 1;
             }
-            if (tipus2 == T_KAJA) {
+            if (tipus2 == object::Type::Food) {
                 tip2 = 2;
             }
-            if (tipus2 == T_CEL) {
+            if (tipus2 == object::Type::Exit) {
                 tip2 = 3;
             }
 

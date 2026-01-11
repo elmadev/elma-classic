@@ -55,12 +55,12 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
         internal_error("spritefeldolgoz-ban !Ptop->kerektomb[sorszam]!");
     }
 
-    int tipus = Ptop->kerektomb[sorszam]->type;
+    object::Type tipus = Ptop->kerektomb[sorszam]->type;
 
-    if (tipus == T_HALALOS) {
+    if (tipus == object::Type::Killer) {
         return 0;
     }
-    if (tipus == T_KAJA) {
+    if (tipus == object::Type::Food) {
         Ptop->kerektomb[sorszam]->active = false;
         (*pkajaszam)++;
         startwavegyujto(WAV_EVES, 0.99, -1);
@@ -80,7 +80,7 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
         }
         return 2;
     }
-    if (tipus == T_CEL) {
+    if (tipus == object::Type::Exit) {
         if (Motor1->apple_count + Motor2->apple_count >= Kajakell) {
             return 1;
         }

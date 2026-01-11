@@ -390,7 +390,7 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
     bltfront(BufferMain, 226, 2, 540, 30);
 }
 
-void kikereknev(int tipus, int kajatipus, int foodsorszam) {
+void kikereknev(object::Type tipus, int kajatipus, int foodsorszam) {
     // Belevaltoztatunk kispritenev() valtozojaba, hogy majd toroljon:
     strcpy(Kepnevkint, "aaccbbdde");
 
@@ -403,16 +403,16 @@ void kikereknev(int tipus, int kajatipus, int foodsorszam) {
 
     Pabc1->write(Pspritenevbuffer, 0, 14, "Object:");
     char tmp[50];
-    //	T_CEL = 1, T_KAJA, T_HALALOS, T_KEZDO };
+    //	object::Type::Exit = 1, object::Type::Food, object::Type::Killer, object::Type::Start };
     // enum { KT_NORMAL, KT_UP, KT_DOWN, KT_LEFT, KT_RIGHT };
-    if (tipus == T_CEL) {
+    if (tipus == object::Type::Exit) {
         sprintf(tmp, "Exit");
     }
-    if (tipus == T_KEZDO) {
+    if (tipus == object::Type::Start) {
         sprintf(tmp, "Start");
     }
 
-    if (tipus == T_KAJA) {
+    if (tipus == object::Type::Food) {
         if (kajatipus == KT_NORMAL) {
             sprintf(tmp, "Food");
         }
@@ -435,7 +435,7 @@ void kikereknev(int tipus, int kajatipus, int foodsorszam) {
         Pabc2->write(Pspritenevbuffer, 193, 14, tmp2);
     }
 
-    if (tipus == T_HALALOS) {
+    if (tipus == object::Type::Killer) {
         sprintf(tmp, "Killer");
     }
 
@@ -525,7 +525,7 @@ static void ujrarajzol(int egesz) {
 
 static void beallitkozelvane(int mx, int my) {
     if (Tool == T_CREATE_FOOD) {
-        kikereknev(T_KAJA, Food_kajatipus, Food_foodsorszam);
+        kikereknev(object::Type::Food, Food_kajatipus, Food_foodsorszam);
         return;
     }
     if (Tool == T_CREATE_SPRITE) {

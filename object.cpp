@@ -4,7 +4,7 @@
 #include "platform_utils.h"
 #include <cmath>
 
-object::object(double x, double y, int typ) {
+object::object(double x, double y, Type typ) {
     r.x = x;
     r.y = y;
     type = typ;
@@ -32,7 +32,7 @@ void object::render() {
     render_line(r + vect2(length, -length), r + vect2(-length, length), false);
 
     // Draw the letter
-    if (type == T_CEL) {
+    if (type == Type::Exit) {
         // E
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.3), r + vect2(0.15, 0.3), false);
@@ -40,14 +40,14 @@ void object::render() {
         render_line(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), false);
         return;
     }
-    if (type == T_KAJA) {
+    if (type == Type::Food) {
         // A
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, -0.3), r + vect2(0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.0), r + vect2(0.1, 0.0), false);
         return;
     }
-    if (type == T_KEZDO) {
+    if (type == Type::Start) {
         // S
         render_line(r + vect2(0.15, 0.3), r + vect2(0.15, 0.0), false);
         render_line(r + vect2(-0.15, -0.3), r + vect2(-0.15, 0.0), false);
@@ -56,7 +56,7 @@ void object::render() {
         render_line(r + vect2(-0.15, 0.0), r + vect2(0.15, 0.0), false);
         return;
     }
-    if (type == T_HALALOS) {
+    if (type == Type::Killer) {
         // K
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.07), r + vect2(0.15, -0.3), false);
@@ -118,6 +118,6 @@ double object::checksum() {
     double sum = 0;
     sum += r.x;
     sum += r.y;
-    sum += type;
+    sum += (int)type;
     return sum;
 }

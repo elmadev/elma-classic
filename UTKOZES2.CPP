@@ -29,7 +29,7 @@ int utkozikesprite(vect2 r, double sugar) {
             continue;
         }
 
-        if (pker->type == T_CEL && !Single && Tag) {
+        if (pker->type == object::Type::Exit && !Single && Tag) {
             continue; // Flag Tag-ben nincsen cel
         }
 

@@ -118,7 +118,7 @@ int check_topology(int kelldialog) {
     // Most megnezzuk, hogy bal kerek nincs-e kint:
     for (int i = 0; i < MAXKEREK; i++) {
         object* pker = Ptop->kerektomb[i];
-        if (pker && pker->type == T_KEZDO) {
+        if (pker && pker->type == object::Type::Start) {
             if (!Ptop->levegoben(NULL, &pker->r)) {
                 if (kelldialog) {
                     dialog("Error: The start object, which determines the place of the left wheel "

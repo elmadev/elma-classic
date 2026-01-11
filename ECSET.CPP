@@ -1175,7 +1175,8 @@ void ecset::addobjektumok(void) {
             return;
         }
 
-        if (pk->type == T_KAJA || pk->type == T_KEZDO || pk->type == T_CEL) {
+        if (pk->type == object::Type::Food || pk->type == object::Type::Start ||
+            pk->type == object::Type::Exit) {
             continue;
         }
 
@@ -1183,7 +1184,7 @@ void ecset::addobjektumok(void) {
         if (view) {
             unsigned char* mut = Plgr->viewexit;
             int ujtavolsag = 498;
-            if (pk->type == T_HALALOS) {
+            if (pk->type == object::Type::Killer) {
                 mut = Plgr->viewkiller;
                 ujtavolsag = 499;
             }
@@ -1207,7 +1208,7 @@ void ecset::addobjektumok(void) {
 
         pic8* ppic = Plgr->pexit;
         int ujtavolsag = 498;
-        if( pk->type == T_HALALOS ) {
+        if( pk->type == object::Type::Killer ) {
             ppic = Plgr->pkiller;
             ujtavolsag = 499;
         }

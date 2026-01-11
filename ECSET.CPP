@@ -86,8 +86,8 @@ static void meghelyez(double* pd) {
 
 void ecset::getorigoandsize(void) {
     // Megkeresi burkolokat:
-    Pszak->felsorolasresetszak();
-    vonal* psz = Pszak->getnextszak();
+    Segments->iterate_all_segments();
+    segment* psz = Segments->next_segment();
     if (!psz) {
         internal_error("Nincs egyetlen szakasz sem definialva!");
     }
@@ -122,7 +122,7 @@ void ecset::getorigoandsize(void) {
             maxy = psz->r.y + psz->v.y;
         }
 
-        psz = Pszak->getnextszak();
+        psz = Segments->next_segment();
     }
 
     if (view) {
@@ -143,7 +143,7 @@ void ecset::getorigoandsize(void) {
     }
 }
 
-void ecset::addszakasz(vonal* psz) {
+void ecset::addszakasz(segment* psz) {
     vect2 r, v;
     r = psz->r - origo;
     r.x *= MetersToPixels;
@@ -1261,7 +1261,7 @@ void ecset::levon10000t(void) {
     }
 };
 
-// Ptop es Pszak alapjan:
+// Ptop es Segments alapjan:
 ecset::ecset(int view_p) {
     view = view_p;
 
@@ -1283,8 +1283,8 @@ ecset::ecset(int view_p) {
     xsizedb = ysizedb = 0.0;
     maxx = sorszam = 0;
 
-    if (!Ptop || !Pszak) {
-        internal_error("ecset::ecset !Ptop || !Pszak!");
+    if (!Ptop || !Segments) {
+        internal_error("ecset::ecset !Ptop || !Segments!");
     }
 
     elsotomb = new mdarabtomb;
@@ -1319,14 +1319,14 @@ ecset::ecset(int view_p) {
     }
 
     // Vegigmegyunk osszes szakaszon:
-    Pszak->felsorolasresetszak();
-    vonal* psz = Pszak->getnextszak();
+    Segments->iterate_all_segments();
+    segment* psz = Segments->next_segment();
     if (!psz) {
         internal_error("Nincs egyetlen szakasz sem definialva!");
     }
     while (psz) {
         addszakasz(psz);
-        psz = Pszak->getnextszak();
+        psz = Segments->next_segment();
     }
 
     // Sorrendbe rendezzuk egy sor elemeit:
@@ -1359,7 +1359,7 @@ ecset::ecset(int view_p) {
 }
 
 // URES sorokat tesz bele:
-// Ptop es Pszak alapjan:
+// Ptop es Segments alapjan:
 ecset::ecset(ecset* pold) {
     for (int i = 0; i < MAXECSETSOR; i++) {
         msorok[i] = NULL;
@@ -1380,8 +1380,8 @@ ecset::ecset(ecset* pold) {
     xsizedb = ysizedb = 0.0;
     maxx = sorszam = 0;
 
-    if (!Ptop || !Pszak) {
-        internal_error("ecset::ecset !Ptop || !Pszak!");
+    if (!Ptop || !Segments) {
+        internal_error("ecset::ecset !Ptop || !Segments!");
     }
 
     elsotomb = new mdarabtomb;

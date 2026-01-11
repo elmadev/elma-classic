@@ -19,7 +19,7 @@ static char Bentlevelnev[20] = "";
 void invalidate_level() { Volttopsave = 1; }
 
 // Beolvas egy level-t ha kell (nev max 12 karakter).
-// Torli es kitolti Ptop, Plgr, Pszak, ecset mutatokat.
+// Torli es kitolti Ptop, Plgr, Segments, ecset mutatokat.
 // Ha belso file-ban is megvan palya onnan veszi:
 // Hamissal ter vissza, ha hibas topologiaju level:
 int floadlevel_p(const char* nev) {
@@ -29,7 +29,7 @@ int floadlevel_p(const char* nev) {
     if (strlen(nev) > 12 || !nev[0]) {
         internal_error("floadlevel_p-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
     }
-    if (Volttopsave || !Ptop || !Pszak || strcmpi(nev, Bentlevelnev) != 0) {
+    if (Volttopsave || !Ptop || !Segments || strcmpi(nev, Bentlevelnev) != 0) {
         Volttopsave = 0;
         // Ujra be kell olvasni palyat:
         strcpy(Bentlevelnev, nev);
@@ -60,14 +60,14 @@ int floadlevel_p(const char* nev) {
         loadlgrfile(Ptop->lgrnev);
         Ptop->pic_selejtez(Plgr);
 
-        if (Pszak) {
-            delete Pszak;
+        if (Segments) {
+            delete Segments;
         }
-        Pszak = new szakaszok(Ptop);
+        Segments = new segments(Ptop);
         if (HeadRadius > Motor1->left_wheel.radius) {
-            Pszak->rendez(HeadRadius);
+            Segments->setup_collision_grid(HeadRadius);
         } else {
-            Pszak->rendez(Motor1->left_wheel.radius);
+            Segments->setup_collision_grid(Motor1->left_wheel.radius);
         }
 
         betoltecseteket();
@@ -76,7 +76,7 @@ int floadlevel_p(const char* nev) {
 }
 
 // Torli es kitolti Ptop, Plgr, mutatokat.
-// Pszak, ecset mutatokat torli:
+// Segments, ecset mutatokat torli:
 // Ha belso file-ban is megvan palya onnan veszi:
 // Igaz ha file nem volt lezarva, kulonben new palya hamissal:
 int floadlevel_e(const char* nev, int forceload) {
@@ -119,10 +119,10 @@ int floadlevel_e(const char* nev, int forceload) {
         }
     }
 
-    if (Pszak) { // ervenytelenites
-        delete Pszak;
+    if (Segments) { // ervenytelenites
+        delete Segments;
     }
-    Pszak = NULL;
+    Segments = NULL;
 
     // Ha vannak benne idok, figyelmeztetes:
     if (Ptop->idok.single.times_count > 0 || Ptop->idok.multi.times_count > 0) {

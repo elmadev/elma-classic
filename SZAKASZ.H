@@ -3,68 +3,68 @@
 
 #include "vect2.h"
 
-struct vonal;
+struct segment;
 
-struct vonalnode {
-    vonal* pvonal;
-    vonalnode* pnext;
+struct segment_node {
+    segment* seg;
+    segment_node* next;
 };
 
-typedef vonalnode* pvonalnode;
+typedef segment_node* psegment_node;
 
-#define CSOMAGBANNODESZAM (500)
-struct soknodecsomag {
-    vonalnode nodetomb[CSOMAGBANNODESZAM];
-    soknodecsomag* nextcsomag;
+#define SEGMENT_NODE_BLOCK_LENGTH (500)
+struct segment_node_array {
+    segment_node nodes[SEGMENT_NODE_BLOCK_LENGTH];
+    segment_node_array* next;
 };
 
 class topol;
 
-class szakaszok {
-    vonal* tomb;
-    int maxszam;
-    int szam;
-    int szakfuto;
+class segments {
+    segment* seg_list;
+    int seg_list_allocated_length;
+    int seg_list_length;
+    int seg_list_iteration_index;
 
     // Terbeli kereseshez:
-    pvonalnode* tertomb;
-    int xdim, ydim;
-    double cellameret;
-    vect2 origo;
-    vonalnode* nextnode; // getnext ez alapjan dolgozik!
+    psegment_node* collision_grid;
+    int collision_grid_width, collision_grid_height;
+    double collision_grid_cell_size;
+    vect2 collision_grid_origin;
+    segment_node* collision_grid_iterable; // next_collision_grid_segment ez alapjan dolgozik!
 
-    void beindexelvonalat(vonal* pv, double maxtav);
-    void bekot(int cellax, int cellay, vonal* pv);
+    void add_segment_to_collision_grid(segment* seg, double max_radius);
+    void add_node_to_cell(int cell_x, int cell_y, segment* seg);
 
     // Terbeli kereseshez nodkezeles:
-    soknodecsomag* pelsocsomag;
-    int csomagbanbetelt;
-    vonalnode* getnewnode(void);
-    void deleteallnodes(void);
+    segment_node_array* node_array;
+    int node_array_index;
+    segment_node* new_node(void);
+    void delete_all_nodes(void);
 
   public:
-    szakaszok(topol* ptop);
-    ~szakaszok(void);
+    segments(topol* lev);
+    ~segments(void);
 
     // Terbeli fv.-ek:
     // rendez-t csak egyszer szabad hivni!
-    void rendez(double maxtav);
-    void felsorolasreset(vect2 r);
-    vonal* getnext(void);
+    void setup_collision_grid(double max_radius);
+    void iterate_collision_grid_cell_segments(vect2 r);
+    segment* next_collision_grid_segment(void);
 
     // Osszes szakaszon vegigmennek:
-    void felsorolasresetszak(void);
-    vonal* getnextszak(void);
+    void iterate_all_segments(void);
+    segment* next_segment(void);
 
-    vonal* getptrszakasz(int sorszam);
-    int getsorszam(vonal* pvonal);
+    segment* getptrszakasz(int sorszam);
+    int getsorszam(segment* pvonal);
 };
 
-struct vonal {
-    vect2 r, v, egyseg;
-    double hossz;
+struct segment {
+    vect2 r, v, unit_vector;
+    double length;
 };
 
-extern szakaszok* Pszak;
+extern segments* Segments;
 
 #endif

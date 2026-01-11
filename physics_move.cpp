@@ -86,8 +86,8 @@ void rigidbody_movement(rigidbody* rb, vect2 force, double torque, double dt, bo
     int anchor_point_count = 0;
     vect2 point1;
     vect2 point2;
-    vonal* line1 = nullptr;
-    vonal* line2 = nullptr;
+    segment* line1 = nullptr;
+    segment* line2 = nullptr;
 
     // Get up to two points of collision between wheel and polygons
     if (do_collision) {

@@ -4,9 +4,9 @@
 #include "SZAKASZ.H"
 #include "vect2.h"
 
-static int gombszakasz(vect2 r, double sugar, vonal* pv, vect2* pt) {
+static int gombszakasz(vect2 r, double sugar, segment* pv, vect2* pt) {
     vect2 rel = r - pv->r;
-    double pozicio = rel * pv->egyseg;
+    double pozicio = rel * pv->unit_vector;
     if (pozicio < 0) {
         if ((r - pv->r).length() < sugar) {
             *pt = pv->r;
@@ -15,31 +15,31 @@ static int gombszakasz(vect2 r, double sugar, vonal* pv, vect2* pt) {
             return 0;
         }
     }
-    if (pozicio > pv->hossz) {
-        if ((r - (pv->r + pv->egyseg * pv->hossz)).length() < sugar) {
-            *pt = pv->r + pv->egyseg * pv->hossz;
+    if (pozicio > pv->length) {
+        if ((r - (pv->r + pv->unit_vector * pv->length)).length() < sugar) {
+            *pt = pv->r + pv->unit_vector * pv->length;
             return 1;
         } else {
             return 0;
         }
     }
-    vect2 n = rotate_90deg(pv->egyseg);
+    vect2 n = rotate_90deg(pv->unit_vector);
     double tav = rel * n;
     if (tav < -sugar || tav > sugar) {
         return 0;
     }
-    *pt = pv->r + pv->egyseg * pozicio;
+    *pt = pv->r + pv->unit_vector * pozicio;
     return 1;
 }
 
-int talppontkereses(vect2 r, double sugar, vect2* pt1, vect2* pt2, vonal** ppv1, vonal** ppv2) {
+int talppontkereses(vect2 r, double sugar, vect2* pt1, vect2* pt2, segment** ppv1, segment** ppv2) {
     *ppv1 = *ppv2 = nullptr;
 
-    Pszak->felsorolasreset(r);
+    Segments->iterate_collision_grid_cell_segments(r);
     int talppontszam = 0;
-    vonal* pv = nullptr;
+    segment* pv = nullptr;
     // int vegignezett = 0; // tesztelesre!
-    while ((pv = Pszak->getnext()) != nullptr) {
+    while ((pv = Segments->next_collision_grid_segment()) != nullptr) {
         // vegignezett++;
         vect2 t;
         if (gombszakasz(r, sugar, pv, &t)) {

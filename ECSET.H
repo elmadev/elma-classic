@@ -8,7 +8,7 @@ class grass;
 struct mdarab;
 class pic8;
 class sprite;
-struct vonal;
+struct segment;
 
 // Egy iterator class (inkabb cache) ecsethez (foltoz hasznalja oket):
 class mdbiter {
@@ -77,7 +77,7 @@ class ecset {
     darab* curdarabok_B[MAXECSETSOR]; // Melyik darab kurrens
 
     void getorigoandsize(void);
-    void addszakasz(vonal* psz);
+    void addszakasz(segment* psz);
     // Rovid folddarabokat atalakitja konkret mutatova:
     void foldmutatocsere(void);
     // Egymas utani azonos maszkokat es ureseket lecsereli egy hosszabbra:
@@ -107,7 +107,7 @@ class ecset {
 
     void foltoz(void);
 
-    ecset(int view);    // Ptop es Pszak alapjan
+    ecset(int view);    // Ptop es Segments alapjan
     ecset(ecset* pold); // Ures sortomboket hoz benne letre
     ~ecset(void);
 

@@ -57,6 +57,8 @@ void platform_init() {
     }
 }
 
+long long get_milliseconds() { return SDL_GetTicks64(); }
+
 static bool SurfaceLocked = false;
 
 unsigned char** lock_backbuffer(bool flipped) {

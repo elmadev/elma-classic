@@ -12,17 +12,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <timeapi.h>
-#endif
 
-static double StopwatchStartTime = 0;
+static double StopwatchStartTime = 0.0;
 
-double stopwatch() { return timeGetTime() * 0.182 - StopwatchStartTime; }
+double stopwatch() { return get_milliseconds() * 0.182 - StopwatchStartTime; }
 
-void stopwatch_reset() { StopwatchStartTime = timeGetTime() * 0.182; }
+void stopwatch_reset() { StopwatchStartTime = get_milliseconds() * 0.182; }
 
 eol_settings* EolSettings = nullptr;
 

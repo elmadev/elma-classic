@@ -2,8 +2,6 @@
 #define PLATFORM_UTILS_H
 
 #ifndef _WIN32
-#include <cstddef>
-#include <sys/time.h>
 #include <unistd.h>
 #else
 #include <io.h>
@@ -32,11 +30,6 @@ int strnicmp(const char* a, const char* b, size_t len);
 void strupr(char* str);
 void strlwr(char* str);
 
-static inline long long timeGetTime() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
-}
 #endif
 
 #endif

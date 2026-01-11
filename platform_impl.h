@@ -32,5 +32,6 @@ void show_cursor();
 void hide_cursor();
 
 bool is_fullscreen();
+long long get_milliseconds();
 
 #endif

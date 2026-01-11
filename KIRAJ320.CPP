@@ -10,6 +10,7 @@
 #include "LGRFILE.H"
 #include "M_PIC.H"
 #include "main.h"
+#include "object.h"
 #include "pic8.h"
 #include "platform_utils.h"
 #include "physics_init.h"

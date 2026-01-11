@@ -2,6 +2,7 @@
 #include "editor_canvas.h"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
+#include "object.h"
 #include "polygon.h"
 #include "TOPOL.H"
 

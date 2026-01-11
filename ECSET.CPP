@@ -8,6 +8,7 @@
 #include "LGRFILE.H"
 #include "main.h"
 #include "menu_pic.h"
+#include "object.h"
 #include "physics_init.h"
 #include "pic8.h"
 #include "SZAKASZ.H"

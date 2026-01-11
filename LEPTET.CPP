@@ -1,6 +1,7 @@
 #include "LEPTET.H"
 #include "EDITUJ.H"
 #include "LEJATSZO.H"
+#include "object.h"
 #include "physics_init.h"
 #include "physics_move.h"
 #include "platform_utils.h"

@@ -3,6 +3,7 @@
 #include "EDITUJ.H"
 #include "LEJATSZO.H"
 #include "main.h"
+#include "object.h"
 #include "physics_init.h"
 #include "TOPOL.H"
 #include "vect2.h"

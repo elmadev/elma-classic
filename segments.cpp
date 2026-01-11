@@ -287,10 +287,10 @@ void segments::setup_collision_grid(double max_radius) {
 
     // Add a small margin to prevent physics glitch at edge of map
     // We assume this is wider than max_radius
-    minx -= 6.0;
-    miny -= 6.0;
-    maxx += 6.0;
-    maxy += 6.0;
+    minx -= SEGMENTS_BORDER;
+    miny -= SEGMENTS_BORDER;
+    maxx += SEGMENTS_BORDER;
+    maxy += SEGMENTS_BORDER;
 
     collision_grid_origin = vect2(minx, miny);
     double width = maxx - minx;
@@ -302,8 +302,9 @@ void segments::setup_collision_grid(double max_radius) {
     if (collision_grid_width < 0 || collision_grid_height < 0) {
         internal_error("collision_grid_width < 0 || collision_grid_height < 0!");
     }
-    if (collision_grid_width > 200 || collision_grid_height > 200) {
-        internal_error("collision_grid_width > 200 || collision_grid_height > 200!");
+    constexpr int MAX_SIZE = LEVEL_MAX_SIZE + 2 * SEGMENTS_BORDER;
+    if (collision_grid_width > MAX_SIZE || collision_grid_height > MAX_SIZE) {
+        internal_error("collision_grid_width > MAX_SIZE || collision_grid_height > MAX_SIZE!");
     }
 
     // Allocate the collision_grid

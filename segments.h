@@ -5,6 +5,9 @@
 
 class level;
 
+constexpr int LEVEL_MAX_SIZE = 188;
+constexpr int SEGMENTS_BORDER = 6;
+
 // A single line segment from a polygon
 struct segment {
     vect2 r;

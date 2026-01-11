@@ -99,7 +99,7 @@ else
 endif
 
 sdl2_dep = dependency('sdl2',
-    static: build_machine.system() == 'windows',
+    static: true,
     default_options: {
         'test': false,
         'with_main': false,

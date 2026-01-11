@@ -1,6 +1,7 @@
 #include "abc8.h"
 #include "eol_settings.h"
 #include "keys.h"
+#include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"
 #include "platform_impl.h"
@@ -27,6 +28,9 @@ eol_settings* EolSettings = nullptr;
 int main() {
     EolSettings = new eol_settings();
     eol_settings::read_settings();
+
+    SCREEN_WIDTH = EolSettings->screen_width;
+    SCREEN_HEIGHT = EolSettings->screen_height;
 
     platform_init();
 

@@ -4,9 +4,9 @@
 
 vect2 Vect2i(1.0, 0.0), Vect2j(0.0, 1.0), Vect2null(0.0, 0.0);
 
-vect2 operator*(double x, vect2 a) { return vect2(a.x * x, a.y * x); }
+vect2 operator*(double x, const vect2& a) { return vect2(a.x * x, a.y * x); }
 
-vect2 operator*(vect2 a, double x) { return vect2(a.x * x, a.y * x); }
+vect2 operator*(const vect2& a, double x) { return vect2(a.x * x, a.y * x); }
 
 vect2::vect2(void) { x = y = 0; }
 
@@ -15,11 +15,11 @@ vect2::vect2(double xp, double yp) {
     y = yp;
 }
 
-vect2 vect2::operator+(vect2 a) { return vect2(x + a.x, y + a.y); }
+vect2 vect2::operator+(const vect2& a) const { return vect2(x + a.x, y + a.y); }
 
-vect2 vect2::operator-(vect2 a) { return vect2(x - a.x, y - a.y); }
+vect2 vect2::operator-(const vect2& a) const { return vect2(x - a.x, y - a.y); }
 
-double vect2::operator*(vect2 a) { return x * a.x + y * a.y; }
+double vect2::operator*(const vect2& a) const { return x * a.x + y * a.y; }
 
 void vect2::rotate(double rotation) {
     double a = sin(rotation);
@@ -43,9 +43,9 @@ static double square_root(double a) {
     return .5 * (x1 + a / x1);
 }
 
-double vect2::length() { return square_root(x * x + y * y); }
+double vect2::length() const { return square_root(x * x + y * y); }
 
-vect2 unit_vector(vect2 a) { return a * (1 / a.length()); }
+vect2 unit_vector(const vect2 a) { return a * (1 / a.length()); }
 
 void vect2::normalize() {
     double recip = 1 / length();
@@ -53,11 +53,11 @@ void vect2::normalize() {
     y *= recip;
 }
 
-vect2 rotate_90deg(vect2 in) { return vect2(-in.y, in.x); }
+vect2 rotate_90deg(const vect2& in) { return vect2(-in.y, in.x); }
 
-vect2 rotate_minus90deg(vect2 in) { return vect2(in.y, -in.x); }
+vect2 rotate_minus90deg(const vect2& in) { return vect2(in.y, -in.x); }
 
-vect2 intersection(vect2 r1, vect2 v1, vect2 r2, vect2 v2) {
+vect2 intersection(const vect2& r1, vect2 v1, vect2 r2, vect2 v2) {
     vect2 n = rotate_90deg(v1);
     double nv2 = n * v2;
     if (fabs(nv2) < 0.00000001) {
@@ -78,7 +78,8 @@ vect2 intersection(vect2 r1, vect2 v1, vect2 r2, vect2 v2) {
     return r2 - v2 * (nr21 / nv2);
 }
 
-double point_segment_distance(vect2 point_r, vect2 segment_r, vect2 segment_v) {
+double point_segment_distance(const vect2& point_r, const vect2& segment_r,
+                              const vect2& segment_v) {
     vect2 rr = point_r - segment_r;
     double scalar = segment_r * rr;
     if (scalar <= 0) {
@@ -94,13 +95,13 @@ double point_segment_distance(vect2 point_r, vect2 segment_r, vect2 segment_v) {
     return fabs(n * rr);
 }
 
-double point_line_distance(vect2 point_r, vect2 segment_r, vect2 segment_v) {
+double point_line_distance(const vect2& point_r, const vect2& segment_r, const vect2& segment_v) {
     vect2 rr = point_r - segment_r;
     vect2 n = rotate_90deg(unit_vector(segment_v));
     return fabs(n * rr);
 }
 
-vect2 circles_intersection(vect2 r1, vect2 r2, double l1, double l2) {
+vect2 circles_intersection(const vect2& r1, const vect2& r2, double l1, double l2) {
     vect2 v = r2 - r1;
     double l = v.length();
     // If the circles don't intersect, resize the circles so they intersect.
@@ -124,7 +125,7 @@ vect2 circles_intersection(vect2 r1, vect2 r2, double l1, double l2) {
 }
 
 // Returns true if the infinite line `v1` and segment `r2`, `v2` intersect.
-static bool line_segment_intersects(vect2 v1, vect2 r2, vect2 v2) {
+static bool line_segment_intersects(const vect2& v1, const vect2& r2, const vect2& v2) {
     vect2 norm = rotate_90deg(v1);
     int first_side = r2 * norm > 0;
     int second_side = (r2 + v2) * norm > 0;
@@ -133,7 +134,7 @@ static bool line_segment_intersects(vect2 v1, vect2 r2, vect2 v2) {
 
 // Returns true if the infinite line `v1` and segment `r2`, `v2` intersect.
 // This is inexact and will return true if the line and segment are close.
-static bool line_segment_intersects_inexact(vect2 v1, vect2 r2, vect2 v2) {
+static bool line_segment_intersects_inexact(const vect2& v1, const vect2& r2, const vect2& v2) {
     static double epsilon = 0.00000001;
     vect2 norm = rotate_90deg(v1);
     int first_side = 0;
@@ -158,17 +159,18 @@ static bool line_segment_intersects_inexact(vect2 v1, vect2 r2, vect2 v2) {
     return true;
 }
 
-bool segments_intersect(vect2 r1, vect2 v1, vect2 r2, vect2 v2) {
+bool segments_intersect(const vect2& r1, const vect2& v1, const vect2& r2, const vect2& v2) {
     return line_segment_intersects(v1, r2 - r1, v2) && line_segment_intersects(v2, r1 - r2, v1);
 }
 
-bool segments_intersect_inexact(vect2 r1, vect2 v1, vect2 r2, vect2 v2) {
+bool segments_intersect_inexact(const vect2& r1, const vect2& v1, const vect2& r2,
+                                const vect2& v2) {
     return line_segment_intersects_inexact(v1, r2 - r1, v2) &&
            line_segment_intersects_inexact(v2, r1 - r2, v1);
 }
 
-bool line_circle_intersection(vect2 line_r, vect2 line_v, vect2 circle_r, double radius,
-                              vect2* intersection_point) {
+bool line_circle_intersection(const vect2& line_r, vect2 line_v, const vect2& circle_r,
+                              double radius, vect2* intersection_point) {
     vect2 r = circle_r - line_r;
     line_v.normalize();
     vect2 k = line_v * (line_v * r);

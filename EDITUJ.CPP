@@ -390,7 +390,7 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
     bltfront(BufferMain, 226, 2, 540, 30);
 }
 
-void kikereknev(object::Type tipus, int kajatipus, int foodsorszam) {
+void kikereknev(object::Type tipus, object::Property kajatipus, int foodsorszam) {
     // Belevaltoztatunk kispritenev() valtozojaba, hogy majd toroljon:
     strcpy(Kepnevkint, "aaccbbdde");
 
@@ -404,7 +404,8 @@ void kikereknev(object::Type tipus, int kajatipus, int foodsorszam) {
     Pabc1->write(Pspritenevbuffer, 0, 14, "Object:");
     char tmp[50];
     //	object::Type::Exit = 1, object::Type::Food, object::Type::Killer, object::Type::Start };
-    // enum { KT_NORMAL, KT_UP, KT_DOWN, KT_LEFT, KT_RIGHT };
+    // enum { object::Property::NONE, object::Property::GRAVITY_UP, object::Property::GRAVITY_DOWN,
+    // object::Property::GRAVITY_LEFT, object::Property::GRAVITY_RIGHT };
     if (tipus == object::Type::Exit) {
         sprintf(tmp, "Exit");
     }
@@ -413,19 +414,19 @@ void kikereknev(object::Type tipus, int kajatipus, int foodsorszam) {
     }
 
     if (tipus == object::Type::Food) {
-        if (kajatipus == KT_NORMAL) {
+        if (kajatipus == object::Property::None) {
             sprintf(tmp, "Food");
         }
-        if (kajatipus == KT_UP) {
+        if (kajatipus == object::Property::GravityUp) {
             sprintf(tmp, "Grav. Up");
         }
-        if (kajatipus == KT_DOWN) {
+        if (kajatipus == object::Property::GravityDown) {
             sprintf(tmp, "Grav. Down");
         }
-        if (kajatipus == KT_LEFT) {
+        if (kajatipus == object::Property::GravityLeft) {
             sprintf(tmp, "Grav. Left");
         }
-        if (kajatipus == KT_RIGHT) {
+        if (kajatipus == object::Property::GravityRight) {
             sprintf(tmp, "Grav. Right");
         }
 

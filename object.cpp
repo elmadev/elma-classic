@@ -8,7 +8,7 @@ object::object(double x, double y, Type typ) {
     r.x = x;
     r.y = y;
     type = typ;
-    property = 0;
+    property = Property::None;
     animation = 0;
 }
 
@@ -79,7 +79,7 @@ object::object(FILE* h, int version) {
         internal_error("Failed to read object from file!");
     }
     if (version == 6) {
-        property = 0;
+        property = Property::None;
         animation = 0;
     } else if (version == 14) {
         if (fread(&property, 1, 4, h) != 4) {

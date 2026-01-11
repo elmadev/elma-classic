@@ -10,7 +10,6 @@
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"
-#include "object.h"
 #include "pic8.h"
 #include "TOPOL.H"
 
@@ -610,7 +609,8 @@ void t_delete_poly_nyomva(int mx, int my) {
 // CREATE_KEREK CREATE_KEREK CREATE_KEREK CREATE_KEREK CREATE_KEREK
 
 // Legkozelebbi create food ezt fogja hasznalni:
-int Food_kajatipus = 0, Food_foodsorszam = 0;
+object::Property Food_kajatipus = object::Property::None;
+int Food_foodsorszam = 0;
 
 void t_create_food_nyomva_jobb(void) {
     set_kerek_tipus("Select Create_Food subtype!", &Food_kajatipus, &Food_foodsorszam);

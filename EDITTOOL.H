@@ -1,6 +1,8 @@
 #ifndef EDITTOOL_H
 #define EDITTOOL_H
 
+#include "object.h"
+
 void alaphelp(void); // O figyeli ki a tool
 
 void t_move_nyomva(int x, int y);
@@ -22,7 +24,8 @@ void t_delete_vert_nyomva(int x, int y);
 void t_delete_poly_nyomva(int x, int y);
 
 // Legkozelebbi create food 0
-extern int Food_kajatipus, Food_foodsorszam;
+extern object::Property Food_kajatipus;
+extern int Food_foodsorszam;
 void t_create_food_nyomva_jobb(void);
 // Food es killer is egyben:
 void t_create_kerek_nyomva(int x, int y, int food);

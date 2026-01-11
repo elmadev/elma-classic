@@ -65,16 +65,18 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
         (*pkajaszam)++;
         startwavegyujto(WAV_EVES, 0.99, -1);
         switch (Ptop->kerektomb[sorszam]->property) {
-        case KT_UP:
+        case object::Property::None:
+            break;
+        case object::Property::GravityUp:
             pmot->gravity_direction = MotorGravity::Up;
             break;
-        case KT_DOWN:
+        case object::Property::GravityDown:
             pmot->gravity_direction = MotorGravity::Down;
             break;
-        case KT_LEFT:
+        case object::Property::GravityLeft:
             pmot->gravity_direction = MotorGravity::Left;
             break;
-        case KT_RIGHT:
+        case object::Property::GravityRight:
             pmot->gravity_direction = MotorGravity::Right;
             break;
         }

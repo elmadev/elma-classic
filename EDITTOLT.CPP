@@ -10,7 +10,6 @@
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"
-#include "object.h"
 #include "pic8.h"
 #include "platform_impl.h"
 #include "platform_utils.h"
@@ -1755,7 +1754,7 @@ void set_gyuru_attributes(polygon* pgy) {
     }
 }
 
-void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
+void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoodsorszam) {
     invalidateegesz();
 
     // Koordok megadasa:
@@ -1870,19 +1869,19 @@ void set_kerek_tipus(const char* fejlec, int* pkajatipus, int* pfoodsorszam) {
                 Valtozott = 1;
                 switch (index) {
                 case 0:
-                    *pkajatipus = KT_NORMAL;
+                    *pkajatipus = object::Property::None;
                     break;
                 case 1:
-                    *pkajatipus = KT_UP;
+                    *pkajatipus = object::Property::GravityUp;
                     break;
                 case 2:
-                    *pkajatipus = KT_DOWN;
+                    *pkajatipus = object::Property::GravityDown;
                     break;
                 case 3:
-                    *pkajatipus = KT_LEFT;
+                    *pkajatipus = object::Property::GravityLeft;
                     break;
                 case 4:
-                    *pkajatipus = KT_RIGHT;
+                    *pkajatipus = object::Property::GravityRight;
                     break;
                 default:
                     internal_error("0893ytpoerhg");

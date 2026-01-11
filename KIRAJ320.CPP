@@ -30,7 +30,7 @@ static double Kepmeret = 1.0;
 static double Szorzo = 1.1;
 void novelkepmeret(void) {
     Kepmeret *= Szorzo;
-    if (Kepmeret > 1.0) {
+    if (Kepmeret >= 0.999) {
         Kepmeret = 1.0;
     }
     Kitoltestmegrak = Kitoltestmegrakkezd;
@@ -61,8 +61,8 @@ static int Viewxorig, Viewxtolas;
 void beallitmereteket(int splitscreen) {
     Cy1Bplayer = 100, Cy2Bplayer = 200;
 
-    Cxsize = (int)(SCREEN_WIDTH * (Kepmeret * 1.001));
-    Cysize = (int)(SCREEN_HEIGHT * (Kepmeret * 1.001));
+    Cxsize = (int)(SCREEN_WIDTH * Kepmeret);
+    Cysize = (int)(SCREEN_HEIGHT * Kepmeret);
     Cx1 = (SCREEN_WIDTH - Cxsize) / 2;
     Cy1 = (SCREEN_HEIGHT - Cysize) / 2;
     Cx2 = Cx1 + Cxsize - 1;

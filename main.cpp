@@ -1,4 +1,5 @@
 #include "abc8.h"
+#include "eol_settings.h"
 #include "keys.h"
 #include "main.h"
 #include "menu_pic.h"
@@ -21,7 +22,12 @@ double stopwatch() { return timeGetTime() * 0.182 - StopwatchStartTime; }
 
 void stopwatch_reset() { StopwatchStartTime = timeGetTime() * 0.182; }
 
+eol_settings* EolSettings = nullptr;
+
 int main() {
+    EolSettings = new eol_settings();
+    eol_settings::read_settings();
+
     platform_init();
 
     teljes();

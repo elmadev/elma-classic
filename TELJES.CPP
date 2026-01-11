@@ -3,7 +3,6 @@
 #include "abc8.h"
 #include "ball_collision.h"
 #include "EDITUJ.H"
-#include "eol_settings.h"
 #include "JATEKOS.H"
 #include "LEJATSZO.H"
 #include "M_PIC.H"
@@ -19,7 +18,6 @@
 #include <cstring>
 
 state* State = NULL;
-eol_settings* EolSettings = nullptr;
 
 void cheatplayer(void) {
     // Egyetlen jatekosnak sem szabad lennie:
@@ -75,9 +73,6 @@ void teljes(void) {
     if (!State) {
         external_error("memory");
     }
-
-    EolSettings = new eol_settings();
-    eol_settings::read_settings();
 
     mergestatedat();
 

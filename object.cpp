@@ -12,9 +12,7 @@ object::object(double x, double y, int typ) {
     animation = 0;
 }
 
-constexpr double LETTER_K_INTERSECTION_POINT = -0.15 + 0.3 * (0.07 / 0.37);
-
-void object::render(void) {
+void object::render() {
     // Draw a circle approximated by 16 slices
     int slices = 16;
     double radius = 0.4;
@@ -63,6 +61,7 @@ void object::render(void) {
         render_line(r + vect2(-0.15, 0.3), r + vect2(-0.15, -0.3), false);
         render_line(r + vect2(-0.15, 0.07), r + vect2(0.15, -0.3), false);
         // Bottom-right leg:
+        constexpr double LETTER_K_INTERSECTION_POINT = -0.15 + 0.3 * (0.07 / 0.37);
         render_line(r + vect2(LETTER_K_INTERSECTION_POINT, 0.0), r + vect2(0.15, 0.3), false);
         return;
     }
@@ -70,13 +69,13 @@ void object::render(void) {
 }
 
 object::object(FILE* h, int version) {
-    if (fread(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
+    if (fread(&r.x, 1, sizeof(r.x), h) != 8) {
         internal_error("Failed to read object from file!");
     }
-    if (fread(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
+    if (fread(&r.y, 1, sizeof(r.y), h) != 8) {
         internal_error("Failed to read object from file!");
     }
-    if (fread(&type, 1, sizeof(type), h) != sizeof(type)) {
+    if (fread(&type, 1, sizeof(type), h) != 4) {
         internal_error("Failed to read object from file!");
     }
 
@@ -98,13 +97,13 @@ object::object(FILE* h, int version) {
 }
 
 void object::save(FILE* h) {
-    if (fwrite(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
+    if (fwrite(&r.x, 1, sizeof(r.x), h) != 8) {
         internal_error("Failed to write object to file!");
     }
-    if (fwrite(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
+    if (fwrite(&r.y, 1, sizeof(r.y), h) != 8) {
         internal_error("Failed to write object to file!");
     }
-    if (fwrite(&type, 1, sizeof(type), h) != sizeof(type)) {
+    if (fwrite(&type, 1, sizeof(type), h) != 4) {
         internal_error("Failed to write object to file!");
     }
     if (fwrite(&property, 1, 4, h) != 4) {
@@ -115,7 +114,7 @@ void object::save(FILE* h) {
     }
 }
 
-double object::checksum(void) {
+double object::checksum() {
     double sum = 0;
     sum += r.x;
     sum += r.y;

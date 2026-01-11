@@ -15,7 +15,7 @@ class object {
     int type;
     int property;  // Food gravity
     int animation; // Food animation (0-8)
-    int active;    // true if visible/interactable
+    bool active;   // true if visible/interactable
     unsigned char szin;
     int sinfazisint;
     double floating_phase; // Floating up/down phase, -Pi to Pi
@@ -23,9 +23,9 @@ class object {
     object(double x, double y, int typ);
     object(FILE* h, int version);
     // Render object in editor.
-    void render(void);
+    void render();
     void save(FILE* h);
-    double checksum(void);
+    double checksum();
 };
 
 #endif

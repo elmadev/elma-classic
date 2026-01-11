@@ -61,7 +61,7 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
         return 0;
     }
     if (tipus == T_KAJA) {
-        Ptop->kerektomb[sorszam]->active = 0;
+        Ptop->kerektomb[sorszam]->active = false;
         (*pkajaszam)++;
         startwavegyujto(WAV_EVES, 0.99, -1);
         switch (Ptop->kerektomb[sorszam]->property) {

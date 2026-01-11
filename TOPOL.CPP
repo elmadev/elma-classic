@@ -1746,7 +1746,7 @@ int topol::setallaktiv(motorst* pmot) {
             pker->sinfazisint = random_range(1000);
             pker->floating_phase = pker->sinfazisint * 2.0 * PI / 1000.0;
 
-            pker->active = 1;
+            pker->active = true;
             if (pker->type == T_KAJA) {
                 kajaszam++;
             }
@@ -1755,7 +1755,7 @@ int topol::setallaktiv(motorst* pmot) {
                     internal_error("topol::setallaktiv-ban palyan ket kezdo is van!");
                 }
                 voltkezdo = 1;
-                pker->active = 0;
+                pker->active = false;
                 Kezdetihelydiff = pker->r - pmot->left_wheel.r;
                 pmot->bike.r = pmot->bike.r + Kezdetihelydiff;
                 pmot->left_wheel.r = pmot->left_wheel.r + Kezdetihelydiff;

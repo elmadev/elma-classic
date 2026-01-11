@@ -132,7 +132,11 @@ void menu_options() {
             break;
         }
 
-        nav.setup(13 + flag_tag_opt, true);
+        strcpy(NavEntriesLeft[13 + flag_tag_opt], "Resolution:");
+        sprintf(NavEntriesRight[13 + flag_tag_opt], "%dx%d", EolSettings->screen_width,
+                EolSettings->screen_height);
+
+        nav.setup(14 + flag_tag_opt, true);
 
         choice = nav.navigate();
 
@@ -213,6 +217,21 @@ void menu_options() {
             case MapAlignment::Right:
                 EolSettings->map_alignment = MapAlignment::None;
                 break;
+            }
+        }
+
+        if (choice == 13) {
+            switch (EolSettings->screen_width) {
+            case 640: {
+                EolSettings->screen_width = 1024;
+                EolSettings->screen_height = 768;
+                break;
+            }
+            case 1024: {
+                EolSettings->screen_width = 640;
+                EolSettings->screen_height = 480;
+                break;
+            }
             }
         }
 

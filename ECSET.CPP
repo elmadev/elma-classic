@@ -11,7 +11,7 @@
 #include "object.h"
 #include "physics_init.h"
 #include "pic8.h"
-#include "SZAKASZ.H"
+#include "segments.h"
 #include "TOPOL.H"
 #include <cstdint>
 #include <cmath>

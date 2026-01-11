@@ -1,4 +1,4 @@
-#include "SZAKASZ.H"
+#include "segments.h"
 #include "main.h"
 #include "polygon.h"
 #include "TOPOL.H"

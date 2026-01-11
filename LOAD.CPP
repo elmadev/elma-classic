@@ -8,7 +8,7 @@
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "platform_utils.h"
-#include "SZAKASZ.H"
+#include "segments.h"
 #include "TOPOL.H"
 #include <cstring>
 

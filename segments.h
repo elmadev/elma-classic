@@ -1,5 +1,5 @@
-#ifndef SZAKASZ_H
-#define SZAKASZ_H
+#ifndef SEGMENTS_H
+#define SEGMENTS_H
 
 #include "vect2.h"
 

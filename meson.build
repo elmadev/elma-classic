@@ -56,7 +56,7 @@ elma_sources = files(
     'SKIP.CPP',
     'SPRITE.CPP',
     'state.cpp',
-    'SZAKASZ.CPP',
+    'segments.cpp',
     'TELJES.CPP',
     'TOPOL.CPP',
     'UTKOZES.CPP',

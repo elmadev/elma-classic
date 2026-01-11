@@ -1,9 +1,12 @@
 #include "DOBOZ.H"
 #include "affine_pic.h"
+#include "fixed_point.h"
 #include "KIRAJZOL.H"
 #include "pic8.h"
 #include "vect2.h"
 #include <cmath>
+
+using SignedFixed32 = FixedPoint<int>;
 
 // Affinitassal kapcsolatos dolgok:
 int Affinitas = 0;
@@ -16,48 +19,39 @@ static double Affinaranyy = 1.0;
 static double Tulvizszintes = 0.005;
 
 void egysor(unsigned char lyuk, unsigned char szam, unsigned char* sor, unsigned char* tomb,
-            long futox, long futoy, long dx, long dy) {
-    short* pf_futox = (short*)(&futox);
-    pf_futox++;
-    short* pf_futoy = (short*)(&futoy);
-    pf_futoy++;
+            SignedFixed32 futox, SignedFixed32 futoy, SignedFixed32 dx, SignedFixed32 dy) {
     for (short x = 0; x < szam; x++) {
-        unsigned short fx = *pf_futox;
-        unsigned short fy = *pf_futoy;
-        fy = (unsigned short)((fy << 8) + fx);
+        int fx = int(futox);
+        int fy = int(futoy);
 
-        unsigned char c = tomb[fy];
+        unsigned char c = tomb[(fy << 8) + fx];
         if (c != lyuk) {
             sor[x] = c;
         }
 
-        futox += dx;
-        futoy += dy;
+        futox = futox + dx;
+        futoy = futoy + dy;
     }
 }
 
 // Ez a fuggveny kilogas eseten hivodik meg, plussz parametere xhossz:
-void egysor(unsigned char lyuk, short szam, unsigned char* sor, unsigned char* tomb, long futox,
-            long futoy, long dx, long dy, int xhossz) {
-    short* pf_futox = (short*)(&futox);
-    pf_futox++;
-    short* pf_futoy = (short*)(&futoy);
-    pf_futoy++;
+void egysor(unsigned char lyuk, short szam, unsigned char* sor, unsigned char* tomb,
+            SignedFixed32 futox, SignedFixed32 futoy, SignedFixed32 dx, SignedFixed32 dy,
+            int xhossz) {
     for (short x = 0; x < szam; x++) {
         if (x >= xhossz) {
             return;
         }
-        unsigned short fx = *pf_futox;
-        unsigned short fy = *pf_futoy;
-        fy = (unsigned short)((fy << 8) + fx);
+        int fx = int(futox);
+        int fy = int(futoy);
 
-        unsigned char c = tomb[fy];
+        unsigned char c = tomb[(fy << 8) + fx];
         if (c != lyuk) {
             sor[x] = c;
         }
 
-        futox += dx;
-        futoy += dy;
+        futox = futox + dx;
+        futoy = futoy + dy;
     }
 }
 
@@ -263,9 +257,9 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
     double szint = ybal;
 
     // Kiszamolja hatarolo egyenesek parametereit:
-    long hatbal1, hatjobb1;
+    SignedFixed32 hatbal1, hatjobb1;
     double m1d = u.x / u.y;
-    long hatbal2, hatjobb2;
+    SignedFixed32 hatbal2, hatjobb2;
     double m2d = v.x / v.y;
     if (Affinitas) {
         // u es v nem biztos, hogy merolegesek egymasra, ezert szamitas
@@ -275,81 +269,72 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
         double xmetszet = r.x + v.x - (u.x / u.y) * v.y;
         if (r.x < xmetszet) {
             // u a ball es u+v a jobb!:
-            hatbal1 = (r.x + (szint - r.y) * m1d) * 65536.0;
-            hatjobb1 = (r.x + v.x + (szint - r.y - v.y) * m1d) * 65536.0;
+            hatbal1 = SignedFixed32(r.x + (szint - r.y) * m1d);
+            hatjobb1 = SignedFixed32(r.x + v.x + (szint - r.y - v.y) * m1d);
         } else {
-            hatjobb1 = (r.x + (szint - r.y) * m1d) * 65536.0;
-            hatbal1 = (r.x + v.x + (szint - r.y - v.y) * m1d) * 65536.0;
+            hatjobb1 = SignedFixed32(r.x + (szint - r.y) * m1d);
+            hatbal1 = SignedFixed32(r.x + v.x + (szint - r.y - v.y) * m1d);
         }
         // Most v-ra meroleges eleket intezzuk el:
         // megkeressuk r magassagaban nem r-en atmeno v x koordjat:
         xmetszet = r.x + u.x - (v.x / v.y) * u.y;
         if (r.x < xmetszet) {
             // v a ball es v+u a jobb!:
-            hatbal2 = (r.x + (szint - r.y) * m2d) * 65536.0;
-            hatjobb2 = (r.x + u.x + (szint - r.y - u.y) * m2d) * 65536.0;
+            hatbal2 = SignedFixed32(r.x + (szint - r.y) * m2d);
+            hatjobb2 = SignedFixed32(r.x + u.x + (szint - r.y - u.y) * m2d);
         } else {
-            hatjobb2 = (r.x + (szint - r.y) * m2d) * 65536.0;
-            hatbal2 = (r.x + u.x + (szint - r.y - u.y) * m2d) * 65536.0;
+            hatjobb2 = SignedFixed32(r.x + (szint - r.y) * m2d);
+            hatbal2 = SignedFixed32(r.x + u.x + (szint - r.y - u.y) * m2d);
         }
     } else {
         // u es v merolegesek egymasra, ezert szamitas gyors lehet:
         // Most u-ra meroleges eleket intezzuk el:
         if (v.x > 0) {
             // u a ball es u+v a jobb!:
-            hatbal1 = (r.x + (szint - r.y) * m1d) * 65536.0;
-            hatjobb1 = (r.x + v.x + (szint - r.y - v.y) * m1d) * 65536.0;
+            hatbal1 = SignedFixed32(r.x + (szint - r.y) * m1d);
+            hatjobb1 = SignedFixed32(r.x + v.x + (szint - r.y - v.y) * m1d);
         } else {
-            hatjobb1 = (r.x + (szint - r.y) * m1d) * 65536.0;
-            hatbal1 = (r.x + v.x + (szint - r.y - v.y) * m1d) * 65536.0;
+            hatjobb1 = SignedFixed32(r.x + (szint - r.y) * m1d);
+            hatbal1 = SignedFixed32(r.x + v.x + (szint - r.y - v.y) * m1d);
         }
         // Most v-ra meroleges eleket intezzuk el:
         if (u.x > 0) {
             // v a ball es v+u a jobb!:
-            hatbal2 = (r.x + (szint - r.y) * m2d) * 65536.0;
-            hatjobb2 = (r.x + u.x + (szint - r.y - u.y) * m2d) * 65536.0;
+            hatbal2 = SignedFixed32(r.x + (szint - r.y) * m2d);
+            hatjobb2 = SignedFixed32(r.x + u.x + (szint - r.y - u.y) * m2d);
         } else {
-            hatjobb2 = (r.x + (szint - r.y) * m2d) * 65536.0;
-            hatbal2 = (r.x + u.x + (szint - r.y - u.y) * m2d) * 65536.0;
+            hatjobb2 = SignedFixed32(r.x + (szint - r.y) * m2d);
+            hatbal2 = SignedFixed32(r.x + u.x + (szint - r.y - u.y) * m2d);
         }
     }
 
-    long m1 = m1d * 65536.0;
-    long m2 = m2d * 65536.0;
+    SignedFixed32 m1 = SignedFixed32(m1d);
+    SignedFixed32 m2 = SignedFixed32(m2d);
 
     // Most kiszamoljuk kis kepen futok elejet:
     vect2 diff = vect2(xbal, ybal) - r;
     vect2 kiskeporigo = vect2(0.5, 0.5) + diff.x * invi + diff.y * invj;
-    long xkiskep = kiskeporigo.x * 65536.0;
-    long ykiskep = kiskeporigo.y * 65536.0;
+    SignedFixed32 xkiskep = SignedFixed32(kiskeporigo.x);
+    SignedFixed32 ykiskep = SignedFixed32(kiskeporigo.y);
 
-    long invix = invi.x * 65536.0;
-    long inviy = invi.y * 65536.0;
-    long invjx = invj.x * 65536.0;
-    long invjy = invj.y * 65536.0;
-
-    short* pf_hatbal1 = (short*)(&hatbal1);
-    pf_hatbal1++;
-    short* pf_hatjobb1 = (short*)(&hatjobb1);
-    pf_hatjobb1++;
-    short* pf_hatbal2 = (short*)(&hatbal2);
-    pf_hatbal2++;
-    short* pf_hatjobb2 = (short*)(&hatjobb2);
-    pf_hatjobb2++;
+    SignedFixed32 invix = SignedFixed32(invi.x);
+    SignedFixed32 inviy = SignedFixed32(invi.y);
+    SignedFixed32 invjx = SignedFixed32(invj.x);
+    SignedFixed32 invjy = SignedFixed32(invj.y);
 
     if (kilog) {
         // Voltkilogas = 1; //Csak teszteleshez
         //  Nagy ciklus kezdetet veszi:
         while (1) {
             // Kiszamoljuk bal es jobb hatarokat ebben a sorban!
-            int x1 = *pf_hatbal1;
-            int xb = *pf_hatbal2;
+            int x1 = (int)hatbal1;
+            int xb = (int)hatbal2;
             if (xb > x1) {
                 x1 = xb;
             }
             x1++;
-            int x2 = *pf_hatjobb1;
-            xb = *pf_hatjobb2;
+            int x2 = (int)hatjobb1;
+            xb = (int)hatjobb2;
             if (xb < x2) {
                 x2 = xb;
             }
@@ -358,13 +343,13 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
                 // Most raallitjuk xbal-t x1-re:
                 while (xbal > x1 && xbal > 0) { // VALT
                     xbal--;
-                    xkiskep -= invix;
-                    ykiskep -= inviy;
+                    xkiskep = xkiskep - invix;
+                    ykiskep = ykiskep - inviy;
                 }
                 while (xbal < x1 || xbal < 0) {
                     xbal++;
-                    xkiskep += invix;
-                    ykiskep += inviy;
+                    xkiskep = xkiskep + invix;
+                    ykiskep = ykiskep + inviy;
                 }
                 unsigned char* cim = ppic8->get_row(ybal);
                 cim += xbal;
@@ -381,25 +366,25 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
             if (ybal < 0) { // VALT
                 return;     // VALT
             }
-            xkiskep -= invjx;
-            ykiskep -= invjy;
-            hatbal1 -= m1;
-            hatjobb1 -= m1;
-            hatbal2 -= m2;
-            hatjobb2 -= m2;
+            xkiskep = xkiskep - invjx;
+            ykiskep = ykiskep - invjy;
+            hatbal1 = hatbal1 - m1;
+            hatjobb1 = hatjobb1 - m1;
+            hatbal2 = hatbal2 - m2;
+            hatjobb2 = hatjobb2 - m2;
         }
     } else {
         // Nagy ciklus kezdetet veszi:
         while (1) {
             // Kiszamoljuk bal es jobb hatarokat ebben a sorban!
-            int x1 = *pf_hatbal1;
-            int xb = *pf_hatbal2;
+            int x1 = (int)hatbal1;
+            int xb = (int)hatbal2;
             if (xb > x1) {
                 x1 = xb;
             }
             x1++;
-            int x2 = *pf_hatjobb1;
-            xb = *pf_hatjobb2;
+            int x2 = (int)hatjobb1;
+            xb = (int)hatjobb2;
             if (xb < x2) {
                 x2 = xb;
             }
@@ -408,13 +393,13 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
                 // Most raallitjuk xbal-t x1-re:
                 while (xbal > x1) {
                     xbal--;
-                    xkiskep -= invix;
-                    ykiskep -= inviy;
+                    xkiskep = xkiskep - invix;
+                    ykiskep = ykiskep - inviy;
                 }
                 while (xbal < x1) {
                     xbal++;
-                    xkiskep += invix;
-                    ykiskep += inviy;
+                    xkiskep = xkiskep + invix;
+                    ykiskep = ykiskep + inviy;
                 }
                 unsigned char* cim = ppic8->get_row(ybal);
                 cim += xbal;
@@ -427,12 +412,12 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
             }
             // Egy sorral lejjebb kell lepni!:
             ybal--;
-            xkiskep -= invjx;
-            ykiskep -= invjy;
-            hatbal1 -= m1;
-            hatjobb1 -= m1;
-            hatbal2 -= m2;
-            hatjobb2 -= m2;
+            xkiskep = xkiskep - invjx;
+            ykiskep = ykiskep - invjy;
+            hatbal1 = hatbal1 - m1;
+            hatjobb1 = hatjobb1 - m1;
+            hatbal2 = hatbal2 - m2;
+            hatjobb2 = hatjobb2 - m2;
         }
     }
 }

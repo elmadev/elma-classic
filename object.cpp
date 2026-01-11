@@ -78,18 +78,18 @@ object::object(FILE* h, int version) {
     if (fread(&type, 1, sizeof(type), h) != 4) {
         internal_error("Failed to read object from file!");
     }
-
-    property = 0;
-    if (version >= 9) {
+    if (version == 6) {
+        property = 0;
+        animation = 0;
+    } else if (version == 14) {
         if (fread(&property, 1, 4, h) != 4) {
             internal_error("Failed to read object from file!");
         }
-    }
-    animation = 0;
-    if (version >= 11) {
         if (fread(&animation, 1, 4, h) != 4) {
             internal_error("Failed to read object from file!");
         }
+    } else {
+        internal_error("object::object unknown version!");
     }
     if (animation < 0 || animation > 8) {
         internal_error("object::object invalid animation");

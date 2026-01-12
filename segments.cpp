@@ -387,10 +387,3 @@ segment* segments::next_segment() {
     }
     return &seg_list[seg_list_iteration_index++];
 }
-
-segment* segments::getptrszakasz(int sorszam) {
-    if (sorszam >= seg_list_length) {
-        internal_error("segments::getptrszakasz-ban sorszam >= seg_list_length!");
-    }
-    return &seg_list[sorszam];
-}

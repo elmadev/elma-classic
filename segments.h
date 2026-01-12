@@ -78,9 +78,6 @@ class segments {
     void iterate_all_segments();
     // Get the next line segment in the level
     segment* next_segment();
-
-    segment* getptrszakasz(int sorszam);
-    int getsorszam(segment* pvonal);
 };
 
 extern segments* Segments;

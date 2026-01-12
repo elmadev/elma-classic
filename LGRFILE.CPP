@@ -857,8 +857,8 @@ lgrfile::lgrfile(const char* lgrnev) {
     p2biker = NULL;
 
     // Elintezzuk index szineket:
-    viewfoldsor[0] = pcolors->gpixel(6, 6 + 0 * 12);
-    viewegsor[0] = pcolors->gpixel(6, 6 + 1 * 12);
+    viewfoldsor = pcolors->gpixel(6, 6 + 0 * 12);
+    viewegsor = pcolors->gpixel(6, 6 + 1 * 12);
     keretindex = pcolors->gpixel(6, 6 + 2 * 12);
     viewmotorindex1 = pcolors->gpixel(6, 6 + 4 * 12);
     viewmotorindex2 = pcolors->gpixel(6, 6 + 5 * 12);
@@ -870,10 +870,6 @@ lgrfile::lgrfile(const char* lgrnev) {
     // ecsetben mutato fog hivatkozni rajuk (max 3 egymas utan):
     viewexit[2] = viewexit[1] = viewexit[0];
     viewkiller[2] = viewkiller[1] = viewkiller[0];
-    for (int i = 1; i < SCREEN_WIDTH; i++) {
-        viewfoldsor[i] = viewfoldsor[0];
-        viewegsor[i] = viewegsor[0];
-    }
 
     // Most texturakat kibovitjuk vizszintes iranyban:
     for (int i = 0; i < texturaszam; i++) {

@@ -1443,6 +1443,10 @@ static int Xe1, Xe2;
 
 unsigned char *Foldsor = NULL, *Egsor = NULL;
 
+static inline void draw_sky(unsigned char* pc, size_t offset, size_t size) {
+    memcpy(pc, Foldsor + offset, size);
+}
+
 void ecset::kiegysor_A(unsigned char* pc, int ye) {
     // Visszalepunk amig kell:
     darab* pda = curdarabok_A[ye];
@@ -1479,7 +1483,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
                 return;
             }
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                memcpy(pc, Foldsor, ujpdaxsize - ures);
+                draw_sky(pc, 0, ujpdaxsize - ures);
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
@@ -1502,7 +1506,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
             memcpy(pc, Egsor, size);
         } else {
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                memcpy(pc, Foldsor, size);
+                draw_sky(pc, 0, size);
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
@@ -1534,7 +1538,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
                 return;
             }
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                memcpy(pc, Foldsor + (xpos - Xe1), Xe2 - xpos + 1);
+                draw_sky(pc, xpos - Xe1, Xe2 - xpos + 1);
                 return;
             }
 #ifdef DEBUG
@@ -1553,7 +1557,7 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
                 memcpy(pc, Egsor + (xpos - Xe1), pda->xsize);
             } else {
                 if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                    memcpy(pc, Foldsor + (xpos - Xe1), pda->xsize);
+                    draw_sky(pc, xpos - Xe1, pda->xsize);
                 } else {
 #ifdef DEBUG
                     if ((pixelek_t)pda->pixelek != PX_URES) {
@@ -1606,7 +1610,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
                 return;
             }
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                memcpy(pc, Foldsor, ujpdaxsize - ures);
+                draw_sky(pc, 0, ujpdaxsize - ures);
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
@@ -1629,7 +1633,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
             memcpy(pc, Egsor, size);
         } else {
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                memcpy(pc, Foldsor, size);
+                draw_sky(pc, 0, size);
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixelek != PX_URES) {
@@ -1661,7 +1665,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
                 return;
             }
             if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                memcpy(pc, Foldsor + (xpos - Xe1), Xe2 - xpos + 1);
+                draw_sky(pc, xpos - Xe1, Xe2 - xpos + 1);
                 return;
             }
 #ifdef DEBUG
@@ -1680,7 +1684,7 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
                 memcpy(pc, Egsor + (xpos - Xe1), pda->xsize);
             } else {
                 if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                    memcpy(pc, Foldsor + (xpos - Xe1), pda->xsize);
+                    draw_sky(pc, xpos - Xe1, pda->xsize);
                 } else {
 #ifdef DEBUG
                     if ((pixelek_t)pda->pixelek != PX_URES) {

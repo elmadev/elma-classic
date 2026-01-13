@@ -383,23 +383,20 @@ static void mix_friction(short* buffer, int buffer_length) {
 
     // We interpolate the volume over the buffer length,
     // so sound playback isn't deterministic across platforms
-    long volume_prev = 65536.0 * FrictionVolumePrev;
-    long volume_next = 65536.0 * FrictionVolumeNext;
-    long delta_volume = (volume_next - volume_prev) / ((double)buffer_length);
+    double volume = FrictionVolumePrev;
+    double volume_next = FrictionVolumeNext;
+    double delta_volume = (volume_next - volume) / buffer_length;
     int sample_length = SoundFriction->size;
     for (int i = 0; i < buffer_length; i++) {
-        long sample = SoundFriction->tomb[SoundFrictionIndex];
+        short sample = SoundFriction->tomb[SoundFrictionIndex];
         SoundFrictionIndex++;
         if (SoundFrictionIndex >= sample_length) {
             SoundFrictionIndex = 0;
         }
-
-        sample *= volume_prev;
-        buffer[i] += (short)(sample >> 16);
-
-        volume_prev += delta_volume;
+        buffer[i] += (short)(sample * volume);
+        volume += delta_volume;
     }
-    FrictionVolumePrev = ((double)volume_prev) / 65536.0;
+    FrictionVolumePrev = volume;
 }
 
 void sound_mixer(short* buffer, int buffer_length) {

@@ -22,14 +22,13 @@ class wav {
 
 class wav2 {
     short *tomb, *mtomb;
-    unsigned long ulsize, ulfuto;
-    unsigned short *plow, *phigh;
+    double ulsize, ulfuto;
 
   public:
     wav2(wav* pwav);
     void reset(int fazis = -1);
     // dt 65536 szoros:
-    short getnextsample(long dt);
+    short getnextsample(double dt);
 };
 
 #endif

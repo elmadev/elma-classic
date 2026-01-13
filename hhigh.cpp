@@ -330,13 +330,13 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 // Copy until the end of the sound effect, then loop
                 mot->motor_state = MotorState::Idle;
                 mot->playback_index_idle = WAV_FADE_LENGTH;
-                long previous_dt = 65536.0 * mot->frequency_prev;
+                double dt = mot->frequency_prev;
                 for (int i = 0; i < WAV_FADE_LENGTH; i++) {
                     short gas_sample;
                     if (is_motor1) {
-                        gas_sample = SoundMotorGas1->getnextsample(previous_dt);
+                        gas_sample = SoundMotorGas1->getnextsample(dt);
                     } else {
-                        gas_sample = SoundMotorGas2->getnextsample(previous_dt);
+                        gas_sample = SoundMotorGas2->getnextsample(dt);
                     }
                     short idle_sample = SoundMotorIdle->tomb[i];
 
@@ -350,21 +350,21 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 break;
             } else {
                 // Buffer is full
-                long previous_dt = 65536.0 * mot->frequency_prev;
-                long current_dt = 65536.0 * mot->frequency_next;
-                long ddt = 0;
+                double dt = mot->frequency_prev;
+                double next_dt = mot->frequency_next;
+                double ddt = 0;
                 if (source_length > 30) {
-                    ddt = (current_dt - previous_dt) / ((double)source_length);
+                    ddt = (next_dt - dt) / source_length;
                 }
                 for (int i = 0; i < source_length; i++) {
                     if (is_motor1) {
-                        buffer[copied_counter + i] += SoundMotorGas1->getnextsample(previous_dt);
+                        buffer[copied_counter + i] += SoundMotorGas1->getnextsample(dt);
                     } else {
-                        buffer[copied_counter + i] += SoundMotorGas2->getnextsample(previous_dt);
+                        buffer[copied_counter + i] += SoundMotorGas2->getnextsample(dt);
                     }
-                    previous_dt += ddt;
+                    dt += ddt;
                 }
-                mot->frequency_prev = ((double)previous_dt) / 65536.0;
+                mot->frequency_prev = dt;
                 return;
             }
             break;

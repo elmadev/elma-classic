@@ -189,25 +189,25 @@ wav2::wav2(wav* pwav) {
         mtomb[i] = tomb[i + 1] - tomb[i];
     }
     mtomb[pwav->size - 1] = tomb[0] - tomb[pwav->size - 1];
-    ulsize = ((unsigned long)pwav->size) * 65536;
-    ulfuto = 0;
-    plow = (unsigned short*)&ulfuto;
-    phigh = plow + 1;
+    ulsize = pwav->size;
+    ulfuto = 0.0;
 }
 
 void wav2::reset(int fazis) {
     if (fazis < 0) {
-        ulfuto = 0;
+        ulfuto = 0.0;
     } else {
-        ulfuto = fazis * 65536;
+        ulfuto = fazis;
     }
 }
 
 // dt 65536 szoros:
-short wav2::getnextsample(long dt) {
+short wav2::getnextsample(double dt) {
     ulfuto += dt;
     if (ulfuto >= ulsize) {
         ulfuto -= ulsize;
     }
-    return tomb[*phigh] + ((mtomb[*phigh] * (*plow)) >> 16);
+    int whole = (int)(ulfuto);
+    double fraction = ulfuto - whole;
+    return tomb[whole] + (short)(mtomb[whole] * fraction);
 }

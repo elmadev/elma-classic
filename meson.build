@@ -2,7 +2,7 @@ project('elma', 'cpp', version: '1.4', meson_version: '>=1.2.0', default_options
 
 add_project_arguments('-DELMA_VERSION="@0@"'.format(meson.project_version()), language: 'cpp')
 
-if get_option('buildtype') == 'debug'
+if get_option('buildtype') == 'debug' or get_option('buildtype') == 'debugoptimized'
     add_project_arguments('-DDEBUG', language: 'cpp')
 endif
 

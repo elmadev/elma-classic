@@ -284,8 +284,8 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 }
                 double fade_percentage = i / (double)(WAV_FADE_LENGTH);
                 buffer[copied_counter + fade_counter] +=
-                    fade_percentage * SoundMotorGasStart->tomb[i] +
-                    (1 - fade_percentage) * SoundMotorIdle->tomb[mot->playback_index_idle];
+                    (short)(fade_percentage * SoundMotorGasStart->tomb[i] +
+                            (1 - fade_percentage) * SoundMotorIdle->tomb[mot->playback_index_idle]);
                 mot->playback_index_idle++;
                 fade_counter++;
             }
@@ -344,7 +344,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                     double gas_fade_percentage = 1.0 - fade_percentage;
 
                     buffer[copied_counter + i] +=
-                        fade_percentage * idle_sample + gas_fade_percentage * gas_sample;
+                        (short)(fade_percentage * idle_sample + gas_fade_percentage * gas_sample);
                 }
                 copied_counter += WAV_FADE_LENGTH;
                 break;

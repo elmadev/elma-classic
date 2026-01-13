@@ -54,7 +54,7 @@ elma_sources = files(
     'RECORDER.CPP',
     'platform_sdl.cpp',
     'SKIP.CPP',
-    'SPRITE.CPP',
+    'transparency.cpp',
     'state.cpp',
     'segments.cpp',
     'TELJES.CPP',

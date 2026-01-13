@@ -1,4 +1,4 @@
-#include "SPRITE.H"
+#include "transparency.h"
 #include "main.h"
 #include "pic8.h"
 #include <cstring>

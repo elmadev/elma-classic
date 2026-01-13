@@ -1,5 +1,5 @@
-#ifndef SPRITE_H
-#define SPRITE_H
+#ifndef TRANSPARENCY_H
+#define TRANSPARENCY_H
 
 class pic8;
 

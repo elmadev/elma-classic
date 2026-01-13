@@ -26,7 +26,7 @@ static int ActiveWavEvents = 0;
 constexpr int MAX_WAV_EVENTS = 5;
 static int WavEventActive[MAX_WAV_EVENTS];
 static int WavEventPlaybackIndex[MAX_WAV_EVENTS];
-static unsigned long WavEventVolume[MAX_WAV_EVENTS];
+static double WavEventVolume[MAX_WAV_EVENTS];
 static wav* WavEventSound[MAX_WAV_EVENTS];
 
 // Load all sounds into memory
@@ -81,7 +81,7 @@ void sound_engine_init() {
     for (int i = 0; i < MAX_WAV_EVENTS; i++) {
         WavEventActive[i] = 0;
         WavEventPlaybackIndex[i] = 0;
-        WavEventVolume[i] = 0;
+        WavEventVolume[i] = 0.0;
         WavEventSound[i] = nullptr;
     }
 
@@ -169,7 +169,7 @@ void start_wav(WavEvent event, double volume) {
             WavEventActive[i] = 1;
             WavEventPlaybackIndex[i] = 0;
             WavEventSound[i] = sound;
-            WavEventVolume[i] = volume * 65536.0;
+            WavEventVolume[i] = volume;
             return;
         }
     }
@@ -202,9 +202,9 @@ static void mix_into_buffer(short* buffer, short* source, int buffer_length) {
     }
 }
 
-static void mix_into_buffer(short* buffer, short* source, int buffer_length, unsigned long volume) {
+static void mix_into_buffer(short* buffer, short* source, int buffer_length, double volume) {
     for (int i = 0; i < buffer_length; i++) {
-        buffer[i] += short((source[i] * volume) >> 16);
+        buffer[i] += short(source[i] * volume);
     }
 }
 

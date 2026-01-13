@@ -1,7 +1,7 @@
 #ifndef EOL_SETTINGS
 #define EOL_SETTINGS
 
-enum class MapAlignment : unsigned char { None = 0, Left = 1, Middle = 2, Right = 3 };
+enum class MapAlignment { None, Left, Middle, Right };
 
 struct eol_settings {
     eol_settings();

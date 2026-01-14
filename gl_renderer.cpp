@@ -168,6 +168,13 @@ int gl_init(SDL_Window* sdl_window, int width, int height) {
         return -1;
     }
 
+    // Disable unnecessary GL features
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_STENCIL_TEST);
+    glDisable(GL_BLEND);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DITHER);
+
     glViewport(0, 0, width, height);
 
     // Disable VSync

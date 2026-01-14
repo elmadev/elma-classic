@@ -1,16 +1,19 @@
 #include "sprite.h"
 #include "editor_canvas.h"
+#include "fs_utils.h"
 #include "LGRFILE.H"
 #include "main.h"
 #include "physics_init.h"
 #include <cstring>
 
-sprite::sprite(double x, double y, char* pic_name, char* text_name, char* mask_nam) {
+sprite::sprite(double x, double y, const char* pic_name, const char* text_name,
+               const char* mask_nam) {
     if (!Plgr) {
         internal_error("sprite::sprite !Plgr");
     }
     r = vect2(x, y);
-    if (strlen(pic_name) > 8 || strlen(mask_nam) > 8 || strlen(text_name) > 8) {
+    if (strlen(pic_name) > MAX_FILENAME_LEN || strlen(mask_nam) > MAX_FILENAME_LEN ||
+        strlen(text_name) > MAX_FILENAME_LEN) {
         internal_error("sprite::sprite name too long!");
     }
     strcpy(picture_name, pic_name);
@@ -31,10 +34,8 @@ sprite::sprite(double x, double y, char* pic_name, char* text_name, char* mask_n
         if (index < 0) {
             picture_name[0] = 0;
         } else {
-            wireframe_width = Plgr->kepek[index].xsize;
-            wireframe_height = Plgr->kepek[index].ysize;
-            wireframe_width *= PixelsToMeters;
-            wireframe_height *= PixelsToMeters;
+            wireframe_width = Plgr->kepek[index].xsize * PixelsToMeters;
+            wireframe_height = Plgr->kepek[index].ysize * PixelsToMeters;
             distance = Plgr->kepek[index].tavolsag;
             clipping = Plgr->kepek[index].hatarol;
         }
@@ -62,7 +63,7 @@ sprite::sprite(double x, double y, char* pic_name, char* text_name, char* mask_n
     }
 }
 
-void sprite::render(void) {
+void sprite::render() {
     render_line(r, r + vect2(wireframe_width, 0.0), false);
     render_line(r, r + vect2(0.0, wireframe_height), false);
     vect2 r2(wireframe_width + r.x, wireframe_height + r.y);
@@ -71,11 +72,6 @@ void sprite::render(void) {
 }
 
 sprite::sprite(FILE* h) {
-    int sizeof_dist = sizeof(distance);
-    if (sizeof_dist != 4) {
-        internal_error("sprite::sprite-ban sizeof( distance ) != 4!");
-    }
-
     if (fread(picture_name, 1, 10, h) != 10) {
         internal_error("Failed to read sprite from file!");
     }
@@ -89,16 +85,16 @@ sprite::sprite(FILE* h) {
     }
     mask_name[9] = 0;
 
-    if (fread(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
+    if (fread(&r.x, 1, sizeof(r.x), h) != 8) {
         internal_error("Failed to read sprite from file!");
     }
-    if (fread(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
+    if (fread(&r.y, 1, sizeof(r.y), h) != 8) {
         internal_error("Failed to read sprite from file!");
     }
-    if (fread(&distance, 1, sizeof(distance), h) != sizeof(distance)) {
+    if (fread(&distance, 1, sizeof(distance), h) != 4) {
         internal_error("Failed to read sprite from file!");
     }
-    if (fread(&clipping, 1, sizeof(clipping), h) != sizeof(clipping)) {
+    if (fread(&clipping, 1, sizeof(clipping), h) != 4) {
         internal_error("Failed to read sprite from file!");
     }
 }
@@ -113,22 +109,22 @@ void sprite::save(FILE* h) {
     if (fwrite(mask_name, 1, 10, h) != 10) {
         internal_error("Failed to write sprite to file!");
     }
-    if (fwrite(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
+    if (fwrite(&r.x, 1, sizeof(r.x), h) != 8) {
         internal_error("Failed to write sprite to file!");
     }
-    if (fwrite(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
+    if (fwrite(&r.y, 1, sizeof(r.y), h) != 8) {
         internal_error("Failed to write sprite to file!");
     }
-    if (fwrite(&distance, 1, sizeof(distance), h) != sizeof(distance)) {
+    if (fwrite(&distance, 1, sizeof(distance), h) != 4) {
         internal_error("Failed to write sprite to file!");
     }
-    if (fwrite(&clipping, 1, sizeof(clipping), h) != sizeof(clipping)) {
+    if (fwrite(&clipping, 1, sizeof(clipping), h) != 4) {
         internal_error("Failed to write sprite to file!");
     }
 }
 
-double sprite::checksum(void) {
-    double sum = 0;
+double sprite::checksum() {
+    double sum = 0.0;
     sum += r.x;
     sum += r.y;
     return sum;

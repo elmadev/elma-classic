@@ -5,18 +5,10 @@
 #include "physics_init.h"
 #include <cstring>
 
-// SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
-// SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
-// SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
-// SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
-// SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
-// SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
-
 sprite::sprite(double x, double y, char* pic_name, char* text_name, char* mask_nam) {
     if (!Plgr) {
         internal_error("sprite::sprite !Plgr");
     }
-
     r = vect2(x, y);
     if (strlen(pic_name) > 8 || strlen(mask_nam) > 8 || strlen(text_name) > 8) {
         internal_error("sprite::sprite name too long!");
@@ -24,10 +16,10 @@ sprite::sprite(double x, double y, char* pic_name, char* text_name, char* mask_n
     strcpy(picture_name, pic_name);
     strcpy(texture_name, text_name);
     strcpy(mask_name, mask_nam);
+
+    // Default values - they should all be overwritten below (or else crash)
     distance = 100;
     clipping = 0;
-
-    // Default meret:
     wireframe_width = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
     wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
 
@@ -39,7 +31,6 @@ sprite::sprite(double x, double y, char* pic_name, char* text_name, char* mask_n
         if (index < 0) {
             picture_name[0] = 0;
         } else {
-            // Megvan kep:
             wireframe_width = Plgr->kepek[index].xsize;
             wireframe_height = Plgr->kepek[index].ysize;
             wireframe_width *= PixelsToMeters;
@@ -48,7 +39,6 @@ sprite::sprite(double x, double y, char* pic_name, char* text_name, char* mask_n
             clipping = Plgr->kepek[index].hatarol;
         }
     } else {
-        // Nem kep sprite:
         if (mask_name[0]) {
             int index = Plgr->getmaszkindex(mask_name);
             if (index < 0) {
@@ -89,15 +79,15 @@ sprite::sprite(FILE* h) {
     if (fread(picture_name, 1, 10, h) != 10) {
         internal_error("Failed to read sprite from file!");
     }
-    picture_name[9] = 0; // Csak biztonsagert
+    picture_name[9] = 0;
     if (fread(texture_name, 1, 10, h) != 10) {
         internal_error("Failed to read sprite from file!");
     }
-    texture_name[9] = 0; // Csak biztonsagert
+    texture_name[9] = 0;
     if (fread(mask_name, 1, 10, h) != 10) {
         internal_error("Failed to read sprite from file!");
     }
-    mask_name[9] = 0; // Csak biztonsagert
+    mask_name[9] = 0;
 
     if (fread(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
         internal_error("Failed to read sprite from file!");

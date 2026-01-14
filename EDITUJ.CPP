@@ -332,7 +332,7 @@ static pic8* Pspritenevbuffer = NULL;
 static char Kepnevkint[10] = "", Texturanevkint[10] = "", Maszknevkint[10] = "";
 
 void kispritenev(const char* kepnev, const char* texturanev, const char* maszknev, int tav,
-                 int hatarol) {
+                 Clipping hatarol) {
     if (strcmp(kepnev, Kepnevkint) == 0 && strcmp(texturanev, Texturanevkint) == 0 &&
         strcmp(maszknev, Maszknevkint) == 0) {
         return;
@@ -357,14 +357,14 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
         Pabc1->write(Pspritenevbuffer, 0, 14, "PICTURE:");
         char tmp[30];
         sprintf(tmp, "%s (%d)  ", kepnev, tav);
-        if (hatarol == HATAROL_G) {
+        if (hatarol == Clipping::Unclipped) {
+            strcat(tmp, "U");
+        }
+        if (hatarol == Clipping::Ground) {
             strcat(tmp, "G");
         }
-        if (hatarol == HATAROL_S) {
+        if (hatarol == Clipping::Sky) {
             strcat(tmp, "S");
-        }
-        if (hatarol != HATAROL_G && hatarol != HATAROL_S) {
-            strcat(tmp, "U");
         }
         Pabc2->write(Pspritenevbuffer, 60, 14, tmp);
     }
@@ -374,14 +374,14 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
         Pabc1->write(Pspritenevbuffer, 126, 14, "MASK:");
         char tmp[30];
         sprintf(tmp, "%s (%d)  ", maszknev, tav);
-        if (hatarol == HATAROL_G) {
+        if (hatarol == Clipping::Unclipped) {
+            strcat(tmp, "U");
+        }
+        if (hatarol == Clipping::Ground) {
             strcat(tmp, "G");
         }
-        if (hatarol == HATAROL_S) {
+        if (hatarol == Clipping::Sky) {
             strcat(tmp, "S");
-        }
-        if (hatarol != HATAROL_G && hatarol != HATAROL_S) {
-            strcat(tmp, "U");
         }
         Pabc2->write(Pspritenevbuffer, 164, 14, tmp);
     }
@@ -520,7 +520,8 @@ static void ujrarajzol(int egesz) {
         if (!Plgr) {
             internal_error("89u5t4");
         }
-        kispritenev(Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev, 0, 0);
+        kispritenev(Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev, 0,
+                    Clipping::Unclipped);
     }
 }
 
@@ -533,7 +534,8 @@ static void beallitkozelvane(int mx, int my) {
         if (!Plgr) {
             internal_error("7896675");
         }
-        kispritenev(Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev, 0, 0);
+        kispritenev(Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev, 0,
+                    Clipping::Unclipped);
         return;
     }
 
@@ -593,7 +595,7 @@ static void beallitkozelvane(int mx, int my) {
     }
 
     if (!ps && !pker) {
-        kispritenev("", "", "", 0, 0);
+        kispritenev("", "", "", 0, Clipping::Unclipped);
     }
 }
 

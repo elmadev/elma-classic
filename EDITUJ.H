@@ -1,6 +1,8 @@
 #ifndef EDITUJ_H
 #define EDITUJ_H
 
+#include "sprite.h"
+
 class abc8;
 class object;
 class palette;
@@ -66,6 +68,6 @@ void toolhelp(const char* text = nullptr);
 #define SZ_ZOOMVONAL (90)
 
 void kispritenev(const char* kepnev, const char* texturanev, const char* maszknev, int tav,
-                 int hatarol);
+                 Clipping hatarol);
 
 #endif

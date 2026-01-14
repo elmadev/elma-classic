@@ -1,6 +1,7 @@
 #ifndef LGRFILE_H
 #define LGRFILE_H
 
+#include "sprite.h"
 #include <cstdio>
 
 class anim;
@@ -29,7 +30,8 @@ struct maszk {
 
 struct kep {
     char nev[10];
-    int tavolsag, hatarol;
+    int tavolsag;
+    Clipping hatarol;
 
     int xsize, ysize;
     unsigned char* adatok; // leiras kovetkezik:
@@ -44,7 +46,8 @@ struct kep {
 struct textura {
     char nev[10];
     pic8* ppic;
-    int tavolsag, hatarol;
+    int tavolsag;
+    Clipping hatarol;
     int foltos;
     int origxsize;
 };

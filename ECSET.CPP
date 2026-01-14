@@ -803,13 +803,13 @@ void ecset::addspriteok(int fazis) {
         }
 
         // Fazis fuggvenyeben csak bizonyos kepeket rakunk be:
-        if (fazis == FAZIS_FOLD && psp->clipping != HATAROL_G) {
+        if (fazis == FAZIS_FOLD && psp->clipping != Clipping::Ground) {
             continue;
         }
-        if (fazis == FAZIS_EG && psp->clipping != HATAROL_S) {
+        if (fazis == FAZIS_EG && psp->clipping != Clipping::Sky) {
             continue;
         }
-        if (fazis == FAZIS_NEMFOLDEG && psp->clipping) {
+        if (fazis == FAZIS_NEMFOLDEG && psp->clipping != Clipping::Unclipped) {
             continue;
         }
 
@@ -1130,16 +1130,16 @@ void ecset::addkovetok(int fazis) {
             continue;
         }
 
-        int hatarol = HATAROL_G;
+        Clipping hatarol = Clipping::Ground;
 
         // Fazis fuggvenyeben csak bizonyos kepeket rakunk be:
-        if (fazis == FAZIS_FOLD && hatarol != HATAROL_G) {
+        if (fazis == FAZIS_FOLD && hatarol != Clipping::Ground) {
             continue;
         }
-        if (fazis == FAZIS_EG && hatarol != HATAROL_S) {
+        if (fazis == FAZIS_EG && hatarol != Clipping::Sky) {
             continue;
         }
-        if (fazis == FAZIS_NEMFOLDEG && hatarol) {
+        if (fazis == FAZIS_NEMFOLDEG && hatarol != Clipping::Unclipped) {
             continue;
         }
 

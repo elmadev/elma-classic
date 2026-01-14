@@ -1,6 +1,7 @@
 #ifndef PICLIST_H
 #define PICLIST_H
 
+#include "sprite.h"
 #include <cstdio>
 
 #define MAX_PICLIST_LENGTH (3000)
@@ -22,7 +23,7 @@ class piclist {
     char name[(MAX_PICLIST_LENGTH + 10) * 10];
     Type type[MAX_PICLIST_LENGTH + 10];
     int default_distance[MAX_PICLIST_LENGTH + 10];
-    int default_clipping[MAX_PICLIST_LENGTH + 10];
+    Clipping default_clipping[MAX_PICLIST_LENGTH + 10];
     Transparency transparency[MAX_PICLIST_LENGTH + 10];
 
     piclist(FILE* h);

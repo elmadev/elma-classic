@@ -313,7 +313,7 @@ void lgrfile::beirtexturat(pic8* ppic, piclist* ppiclist, int index) {
         strcpy(ptext->nev, "qgrass");
         ptext->ppic = ppic;
         ptext->tavolsag = 450;
-        ptext->hatarol = HATAROL_G;
+        ptext->hatarol = Clipping::Ground;
         ptext->foltos = 1;
     }
 

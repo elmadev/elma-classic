@@ -22,7 +22,7 @@ sprite::sprite(double x, double y, const char* pic_name, const char* text_name,
 
     // Default values - they should all be overwritten below (or else crash)
     distance = 100;
-    clipping = 0;
+    clipping = Clipping::Unclipped;
     wireframe_width = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
     wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
 

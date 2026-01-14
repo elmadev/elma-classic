@@ -6,8 +6,12 @@
 
 constexpr int DEFAULT_SPRITE_WIREFRAME = 20;
 
-#define HATAROL_G (1)
-#define HATAROL_S (2)
+enum class Clipping {
+    Unknown = -1,
+    Unclipped = 0,
+    Ground = 1,
+    Sky = 2,
+};
 
 class sprite {
   public:
@@ -18,7 +22,7 @@ class sprite {
     double wireframe_width;
     double wireframe_height;
     int distance;
-    int clipping;
+    Clipping clipping;
 
     sprite(double x, double y, const char* pic_name, const char* text_name, const char* mask_nam);
     sprite(FILE* h);

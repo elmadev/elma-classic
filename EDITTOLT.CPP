@@ -1103,7 +1103,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
                     sprintf(tavstr, "%d", tavolsag);
                     Pabc2->write(BufferMain, lx1 + 67, ly1 + 15 + i * dy, tavstr);
                     // Kiirjuk hatarolokat:
-                    int hatarol = 0;
+                    Clipping hatarol = Clipping::Unclipped;
                     if (kepnev[0]) {
                         hatarol = Plgr->kepek[i + felso].hatarol;
                     } else {
@@ -1111,10 +1111,10 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
                     }
 
                     strcpy(tavstr, "U");
-                    if (hatarol == HATAROL_G) {
+                    if (hatarol == Clipping::Ground) {
                         strcpy(tavstr, "G");
                     }
-                    if (hatarol == HATAROL_S) {
+                    if (hatarol == Clipping::Sky) {
                         strcpy(tavstr, "S");
                     }
                     Pabc2->write(BufferMain, lx1 + 92, ly1 + 15 + i * dy, tavstr);
@@ -1492,7 +1492,7 @@ static int tavolsagbeir(pic8* ppic, box abox, int tavolsag) {
     }
 }
 
-static int hatarolbeir(pic8* ppic, box abox, int hatarol) {
+static Clipping hatarolbeir(pic8* ppic, box abox, Clipping hatarol) {
     push();
     boxbair(ppic, abox, Feherszin, "", 1);
     bltfront(ppic, abox.x1, abox.y1, abox.x2, abox.y2);
@@ -1505,15 +1505,15 @@ static int hatarolbeir(pic8* ppic, box abox, int hatarol) {
         }
         if (c == 'u' || c == 'U') {
             pop();
-            return 0;
+            return Clipping::Unclipped;
         }
         if (c == 'g' || c == 'G') {
             pop();
-            return HATAROL_G;
+            return Clipping::Ground;
         }
         if (c == 's' || c == 'S') {
             pop();
-            return HATAROL_S;
+            return Clipping::Sky;
         }
     }
 }
@@ -1535,7 +1535,7 @@ void setspritetav(sprite* psp) {
     int kepvaltozott = 1;
     left_mouse_clicked();
     int tavolsag = psp->distance;
-    int hatarol = psp->clipping;
+    Clipping hatarol = psp->clipping;
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
@@ -1600,7 +1600,7 @@ void setspritetav(sprite* psp) {
             // Default-ok kiirasa:
             Pabc2->write(BufferMain, x1 + 12, y1 + 100, "Default:");
             int deftav = -1;
-            int defhatarol = -1;
+            Clipping defhatarol = Clipping::Unknown;
             if (psp->picture_name[0]) {
                 int index = Plgr->getkepindex(psp->picture_name);
                 if (index < 0) {
@@ -1627,14 +1627,16 @@ void setspritetav(sprite* psp) {
             Pabc2->write_centered(BufferMain, x1 + 119, y1 + 100, tmp);
 
             // Hatarolas:
-            strcpy(tmp, "U");
-            if (defhatarol < 0) {
+            if (defhatarol == Clipping::Unknown) {
                 strcpy(tmp, "-");
             }
-            if (defhatarol == HATAROL_G) {
+            if (defhatarol == Clipping::Unclipped) {
+                strcpy(tmp, "U");
+            }
+            if (defhatarol == Clipping::Ground) {
                 strcpy(tmp, "G");
             }
-            if (defhatarol == HATAROL_S) {
+            if (defhatarol == Clipping::Sky) {
                 strcpy(tmp, "S");
             }
             Pabc2->write_centered(BufferMain, x1 + 198, y1 + 100, tmp);
@@ -1647,11 +1649,13 @@ void setspritetav(sprite* psp) {
             Pabc2->write_centered(BufferMain, x1 + 119, boxtav.y2 + 14, "(1-999)");
             // Clipping boxba:
             render_box(BufferMain, boxclipp, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            strcpy(tmp, "U");
-            if (hatarol == HATAROL_G) {
+            if (hatarol == Clipping::Unclipped) {
+                strcpy(tmp, "U");
+            }
+            if (hatarol == Clipping::Ground) {
                 strcpy(tmp, "G");
             }
-            if (hatarol == HATAROL_S) {
+            if (hatarol == Clipping::Sky) {
                 strcpy(tmp, "S");
             }
             boxbair(BufferMain, boxclipp, Feherszin, tmp);

@@ -733,9 +733,9 @@ static void makeszinkonvtomb(unsigned char* pal) {
         int r = pal[i * 3];
         int g = pal[i * 3 + 1];
         int b = pal[i * 3 + 2];
-        r >>= 4;
-        g >>= 4;
-        b >>= 4;
+        r >>= 6;
+        g >>= 6;
+        b >>= 6;
         int szin = r * 16 + g * 4 + b;
         if (szin < 0 || szin >= 64) {
             internal_error("897 648u9");

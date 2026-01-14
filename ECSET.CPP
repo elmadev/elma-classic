@@ -769,7 +769,7 @@ void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
 
     maszk* pm = &Plgr->maszkok[index_m];
 
-    int tavolsag = psp->tavolsag;
+    int tavolsag = psp->distance;
 
     int xsize = pm->xsize;
     int ysize = pm->ysize;
@@ -803,26 +803,26 @@ void ecset::addspriteok(int fazis) {
         }
 
         // Fazis fuggvenyeben csak bizonyos kepeket rakunk be:
-        if (fazis == FAZIS_FOLD && psp->hatarol != HATAROL_G) {
+        if (fazis == FAZIS_FOLD && psp->clipping != HATAROL_G) {
             continue;
         }
-        if (fazis == FAZIS_EG && psp->hatarol != HATAROL_S) {
+        if (fazis == FAZIS_EG && psp->clipping != HATAROL_S) {
             continue;
         }
-        if (fazis == FAZIS_NEMFOLDEG && psp->hatarol) {
+        if (fazis == FAZIS_NEMFOLDEG && psp->clipping) {
             continue;
         }
 
-        if (psp->kepnev[0] == 0) {
+        if (psp->picture_name[0] == 0) {
             // Csak maszkos textura lehet, kulon intezzuk:
-            if (!psp->texturanev[0] || !psp->maszknev[0]) {
+            if (!psp->texture_name[0] || !psp->mask_name[0]) {
                 continue;
             }
-            int index_t = Plgr->gettexturaindex(psp->texturanev);
+            int index_t = Plgr->gettexturaindex(psp->texture_name);
             if (index_t < 0) {
                 internal_error("tgferg");
             }
-            int index_m = Plgr->getmaszkindex(psp->maszknev);
+            int index_m = Plgr->getmaszkindex(psp->mask_name);
             if (index_m < 0) {
                 internal_error("6t7ffrge");
             }
@@ -833,11 +833,11 @@ void ecset::addspriteok(int fazis) {
         }
 
         // Ez egy kep:
-        if (psp->texturanev[0] || psp->maszknev[0]) {
+        if (psp->texture_name[0] || psp->mask_name[0]) {
             internal_error("gkuhlij");
         }
 
-        int index = Plgr->getkepindex(psp->kepnev);
+        int index = Plgr->getkepindex(psp->picture_name);
         if (index < 0) {
             internal_error("kjhhgfchg");
         }
@@ -847,7 +847,7 @@ void ecset::addspriteok(int fazis) {
         int x1 = (int)((psp->r.x - origo.x) * MetersToPixels);
         int y1 = (int)((-psp->r.y - origo.y) * MetersToPixels);
 
-        int ujtavolsag = psp->tavolsag;
+        int ujtavolsag = psp->distance;
 
         int xsize = pkep->xsize;
         int ysize = pkep->ysize;

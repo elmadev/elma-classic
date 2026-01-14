@@ -299,12 +299,12 @@ void t_move_mmove(int mx, int my) {
             Pker->r.y = dy;
             Pker->render();
         } else {
-            Psp->kirajzol();
+            Psp->render();
             double dx = pixel_to_meter_x(mx);
             double dy = pixel_to_meter_y(my);
             Psp->r.x = dx;
             Psp->r.y = dy;
-            Psp->kirajzol();
+            Psp->render();
         }
     }
     unlockfrontbuffer_pic();

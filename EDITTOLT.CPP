@@ -1534,8 +1534,8 @@ void setspritetav(sprite* psp) {
 
     int kepvaltozott = 1;
     left_mouse_clicked();
-    int tavolsag = psp->tavolsag;
-    int hatarol = psp->hatarol;
+    int tavolsag = psp->distance;
+    int hatarol = psp->clipping;
     while (1) {
         // Nezzuk gombokat:
         while (has_keypress()) {
@@ -1544,11 +1544,11 @@ void setspritetav(sprite* psp) {
                 return;
             }
             if (c == KEY_ENTER) {
-                if (psp->tavolsag != tavolsag || psp->hatarol != hatarol) {
+                if (psp->distance != tavolsag || psp->clipping != hatarol) {
                     Valtozott = 1;
                 }
-                psp->tavolsag = tavolsag;
-                psp->hatarol = hatarol;
+                psp->distance = tavolsag;
+                psp->clipping = hatarol;
                 return;
             }
         }
@@ -1557,11 +1557,11 @@ void setspritetav(sprite* psp) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
-                if (psp->tavolsag != tavolsag || psp->hatarol != hatarol) {
+                if (psp->distance != tavolsag || psp->clipping != hatarol) {
                     Valtozott = 1;
                 }
-                psp->tavolsag = tavolsag;
-                psp->hatarol = hatarol;
+                psp->distance = tavolsag;
+                psp->clipping = hatarol;
                 return;
             }
             if (is_in_box(Moux, Mouy, boxcancel)) {
@@ -1589,11 +1589,11 @@ void setspritetav(sprite* psp) {
                                   "CANCEL");
 
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15, "Set Picture Properties");
-            if (psp->kepnev[0]) {
-                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 45, psp->kepnev);
+            if (psp->picture_name[0]) {
+                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 45, psp->picture_name);
             } else {
-                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 34, psp->texturanev);
-                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 56, psp->maszknev);
+                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 34, psp->texture_name);
+                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 56, psp->mask_name);
             }
             Pabc2->write(BufferMain, x1 + 92, y1 + 76, "Distance");
             Pabc2->write(BufferMain, x1 + 172, y1 + 76, "Clipping");
@@ -1601,16 +1601,16 @@ void setspritetav(sprite* psp) {
             Pabc2->write(BufferMain, x1 + 12, y1 + 100, "Default:");
             int deftav = -1;
             int defhatarol = -1;
-            if (psp->kepnev[0]) {
-                int index = Plgr->getkepindex(psp->kepnev);
+            if (psp->picture_name[0]) {
+                int index = Plgr->getkepindex(psp->picture_name);
                 if (index < 0) {
                     internal_error("iohdiuyde");
                 }
                 deftav = Plgr->kepek[index].tavolsag;
                 defhatarol = Plgr->kepek[index].hatarol;
             }
-            if (psp->texturanev[0]) {
-                int index = Plgr->gettexturaindex(psp->texturanev);
+            if (psp->texture_name[0]) {
+                int index = Plgr->gettexturaindex(psp->texture_name);
                 if (index < 0) {
                     internal_error("u6ythggf");
                 }

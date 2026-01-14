@@ -305,16 +305,16 @@ int topol::pic_selejtez(lgrfile* plgr) {
         if (spritetomb[i]) {
             sprite* psp = spritetomb[i];
             // Default meret:
-            psp->xsize = PixelsToMeters * DEFAULTSIZE;
-            psp->ysize = PixelsToMeters * DEFAULTSIZE;
+            psp->wireframe_width = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
+            psp->wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
 
-            if (psp->kepnev[0] && (psp->maszknev[0] || psp->texturanev[0])) {
+            if (psp->picture_name[0] && (psp->mask_name[0] || psp->texture_name[0])) {
                 internal_error("pic_selejtez-ben sok nev egy spriteban!");
             }
-            if (psp->kepnev[0]) {
-                int index = plgr->getkepindex(psp->kepnev);
+            if (psp->picture_name[0]) {
+                int index = plgr->getkepindex(psp->picture_name);
                 if (index < 0) {
-                    psp->kepnev[0] = 0;
+                    psp->picture_name[0] = 0;
                     // Toroljuk:
                     delete spritetomb[i];
                     spritetomb[i] = NULL;
@@ -322,31 +322,31 @@ int topol::pic_selejtez(lgrfile* plgr) {
                     continue;
                 }
                 // Megvan kep:
-                psp->xsize = plgr->kepek[index].xsize;
-                psp->ysize = plgr->kepek[index].ysize;
-                psp->xsize *= PixelsToMeters;
-                psp->ysize *= PixelsToMeters;
+                psp->wireframe_width = plgr->kepek[index].xsize;
+                psp->wireframe_height = plgr->kepek[index].ysize;
+                psp->wireframe_width *= PixelsToMeters;
+                psp->wireframe_height *= PixelsToMeters;
             } else {
                 // Nem kep sprite:
-                if (psp->maszknev[0]) {
-                    int index = plgr->getmaszkindex(psp->maszknev);
+                if (psp->mask_name[0]) {
+                    int index = plgr->getmaszkindex(psp->mask_name);
                     if (index < 0) {
-                        psp->maszknev[0] = 0;
+                        psp->mask_name[0] = 0;
                         // Toroljuk:
                         delete spritetomb[i];
                         spritetomb[i] = NULL;
                         volttorles = 1;
                     } else {
-                        psp->xsize = plgr->maszkok[index].xsize;
-                        psp->ysize = plgr->maszkok[index].ysize;
-                        psp->xsize *= PixelsToMeters;
-                        psp->ysize *= PixelsToMeters;
+                        psp->wireframe_width = plgr->maszkok[index].xsize;
+                        psp->wireframe_height = plgr->maszkok[index].ysize;
+                        psp->wireframe_width *= PixelsToMeters;
+                        psp->wireframe_height *= PixelsToMeters;
                     }
                 }
-                if (psp->texturanev[0]) {
-                    int index = plgr->gettexturaindex(psp->texturanev);
+                if (psp->texture_name[0]) {
+                    int index = plgr->gettexturaindex(psp->texture_name);
                     if (index < 0) {
-                        psp->texturanev[0] = 0;
+                        psp->texture_name[0] = 0;
                         // Toroljuk:
                         delete spritetomb[i];
                         spritetomb[i] = NULL;
@@ -524,7 +524,7 @@ void topol::kirajzol(void) {
     for (int i = 0; i < MAXSPRITE; i++) {
         if (spritetomb[i]) {
             if (Rajzolkepek) {
-                spritetomb[i]->kirajzol();
+                spritetomb[i]->render();
             }
         }
     }
@@ -1500,7 +1500,7 @@ double topol::belyegszamitas(int kellspriteis) {
     if (kellspriteis) {
         for (int i = 0; i < MAXSPRITE; i++) {
             if (spritetomb[i]) {
-                belyeg += spritetomb[i]->belyegszamitas();
+                belyeg += spritetomb[i]->checksum();
             }
         }
     }

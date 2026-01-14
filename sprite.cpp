@@ -12,92 +12,92 @@
 // SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
 // SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
 
-sprite::sprite(double x, double y, char* kepnev_p, char* texturanev_p, char* maszknev_p) {
+sprite::sprite(double x, double y, char* pic_name, char* text_name, char* mask_nam) {
     if (!Plgr) {
         internal_error("7uyhfg");
     }
 
     r = vect2(x, y);
-    if (strlen(kepnev_p) > 8 || strlen(maszknev_p) > 8 || strlen(texturanev_p) > 8) {
+    if (strlen(pic_name) > 8 || strlen(mask_nam) > 8 || strlen(text_name) > 8) {
         internal_error("87vgrg");
     }
-    strcpy(kepnev, kepnev_p);
-    strcpy(texturanev, texturanev_p);
-    strcpy(maszknev, maszknev_p);
-    tavolsag = 100;
-    hatarol = 0;
+    strcpy(picture_name, pic_name);
+    strcpy(texture_name, text_name);
+    strcpy(mask_name, mask_nam);
+    distance = 100;
+    clipping = 0;
 
     // Default meret:
-    xsize = PixelsToMeters * DEFAULTSIZE;
-    ysize = PixelsToMeters * DEFAULTSIZE;
+    wireframe_width = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
+    wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
 
-    if (kepnev[0] && (maszknev[0] || texturanev[0])) {
+    if (picture_name[0] && (mask_name[0] || texture_name[0])) {
         internal_error("sp::sp-ban sok nev egy poligonban!");
     }
-    if (kepnev[0]) {
-        int index = Plgr->getkepindex(kepnev);
+    if (picture_name[0]) {
+        int index = Plgr->getkepindex(picture_name);
         if (index < 0) {
-            kepnev[0] = 0;
+            picture_name[0] = 0;
         } else {
             // Megvan kep:
-            xsize = Plgr->kepek[index].xsize;
-            ysize = Plgr->kepek[index].ysize;
-            xsize *= PixelsToMeters;
-            ysize *= PixelsToMeters;
-            tavolsag = Plgr->kepek[index].tavolsag;
-            hatarol = Plgr->kepek[index].hatarol;
+            wireframe_width = Plgr->kepek[index].xsize;
+            wireframe_height = Plgr->kepek[index].ysize;
+            wireframe_width *= PixelsToMeters;
+            wireframe_height *= PixelsToMeters;
+            distance = Plgr->kepek[index].tavolsag;
+            clipping = Plgr->kepek[index].hatarol;
         }
     } else {
         // Nem kep sprite:
-        if (maszknev[0]) {
-            int index = Plgr->getmaszkindex(maszknev);
+        if (mask_name[0]) {
+            int index = Plgr->getmaszkindex(mask_name);
             if (index < 0) {
-                maszknev[0] = 0;
+                mask_name[0] = 0;
             } else {
-                xsize = Plgr->maszkok[index].xsize;
-                ysize = Plgr->maszkok[index].ysize;
-                xsize *= PixelsToMeters;
-                ysize *= PixelsToMeters;
+                wireframe_width = Plgr->maszkok[index].xsize;
+                wireframe_height = Plgr->maszkok[index].ysize;
+                wireframe_width *= PixelsToMeters;
+                wireframe_height *= PixelsToMeters;
             }
         }
-        if (texturanev[0]) {
-            int index = Plgr->gettexturaindex(texturanev);
+        if (texture_name[0]) {
+            int index = Plgr->gettexturaindex(texture_name);
             if (index < 0) {
-                texturanev[0] = 0;
+                texture_name[0] = 0;
             } else {
-                tavolsag = Plgr->texturak[index].tavolsag;
-                hatarol = Plgr->texturak[index].hatarol;
+                distance = Plgr->texturak[index].tavolsag;
+                clipping = Plgr->texturak[index].hatarol;
             }
         }
     }
 }
 
-void sprite::kirajzol(void) {
-    render_line(r, r + vect2(xsize, 0.0), false);
-    render_line(r, r + vect2(0.0, ysize), false);
-    vect2 r2(xsize + r.x, ysize + r.y);
-    render_line(r2, r2 - vect2(xsize, 0.0), false);
-    render_line(r2, r2 - vect2(0.0, ysize), false);
+void sprite::render(void) {
+    render_line(r, r + vect2(wireframe_width, 0.0), false);
+    render_line(r, r + vect2(0.0, wireframe_height), false);
+    vect2 r2(wireframe_width + r.x, wireframe_height + r.y);
+    render_line(r2, r2 - vect2(wireframe_width, 0.0), false);
+    render_line(r2, r2 - vect2(0.0, wireframe_height), false);
 }
 
 sprite::sprite(FILE* h) {
-    int meret = sizeof(tavolsag);
+    int meret = sizeof(distance);
     if (meret != 4) {
-        internal_error("sprite::sprite-ban sizeof( tavolsag ) != 4!");
+        internal_error("sprite::sprite-ban sizeof( distance ) != 4!");
     }
 
-    if (fread(kepnev, 1, 10, h) != 10) {
+    if (fread(picture_name, 1, 10, h) != 10) {
         internal_error("Nemo sp!");
     }
-    kepnev[9] = 0; // Csak biztonsagert
-    if (fread(texturanev, 1, 10, h) != 10) {
+    picture_name[9] = 0; // Csak biztonsagert
+    if (fread(texture_name, 1, 10, h) != 10) {
         internal_error("Nemo sp!");
     }
-    texturanev[9] = 0; // Csak biztonsagert
-    if (fread(maszknev, 1, 10, h) != 10) {
+    texture_name[9] = 0; // Csak biztonsagert
+    if (fread(mask_name, 1, 10, h) != 10) {
         internal_error("Nemo sp!");
     }
-    maszknev[9] = 0; // Csak biztonsagert
+    mask_name[9] = 0; // Csak biztonsagert
 
     if (fread(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
         internal_error("Nem olvas file-bol sprite::sprite-ban!");
@@ -105,22 +105,22 @@ sprite::sprite(FILE* h) {
     if (fread(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
         internal_error("Nem olvas file-bol sprite::sprite-ban!");
     }
-    if (fread(&tavolsag, 1, sizeof(tavolsag), h) != sizeof(tavolsag)) {
+    if (fread(&distance, 1, sizeof(distance), h) != sizeof(distance)) {
         internal_error("Nem olvas file-bol sprite::sprite-ban!");
     }
-    if (fread(&hatarol, 1, sizeof(hatarol), h) != sizeof(hatarol)) {
+    if (fread(&clipping, 1, sizeof(clipping), h) != sizeof(clipping)) {
         internal_error("Nem olvas file-bol sprite::sprite-ban!");
     }
 }
 
 void sprite::save(FILE* h) {
-    if (fwrite(kepnev, 1, 10, h) != 10) {
+    if (fwrite(picture_name, 1, 10, h) != 10) {
         internal_error("Nir sp!");
     }
-    if (fwrite(texturanev, 1, 10, h) != 10) {
+    if (fwrite(texture_name, 1, 10, h) != 10) {
         internal_error("Nir sp!");
     }
-    if (fwrite(maszknev, 1, 10, h) != 10) {
+    if (fwrite(mask_name, 1, 10, h) != 10) {
         internal_error("Nir sp!");
     }
     if (fwrite(&r.x, 1, sizeof(r.x), h) != sizeof(r.x)) {
@@ -129,15 +129,15 @@ void sprite::save(FILE* h) {
     if (fwrite(&r.y, 1, sizeof(r.y), h) != sizeof(r.y)) {
         internal_error("Nir sp!");
     }
-    if (fwrite(&tavolsag, 1, sizeof(tavolsag), h) != sizeof(tavolsag)) {
+    if (fwrite(&distance, 1, sizeof(distance), h) != sizeof(distance)) {
         internal_error("Nir sp!");
     }
-    if (fwrite(&hatarol, 1, sizeof(hatarol), h) != sizeof(hatarol)) {
+    if (fwrite(&clipping, 1, sizeof(clipping), h) != sizeof(clipping)) {
         internal_error("Nir sp!");
     }
 }
 
-double sprite::belyegszamitas(void) {
+double sprite::checksum(void) {
     double belyeg = 0;
     belyeg += r.x;
     belyeg += r.y;

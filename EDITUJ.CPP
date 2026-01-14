@@ -585,7 +585,7 @@ static void beallitkozelvane(int mx, int my) {
     } */
 
     if (ps) {
-        kispritenev(ps->kepnev, ps->texturanev, ps->maszknev, ps->tavolsag, ps->hatarol);
+        kispritenev(ps->picture_name, ps->texture_name, ps->mask_name, ps->distance, ps->clipping);
     }
 
     if (pker) {

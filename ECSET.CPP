@@ -12,6 +12,7 @@
 #include "physics_init.h"
 #include "pic8.h"
 #include "segments.h"
+#include "sprite.h"
 #include "TOPOL.H"
 #include <cstdint>
 #include <cmath>

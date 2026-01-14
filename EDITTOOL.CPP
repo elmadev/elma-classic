@@ -11,6 +11,7 @@
 #include "menu_pic.h"
 #include "pic8.h"
 #include "TOPOL.H"
+#include "sprite.h"
 
 // int Kurzornegyzet = 0;
 

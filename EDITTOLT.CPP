@@ -13,6 +13,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "polygon.h"
+#include "sprite.h"
 #include "TOPOL.H"
 #include <cstring>
 

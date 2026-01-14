@@ -14,6 +14,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "TOPOL.H"
+#include "sprite.h"
 #include <cstring>
 
 /*void tesztloadlgr( void ) {

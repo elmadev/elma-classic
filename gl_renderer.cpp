@@ -4,6 +4,31 @@
 #include <SDL.h>
 #include <glad/glad.h>
 
+static const char* VertexShaderSource = R"(
+#version 410 core
+layout (location = 0) in vec2 position;
+layout (location = 1) in vec2 texCoord;
+out vec2 fragTexCoord;
+
+void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+    fragTexCoord = texCoord;
+}
+)";
+
+static const char* FragmentShaderSource = R"(
+#version 410 core
+in vec2 fragTexCoord;
+out vec4 FragColor;
+uniform sampler2D IndexTexture;
+uniform sampler1D PaletteTexture;
+
+void main() {
+    float index = texture(IndexTexture, fragTexCoord).r;
+    FragColor = texture(PaletteTexture, index);
+}
+)";
+
 static SDL_GLContext GLContext = nullptr;
 static int FrameWidth = 0;
 static int FrameHeight = 0;
@@ -11,6 +36,61 @@ static GLuint VAO = 0;
 static GLuint VBO = 0;
 static GLuint IndexTexture = 0;
 static GLuint PaletteTexture = 0;
+static GLuint ShaderProgram = 0;
+static GLint IndexTexLoc = -1;
+static GLint PaletteTexLoc = -1;
+
+static GLuint compile_shader(GLenum type, const char* source) {
+    GLuint shader = glCreateShader(type);
+    if (shader == 0) {
+        return 0;
+    }
+    glShaderSource(shader, 1, &source, nullptr);
+    glCompileShader(shader);
+
+    GLint success;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+        internal_error("Shader compilation failed:", infoLog);
+        return 0;
+    }
+    return shader;
+}
+
+static int init_shaders() {
+    GLuint vertexShader = compile_shader(GL_VERTEX_SHADER, VertexShaderSource);
+    GLuint fragmentShader = compile_shader(GL_FRAGMENT_SHADER, FragmentShaderSource);
+    if (!vertexShader || !fragmentShader) {
+        return -1;
+    }
+
+    ShaderProgram = glCreateProgram();
+    glAttachShader(ShaderProgram, vertexShader);
+    glAttachShader(ShaderProgram, fragmentShader);
+    glLinkProgram(ShaderProgram);
+
+    GLint success;
+    glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetProgramInfoLog(ShaderProgram, 512, nullptr, infoLog);
+        internal_error("Shader linking failed:", infoLog);
+        return -1;
+    }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    glUseProgram(ShaderProgram);
+    IndexTexLoc = glGetUniformLocation(ShaderProgram, "IndexTexture");
+    PaletteTexLoc = glGetUniformLocation(ShaderProgram, "PaletteTexture");
+    glUniform1i(IndexTexLoc, 0);
+    glUniform1i(PaletteTexLoc, 1);
+
+    return 0;
+}
 
 static void setup_textures(int width, int height) {
     // Create index texture (R8)
@@ -75,6 +155,12 @@ int gl_init(SDL_Window* sdl_window, int width, int height) {
     // Disable VSync
     SDL_GL_SetSwapInterval(0);
     setup_vertex_data();
+
+    if (init_shaders() != 0) {
+        internal_error("Failed to initialize shaders");
+        return -1;
+    }
+
     setup_textures(width, height);
 
     return 0;
@@ -96,6 +182,10 @@ void gl_cleanup() {
     if (VAO) {
         glDeleteVertexArrays(1, &VAO);
         VAO = 0;
+    }
+    if (ShaderProgram) {
+        glDeleteProgram(ShaderProgram);
+        ShaderProgram = 0;
     }
     if (GLContext) {
         SDL_GL_DeleteContext(GLContext);

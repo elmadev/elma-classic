@@ -715,9 +715,9 @@ int tolt_save_as(int lokkolhato) {
                         return 0;
                     }
                 }
-                Ptop->locked = 1;
+                Ptop->locked = true;
                 Ptop->save(nev);
-                Ptop->locked = 0;
+                Ptop->locked = false;
                 // strcpy( State->editor_filename, nev );
                 return 1;
             }

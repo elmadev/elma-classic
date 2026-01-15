@@ -2,6 +2,7 @@
 #define EDITTOLT_H
 
 #include "object.h"
+#include "polygon.h"
 
 class sprite;
 
@@ -25,6 +26,8 @@ int tolt_picklgrfile(char* lgrnev); // lgrnevbe masol max 8 chart
 void setspritetav(sprite* psp);
 
 void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoodsorszam);
+
+void set_gyuru_attributes(polygon* pgy);
 
 extern int Rajzolpoligon;
 extern int Rajzolkoveto;

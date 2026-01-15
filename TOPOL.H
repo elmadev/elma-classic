@@ -9,41 +9,38 @@ class polygon;
 class sprite;
 struct motorst;
 
-void set_gyuru_attributes(polygon* pgy);
-
-#define MAX_OBJECTS (52)
+constexpr int MAX_POLYGONS = 300;
 constexpr int MAX_VERTICES = 5000;
-
-#define MAX_SPRITES (5000)
-
-#define MAX_POLYGONS (300)
+constexpr int MAX_OBJECTS = 52;
+constexpr int MAX_SPRITES = 5000;
 
 typedef polygon* ptrgyuru;
-#define LEVEL_NAME_LENGTH (50)
+constexpr int LEVEL_NAME_LENGTH = 50;
+constexpr int LEVEL_NAME_LENGTH_OLD = 14;
 
 class lgrfile;
 
 class level {
-    friend int menu_exit(void);
+    friend int menu_exit();
     friend int floadlevel_e(const char* nev, int forceload);
     friend int floadlevel_p(const char* nev);
-    friend void invalidate_ptop(void);
+    friend void invalidate_ptop();
 
     double checksum(int check_sprites);
 
     // Create a default level
-    level(void);
+    level();
     // Load level from file
     level(const char* filename);
-    ~level(void);
+    ~level();
     void load_external(const char* filename);
     void load_internal(const char* filename);
 
   public:
-    long level_id;
-    int lgr_not_found;
-
-    int topology_errors, locked;
+    int level_id;
+    bool lgr_not_found;
+    bool topology_errors;
+    bool locked;
     ptrgyuru polygons[MAX_POLYGONS]; // Ez csak gany miatt public
     object* objects[MAX_OBJECTS];
     sprite* sprites[MAX_SPRITES];
@@ -59,34 +56,34 @@ class level {
     // are different.
     //
     // Returns true if any sprites were deleted.
-    int discard_missing_lgr_assets(lgrfile* lgr);
+    bool discard_missing_lgr_assets(lgrfile* lgr);
     // Get closest vertex to (x, y) in the editor, if the distance is less than 10 pixels. A polygon
     // can `skip` can be passed to skip that polygon.
-    polygon* get_closest_vertex(double x, double y, int* vertex_index, double* distance = NULL,
-                                polygon* skip = NULL);
+    polygon* get_closest_vertex(double x, double y, int* vertex_index, double* distance = nullptr,
+                                polygon* skip = nullptr);
     // Get closest object to (x, y) in editor, if the distance is less than 10 pixels.
-    object* get_closest_object(double x, double y, double* distance = NULL);
+    object* get_closest_object(double x, double y, double* distance = nullptr);
     // Get closest sprite to (x, y) in editor, if the distance is less than 10 pixels.
-    sprite* get_closest_sprite(double x, double y, double* distance = NULL);
-    void save(const char* filename, int skip_topology = 0);
+    sprite* get_closest_sprite(double x, double y, double* distance = nullptr);
+    void save(const char* filename, bool skip_topology = false);
     // Update top ten of an external level
     void save_topten(const char* filename);
     // Render the level in the internal editor.
-    void render(void);
+    void render();
     // Check to see if either a polygon or point is within the sky or ground (only provide one)
-    int is_sky(polygon* poly, vect2* point = NULL);
+    bool is_sky(polygon* poly, vect2* point = nullptr);
     // Get the min/max dimensions of level, optionally including objects/sprites
     void get_boundaries(double* x1, double* y1, double* x2, double* y2,
-                        int check_objects_and_sprites);
+                        bool check_objects_and_sprites);
     // Returns apple count.
     int initialize_objects(motorst* mot);
-    void sort_objects(void);
+    void sort_objects();
     object* get_object(int index);
 
-    int objects_flipped;
+    bool objects_flipped;
     // Invert the y of all objects (needs to be inverted for in-game, and uninverted in editor)
-    void flip_objects(void);
-    void unflip_objects(void);
+    void flip_objects();
+    void unflip_objects();
 };
 
 extern vect2 BikeStartOffset;

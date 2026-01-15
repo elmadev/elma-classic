@@ -92,7 +92,7 @@ int check_topology(int kelldialog) {
 
     // Most megnezzuk, hogy nincs-e kintlevo objektum:
     double x1, y1, x2, y2;
-    Ptop->get_boundaries(&x1, &y1, &x2, &y2, 0);
+    Ptop->get_boundaries(&x1, &y1, &x2, &y2, false);
     x1 -= 1.0;
     y1 -= 1.0;
     x2 += 1.0;

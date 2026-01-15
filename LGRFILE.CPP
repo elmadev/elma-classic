@@ -98,7 +98,7 @@ void loadlgrfile(const char* nev) {
         strcpy(lgrtmp, "lgr/default.lgr");
         strcpy(Bentlgrnev, "DEFAULT");
 
-        Ptop->lgr_not_found = 1;
+        Ptop->lgr_not_found = true;
         if (access(lgrtmp, 0) != 0) {
             external_error("Could not open file LGR\\DEFAULT.LGR!");
         }

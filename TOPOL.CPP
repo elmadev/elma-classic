@@ -19,59 +19,48 @@
 #include <ctime>
 #include <cstring>
 
-#define TOP_TEN_HEADER (6754362)
-#define TOP_TEN_FOOTER (8674642)
-
-#define CHECKSUM_MULTIPLIER (3247.764325643)
+constexpr int TOP_TEN_HEADER = 6754362;
+constexpr int TOP_TEN_FOOTER = 8674642;
 
 static char InternalFilePaths[STATE_LEVEL_COUNT + 2][14] = {
-    "nulla.leb",    "a01.leb",    "a02.leb",      "a03.leb",   "a04.leb",     "a05.leb",
-    "a06.leb",      "a07.leb",    "ujtag.leb",    "a08.leb",   "a09.leb",     "ujgrav.leb",
-    "a10.leb",
+    "nulla.leb",    "a01.leb",     "a02.leb",      "a03.leb",      "a04.leb",     "a05.leb",
+    "a06.leb",      "a07.leb",     "ujtag.leb",    "a08.leb",      "a09.leb",     "ujgrav.leb",
+    "a10.leb",      "a11.leb",     "a12.leb",      "a13.leb",      "a14.leb",     "a15.leb",
+    "a16.leb",      "a17.leb",     "ujupdown.leb", "a18.leb",      "a19.leb",     "a20.leb",
+    "a21.leb",      "a22.leb",     "a23.leb",      "a24.leb",      "a25.leb",     "a26.leb",
+    "ujkomb.leb",   "a27.leb",     "ujtolcs.leb",  "a28.leb",      "ujzuhan.leb", "a29.leb",
+    "a30.leb",      "a31.leb",     "a32.leb",      "ujvissza.leb", "a33.leb",     "a34.leb",
+    "a35.leb",      "a36.leb",     "a37.leb",      "ujcsab.leb",   "Mate.leb",    "a38.leb",
+    "ujdownhi.leb", "ujcsomo.leb", "a39.leb",      "a40.leb",      "a41.leb",     "ujhook.leb",
+    "a42.leb",      "visit.leb",   "a04.leb",      "a05.leb",      "a06.leb",     "a07.leb",
+    "a08.leb",      "a09.leb",     "a10.leb"};
 
-    "a11.leb",      "a12.leb",    "a13.leb",      "a14.leb",   "a15.leb",     "a16.leb",
-    "a17.leb",
-
-    "ujupdown.leb", "a18.leb",    "a19.leb",      "a20.leb",
-
-    "a21.leb",      "a22.leb",    "a23.leb",      "a24.leb",   "a25.leb",     "a26.leb",
-    "ujkomb.leb",   "a27.leb",    "ujtolcs.leb",  "a28.leb",   "ujzuhan.leb", "a29.leb",
-    "a30.leb",
-
-    "a31.leb",      "a32.leb",    "ujvissza.leb", "a33.leb",   "a34.leb",     "a35.leb",
-    "a36.leb",      "a37.leb",    "ujcsab.leb",   "Mate.leb",  "a38.leb",     "ujdownhi.leb",
-    "ujcsomo.leb",  "a39.leb",    "a40.leb",
-
-    "a41.leb",      "ujhook.leb", "a42.leb",      "visit.leb", "a04.leb",     "a05.leb",
-    "a06.leb",      "a07.leb",    "a08.leb",      "a09.leb",   "a10.leb"};
-
-int DescListLoaded = 0;
-#define TOPOL_INTERNAL_LEVEL_COUNT (55)
-#define INTERNAL_MAX_NAME_LENGTH (30)
-char InternalLevelNames[(INTERNAL_MAX_NAME_LENGTH + 2) * TOPOL_INTERNAL_LEVEL_COUNT + 6];
-
+constexpr int INTERNAL_MAX_NAME_LENGTH = 30;
+char InternalLevelNames[(INTERNAL_MAX_NAME_LENGTH + 2) * INTERNAL_LEVEL_COUNT + 6];
 static char FgetsBuffer[110];
 
-static int read_encrypted(void* buffer, int length, FILE* h) {
+static bool read_encrypted(void* buffer, int length, FILE* h) {
     if (fread(buffer, 1, length, h) != length) {
-        return 0;
+        return false;
     }
     unsigned char* pc = (unsigned char*)buffer;
-    short a = 21, b = 9783, c = 3389;
-
+    short a = 21;
+    short b = 9783;
+    short c = 3389;
     for (int i = 0; i < length; i++) {
         pc[i] ^= a;
         a %= c;
         b += a * c;
         a = 31 * b + c;
     }
-    return 1;
+    return true;
 }
 
-static int write_encrypted(void* buffer, int length, FILE* h) {
+static bool write_encrypted(void* buffer, int length, FILE* h) {
     unsigned char* pc = (unsigned char*)buffer;
-    short a = 21, b = 9783, c = 3389;
-
+    short a = 21;
+    short b = 9783;
+    short c = 3389;
     for (int i = 0; i < length; i++) {
         pc[i] ^= a;
         a %= c;
@@ -79,29 +68,30 @@ static int write_encrypted(void* buffer, int length, FILE* h) {
         a = 31 * b + c;
     }
     if (fwrite(buffer, 1, length, h) != length) {
-        return 0;
+        return false;
     }
-    a = 21, b = 9783, c = 3389;
-
+    a = 21;
+    b = 9783;
+    c = 3389;
     for (int i = 0; i < length; i++) {
         pc[i] ^= a;
         a %= c;
         b += a * c;
         a = 31 * b + c;
     }
-    return 1;
+    return true;
 }
 
 const char* get_internal_level_name(int index) {
+    static bool DescListLoaded = false;
     if (!DescListLoaded) {
         // Initialize on first call from desclist.txt
-        DescListLoaded = 1;
+        DescListLoaded = true;
         FILE* h = qopen("desclist.txt", "r");
         if (!h) {
             internal_error("desclist.txt missing from resource file!");
         }
-
-        for (int i = 0; i < TOPOL_INTERNAL_LEVEL_COUNT; i++) {
+        for (int i = 0; i < INTERNAL_LEVEL_COUNT; i++) {
             // Each row contains the level name in plaintext
             if (!fgets(FgetsBuffer, 100, h)) {
                 internal_error("Failed to read desclist.txt");
@@ -117,10 +107,9 @@ const char* get_internal_level_name(int index) {
             }
             strcpy(&InternalLevelNames[i * (INTERNAL_MAX_NAME_LENGTH + 2)], FgetsBuffer);
         }
-
         qclose(h);
     }
-    if (index < 0 || index >= TOPOL_INTERNAL_LEVEL_COUNT) {
+    if (index < 0 || index >= INTERNAL_LEVEL_COUNT) {
         internal_error("get_internal_level_name index out of bounds");
     }
     // Hardcoded Animal Fram fix
@@ -130,58 +119,56 @@ const char* get_internal_level_name(int index) {
     return &InternalLevelNames[index * (INTERNAL_MAX_NAME_LENGTH + 2)];
 }
 
-level::level(void) {
+level::level() {
     level_id = 0;
-    lgr_not_found = 0;
-    objects_flipped = 0;
-    topology_errors = 0;
-    locked = 0;
+    lgr_not_found = false;
+    objects_flipped = false;
+    topology_errors = false;
+    locked = false;
     topten_file_offset = 0;
-
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        polygons[i] = NULL;
+        polygons[i] = nullptr;
     }
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        objects[i] = NULL;
+        objects[i] = nullptr;
     }
     for (int i = 0; i < MAX_SPRITES; i++) {
-        sprites[i] = NULL;
+        sprites[i] = nullptr;
     }
-
     memset(&toptens, 0, sizeof(toptens));
 
     polygons[0] = new polygon;
-    objects[0] = new object(-2, 0.5, object::Type::Exit);
-    objects[1] = new object(2, 0.5, object::Type::Start);
+    objects[0] = new object(-2.0, 0.5, object::Type::Exit);
+    objects[1] = new object(2.0, 0.5, object::Type::Start);
     strcpy(level_name, "Unnamed");
     strcpy(lgr_name, "DEFAULT");
     strcpy(foreground_name, "ground");
     strcpy(background_name, "sky");
 }
 
-level::~level(void) {
+level::~level() {
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (polygons[i]) {
             delete polygons[i];
         }
-        polygons[i] = NULL;
+        polygons[i] = nullptr;
     }
     for (int i = 0; i < MAX_OBJECTS; i++) {
         if (objects[i]) {
             delete objects[i];
         }
-        objects[i] = NULL;
+        objects[i] = nullptr;
     }
     for (int i = 0; i < MAX_SPRITES; i++) {
         if (sprites[i]) {
             delete sprites[i];
         }
-        sprites[i] = NULL;
+        sprites[i] = nullptr;
     }
 }
 
-int level::discard_missing_lgr_assets(lgrfile* lgr) {
-    int sprites_deleted = 0;
+bool level::discard_missing_lgr_assets(lgrfile* lgr) {
+    bool sprites_deleted = false;
     for (int i = 0; i < MAX_SPRITES; i++) {
         if (sprites[i]) {
             sprite* spr = sprites[i];
@@ -199,28 +186,24 @@ int level::discard_missing_lgr_assets(lgrfile* lgr) {
                 if (index < 0) {
                     spr->picture_name[0] = 0;
                     delete sprites[i];
-                    sprites[i] = NULL;
-                    sprites_deleted = 1;
+                    sprites[i] = nullptr;
+                    sprites_deleted = true;
                     continue;
                 }
 
-                spr->wireframe_width = lgr->kepek[index].xsize;
-                spr->wireframe_height = lgr->kepek[index].ysize;
-                spr->wireframe_width *= PixelsToMeters;
-                spr->wireframe_height *= PixelsToMeters;
+                spr->wireframe_width = lgr->kepek[index].xsize * PixelsToMeters;
+                spr->wireframe_height = lgr->kepek[index].ysize * PixelsToMeters;
             } else {
                 if (spr->mask_name[0]) {
                     int index = lgr->getmaszkindex(spr->mask_name);
                     if (index < 0) {
                         spr->mask_name[0] = 0;
                         delete sprites[i];
-                        sprites[i] = NULL;
-                        sprites_deleted = 1;
+                        sprites[i] = nullptr;
+                        sprites_deleted = true;
                     } else {
-                        spr->wireframe_width = lgr->maszkok[index].xsize;
-                        spr->wireframe_height = lgr->maszkok[index].ysize;
-                        spr->wireframe_width *= PixelsToMeters;
-                        spr->wireframe_height *= PixelsToMeters;
+                        spr->wireframe_width = lgr->maszkok[index].xsize * PixelsToMeters;
+                        spr->wireframe_height = lgr->maszkok[index].ysize * PixelsToMeters;
                     }
                 }
 
@@ -229,22 +212,22 @@ int level::discard_missing_lgr_assets(lgrfile* lgr) {
                     if (index < 0) {
                         spr->texture_name[0] = 0;
                         delete sprites[i];
-                        sprites[i] = NULL;
-                        sprites_deleted = 1;
+                        sprites[i] = nullptr;
+                        sprites_deleted = true;
                     }
                 }
             }
         }
     }
 
-    int sprites_shifted = 1;
+    bool sprites_shifted = true;
     while (sprites_shifted) {
-        sprites_shifted = 0;
+        sprites_shifted = false;
         for (int i = 0; i < MAX_SPRITES - 1; i++) {
             if (!sprites[i] && sprites[i + 1]) {
                 sprites[i] = sprites[i + 1];
-                sprites[i + 1] = NULL;
-                sprites_shifted = 1;
+                sprites[i + 1] = nullptr;
+                sprites_shifted = true;
             }
         }
     }
@@ -293,9 +276,8 @@ polygon* level::get_closest_vertex(double x, double y, int* vertex_index, double
     if (distance) {
         *distance = 1000000000.0;
     }
-
     double closest_distance = 1000000.0;
-    polygon* poly = NULL;
+    polygon* poly = nullptr;
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (!polygons[i]) {
             continue;
@@ -325,7 +307,7 @@ polygon* level::get_closest_vertex(double x, double y, int* vertex_index, double
 
     if (closest_distance > max_grab_distance()) {
         *vertex_index = 0;
-        return NULL;
+        return nullptr;
     }
 
     if (distance) {
@@ -339,9 +321,8 @@ object* level::get_closest_object(double x, double y, double* distance) {
     if (distance) {
         *distance = 1000000000.0;
     }
-
     double closest_distance = 1000000.0;
-    object* obj = NULL;
+    object* obj = nullptr;
     vect2 r(x, y);
     for (int i = 0; i < MAX_OBJECTS; i++) {
         if (objects[i]) {
@@ -354,7 +335,7 @@ object* level::get_closest_object(double x, double y, double* distance) {
     }
 
     if (closest_distance > max_grab_distance()) {
-        return NULL;
+        return nullptr;
     }
 
     if (distance) {
@@ -368,9 +349,8 @@ sprite* level::get_closest_sprite(double x, double y, double* distance) {
     if (distance) {
         *distance = 1000000000.0;
     }
-
     double closest_distance = 1000000.0;
-    sprite* spr = NULL;
+    sprite* spr = nullptr;
     vect2 r(x, y);
     for (int i = 0; i < MAX_SPRITES; i++) {
         // Skip all sprites if they aren't rendered in editor
@@ -390,7 +370,7 @@ sprite* level::get_closest_sprite(double x, double y, double* distance) {
     }
 
     if (closest_distance > max_grab_distance()) {
-        return NULL;
+        return nullptr;
     }
 
     if (distance) {
@@ -400,7 +380,7 @@ sprite* level::get_closest_sprite(double x, double y, double* distance) {
     return spr;
 }
 
-void level::render(void) {
+void level::render() {
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (polygons[i]) {
             if (polygons[i]->is_grass) {
@@ -430,7 +410,7 @@ void level::render(void) {
     }
 }
 
-int level::is_sky(polygon* poly, vect2* point) {
+bool level::is_sky(polygon* poly, vect2* point) {
     if ((poly && point) || (!poly && !point)) {
         internal_error("level::is_sky only one parameter may be used!");
     }
@@ -453,11 +433,7 @@ int level::is_sky(polygon* poly, vect2* point) {
     }
 
     // Based on even/odd number of intersections we can tell if it is ground or sky
-    if (intersections % 2) {
-        return 1;
-    } else {
-        return 0;
-    }
+    return intersections % 2;
 }
 
 int get_internal_index(const char* filename) {
@@ -508,13 +484,12 @@ void load_best_time(const char* filename, int single) {
     }
     // Get the topten table
     int internal_index = get_internal_index(filename);
-    topten_set* tten_set = NULL;
+    topten_set* tten_set = nullptr;
     if (internal_index > 0) {
         internal_index--; // Zero-indexed
         if (internal_index >= INTERNAL_LEVEL_COUNT) {
             internal_error("load_best_time internal_index out of range!");
         }
-
         tten_set = &State->toptens[internal_index];
     } else {
         if (!Ptop) {
@@ -523,7 +498,7 @@ void load_best_time(const char* filename, int single) {
         }
         tten_set = &Ptop->toptens;
     }
-    topten* tten = NULL;
+    topten* tten = nullptr;
     if (single) {
         tten = &tten_set->single;
     } else {
@@ -538,22 +513,21 @@ void load_best_time(const char* filename, int single) {
     }
 }
 
-static char* InternalLevelLgrs[110] = {NULL, NULL}; // 1-indexed
-
+static char* InternalLevelLgrs[110] = {nullptr, nullptr}; // 1-indexed
 static char StrlwrBuffer[50] = "";
 
-static void load_internal_lgr_filenames(void) {
+static void load_internal_lgr_filenames() {
     // Create the list of null pointers
     if (INTERNAL_LEVEL_COUNT > 105) {
         internal_error("load_internal_lgr_filenames too many internal levels!");
     }
 
     for (int i = 0; i < 110; i++) {
-        InternalLevelLgrs[i] = NULL;
+        InternalLevelLgrs[i] = nullptr;
     }
 
     // Create a text buffer with default value of "default".lgr
-    static char* internal_lgrs_data = NULL;
+    static char* internal_lgrs_data = nullptr;
     internal_lgrs_data = new char[10 * (INTERNAL_LEVEL_COUNT + 2)];
     if (!internal_lgrs_data) {
         internal_error("load_internal_lgr_filenames out of memory!");
@@ -570,7 +544,7 @@ static void load_internal_lgr_filenames(void) {
         return;
     }
 
-    while (1) {
+    while (true) {
         // Read each row from lgrlist.txt
         if (!fgets(FgetsBuffer, 40, h)) {
             break;
@@ -594,7 +568,7 @@ static void load_internal_lgr_filenames(void) {
 
         *strstr(StrlwrBuffer, ".lgr") = 0;
         char* lgr_filename = StrlwrBuffer;
-        while ((*lgr_filename == ' ') || (*lgr_filename == 9)) {
+        while ((*lgr_filename == ' ') || (*lgr_filename == '\t')) {
             lgr_filename++;
         }
 
@@ -642,25 +616,23 @@ level::level(const char* filename) {
 }
 
 void level::load_external(const char* filename) {
-    lgr_not_found = 0;
-    objects_flipped = 0;
-    topology_errors = 0;
-    locked = 0;
-
+    lgr_not_found = false;
+    objects_flipped = false;
+    topology_errors = false;
+    locked = false;
     topten_file_offset = 0;
     memset(&toptens, 0, sizeof(toptens));
-
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        polygons[i] = NULL;
+        polygons[i] = nullptr;
     }
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        objects[i] = NULL;
+        objects[i] = nullptr;
     }
     for (int i = 0; i < MAX_SPRITES; i++) {
-        sprites[i] = NULL;
+        sprites[i] = nullptr;
     }
 
-    FILE* h = NULL;
+    FILE* h = nullptr;
     char path[40];
     sprintf(path, "lev/%s", filename);
     h = fopen(path, "rb");
@@ -670,10 +642,10 @@ void level::load_external(const char* filename) {
 
     char tmp[10] = "AAAAA";
     if (fread(tmp, 1, 5, h) != 5) {
-        internal_error("Error reading level file!");
+        internal_error("Error reading level file!", filename);
     }
     if (strncmp(tmp, "POT", 3) != 0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
 
     level_id = 0;
@@ -691,59 +663,57 @@ void level::load_external(const char* filename) {
     int level_id_checksum;
     if (version >= 13) {
         if (fread(&level_id_checksum, 1, 2, h) != 2) {
-            internal_error("Error reading level file!");
+            internal_error("Error reading level file!", filename);
         }
     }
 
-    if (fread(&level_id, 1, 4, h) != 4) {
-        internal_error("Error reading level file!");
+    if (fread(&level_id, 1, sizeof(level_id), h) != 4) {
+        internal_error("Error reading level file!", filename);
     }
 
-    if (fread(&integrity_checksum, 1, sizeof(integrity_checksum), h) != sizeof(double)) {
-        internal_error("Corrupt .LEV file!");
+    if (fread(&integrity_checksum, 1, sizeof(integrity_checksum), h) != 8) {
+        internal_error("Corrupt .LEV file!", filename);
     }
 
     double integrity_shareware;
-    if (fread(&integrity_shareware, 1, sizeof(integrity_shareware), h) !=
-        sizeof(integrity_shareware)) {
-        internal_error("Error reading level file!");
+    if (fread(&integrity_shareware, 1, sizeof(integrity_shareware), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
     if (integrity_shareware + integrity_checksum < 9786.0 ||
         integrity_shareware + integrity_checksum > 36546.0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
 
     // Levels that can only be played in Registered would meet the condition:
     // integrity_shareware + integrity_checksum <= 20000.0
 
     double integrity_topology_errors;
-    if (fread(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h) !=
-        sizeof(integrity_topology_errors)) {
-        internal_error("Error reading level file!");
+    if (fread(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
     if (integrity_topology_errors + integrity_checksum < 9786.0 ||
         integrity_topology_errors + integrity_checksum > 36546.0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
     if (integrity_topology_errors + integrity_checksum > 20000.0) {
-        topology_errors = 1;
+        topology_errors = true;
     }
 
     double integrity_locked;
-    if (fread(&integrity_locked, 1, sizeof(integrity_locked), h) != sizeof(integrity_locked)) {
-        internal_error("Error reading level file!");
+    if (fread(&integrity_locked, 1, sizeof(integrity_locked), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
     if (integrity_locked + integrity_checksum < 9875.0 ||
         integrity_locked + integrity_checksum > 32345.0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
     if (integrity_locked + integrity_checksum > 20000.0) {
-        locked = 1;
+        locked = true;
     }
 
     int level_name_length = LEVEL_NAME_LENGTH;
     if (version < 14) {
-        level_name_length = 14;
+        level_name_length = LEVEL_NAME_LENGTH_OLD;
     }
     fread(level_name, 1, level_name_length + 1, h);
     level_name[level_name_length] = 0;
@@ -770,17 +740,16 @@ void level::load_external(const char* filename) {
     }
 
     double encrypted_polygon_count = 0;
-    if (fread(&encrypted_polygon_count, 1, sizeof(encrypted_polygon_count), h) !=
-        sizeof(encrypted_polygon_count)) {
-        internal_error("Error reading level file!");
+    if (fread(&encrypted_polygon_count, 1, sizeof(encrypted_polygon_count), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
 
     int polygon_count = (int)(encrypted_polygon_count);
     if (polygon_count > MAX_POLYGONS) {
-        internal_error("Too many polygons in level file!");
+        internal_error("Too many polygons in level file!", filename);
     }
     if (polygon_count <= 0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
 
     for (int i = 0; i < polygon_count; i++) {
@@ -788,17 +757,16 @@ void level::load_external(const char* filename) {
     }
 
     double encrypted_object_count = 0;
-    if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) !=
-        sizeof(encrypted_object_count)) {
-        internal_error("Error reading level file!");
+    if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
 
     int object_count = (int)(encrypted_object_count);
     if (object_count > MAX_OBJECTS) {
-        internal_error("Too many objects in level file!");
+        internal_error("Too many objects in level file!", filename);
     }
     if (object_count <= 0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
 
     for (int i = 0; i < object_count; i++) {
@@ -807,17 +775,16 @@ void level::load_external(const char* filename) {
 
     if (version > 6) {
         double encrypted_sprite_count = 0;
-        if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) !=
-            sizeof(encrypted_sprite_count)) {
-            internal_error("Error reading level file!");
+        if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) != 8) {
+            internal_error("Error reading level file!", filename);
         }
 
         int sprite_count = (int)(encrypted_sprite_count);
         if (sprite_count > MAX_SPRITES) {
-            internal_error("Too many pictures in level file!");
+            internal_error("Too many pictures in level file!", filename);
         }
         if (sprite_count < 0) {
-            internal_error("Corrupt .LEV file!");
+            internal_error("Corrupt .LEV file!", filename);
         }
 
         if (version < 8 && sprite_count > 0) {
@@ -837,9 +804,10 @@ void level::load_external(const char* filename) {
     }
 
     int magic_number = 0;
-    if (fread(&magic_number, 1, 4, h) != 4 || magic_number != TOP_TEN_HEADER) {
+    if (fread(&magic_number, 1, sizeof(magic_number), h) != 4 || magic_number != TOP_TEN_HEADER) {
     } else {
-        if (!read_encrypted(&toptens, sizeof(toptens), h) || fread(&magic_number, 1, 4, h) != 4 ||
+        if (!read_encrypted(&toptens, sizeof(toptens), h) ||
+            fread(&magic_number, 1, sizeof(magic_number), h) != 4 ||
             magic_number != TOP_TEN_FOOTER) {
             memset(&toptens, 0, sizeof(toptens));
         }
@@ -849,30 +817,30 @@ void level::load_external(const char* filename) {
     // Verify checksum
     double calculated_checksum = checksum(version > 6);
     if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
-        external_error("Corrupt .LEV file!: ", filename);
+        external_error("Corrupt .LEV file!", filename);
     }
 }
 
 void level::load_internal(const char* filename) {
-    lgr_not_found = 0;
-    objects_flipped = 0;
-    topology_errors = 0;
-    locked = 0;
+    lgr_not_found = false;
+    objects_flipped = false;
+    topology_errors = false;
+    locked = false;
 
     topten_file_offset = 0;
     memset(&toptens, 0, sizeof(toptens));
 
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        polygons[i] = NULL;
+        polygons[i] = nullptr;
     }
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        objects[i] = NULL;
+        objects[i] = nullptr;
     }
     for (int i = 0; i < MAX_SPRITES; i++) {
-        sprites[i] = NULL;
+        sprites[i] = nullptr;
     }
 
-    FILE* h = NULL;
+    FILE* h = nullptr;
     h = qopen(filename, "rb");
     if (!h) {
         internal_error("Failed to open level file: ", filename);
@@ -880,10 +848,10 @@ void level::load_internal(const char* filename) {
 
     char tmp[10] = "AAAAA";
     if (fread(tmp, 1, 5, h) != 5) {
-        internal_error("Error reading level file!");
+        internal_error("Error reading level file!", filename);
     }
     if (strncmp(tmp, "@@^!@", 3) != 0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
 
     level_id = 0;
@@ -901,56 +869,54 @@ void level::load_internal(const char* filename) {
     int level_id_checksum;
     if (version >= 13) {
         if (fread(&level_id_checksum, 1, 2, h) != 2) {
-            internal_error("Error reading level file!");
+            internal_error("Error reading level file!", filename);
         }
     }
 
-    if (fread(&level_id, 1, 4, h) != 4) {
-        internal_error("Error reading level file!");
+    if (fread(&level_id, 1, sizeof(level_id), h) != 4) {
+        internal_error("Error reading level file!", filename);
     }
 
-    if (fread(&integrity_checksum, 1, sizeof(integrity_checksum), h) != sizeof(double)) {
-        internal_error("Corrupt .LEV file!");
+    if (fread(&integrity_checksum, 1, sizeof(integrity_checksum), h) != 8) {
+        internal_error("Corrupt .LEV file!", filename);
     }
 
     double integrity_shareware;
-    if (fread(&integrity_shareware, 1, sizeof(integrity_shareware), h) !=
-        sizeof(integrity_shareware)) {
-        internal_error("Error reading level file!");
+    if (fread(&integrity_shareware, 1, sizeof(integrity_shareware), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
     if (integrity_shareware + integrity_checksum < 9786.0 ||
         integrity_shareware + integrity_checksum > 36546.0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
 
     double integrity_topology_errors;
-    if (fread(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h) !=
-        sizeof(integrity_topology_errors)) {
-        internal_error("Error reading level file!");
+    if (fread(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
     if (integrity_topology_errors + integrity_checksum < 9786.0 ||
         integrity_topology_errors + integrity_checksum > 36546.0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
     if (integrity_topology_errors + integrity_checksum > 20000.0) {
-        topology_errors = 1;
+        topology_errors = true;
     }
 
     double integrity_locked;
-    if (fread(&integrity_locked, 1, sizeof(integrity_locked), h) != sizeof(integrity_locked)) {
-        internal_error("Error reading level file!");
+    if (fread(&integrity_locked, 1, sizeof(integrity_locked), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
     if (integrity_locked + integrity_checksum < 9875.0 ||
         integrity_locked + integrity_checksum > 32345.0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
     if (integrity_locked + integrity_checksum > 20000.0) {
-        locked = 1;
+        locked = true;
     }
 
     int level_name_length = LEVEL_NAME_LENGTH;
     if (version < 14) {
-        level_name_length = 14;
+        level_name_length = LEVEL_NAME_LENGTH_OLD;
     }
     fread(level_name, 1, level_name_length + 1, h);
     level_name[level_name_length] = 0;
@@ -976,28 +942,26 @@ void level::load_internal(const char* filename) {
         qseek(h, 100, SEEK_SET);
     }
     double encrypted_polygon_count = 0;
-    if (fread(&encrypted_polygon_count, 1, sizeof(encrypted_polygon_count), h) !=
-        sizeof(encrypted_polygon_count)) {
-        internal_error("Error reading level file!");
+    if (fread(&encrypted_polygon_count, 1, sizeof(encrypted_polygon_count), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
 
     int polygon_count = (int)(encrypted_polygon_count);
     if (polygon_count > MAX_POLYGONS) {
-        internal_error("Too many polygons in level file!");
+        internal_error("Too many polygons in level file!", filename);
     }
     if (polygon_count <= 0) {
-        internal_error("Corrupt .LEV file!");
+        internal_error("Corrupt .LEV file!", filename);
     }
 
     double encrypted_object_count = 0;
-    if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) !=
-        sizeof(encrypted_object_count)) {
-        internal_error("Error reading level file!");
+    if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) != 8) {
+        internal_error("Error reading level file!", filename);
     }
 
     int object_count = (int)(encrypted_object_count);
     if (object_count > MAX_OBJECTS) {
-        internal_error("Too many objects in level file!");
+        internal_error("Too many objects in level file!", filename);
     }
     if (object_count <= 0) {
         internal_error("Corrupt .LEV file!");
@@ -1013,17 +977,16 @@ void level::load_internal(const char* filename) {
 
     if (version > 6) {
         double encrypted_sprite_count = 0;
-        if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) !=
-            sizeof(encrypted_sprite_count)) {
-            internal_error("Error reading level file!");
+        if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) != 8) {
+            internal_error("Error reading level file!", filename);
         }
 
         int sprite_count = (int)(encrypted_sprite_count);
         if (sprite_count > MAX_SPRITES) {
-            internal_error("Too many pictures in level file!");
+            internal_error("Too many pictures in level file!", filename);
         }
         if (sprite_count < 0) {
-            internal_error("Corrupt .LEV file!");
+            internal_error("Corrupt .LEV file!", filename);
         }
 
         if (version < 8 && sprite_count > 0) {
@@ -1039,16 +1002,16 @@ void level::load_internal(const char* filename) {
 
     double calculated_checksum = checksum(version > 6);
     if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
-        external_error("Corrupt .LEV file!: ", filename);
+        external_error("Corrupt .LEV file!", filename);
     }
 }
 
 // Generate random level ID.
 // Upper 16 bits are random.
 // Lower 16 bits are a hashed checksum.
-static long generate_level_id(double checksum) {
+static int generate_level_id(double checksum) {
     srand(clock());
-    unsigned long random = random_range(6542);
+    unsigned int random = random_range(6542);
     random *= random_range(7042);
     random += random_range(4542);
     random *= random_range(3042);
@@ -1057,13 +1020,13 @@ static long generate_level_id(double checksum) {
 
     checksum = sin(checksum);
     checksum *= (checksum + 1.0001) * 40000;
-    unsigned long level_id_checksum = checksum;
+    unsigned int level_id_checksum = (unsigned int)(checksum);
 
-    unsigned long level_id = (level_id_checksum & 0x0000ffff) | (random & 0xffff0000);
+    unsigned int level_id = (level_id_checksum & 0x0000ffff) | (random & 0xffff0000);
     return level_id;
 }
 
-void level::save(const char* filename, int skip_topology) {
+void level::save(const char* filename, bool skip_topology) {
     memset(&toptens, 0, sizeof(toptens));
 
     Volttopsave = 1;
@@ -1071,7 +1034,7 @@ void level::save(const char* filename, int skip_topology) {
         internal_error("level::save objects_flipped!");
     }
     if (skip_topology) {
-        topology_errors = 0;
+        topology_errors = false;
     } else {
         topology_errors = check_topology(0);
         if (topology_errors && locked) {
@@ -1250,7 +1213,7 @@ void level::save_topten(const char* filename) {
 }
 
 void level::get_boundaries(double* x1, double* y1, double* x2, double* y2,
-                           int check_objects_and_sprites) {
+                           bool check_objects_and_sprites) {
     *x1 = 100000000000.0;
     *y1 = 100000000000.0;
     *x2 = -100000000000.0;
@@ -1316,6 +1279,7 @@ double level::checksum(int check_sprites) {
         }
     }
 
+    constexpr double CHECKSUM_MULTIPLIER = 3247.764325643;
     return CHECKSUM_MULTIPLIER * sum;
 }
 
@@ -1323,7 +1287,7 @@ vect2 BikeStartOffset;
 
 int level::initialize_objects(motorst* mot) {
     int apple_count = 0;
-    int start_found = 0;
+    bool start_found = false;
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Ptop->objects[i];
         if (obj) {
@@ -1339,7 +1303,7 @@ int level::initialize_objects(motorst* mot) {
                 if (start_found) {
                     internal_error("Level can only have one Start object!");
                 }
-                start_found = 1;
+                start_found = true;
                 // Hide start object. Store the bike position to respawn in flag tag mode
                 obj->active = false;
                 BikeStartOffset = obj->r - mot->left_wheel.r;
@@ -1359,7 +1323,7 @@ int level::initialize_objects(motorst* mot) {
 }
 
 // sort: Killer, Apple, Exit, Start
-void level::sort_objects(void) {
+void level::sort_objects() {
     int count = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Ptop->objects[i];
@@ -1431,12 +1395,11 @@ object* level::get_object(int index) {
     return obj;
 }
 
-void level::flip_objects(void) {
+void level::flip_objects() {
     if (objects_flipped) {
         return;
     }
-
-    objects_flipped = 1;
+    objects_flipped = true;
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Ptop->objects[i];
         if (obj) {
@@ -1445,12 +1408,12 @@ void level::flip_objects(void) {
     }
 }
 
-void level::unflip_objects(void) {
+void level::unflip_objects() {
     if (!objects_flipped) {
         return;
     }
 
-    objects_flipped = 0;
+    objects_flipped = false;
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Ptop->objects[i];
         if (obj) {

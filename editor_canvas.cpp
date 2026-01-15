@@ -74,7 +74,7 @@ void zoom(vect2 center, double width) {
     // Disallow zooming too far away from the level.
     // Nudge the view back towards the center if needed
     double x1, y1, x2, y2;
-    Ptop->get_boundaries(&x1, &y1, &x2, &y2, 1);
+    Ptop->get_boundaries(&x1, &y1, &x2, &y2, true);
     double dx = 0.0;
     double dy = 0.0;
     if (CanvasTopLeft.x < x2 - ZOOM_OUT_LIMIT) {
@@ -137,7 +137,7 @@ void zoom_in(int x1, int y1, int x2, int y2) {
 
 void zoom_fill() {
     double x1, y1, x2, y2;
-    Ptop->get_boundaries(&x1, &y1, &x2, &y2, 1);
+    Ptop->get_boundaries(&x1, &y1, &x2, &y2, true);
     double x_center = (x1 + x2) * 0.5;
     double x_edge = (x2 - x1) * 0.5 * 1.05;
     double y_center = (y1 + y2) * 0.5;

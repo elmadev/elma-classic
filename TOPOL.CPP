@@ -515,28 +515,12 @@ void load_best_time(const char* filename, int single) {
     }
 }
 
-static char* InternalLevelLgrs[110] = {nullptr, nullptr}; // 1-indexed
+static char InternalLevelLgrs[INTERNAL_LEVEL_COUNT + 1][10]; // 1-indexed
 static char StrlwrBuffer[50] = "";
 
 static void load_internal_lgr_filenames() {
-    // Create the list of null pointers
-    if (INTERNAL_LEVEL_COUNT > 105) {
-        internal_error("load_internal_lgr_filenames too many internal levels!");
-    }
-
-    for (int i = 0; i < 110; i++) {
-        InternalLevelLgrs[i] = nullptr;
-    }
-
-    // Create a text buffer with default value of "default".lgr
-    static char* internal_lgrs_data = nullptr;
-    internal_lgrs_data = new char[10 * (INTERNAL_LEVEL_COUNT + 2)];
-    if (!internal_lgrs_data) {
-        internal_error("load_internal_lgr_filenames out of memory!");
-    }
-
+    // Initialize all levels with lgr name "default".lgr
     for (int i = 1; i <= INTERNAL_LEVEL_COUNT; i++) {
-        InternalLevelLgrs[i] = &internal_lgrs_data[10 * (i - 1)];
         strcpy(InternalLevelLgrs[i], "default");
     }
 
@@ -586,7 +570,9 @@ static void load_internal_lgr_filenames() {
 }
 
 level::level(const char* filename) {
-    if (!InternalLevelLgrs[1]) {
+    static bool InternalLgrNamesLoaded = false;
+    if (!InternalLgrNamesLoaded) {
+        InternalLgrNamesLoaded = true;
         load_internal_lgr_filenames();
     }
 

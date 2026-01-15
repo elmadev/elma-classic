@@ -19,19 +19,19 @@
 #include <ctime>
 #include <cstring>
 
-#define IDOEGYEDISZAM1 (6754362)
-#define IDOEGYEDISZAM2 (8674642)
+#define TOP_TEN_HEADER (6754362)
+#define TOP_TEN_FOOTER (8674642)
 
 // Ertekeik kommentkent kint is vannak:
 
-#define BELYEGSZORZO (3247.764325643)
+#define CHECKSUM_MULTIPLIER (3247.764325643)
 
 // Ha define-olva van, save belso lev formatumban, .leb kiterjesztessel
 // ment mintha shareware lenne, plusz hakellmentbelleveket fuggveny
 // osszes levelt igy ki is menti:
 // #define BELSOTIR
 
-static char Levelnevek[STATE_LEVEL_COUNT + 2][14] = {
+static char InternalFilePaths[STATE_LEVEL_COUNT + 2][14] = {
     "nulla.leb",    "a01.leb",    "a02.leb",      "a03.leb",   "a04.leb",     "a05.leb",
     "a06.leb",      "a07.leb",    "ujtag.leb",    "a08.leb",   "a09.leb",     "ujgrav.leb",
     "a10.leb",
@@ -52,24 +52,24 @@ static char Levelnevek[STATE_LEVEL_COUNT + 2][14] = {
     "a41.leb",      "ujhook.leb", "a42.leb",      "visit.leb", "a04.leb",     "a05.leb",
     "a06.leb",      "a07.leb",    "a08.leb",      "a09.leb",   "a10.leb"};
 
-int Leveldescinited = 0;
-#define MAXBEEPLEVELSZAM (55)
-#define DESCNEVHOSSZ (30)
-char Leveldescek[(DESCNEVHOSSZ + 2) * MAXBEEPLEVELSZAM + 6];
+int DescListLoaded = 0;
+#define TOPOL_INTERNAL_LEVEL_COUNT (55)
+#define INTERNAL_MAX_NAME_LENGTH (30)
+char InternalLevelNames[(INTERNAL_MAX_NAME_LENGTH + 2) * TOPOL_INTERNAL_LEVEL_COUNT + 6];
 
-static char Sor[110];
+static char FgetsBuffer[110];
 
 // Van ugyanilyen neven state.cpp-ben is ket fv.:
 
 // Sikerest adja vissza:
-static int titkosread(void* mut, int hossz, FILE* h) {
-    if (fread(mut, 1, hossz, h) != hossz) {
+static int read_encrypted(void* buffer, int length, FILE* h) {
+    if (fread(buffer, 1, length, h) != length) {
         return 0;
     }
-    unsigned char* pc = (unsigned char*)mut;
+    unsigned char* pc = (unsigned char*)buffer;
     short a = 21, b = 9783, c = 3389;
 
-    for (int i = 0; i < hossz; i++) {
+    for (int i = 0; i < length; i++) {
         pc[i] ^= a;
         a %= c;
         b += a * c;
@@ -79,22 +79,22 @@ static int titkosread(void* mut, int hossz, FILE* h) {
 }
 
 // Sikerest adja vissza:
-static int titkoswrite(void* mut, int hossz, FILE* h) {
-    unsigned char* pc = (unsigned char*)mut;
+static int write_encrypted(void* buffer, int length, FILE* h) {
+    unsigned char* pc = (unsigned char*)buffer;
     short a = 21, b = 9783, c = 3389;
 
-    for (int i = 0; i < hossz; i++) {
+    for (int i = 0; i < length; i++) {
         pc[i] ^= a;
         a %= c;
         b += a * c;
         a = 31 * b + c;
     }
-    if (fwrite(mut, 1, hossz, h) != hossz) {
+    if (fwrite(buffer, 1, length, h) != length) {
         return 0;
     }
     a = 21, b = 9783, c = 3389;
 
-    for (int i = 0; i < hossz; i++) {
+    for (int i = 0; i < length; i++) {
         pc[i] ^= a;
         a %= c;
         b += a * c;
@@ -104,38 +104,38 @@ static int titkoswrite(void* mut, int hossz, FILE* h) {
 }
 
 const char* get_internal_level_name(int index) {
-    if (!Leveldescinited) {
-        Leveldescinited = 1;
+    if (!DescListLoaded) {
+        DescListLoaded = 1;
         FILE* h = qopen("desclist.txt", "r");
         if (!h) {
             internal_error("desclist.txt missing from resource file!");
         }
 
-        for (int i = 0; i < MAXBEEPLEVELSZAM; i++) {
-            if (!fgets(Sor, 100, h)) {
-                internal_error("7de2y7");
+        for (int i = 0; i < TOPOL_INTERNAL_LEVEL_COUNT; i++) {
+            if (!fgets(FgetsBuffer, 100, h)) {
+                internal_error("Failed to read desclist.txt");
             }
-            if (strchr(Sor, '\n')) {
-                *strchr(Sor, '\n') = 0;
+            if (strchr(FgetsBuffer, '\n')) {
+                *strchr(FgetsBuffer, '\n') = 0;
             }
-            if (strchr(Sor, '\r')) {
-                *strchr(Sor, '\r') = 0;
+            if (strchr(FgetsBuffer, '\r')) {
+                *strchr(FgetsBuffer, '\r') = 0;
             }
-            if (strlen(Sor) > DESCNEVHOSSZ) {
-                internal_error("tct86");
+            if (strlen(FgetsBuffer) > INTERNAL_MAX_NAME_LENGTH) {
+                internal_error("desclist.txt name is too long!");
             }
-            strcpy(&Leveldescek[i * (DESCNEVHOSSZ + 2)], Sor);
+            strcpy(&InternalLevelNames[i * (INTERNAL_MAX_NAME_LENGTH + 2)], FgetsBuffer);
         }
 
         qclose(h);
     }
-    if (index < 0 || index >= MAXBEEPLEVELSZAM) {
-        internal_error("8u9r5tg");
+    if (index < 0 || index >= TOPOL_INTERNAL_LEVEL_COUNT) {
+        internal_error("get_internal_level_name index out of bounds");
     }
     if (index == 30) { // Animal Farm
         return "Animal Farm";
     }
-    return &Leveldescek[index * (DESCNEVHOSSZ + 2)];
+    return &InternalLevelNames[index * (INTERNAL_MAX_NAME_LENGTH + 2)];
 }
 
 // TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL
@@ -237,57 +237,57 @@ int level::discard_missing_lgr_assets(lgrfile* lgr) {
     // kep, maszk, vagy textura nev:
 
     // Ezt lehetne hasznalni dialogushoz:
-    int volttorles = 0;
+    int sprites_deleted = 0;
     for (int i = 0; i < MAX_SPRITES; i++) {
         if (sprites[i]) {
-            sprite* psp = sprites[i];
+            sprite* spr = sprites[i];
             // Default meret:
-            psp->wireframe_width = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
-            psp->wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
+            spr->wireframe_width = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
+            spr->wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
 
-            if (psp->picture_name[0] && (psp->mask_name[0] || psp->texture_name[0])) {
-                internal_error("discard_missing_lgr_assets-ben sok nev egy spriteban!");
+            if (spr->picture_name[0] && (spr->mask_name[0] || spr->texture_name[0])) {
+                internal_error("discard_missing_lgr_assets invalid pic/mask/text combination!");
             }
-            if (psp->picture_name[0]) {
-                int index = lgr->getkepindex(psp->picture_name);
+            if (spr->picture_name[0]) {
+                int index = lgr->getkepindex(spr->picture_name);
                 if (index < 0) {
-                    psp->picture_name[0] = 0;
+                    spr->picture_name[0] = 0;
                     // Toroljuk:
                     delete sprites[i];
                     sprites[i] = NULL;
-                    volttorles = 1;
+                    sprites_deleted = 1;
                     continue;
                 }
                 // Megvan kep:
-                psp->wireframe_width = lgr->kepek[index].xsize;
-                psp->wireframe_height = lgr->kepek[index].ysize;
-                psp->wireframe_width *= PixelsToMeters;
-                psp->wireframe_height *= PixelsToMeters;
+                spr->wireframe_width = lgr->kepek[index].xsize;
+                spr->wireframe_height = lgr->kepek[index].ysize;
+                spr->wireframe_width *= PixelsToMeters;
+                spr->wireframe_height *= PixelsToMeters;
             } else {
                 // Nem kep sprite:
-                if (psp->mask_name[0]) {
-                    int index = lgr->getmaszkindex(psp->mask_name);
+                if (spr->mask_name[0]) {
+                    int index = lgr->getmaszkindex(spr->mask_name);
                     if (index < 0) {
-                        psp->mask_name[0] = 0;
+                        spr->mask_name[0] = 0;
                         // Toroljuk:
                         delete sprites[i];
                         sprites[i] = NULL;
-                        volttorles = 1;
+                        sprites_deleted = 1;
                     } else {
-                        psp->wireframe_width = lgr->maszkok[index].xsize;
-                        psp->wireframe_height = lgr->maszkok[index].ysize;
-                        psp->wireframe_width *= PixelsToMeters;
-                        psp->wireframe_height *= PixelsToMeters;
+                        spr->wireframe_width = lgr->maszkok[index].xsize;
+                        spr->wireframe_height = lgr->maszkok[index].ysize;
+                        spr->wireframe_width *= PixelsToMeters;
+                        spr->wireframe_height *= PixelsToMeters;
                     }
                 }
-                if (psp->texture_name[0]) {
-                    int index = lgr->gettexturaindex(psp->texture_name);
+                if (spr->texture_name[0]) {
+                    int index = lgr->gettexturaindex(spr->texture_name);
                     if (index < 0) {
-                        psp->texture_name[0] = 0;
+                        spr->texture_name[0] = 0;
                         // Toroljuk:
                         delete sprites[i];
                         sprites[i] = NULL;
-                        volttorles = 1;
+                        sprites_deleted = 1;
                     }
                 }
             }
@@ -295,15 +295,15 @@ int level::discard_missing_lgr_assets(lgrfile* lgr) {
     }
 
     // Most meg spritetomb elejere kompaktaljuk spriteokat:
-    int voltvaltozas = 1;
-    while (voltvaltozas) {
-        voltvaltozas = 0;
+    int sprites_shifted = 1;
+    while (sprites_shifted) {
+        sprites_shifted = 0;
         for (int i = 0; i < MAX_SPRITES - 1; i++) {
             if (!sprites[i] && sprites[i + 1]) {
                 // Kovetkezo mutatot ide hozzuk:
                 sprites[i] = sprites[i + 1];
                 sprites[i + 1] = NULL;
-                voltvaltozas = 1;
+                sprites_shifted = 1;
             }
         }
     }
@@ -320,7 +320,7 @@ int level::discard_missing_lgr_assets(lgrfile* lgr) {
     }
 
     if (Plgr->texturaszam < 2) {
-        internal_error("8u9yr");
+        internal_error("Lgr must have at least 2 textures!");
     }
 
     if (!Ptop->foreground_name[0]) {
@@ -338,7 +338,7 @@ int level::discard_missing_lgr_assets(lgrfile* lgr) {
             strcpy(Ptop->background_name, Plgr->texturak[1].nev);
         }
     }
-    return volttorles;
+    return sprites_deleted;
 }
 
 polygon* level::get_closest_vertex(double x, double y, int* vertex_index, double* distance,
@@ -347,8 +347,8 @@ polygon* level::get_closest_vertex(double x, double y, int* vertex_index, double
         *distance = 1000000000.0;
     }
 
-    double tav = 1000000.0;
-    polygon* pgy = NULL;
+    double closest_distance = 1000000.0;
+    polygon* poly = NULL;
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (!polygons[i]) {
             continue;
@@ -363,22 +363,22 @@ polygon* level::get_closest_vertex(double x, double y, int* vertex_index, double
             continue;
         }
 
-        int ujk;
-        double ujtav = polygons[i]->get_closest_vertex(x, y, &ujk);
-        if (ujtav < tav) {
-            tav = ujtav;
-            *vertex_index = ujk;
-            pgy = polygons[i];
+        int new_index;
+        double new_distance = polygons[i]->get_closest_vertex(x, y, &new_index);
+        if (new_distance < closest_distance) {
+            closest_distance = new_distance;
+            *vertex_index = new_index;
+            poly = polygons[i];
         }
     }
-    if (tav > max_grab_distance()) {
+    if (closest_distance > max_grab_distance()) {
         *vertex_index = 0;
         return NULL;
     }
     if (distance) {
-        *distance = tav;
+        *distance = closest_distance;
     }
-    return pgy;
+    return poly;
 }
 
 object* level::get_closest_object(double x, double y, double* distance) {
@@ -386,25 +386,25 @@ object* level::get_closest_object(double x, double y, double* distance) {
         *distance = 1000000000.0;
     }
 
-    double tav = 1000000.0;
-    object* pker = NULL;
+    double closest_distance = 1000000.0;
+    object* obj = NULL;
     vect2 r(x, y);
     for (int i = 0; i < MAX_OBJECTS; i++) {
         if (objects[i]) {
-            double ujtav = (objects[i]->r - r).length();
-            if (ujtav < tav) {
-                tav = ujtav;
-                pker = objects[i];
+            double new_distance = (objects[i]->r - r).length();
+            if (new_distance < closest_distance) {
+                closest_distance = new_distance;
+                obj = objects[i];
             }
         }
     }
-    if (tav > max_grab_distance()) {
+    if (closest_distance > max_grab_distance()) {
         return NULL;
     }
     if (distance) {
-        *distance = tav;
+        *distance = closest_distance;
     }
-    return pker;
+    return obj;
 }
 
 sprite* level::get_closest_sprite(double x, double y, double* distance) {
@@ -412,8 +412,8 @@ sprite* level::get_closest_sprite(double x, double y, double* distance) {
         *distance = 1000000000.0;
     }
 
-    double tav = 1000000.0;
-    sprite* psp = NULL;
+    double closest_distance = 1000000.0;
+    sprite* spr = NULL;
     vect2 r(x, y);
     for (int i = 0; i < MAX_SPRITES; i++) {
         if (!Rajzolkepek) {
@@ -423,19 +423,19 @@ sprite* level::get_closest_sprite(double x, double y, double* distance) {
             continue;
         }
 
-        double ujtav = (sprites[i]->r - r).length();
-        if (ujtav < tav) {
-            tav = ujtav;
-            psp = sprites[i];
+        double new_distance = (sprites[i]->r - r).length();
+        if (new_distance < closest_distance) {
+            closest_distance = new_distance;
+            spr = sprites[i];
         }
     }
-    if (tav > max_grab_distance()) {
+    if (closest_distance > max_grab_distance()) {
         return NULL;
     }
     if (distance) {
-        *distance = tav;
+        *distance = closest_distance;
     }
-    return psp;
+    return spr;
 }
 
 void level::render(void) {
@@ -471,7 +471,7 @@ void level::render(void) {
 // Igaz, ha bent van:
 int level::is_sky(polygon* poly, vect2* point) {
     if ((poly && point) || (!poly && !point)) {
-        internal_error("level::is_sky-ben paramok nem stimmelnek!");
+        internal_error("level::is_sky only one parameter may be used!");
     }
 
     vect2 r;
@@ -482,13 +482,13 @@ int level::is_sky(polygon* poly, vect2* point) {
     }
     vect2 v = vect2(27654.475374565578, 37850.5364775);
     // Vegigmegyunk az egeszen:
-    int metszes = 0;
+    int intersections = 0;
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (polygons[i] && !polygons[i]->is_grass && polygons[i] != poly) {
-            metszes += polygons[i]->count_intersections(r, v);
+            intersections += polygons[i]->count_intersections(r, v);
         }
     }
-    if (metszes % 2) {
+    if (intersections % 2) {
         return 1;
     } else {
         return 0;
@@ -501,16 +501,16 @@ int get_internal_index(const char* filename) {
         return 0;
     }
 
-    const char* fut = &filename[5];
+    const char* number_string = &filename[5];
     int sum = 0;
     for (int i = 0; i < 3; i++) {
         sum *= 10;
-        int add = *fut - '0';
+        int add = *number_string - '0';
         if (add < 0 || add > 9) {
             return 0;
         }
         sum += add;
-        fut++;
+        number_string++;
     }
 
     if (strcmpi(&filename[8], ".lev") != 0) {
@@ -525,8 +525,8 @@ int get_internal_index(const char* filename) {
 
 // Ha letezik file, akkor 0-t ad vissza!:
 int access_level_file(const char* filename) {
-    int belsopalyaszam = get_internal_index(filename);
-    if (belsopalyaszam > 0) {
+    int internal_index = get_internal_index(filename);
+    if (internal_index > 0) {
         return 0;
     }
     char tmp[30];
@@ -539,65 +539,66 @@ char BestTime[30] = "";
 // Azt a nevet keri, amit topol::topol kap:
 void load_best_time(const char* filename, int single) {
     if (strlen(filename) > 20) {
-        internal_error("4534516");
+        internal_error("load_best_time strlen(filename) > 20");
     }
 
-    int belsopalyaszam = get_internal_index(filename);
-    topten_set* idok = NULL;
-    if (belsopalyaszam > 0) {
-        belsopalyaszam--; // Mivel eggyel nagyobb tomb indexenel
+    int internal_index = get_internal_index(filename);
+    topten_set* tten_set = NULL;
+    if (internal_index > 0) {
+        internal_index--; // Mivel eggyel nagyobb tomb indexenel
                           // Belso palya:
-        if (belsopalyaszam >= INTERNAL_LEVEL_COUNT) {
-            internal_error("67467524");
+        if (internal_index >= INTERNAL_LEVEL_COUNT) {
+            internal_error("load_best_time internal_index out of range!");
         }
 
-        idok = &State->toptens[belsopalyaszam];
+        tten_set = &State->toptens[internal_index];
     } else {
         // Kulso palya:
         if (!Ptop) {
-            internal_error("78236");
+            internal_error(
+                "load_best_time external level must be loaded before getting best time!");
         }
-        idok = &Ptop->toptens;
+        tten_set = &Ptop->toptens;
     }
 
-    topten* egyfeleidok = NULL;
+    topten* tten = NULL;
     if (single) {
-        egyfeleidok = &idok->single;
+        tten = &tten_set->single;
     } else {
-        egyfeleidok = &idok->multi;
+        tten = &tten_set->multi;
     }
 
-    if (egyfeleidok->times_count > 0) {
-        centiseconds_to_string(egyfeleidok->times[0], BestTime);
+    if (tten->times_count > 0) {
+        centiseconds_to_string(tten->times[0], BestTime);
     } else {
         BestTime[0] = 0;
     }
 }
 
 // Elso palya indexe 1:
-static char* Lgrtabla[110] = {NULL, NULL}; // 1-es indexut figyeli hogy init-e
+static char* InternalLevelLgrs[110] = {NULL, NULL}; // 1-es indexut figyeli hogy init-e
 
-static char Szo[50] = "";
+static char StrlwrBuffer[50] = "";
 
-static void makelgrtabla(void) {
+static void load_internal_lgr_filenames(void) {
     if (INTERNAL_LEVEL_COUNT > 105) {
-        internal_error("uierty895");
+        internal_error("load_internal_lgr_filenames too many internal levels!");
     }
 
     for (int i = 0; i < 110; i++) {
-        Lgrtabla[i] = NULL;
+        InternalLevelLgrs[i] = NULL;
     }
 
-    static char* chartomb = NULL;
+    static char* internal_lgrs_data = NULL;
 
-    chartomb = new char[10 * (INTERNAL_LEVEL_COUNT + 2)];
-    if (!chartomb) {
-        internal_error("memory");
+    internal_lgrs_data = new char[10 * (INTERNAL_LEVEL_COUNT + 2)];
+    if (!internal_lgrs_data) {
+        internal_error("load_internal_lgr_filenames out of memory!");
     }
 
     for (int i = 1; i <= INTERNAL_LEVEL_COUNT; i++) {
-        Lgrtabla[i] = &chartomb[10 * (i - 1)];
-        strcpy(Lgrtabla[i], "default");
+        InternalLevelLgrs[i] = &internal_lgrs_data[10 * (i - 1)];
+        strcpy(InternalLevelLgrs[i], "default");
     }
 
     // Most fel van toltve default ertekekkel, beolvassuk file-t:
@@ -608,30 +609,30 @@ static void makelgrtabla(void) {
 
     while (1) {
         // Beolvasunk egy sort:
-        if (!fgets(Sor, 40, h)) {
+        if (!fgets(FgetsBuffer, 40, h)) {
             break;
         }
-        int levelszam = 0;
-        if (sscanf(Sor, "%d%s", &levelszam, Szo) != 2) {
+        int internal_index = 0;
+        if (sscanf(FgetsBuffer, "%d%s", &internal_index, StrlwrBuffer) != 2) {
             continue;
         }
-        if (levelszam < 1 || levelszam > INTERNAL_LEVEL_COUNT) {
+        if (internal_index < 1 || internal_index > INTERNAL_LEVEL_COUNT) {
             continue;
         }
-        strlwr(Szo);
-        if (!strstr(Szo, ".lgr")) {
+        strlwr(StrlwrBuffer);
+        if (!strstr(StrlwrBuffer, ".lgr")) {
             continue;
         }
-        *strstr(Szo, ".lgr") = 0;
-        char* szo = Szo;
+        *strstr(StrlwrBuffer, ".lgr") = 0;
+        char* lgr_filename = StrlwrBuffer;
         // Levagjuk elejerol space-eket es tabokat:
-        while ((*szo == ' ') || (*szo == 9)) {
-            szo++;
+        while ((*lgr_filename == ' ') || (*lgr_filename == 9)) {
+            lgr_filename++;
         }
-        if ((strlen(szo) > 8) || (strlen(szo) < 1)) {
+        if ((strlen(lgr_filename) > 8) || (strlen(lgr_filename) < 1)) {
             continue;
         }
-        strcpy(Lgrtabla[levelszam], szo);
+        strcpy(InternalLevelLgrs[internal_index], lgr_filename);
     }
 
     fclose(h);
@@ -639,22 +640,22 @@ static void makelgrtabla(void) {
 
 // QWQUU001 elso palya:
 level::level(const char* filename) {
-    if (!Lgrtabla[1]) {
-        makelgrtabla();
+    if (!InternalLevelLgrs[1]) {
+        load_internal_lgr_filenames();
     }
 
-    int kulso = 1;
+    int is_external = 1;
 
-    char filenev[21];
+    char filepath[21];
     if (strlen(filename) > 20) {
-        internal_error("7y537yf");
+        internal_error("level::level strlen(filename) > 20");
     }
-    strcpy(filenev, filename);
+    strcpy(filepath, filename);
 
-    int belsopalyaszam = get_internal_index(filenev);
-    if (belsopalyaszam > 0) {
-        kulso = 0;
-        strcpy(filenev, Levelnevek[belsopalyaszam]);
+    int internal_index = get_internal_index(filepath);
+    if (internal_index > 0) {
+        is_external = 0;
+        strcpy(filepath, InternalFilePaths[internal_index]);
     }
 
     // Innentol kezdve ket kulon rutin fogja beolvasni kulso es belso file-okat
@@ -664,19 +665,19 @@ level::level(const char* filename) {
     // loadbelso beolvassa kerekek szamat is sok gyuru elott, mig kulso
     // beolvassa sok gyurut es csak utana olvassa kerekek szamat es kerekeket
 
-    if (kulso) {
-        load_external(filenev);
+    if (is_external) {
+        load_external(filepath);
     } else {
-        load_internal(filenev);
+        load_internal(filepath);
         // Sajat tablabol vesszuk lgr neveket:
         // #ifdef DEBUG 		Demo miatt most nem ellenorizzuk
-        //	if( belsopalyaszam < 0 || belsopalyaszam > INTERNAL_LEVEL_COUNT )
+        //	if( internal_index < 0 || internal_index > INTERNAL_LEVEL_COUNT )
         //		internal_error( "4i4fyuif" );
         // #endif
-        char tmp[40];
-        sprintf(tmp, "lgr/%s.lgr", Lgrtabla[belsopalyaszam]);
-        if (access(tmp, 0) == 0) { // Csak ha letezik file:
-            strcpy(lgr_name, Lgrtabla[belsopalyaszam]);
+        char lgrpath[40];
+        sprintf(lgrpath, "lgr/%s.lgr", InternalLevelLgrs[internal_index]);
+        if (access(lgrpath, 0) == 0) { // Csak ha letezik file:
+            strcpy(lgr_name, InternalLevelLgrs[internal_index]);
         }
     }
 }
@@ -704,11 +705,11 @@ void level::load_external(const char* filename) {
 
     FILE* h = NULL;
     ////if( kulso ) {
-    char tmpnev[40];
-    sprintf(tmpnev, "lev/%s", filename);
-    h = fopen(tmpnev, "rb");
+    char path[40];
+    sprintf(path, "lev/%s", filename);
+    h = fopen(path, "rb");
     if (!h) {
-        internal_error("level::level-ban nem tudta nyitni file-t!: ", tmpnev);
+        internal_error("Failed to open level file: ", path);
     }
     /*////}
     else {
@@ -720,24 +721,24 @@ void level::load_external(const char* filename) {
     // Verzio beolvasasa:
     char tmp[10] = "AAAAA";
     if (fread(tmp, 1, 5, h) != 5) {
-        internal_error("Nem tudott olvasni txt file-bol!");
+        internal_error("Error reading level file!");
     }
     if (strncmp(tmp, "POT", 3) != 0) {
-        internal_error("level::level( char* filename )-ben nem stimmel eleje!");
+        internal_error("Corrupt .LEV file!");
     }
 
     level_id = 0;
-    double belyeg_d = 0;
-    int verzio = tmp[4] - '0' + 10 * (tmp[3] - '0');
+    double integrity_checksum = 0;
+    int version = tmp[4] - '0' + 10 * (tmp[3] - '0');
 
-    if (verzio > 14) {
+    if (version > 14) {
         external_error("Level file's version is too new!: ", filename);
     }
 
     // Most csak ezt a ket verziot tudja olvasni, de eleg kikommentezni
     // hogy mindet olvassa:
-    if (verzio != 6 && verzio != 14) {
-        external_error("Corrupt level file!: ", filename);
+    if (version != 6 && version != 14) {
+        external_error("Corrupt .LEV file!", filename);
     }
 
     // verzio 6: 1.2-es verzio levele
@@ -749,77 +750,83 @@ void level::load_external(const char* filename) {
     // verzio 13: plusz 2 byte-ot beolvas meg belyeg elott
     // verzio 14: LEVELNAME (14)-rol (50)-re emelkedik, nem seek-el 100-ra
 
-    int dummy;
-    if (verzio >= 13) {
-        if (fread(&dummy, 1, 2, h) != 2) {
-            internal_error("Nem tudott olvasni lev file-bol!");
+    int level_id_checksum;
+    if (version >= 13) {
+        if (fread(&level_id_checksum, 1, 2, h) != 2) {
+            internal_error("Error reading level file!");
         }
     }
 
     // Belyeg:
     if (fread(&level_id, 1, 4, h) != 4) {
-        internal_error("Nem tudott olvasni lev file-bol!");
+        internal_error("Error reading level file!");
     }
 
-    if (fread(&belyeg_d, 1, sizeof(belyeg_d), h) != sizeof(double)) {
-        internal_error("Nem tudott olvasni lev file-bol double belyeget!");
+    if (fread(&integrity_checksum, 1, sizeof(integrity_checksum), h) != sizeof(double)) {
+        internal_error("Corrupt .LEV file!");
     }
 
     // Beolvassuk hogy shareware-e:
-    double sarvarertek;
-    if (fread(&sarvarertek, 1, sizeof(sarvarertek), h) != sizeof(sarvarertek)) {
-        internal_error("Nem tudott olvasni lev file-bol!");
+    double integrity_shareware;
+    if (fread(&integrity_shareware, 1, sizeof(integrity_shareware), h) !=
+        sizeof(integrity_shareware)) {
+        internal_error("Error reading level file!");
     }
-    if (sarvarertek + belyeg_d < 9786.0 || sarvarertek + belyeg_d > 36546.0) {
-        internal_error("level::level-ban sarvarertek kivul esik tartomanyon!");
+    if (integrity_shareware + integrity_checksum < 9786.0 ||
+        integrity_shareware + integrity_checksum > 36546.0) {
+        internal_error("Corrupt .LEV file!");
     }
 
-    // Levels that can only be played in Registered would meet the condition: sarvarertek + belyeg_d
+    // Levels that can only be played in Registered would meet the condition: integrity_shareware +
+    // belyeg_d
     // <= 20000.0
 
     // Beolvassuk hogy hibas-e:
-    double hibaertek;
-    if (fread(&hibaertek, 1, sizeof(hibaertek), h) != sizeof(hibaertek)) {
-        internal_error("Nem tudott olvasni lev file-bol!");
+    double integrity_topology_errors;
+    if (fread(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h) !=
+        sizeof(integrity_topology_errors)) {
+        internal_error("Error reading level file!");
     }
-    if (hibaertek + belyeg_d < 9786.0 || hibaertek + belyeg_d > 36546.0) {
-        internal_error("level::level-ban hibaertek kivul esik tartomanyon!");
+    if (integrity_topology_errors + integrity_checksum < 9786.0 ||
+        integrity_topology_errors + integrity_checksum > 36546.0) {
+        internal_error("Corrupt .LEV file!");
     }
-    if (hibaertek + belyeg_d > 20000.0) {
+    if (integrity_topology_errors + integrity_checksum > 20000.0) {
         topology_errors = 1;
     }
 
     // Beolvassuk hogy lezart-e:
-    double lezartertek;
-    if (fread(&lezartertek, 1, sizeof(lezartertek), h) != sizeof(lezartertek)) {
-        internal_error("Nem tudott olvasni lev file-bol!");
+    double integrity_locked;
+    if (fread(&integrity_locked, 1, sizeof(integrity_locked), h) != sizeof(integrity_locked)) {
+        internal_error("Error reading level file!");
     }
-    if (lezartertek + belyeg_d < 9875.0 || lezartertek + belyeg_d > 32345.0) {
-        internal_error("level::level-ban lezartertek kivul esik tartomanyon!");
+    if (integrity_locked + integrity_checksum < 9875.0 ||
+        integrity_locked + integrity_checksum > 32345.0) {
+        internal_error("Corrupt .LEV file!");
     }
-    if (lezartertek + belyeg_d > 20000.0) {
+    if (integrity_locked + integrity_checksum > 20000.0) {
         locked = 1;
     }
 
     // lezart = 0; // Ha ez nincs kikomentezve, unlockol minden file-t
 
     // Beolvassuk level nevet:
-    int tmpnamehossz = LEVEL_NAME_LENGTH;
-    if (verzio < 14) {
-        tmpnamehossz = 14;
+    int level_name_length = LEVEL_NAME_LENGTH;
+    if (version < 14) {
+        level_name_length = 14;
     }
-    fread(level_name, 1, tmpnamehossz + 1, h);
-    level_name[tmpnamehossz] = 0; // Ez csak biztonsagert
+    fread(level_name, 1, level_name_length + 1, h);
+    level_name[level_name_length] = 0; // Ez csak biztonsagert
 
     // Beolvassuk lgr nevet:
-    if (verzio > 6) {
+    if (version > 6) {
         fread(lgr_name, 1, 16, h);
         lgr_name[15] = 0; // Ez csak biztonsagert
     } else {
         strcpy(lgr_name, "default");
     }
 
-    if (verzio >= 8) {
+    if (version >= 8) {
         fread(foreground_name, 1, 10, h);
         foreground_name[9] = 0; // Ez csak biztonsagert
         fread(background_name, 1, 10, h);
@@ -830,71 +837,74 @@ void level::load_external(const char* filename) {
     }
 
     // Gyuruk szamat 100 byte utan kezdjuk:
-    if (verzio < 14) {
+    if (version < 14) {
         ////if( kulso )
         fseek(h, 100, SEEK_SET);
     }
     ////else
     ////    qseek( h, 100, SEEK_SET );
 
-    double gyuruolvszam = 0;
-    if (fread(&gyuruolvszam, 1, sizeof(gyuruolvszam), h) != sizeof(gyuruolvszam)) {
-        internal_error("level::level-ban nem tudta olvasni lebego gyuruszamot!");
+    double encrypted_polygon_count = 0;
+    if (fread(&encrypted_polygon_count, 1, sizeof(encrypted_polygon_count), h) !=
+        sizeof(encrypted_polygon_count)) {
+        internal_error("Error reading level file!");
     }
 
-    int gyuruszam = (int)(gyuruolvszam);
-    if (gyuruszam > MAX_POLYGONS) {
-        internal_error("level::level-ban gyuruszam > MAX_POLYGONS!: ");
+    int polygon_count = (int)(encrypted_polygon_count);
+    if (polygon_count > MAX_POLYGONS) {
+        internal_error("Too many polygons in level file!");
     }
-    if (gyuruszam <= 0) {
-        internal_error("level::level-ban gyuruszam <= 0!");
+    if (polygon_count <= 0) {
+        internal_error("Corrupt .LEV file!");
     }
 
     // Beolvassa sok gyurut:
-    for (int i = 0; i < gyuruszam; i++) {
-        polygons[i] = new polygon(h, verzio);
+    for (int i = 0; i < polygon_count; i++) {
+        polygons[i] = new polygon(h, version);
     }
 
     // Kerekek szama:
-    double kerekolvszam = 0;
-    if (fread(&kerekolvszam, 1, sizeof(kerekolvszam), h) != sizeof(kerekolvszam)) {
-        internal_error("level::level-ban nem tudta olvasni lebego kerekszamot!");
+    double encrypted_object_count = 0;
+    if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) !=
+        sizeof(encrypted_object_count)) {
+        internal_error("Error reading level file!");
     }
 
-    int kerekszam = (int)(kerekolvszam);
-    if (kerekszam > MAX_OBJECTS) {
-        internal_error("level::level-ban kerekszam > MAX_OBJECTS!: ");
+    int object_count = (int)(encrypted_object_count);
+    if (object_count > MAX_OBJECTS) {
+        internal_error("Too many objects in level file!");
     }
-    if (kerekszam <= 0) {
-        internal_error("level::level-ban kerekszam <= 0!");
+    if (object_count <= 0) {
+        internal_error("Corrupt .LEV file!");
     }
 
-    for (int i = 0; i < kerekszam; i++) {
+    for (int i = 0; i < object_count; i++) {
         // Beolvassa sok kereket:
-        objects[i] = new object(h, verzio);
+        objects[i] = new object(h, version);
     }
 
-    if (verzio > 6) {
+    if (version > 6) {
         // Most van SPRITE beolvasas is:
         // Kerekek szama:
-        double spriteolvszam = 0;
-        if (fread(&spriteolvszam, 1, sizeof(spriteolvszam), h) != sizeof(spriteolvszam)) {
-            internal_error("level::level-ban nem tudta olvasni lebego spriteszamot!");
+        double encrypted_sprite_count = 0;
+        if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) !=
+            sizeof(encrypted_sprite_count)) {
+            internal_error("Error reading level file!");
         }
 
-        int spriteszam = (int)(spriteolvszam);
-        if (spriteszam > MAX_SPRITES) {
-            internal_error("level::level-ban spriteszam > MAX_SPRITES!: ");
+        int sprite_count = (int)(encrypted_sprite_count);
+        if (sprite_count > MAX_SPRITES) {
+            internal_error("Too many pictures in level file!");
         }
-        if (spriteszam < 0) {
-            internal_error("level::level-ban spriteszam < 0!");
-        }
-
-        if (verzio < 8 && spriteszam > 0) {
-            internal_error("verzio < 8 && spriteszam > 0!", filename);
+        if (sprite_count < 0) {
+            internal_error("Corrupt .LEV file!");
         }
 
-        for (int i = 0; i < spriteszam; i++) {
+        if (version < 8 && sprite_count > 0) {
+            internal_error("version < 8 && sprite_count > 0!", filename);
+        }
+
+        for (int i = 0; i < sprite_count; i++) {
             // Beolvassa sok kereket:
             sprites[i] = new sprite(h);
         }
@@ -907,16 +917,16 @@ void level::load_external(const char* filename) {
     ////if( kulso ) {
     topten_file_offset = ftell(h);
     if (topten_file_offset < 6) {
-        internal_error("dddhhhew");
+        internal_error("topten_file_offset < 6");
     }
 
-    int tmpszam = 0;
-    if (fread(&tmpszam, 1, 4, h) != 4 || tmpszam != IDOEGYEDISZAM1) {
+    int magic_number = 0;
+    if (fread(&magic_number, 1, 4, h) != 4 || magic_number != TOP_TEN_HEADER) {
         // if( verzio >= 10 )
         //   external_error( "Corrupt file:", filenev );
     } else {
-        if (!titkosread(&toptens, sizeof(toptens), h) || fread(&tmpszam, 1, 4, h) != 4 ||
-            tmpszam != IDOEGYEDISZAM2) {
+        if (!read_encrypted(&toptens, sizeof(toptens), h) || fread(&magic_number, 1, 4, h) != 4 ||
+            magic_number != TOP_TEN_FOOTER) {
             memset(&toptens, 0, sizeof(toptens));
             // external_error( "Corrupt file:", filenev );
         }
@@ -929,8 +939,8 @@ void level::load_external(const char* filename) {
     ////    qclose( h );
 
     // Most megnezzuk, hogy belyeg stimmel-e:
-    double szamitottbelyeg = checksum(verzio > 6);
-    if (fabs(szamitottbelyeg - belyeg_d) > 0.01) {
+    double calculated_checksum = checksum(version > 6);
+    if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
         external_error("Corrupt .LEV file!: ", filename);
     }
 }
@@ -958,20 +968,20 @@ void level::load_internal(const char* filename) {
     FILE* h = NULL;
     h = qopen(filename, "rb");
     if (!h) {
-        internal_error("level::level-ban nem tudta nyitni file-t!: ", filename);
+        internal_error("Failed to open level file: ", filename);
     }
 
     // Verzio beolvasasa:
     char tmp[10] = "AAAAA";
     if (fread(tmp, 1, 5, h) != 5) {
-        internal_error("Nem tudott olvasni txt file-bol!");
+        internal_error("Error reading level file!");
     }
     if (strncmp(tmp, "@@^!@", 3) != 0) {
-        internal_error("level::level( char* filename )-ben nem stimmel eleje!");
+        internal_error("Corrupt .LEV file!");
     }
 
     level_id = 0;
-    double belyeg_d = 0;
+    double integrity_checksum = 0;
     /*int verzio = tmp[4] - '0' + 10*(tmp[3] - '0');
 
     if( verzio < 6 )
@@ -980,7 +990,7 @@ void level::load_internal(const char* filename) {
     if( verzio > 14 )
         external_error( "Level file's version is too new!: ", filename );
     */
-    int verzio = 14; // Mivel leb file-okat mindig igy mentjuk
+    int version = 14; // Mivel leb file-okat mindig igy mentjuk
 
     // verzio 6: 1.2-es verzio levele
     // verzio 7: uj verzio
@@ -991,52 +1001,57 @@ void level::load_internal(const char* filename) {
     // verzio 13: plusz 2 byte-ot beolvas meg belyeg elott
     // verzio 14: LEVELNAME (14)-rol (50)-re emelkedik, nem seek-el 100-ra
 
-    int dummy;
-    if (verzio >= 13) {
-        if (fread(&dummy, 1, 2, h) != 2) {
-            internal_error("Nem tudott olvasni lev file-bol!");
+    int level_id_checksum;
+    if (version >= 13) {
+        if (fread(&level_id_checksum, 1, 2, h) != 2) {
+            internal_error("Error reading level file!");
         }
     }
 
     // Belyeg:
     if (fread(&level_id, 1, 4, h) != 4) {
-        internal_error("Nem tudott olvasni lev file-bol!");
+        internal_error("Error reading level file!");
     }
 
-    if (fread(&belyeg_d, 1, sizeof(belyeg_d), h) != sizeof(double)) {
-        internal_error("Nem tudott olvasni lev file-bol double belyeget!");
+    if (fread(&integrity_checksum, 1, sizeof(integrity_checksum), h) != sizeof(double)) {
+        internal_error("Corrupt .LEV file!");
     }
 
     // Beolvassuk hogy shareware-e:
-    double sarvarertek;
-    if (fread(&sarvarertek, 1, sizeof(sarvarertek), h) != sizeof(sarvarertek)) {
-        internal_error("Nem tudott olvasni lev file-bol!");
+    double integrity_shareware;
+    if (fread(&integrity_shareware, 1, sizeof(integrity_shareware), h) !=
+        sizeof(integrity_shareware)) {
+        internal_error("Error reading level file!");
     }
-    if (sarvarertek + belyeg_d < 9786.0 || sarvarertek + belyeg_d > 36546.0) {
-        internal_error("level::level-ban sarvarertek kivul esik tartomanyon!");
+    if (integrity_shareware + integrity_checksum < 9786.0 ||
+        integrity_shareware + integrity_checksum > 36546.0) {
+        internal_error("Corrupt .LEV file!");
     }
 
     // Beolvassuk hogy hibas-e:
-    double hibaertek;
-    if (fread(&hibaertek, 1, sizeof(hibaertek), h) != sizeof(hibaertek)) {
-        internal_error("Nem tudott olvasni lev file-bol!");
+    double integrity_topology_errors;
+    if (fread(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h) !=
+        sizeof(integrity_topology_errors)) {
+        internal_error("Error reading level file!");
     }
-    if (hibaertek + belyeg_d < 9786.0 || hibaertek + belyeg_d > 36546.0) {
-        internal_error("level::level-ban hibaertek kivul esik tartomanyon!");
+    if (integrity_topology_errors + integrity_checksum < 9786.0 ||
+        integrity_topology_errors + integrity_checksum > 36546.0) {
+        internal_error("Corrupt .LEV file!");
     }
-    if (hibaertek + belyeg_d > 20000.0) {
+    if (integrity_topology_errors + integrity_checksum > 20000.0) {
         topology_errors = 1;
     }
 
     // Beolvassuk hogy lezart-e:
-    double lezartertek;
-    if (fread(&lezartertek, 1, sizeof(lezartertek), h) != sizeof(lezartertek)) {
-        internal_error("Nem tudott olvasni lev file-bol!");
+    double integrity_locked;
+    if (fread(&integrity_locked, 1, sizeof(integrity_locked), h) != sizeof(integrity_locked)) {
+        internal_error("Error reading level file!");
     }
-    if (lezartertek + belyeg_d < 9875.0 || lezartertek + belyeg_d > 32345.0) {
-        internal_error("level::level-ban lezartertek kivul esik tartomanyon!");
+    if (integrity_locked + integrity_checksum < 9875.0 ||
+        integrity_locked + integrity_checksum > 32345.0) {
+        internal_error("Corrupt .LEV file!");
     }
-    if (lezartertek + belyeg_d > 20000.0) {
+    if (integrity_locked + integrity_checksum > 20000.0) {
         locked = 1;
     }
 
@@ -1048,22 +1063,22 @@ void level::load_internal(const char* filename) {
     // lezart = 0; // Ha ez nincs kikomentezve, unlockol minden file-t
 
     // Beolvassuk level nevet:
-    int tmpnamehossz = LEVEL_NAME_LENGTH;
-    if (verzio < 14) {
-        tmpnamehossz = 14;
+    int level_name_length = LEVEL_NAME_LENGTH;
+    if (version < 14) {
+        level_name_length = 14;
     }
-    fread(level_name, 1, tmpnamehossz + 1, h);
-    level_name[tmpnamehossz] = 0; // Ez csak biztonsagert
+    fread(level_name, 1, level_name_length + 1, h);
+    level_name[level_name_length] = 0; // Ez csak biztonsagert
 
     // Beolvassuk lgr nevet:
-    if (verzio > 6) {
+    if (version > 6) {
         fread(lgr_name, 1, 16, h);
         lgr_name[15] = 0; // Ez csak biztonsagert
     } else {
         strcpy(lgr_name, "default");
     }
 
-    if (verzio >= 8) {
+    if (version >= 8) {
         fread(foreground_name, 1, 10, h);
         foreground_name[9] = 0; // Ez csak biztonsagert
         fread(background_name, 1, 10, h);
@@ -1074,67 +1089,70 @@ void level::load_internal(const char* filename) {
     }
 
     // Gyuruk szamat 100 byte utan kezdjuk:
-    if (verzio < 14) {
+    if (version < 14) {
         qseek(h, 100, SEEK_SET);
     }
-    double gyuruolvszam = 0;
-    if (fread(&gyuruolvszam, 1, sizeof(gyuruolvszam), h) != sizeof(gyuruolvszam)) {
-        internal_error("level::level-ban nem tudta olvasni lebego gyuruszamot!");
+    double encrypted_polygon_count = 0;
+    if (fread(&encrypted_polygon_count, 1, sizeof(encrypted_polygon_count), h) !=
+        sizeof(encrypted_polygon_count)) {
+        internal_error("Error reading level file!");
     }
 
-    int gyuruszam = (int)(gyuruolvszam);
-    if (gyuruszam > MAX_POLYGONS) {
-        internal_error("level::level-ban gyuruszam > MAX_POLYGONS!: ");
+    int polygon_count = (int)(encrypted_polygon_count);
+    if (polygon_count > MAX_POLYGONS) {
+        internal_error("Too many polygons in level file!");
     }
-    if (gyuruszam <= 0) {
-        internal_error("level::level-ban gyuruszam <= 0!");
+    if (polygon_count <= 0) {
+        internal_error("Corrupt .LEV file!");
     }
 
     // Kerekek szama:
-    double kerekolvszam = 0;
-    if (fread(&kerekolvszam, 1, sizeof(kerekolvszam), h) != sizeof(kerekolvszam)) {
-        internal_error("level::level-ban nem tudta olvasni lebego kerekszamot!");
+    double encrypted_object_count = 0;
+    if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) !=
+        sizeof(encrypted_object_count)) {
+        internal_error("Error reading level file!");
     }
 
-    int kerekszam = (int)(kerekolvszam);
-    if (kerekszam > MAX_OBJECTS) {
-        internal_error("level::level-ban kerekszam > MAX_OBJECTS!: ");
+    int object_count = (int)(encrypted_object_count);
+    if (object_count > MAX_OBJECTS) {
+        internal_error("Too many objects in level file!");
     }
-    if (kerekszam <= 0) {
-        internal_error("level::level-ban kerekszam <= 0!");
+    if (object_count <= 0) {
+        internal_error("Corrupt .LEV file!");
     }
 
     // Beolvassa sok gyurut:
-    for (int i = 0; i < gyuruszam; i++) {
-        polygons[i] = new polygon(h, verzio);
+    for (int i = 0; i < polygon_count; i++) {
+        polygons[i] = new polygon(h, version);
     }
 
     // Beolvassa sok kereket:
-    for (int i = 0; i < kerekszam; i++) {
-        objects[i] = new object(h, verzio);
+    for (int i = 0; i < object_count; i++) {
+        objects[i] = new object(h, version);
     }
 
-    if (verzio > 6) {
+    if (version > 6) {
         // Most van SPRITE beolvasas is:
         // Kerekek szama:
-        double spriteolvszam = 0;
-        if (fread(&spriteolvszam, 1, sizeof(spriteolvszam), h) != sizeof(spriteolvszam)) {
-            internal_error("level::level-ban nem tudta olvasni lebego spriteszamot!");
+        double encrypted_sprite_count = 0;
+        if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) !=
+            sizeof(encrypted_sprite_count)) {
+            internal_error("Error reading level file!");
         }
 
-        int spriteszam = (int)(spriteolvszam);
-        if (spriteszam > MAX_SPRITES) {
-            internal_error("level::level-ban spriteszam > MAX_SPRITES!: ");
+        int sprite_count = (int)(encrypted_sprite_count);
+        if (sprite_count > MAX_SPRITES) {
+            internal_error("Too many pictures in level file!");
         }
-        if (spriteszam < 0) {
-            internal_error("level::level-ban spriteszam < 0!");
-        }
-
-        if (verzio < 8 && spriteszam > 0) {
-            internal_error("verzio < 8 && spriteszam > 0!", filename);
+        if (sprite_count < 0) {
+            internal_error("Corrupt .LEV file!");
         }
 
-        for (int i = 0; i < spriteszam; i++) {
+        if (version < 8 && sprite_count > 0) {
+            internal_error("version < 8 && sprite_count > 0!", filename);
+        }
+
+        for (int i = 0; i < sprite_count; i++) {
             // Beolvassa sok kereket:
             sprites[i] = new sprite(h);
         }
@@ -1144,27 +1162,27 @@ void level::load_internal(const char* filename) {
     qclose(h);
 
     // Most megnezzuk, hogy belyeg stimmel-e:
-    double szamitottbelyeg = checksum(verzio > 6);
-    if (fabs(szamitottbelyeg - belyeg_d) > 0.01) {
+    double calculated_checksum = checksum(version > 6);
+    if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
         external_error("Corrupt .LEV file!: ", filename);
     }
 }
 
-static long longosit(double belyeg) {
+static long generate_level_id(double checksum) {
     srand(clock());
-    unsigned long veletlen = random_range(6542);
-    veletlen *= random_range(7042);
-    veletlen += random_range(4542);
-    veletlen *= random_range(3042);
-    veletlen *= random_range(3742);
-    veletlen += random_range(9187);
+    unsigned long random = random_range(6542);
+    random *= random_range(7042);
+    random += random_range(4542);
+    random *= random_range(3042);
+    random *= random_range(3742);
+    random += random_range(9187);
 
-    belyeg = sin(belyeg);
-    belyeg *= (belyeg + 1.0001) * 40000;
-    unsigned long l = belyeg;
+    checksum = sin(checksum);
+    checksum *= (checksum + 1.0001) * 40000;
+    unsigned long level_id_checksum = checksum;
 
-    unsigned long belyeg_l = (l & 0x0000ffff) | (veletlen & 0xffff0000);
-    return belyeg_l;
+    unsigned long level_id = (level_id_checksum & 0x0000ffff) | (random & 0xffff0000);
+    return level_id;
 }
 
 void level::save(const char* filename, int skip_topology) {
@@ -1174,7 +1192,7 @@ void level::save(const char* filename, int skip_topology) {
 
     Volttopsave = 1; // load.cpp-nek kell ez
     if (objects_flipped) {
-        internal_error("level::save-ben objects_flipped!");
+        internal_error("level::save objects_flipped!");
     }
     // Mivel ezzel meg valtoztathatunk polygonokon
     // (polygon korbejaras megvaltoztatas, egymason fekvo pontok
@@ -1190,22 +1208,22 @@ void level::save(const char* filename, int skip_topology) {
         }
     }
 
-    char tmpnev[40];
-    sprintf(tmpnev, "lev/%s", filename);
+    char path[40];
+    sprintf(path, "lev/%s", filename);
 #ifdef BELSOTIR
-    if (!strstr(tmpnev, ".lev") && !strstr(tmpnev, ".LEV")) {
-        internal_error("78t4678r4");
+    if (!strstr(path, ".lev") && !strstr(path, ".LEV")) {
+        internal_error("Internal level save filename must end in .LEV!");
     }
-    if (strstr(tmpnev, ".lev")) {
-        strcpy(strstr(tmpnev, ".lev"), ".leb");
+    if (strstr(path, ".lev")) {
+        strcpy(strstr(path, ".lev"), ".leb");
     }
-    if (strstr(tmpnev, ".LEV")) {
-        strcpy(strstr(tmpnev, ".LEV"), ".leb");
+    if (strstr(path, ".LEV")) {
+        strcpy(strstr(path, ".LEV"), ".leb");
     }
 #endif
-    FILE* h = fopen(tmpnev, "wb");
+    FILE* h = fopen(path, "wb");
     if (!h) {
-        internal_error("level::save-ben nem tudta nyitni file-t!: ", tmpnev);
+        internal_error("Failed to open file for writing: ", path);
     }
 
 #ifdef BELSOTIR
@@ -1215,40 +1233,41 @@ void level::save(const char* filename, int skip_topology) {
 #endif
 
     // Kiszamitjuk es kiirjuk ketfele belyeget:
-    double belyeg_d = checksum(1);
-    level_id = longosit(belyeg_d);
+    double integrity_checksum = checksum(1);
+    level_id = generate_level_id(integrity_checksum);
 
     fwrite(&level_id, 1, 2, h); // Kiirunk ket tetszoleges byte-ot
 
     fwrite(&level_id, 1, 4, h);
-    fwrite(&belyeg_d, 1, sizeof(belyeg_d), h);
+    fwrite(&integrity_checksum, 1, sizeof(integrity_checksum), h);
 
     // Kiirjuk hogy sarvari-e:
-    // Shareware levels would meet the criteria sarvarertek + double(belyeg_l) > 20000.0
-    // which originally was calculated as 20961.0 + random_range( 4982 ) - belyeg_d;
-    double sarvarertek = 11877.0 + random_range(5871) - belyeg_d;
+    // Shareware levels would meet the criteria integrity_shareware + double( integrity_checksum ) >
+    // 20000.0 which originally was calculated as 20961.0 + random_range( 4982 ) -
+    // integrity_checksum;
+    double integrity_shareware = 11877.0 + random_range(5871) - integrity_checksum;
 
 // Regisztralt verzioju file-t is shareware-nek tunteti fol:
 #ifdef BELSOTIR
-    sarvarertek = 20961.0 + random_range(4982) - belyeg_d;
+    integrity_shareware = 20961.0 + random_range(4982) - integrity_checksum;
 #endif
 
-    fwrite(&sarvarertek, 1, sizeof(sarvarertek), h);
+    fwrite(&integrity_shareware, 1, sizeof(integrity_shareware), h);
 
     // Kiirjuk hogy hibas-e:
-    // Ha hibaertek + double(belyeg_l) > 20000.0, akkor hibas:
-    double hibaertek = 11877.0 + random_range(5871) - belyeg_d;
+    // Ha hibaertek + double(integrity_checksum) > 20000.0, akkor hibas:
+    double integrity_topology_errors = 11877.0 + random_range(5871) - integrity_checksum;
     if (topology_errors) { // ezt mar elejen meghataroztuk
-        hibaertek = 20961.0 + random_range(4982) - belyeg_d;
+        integrity_topology_errors = 20961.0 + random_range(4982) - integrity_checksum;
     }
-    fwrite(&hibaertek, 1, sizeof(hibaertek), h);
+    fwrite(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h);
 
     // Kiirjuk hogy lezart-e:
-    double lezartertek = 12112.0 + random_range(6102) - belyeg_d;
+    double integrity_locked = 12112.0 + random_range(6102) - integrity_checksum;
     if (locked) {
-        lezartertek = 23090.0 + random_range(6310) - belyeg_d;
+        integrity_locked = 23090.0 + random_range(6310) - integrity_checksum;
     }
-    fwrite(&lezartertek, 1, sizeof(hibaertek), h);
+    fwrite(&integrity_locked, 1, sizeof(integrity_topology_errors), h);
 
 // Kiirjuk level nevet:
 #ifdef BELSOTIR
@@ -1268,28 +1287,28 @@ void level::save(const char* filename, int skip_topology) {
     // Megszamoljuk gyuruket es kerekeket:
     // fseek( h, 100, SEEK_SET ); 14-es verzio ota mar nem seek-el
 
-    int gyuruszam = 0;
+    int polygon_count = 0;
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (polygons[i]) {
-            gyuruszam++;
+            polygon_count++;
         }
     }
-    double gyuruirtszam = gyuruszam + 0.4643643;
+    double polygon_count_encrypted = polygon_count + 0.4643643;
 
-    int kerekszam = 0;
+    int object_count = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
         if (objects[i]) {
-            kerekszam++;
+            object_count++;
         }
     }
-    double kerekirtszam = kerekszam + 0.4643643;
+    double object_count_encrypted = object_count + 0.4643643;
 
     // Kimentjuk gyuruk szamat elejetol kezdve 100 byte utan:
-    fwrite(&gyuruirtszam, 1, sizeof(gyuruirtszam), h);
+    fwrite(&polygon_count_encrypted, 1, sizeof(polygon_count_encrypted), h);
 
 // Ha belso file-kent mentjuk, most megy kerekek szama:
 #ifdef BELSOTIR
-    fwrite(&kerekirtszam, 1, sizeof(kerekirtszam), h);
+    fwrite(&object_count_encrypted, 1, sizeof(object_count_encrypted), h);
 #endif
 
     // Kimentjuk sok gyurut:
@@ -1301,7 +1320,7 @@ void level::save(const char* filename, int skip_topology) {
 
 // Ha kulso file-kent mentjuk, most megy kerekek szama:
 #ifndef BELSOTIR
-    fwrite(&kerekirtszam, 1, sizeof(kerekirtszam), h);
+    fwrite(&object_count_encrypted, 1, sizeof(object_count_encrypted), h);
 #endif
 
     // Kimentjuk sok kereket:
@@ -1311,14 +1330,14 @@ void level::save(const char* filename, int skip_topology) {
         }
     }
     // Kimentjuk spriteokat:
-    int spriteszam = 0;
+    int sprite_count = 0;
     for (int i = 0; i < MAX_SPRITES; i++) {
         if (sprites[i]) {
-            spriteszam++;
+            sprite_count++;
         }
     }
-    double spriteirtszam = spriteszam + 0.2345672;
-    fwrite(&spriteirtszam, 1, sizeof(spriteirtszam), h);
+    double sprite_count_encrypted = sprite_count + 0.2345672;
+    fwrite(&sprite_count_encrypted, 1, sizeof(sprite_count_encrypted), h);
     for (int i = 0; i < MAX_SPRITES; i++) {
         if (sprites[i]) {
             sprites[i]->save(h);
@@ -1326,11 +1345,11 @@ void level::save(const char* filename, int skip_topology) {
     }
 
     // Kiirjuk ido tablat:
-    int tmpszo = IDOEGYEDISZAM1;
-    fwrite(&tmpszo, 1, 4, h);
-    titkoswrite(&toptens, sizeof(toptens), h);
-    tmpszo = IDOEGYEDISZAM2;
-    fwrite(&tmpszo, 1, 4, h);
+    int magic_number = TOP_TEN_HEADER;
+    fwrite(&magic_number, 1, 4, h);
+    write_encrypted(&toptens, sizeof(toptens), h);
+    magic_number = TOP_TEN_FOOTER;
+    fwrite(&magic_number, 1, 4, h);
 
     fclose(h);
 
@@ -1347,31 +1366,31 @@ void level::save(const char* filename, int skip_topology) {
 // Csak eredetileg beolvasott filenev-vel szabad meghivni:
 void level::save_topten(const char* filename) {
     if (topten_file_offset < 6) { // a 6-os talalomra ertek
-        internal_error("hjdvgyj");
+        internal_error("save_topten cannot be used with internal levels!");
     }
 
     // Hozzacsapjuk nevhez LEV direktorit is:
-    char filenev[40];
-    sprintf(filenev, "lev/%s", filename);
+    char path[40];
+    sprintf(path, "lev/%s", filename);
 
-    FILE* h = fopen(filenev, "r+b");
+    FILE* h = fopen(path, "r+b");
     if (!h) {
-        external_error("Could not open file!", filenev);
+        external_error("Could not open file!", path);
     }
 
     if (fseek(h, topten_file_offset, SEEK_SET) != 0) {
-        external_error("Could not write to file:", filenev);
+        external_error("Could not write to file:", path);
     }
-    int tmpszo = IDOEGYEDISZAM1;
-    if (fwrite(&tmpszo, 1, 4, h) != 4) {
-        external_error("Could not write file:", filenev);
+    int magic_number = TOP_TEN_HEADER;
+    if (fwrite(&magic_number, 1, 4, h) != 4) {
+        external_error("Could not write to file:", path);
     }
-    if (!titkoswrite(&toptens, sizeof(toptens), h)) {
-        external_error("Could not write file:", filenev);
+    if (!write_encrypted(&toptens, sizeof(toptens), h)) {
+        external_error("Could not write to file:", path);
     }
-    tmpszo = IDOEGYEDISZAM2;
-    if (fwrite(&tmpszo, 1, 4, h) != 4) {
-        external_error("Could not write file:", filenev);
+    magic_number = TOP_TEN_FOOTER;
+    if (fwrite(&magic_number, 1, 4, h) != 4) {
+        external_error("Could not write to file:", path);
     }
 
     fclose(h);
@@ -1425,26 +1444,26 @@ void level::get_boundaries(double* x1, double* y1, double* x2, double* y2,
 }
 
 double level::checksum(int check_sprites) {
-    double belyeg = 0.0;
+    double sum = 0.0;
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (polygons[i]) {
-            belyeg += polygons[i]->checksum();
+            sum += polygons[i]->checksum();
         }
     }
     for (int i = 0; i < MAX_OBJECTS; i++) {
         if (objects[i]) {
-            belyeg += objects[i]->checksum();
+            sum += objects[i]->checksum();
         }
     }
     if (check_sprites) {
         for (int i = 0; i < MAX_SPRITES; i++) {
             if (sprites[i]) {
-                belyeg += sprites[i]->checksum();
+                sum += sprites[i]->checksum();
             }
         }
     }
 
-    return BELYEGSZORZO * belyeg;
+    return CHECKSUM_MULTIPLIER * sum;
 }
 
 // KEREKKEL kapcsolatos play elotti inicializalasok:
@@ -1455,24 +1474,24 @@ vect2 BikeStartOffset;
 // Motor helyzetet is o allitja be, kajaszamot adja vissza:
 // Eheto kerekeket aktivizalja:
 int level::initialize_objects(motorst* mot) {
-    int kajaszam = 0;
-    int voltkezdo = 0;
+    int apple_count = 0;
+    int start_found = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* pker = Ptop->objects[i];
-        if (pker) {
-            pker->floating_phase = random_range(1000) * 2.0 * PI / 1000.0;
+        object* obj = Ptop->objects[i];
+        if (obj) {
+            obj->floating_phase = random_range(1000) * 2.0 * PI / 1000.0;
 
-            pker->active = true;
-            if (pker->type == object::Type::Food) {
-                kajaszam++;
+            obj->active = true;
+            if (obj->type == object::Type::Food) {
+                apple_count++;
             }
-            if (pker->type == object::Type::Start) {
-                if (voltkezdo) {
-                    internal_error("level::initialize_objects-ban palyan ket kezdo is van!");
+            if (obj->type == object::Type::Start) {
+                if (start_found) {
+                    internal_error("Level can only have one Start object!");
                 }
-                voltkezdo = 1;
-                pker->active = false;
-                BikeStartOffset = pker->r - mot->left_wheel.r;
+                start_found = 1;
+                obj->active = false;
+                BikeStartOffset = obj->r - mot->left_wheel.r;
                 mot->bike.r = mot->bike.r + BikeStartOffset;
                 mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
                 mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;
@@ -1481,64 +1500,64 @@ int level::initialize_objects(motorst* mot) {
             }
         }
     }
-    if (!voltkezdo) {
-        internal_error("level::initialize_objects-ban palyan nincs kezdo!");
+    if (!start_found) {
+        internal_error("Start object not found in level file!");
     }
-    return kajaszam;
+    return apple_count;
 }
 
 // Kerekeket rendezi:
 void level::sort_objects(void) {
-    int szam = 0;
+    int count = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* pker = Ptop->objects[i];
-        if (pker) {
-            szam++;
+        object* obj = Ptop->objects[i];
+        if (obj) {
+            count++;
         }
     }
-    for (int i = 0; i < szam; i++) {
-        object* pker = Ptop->objects[i];
-        if (!pker) {
-            internal_error("level::sort_objects-ben hezagos kerek tomb!");
+    for (int i = 0; i < count; i++) {
+        object* obj = Ptop->objects[i];
+        if (!obj) {
+            internal_error("level::sort_objects has a gap!");
         }
     }
 
-    if (szam < 2) {
-        internal_error("level::sort_objects-ben szam < 2!");
+    if (count < 2) {
+        internal_error("level::sort_objects count < 2!");
     }
-    for (int j = 0; j < szam + 4; j++) {
-        for (int i = 0; i < szam - 1; i++) {
-            object::Type tipus1 = Ptop->objects[i]->type;
-            object::Type tipus2 = Ptop->objects[i + 1]->type;
+    for (int j = 0; j < count + 4; j++) {
+        for (int i = 0; i < count - 1; i++) {
+            object::Type type1 = Ptop->objects[i]->type;
+            object::Type type2 = Ptop->objects[i + 1]->type;
 
             // Sullyozzuk tipusokat hogy sorrendiseget lehessen megallapitani:
-            int tip1 = 10;
-            if (tipus1 == object::Type::Killer) {
-                tip1 = 1;
+            int score1 = 10;
+            if (type1 == object::Type::Killer) {
+                score1 = 1;
             }
-            if (tipus1 == object::Type::Food) {
-                tip1 = 2;
+            if (type1 == object::Type::Food) {
+                score1 = 2;
             }
-            if (tipus1 == object::Type::Exit) {
-                tip1 = 3;
-            }
-
-            int tip2 = 10;
-            if (tipus2 == object::Type::Killer) {
-                tip2 = 1;
-            }
-            if (tipus2 == object::Type::Food) {
-                tip2 = 2;
-            }
-            if (tipus2 == object::Type::Exit) {
-                tip2 = 3;
+            if (type1 == object::Type::Exit) {
+                score1 = 3;
             }
 
-            if (tip1 > tip2) {
+            int score2 = 10;
+            if (type2 == object::Type::Killer) {
+                score2 = 1;
+            }
+            if (type2 == object::Type::Food) {
+                score2 = 2;
+            }
+            if (type2 == object::Type::Exit) {
+                score2 = 3;
+            }
+
+            if (score1 > score2) {
                 // Cserelnunk kell:
-                object tmpker = *Ptop->objects[i];
+                object tmp = *Ptop->objects[i];
                 *Ptop->objects[i] = *Ptop->objects[i + 1];
-                *Ptop->objects[i + 1] = tmpker;
+                *Ptop->objects[i + 1] = tmp;
             }
         }
     }
@@ -1546,13 +1565,13 @@ void level::sort_objects(void) {
 
 object* level::get_object(int index) {
     if (index < 0 || index >= MAX_OBJECTS) {
-        internal_error("level::get_object-ben index < 0 || index >= MAX_OBJECTS!");
+        internal_error("level::get_object index < 0 || index >= MAX_OBJECTS!");
     }
-    object* pker = Ptop->objects[index];
-    if (!pker) {
-        internal_error("level::get_object-ben !pker!");
+    object* obj = Ptop->objects[index];
+    if (!obj) {
+        internal_error("level::get_object !obj!");
     }
-    return pker;
+    return obj;
 }
 
 // kerekekfejjellefele;
@@ -1563,9 +1582,9 @@ void level::flip_objects(void) {
     }
     objects_flipped = 1;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* pker = Ptop->objects[i];
-        if (pker) {
-            pker->r.y = -pker->r.y;
+        object* obj = Ptop->objects[i];
+        if (obj) {
+            obj->r.y = -obj->r.y;
         }
     }
 }
@@ -1576,9 +1595,9 @@ void level::unflip_objects(void) {
     }
     objects_flipped = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* pker = Ptop->objects[i];
-        if (pker) {
-            pker->r.y = -pker->r.y;
+        object* obj = Ptop->objects[i];
+        if (obj) {
+            obj->r.y = -obj->r.y;
         }
     }
 }

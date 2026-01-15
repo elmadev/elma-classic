@@ -796,7 +796,7 @@ void level::load_external(const char* filename) {
     fclose(h);
 
     // Verify checksum
-    double calculated_checksum = checksum(version > 6);
+    double calculated_checksum = checksum();
     if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
         external_error("Corrupt .LEV file!", filename);
     }
@@ -981,7 +981,7 @@ void level::load_internal(const char* filename) {
 
     qclose(h);
 
-    double calculated_checksum = checksum(version > 6);
+    double calculated_checksum = checksum();
     if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
         external_error("Corrupt .LEV file!", filename);
     }
@@ -1050,7 +1050,7 @@ void level::save(const char* filename, bool skip_topology) {
 #endif
 
     // Generate checksum and level id
-    double integrity_checksum = checksum(1);
+    double integrity_checksum = checksum();
     level_id = generate_level_id(integrity_checksum);
     fwrite(&level_id, 1, 2, h); // hashed checksum
     fwrite(&level_id, 1, 4, h);
@@ -1240,7 +1240,7 @@ void level::get_boundaries(double* x1, double* y1, double* x2, double* y2,
     }
 }
 
-double level::checksum(int check_sprites) {
+double level::checksum() {
     double sum = 0.0;
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (polygons[i]) {
@@ -1252,11 +1252,9 @@ double level::checksum(int check_sprites) {
             sum += objects[i]->checksum();
         }
     }
-    if (check_sprites) {
-        for (int i = 0; i < MAX_SPRITES; i++) {
-            if (sprites[i]) {
-                sum += sprites[i]->checksum();
-            }
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        if (sprites[i]) {
+            sum += sprites[i]->checksum();
         }
     }
 

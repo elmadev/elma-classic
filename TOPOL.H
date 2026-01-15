@@ -26,7 +26,7 @@ class level {
     friend int floadlevel_p(const char* nev);
     friend void invalidate_ptop();
 
-    double checksum(int check_sprites);
+    double checksum();
 
     // Create a default level
     level();

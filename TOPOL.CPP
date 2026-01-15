@@ -170,41 +170,43 @@ level::~level() {
 bool level::discard_missing_lgr_assets(lgrfile* lgr) {
     bool sprites_deleted = false;
     for (int i = 0; i < MAX_SPRITES; i++) {
-        if (sprites[i]) {
-            sprite* spr = sprites[i];
-            // Set default size for editor rendering purposes
-            spr->wireframe_width = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
-            spr->wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
+        if (!sprites[i]) {
+            continue;
+        }
 
-            if (spr->picture_name[0] && (spr->mask_name[0] || spr->texture_name[0])) {
-                internal_error("discard_missing_lgr_assets invalid pic/mask/text combination!");
+        sprite* spr = sprites[i];
+        // Set default size for editor rendering purposes
+        spr->wireframe_width = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
+        spr->wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
+
+        if (spr->picture_name[0] && (spr->mask_name[0] || spr->texture_name[0])) {
+            internal_error("discard_missing_lgr_assets invalid pic/mask/text combination!");
+        }
+
+        // Delete any sprite not existing in lgr, and also set the size of the asset
+        if (spr->picture_name[0]) {
+            int index = lgr->getkepindex(spr->picture_name);
+            if (index < 0) {
+                spr->picture_name[0] = 0;
+                delete sprites[i];
+                sprites[i] = nullptr;
+                sprites_deleted = true;
+                continue;
             }
 
-            // Delete any sprite not existing in lgr, and also set the size of the asset
-            if (spr->picture_name[0]) {
-                int index = lgr->getkepindex(spr->picture_name);
+            spr->wireframe_width = lgr->kepek[index].xsize * PixelsToMeters;
+            spr->wireframe_height = lgr->kepek[index].ysize * PixelsToMeters;
+        } else {
+            if (spr->mask_name[0]) {
+                int index = lgr->getmaszkindex(spr->mask_name);
                 if (index < 0) {
-                    spr->picture_name[0] = 0;
+                    spr->mask_name[0] = 0;
                     delete sprites[i];
                     sprites[i] = nullptr;
                     sprites_deleted = true;
-                    continue;
-                }
-
-                spr->wireframe_width = lgr->kepek[index].xsize * PixelsToMeters;
-                spr->wireframe_height = lgr->kepek[index].ysize * PixelsToMeters;
-            } else {
-                if (spr->mask_name[0]) {
-                    int index = lgr->getmaszkindex(spr->mask_name);
-                    if (index < 0) {
-                        spr->mask_name[0] = 0;
-                        delete sprites[i];
-                        sprites[i] = nullptr;
-                        sprites_deleted = true;
-                    } else {
-                        spr->wireframe_width = lgr->maszkok[index].xsize * PixelsToMeters;
-                        spr->wireframe_height = lgr->maszkok[index].ysize * PixelsToMeters;
-                    }
+                } else {
+                    spr->wireframe_width = lgr->maszkok[index].xsize * PixelsToMeters;
+                    spr->wireframe_height = lgr->maszkok[index].ysize * PixelsToMeters;
                 }
 
                 if (spr->texture_name[0]) {

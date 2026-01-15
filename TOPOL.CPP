@@ -100,26 +100,6 @@ void kiirdesceket(void) {
     internal_error("Kiirta desclist.txt-t!");
 }
 
-// Ezt topol friend-jekent deklaraljuk es m_v.cpp hivja minden indulasnal:
-void hakellmentbelleveket(void) {
-#ifdef BELSOTIR
-    finame fname;
-    bool done = find_first("lev/*.lev", fname);
-    // Vegigmegyunk osszes lev file-on es kimentjuk oket belsokent:
-    while (!done) {
-        topol* ptop = new topol(fname);
-        ptop->save(fname, 1);
-        delete ptop;
-
-        done = find_next(fname);
-    }
-
-    find_close();
-
-    internal_error("Kiirta lev fileokat belsokent!");
-#endif
-}
-
 static char Sor[110];
 
 // Van ugyanilyen neven state.cpp-ben is ket fv.:
@@ -1507,87 +1487,6 @@ double topol::belyegszamitas(int kellspriteis) {
 
     return BELYEGSZORZO * belyeg;
 }
-
-// Barmilyen hiba eseten 1-el ter vissza:
-unsigned long getbelyeg(char* nev) {
-    char tmp[30];
-    sprintf(tmp, "lev/%s", nev);
-    FILE* h = fopen(tmp, "rb");
-    if (!h) {
-        return 1;
-    }
-    unsigned long l = 0;
-    if (fread(&l, 1, 1, h) != 1) {
-        return 1;
-    }
-    if (fread(&l, 1, 4, h) != 4) {
-        return 1;
-    }
-    if (fread(&l, 1, 4, h) != 4) {
-        return 1;
-    }
-    fclose(h);
-    return l;
-}
-
-// Igazzal ter vissza, ha megvan nev;
-/*int getbelyegheznev( unsigned long belyeg, char* nev ) {
-    find_t ffblk;
-    int done = _dos_findfirst( "*.lev", _A_NORMAL, &ffblk );
-    while( !done ) {
-        if( getbelyeg( ffblk.name ) == belyeg ) {
-            // Megvan level file neve:
-            strcpy( nev, ffblk.name );
-            return 1;
-        }
-
-        done = _dos_findnext( &ffblk );
-    }
-    return 0;
-} */
-
-// Csak external file-hoz:
-// Ha NULL, akkor valami baj volt vele:
-/*char* getlevelname( char* nev ) {
-    static char levelnamebuffer[LEVELNAMEHOSSZ+4] = "";
-
-    char tmpnev[40];
-    sprintf( tmpnev, "lev\\%s", nev );
-    FILE* h = fopen( tmpnev, "rb" );
-    if( !h )
-        return NULL;
-
-    if( fseek( h, 41, SEEK_CUR ) != 0 ) {
-        fclose( h );
-        return NULL;
-    }
-
-    if( fread( levelnamebuffer, 1, LEVELNAMEHOSSZ+1, h ) != LEVELNAMEHOSSZ+1 ) {
-        fclose( h );
-        return NULL;
-    }
-    levelnamebuffer[LEVELNAMEHOSSZ] = 0; // Ez csak biztonsagert
-
-    fclose( h );
-    return levelnamebuffer;
-} */
-
-/*unsigned long double2belyeg( double* px ) {
-    double y = *px;
-    if( y < 0 )
-        y = 0 - y;
-    y *= 1000.0;
-    if( y > double(0x6fffffff) )
-        internal_error( "double2belyeg-ben y > 0x6fffffff!" );
-
-    unsigned long l = y;
-    return l;
-}
-
-unsigned long double2belyeg( long l ) {
-    double x = l;
-    return double2belyeg( &x );
-} */
 
 // KEREKKEL kapcsolatos play elotti inicializalasok:
 

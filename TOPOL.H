@@ -29,7 +29,6 @@ class topol {
     friend int floadlevel_p(const char* nev);
     friend void invalidate_ptop(void);
     friend void kiirdesceket(void);
-    friend void hakellmentbelleveket(void); // topol.cpp-ben
 
     double belyegszamitas(int kellspriteis);
 
@@ -90,10 +89,6 @@ extern vect2 Kezdetihelydiff; // setallaktiv allitja be
 // Ha letezik file, akkor 0-t ad vissza!:
 // Ugyanugy viselkedik nevvel, mint topol konstruktora:
 int access_topol(const char* filenev);
-
-unsigned long getbelyeg(char* nev);
-// Igazzal ter vissza, ha megvan nev;
-int getbelyegheznev(unsigned long belyeg, char* nev);
 
 // Csak external file-hoz:
 // Ha NULL, akkor valami baj volt vele:

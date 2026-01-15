@@ -113,7 +113,7 @@ const char* get_internal_level_name(int index) {
         internal_error("get_internal_level_name index out of bounds");
     }
     // Hardcoded Animal Fram fix
-    if (index == 30) {
+    if (strcmp(InternalLevelNames[index], "Animal Fram") == 0) {
         return "Animal Farm";
     }
     return InternalLevelNames[index];

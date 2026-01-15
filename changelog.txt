@@ -36,3 +36,4 @@
 * fordit.inf (invert volt buttons) is no longer supported
 * nemmem.inf (Across memory check) is no longer supported
 * files.inf (files are read from ../files, instead of elma.res) is no longer supported
+* Debug code to generate elma.res/desclist.txt is removed

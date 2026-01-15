@@ -28,7 +28,6 @@ class topol {
     friend int floadlevel_e(const char* nev, int forceload);
     friend int floadlevel_p(const char* nev);
     friend void invalidate_ptop(void);
-    friend void kiirdesceket(void);
 
     double belyegszamitas(int kellspriteis);
 

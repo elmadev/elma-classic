@@ -57,49 +57,6 @@ int Leveldescinited = 0;
 #define DESCNEVHOSSZ (30)
 char Leveldescek[(DESCNEVHOSSZ + 2) * MAXBEEPLEVELSZAM + 6];
 
-// Ki is lep:
-void kiirdesceket(void) {
-    FILE* h = fopen("desclist.txt", "w");
-    if (!h) {
-        internal_error("6deyhqe");
-    }
-
-    int nemolvastobbet = 0;
-    for (int i = 0; i < MAXBEEPLEVELSZAM; i++) {
-        if (nemolvastobbet || i >= STATE_LEVEL_COUNT) {
-            fprintf(h, "Itt nincs nev\n");
-            continue;
-        }
-        // Eloallitjuk QWQUU001 fele nevet:
-        char tmp[10];
-        sprintf(tmp, "%d", i + 1);
-        char nev[20];
-        strcpy(nev, "QWQUU");
-        if (i + 1 < 10) {
-            strcat(nev, "0");
-        }
-        if (i + 1 < 100) {
-            strcat(nev, "0");
-        }
-        strcat(nev, tmp);
-        strcat(nev, ".LEV");
-
-        if (access_topol(nev) != 0) {
-            // Ez a topol file mar nem letezik:
-            nemolvastobbet = 1;
-            fprintf(h, "Itt nincs nev\n");
-            continue;
-        }
-        topol* ptop = new topol(nev);
-        fprintf(h, "%s\n", ptop->levelname);
-        delete ptop;
-        ptop = NULL;
-    }
-
-    fclose(h);
-    internal_error("Kiirta desclist.txt-t!");
-}
-
 static char Sor[110];
 
 // Van ugyanilyen neven state.cpp-ben is ket fv.:
@@ -151,7 +108,7 @@ const char* getleveldescription(int level) {
         Leveldescinited = 1;
         FILE* h = qopen("desclist.txt", "r");
         if (!h) {
-            kiirdesceket(); // ki is lep
+            internal_error("desclist.txt missing from resource file!");
         }
 
         for (int i = 0; i < MAXBEEPLEVELSZAM; i++) {

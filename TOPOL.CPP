@@ -852,8 +852,9 @@ static int generate_level_id(double checksum) {
 }
 
 void level::save(const char* filename, bool skip_topology) {
-    memset(&toptens, 0, sizeof(toptens));
+    constexpr bool SAVE_INTERNAL = false;
 
+    memset(&toptens, 0, sizeof(toptens));
     Volttopsave = 1;
     if (objects_flipped) {
         internal_error("level::save objects_flipped!");
@@ -866,27 +867,28 @@ void level::save(const char* filename, bool skip_topology) {
 
     char path[40];
     sprintf(path, "lev/%s", filename);
-#ifdef BELSOTIR
-    if (!strstr(path, ".lev") && !strstr(path, ".LEV")) {
-        internal_error("Internal level save filename must end in .LEV!");
+    if (SAVE_INTERNAL) {
+        // Rename from .lev to .leb
+        if (!strstr(path, ".lev") && !strstr(path, ".LEV")) {
+            internal_error("Internal level save filename must end in .LEV!");
+        }
+        if (strstr(path, ".lev")) {
+            strcpy(strstr(path, ".lev"), ".leb");
+        }
+        if (strstr(path, ".LEV")) {
+            strcpy(strstr(path, ".LEV"), ".leb");
+        }
     }
-    if (strstr(path, ".lev")) {
-        strcpy(strstr(path, ".lev"), ".leb");
-    }
-    if (strstr(path, ".LEV")) {
-        strcpy(strstr(path, ".LEV"), ".leb");
-    }
-#endif
     FILE* h = fopen(path, "wb");
     if (!h) {
         internal_error("Failed to open file for writing: ", path);
     }
 
-#ifdef BELSOTIR
-    fwrite("@@^!@", 1, 5, h);
-#else
-    fwrite("POT14", 1, 5, h);
-#endif
+    if (SAVE_INTERNAL) {
+        fwrite("@@^!@", 1, 5, h);
+    } else {
+        fwrite("POT14", 1, 5, h);
+    }
 
     // Generate checksum and level id
     double integrity_checksum = checksum();
@@ -895,13 +897,11 @@ void level::save(const char* filename, bool skip_topology) {
     fwrite(&level_id, 1, 4, h);
     fwrite(&integrity_checksum, 1, sizeof(integrity_checksum), h);
 
-    // Shareware levels would meet the criteria:
-    // integrity_shareware + integrity_checksum > 20000.0
-    // which originally was calculated as 20961.0 + random_range(4982) - integrity_checksum;
     double integrity_shareware = 11877.0 + random_range(5871) - integrity_checksum;
-#ifdef BELSOTIR
-    integrity_shareware = 20961.0 + random_range(4982) - integrity_checksum;
-#endif
+    if (SAVE_INTERNAL) {
+        // Internals are marked as Shareware-compatible
+        integrity_shareware = 20961.0 + random_range(4982) - integrity_checksum;
+    }
 
     fwrite(&integrity_shareware, 1, sizeof(integrity_shareware), h);
 
@@ -915,12 +915,14 @@ void level::save(const char* filename, bool skip_topology) {
     double integrity_locked = 12112.0 + random_range(6102) - integrity_checksum;
     fwrite(&integrity_locked, 1, sizeof(integrity_topology_errors), h);
 
-#ifdef BELSOTIR
-    for (int iiii = 0; iiii < LEVEL_NAME_LENGTH; iiii++) {
-        levelname[iiii] = 0;
+    if (SAVE_INTERNAL) {
+        // Internals don't have a level name
+        char empty_level_name[LEVEL_NAME_LENGTH + 1];
+        memset(empty_level_name, 0, sizeof(empty_level_name));
+        fwrite(empty_level_name, 1, LEVEL_NAME_LENGTH + 1, h);
+    } else {
+        fwrite(level_name, 1, LEVEL_NAME_LENGTH + 1, h);
     }
-#endif
-    fwrite(level_name, 1, LEVEL_NAME_LENGTH + 1, h);
 
     fwrite(lgr_name, 1, 16, h);
     fwrite(foreground_name, 1, 10, h);
@@ -943,19 +945,19 @@ void level::save(const char* filename, bool skip_topology) {
     double object_count_encrypted = object_count + 0.4643643;
 
     fwrite(&polygon_count_encrypted, 1, sizeof(polygon_count_encrypted), h);
-#ifdef BELSOTIR
-    fwrite(&object_count_encrypted, 1, sizeof(object_count_encrypted), h);
-#endif
-
+    if (SAVE_INTERNAL) {
+        // object_count is moved out of order in .leb files.
+        fwrite(&object_count_encrypted, 1, sizeof(object_count_encrypted), h);
+    }
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (polygons[i]) {
             polygons[i]->save(h, this);
         }
     }
-#ifndef BELSOTIR
-    fwrite(&object_count_encrypted, 1, sizeof(object_count_encrypted), h);
-#endif
 
+    if (!SAVE_INTERNAL) {
+        fwrite(&object_count_encrypted, 1, sizeof(object_count_encrypted), h);
+    }
     for (int i = 0; i < MAX_OBJECTS; i++) {
         if (objects[i]) {
             objects[i]->save(h);
@@ -986,10 +988,11 @@ void level::save(const char* filename, bool skip_topology) {
     fclose(h);
 
     if (topology_errors) {
-#ifdef BELSOTIR
-        internal_error("#define BELSOTIR mellet hibas level file mentes!:", filename);
-#endif
-        dialog("Though the level file was successfully saved, there are some errors in the design.",
+        if (SAVE_INTERNAL) {
+            internal_error("Internal levels cannot have topology errors!", filename);
+        }
+        dialog("Though the level file was successfully saved, there are some errors in the "
+               "design.",
                "You cannot play on this level until you correct these problems. To see what the",
                "problems are, please push the Check Topology button in the editor.");
     }

@@ -22,7 +22,7 @@
 #include "TOPOL.H"
 #include <cstring>
 
-topol* Ptop = NULL;
+level* Ptop = NULL;
 
 abc8 *Pabc1 = NULL, *Pabc2 = NULL;
 
@@ -498,7 +498,7 @@ static void ujrarajzol(int egesz) {
 
     RedrawingEditor = 1; // Csak edit bufferbe rajzoljon kirajzol
 
-    Ptop->kirajzol();
+    Ptop->render();
     if (Pgy) {
         // Atalakitjuk szaggatotta amit kell:
         Pgy->render_one_line(K, Fel, false);
@@ -546,14 +546,14 @@ static void beallitkozelvane(int mx, int my) {
     double tav = 1000000.0;
     if (Tool == T_MOVE || Tool == T_CREATE_VERT || Tool == T_MOVE || Tool == T_DELETE_VERT ||
         Tool == T_DELETE_POLY) {
-        if (Ptop->legkozpont(x, y, &K, &tav)) {
+        if (Ptop->get_closest_vertex(x, y, &K, &tav)) {
             Kozelvan = 1;
         }
     }
     object* pker = NULL;
     if (Tool == T_MOVE || Tool == T_DELETE_KEREK) {
         double ujtav;
-        pker = Ptop->legkozkerek(x, y, &ujtav);
+        pker = Ptop->get_closest_object(x, y, &ujtav);
         if (pker) {
             Kozelvan = 1;
             if (ujtav < tav) {
@@ -566,7 +566,7 @@ static void beallitkozelvane(int mx, int my) {
     sprite* ps = NULL;
     if (Tool == T_MOVE || Tool == T_DELETE_SPRITE) {
         double ujtav;
-        ps = Ptop->legkozsprite(x, y, &ujtav);
+        ps = Ptop->get_closest_sprite(x, y, &ujtav);
         if (ps) {
             Kozelvan = 1;
             if (ujtav < tav) {

@@ -88,7 +88,7 @@ void loadlgrfile(const char* nev) {
         bltfront(BufferMain);
 
         // (Ptop->lgrnev lehet egy mutato nev-vel)
-        strcpy(Ptop->lgrnev, "DEFAULT");
+        strcpy(Ptop->lgr_name, "DEFAULT");
         Valtozott = 1;
 
         if (strcmpi(Bentlgrnev, "DEFAULT") == 0) {
@@ -98,7 +98,7 @@ void loadlgrfile(const char* nev) {
         strcpy(lgrtmp, "lgr/default.lgr");
         strcpy(Bentlgrnev, "DEFAULT");
 
-        Ptop->nincslgrje = 1;
+        Ptop->lgr_not_found = 1;
         if (access(lgrtmp, 0) != 0) {
             external_error("Could not open file LGR\\DEFAULT.LGR!");
         }
@@ -1084,12 +1084,12 @@ lgrfile::~lgrfile(void) {
 
 // Ezt betoltecseteket hivja (Ptop-bol szedi kep neveket):
 void lgrfile::betolthattereket(void) {
-    if (!Ptop->fgnev[0] || !Ptop->bgnev[0]) {
+    if (!Ptop->foreground_name[0] || !Ptop->background_name[0]) {
         internal_error("ydsgyhi");
     }
 
-    if (strcmpi(bgnevbent, Ptop->bgnev) != 0) {
-        strcpy(bgnevbent, Ptop->bgnev);
+    if (strcmpi(bgnevbent, Ptop->background_name) != 0) {
+        strcpy(bgnevbent, Ptop->background_name);
         // Nem jo ami bent van:
         if (peg) {
             delete peg;
@@ -1105,8 +1105,8 @@ void lgrfile::betolthattereket(void) {
         peg = kepetbovitvizszint(pt);
     }
 
-    if (strcmpi(fgnevbent, Ptop->fgnev) != 0) {
-        strcpy(fgnevbent, Ptop->fgnev);
+    if (strcmpi(fgnevbent, Ptop->foreground_name) != 0) {
+        strcpy(fgnevbent, Ptop->foreground_name);
         // Nem jo ami bent van:
         if (pfold) {
             delete pfold;

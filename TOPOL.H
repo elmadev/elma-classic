@@ -11,99 +11,101 @@ struct motorst;
 
 void set_gyuru_attributes(polygon* pgy);
 
-#define MAXKEREK (52)
+#define MAX_OBJECTS (52)
 constexpr int MAX_VERTICES = 5000;
 
-#define MAXSPRITE (5000)
+#define MAX_SPRITES (5000)
 
-#define MAXGYURU (300)
+#define MAX_POLYGONS (300)
 
 typedef polygon* ptrgyuru;
-#define LEVELNAMEHOSSZ (50) // 13-as verzioig (14) volt
+#define LEVEL_NAME_LENGTH (50) // 13-as verzioig (14) volt
 
 class lgrfile;
 
-class topol {
+class level {
     friend int menu_exit(void);
     friend int floadlevel_e(const char* nev, int forceload);
     friend int floadlevel_p(const char* nev);
     friend void invalidate_ptop(void);
 
-    double belyegszamitas(int kellspriteis);
+    double checksum(int check_sprites);
 
-    topol(void);
+    level(void);
     // QWQUU001 elso palya:
-    topol(const char* filenev);
-    ~topol(void);
-    void loadkulso(const char* filenev);
-    void loadbelso(const char* filenev);
+    level(const char* filename);
+    ~level(void);
+    void load_external(const char* filename);
+    void load_internal(const char* filename);
 
   public:
     // Beolvasas utan ervenyes, csak rec file ellenorzesere hasznalando
-    long belyeg;
+    long level_id;
     // loadlgrfile allitja 1-be, ha nincs meg lgr es default.lgr-t hasznal:
-    int nincslgrje;
+    int lgr_not_found;
 
-    int hibas, lezart;
-    ptrgyuru ptomb[MAXGYURU]; // Ez csak gany miatt public
-    object* kerektomb[MAXKEREK];
-    sprite* spritetomb[MAXSPRITE];
-    char levelname[LEVELNAMEHOSSZ + 1];
-    char lgrnev[16];
-    char fgnev[10];
-    char bgnev[10];
+    int topology_errors, locked;
+    ptrgyuru polygons[MAX_POLYGONS]; // Ez csak gany miatt public
+    object* objects[MAX_OBJECTS];
+    sprite* sprites[MAX_SPRITES];
+    char level_name[LEVEL_NAME_LENGTH + 1];
+    char lgr_name[16];
+    char foreground_name[10];
+    char background_name[10];
 
-    topten_set idok;
-    int idokhelye;
+    topten_set toptens;
+    int topten_file_offset;
 
     // Igazzal ter vissza, ha volt valtozas:
-    int pic_selejtez(lgrfile* plgr);
-    polygon* legkozpont(double x, double y, int* pk, double* ptav = NULL, polygon* kimarad = NULL);
-    object* legkozkerek(double x, double y, double* ptav = NULL);
-    sprite* legkozsprite(double x, double y, double* ptav = NULL);
+    int discard_missing_lgr_assets(lgrfile* lgr);
+    polygon* get_closest_vertex(double x, double y, int* vertex_index, double* distance = NULL,
+                                polygon* skip = NULL);
+    object* get_closest_object(double x, double y, double* distance = NULL);
+    sprite* get_closest_sprite(double x, double y, double* distance = NULL);
     // Ha saveidok hivja meg, csak akkor nem kell check:
-    void save(const char* filenev, int nemkellcheck = 0);
+    void save(const char* filename, int skip_topology = 0);
     // Csak eredetileg beolvasott filenev-vel szabad meghivni:
-    void saveidok(const char* filenev);
-    void kirajzol(void);
+    void save_topten(const char* filename);
+    void render(void);
     // pgy levegoben van-e. Akkor folddarab:
-    int levegoben(polygon* pgy, vect2* pr = NULL);
-    void getminmax(double* px1, double* py1, double* px2, double* py2, int kerekkel);
+    int is_sky(polygon* poly, vect2* point = NULL);
+    void get_boundaries(double* x1, double* y1, double* x2, double* y2,
+                        int check_objects_and_sprites);
 
     // Kerekkel kapcsolatos dolgok:
     // Motor helyzetet is o allitja be, kajaszamot adja vissza:
-    int setallaktiv(motorst* pmot); // eheto kerekeket aktivizalja
-    void killerekelore(void);       // kerekeket rendezi
-    object* getptrkerek(int index);
+    int initialize_objects(motorst* mot); // eheto kerekeket aktivizalja
+    void sort_objects(void);              // kerekeket rendezi
+    object* get_object(int index);
 
     // Ha igaz, y negalva van (ez kell lejatszasnal):
-    int kerekekfejjellefele;
-    void kereklefejjel(void);
-    void kerekjolalljon(void);
+    int objects_flipped;
+    void flip_objects(void);
+    void unflip_objects(void);
 };
 
 // lejatszo.cpp-ben Falg Tag ennek alapjan teszi vissza motorost:
-extern vect2 Kezdetihelydiff; // setallaktiv allitja be
+extern vect2 BikeStartOffset; // setallaktiv allitja be
 
 // Ha letezik file, akkor 0-t ad vissza!:
 // Ugyanugy viselkedik nevvel, mint topol konstruktora:
-int access_topol(const char* filenev);
+int access_level_file(const char* filename);
 
 // Csak external file-hoz:
 // Ha NULL, akkor valami baj volt vele:
 // char* getlevelname( char* nev ); mar nem hasznalt
 
 // 0-tol kezdodnek:
-const char* getleveldescription(int level);
+const char* get_internal_level_name(int index);
 
 // Belso belyegszamitasokhoz kell:
 /*unsigned long double2belyeg( double* px );
 unsigned long double2belyeg( long l );*/
 
-extern char Ezenlegjobbido[30];
+extern char BestTime[30];
 // Azt a nevet keri, amit topol::topol kap:
-void beallitlegjobbidot(const char* filenev, int single);
+void load_best_time(const char* filename, int single);
 
-int nevanalizis(const char* nev);
+int get_internal_index(const char* filename);
 
 #endif

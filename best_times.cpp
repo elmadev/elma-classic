@@ -124,7 +124,7 @@ void menu_internal_topten(int level, bool single) {
     char header[100];
     itoa(level + 1, header, 10);
     strcat(header, ": ");
-    strcat(header, getleveldescription(level));
+    strcat(header, get_internal_level_name(level));
 
     topten* tten = &State->toptens[level].single;
     if (!single) {
@@ -135,11 +135,11 @@ void menu_internal_topten(int level, bool single) {
 }
 
 // Render the external best times list
-void menu_external_topten(topol* top, bool single) {
+void menu_external_topten(level* top, bool single) {
     if (single) {
-        render_topten(&top->idok.single, top->levelname, single);
+        render_topten(&top->toptens.single, top->level_name, single);
     } else {
-        render_topten(&top->idok.multi, top->levelname, single);
+        render_topten(&top->toptens.multi, top->level_name, single);
     }
 }
 
@@ -180,7 +180,7 @@ void menu_best_times_choose_level(bool single) {
         // "1 Warm Up"
         itoa(i + 1, NavEntriesLeft[i], 10);
         strcat(NavEntriesLeft[i], " ");
-        strcat(NavEntriesLeft[i], getleveldescription(i));
+        strcat(NavEntriesLeft[i], get_internal_level_name(i));
 
         // Best player, if exists
         strcpy(NavEntriesRight[i], "-");

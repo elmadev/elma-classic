@@ -8,11 +8,11 @@ class object;
 class palette;
 class polygon;
 class sprite;
-class topol;
+class level;
 
 // Uj integralt editor h-ja:
 
-extern topol* Ptop;
+extern level* Ptop;
 // extern pic8* Editbuffer; Ezentul ez BufferMain
 // extern pic8* Editbuffer2;  Ezentul ez BufferBall
 

@@ -92,9 +92,9 @@ void t_move_nyomva(int mx, int my) {
         double y = pixel_to_meter_y(my);
 
         double tavpont, tavkerek, tavsprite;
-        Pgy = Ptop->legkozpont(x, y, &K, &tavpont);
-        Pker = Ptop->legkozkerek(x, y, &tavkerek);
-        Psp = Ptop->legkozsprite(x, y, &tavsprite);
+        Pgy = Ptop->get_closest_vertex(x, y, &K, &tavpont);
+        Pker = Ptop->get_closest_object(x, y, &tavkerek);
+        Psp = Ptop->get_closest_sprite(x, y, &tavsprite);
         if (!Pgy && !Pker && !Psp) {
             return;
         }
@@ -169,7 +169,7 @@ void gany_move_jobb(int mx, int my) {
     double x = pixel_to_meter_x(mx);
     double y = pixel_to_meter_y(my);
     int ujk = 0;
-    polygon* pujgy = Ptop->legkozpont(x, y, &ujk, &tav, Pgy);
+    polygon* pujgy = Ptop->get_closest_vertex(x, y, &ujk, &tav, Pgy);
     if (!pujgy) {
         return;
     }
@@ -191,10 +191,10 @@ void t_move_nyomva_jobb(int mx, int my) {
     double tavsp = 0.0, tavgy = 0.0, tavker = 0.0;
     double x = pixel_to_meter_x(mx);
     double y = pixel_to_meter_y(my);
-    sprite* psp = Ptop->legkozsprite(x, y, &tavsp);
+    sprite* psp = Ptop->get_closest_sprite(x, y, &tavsp);
     int semmi = 0;
-    polygon* pgy = Ptop->legkozpont(x, y, &semmi, &tavgy);
-    object* pk = Ptop->legkozkerek(x, y, &tavker);
+    polygon* pgy = Ptop->get_closest_vertex(x, y, &semmi, &tavgy);
+    object* pk = Ptop->get_closest_object(x, y, &tavker);
 
     if (!psp && !pgy && !pk) {
         return;
@@ -332,17 +332,17 @@ void t_create_vert_nyomva(int mx, int my) {
         double x = pixel_to_meter_x(mx);
         double y = pixel_to_meter_y(my);
 
-        Pgy = Ptop->legkozpont(x, y, &K);
+        Pgy = Ptop->get_closest_vertex(x, y, &K);
         if (!Pgy) {
             // Egy uj poligon elso pontjat rakjuk le:
             // Eloszor megnezzuk, hogy van-e meg hely uj poligonnak:
             int gyuruszam = 0;
-            for (int i = 0; i < MAXGYURU; i++) {
-                if (Ptop->ptomb[i]) {
+            for (int i = 0; i < MAX_POLYGONS; i++) {
+                if (Ptop->polygons[i]) {
                     gyuruszam++;
                 }
             }
-            if (gyuruszam >= MAXGYURU) {
+            if (gyuruszam >= MAX_POLYGONS) {
                 dialog("You cannot create a new polygon",
                        "because you have already reached the maximum number of polygons (300)!");
                 return;
@@ -389,9 +389,9 @@ void t_create_vert_nyomva(int mx, int my) {
         if (!Egypont) {
             internal_error("!Egypont, pedig annak kene lennie (ffdsgiu)!");
         }
-        for (int i = 0; i < MAXGYURU; i++) {
-            if (!Ptop->ptomb[i]) {
-                Pgy = Ptop->ptomb[i] = new polygon;
+        for (int i = 0; i < MAX_POLYGONS; i++) {
+            if (!Ptop->polygons[i]) {
+                Pgy = Ptop->polygons[i] = new polygon;
                 Pgy->vertex_count = 3;
                 Pgy->vertices[0] = pixel_to_meter(Epontx, Eponty);
                 Pgy->vertices[1] = pixel_to_meter(mx, my);
@@ -422,8 +422,8 @@ void t_create_vert_esc(void) {
             // Egesz poligont toroljuk:
             // Eloszor egy kis ellenorzes:
             int gyuruszam = 0;
-            for (int i = 0; i < MAXGYURU; i++) {
-                if (Ptop->ptomb[i]) {
+            for (int i = 0; i < MAX_POLYGONS; i++) {
+                if (Ptop->polygons[i]) {
                     gyuruszam++;
                 }
             }
@@ -432,13 +432,13 @@ void t_create_vert_esc(void) {
             }
 
             int talalt = 0;
-            for (int i = 0; i < MAXGYURU; i++) {
-                if (Ptop->ptomb[i] == Pgy) {
+            for (int i = 0; i < MAX_POLYGONS; i++) {
+                if (Ptop->polygons[i] == Pgy) {
                     // Megtalaltuk:
                     talalt = 1;
                     delete Pgy;
                     Pgy = NULL;
-                    Ptop->ptomb[i] = NULL;
+                    Ptop->polygons[i] = NULL;
                     K = 0;
                     invalidate();
                     break;
@@ -544,7 +544,7 @@ void t_delete_vert_nyomva(int mx, int my) {
     double y = pixel_to_meter_y(my);
 
     int k = 0;
-    polygon* pgy = Ptop->legkozpont(x, y, &k);
+    polygon* pgy = Ptop->get_closest_vertex(x, y, &k);
     if (!pgy) {
         return;
     }
@@ -573,14 +573,14 @@ void t_delete_poly_nyomva(int mx, int my) {
     double y = pixel_to_meter_y(my);
 
     int k = 0;
-    polygon* pgy = Ptop->legkozpont(x, y, &k);
+    polygon* pgy = Ptop->get_closest_vertex(x, y, &k);
     if (!pgy) {
         return;
     }
     // Talaltunk egy poligont, amit le kene torolni:
     int szam = 0;
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (Ptop->ptomb[i]) {
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (Ptop->polygons[i]) {
             szam++;
         }
     }
@@ -591,10 +591,10 @@ void t_delete_poly_nyomva(int mx, int my) {
         dialog("This is the only polygon, so you cannot delete it.");
         return;
     }
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (Ptop->ptomb[i] == pgy) {
-            delete Ptop->ptomb[i];
-            Ptop->ptomb[i] = NULL;
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (Ptop->polygons[i] == pgy) {
+            delete Ptop->polygons[i];
+            Ptop->polygons[i] = NULL;
             Valtozott = 1;
             invalidate();
             return;
@@ -620,28 +620,28 @@ void t_create_food_nyomva_jobb(void) {
 void t_create_kerek_nyomva(int mx, int my, int food) {
     // Megszamoljuk eddigi objektumokat:
     int objszam = 0;
-    for (int i = 0; i < MAXKEREK; i++) {
-        if (Ptop->kerektomb[i]) {
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (Ptop->objects[i]) {
             objszam++;
         }
     }
-    if (objszam >= MAXKEREK) {
+    if (objszam >= MAX_OBJECTS) {
         dialog("You have already reached the maximum number of objects (50)!");
         return;
     }
 
-    for (int i = 0; i < MAXKEREK; i++) {
-        if (!Ptop->kerektomb[i]) {
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (!Ptop->objects[i]) {
             double x = pixel_to_meter_x(mx);
             double y = pixel_to_meter_y(my);
             object::Type tipus = object::Type::Food;
             if (!food) {
                 tipus = object::Type::Killer;
             }
-            Ptop->kerektomb[i] = new object(x, y, tipus);
+            Ptop->objects[i] = new object(x, y, tipus);
             if (food) {
-                Ptop->kerektomb[i]->property = Food_kajatipus;
-                Ptop->kerektomb[i]->animation = Food_foodsorszam;
+                Ptop->objects[i]->property = Food_kajatipus;
+                Ptop->objects[i]->animation = Food_foodsorszam;
             }
             invalidate();
             Valtozott = 1;
@@ -659,12 +659,12 @@ void t_create_kerek_nyomva(int mx, int my, int food) {
 void t_delete_kerek_nyomva(int mx, int my) {
     double x = pixel_to_meter_x(mx);
     double y = pixel_to_meter_y(my);
-    object* pker = Ptop->legkozkerek(x, y);
+    object* pker = Ptop->get_closest_object(x, y);
     if (!pker) {
         return;
     }
-    for (int i = 0; i < MAXKEREK; i++) {
-        if (Ptop->kerektomb[i] == pker) {
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (Ptop->objects[i] == pker) {
             if (pker->type == object::Type::Exit) {
                 dialog("You cannot delete the Exit object!");
                 return;
@@ -674,7 +674,7 @@ void t_delete_kerek_nyomva(int mx, int my) {
                 return;
             }
             delete pker;
-            Ptop->kerektomb[i] = NULL;
+            Ptop->objects[i] = NULL;
             Valtozott = 1;
             invalidate();
             return;
@@ -800,12 +800,12 @@ void t_create_sprite_nyomva(int mx, int my) {
 
     // Megszamoljuk eddigi objektumokat:
     int spriteszam = 0;
-    for (int i = 0; i < MAXSPRITE; i++) {
-        if (Ptop->spritetomb[i]) {
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        if (Ptop->sprites[i]) {
             spriteszam++;
         }
     }
-    if (spriteszam >= MAXSPRITE) {
+    if (spriteszam >= MAX_SPRITES) {
         dialog("You have already reached the maximum number of pictures (5000)!");
         return;
     }
@@ -814,11 +814,11 @@ void t_create_sprite_nyomva(int mx, int my) {
         return; // Nincs kitoltve aktiv sprite
     }
 
-    for (int i = 0; i < MAXSPRITE; i++) {
-        if (!Ptop->spritetomb[i]) {
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        if (!Ptop->sprites[i]) {
             double x = pixel_to_meter_x(mx);
             double y = pixel_to_meter_y(my);
-            Ptop->spritetomb[i] =
+            Ptop->sprites[i] =
                 new sprite(x, y, Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev);
             invalidate();
             Valtozott = 1;
@@ -831,14 +831,14 @@ void t_create_sprite_nyomva(int mx, int my) {
 void t_delete_sprite_nyomva(int mx, int my) {
     double x = pixel_to_meter_x(mx);
     double y = pixel_to_meter_y(my);
-    sprite* psp = Ptop->legkozsprite(x, y);
+    sprite* psp = Ptop->get_closest_sprite(x, y);
     if (!psp) {
         return;
     }
-    for (int i = 0; i < MAXSPRITE; i++) {
-        if (Ptop->spritetomb[i] == psp) {
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        if (Ptop->sprites[i] == psp) {
             delete psp;
-            Ptop->spritetomb[i] = NULL;
+            Ptop->sprites[i] = NULL;
             Valtozott = 1;
             invalidate();
             return;

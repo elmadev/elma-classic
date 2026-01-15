@@ -207,7 +207,7 @@ void replay(void) {
                 MenuPal->set();
                 kiirloading();
                 long belyeg = loadrecek(tmp, 0);
-                if (access_topol(Prec1->palyanev) != 0) {
+                if (access_level_file(Prec1->palyanev) != 0) {
                     int c = menu_dialog("Cannot find the lev file that corresponds",
                                         "to the record file!", tmp, Prec1->palyanev);
                     if (c == KEY_ESC) {
@@ -215,7 +215,7 @@ void replay(void) {
                     }
                 } else {
                     floadlevel_p(Prec1->palyanev);
-                    if (Ptop->belyeg != belyeg) {
+                    if (Ptop->level_id != belyeg) {
                         int c = menu_dialog("The level file has changed since the",
                                             "saving of the record file!", tmp, Prec1->palyanev);
                         if (c == KEY_ESC) {
@@ -256,12 +256,12 @@ void replay(void) {
                 menu_dialog(tmp, "The time of this replay file is:", idostr);
                 continue;
             }
-            if (access_topol(Prec1->palyanev) != 0) {
+            if (access_level_file(Prec1->palyanev) != 0) {
                 menu_dialog("Cannot find the lev file that corresponds", "to the record file!", tmp,
                             Prec1->palyanev);
             } else {
                 floadlevel_p(Prec1->palyanev);
-                if (Ptop->belyeg != belyeg) {
+                if (Ptop->level_id != belyeg) {
                     menu_dialog("The level file has changed since the",
                                 "saving of the record file!", tmp, Prec1->palyanev);
                 } else {
@@ -288,11 +288,11 @@ static void demo(void) {
 
         kiirloading();
         long belyeg = loadrecek(demonevek[demo], 1);
-        if (access_topol(Prec1->palyanev) != 0) {
+        if (access_level_file(Prec1->palyanev) != 0) {
             internal_error("783654");
         }
         floadlevel_p(Prec1->palyanev);
-        if (Ptop->belyeg != belyeg) {
+        if (Ptop->level_id != belyeg) {
             internal_error("6734654");
         }
         Prec1->rewind();

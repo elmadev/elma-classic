@@ -415,7 +415,7 @@ void idoelintezes(long ido, char* valasz, int level, const char* filenev) {
     // Kivalasztjuk hogy single, vagy multiplayer idok-e:
     topten_set* pketfeleido;
     if (extlev) {
-        pketfeleido = &Ptop->idok;
+        pketfeleido = &Ptop->toptens;
     } else {
         pketfeleido = &State->toptens[level];
     }
@@ -438,7 +438,7 @@ void idoelintezes(long ido, char* valasz, int level, const char* filenev) {
         strcpy(pidok->names2[0], State->player2);
         strcat(valasz, "     Best Time!");
         if (extlev) {
-            Ptop->saveidok(filenev);
+            Ptop->save_topten(filenev);
         }
         return;
     }
@@ -490,7 +490,7 @@ void idoelintezes(long ido, char* valasz, int level, const char* filenev) {
     }
 
     if (extlev) {
-        Ptop->saveidok(filenev);
+        Ptop->save_topten(filenev);
     }
 }
 
@@ -501,7 +501,7 @@ void replayprec(void) {
         Prec1->rewind();
         Prec2->rewind();
         if (lejatszo_r(Prec1->palyanev, !elso)) {
-            if (Ptop->kerekekfejjellefele) {
+            if (Ptop->objects_flipped) {
                 internal_error("replayprec-ben Ptop->kerekekfejjellefel!");
             }
             return;
@@ -512,19 +512,19 @@ void replayprec(void) {
 
 // A jelenleg beolvasott palyan jatszik vissza:
 // Azt a nevet kerik, amit topol::topol kap:
-// Ezenlegjobbido beallitasahoz kell neki:
+// BestTime beallitasahoz kell neki:
 void replayjelenlegi(const char* filenev) {
     int elso = 1;
     while (1) {
         Prec1->rewind();
         Prec2->rewind();
         if (lejatszo_r(filenev, !elso)) {
-            if (Ptop->kerekekfejjellefele) {
+            if (Ptop->objects_flipped) {
                 internal_error("replayjelenlegi-ben Ptop->kerekekfejjellefel!");
             }
             return;
         }
-        if (Ptop->kerekekfejjellefele) {
+        if (Ptop->objects_flipped) {
             internal_error("replayjelenlegi-ben Ptop->kerekekfejjellefel!");
         }
         elso = 0;
@@ -568,12 +568,12 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
     while (1) {
         char fejlec[100] = "";
         if (extlev) {
-            if (strlen(Ptop->levelname) > LEVELNAMEHOSSZ) {
+            if (strlen(Ptop->level_name) > LEVEL_NAME_LENGTH) {
                 internal_error("67834767");
             }
-            sprintf(fejlec, "External: %s", Ptop->levelname);
+            sprintf(fejlec, "External: %s", Ptop->level_name);
             if (MenuFont->len(fejlec) > 630) {
-                sprintf(fejlec, "Ext: %s", Ptop->levelname);
+                sprintf(fejlec, "Ext: %s", Ptop->level_name);
             }
         } else {
             strcpy(fejlec, "Level ");
@@ -581,7 +581,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
             itoa(level + 1, tmp, 10);
             strcat(fejlec, tmp);
             strcat(fejlec, ": ");
-            strcat(fejlec, getleveldescription(level));
+            strcat(fejlec, get_internal_level_name(level));
         }
 
         if (!Single && Tag) {
@@ -747,7 +747,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         }
         if (eredmeny == 3) {
             if (level != INTERNAL_LEVEL_COUNT - 1) { // Utolso palyat nem lehet menteni
-                saveplay(Ptop->belyeg);
+                saveplay(Ptop->level_id);
             }
         }
         if (eredmeny == 4) {
@@ -787,7 +787,7 @@ static void playlevel(int level) {
         Prec2->erase(tmpnev);
         long ido = lejatszo(tmpnev);
         MenuPal->set();
-        if (Ptop->kerekekfejjellefele) {
+        if (Ptop->objects_flipped) {
             internal_error("playlevel-ben Ptop->kerekekfejjellefel!");
         }
         char valasz[100] = "";
@@ -865,7 +865,7 @@ void play(void) {
             if (pjatekos->skipped[i]) {
                 strcat(tmp, "SKIPPED!");
             } else {
-                strcat(tmp, getleveldescription(i));
+                strcat(tmp, get_internal_level_name(i));
                 // strcat( tmp, "Nincs level nev!" );
             }
             if (strlen(tmp) > NAV_ENTRY_TEXT_MAX_LENGTH - 5) {

@@ -462,8 +462,8 @@ void ecset::mutatotlanit(void) {
 
 // Ptop kerek-jeinek egesz koordinatait kitolti:
 void ecset::kitoltfoodkoordokat(void) {
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (!pker) {
             continue;
         }
@@ -796,8 +796,8 @@ void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
 }
 
 void ecset::addspriteok(int fazis) {
-    for (int j = 0; j < MAXSPRITE; j++) {
-        sprite* psp = Ptop->spritetomb[j];
+    for (int j = 0; j < MAX_SPRITES; j++) {
+        sprite* psp = Ptop->sprites[j];
         if (!psp) {
             return;
         }
@@ -1121,8 +1121,8 @@ void ecset::addkovetok(int fazis) {
     if (!Plgr->vanfu) {
         return;
     }
-    for (int i = 0; i < MAXGYURU; i++) {
-        polygon* pgy = Ptop->ptomb[i];
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        polygon* pgy = Ptop->polygons[i];
         if (!pgy) {
             return;
         }
@@ -1170,8 +1170,8 @@ void ecset::addobjektumok(void) {
         return;
     }
 
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pk = Ptop->kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pk = Ptop->objects[i];
         if (!pk) {
             return;
         }

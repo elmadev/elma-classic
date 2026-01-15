@@ -715,9 +715,9 @@ int tolt_save_as(int lokkolhato) {
                         return 0;
                     }
                 }
-                Ptop->lezart = 1;
+                Ptop->locked = 1;
                 Ptop->save(nev);
-                Ptop->lezart = 0;
+                Ptop->locked = 0;
                 // strcpy( State->editor_filename, nev );
                 return 1;
             }
@@ -1898,7 +1898,7 @@ void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoo
 }
 
 static void change_level_name(char* nev) {
-    char orignev[LEVELNAMEHOSSZ + 10];
+    char orignev[LEVEL_NAME_LENGTH + 10];
     strcpy(orignev, nev);
 
     push(); // Itt levesszuk egeret es nem is tesszuk vissza vegeig:
@@ -1926,7 +1926,7 @@ static void change_level_name(char* nev) {
             "Type in the name of the level and the designer and press ENTER (ESC to cancel)!");
         int kezdes = (x2 + x1) / 2 - Pabc1->len(nev) / 2;
         Pabc2->write(BufferMain, kezdes, 250, nev);
-        char tmp[LEVELNAMEHOSSZ + 10];
+        char tmp[LEVEL_NAME_LENGTH + 10];
         strcpy(tmp, nev);
         tmp[i] = 0;
         Pabc2->write(BufferMain, kezdes + Pabc1->len(tmp), 255, "-");
@@ -1948,10 +1948,10 @@ static void change_level_name(char* nev) {
         if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ||
             c == ' ') {
 
-            char tmpfejlec[LEVELNAMEHOSSZ + 10];
+            char tmpfejlec[LEVEL_NAME_LENGTH + 10];
             sprintf(tmpfejlec, "Ext: %s", nev);
 
-            if (strlen(nev) >= LEVELNAMEHOSSZ || MenuFont->len(tmpfejlec) > 625) {
+            if (strlen(nev) >= LEVEL_NAME_LENGTH || MenuFont->len(tmpfejlec) > 625) {
                 continue;
             }
 
@@ -2000,13 +2000,13 @@ void change_level_properties(void) {
 
     char fgnev[10];
     char bgnev[10];
-    char levelname[LEVELNAMEHOSSZ + 20];
-    strcpy(fgnev, Ptop->fgnev);
-    strcpy(bgnev, Ptop->bgnev);
-    strcpy(levelname, Ptop->levelname);
+    char levelname[LEVEL_NAME_LENGTH + 20];
+    strcpy(fgnev, Ptop->foreground_name);
+    strcpy(bgnev, Ptop->background_name);
+    strcpy(levelname, Ptop->level_name);
 
     char lgrnev[20] = "";
-    strcpy(lgrnev, Ptop->lgrnev);
+    strcpy(lgrnev, Ptop->lgr_name);
 
     int x1 = 130, y1 = 100;
     int x2 = 570, y2 = 280;
@@ -2034,19 +2034,20 @@ void change_level_properties(void) {
                 return;
             }
             if (c == KEY_ENTER) {
-                if (strcmpi(Ptop->fgnev, fgnev) != 0 || strcmpi(Ptop->bgnev, bgnev) != 0 ||
-                    strcmp(Ptop->levelname, levelname) != 0) {
+                if (strcmpi(Ptop->foreground_name, fgnev) != 0 ||
+                    strcmpi(Ptop->background_name, bgnev) != 0 ||
+                    strcmp(Ptop->level_name, levelname) != 0) {
                     Valtozott = 1;
                 }
-                strcpy(Ptop->fgnev, fgnev);
-                strcpy(Ptop->bgnev, bgnev);
-                strcpy(Ptop->levelname, levelname);
+                strcpy(Ptop->foreground_name, fgnev);
+                strcpy(Ptop->background_name, bgnev);
+                strcpy(Ptop->level_name, levelname);
 
-                if (strcmpi(lgrnev, Ptop->lgrnev) != 0) {
+                if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
                     Valtozott = 1;
-                    strcpy(Ptop->lgrnev, lgrnev);
-                    loadlgrfile(Ptop->lgrnev);
-                    if (Ptop->pic_selejtez(Plgr)) {
+                    strcpy(Ptop->lgr_name, lgrnev);
+                    loadlgrfile(Ptop->lgr_name);
+                    if (Ptop->discard_missing_lgr_assets(Plgr)) {
                         dialogselejtez();
                     }
                 }
@@ -2058,19 +2059,20 @@ void change_level_properties(void) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
-                if (strcmpi(Ptop->fgnev, fgnev) != 0 || strcmpi(Ptop->bgnev, bgnev) != 0 ||
-                    strcmp(Ptop->levelname, levelname) != 0) {
+                if (strcmpi(Ptop->foreground_name, fgnev) != 0 ||
+                    strcmpi(Ptop->background_name, bgnev) != 0 ||
+                    strcmp(Ptop->level_name, levelname) != 0) {
                     Valtozott = 1;
                 }
-                strcpy(Ptop->fgnev, fgnev);
-                strcpy(Ptop->bgnev, bgnev);
-                strcpy(Ptop->levelname, levelname);
+                strcpy(Ptop->foreground_name, fgnev);
+                strcpy(Ptop->background_name, bgnev);
+                strcpy(Ptop->level_name, levelname);
 
-                if (strcmpi(lgrnev, Ptop->lgrnev) != 0) {
+                if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
                     Valtozott = 1;
-                    strcpy(Ptop->lgrnev, lgrnev);
-                    loadlgrfile(Ptop->lgrnev);
-                    if (Ptop->pic_selejtez(Plgr)) {
+                    strcpy(Ptop->lgr_name, lgrnev);
+                    loadlgrfile(Ptop->lgr_name);
+                    if (Ptop->discard_missing_lgr_assets(Plgr)) {
                         dialogselejtez();
                     }
                 }

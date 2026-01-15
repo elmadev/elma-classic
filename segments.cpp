@@ -9,7 +9,7 @@ constexpr int MAX_SEGMENTS = MAX_VERTICES + 130;
 
 segments* Segments = nullptr;
 
-segments::segments(topol* lev) {
+segments::segments(level* lev) {
     seg_list = nullptr;
     seg_list_allocated_length = 0;
     seg_list_length = 0;
@@ -31,8 +31,8 @@ segments::segments(topol* lev) {
     seg_list_allocated_length = MAX_SEGMENTS;
 
     // Load all solid polygons
-    for (int i = 0; i < MAXGYURU; i++) {
-        polygon* poly = lev->ptomb[i];
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        polygon* poly = lev->polygons[i];
         if (!poly) {
             continue;
         }

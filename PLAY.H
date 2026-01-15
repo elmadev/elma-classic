@@ -6,7 +6,7 @@ void play(void);
 // A jelenleg beolvasott palyan jatszik vissza:
 // Csak afterplay menu replay-ebol szabad hasznalni:
 // Azt a nevet kerik, amit topol::topol kap:
-// Ezenlegjobbido beallitasahoz kell neki:
+// BestTime beallitasahoz kell neki:
 void replayjelenlegi(const char* filenev);
 
 // Vagy level == -1 es belyeg != 0 es filenev == NULL,

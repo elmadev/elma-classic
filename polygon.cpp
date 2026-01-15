@@ -281,14 +281,14 @@ polygon::polygon(FILE* h, int version) {
     }
 }
 
-void polygon::save(FILE* h, topol* lev) {
+void polygon::save(FILE* h, level* lev) {
     if (fwrite(&is_grass, 1, sizeof(is_grass), h) != 4) {
         internal_error("polygon::polygon: Failed to write file!");
     }
 
     if (!is_grass) {
         // Swap orientation of polygon if necessary to correctly display as a ground or sky polygon
-        bool sky = lev->levegoben(this);
+        bool sky = lev->is_sky(this);
         bool clockwise = is_clockwise();
         if ((sky && clockwise) || (!sky && !clockwise)) {
             for (int i = 0; i < vertex_count / 2; i++) {

@@ -309,7 +309,7 @@ int vizsgalat(motorst* pmot) {
         for (int i = 0; i < 3; i++) {
             if (sorszamtomb[i] >= 0) {
                 startwavegyujto(WavEvent::None, 0.0, sorszamtomb[i]);
-                object* pker = Ptop->getptrkerek(sorszamtomb[i]);
+                object* pker = Ptop->get_object(sorszamtomb[i]);
                 if (pker->type == object::Type::Food) {
                     pker->active = false;
                     voltkaja = 1; // Hatha van meg tobb kaja is

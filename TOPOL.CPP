@@ -103,7 +103,7 @@ static int titkoswrite(void* mut, int hossz, FILE* h) {
     return 1;
 }
 
-const char* getleveldescription(int level) {
+const char* get_internal_level_name(int index) {
     if (!Leveldescinited) {
         Leveldescinited = 1;
         FILE* h = qopen("desclist.txt", "r");
@@ -129,13 +129,13 @@ const char* getleveldescription(int level) {
 
         qclose(h);
     }
-    if (level < 0 || level >= MAXBEEPLEVELSZAM) {
+    if (index < 0 || index >= MAXBEEPLEVELSZAM) {
         internal_error("8u9r5tg");
     }
-    if (level == 30) { // Animal Farm
+    if (index == 30) { // Animal Farm
         return "Animal Farm";
     }
-    return &Leveldescek[level * (DESCNEVHOSSZ + 2)];
+    return &Leveldescek[index * (DESCNEVHOSSZ + 2)];
 }
 
 // TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL
@@ -181,112 +181,112 @@ const char* getleveldescription(int level) {
 // TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL
 // TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL TOPOL
 
-topol::topol(void) {
-    belyeg = 0;
-    nincslgrje = 0;
-    kerekekfejjellefele = 0;
-    hibas = 0;
-    lezart = 0;
-    idokhelye = 0;
+level::level(void) {
+    level_id = 0;
+    lgr_not_found = 0;
+    objects_flipped = 0;
+    topology_errors = 0;
+    locked = 0;
+    topten_file_offset = 0;
 
-    for (int i = 0; i < MAXGYURU; i++) {
-        ptomb[i] = NULL;
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        polygons[i] = NULL;
     }
-    for (int i = 0; i < MAXKEREK; i++) {
-        kerektomb[i] = NULL;
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        objects[i] = NULL;
     }
-    for (int i = 0; i < MAXSPRITE; i++) {
-        spritetomb[i] = NULL;
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        sprites[i] = NULL;
     }
 
-    memset(&idok, 0, sizeof(idok));
+    memset(&toptens, 0, sizeof(toptens));
 
-    ptomb[0] = new polygon;
-    kerektomb[0] = new object(-2, 0.5, object::Type::Exit);
-    kerektomb[1] = new object(2, 0.5, object::Type::Start);
-    strcpy(levelname, "Unnamed");
-    strcpy(lgrnev, "DEFAULT");
-    strcpy(fgnev, "ground");
-    strcpy(bgnev, "sky");
+    polygons[0] = new polygon;
+    objects[0] = new object(-2, 0.5, object::Type::Exit);
+    objects[1] = new object(2, 0.5, object::Type::Start);
+    strcpy(level_name, "Unnamed");
+    strcpy(lgr_name, "DEFAULT");
+    strcpy(foreground_name, "ground");
+    strcpy(background_name, "sky");
 }
 
-topol::~topol(void) {
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (ptomb[i]) {
-            delete ptomb[i];
+level::~level(void) {
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (polygons[i]) {
+            delete polygons[i];
         }
-        ptomb[i] = NULL;
+        polygons[i] = NULL;
     }
-    for (int i = 0; i < MAXKEREK; i++) {
-        if (kerektomb[i]) {
-            delete kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (objects[i]) {
+            delete objects[i];
         }
-        kerektomb[i] = NULL;
+        objects[i] = NULL;
     }
-    for (int i = 0; i < MAXSPRITE; i++) {
-        if (spritetomb[i]) {
-            delete spritetomb[i];
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        if (sprites[i]) {
+            delete sprites[i];
         }
-        spritetomb[i] = NULL;
+        sprites[i] = NULL;
     }
 }
 
 // Igazzal ter vissza, ha volt valtozas:
-int topol::pic_selejtez(lgrfile* plgr) {
+int level::discard_missing_lgr_assets(lgrfile* lgr) {
     // Most minden sprite-ot kitorol, ha nincs meg hozza LGR-file-ban
     // kep, maszk, vagy textura nev:
 
     // Ezt lehetne hasznalni dialogushoz:
     int volttorles = 0;
-    for (int i = 0; i < MAXSPRITE; i++) {
-        if (spritetomb[i]) {
-            sprite* psp = spritetomb[i];
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        if (sprites[i]) {
+            sprite* psp = sprites[i];
             // Default meret:
             psp->wireframe_width = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
             psp->wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
 
             if (psp->picture_name[0] && (psp->mask_name[0] || psp->texture_name[0])) {
-                internal_error("pic_selejtez-ben sok nev egy spriteban!");
+                internal_error("discard_missing_lgr_assets-ben sok nev egy spriteban!");
             }
             if (psp->picture_name[0]) {
-                int index = plgr->getkepindex(psp->picture_name);
+                int index = lgr->getkepindex(psp->picture_name);
                 if (index < 0) {
                     psp->picture_name[0] = 0;
                     // Toroljuk:
-                    delete spritetomb[i];
-                    spritetomb[i] = NULL;
+                    delete sprites[i];
+                    sprites[i] = NULL;
                     volttorles = 1;
                     continue;
                 }
                 // Megvan kep:
-                psp->wireframe_width = plgr->kepek[index].xsize;
-                psp->wireframe_height = plgr->kepek[index].ysize;
+                psp->wireframe_width = lgr->kepek[index].xsize;
+                psp->wireframe_height = lgr->kepek[index].ysize;
                 psp->wireframe_width *= PixelsToMeters;
                 psp->wireframe_height *= PixelsToMeters;
             } else {
                 // Nem kep sprite:
                 if (psp->mask_name[0]) {
-                    int index = plgr->getmaszkindex(psp->mask_name);
+                    int index = lgr->getmaszkindex(psp->mask_name);
                     if (index < 0) {
                         psp->mask_name[0] = 0;
                         // Toroljuk:
-                        delete spritetomb[i];
-                        spritetomb[i] = NULL;
+                        delete sprites[i];
+                        sprites[i] = NULL;
                         volttorles = 1;
                     } else {
-                        psp->wireframe_width = plgr->maszkok[index].xsize;
-                        psp->wireframe_height = plgr->maszkok[index].ysize;
+                        psp->wireframe_width = lgr->maszkok[index].xsize;
+                        psp->wireframe_height = lgr->maszkok[index].ysize;
                         psp->wireframe_width *= PixelsToMeters;
                         psp->wireframe_height *= PixelsToMeters;
                     }
                 }
                 if (psp->texture_name[0]) {
-                    int index = plgr->gettexturaindex(psp->texture_name);
+                    int index = lgr->gettexturaindex(psp->texture_name);
                     if (index < 0) {
                         psp->texture_name[0] = 0;
                         // Toroljuk:
-                        delete spritetomb[i];
-                        spritetomb[i] = NULL;
+                        delete sprites[i];
+                        sprites[i] = NULL;
                         volttorles = 1;
                     }
                 }
@@ -298,193 +298,194 @@ int topol::pic_selejtez(lgrfile* plgr) {
     int voltvaltozas = 1;
     while (voltvaltozas) {
         voltvaltozas = 0;
-        for (int i = 0; i < MAXSPRITE - 1; i++) {
-            if (!spritetomb[i] && spritetomb[i + 1]) {
+        for (int i = 0; i < MAX_SPRITES - 1; i++) {
+            if (!sprites[i] && sprites[i + 1]) {
                 // Kovetkezo mutatot ide hozzuk:
-                spritetomb[i] = spritetomb[i + 1];
-                spritetomb[i + 1] = NULL;
+                sprites[i] = sprites[i + 1];
+                sprites[i + 1] = NULL;
                 voltvaltozas = 1;
             }
         }
     }
 
     // Kiselejtezzuk es ha kell ujra is toltjuk fore es background neveket:
-    if (strcmpi(Ptop->fgnev, Ptop->bgnev) == 0) {
-        Ptop->bgnev[0] = 0;
+    if (strcmpi(Ptop->foreground_name, Ptop->background_name) == 0) {
+        Ptop->background_name[0] = 0;
     }
-    if (Plgr->gettexturaindex(Ptop->fgnev) < 0) {
-        Ptop->fgnev[0] = 0;
+    if (Plgr->gettexturaindex(Ptop->foreground_name) < 0) {
+        Ptop->foreground_name[0] = 0;
     }
-    if (Plgr->gettexturaindex(Ptop->bgnev) < 0) {
-        Ptop->bgnev[0] = 0;
+    if (Plgr->gettexturaindex(Ptop->background_name) < 0) {
+        Ptop->background_name[0] = 0;
     }
 
     if (Plgr->texturaszam < 2) {
         internal_error("8u9yr");
     }
 
-    if (!Ptop->fgnev[0]) {
-        if (strcmpi(Ptop->bgnev, Plgr->texturak[0].nev) != 0) {
-            strcpy(Ptop->fgnev, Plgr->texturak[0].nev);
+    if (!Ptop->foreground_name[0]) {
+        if (strcmpi(Ptop->background_name, Plgr->texturak[0].nev) != 0) {
+            strcpy(Ptop->foreground_name, Plgr->texturak[0].nev);
         } else {
-            strcpy(Ptop->fgnev, Plgr->texturak[1].nev);
+            strcpy(Ptop->foreground_name, Plgr->texturak[1].nev);
         }
     }
 
-    if (!Ptop->bgnev[0]) {
-        if (strcmpi(Ptop->fgnev, Plgr->texturak[0].nev) != 0) {
-            strcpy(Ptop->bgnev, Plgr->texturak[0].nev);
+    if (!Ptop->background_name[0]) {
+        if (strcmpi(Ptop->foreground_name, Plgr->texturak[0].nev) != 0) {
+            strcpy(Ptop->background_name, Plgr->texturak[0].nev);
         } else {
-            strcpy(Ptop->bgnev, Plgr->texturak[1].nev);
+            strcpy(Ptop->background_name, Plgr->texturak[1].nev);
         }
     }
     return volttorles;
 }
 
-polygon* topol::legkozpont(double x, double y, int* pk, double* ptav, polygon* kimarad) {
-    if (ptav) {
-        *ptav = 1000000000.0;
+polygon* level::get_closest_vertex(double x, double y, int* vertex_index, double* distance,
+                                   polygon* skip) {
+    if (distance) {
+        *distance = 1000000000.0;
     }
 
     double tav = 1000000.0;
     polygon* pgy = NULL;
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (!ptomb[i]) {
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (!polygons[i]) {
             continue;
         }
-        if (ptomb[i] == kimarad) {
+        if (polygons[i] == skip) {
             continue;
         }
-        if (ptomb[i]->is_grass && !Rajzolkoveto) {
+        if (polygons[i]->is_grass && !Rajzolkoveto) {
             continue;
         }
-        if (!ptomb[i]->is_grass && !Rajzolpoligon) {
+        if (!polygons[i]->is_grass && !Rajzolpoligon) {
             continue;
         }
 
         int ujk;
-        double ujtav = ptomb[i]->get_closest_vertex(x, y, &ujk);
+        double ujtav = polygons[i]->get_closest_vertex(x, y, &ujk);
         if (ujtav < tav) {
             tav = ujtav;
-            *pk = ujk;
-            pgy = ptomb[i];
+            *vertex_index = ujk;
+            pgy = polygons[i];
         }
     }
     if (tav > max_grab_distance()) {
-        *pk = 0;
+        *vertex_index = 0;
         return NULL;
     }
-    if (ptav) {
-        *ptav = tav;
+    if (distance) {
+        *distance = tav;
     }
     return pgy;
 }
 
-object* topol::legkozkerek(double x, double y, double* ptav) {
-    if (ptav) {
-        *ptav = 1000000000.0;
+object* level::get_closest_object(double x, double y, double* distance) {
+    if (distance) {
+        *distance = 1000000000.0;
     }
 
     double tav = 1000000.0;
     object* pker = NULL;
     vect2 r(x, y);
-    for (int i = 0; i < MAXKEREK; i++) {
-        if (kerektomb[i]) {
-            double ujtav = (kerektomb[i]->r - r).length();
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (objects[i]) {
+            double ujtav = (objects[i]->r - r).length();
             if (ujtav < tav) {
                 tav = ujtav;
-                pker = kerektomb[i];
+                pker = objects[i];
             }
         }
     }
     if (tav > max_grab_distance()) {
         return NULL;
     }
-    if (ptav) {
-        *ptav = tav;
+    if (distance) {
+        *distance = tav;
     }
     return pker;
 }
 
-sprite* topol::legkozsprite(double x, double y, double* ptav) {
-    if (ptav) {
-        *ptav = 1000000000.0;
+sprite* level::get_closest_sprite(double x, double y, double* distance) {
+    if (distance) {
+        *distance = 1000000000.0;
     }
 
     double tav = 1000000.0;
     sprite* psp = NULL;
     vect2 r(x, y);
-    for (int i = 0; i < MAXSPRITE; i++) {
+    for (int i = 0; i < MAX_SPRITES; i++) {
         if (!Rajzolkepek) {
             continue;
         }
-        if (!spritetomb[i]) {
+        if (!sprites[i]) {
             continue;
         }
 
-        double ujtav = (spritetomb[i]->r - r).length();
+        double ujtav = (sprites[i]->r - r).length();
         if (ujtav < tav) {
             tav = ujtav;
-            psp = spritetomb[i];
+            psp = sprites[i];
         }
     }
     if (tav > max_grab_distance()) {
         return NULL;
     }
-    if (ptav) {
-        *ptav = tav;
+    if (distance) {
+        *distance = tav;
     }
     return psp;
 }
 
-void topol::kirajzol(void) {
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (ptomb[i]) {
-            if (ptomb[i]->is_grass) {
+void level::render(void) {
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (polygons[i]) {
+            if (polygons[i]->is_grass) {
                 // Kovetok:
                 if (Rajzolkoveto) {
-                    ptomb[i]->render_outline();
+                    polygons[i]->render_outline();
                 }
             } else {
                 // Normal poligonok:
                 if (Rajzolpoligon) {
-                    ptomb[i]->render_outline();
+                    polygons[i]->render_outline();
                 }
             }
         }
     }
-    for (int i = 0; i < MAXKEREK; i++) {
-        if (kerektomb[i]) {
-            kerektomb[i]->render();
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (objects[i]) {
+            objects[i]->render();
         }
     }
-    for (int i = 0; i < MAXSPRITE; i++) {
-        if (spritetomb[i]) {
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        if (sprites[i]) {
             if (Rajzolkepek) {
-                spritetomb[i]->render();
+                sprites[i]->render();
             }
         }
     }
 }
 
 // Igaz, ha bent van:
-int topol::levegoben(polygon* pgy, vect2* pr) {
-    if ((pgy && pr) || (!pgy && !pr)) {
-        internal_error("topol::levegoben-ben paramok nem stimmelnek!");
+int level::is_sky(polygon* poly, vect2* point) {
+    if ((poly && point) || (!poly && !point)) {
+        internal_error("level::is_sky-ben paramok nem stimmelnek!");
     }
 
     vect2 r;
-    if (pgy) {
-        r = pgy->vertices[0]; // pgy->center();
+    if (poly) {
+        r = poly->vertices[0]; // poly->center();
     } else {
-        r = *pr;
+        r = *point;
     }
     vect2 v = vect2(27654.475374565578, 37850.5364775);
     // Vegigmegyunk az egeszen:
     int metszes = 0;
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (ptomb[i] && !ptomb[i]->is_grass && ptomb[i] != pgy) {
-            metszes += ptomb[i]->count_intersections(r, v);
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (polygons[i] && !polygons[i]->is_grass && polygons[i] != poly) {
+            metszes += polygons[i]->count_intersections(r, v);
         }
     }
     if (metszes % 2) {
@@ -494,13 +495,13 @@ int topol::levegoben(polygon* pgy, vect2* pr) {
     }
 }
 
-int nevanalizis(const char* nev) {
+int get_internal_index(const char* filename) {
     // (rekorder.cpp-ben is be van huzalozva ez a string:)
-    if (strnicmp(nev, "QWQUU", 5) != 0) {
+    if (strnicmp(filename, "QWQUU", 5) != 0) {
         return 0;
     }
 
-    const char* fut = &nev[5];
+    const char* fut = &filename[5];
     int sum = 0;
     for (int i = 0; i < 3; i++) {
         sum *= 10;
@@ -512,7 +513,7 @@ int nevanalizis(const char* nev) {
         fut++;
     }
 
-    if (strcmpi(&nev[8], ".lev") != 0) {
+    if (strcmpi(&filename[8], ".lev") != 0) {
         return 0;
     }
 
@@ -523,25 +524,25 @@ int nevanalizis(const char* nev) {
 }
 
 // Ha letezik file, akkor 0-t ad vissza!:
-int access_topol(const char* filenev) {
-    int belsopalyaszam = nevanalizis(filenev);
+int access_level_file(const char* filename) {
+    int belsopalyaszam = get_internal_index(filename);
     if (belsopalyaszam > 0) {
         return 0;
     }
     char tmp[30];
-    sprintf(tmp, "lev/%s", filenev);
+    sprintf(tmp, "lev/%s", filename);
     return access(tmp, 0);
 }
 
-char Ezenlegjobbido[30] = "";
+char BestTime[30] = "";
 
 // Azt a nevet keri, amit topol::topol kap:
-void beallitlegjobbidot(const char* filenev, int single) {
-    if (strlen(filenev) > 20) {
+void load_best_time(const char* filename, int single) {
+    if (strlen(filename) > 20) {
         internal_error("4534516");
     }
 
-    int belsopalyaszam = nevanalizis(filenev);
+    int belsopalyaszam = get_internal_index(filename);
     topten_set* idok = NULL;
     if (belsopalyaszam > 0) {
         belsopalyaszam--; // Mivel eggyel nagyobb tomb indexenel
@@ -556,7 +557,7 @@ void beallitlegjobbidot(const char* filenev, int single) {
         if (!Ptop) {
             internal_error("78236");
         }
-        idok = &Ptop->idok;
+        idok = &Ptop->toptens;
     }
 
     topten* egyfeleidok = NULL;
@@ -567,9 +568,9 @@ void beallitlegjobbidot(const char* filenev, int single) {
     }
 
     if (egyfeleidok->times_count > 0) {
-        centiseconds_to_string(egyfeleidok->times[0], Ezenlegjobbido);
+        centiseconds_to_string(egyfeleidok->times[0], BestTime);
     } else {
-        Ezenlegjobbido[0] = 0;
+        BestTime[0] = 0;
     }
 }
 
@@ -637,7 +638,7 @@ static void makelgrtabla(void) {
 }
 
 // QWQUU001 elso palya:
-topol::topol(const char* filenev_p) {
+level::level(const char* filename) {
     if (!Lgrtabla[1]) {
         makelgrtabla();
     }
@@ -645,12 +646,12 @@ topol::topol(const char* filenev_p) {
     int kulso = 1;
 
     char filenev[21];
-    if (strlen(filenev_p) > 20) {
+    if (strlen(filename) > 20) {
         internal_error("7y537yf");
     }
-    strcpy(filenev, filenev_p);
+    strcpy(filenev, filename);
 
-    int belsopalyaszam = nevanalizis(filenev);
+    int belsopalyaszam = get_internal_index(filenev);
     if (belsopalyaszam > 0) {
         kulso = 0;
         strcpy(filenev, Levelnevek[belsopalyaszam]);
@@ -664,9 +665,9 @@ topol::topol(const char* filenev_p) {
     // beolvassa sok gyurut es csak utana olvassa kerekek szamat es kerekeket
 
     if (kulso) {
-        loadkulso(filenev);
+        load_external(filenev);
     } else {
-        loadbelso(filenev);
+        load_internal(filenev);
         // Sajat tablabol vesszuk lgr neveket:
         // #ifdef DEBUG 		Demo miatt most nem ellenorizzuk
         //	if( belsopalyaszam < 0 || belsopalyaszam > INTERNAL_LEVEL_COUNT )
@@ -675,45 +676,45 @@ topol::topol(const char* filenev_p) {
         char tmp[40];
         sprintf(tmp, "lgr/%s.lgr", Lgrtabla[belsopalyaszam]);
         if (access(tmp, 0) == 0) { // Csak ha letezik file:
-            strcpy(lgrnev, Lgrtabla[belsopalyaszam]);
+            strcpy(lgr_name, Lgrtabla[belsopalyaszam]);
         }
     }
 }
 
-void topol::loadkulso(const char* filenev) {
+void level::load_external(const char* filename) {
     ////int kulso = 1;
 
-    nincslgrje = 0;
-    kerekekfejjellefele = 0;
-    hibas = 0;
-    lezart = 0;
+    lgr_not_found = 0;
+    objects_flipped = 0;
+    topology_errors = 0;
+    locked = 0;
 
-    idokhelye = 0;
-    memset(&idok, 0, sizeof(idok));
+    topten_file_offset = 0;
+    memset(&toptens, 0, sizeof(toptens));
 
-    for (int i = 0; i < MAXGYURU; i++) {
-        ptomb[i] = NULL;
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        polygons[i] = NULL;
     }
-    for (int i = 0; i < MAXKEREK; i++) {
-        kerektomb[i] = NULL;
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        objects[i] = NULL;
     }
-    for (int i = 0; i < MAXSPRITE; i++) {
-        spritetomb[i] = NULL;
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        sprites[i] = NULL;
     }
 
     FILE* h = NULL;
     ////if( kulso ) {
     char tmpnev[40];
-    sprintf(tmpnev, "lev/%s", filenev);
+    sprintf(tmpnev, "lev/%s", filename);
     h = fopen(tmpnev, "rb");
     if (!h) {
-        internal_error("topol::topol-ban nem tudta nyitni file-t!: ", tmpnev);
+        internal_error("level::level-ban nem tudta nyitni file-t!: ", tmpnev);
     }
     /*////}
     else {
         h = qopen( filenev, "rb" );
         if( !h )
-            internal_error( "topol::topol-ban nem tudta nyitni file-t!: ", filenev );
+            internal_error( "level::level-ban nem tudta nyitni file-t!: ", filenev );
     } */////
 
     // Verzio beolvasasa:
@@ -722,21 +723,21 @@ void topol::loadkulso(const char* filenev) {
         internal_error("Nem tudott olvasni txt file-bol!");
     }
     if (strncmp(tmp, "POT", 3) != 0) {
-        internal_error("topol::topol( char* filenev )-ben nem stimmel eleje!");
+        internal_error("level::level( char* filename )-ben nem stimmel eleje!");
     }
 
-    belyeg = 0;
+    level_id = 0;
     double belyeg_d = 0;
     int verzio = tmp[4] - '0' + 10 * (tmp[3] - '0');
 
     if (verzio > 14) {
-        external_error("Level file's version is too new!: ", filenev);
+        external_error("Level file's version is too new!: ", filename);
     }
 
     // Most csak ezt a ket verziot tudja olvasni, de eleg kikommentezni
     // hogy mindet olvassa:
     if (verzio != 6 && verzio != 14) {
-        external_error("Corrupt level file!: ", filenev);
+        external_error("Corrupt level file!: ", filename);
     }
 
     // verzio 6: 1.2-es verzio levele
@@ -756,7 +757,7 @@ void topol::loadkulso(const char* filenev) {
     }
 
     // Belyeg:
-    if (fread(&belyeg, 1, 4, h) != 4) {
+    if (fread(&level_id, 1, 4, h) != 4) {
         internal_error("Nem tudott olvasni lev file-bol!");
     }
 
@@ -770,7 +771,7 @@ void topol::loadkulso(const char* filenev) {
         internal_error("Nem tudott olvasni lev file-bol!");
     }
     if (sarvarertek + belyeg_d < 9786.0 || sarvarertek + belyeg_d > 36546.0) {
-        internal_error("topol::topol-ban sarvarertek kivul esik tartomanyon!");
+        internal_error("level::level-ban sarvarertek kivul esik tartomanyon!");
     }
 
     // Levels that can only be played in Registered would meet the condition: sarvarertek + belyeg_d
@@ -782,10 +783,10 @@ void topol::loadkulso(const char* filenev) {
         internal_error("Nem tudott olvasni lev file-bol!");
     }
     if (hibaertek + belyeg_d < 9786.0 || hibaertek + belyeg_d > 36546.0) {
-        internal_error("topol::topol-ban hibaertek kivul esik tartomanyon!");
+        internal_error("level::level-ban hibaertek kivul esik tartomanyon!");
     }
     if (hibaertek + belyeg_d > 20000.0) {
-        hibas = 1;
+        topology_errors = 1;
     }
 
     // Beolvassuk hogy lezart-e:
@@ -794,38 +795,38 @@ void topol::loadkulso(const char* filenev) {
         internal_error("Nem tudott olvasni lev file-bol!");
     }
     if (lezartertek + belyeg_d < 9875.0 || lezartertek + belyeg_d > 32345.0) {
-        internal_error("topol::topol-ban lezartertek kivul esik tartomanyon!");
+        internal_error("level::level-ban lezartertek kivul esik tartomanyon!");
     }
     if (lezartertek + belyeg_d > 20000.0) {
-        lezart = 1;
+        locked = 1;
     }
 
     // lezart = 0; // Ha ez nincs kikomentezve, unlockol minden file-t
 
     // Beolvassuk level nevet:
-    int tmpnamehossz = LEVELNAMEHOSSZ;
+    int tmpnamehossz = LEVEL_NAME_LENGTH;
     if (verzio < 14) {
         tmpnamehossz = 14;
     }
-    fread(levelname, 1, tmpnamehossz + 1, h);
-    levelname[tmpnamehossz] = 0; // Ez csak biztonsagert
+    fread(level_name, 1, tmpnamehossz + 1, h);
+    level_name[tmpnamehossz] = 0; // Ez csak biztonsagert
 
     // Beolvassuk lgr nevet:
     if (verzio > 6) {
-        fread(lgrnev, 1, 16, h);
-        lgrnev[15] = 0; // Ez csak biztonsagert
+        fread(lgr_name, 1, 16, h);
+        lgr_name[15] = 0; // Ez csak biztonsagert
     } else {
-        strcpy(lgrnev, "default");
+        strcpy(lgr_name, "default");
     }
 
     if (verzio >= 8) {
-        fread(fgnev, 1, 10, h);
-        fgnev[9] = 0; // Ez csak biztonsagert
-        fread(bgnev, 1, 10, h);
-        fgnev[9] = 0; // Ez csak biztonsagert
+        fread(foreground_name, 1, 10, h);
+        foreground_name[9] = 0; // Ez csak biztonsagert
+        fread(background_name, 1, 10, h);
+        foreground_name[9] = 0; // Ez csak biztonsagert
     } else {
-        strcpy(fgnev, "ground");
-        strcpy(bgnev, "sky");
+        strcpy(foreground_name, "ground");
+        strcpy(background_name, "sky");
     }
 
     // Gyuruk szamat 100 byte utan kezdjuk:
@@ -838,39 +839,39 @@ void topol::loadkulso(const char* filenev) {
 
     double gyuruolvszam = 0;
     if (fread(&gyuruolvszam, 1, sizeof(gyuruolvszam), h) != sizeof(gyuruolvszam)) {
-        internal_error("topol::topol-ban nem tudta olvasni lebego gyuruszamot!");
+        internal_error("level::level-ban nem tudta olvasni lebego gyuruszamot!");
     }
 
     int gyuruszam = (int)(gyuruolvszam);
-    if (gyuruszam > MAXGYURU) {
-        internal_error("topol::topol-ban gyuruszam > MAXGYURU!: ");
+    if (gyuruszam > MAX_POLYGONS) {
+        internal_error("level::level-ban gyuruszam > MAX_POLYGONS!: ");
     }
     if (gyuruszam <= 0) {
-        internal_error("topol::topol-ban gyuruszam <= 0!");
+        internal_error("level::level-ban gyuruszam <= 0!");
     }
 
     // Beolvassa sok gyurut:
     for (int i = 0; i < gyuruszam; i++) {
-        ptomb[i] = new polygon(h, verzio);
+        polygons[i] = new polygon(h, verzio);
     }
 
     // Kerekek szama:
     double kerekolvszam = 0;
     if (fread(&kerekolvszam, 1, sizeof(kerekolvszam), h) != sizeof(kerekolvszam)) {
-        internal_error("topol::topol-ban nem tudta olvasni lebego kerekszamot!");
+        internal_error("level::level-ban nem tudta olvasni lebego kerekszamot!");
     }
 
     int kerekszam = (int)(kerekolvszam);
-    if (kerekszam > MAXKEREK) {
-        internal_error("topol::topol-ban kerekszam > MAXKEREK!: ");
+    if (kerekszam > MAX_OBJECTS) {
+        internal_error("level::level-ban kerekszam > MAX_OBJECTS!: ");
     }
     if (kerekszam <= 0) {
-        internal_error("topol::topol-ban kerekszam <= 0!");
+        internal_error("level::level-ban kerekszam <= 0!");
     }
 
     for (int i = 0; i < kerekszam; i++) {
         // Beolvassa sok kereket:
-        kerektomb[i] = new object(h, verzio);
+        objects[i] = new object(h, verzio);
     }
 
     if (verzio > 6) {
@@ -878,24 +879,24 @@ void topol::loadkulso(const char* filenev) {
         // Kerekek szama:
         double spriteolvszam = 0;
         if (fread(&spriteolvszam, 1, sizeof(spriteolvszam), h) != sizeof(spriteolvszam)) {
-            internal_error("topol::topol-ban nem tudta olvasni lebego spriteszamot!");
+            internal_error("level::level-ban nem tudta olvasni lebego spriteszamot!");
         }
 
         int spriteszam = (int)(spriteolvszam);
-        if (spriteszam > MAXSPRITE) {
-            internal_error("topol::topol-ban spriteszam > MAXSPRITE!: ");
+        if (spriteszam > MAX_SPRITES) {
+            internal_error("level::level-ban spriteszam > MAX_SPRITES!: ");
         }
         if (spriteszam < 0) {
-            internal_error("topol::topol-ban spriteszam < 0!");
+            internal_error("level::level-ban spriteszam < 0!");
         }
 
         if (verzio < 8 && spriteszam > 0) {
-            internal_error("verzio < 8 && spriteszam > 0!", filenev);
+            internal_error("verzio < 8 && spriteszam > 0!", filename);
         }
 
         for (int i = 0; i < spriteszam; i++) {
             // Beolvassa sok kereket:
-            spritetomb[i] = new sprite(h);
+            sprites[i] = new sprite(h);
         }
     }
 
@@ -904,8 +905,8 @@ void topol::loadkulso(const char* filenev) {
     // Meg beolvassuk ido tablat is kulso file eseten:
     // idokhelye es idok tartalma eddig 0:
     ////if( kulso ) {
-    idokhelye = ftell(h);
-    if (idokhelye < 6) {
+    topten_file_offset = ftell(h);
+    if (topten_file_offset < 6) {
         internal_error("dddhhhew");
     }
 
@@ -914,9 +915,9 @@ void topol::loadkulso(const char* filenev) {
         // if( verzio >= 10 )
         //   external_error( "Corrupt file:", filenev );
     } else {
-        if (!titkosread(&idok, sizeof(idok), h) || fread(&tmpszam, 1, 4, h) != 4 ||
+        if (!titkosread(&toptens, sizeof(toptens), h) || fread(&tmpszam, 1, 4, h) != 4 ||
             tmpszam != IDOEGYEDISZAM2) {
-            memset(&idok, 0, sizeof(idok));
+            memset(&toptens, 0, sizeof(toptens));
             // external_error( "Corrupt file:", filenev );
         }
     }
@@ -928,36 +929,36 @@ void topol::loadkulso(const char* filenev) {
     ////    qclose( h );
 
     // Most megnezzuk, hogy belyeg stimmel-e:
-    double szamitottbelyeg = belyegszamitas(verzio > 6);
+    double szamitottbelyeg = checksum(verzio > 6);
     if (fabs(szamitottbelyeg - belyeg_d) > 0.01) {
-        external_error("Corrupt .LEV file!: ", filenev);
+        external_error("Corrupt .LEV file!: ", filename);
     }
 }
 
 // Ezt ha ujra kell kepezni loadkulso atalakitasaval kell:
-void topol::loadbelso(const char* filenev) {
-    nincslgrje = 0;
-    kerekekfejjellefele = 0;
-    hibas = 0;
-    lezart = 0;
+void level::load_internal(const char* filename) {
+    lgr_not_found = 0;
+    objects_flipped = 0;
+    topology_errors = 0;
+    locked = 0;
 
-    idokhelye = 0;
-    memset(&idok, 0, sizeof(idok));
+    topten_file_offset = 0;
+    memset(&toptens, 0, sizeof(toptens));
 
-    for (int i = 0; i < MAXGYURU; i++) {
-        ptomb[i] = NULL;
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        polygons[i] = NULL;
     }
-    for (int i = 0; i < MAXKEREK; i++) {
-        kerektomb[i] = NULL;
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        objects[i] = NULL;
     }
-    for (int i = 0; i < MAXSPRITE; i++) {
-        spritetomb[i] = NULL;
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        sprites[i] = NULL;
     }
 
     FILE* h = NULL;
-    h = qopen(filenev, "rb");
+    h = qopen(filename, "rb");
     if (!h) {
-        internal_error("topol::topol-ban nem tudta nyitni file-t!: ", filenev);
+        internal_error("level::level-ban nem tudta nyitni file-t!: ", filename);
     }
 
     // Verzio beolvasasa:
@@ -966,18 +967,18 @@ void topol::loadbelso(const char* filenev) {
         internal_error("Nem tudott olvasni txt file-bol!");
     }
     if (strncmp(tmp, "@@^!@", 3) != 0) {
-        internal_error("topol::topol( char* filenev )-ben nem stimmel eleje!");
+        internal_error("level::level( char* filename )-ben nem stimmel eleje!");
     }
 
-    belyeg = 0;
+    level_id = 0;
     double belyeg_d = 0;
     /*int verzio = tmp[4] - '0' + 10*(tmp[3] - '0');
 
     if( verzio < 6 )
-        external_error( "Corrupt level file!: ", filenev );
+        external_error( "Corrupt level file!: ", filename );
 
     if( verzio > 14 )
-        external_error( "Level file's version is too new!: ", filenev );
+        external_error( "Level file's version is too new!: ", filename );
     */
     int verzio = 14; // Mivel leb file-okat mindig igy mentjuk
 
@@ -998,7 +999,7 @@ void topol::loadbelso(const char* filenev) {
     }
 
     // Belyeg:
-    if (fread(&belyeg, 1, 4, h) != 4) {
+    if (fread(&level_id, 1, 4, h) != 4) {
         internal_error("Nem tudott olvasni lev file-bol!");
     }
 
@@ -1012,7 +1013,7 @@ void topol::loadbelso(const char* filenev) {
         internal_error("Nem tudott olvasni lev file-bol!");
     }
     if (sarvarertek + belyeg_d < 9786.0 || sarvarertek + belyeg_d > 36546.0) {
-        internal_error("topol::topol-ban sarvarertek kivul esik tartomanyon!");
+        internal_error("level::level-ban sarvarertek kivul esik tartomanyon!");
     }
 
     // Beolvassuk hogy hibas-e:
@@ -1021,10 +1022,10 @@ void topol::loadbelso(const char* filenev) {
         internal_error("Nem tudott olvasni lev file-bol!");
     }
     if (hibaertek + belyeg_d < 9786.0 || hibaertek + belyeg_d > 36546.0) {
-        internal_error("topol::topol-ban hibaertek kivul esik tartomanyon!");
+        internal_error("level::level-ban hibaertek kivul esik tartomanyon!");
     }
     if (hibaertek + belyeg_d > 20000.0) {
-        hibas = 1;
+        topology_errors = 1;
     }
 
     // Beolvassuk hogy lezart-e:
@@ -1033,10 +1034,10 @@ void topol::loadbelso(const char* filenev) {
         internal_error("Nem tudott olvasni lev file-bol!");
     }
     if (lezartertek + belyeg_d < 9875.0 || lezartertek + belyeg_d > 32345.0) {
-        internal_error("topol::topol-ban lezartertek kivul esik tartomanyon!");
+        internal_error("level::level-ban lezartertek kivul esik tartomanyon!");
     }
     if (lezartertek + belyeg_d > 20000.0) {
-        lezart = 1;
+        locked = 1;
     }
 
     // if( lezart ) {
@@ -1047,29 +1048,29 @@ void topol::loadbelso(const char* filenev) {
     // lezart = 0; // Ha ez nincs kikomentezve, unlockol minden file-t
 
     // Beolvassuk level nevet:
-    int tmpnamehossz = LEVELNAMEHOSSZ;
+    int tmpnamehossz = LEVEL_NAME_LENGTH;
     if (verzio < 14) {
         tmpnamehossz = 14;
     }
-    fread(levelname, 1, tmpnamehossz + 1, h);
-    levelname[tmpnamehossz] = 0; // Ez csak biztonsagert
+    fread(level_name, 1, tmpnamehossz + 1, h);
+    level_name[tmpnamehossz] = 0; // Ez csak biztonsagert
 
     // Beolvassuk lgr nevet:
     if (verzio > 6) {
-        fread(lgrnev, 1, 16, h);
-        lgrnev[15] = 0; // Ez csak biztonsagert
+        fread(lgr_name, 1, 16, h);
+        lgr_name[15] = 0; // Ez csak biztonsagert
     } else {
-        strcpy(lgrnev, "default");
+        strcpy(lgr_name, "default");
     }
 
     if (verzio >= 8) {
-        fread(fgnev, 1, 10, h);
-        fgnev[9] = 0; // Ez csak biztonsagert
-        fread(bgnev, 1, 10, h);
-        bgnev[9] = 0; // Ez csak biztonsagert
+        fread(foreground_name, 1, 10, h);
+        foreground_name[9] = 0; // Ez csak biztonsagert
+        fread(background_name, 1, 10, h);
+        background_name[9] = 0; // Ez csak biztonsagert
     } else {
-        strcpy(fgnev, "ground");
-        strcpy(bgnev, "sky");
+        strcpy(foreground_name, "ground");
+        strcpy(background_name, "sky");
     }
 
     // Gyuruk szamat 100 byte utan kezdjuk:
@@ -1078,39 +1079,39 @@ void topol::loadbelso(const char* filenev) {
     }
     double gyuruolvszam = 0;
     if (fread(&gyuruolvszam, 1, sizeof(gyuruolvszam), h) != sizeof(gyuruolvszam)) {
-        internal_error("topol::topol-ban nem tudta olvasni lebego gyuruszamot!");
+        internal_error("level::level-ban nem tudta olvasni lebego gyuruszamot!");
     }
 
     int gyuruszam = (int)(gyuruolvszam);
-    if (gyuruszam > MAXGYURU) {
-        internal_error("topol::topol-ban gyuruszam > MAXGYURU!: ");
+    if (gyuruszam > MAX_POLYGONS) {
+        internal_error("level::level-ban gyuruszam > MAX_POLYGONS!: ");
     }
     if (gyuruszam <= 0) {
-        internal_error("topol::topol-ban gyuruszam <= 0!");
+        internal_error("level::level-ban gyuruszam <= 0!");
     }
 
     // Kerekek szama:
     double kerekolvszam = 0;
     if (fread(&kerekolvszam, 1, sizeof(kerekolvszam), h) != sizeof(kerekolvszam)) {
-        internal_error("topol::topol-ban nem tudta olvasni lebego kerekszamot!");
+        internal_error("level::level-ban nem tudta olvasni lebego kerekszamot!");
     }
 
     int kerekszam = (int)(kerekolvszam);
-    if (kerekszam > MAXKEREK) {
-        internal_error("topol::topol-ban kerekszam > MAXKEREK!: ");
+    if (kerekszam > MAX_OBJECTS) {
+        internal_error("level::level-ban kerekszam > MAX_OBJECTS!: ");
     }
     if (kerekszam <= 0) {
-        internal_error("topol::topol-ban kerekszam <= 0!");
+        internal_error("level::level-ban kerekszam <= 0!");
     }
 
     // Beolvassa sok gyurut:
     for (int i = 0; i < gyuruszam; i++) {
-        ptomb[i] = new polygon(h, verzio);
+        polygons[i] = new polygon(h, verzio);
     }
 
     // Beolvassa sok kereket:
     for (int i = 0; i < kerekszam; i++) {
-        kerektomb[i] = new object(h, verzio);
+        objects[i] = new object(h, verzio);
     }
 
     if (verzio > 6) {
@@ -1118,24 +1119,24 @@ void topol::loadbelso(const char* filenev) {
         // Kerekek szama:
         double spriteolvszam = 0;
         if (fread(&spriteolvszam, 1, sizeof(spriteolvszam), h) != sizeof(spriteolvszam)) {
-            internal_error("topol::topol-ban nem tudta olvasni lebego spriteszamot!");
+            internal_error("level::level-ban nem tudta olvasni lebego spriteszamot!");
         }
 
         int spriteszam = (int)(spriteolvszam);
-        if (spriteszam > MAXSPRITE) {
-            internal_error("topol::topol-ban spriteszam > MAXSPRITE!: ");
+        if (spriteszam > MAX_SPRITES) {
+            internal_error("level::level-ban spriteszam > MAX_SPRITES!: ");
         }
         if (spriteszam < 0) {
-            internal_error("topol::topol-ban spriteszam < 0!");
+            internal_error("level::level-ban spriteszam < 0!");
         }
 
         if (verzio < 8 && spriteszam > 0) {
-            internal_error("verzio < 8 && spriteszam > 0!", filenev);
+            internal_error("verzio < 8 && spriteszam > 0!", filename);
         }
 
         for (int i = 0; i < spriteszam; i++) {
             // Beolvassa sok kereket:
-            spritetomb[i] = new sprite(h);
+            sprites[i] = new sprite(h);
         }
     }
 
@@ -1143,9 +1144,9 @@ void topol::loadbelso(const char* filenev) {
     qclose(h);
 
     // Most megnezzuk, hogy belyeg stimmel-e:
-    double szamitottbelyeg = belyegszamitas(verzio > 6);
+    double szamitottbelyeg = checksum(verzio > 6);
     if (fabs(szamitottbelyeg - belyeg_d) > 0.01) {
-        external_error("Corrupt .LEV file!: ", filenev);
+        external_error("Corrupt .LEV file!: ", filename);
     }
 }
 
@@ -1166,23 +1167,23 @@ static long longosit(double belyeg) {
     return belyeg_l;
 }
 
-void topol::save(const char* filenev, int nemkellcheck) {
-    memset(&idok, 0, sizeof(idok));
+void level::save(const char* filename, int skip_topology) {
+    memset(&toptens, 0, sizeof(toptens));
     // if( lezart )
-    //   internal_error( "topol::save-ben lezart!" );
+    //   internal_error( "level::save-ben lezart!" );
 
     Volttopsave = 1; // load.cpp-nek kell ez
-    if (kerekekfejjellefele) {
-        internal_error("topol::save-ben kerekekfejjellefele!");
+    if (objects_flipped) {
+        internal_error("level::save-ben objects_flipped!");
     }
     // Mivel ezzel meg valtoztathatunk polygonokon
     // (polygon korbejaras megvaltoztatas, egymason fekvo pontok
     // megszuntetese, tul hegyes szogek eltolasa), ezert ezt elore tesszuk:
-    if (nemkellcheck) {
-        hibas = 0;
+    if (skip_topology) {
+        topology_errors = 0;
     } else {
-        hibas = check_topology(0);
-        if (hibas && lezart) {
+        topology_errors = check_topology(0);
+        if (topology_errors && locked) {
             dialog("You cannot save this file as a locked file because there are",
                    "some topology errors in the design and you could not play on it!");
             return;
@@ -1190,7 +1191,7 @@ void topol::save(const char* filenev, int nemkellcheck) {
     }
 
     char tmpnev[40];
-    sprintf(tmpnev, "lev/%s", filenev);
+    sprintf(tmpnev, "lev/%s", filename);
 #ifdef BELSOTIR
     if (!strstr(tmpnev, ".lev") && !strstr(tmpnev, ".LEV")) {
         internal_error("78t4678r4");
@@ -1204,7 +1205,7 @@ void topol::save(const char* filenev, int nemkellcheck) {
 #endif
     FILE* h = fopen(tmpnev, "wb");
     if (!h) {
-        internal_error("topol::save-ben nem tudta nyitni file-t!: ", tmpnev);
+        internal_error("level::save-ben nem tudta nyitni file-t!: ", tmpnev);
     }
 
 #ifdef BELSOTIR
@@ -1214,12 +1215,12 @@ void topol::save(const char* filenev, int nemkellcheck) {
 #endif
 
     // Kiszamitjuk es kiirjuk ketfele belyeget:
-    double belyeg_d = belyegszamitas(1);
-    belyeg = longosit(belyeg_d);
+    double belyeg_d = checksum(1);
+    level_id = longosit(belyeg_d);
 
-    fwrite(&belyeg, 1, 2, h); // Kiirunk ket tetszoleges byte-ot
+    fwrite(&level_id, 1, 2, h); // Kiirunk ket tetszoleges byte-ot
 
-    fwrite(&belyeg, 1, 4, h);
+    fwrite(&level_id, 1, 4, h);
     fwrite(&belyeg_d, 1, sizeof(belyeg_d), h);
 
     // Kiirjuk hogy sarvari-e:
@@ -1237,14 +1238,14 @@ void topol::save(const char* filenev, int nemkellcheck) {
     // Kiirjuk hogy hibas-e:
     // Ha hibaertek + double(belyeg_l) > 20000.0, akkor hibas:
     double hibaertek = 11877.0 + random_range(5871) - belyeg_d;
-    if (hibas) { // ezt mar elejen meghataroztuk
+    if (topology_errors) { // ezt mar elejen meghataroztuk
         hibaertek = 20961.0 + random_range(4982) - belyeg_d;
     }
     fwrite(&hibaertek, 1, sizeof(hibaertek), h);
 
     // Kiirjuk hogy lezart-e:
     double lezartertek = 12112.0 + random_range(6102) - belyeg_d;
-    if (lezart) {
+    if (locked) {
         lezartertek = 23090.0 + random_range(6310) - belyeg_d;
     }
     fwrite(&lezartertek, 1, sizeof(hibaertek), h);
@@ -1252,32 +1253,32 @@ void topol::save(const char* filenev, int nemkellcheck) {
 // Kiirjuk level nevet:
 #ifdef BELSOTIR
     // leb-nel toroljuk nevet:
-    for (int iiii = 0; iiii < LEVELNAMEHOSSZ; iiii++) {
+    for (int iiii = 0; iiii < LEVEL_NAME_LENGTH; iiii++) {
         levelname[iiii] = 0;
     }
 #endif
-    fwrite(levelname, 1, LEVELNAMEHOSSZ + 1, h);
+    fwrite(level_name, 1, LEVEL_NAME_LENGTH + 1, h);
 
     // Kiirjuk level nevet:
-    fwrite(lgrnev, 1, 16, h);
+    fwrite(lgr_name, 1, 16, h);
     // Kiirjuk hatter es eloter nevet:
-    fwrite(fgnev, 1, 10, h);
-    fwrite(bgnev, 1, 10, h);
+    fwrite(foreground_name, 1, 10, h);
+    fwrite(background_name, 1, 10, h);
 
     // Megszamoljuk gyuruket es kerekeket:
     // fseek( h, 100, SEEK_SET ); 14-es verzio ota mar nem seek-el
 
     int gyuruszam = 0;
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (ptomb[i]) {
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (polygons[i]) {
             gyuruszam++;
         }
     }
     double gyuruirtszam = gyuruszam + 0.4643643;
 
     int kerekszam = 0;
-    for (int i = 0; i < MAXKEREK; i++) {
-        if (kerektomb[i]) {
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (objects[i]) {
             kerekszam++;
         }
     }
@@ -1292,9 +1293,9 @@ void topol::save(const char* filenev, int nemkellcheck) {
 #endif
 
     // Kimentjuk sok gyurut:
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (ptomb[i]) {
-            ptomb[i]->save(h, this);
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (polygons[i]) {
+            polygons[i]->save(h, this);
         }
     }
 
@@ -1304,38 +1305,38 @@ void topol::save(const char* filenev, int nemkellcheck) {
 #endif
 
     // Kimentjuk sok kereket:
-    for (int i = 0; i < MAXKEREK; i++) {
-        if (kerektomb[i]) {
-            kerektomb[i]->save(h);
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (objects[i]) {
+            objects[i]->save(h);
         }
     }
     // Kimentjuk spriteokat:
     int spriteszam = 0;
-    for (int i = 0; i < MAXSPRITE; i++) {
-        if (spritetomb[i]) {
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        if (sprites[i]) {
             spriteszam++;
         }
     }
     double spriteirtszam = spriteszam + 0.2345672;
     fwrite(&spriteirtszam, 1, sizeof(spriteirtszam), h);
-    for (int i = 0; i < MAXSPRITE; i++) {
-        if (spritetomb[i]) {
-            spritetomb[i]->save(h);
+    for (int i = 0; i < MAX_SPRITES; i++) {
+        if (sprites[i]) {
+            sprites[i]->save(h);
         }
     }
 
     // Kiirjuk ido tablat:
     int tmpszo = IDOEGYEDISZAM1;
     fwrite(&tmpszo, 1, 4, h);
-    titkoswrite(&idok, sizeof(idok), h);
+    titkoswrite(&toptens, sizeof(toptens), h);
     tmpszo = IDOEGYEDISZAM2;
     fwrite(&tmpszo, 1, 4, h);
 
     fclose(h);
 
-    if (hibas) {
+    if (topology_errors) {
 #ifdef BELSOTIR
-        internal_error("#define BELSOTIR mellet hibas topol file mentes!:", filenev);
+        internal_error("#define BELSOTIR mellet hibas level file mentes!:", filename);
 #endif
         dialog("Though the level file was successfully saved, there are some errors in the design.",
                "You cannot play on this level until you correct these problems. To see what the",
@@ -1344,28 +1345,28 @@ void topol::save(const char* filenev, int nemkellcheck) {
 }
 
 // Csak eredetileg beolvasott filenev-vel szabad meghivni:
-void topol::saveidok(const char* filenev_p) {
-    if (idokhelye < 6) { // a 6-os talalomra ertek
+void level::save_topten(const char* filename) {
+    if (topten_file_offset < 6) { // a 6-os talalomra ertek
         internal_error("hjdvgyj");
     }
 
     // Hozzacsapjuk nevhez LEV direktorit is:
     char filenev[40];
-    sprintf(filenev, "lev/%s", filenev_p);
+    sprintf(filenev, "lev/%s", filename);
 
     FILE* h = fopen(filenev, "r+b");
     if (!h) {
         external_error("Could not open file!", filenev);
     }
 
-    if (fseek(h, idokhelye, SEEK_SET) != 0) {
+    if (fseek(h, topten_file_offset, SEEK_SET) != 0) {
         external_error("Could not write to file:", filenev);
     }
     int tmpszo = IDOEGYEDISZAM1;
     if (fwrite(&tmpszo, 1, 4, h) != 4) {
         external_error("Could not write file:", filenev);
     }
-    if (!titkoswrite(&idok, sizeof(idok), h)) {
+    if (!titkoswrite(&toptens, sizeof(toptens), h)) {
         external_error("Could not write file:", filenev);
     }
     tmpszo = IDOEGYEDISZAM2;
@@ -1376,68 +1377,69 @@ void topol::saveidok(const char* filenev_p) {
     fclose(h);
 }
 
-void topol::getminmax(double* px1, double* py1, double* px2, double* py2, int kerekkel) {
-    *px1 = 100000000000.0;
-    *py1 = 100000000000.0;
-    *px2 = -100000000000.0;
-    *py2 = -100000000000.0;
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (ptomb[i]) {
-            ptomb[i]->update_boundaries(px1, py1, px2, py2);
+void level::get_boundaries(double* x1, double* y1, double* x2, double* y2,
+                           int check_objects_and_sprites) {
+    *x1 = 100000000000.0;
+    *y1 = 100000000000.0;
+    *x2 = -100000000000.0;
+    *y2 = -100000000000.0;
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (polygons[i]) {
+            polygons[i]->update_boundaries(x1, y1, x2, y2);
         }
     }
-    if (kerekkel) {
-        for (int i = 0; i < MAXKEREK; i++) {
-            if (kerektomb[i]) {
-                if (*px1 > kerektomb[i]->r.x) {
-                    *px1 = kerektomb[i]->r.x;
+    if (check_objects_and_sprites) {
+        for (int i = 0; i < MAX_OBJECTS; i++) {
+            if (objects[i]) {
+                if (*x1 > objects[i]->r.x) {
+                    *x1 = objects[i]->r.x;
                 }
-                if (*px2 < kerektomb[i]->r.x) {
-                    *px2 = kerektomb[i]->r.x;
+                if (*x2 < objects[i]->r.x) {
+                    *x2 = objects[i]->r.x;
                 }
-                if (*py1 > kerektomb[i]->r.y) {
-                    *py1 = kerektomb[i]->r.y;
+                if (*y1 > objects[i]->r.y) {
+                    *y1 = objects[i]->r.y;
                 }
-                if (*py2 < kerektomb[i]->r.y) {
-                    *py2 = kerektomb[i]->r.y;
+                if (*y2 < objects[i]->r.y) {
+                    *y2 = objects[i]->r.y;
                 }
             }
         }
-        for (int i = 0; i < MAXSPRITE; i++) {
-            if (spritetomb[i]) {
-                if (*px1 > spritetomb[i]->r.x) {
-                    *px1 = spritetomb[i]->r.x;
+        for (int i = 0; i < MAX_SPRITES; i++) {
+            if (sprites[i]) {
+                if (*x1 > sprites[i]->r.x) {
+                    *x1 = sprites[i]->r.x;
                 }
-                if (*px2 < spritetomb[i]->r.x) {
-                    *px2 = spritetomb[i]->r.x;
+                if (*x2 < sprites[i]->r.x) {
+                    *x2 = sprites[i]->r.x;
                 }
-                if (*py1 > spritetomb[i]->r.y) {
-                    *py1 = spritetomb[i]->r.y;
+                if (*y1 > sprites[i]->r.y) {
+                    *y1 = sprites[i]->r.y;
                 }
-                if (*py2 < spritetomb[i]->r.y) {
-                    *py2 = spritetomb[i]->r.y;
+                if (*y2 < sprites[i]->r.y) {
+                    *y2 = sprites[i]->r.y;
                 }
             }
         }
     }
 }
 
-double topol::belyegszamitas(int kellspriteis) {
+double level::checksum(int check_sprites) {
     double belyeg = 0.0;
-    for (int i = 0; i < MAXGYURU; i++) {
-        if (ptomb[i]) {
-            belyeg += ptomb[i]->checksum();
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (polygons[i]) {
+            belyeg += polygons[i]->checksum();
         }
     }
-    for (int i = 0; i < MAXKEREK; i++) {
-        if (kerektomb[i]) {
-            belyeg += kerektomb[i]->checksum();
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (objects[i]) {
+            belyeg += objects[i]->checksum();
         }
     }
-    if (kellspriteis) {
-        for (int i = 0; i < MAXSPRITE; i++) {
-            if (spritetomb[i]) {
-                belyeg += spritetomb[i]->checksum();
+    if (check_sprites) {
+        for (int i = 0; i < MAX_SPRITES; i++) {
+            if (sprites[i]) {
+                belyeg += sprites[i]->checksum();
             }
         }
     }
@@ -1448,15 +1450,15 @@ double topol::belyegszamitas(int kellspriteis) {
 // KEREKKEL kapcsolatos play elotti inicializalasok:
 
 // lejatszo.cpp-ben Falg Tag ennek alapjan teszi vissza motorost:
-vect2 Kezdetihelydiff;
+vect2 BikeStartOffset;
 
 // Motor helyzetet is o allitja be, kajaszamot adja vissza:
 // Eheto kerekeket aktivizalja:
-int topol::setallaktiv(motorst* pmot) {
+int level::initialize_objects(motorst* mot) {
     int kajaszam = 0;
     int voltkezdo = 0;
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (pker) {
             pker->floating_phase = random_range(1000) * 2.0 * PI / 1000.0;
 
@@ -1466,48 +1468,48 @@ int topol::setallaktiv(motorst* pmot) {
             }
             if (pker->type == object::Type::Start) {
                 if (voltkezdo) {
-                    internal_error("topol::setallaktiv-ban palyan ket kezdo is van!");
+                    internal_error("level::initialize_objects-ban palyan ket kezdo is van!");
                 }
                 voltkezdo = 1;
                 pker->active = false;
-                Kezdetihelydiff = pker->r - pmot->left_wheel.r;
-                pmot->bike.r = pmot->bike.r + Kezdetihelydiff;
-                pmot->left_wheel.r = pmot->left_wheel.r + Kezdetihelydiff;
-                pmot->right_wheel.r = pmot->right_wheel.r + Kezdetihelydiff;
-                pmot->body_r = pmot->body_r + Kezdetihelydiff;
+                BikeStartOffset = pker->r - mot->left_wheel.r;
+                mot->bike.r = mot->bike.r + BikeStartOffset;
+                mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
+                mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;
+                mot->body_r = mot->body_r + BikeStartOffset;
                 // Fejr = Kor1.r;
             }
         }
     }
     if (!voltkezdo) {
-        internal_error("topol::setallaktiv-ban palyan nincs kezdo!");
+        internal_error("level::initialize_objects-ban palyan nincs kezdo!");
     }
     return kajaszam;
 }
 
 // Kerekeket rendezi:
-void topol::killerekelore(void) {
+void level::sort_objects(void) {
     int szam = 0;
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (pker) {
             szam++;
         }
     }
     for (int i = 0; i < szam; i++) {
-        object* pker = Ptop->kerektomb[i];
+        object* pker = Ptop->objects[i];
         if (!pker) {
-            internal_error("topol::killerekelore-ben hezagos kerek tomb!");
+            internal_error("level::sort_objects-ben hezagos kerek tomb!");
         }
     }
 
     if (szam < 2) {
-        internal_error("topol::killerekelore-ben szam < 2!");
+        internal_error("level::sort_objects-ben szam < 2!");
     }
     for (int j = 0; j < szam + 4; j++) {
         for (int i = 0; i < szam - 1; i++) {
-            object::Type tipus1 = Ptop->kerektomb[i]->type;
-            object::Type tipus2 = Ptop->kerektomb[i + 1]->type;
+            object::Type tipus1 = Ptop->objects[i]->type;
+            object::Type tipus2 = Ptop->objects[i + 1]->type;
 
             // Sullyozzuk tipusokat hogy sorrendiseget lehessen megallapitani:
             int tip1 = 10;
@@ -1534,47 +1536,47 @@ void topol::killerekelore(void) {
 
             if (tip1 > tip2) {
                 // Cserelnunk kell:
-                object tmpker = *Ptop->kerektomb[i];
-                *Ptop->kerektomb[i] = *Ptop->kerektomb[i + 1];
-                *Ptop->kerektomb[i + 1] = tmpker;
+                object tmpker = *Ptop->objects[i];
+                *Ptop->objects[i] = *Ptop->objects[i + 1];
+                *Ptop->objects[i + 1] = tmpker;
             }
         }
     }
 }
 
-object* topol::getptrkerek(int index) {
-    if (index < 0 || index >= MAXKEREK) {
-        internal_error("topol::getptrkerek-ben index < 0 || index >= MAXKEREK!");
+object* level::get_object(int index) {
+    if (index < 0 || index >= MAX_OBJECTS) {
+        internal_error("level::get_object-ben index < 0 || index >= MAX_OBJECTS!");
     }
-    object* pker = Ptop->kerektomb[index];
+    object* pker = Ptop->objects[index];
     if (!pker) {
-        internal_error("topol::getptrkerek-ben !pker!");
+        internal_error("level::get_object-ben !pker!");
     }
     return pker;
 }
 
 // kerekekfejjellefele;
 
-void topol::kereklefejjel(void) {
-    if (kerekekfejjellefele) {
+void level::flip_objects(void) {
+    if (objects_flipped) {
         return;
     }
-    kerekekfejjellefele = 1;
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    objects_flipped = 1;
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (pker) {
             pker->r.y = -pker->r.y;
         }
     }
 }
 
-void topol::kerekjolalljon(void) {
-    if (!kerekekfejjellefele) {
+void level::unflip_objects(void) {
+    if (!objects_flipped) {
         return;
     }
-    kerekekfejjellefele = 0;
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    objects_flipped = 0;
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (pker) {
             pker->r.y = -pker->r.y;
         }

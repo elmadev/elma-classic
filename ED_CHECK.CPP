@@ -11,16 +11,16 @@ int check_topology(int kelldialog) {
     dialog("Checking Topology, please wait!", DIALOG_BUTTONS, DIALOG_RETURN);
 
     // Eloszor egymason fekvo szomszedos pontokat valasztjuk szet:
-    for (int i = 0; i < MAXGYURU; i++) {
-        polygon* pgy = Ptop->ptomb[i];
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        polygon* pgy = Ptop->polygons[i];
         if (pgy) {
             pgy->separate_stacked_vertices();
         }
     }
 
     // Most megszuntetjuk hegyes szogeket:
-    for (int i = 0; i < MAXGYURU; i++) {
-        polygon* pgy = Ptop->ptomb[i];
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        polygon* pgy = Ptop->polygons[i];
         if (pgy && !pgy->is_grass) {
             pgy->is_clockwise(); // Ez automatikusan megcsinalja:
         }
@@ -28,8 +28,8 @@ int check_topology(int kelldialog) {
 
     // Most megnezzuk, hogy nincs-e tul sok pont osszesen:
     int pontszam = 0;
-    for (int i = 0; i < MAXGYURU; i++) {
-        polygon* pgy = Ptop->ptomb[i];
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        polygon* pgy = Ptop->polygons[i];
         if (pgy) {
             pontszam += pgy->vertex_count;
         }
@@ -49,8 +49,8 @@ int check_topology(int kelldialog) {
     }
 
     // Most megnezzuk, hogy nincsenek-e egymast metszo vonalak:
-    for (int i = 0; i < MAXGYURU; i++) {
-        polygon* pgy = Ptop->ptomb[i];
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        polygon* pgy = Ptop->polygons[i];
         if (pgy && !pgy->is_grass) {
             for (int j = 0; j < pgy->vertex_count; j++) {
                 vect2 r = pgy->vertices[j];
@@ -62,8 +62,8 @@ int check_topology(int kelldialog) {
                 }
                 // Megvan r, v szakasz, amirol el kell donteni, hogy van-e
                 // metszespontja akarmi massal:
-                for (int k = 0; k < MAXGYURU; k++) {
-                    polygon* pgy2 = Ptop->ptomb[k];
+                for (int k = 0; k < MAX_POLYGONS; k++) {
+                    polygon* pgy2 = Ptop->polygons[k];
                     if (pgy2 && !pgy2->is_grass) {
                         bool vanmetszes = false;
                         vect2 m;
@@ -92,13 +92,13 @@ int check_topology(int kelldialog) {
 
     // Most megnezzuk, hogy nincs-e kintlevo objektum:
     double x1, y1, x2, y2;
-    Ptop->getminmax(&x1, &y1, &x2, &y2, 0);
+    Ptop->get_boundaries(&x1, &y1, &x2, &y2, 0);
     x1 -= 1.0;
     y1 -= 1.0;
     x2 += 1.0;
     y2 += 1.0;
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (pker) {
             if (pker->r.x < x1 || pker->r.x > x2 || pker->r.y < y1 || pker->r.y > y2) {
                 if (kelldialog) {
@@ -116,10 +116,10 @@ int check_topology(int kelldialog) {
     }
 
     // Most megnezzuk, hogy bal kerek nincs-e kint:
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (pker && pker->type == object::Type::Start) {
-            if (!Ptop->levegoben(NULL, &pker->r)) {
+            if (!Ptop->is_sky(NULL, &pker->r)) {
                 if (kelldialog) {
                     dialog("Error: The start object, which determines the place of the left wheel "
                            "when you start to",

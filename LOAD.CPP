@@ -35,8 +35,8 @@ int floadlevel_p(const char* nev) {
         if (Ptop) {
             delete Ptop;
         }
-        Ptop = new topol(nev);
-        if (Ptop->hibas) {
+        Ptop = new level(nev);
+        if (Ptop->topology_errors) {
             // Kiir hiba uzenetet:
             menu_pic szl;
             szl.add_line_centered("Level file has some topology errors!", 320, 190);
@@ -56,8 +56,8 @@ int floadlevel_p(const char* nev) {
             Ptop = NULL;
             return 0;
         }
-        loadlgrfile(Ptop->lgrnev);
-        Ptop->pic_selejtez(Plgr);
+        loadlgrfile(Ptop->lgr_name);
+        Ptop->discard_missing_lgr_assets(Plgr);
 
         if (Segments) {
             delete Segments;
@@ -87,7 +87,7 @@ int floadlevel_e(const char* nev, int forceload) {
     if (strlen(nev) > 12 || !nev[0]) {
         internal_error("floadlevel_e-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
     }
-    if (forceload || Volttopsave || !Ptop || Ptop->lezart || strcmpi(nev, Bentlevelnev) != 0) {
+    if (forceload || Volttopsave || !Ptop || Ptop->locked || strcmpi(nev, Bentlevelnev) != 0) {
         Volttopsave = 0;
         // Ujra be kell olvasni palyat:
         strcpy(Bentlevelnev, nev);
@@ -95,13 +95,13 @@ int floadlevel_e(const char* nev, int forceload) {
             delete Ptop;
         }
         if (strcmpi(nev, "_uj_topol_") == 0) {
-            Ptop = new topol;
+            Ptop = new level;
             Bentlevelnev[0] = 0;
         } else {
-            Ptop = new topol(nev);
+            Ptop = new level(nev);
         }
 
-        if (Ptop->lezart) {
+        if (Ptop->locked) {
             levoltzarva = 1;
 
             char szoveg[80];
@@ -109,11 +109,11 @@ int floadlevel_e(const char* nev, int forceload) {
 
             dialog(szoveg);
             delete Ptop;
-            Ptop = new topol;
+            Ptop = new level;
         }
 
-        loadlgrfile(Ptop->lgrnev);
-        if (Ptop->pic_selejtez(Plgr)) {
+        loadlgrfile(Ptop->lgr_name);
+        if (Ptop->discard_missing_lgr_assets(Plgr)) {
             dialogselejtez();
         }
     }
@@ -124,7 +124,7 @@ int floadlevel_e(const char* nev, int forceload) {
     Segments = NULL;
 
     // Ha vannak benne idok, figyelmeztetes:
-    if (Ptop->idok.single.times_count > 0 || Ptop->idok.multi.times_count > 0) {
+    if (Ptop->toptens.single.times_count > 0 || Ptop->toptens.multi.times_count > 0) {
         dialog("Warning!", "The level file you are opening has some best times.",
                "If you save this level file, these times will be erased!");
     }

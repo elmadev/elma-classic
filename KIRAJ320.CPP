@@ -246,8 +246,8 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
     int objminy = balalsoy;
     int objmaxx = balalsox + Viewxsize - 1;
     int objmaxy = balalsoy + Viewysize - 1;
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (!pker) {
             break;
         }
@@ -624,8 +624,8 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     int objminy = balalsoy - ANIM_WIDTH - 2;
     int objmaxx = balalsox + SCREEN_WIDTH;
     int objmaxy = balalsoy + SCREEN_HEIGHT;
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (!pker) {
             break;
         }
@@ -740,9 +740,9 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         }
         else*/
         if (Tag) {
-            draw_timers(Ezenlegjobbido, fogoido, t, ppic, Cxsize, Cysize);
+            draw_timers(BestTime, fogoido, t, ppic, Cxsize, Cysize);
         } else {
-            draw_timers(Ezenlegjobbido, -1.0, t, ppic, Cxsize, Cysize);
+            draw_timers(BestTime, -1.0, t, ppic, Cxsize, Cysize);
         }
     }
 }

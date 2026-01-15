@@ -19,8 +19,8 @@ int utkozikesprite(vect2 r, double sugar) {
     int objmaxx = balalsox + 200;
     int objmaxy = balalsoy + 200;
 
-    for (int i = 0; i < MAXKEREK; i++) {
-        object* pker = Ptop->kerektomb[i];
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* pker = Ptop->objects[i];
         if (!pker) {
             break;
         }

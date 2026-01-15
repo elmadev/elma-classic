@@ -4,7 +4,7 @@
 #include "vect2.h"
 #include <cstdio>
 
-class topol;
+class level;
 
 class polygon {
     int allocated_vertex_count;
@@ -19,7 +19,7 @@ class polygon {
     polygon(FILE* h, int version);
     ~polygon();
 
-    void save(FILE* h, topol* lev);
+    void save(FILE* h, level* lev);
     void set_vertex(int v, double x, double y);
     void render_one_line(int v, bool forward, bool dotted);
     void render_outline();

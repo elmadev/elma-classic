@@ -3,7 +3,7 @@
 
 #include "vect2.h"
 
-class topol;
+class level;
 
 // A single line segment from a polygon
 struct segment {
@@ -60,7 +60,7 @@ class segments {
 
   public:
     // Load a list of all the line segments of a level.
-    segments(topol* lev);
+    segments(level* lev);
     ~segments();
 
     // Initialize the collision_grid with the max radius of any interactable bike part

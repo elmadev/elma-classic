@@ -37,7 +37,7 @@ static int afterplayext( char* filenev, long ido ) {
         Idoszovegek[1].y = 134;
 
         // Kiirjuk ha lockolt:
-        if( Ptop->lezart ) {
+        if( Ptop->locked ) {
             //Korny->pabc_afterplaymenu->write( Korny->picbuffer,
             //		9, 173, "Locked" );
             strcpy( Idoszovegek[2].text, "Locked" );
@@ -68,7 +68,7 @@ static int afterplayext( char* filenev, long ido ) {
 
         val.setup( 4 );
         int eredmeny = 0;
-        if( Ptop->lezart )
+        if( Ptop->locked )
             eredmeny = val.navigate( Idoszovegek, 3 );
         else
             eredmeny = val.navigate( Idoszovegek, 2 );

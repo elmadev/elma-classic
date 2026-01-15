@@ -302,7 +302,7 @@ void state::write_stats() {
     fprintf(h, "Single player times:\n");
     fprintf(h, "\n");
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
-        fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
+        fprintf(h, "Level %d, %s:\n", i + 1, get_internal_level_name(i));
         topten* tten = &toptens[i].single;
         write_stats_topten(h, tten, true);
         fprintf(h, "\n");
@@ -313,7 +313,7 @@ void state::write_stats() {
     fprintf(h, "Multiplayer times:\n");
     fprintf(h, "\n");
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
-        fprintf(h, "Level %d, %s:\n", i + 1, getleveldescription(i));
+        fprintf(h, "Level %d, %s:\n", i + 1, get_internal_level_name(i));
         topten* tten = &toptens[i].multi;
         write_stats_topten(h, tten, false);
         fprintf(h, "\n");

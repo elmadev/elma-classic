@@ -45,23 +45,23 @@ static viewtimest Viewtime2 = {1, 0, 1, 0};
 
 // 0-meghalt, 1-megnyerte, 2-semmi kulonos:
 static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
-    if (sorszam < 0 || sorszam >= MAXKEREK) {
+    if (sorszam < 0 || sorszam >= MAX_OBJECTS) {
         internal_error("spritefeldolgoz-ban sorszam < 0 || sorszam >= MAXKEREK!");
     }
-    if (!Ptop->kerektomb[sorszam]) {
-        internal_error("spritefeldolgoz-ban !Ptop->kerektomb[sorszam]!");
+    if (!Ptop->objects[sorszam]) {
+        internal_error("spritefeldolgoz-ban !Ptop->objects[sorszam]!");
     }
 
-    object::Type tipus = Ptop->kerektomb[sorszam]->type;
+    object::Type tipus = Ptop->objects[sorszam]->type;
 
     if (tipus == object::Type::Killer) {
         return 0;
     }
     if (tipus == object::Type::Food) {
-        Ptop->kerektomb[sorszam]->active = false;
+        Ptop->objects[sorszam]->active = false;
         (*pkajaszam)++;
         startwavegyujto(WavEvent::Food, 0.99, -1);
-        switch (Ptop->kerektomb[sorszam]->property) {
+        switch (Ptop->objects[sorszam]->property) {
         case object::Property::None:
             break;
         case object::Property::GravityUp:
@@ -146,10 +146,10 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
             // Flag Tag modban nem allnak meg, hanem visszamennek starthelyre:
             init_motor(pmot);
             // Kezdetihelydiff-et setallaktiv allitja be:
-            pmot->bike.r = pmot->bike.r + Kezdetihelydiff;
-            pmot->left_wheel.r = pmot->left_wheel.r + Kezdetihelydiff;
-            pmot->right_wheel.r = pmot->right_wheel.r + Kezdetihelydiff;
-            pmot->body_r = pmot->body_r + Kezdetihelydiff;
+            pmot->bike.r = pmot->bike.r + BikeStartOffset;
+            pmot->left_wheel.r = pmot->left_wheel.r + BikeStartOffset;
+            pmot->right_wheel.r = pmot->right_wheel.r + BikeStartOffset;
+            pmot->body_r = pmot->body_r + BikeStartOffset;
 
             // Valtozok inicializalasa:
             int showkep = pvalt->showkep;
@@ -329,7 +329,7 @@ long lejatszo(const char* filenev) {
     Prec1->settag(Tag);
     Prec2->settag(Tag);
 
-    beallitlegjobbidot(filenev, Single);
+    load_best_time(filenev, Single);
 
     if (Single) {
         Multirec = 0;
@@ -342,11 +342,11 @@ long lejatszo(const char* filenev) {
     if (!Ptop) {
         internal_error("lejatszo-ban !Ptop!");
     }
-    Ptop->kereklefejjel();
-    Ptop->killerekelore();
+    Ptop->flip_objects();
+    Ptop->sort_objects();
     // setallaktiv allitja be motor kezdeti helyzetet es fazisokat is!:
-    Kajakell = Ptop->setallaktiv(Motor1);
-    Ptop->setallaktiv(Motor2);
+    Kajakell = Ptop->initialize_objects(Motor1);
+    Ptop->initialize_objects(Motor2);
 
     // Eloszor keretet tobbszor kirakja kirajzol320:
     Kitoltestmegrak = Kitoltestmegrakkezd;
@@ -489,12 +489,12 @@ long lejatszo(const char* filenev) {
 
                 Mute = true;
                 if (megvanido) {
-                    Ptop->kerekjolalljon();
+                    Ptop->unflip_objects();
                     Prec1->encode_frame_count();
                     Prec2->encode_frame_count();
                     return megvanido;
                 } else {
-                    Ptop->kerekjolalljon();
+                    Ptop->unflip_objects();
                     Prec1->encode_frame_count();
                     Prec2->encode_frame_count();
                     return -1;
@@ -573,7 +573,7 @@ long lejatszo(const char* filenev) {
                 fprintf(h, "%d", framerate);
                 fclose(h);
             }
-            Ptop->kerekjolalljon();
+            Ptop->unflip_objects();
             Prec1->encode_frame_count();
             Prec2->encode_frame_count();
             Masodikmenet = 1;
@@ -706,18 +706,18 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     Single = !Multirec;
     Tag = Prec1->gettag();
 
-    beallitlegjobbidot(filenev, Single);
+    load_best_time(filenev, Single);
 
     int palmegnincs = 1;
     init_physics_data();
     if (!Ptop) {
         internal_error("lejatszo-ban !Ptop!");
     }
-    Ptop->kereklefejjel();
-    Ptop->killerekelore();
+    Ptop->flip_objects();
+    Ptop->sort_objects();
     // setallaktiv allitja be motor kezdeti helyzetet is!:
-    Kajakell = Ptop->setallaktiv(Motor1);
-    Ptop->setallaktiv(Motor2);
+    Kajakell = Ptop->initialize_objects(Motor1);
+    Ptop->initialize_objects(Motor2);
 
     // Eloszor keretet tobbszor is kirakja kirajzol320:
     Kitoltestmegrak = Kitoltestmegrakkezd;
@@ -788,7 +788,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             delay((int)(LevelEndDelay * 400.0));
 
             Mute = true;
-            Ptop->kerekjolalljon();
+            Ptop->unflip_objects();
 
             Elozoshowkep1 = valt1.showkep;
             Elozoshowkep2 = valt2.showkep;
@@ -875,7 +875,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
             Mute = true;
 
-            Ptop->kerekjolalljon();
+            Ptop->unflip_objects();
 
             Elozoshowkep1 = valt1.showkep;
             Elozoshowkep2 = valt2.showkep;

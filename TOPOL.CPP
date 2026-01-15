@@ -14,6 +14,7 @@
 #include "platform_utils.h"
 #include "sprite.h"
 #include "qopen.h"
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
@@ -1302,6 +1303,19 @@ int level::initialize_objects(motorst* mot) {
     return apple_count;
 }
 
+inline static int object_order(object::Type type) {
+    switch (type) {
+    case object::Type::Killer:
+        return 1;
+    case object::Type::Food:
+        return 2;
+    case object::Type::Exit:
+        return 3;
+    default:
+        return 10;
+    }
+}
+
 // sort: Killer, Apple, Exit, Start
 void level::sort_objects() {
     int count = 0;
@@ -1325,41 +1339,10 @@ void level::sort_objects() {
         internal_error("level::sort_objects count < 2!");
     }
 
-    // Bubble sort in following priority: Killer, Apple, Exit, Start
-    for (int j = 0; j < count + 4; j++) {
-        for (int i = 0; i < count - 1; i++) {
-            object::Type type1 = objects[i]->type;
-            object::Type type2 = objects[i + 1]->type;
-
-            int score1 = 10;
-            if (type1 == object::Type::Killer) {
-                score1 = 1;
-            }
-            if (type1 == object::Type::Food) {
-                score1 = 2;
-            }
-            if (type1 == object::Type::Exit) {
-                score1 = 3;
-            }
-
-            int score2 = 10;
-            if (type2 == object::Type::Killer) {
-                score2 = 1;
-            }
-            if (type2 == object::Type::Food) {
-                score2 = 2;
-            }
-            if (type2 == object::Type::Exit) {
-                score2 = 3;
-            }
-
-            if (score1 > score2) {
-                object tmp = *objects[i];
-                *objects[i] = *objects[i + 1];
-                *objects[i + 1] = tmp;
-            }
-        }
-    }
+    // Sort in following priority: Killer, Apple, Exit, Start
+    std::stable_sort(objects, objects + count, [](const object* a, const object* b) {
+        return object_order(a->type) < object_order(b->type);
+    });
 }
 
 object* level::get_object(int index) {

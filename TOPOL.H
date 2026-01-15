@@ -19,7 +19,7 @@ constexpr int MAX_VERTICES = 5000;
 #define MAX_POLYGONS (300)
 
 typedef polygon* ptrgyuru;
-#define LEVEL_NAME_LENGTH (50) // 13-as verzioig (14) volt
+#define LEVEL_NAME_LENGTH (50)
 
 class lgrfile;
 
@@ -31,17 +31,16 @@ class level {
 
     double checksum(int check_sprites);
 
+    // Create a default level
     level(void);
-    // QWQUU001 elso palya:
+    // Load level from file
     level(const char* filename);
     ~level(void);
     void load_external(const char* filename);
     void load_internal(const char* filename);
 
   public:
-    // Beolvasas utan ervenyes, csak rec file ellenorzesere hasznalando
     long level_id;
-    // loadlgrfile allitja 1-be, ha nincs meg lgr es default.lgr-t hasznal:
     int lgr_not_found;
 
     int topology_errors, locked;
@@ -54,58 +53,55 @@ class level {
     char background_name[10];
 
     topten_set toptens;
-    int topten_file_offset;
+    int topten_file_offset; // 0 if internal level
 
-    // Igazzal ter vissza, ha volt valtozas:
+    // Delete sprites that don't exist in current lgr, and make sure default ground / sky textures
+    // are different.
+    //
+    // Returns true if any sprites were deleted.
     int discard_missing_lgr_assets(lgrfile* lgr);
+    // Get closest vertex to (x, y) in the editor, if the distance is less than 10 pixels. A polygon
+    // can `skip` can be passed to skip that polygon.
     polygon* get_closest_vertex(double x, double y, int* vertex_index, double* distance = NULL,
                                 polygon* skip = NULL);
+    // Get closest object to (x, y) in editor, if the distance is less than 10 pixels.
     object* get_closest_object(double x, double y, double* distance = NULL);
+    // Get closest sprite to (x, y) in editor, if the distance is less than 10 pixels.
     sprite* get_closest_sprite(double x, double y, double* distance = NULL);
-    // Ha saveidok hivja meg, csak akkor nem kell check:
     void save(const char* filename, int skip_topology = 0);
-    // Csak eredetileg beolvasott filenev-vel szabad meghivni:
+    // Update top ten of an external level
     void save_topten(const char* filename);
+    // Render the level in the internal editor.
     void render(void);
-    // pgy levegoben van-e. Akkor folddarab:
+    // Check to see if either a polygon or point is within the sky or ground (only provide one)
     int is_sky(polygon* poly, vect2* point = NULL);
+    // Get the min/max dimensions of level, optionally including objects/sprites
     void get_boundaries(double* x1, double* y1, double* x2, double* y2,
                         int check_objects_and_sprites);
-
-    // Kerekkel kapcsolatos dolgok:
-    // Motor helyzetet is o allitja be, kajaszamot adja vissza:
-    int initialize_objects(motorst* mot); // eheto kerekeket aktivizalja
-    void sort_objects(void);              // kerekeket rendezi
+    // Returns apple count.
+    int initialize_objects(motorst* mot);
+    void sort_objects(void);
     object* get_object(int index);
 
-    // Ha igaz, y negalva van (ez kell lejatszasnal):
     int objects_flipped;
+    // Invert the y of all objects (needs to be inverted for in-game, and uninverted in editor)
     void flip_objects(void);
     void unflip_objects(void);
 };
 
-// lejatszo.cpp-ben Falg Tag ennek alapjan teszi vissza motorost:
-extern vect2 BikeStartOffset; // setallaktiv allitja be
+extern vect2 BikeStartOffset;
 
-// Ha letezik file, akkor 0-t ad vissza!:
-// Ugyanugy viselkedik nevvel, mint topol konstruktora:
+// Similar to access(). Return 0 if level exists. Internal levels always exist.
 int access_level_file(const char* filename);
 
-// Csak external file-hoz:
-// Ha NULL, akkor valami baj volt vele:
-// char* getlevelname( char* nev ); mar nem hasznalt
-
-// 0-tol kezdodnek:
+// Indexed from 0
 const char* get_internal_level_name(int index);
 
-// Belso belyegszamitasokhoz kell:
-/*unsigned long double2belyeg( double* px );
-unsigned long double2belyeg( long l );*/
-
 extern char BestTime[30];
-// Azt a nevet keri, amit topol::topol kap:
+// Store the best time of the level to display while doing a run
 void load_best_time(const char* filename, int single);
 
+// Returns internal level index (1-55), or 0 if external level
 int get_internal_index(const char* filename);
 
 #endif

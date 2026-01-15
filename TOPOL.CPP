@@ -576,30 +576,22 @@ level::level(const char* filename) {
         load_internal_lgr_filenames();
     }
 
-    int is_external = 1;
-
-    char filepath[21];
     if (strlen(filename) > 20) {
         internal_error("level::level strlen(filename) > 20");
     }
-    strcpy(filepath, filename);
 
-    int internal_index = get_internal_index(filepath);
+    int internal_index = get_internal_index(filename);
     if (internal_index > 0) {
-        is_external = 0;
-        strcpy(filepath, InternalFilePaths[internal_index]);
-    }
-
-    if (is_external) {
-        load_external(filepath);
-    } else {
-        load_internal(filepath);
+        load_internal(InternalFilePaths[internal_index]);
         // Override lgr name from lgrlist.txt
         char lgrpath[40];
-        sprintf(lgrpath, "lgr/%s.lgr", InternalLevelLgrs[internal_index]);
+        const char* lgrname = InternalLevelLgrs[internal_index];
+        sprintf(lgrpath, "lgr/%s.lgr", lgrname);
         if (access(lgrpath, 0) == 0) {
-            strcpy(lgr_name, InternalLevelLgrs[internal_index]);
+            strcpy(lgr_name, lgrname);
         }
+    } else {
+        load_external(filename);
     }
 }
 

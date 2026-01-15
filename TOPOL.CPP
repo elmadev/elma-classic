@@ -640,7 +640,7 @@ void level::load_external(const char* filename) {
     }
 
     int level_id_checksum;
-    if (version >= 13) {
+    if (version == 14) {
         if (fread(&level_id_checksum, 1, 2, h) != 2) {
             internal_error("Error reading level file!", filename);
         }
@@ -689,20 +689,20 @@ void level::load_external(const char* filename) {
     }
 
     int level_name_length = LEVEL_NAME_LENGTH;
-    if (version < 14) {
+    if (version == 6) {
         level_name_length = LEVEL_NAME_LENGTH_OLD;
     }
     fread(level_name, 1, level_name_length + 1, h);
     level_name[level_name_length] = 0;
 
-    if (version > 6) {
+    if (version == 14) {
         fread(lgr_name, 1, 16, h);
         lgr_name[15] = 0;
     } else {
         strcpy(lgr_name, "default");
     }
 
-    if (version >= 8) {
+    if (version == 14) {
         fread(foreground_name, 1, 10, h);
         foreground_name[9] = 0;
         fread(background_name, 1, 10, h);
@@ -712,7 +712,7 @@ void level::load_external(const char* filename) {
         strcpy(background_name, "sky");
     }
 
-    if (version < 14) {
+    if (version == 6) {
         fseek(h, 100, SEEK_SET);
     }
 
@@ -725,6 +725,7 @@ void level::load_external(const char* filename) {
     if (polygon_count > MAX_POLYGONS) {
         internal_error("Too many polygons in level file!", filename);
     }
+
     if (polygon_count <= 0) {
         internal_error("Corrupt .LEV file!", filename);
     }
@@ -745,17 +746,15 @@ void level::load_external(const char* filename) {
     if (object_count <= 0) {
         internal_error("Corrupt .LEV file!", filename);
     }
-
     for (int i = 0; i < object_count; i++) {
         objects[i] = new object(h, version);
     }
 
-    if (version > 6) {
+    if (version == 14) {
         double encrypted_sprite_count = 0;
         if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) != 8) {
             internal_error("Error reading level file!", filename);
         }
-
         int sprite_count = (int)(encrypted_sprite_count);
         if (sprite_count > MAX_SPRITES) {
             internal_error("Too many pictures in level file!", filename);
@@ -763,11 +762,6 @@ void level::load_external(const char* filename) {
         if (sprite_count < 0) {
             internal_error("Corrupt .LEV file!", filename);
         }
-
-        if (version < 8 && sprite_count > 0) {
-            internal_error("version < 8 && sprite_count > 0!", filename);
-        }
-
         for (int i = 0; i < sprite_count; i++) {
             sprites[i] = new sprite(h);
         }
@@ -780,15 +774,21 @@ void level::load_external(const char* filename) {
         internal_error("topten_file_offset < 6");
     }
 
+    bool valid_topten = false;
     int magic_number = 0;
-    if (fread(&magic_number, 1, sizeof(magic_number), h) != 4 || magic_number != TOP_TEN_HEADER) {
-    } else {
-        if (!read_encrypted(&toptens, sizeof(toptens), h) ||
-            fread(&magic_number, 1, sizeof(magic_number), h) != 4 ||
-            magic_number != TOP_TEN_FOOTER) {
-            memset(&toptens, 0, sizeof(toptens));
+    if (fread(&magic_number, 1, sizeof(magic_number), h) == 4 && magic_number == TOP_TEN_HEADER) {
+        if (read_encrypted(&toptens, sizeof(toptens), h)) {
+            if (fread(&magic_number, 1, sizeof(magic_number), h) == 4 &&
+                magic_number == TOP_TEN_FOOTER) {
+                valid_topten = true;
+            }
         }
     }
+
+    if (!valid_topten) {
+        memset(&toptens, 0, sizeof(toptens));
+    }
+
     fclose(h);
 
     // Verify checksum

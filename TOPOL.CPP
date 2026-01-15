@@ -838,7 +838,7 @@ void level::load_internal(const char* filename) {
     if (fread(tmp, 1, 5, h) != 5) {
         internal_error("Error reading level file!", filename);
     }
-    if (strncmp(tmp, "@@^!@", 3) != 0) {
+    if (strncmp(tmp, "@@^!@", 5) != 0) {
         internal_error("Corrupt .LEV file!", filename);
     }
 

@@ -35,8 +35,6 @@ static char InternalFilePaths[STATE_LEVEL_COUNT + 2][14] = {
     "a42.leb",      "visit.leb",   "a04.leb",      "a05.leb",      "a06.leb",     "a07.leb",
     "a08.leb",      "a09.leb",     "a10.leb"};
 
-constexpr int INTERNAL_MAX_NAME_LENGTH = 30;
-char InternalLevelNames[(INTERNAL_MAX_NAME_LENGTH + 2) * INTERNAL_LEVEL_COUNT + 6];
 static char FgetsBuffer[110];
 
 static bool read_encrypted(void* buffer, int length, FILE* h) {
@@ -83,6 +81,8 @@ static bool write_encrypted(void* buffer, int length, FILE* h) {
 }
 
 const char* get_internal_level_name(int index) {
+    constexpr int INTERNAL_MAX_NAME_LENGTH = 30;
+    static char InternalLevelNames[INTERNAL_LEVEL_COUNT][INTERNAL_MAX_NAME_LENGTH + 2] = {};
     static bool DescListLoaded = false;
     if (!DescListLoaded) {
         // Initialize on first call from desclist.txt
@@ -105,7 +105,7 @@ const char* get_internal_level_name(int index) {
             if (strlen(FgetsBuffer) > INTERNAL_MAX_NAME_LENGTH) {
                 internal_error("desclist.txt name is too long!");
             }
-            strcpy(&InternalLevelNames[i * (INTERNAL_MAX_NAME_LENGTH + 2)], FgetsBuffer);
+            strcpy(InternalLevelNames[i], FgetsBuffer);
         }
         qclose(h);
     }
@@ -116,7 +116,7 @@ const char* get_internal_level_name(int index) {
     if (index == 30) {
         return "Animal Farm";
     }
-    return &InternalLevelNames[index * (INTERNAL_MAX_NAME_LENGTH + 2)];
+    return InternalLevelNames[index];
 }
 
 level::level() {

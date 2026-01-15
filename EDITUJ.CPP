@@ -707,7 +707,7 @@ void editor(void) {
                     tolt_open();
                 }
                 if (c == 's') {
-                    tolt_save(1);
+                    tolt_save();
                 }
                 if (c == 'z') {
                     menu_zoomout();
@@ -805,14 +805,14 @@ void editor(void) {
                         }
 
                         if (i == 3 && balnyomva) {
-                            tolt_save_as(1);
+                            tolt_save_as();
                         }
                         if (i == 3 && jobbnyomva) {
                             menuhelp_save_as();
                         }
 
                         if (i == 4 && balnyomva) {
-                            tolt_save(1);
+                            tolt_save();
                         }
                         if (i == 4 && jobbnyomva) {
                             menuhelp_save();

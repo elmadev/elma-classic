@@ -513,11 +513,11 @@ void tolt_new(void) {
 }
 
 // Ha sikeresen mentett, akkor igaz:
-int tolt_save(int lokkolhato) {
+int tolt_save() {
     invalidateegesz();
     if (State->editor_filename[0] == 0) {
         // Ez a file meg nincsen elnevezve:
-        return tolt_save_as(lokkolhato);
+        return tolt_save_as();
     }
     Ptop->save(State->editor_filename);
     Valtozott = 0;
@@ -525,35 +525,19 @@ int tolt_save(int lokkolhato) {
 }
 
 // Ha sikeresen mentett, akkor igaz:
-int tolt_save_as(int lokkolhato) {
+int tolt_save_as() {
     invalidateegesz();
     // Itt most be kell olvasnunk egy nevet:
-    box boxnagy = {20, 200, 600, 380};
-    if (!lokkolhato) {
-        boxnagy.y2 = 300;
-    }
+    box boxnagy = {20, 200, 600, 300};
     box boxsave = {320 - 30, 273, 320 + 30, 290};
-    box boxsavelock = {320 - 45, 340, 320 + 45, 357};
 
     push();
     render_box(BufferMain, boxnagy, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
     render_box(BufferMain, boxsave, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    if (lokkolhato) {
-        render_box(BufferMain, boxsavelock, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    }
     Pabc2->write_centered(
         BufferMain, (boxnagy.x2 + boxnagy.x1) / 2, 220,
         "Type in the file name and press ENTER or click on SAVE, or press ESC to cancel!");
-    if (lokkolhato) {
-        Pabc2->write_centered(
-            BufferMain, (boxnagy.x2 + boxnagy.x1) / 2, 320,
-            "If you click on the SAVE LOCKED button, the saved file won't be modifiable anymore. ");
-    }
     Pabc2->write_centered(BufferMain, (boxsave.x2 + boxsave.x1) / 2, boxsave.y1 + 13, "SAVE");
-    if (lokkolhato) {
-        Pabc2->write_centered(BufferMain, (boxsavelock.x2 + boxsavelock.x1) / 2,
-                              boxsavelock.y1 + 13, "SAVE LOCKED");
-    }
 
     bltfront(BufferMain, boxnagy.x1, boxnagy.y1, boxnagy.x2, boxnagy.y2);
     pop();
@@ -678,47 +662,6 @@ int tolt_save_as(int lokkolhato) {
                 Ptop->save(nev);
                 strcpy(State->editor_filename, nev);
                 Valtozott = 0;
-                return 1;
-            }
-            if (lokkolhato && is_in_box(Moux, Mouy, boxsavelock)) {
-                // Lockoltan mentjuk el:
-                if (nev[0] == 0) {
-                    continue;
-                }
-                // Most mentunk:
-                // Eloallitjuk nevet:
-                strcat(nev, ".lev");
-                if (strcmpi(nev, State->editor_filename) == 0) {
-                    dialog(
-                        "You must give a name that is different from the name of the edited file!");
-                    return 0;
-                }
-                if (dialog(
-                        "WARNING: The file you save will be locked. You won't be able to load it "
-                        "into the editor!",
-                        "You should save a locked file only if you want to give it to somebody",
-                        "and don't want him/her to modify your level file.",
-                        "It is recommended that you save and keep the original (not locked) file",
-                        "in case you want to modify it.",
-                        "After saving the file, the name of the content of the editor will remain "
-                        "the original.",
-                        "", "Do you want to continue?",
-
-                        DIALOG_BUTTONS, "Yes", "No") == 1) {
-                    return 0;
-                }
-                char tmpnev[40];
-                strcpy(tmpnev, "lev/");
-                strcat(tmpnev, nev);
-                if (access(tmpnev, 0) == 0) {
-                    if (dialog("File exists, overwrite?", nev, DIALOG_BUTTONS, "Yes", "No") == 1) {
-                        return 0;
-                    }
-                }
-                Ptop->locked = true;
-                Ptop->save(nev);
-                Ptop->locked = false;
-                // strcpy( State->editor_filename, nev );
                 return 1;
             }
         }

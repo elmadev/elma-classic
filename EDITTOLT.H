@@ -8,8 +8,8 @@ class sprite;
 
 void tolt_open(void);
 // Ha sikeresen mentettek, akkor igazak:
-int tolt_save_as(int lokkolhato);
-int tolt_save(int lokkolhato);
+int tolt_save_as();
+int tolt_save();
 void tolt_new(void);
 
 void change_level_properties(void);

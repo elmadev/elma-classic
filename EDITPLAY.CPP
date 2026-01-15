@@ -9,7 +9,7 @@
 void editplay(void) {
     invalidateegesz();
     if (Valtozott || State->editor_filename[0] == 0 || Ptop->topology_errors) {
-        if (!tolt_save(0)) {
+        if (!tolt_save()) {
             return;
         }
     }

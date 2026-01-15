@@ -235,17 +235,17 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
     }
 
     // Disallow identical foreground/background textures
-    if (strcmpi(Ptop->foreground_name, Ptop->background_name) == 0) {
-        Ptop->background_name[0] = 0;
+    if (strcmpi(foreground_name, background_name) == 0) {
+        background_name[0] = 0;
     }
 
     // Erase missing texture names
-    if (Plgr->gettexturaindex(Ptop->foreground_name) < 0) {
-        Ptop->foreground_name[0] = 0;
+    if (Plgr->gettexturaindex(foreground_name) < 0) {
+        foreground_name[0] = 0;
     }
 
-    if (Plgr->gettexturaindex(Ptop->background_name) < 0) {
-        Ptop->background_name[0] = 0;
+    if (Plgr->gettexturaindex(background_name) < 0) {
+        background_name[0] = 0;
     }
 
     if (Plgr->texturaszam < 2) {
@@ -254,19 +254,19 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
 
     // If we have missing/invalid texture name, replace the name with a texture from the list
     // We grab the lowest index texture where foreground_name != background_name
-    if (!Ptop->foreground_name[0]) {
-        if (strcmpi(Ptop->background_name, Plgr->texturak[0].nev) != 0) {
-            strcpy(Ptop->foreground_name, Plgr->texturak[0].nev);
+    if (!foreground_name[0]) {
+        if (strcmpi(background_name, Plgr->texturak[0].nev) != 0) {
+            strcpy(foreground_name, Plgr->texturak[0].nev);
         } else {
-            strcpy(Ptop->foreground_name, Plgr->texturak[1].nev);
+            strcpy(foreground_name, Plgr->texturak[1].nev);
         }
     }
 
-    if (!Ptop->background_name[0]) {
-        if (strcmpi(Ptop->foreground_name, Plgr->texturak[0].nev) != 0) {
-            strcpy(Ptop->background_name, Plgr->texturak[0].nev);
+    if (!background_name[0]) {
+        if (strcmpi(foreground_name, Plgr->texturak[0].nev) != 0) {
+            strcpy(background_name, Plgr->texturak[0].nev);
         } else {
-            strcpy(Ptop->background_name, Plgr->texturak[1].nev);
+            strcpy(background_name, Plgr->texturak[1].nev);
         }
     }
 
@@ -1269,7 +1269,7 @@ int level::initialize_objects(motorst* mot) {
     int apple_count = 0;
     bool start_found = false;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = objects[i];
         if (obj) {
             // Set a random phase to every object
             obj->floating_phase = random_range(1000) * 2.0 * PI / 1000.0;
@@ -1306,7 +1306,7 @@ int level::initialize_objects(motorst* mot) {
 void level::sort_objects() {
     int count = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = objects[i];
         if (obj) {
             count++;
         }
@@ -1314,7 +1314,7 @@ void level::sort_objects() {
 
     // Check there are no NULL objects
     for (int i = 0; i < count; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = objects[i];
         if (!obj) {
             internal_error("level::sort_objects has a gap!");
         }
@@ -1328,8 +1328,8 @@ void level::sort_objects() {
     // Bubble sort in following priority: Killer, Apple, Exit, Start
     for (int j = 0; j < count + 4; j++) {
         for (int i = 0; i < count - 1; i++) {
-            object::Type type1 = Ptop->objects[i]->type;
-            object::Type type2 = Ptop->objects[i + 1]->type;
+            object::Type type1 = objects[i]->type;
+            object::Type type2 = objects[i + 1]->type;
 
             int score1 = 10;
             if (type1 == object::Type::Killer) {
@@ -1354,9 +1354,9 @@ void level::sort_objects() {
             }
 
             if (score1 > score2) {
-                object tmp = *Ptop->objects[i];
-                *Ptop->objects[i] = *Ptop->objects[i + 1];
-                *Ptop->objects[i + 1] = tmp;
+                object tmp = *objects[i];
+                *objects[i] = *objects[i + 1];
+                *objects[i + 1] = tmp;
             }
         }
     }
@@ -1367,7 +1367,7 @@ object* level::get_object(int index) {
         internal_error("level::get_object index < 0 || index >= MAX_OBJECTS!");
     }
 
-    object* obj = Ptop->objects[index];
+    object* obj = objects[index];
     if (!obj) {
         internal_error("level::get_object !obj!");
     }
@@ -1381,7 +1381,7 @@ void level::flip_objects() {
     }
     objects_flipped = true;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = objects[i];
         if (obj) {
             obj->r.y = -obj->r.y;
         }
@@ -1395,7 +1395,7 @@ void level::unflip_objects() {
 
     objects_flipped = false;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = objects[i];
         if (obj) {
             obj->r.y = -obj->r.y;
         }

@@ -40,7 +40,6 @@ class level {
     int level_id;
     bool lgr_not_found;
     bool topology_errors;
-    bool locked;
     ptrgyuru polygons[MAX_POLYGONS]; // Ez csak gany miatt public
     object* objects[MAX_OBJECTS];
     sprite* sprites[MAX_SPRITES];

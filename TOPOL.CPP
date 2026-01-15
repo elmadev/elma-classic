@@ -125,7 +125,6 @@ level::level() {
     lgr_not_found = false;
     objects_flipped = false;
     topology_errors = false;
-    locked = false;
     topten_file_offset = 0;
     for (int i = 0; i < MAX_POLYGONS; i++) {
         polygons[i] = nullptr;
@@ -600,7 +599,6 @@ void level::load_external(const char* filename) {
     lgr_not_found = false;
     objects_flipped = false;
     topology_errors = false;
-    locked = false;
     topten_file_offset = 0;
     memset(&toptens, 0, sizeof(toptens));
     for (int i = 0; i < MAX_POLYGONS; i++) {
@@ -680,6 +678,7 @@ void level::load_external(const char* filename) {
         topology_errors = true;
     }
 
+    // Ignore locked parameter, but keep the integrity check
     double integrity_locked;
     if (fread(&integrity_locked, 1, sizeof(integrity_locked), h) != 8) {
         internal_error("Error reading level file!", filename);
@@ -687,9 +686,6 @@ void level::load_external(const char* filename) {
     if (integrity_locked + integrity_checksum < 9875.0 ||
         integrity_locked + integrity_checksum > 32345.0) {
         internal_error("Corrupt .LEV file!", filename);
-    }
-    if (integrity_locked + integrity_checksum > 20000.0) {
-        locked = true;
     }
 
     int level_name_length = LEVEL_NAME_LENGTH;
@@ -806,7 +802,6 @@ void level::load_internal(const char* filename) {
     lgr_not_found = false;
     objects_flipped = false;
     topology_errors = false;
-    locked = false;
 
     topten_file_offset = 0;
     memset(&toptens, 0, sizeof(toptens));
@@ -890,9 +885,6 @@ void level::load_internal(const char* filename) {
     if (integrity_locked + integrity_checksum < 9875.0 ||
         integrity_locked + integrity_checksum > 32345.0) {
         internal_error("Corrupt .LEV file!", filename);
-    }
-    if (integrity_locked + integrity_checksum > 20000.0) {
-        locked = true;
     }
 
     int level_name_length = LEVEL_NAME_LENGTH;
@@ -1018,11 +1010,6 @@ void level::save(const char* filename, bool skip_topology) {
         topology_errors = false;
     } else {
         topology_errors = check_topology(0);
-        if (topology_errors && locked) {
-            dialog("You cannot save this file as a locked file because there are",
-                   "some topology errors in the design and you could not play on it!");
-            return;
-        }
     }
 
     char path[40];
@@ -1072,10 +1059,8 @@ void level::save(const char* filename, bool skip_topology) {
     }
     fwrite(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h);
 
+    // Always set integrity as unlocked
     double integrity_locked = 12112.0 + random_range(6102) - integrity_checksum;
-    if (locked) {
-        integrity_locked = 23090.0 + random_range(6310) - integrity_checksum;
-    }
     fwrite(&integrity_locked, 1, sizeof(integrity_topology_errors), h);
 
 #ifdef BELSOTIR

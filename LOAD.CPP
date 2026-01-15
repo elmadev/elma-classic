@@ -87,7 +87,7 @@ int floadlevel_e(const char* nev, int forceload) {
     if (strlen(nev) > 12 || !nev[0]) {
         internal_error("floadlevel_e-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
     }
-    if (forceload || Volttopsave || !Ptop || Ptop->locked || strcmpi(nev, Bentlevelnev) != 0) {
+    if (forceload || Volttopsave || !Ptop || strcmpi(nev, Bentlevelnev) != 0) {
         Volttopsave = 0;
         // Ujra be kell olvasni palyat:
         strcpy(Bentlevelnev, nev);
@@ -99,17 +99,6 @@ int floadlevel_e(const char* nev, int forceload) {
             Bentlevelnev[0] = 0;
         } else {
             Ptop = new level(nev);
-        }
-
-        if (Ptop->locked) {
-            levoltzarva = 1;
-
-            char szoveg[80];
-            sprintf(szoveg, "The file '%s' is locked, you cannot edit it!", State->editor_filename);
-
-            dialog(szoveg);
-            delete Ptop;
-            Ptop = new level;
         }
 
         loadlgrfile(Ptop->lgr_name);

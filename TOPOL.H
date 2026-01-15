@@ -33,8 +33,7 @@ class level {
     // Load level from file
     level(const char* filename);
     ~level();
-    void load_external(const char* filename);
-    void load_internal(const char* filename);
+    void from_file(const char* filename, bool internal);
 
   public:
     int level_id;

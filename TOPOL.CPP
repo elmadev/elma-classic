@@ -582,7 +582,7 @@ level::level(const char* filename) {
 
     int internal_index = get_internal_index(filename);
     if (internal_index > 0) {
-        load_internal(InternalFilePaths[internal_index]);
+        from_file(InternalFilePaths[internal_index], true);
         // Override lgr name from lgrlist.txt
         char lgrpath[40];
         const char* lgrname = InternalLevelLgrs[internal_index];
@@ -591,11 +591,11 @@ level::level(const char* filename) {
             strcpy(lgr_name, lgrname);
         }
     } else {
-        load_external(filename);
+        from_file(filename, false);
     }
 }
 
-void level::load_external(const char* filename) {
+void level::from_file(const char* filename, bool internal) {
     lgr_not_found = false;
     objects_flipped = false;
     topology_errors = false;
@@ -612,31 +612,43 @@ void level::load_external(const char* filename) {
     }
 
     FILE* h = nullptr;
-    char path[40];
-    sprintf(path, "lev/%s", filename);
-    h = fopen(path, "rb");
+    if (internal) {
+        h = qopen(filename, "rb");
+    } else {
+        char path[40];
+        sprintf(path, "lev/%s", filename);
+        h = fopen(path, "rb");
+    }
+
     if (!h) {
-        internal_error("Failed to open level file: ", path);
+        internal_error("Failed to open level file: ", filename);
     }
 
     char tmp[10] = "AAAAA";
     if (fread(tmp, 1, 5, h) != 5) {
         internal_error("Error reading level file!", filename);
     }
-    if (strncmp(tmp, "POT", 3) != 0) {
-        internal_error("Corrupt .LEV file!", filename);
-    }
 
-    level_id = 0;
-    double integrity_checksum = 0;
-    int version = tmp[4] - '0' + 10 * (tmp[3] - '0');
+    int version;
+    if (internal) {
+        if (strncmp(tmp, "@@^!@", 5) != 0) {
+            internal_error("level file header is invalid!");
+        }
 
-    if (version > 14) {
-        external_error("Level file's version is too new!: ", filename);
-    }
+        version = 14;
+    } else {
+        if (strncmp(tmp, "POT", 3) != 0) {
+            internal_error("Corrupt .LEV file!", filename);
+        }
 
-    if (version != 6 && version != 14) {
-        external_error("Corrupt .LEV file!", filename);
+        version = tmp[4] - '0' + 10 * (tmp[3] - '0');
+        if (version > 14) {
+            external_error("Level file's version is too new!: ", filename);
+        }
+
+        if (version != 6 && version != 14) {
+            external_error("Corrupt .LEV file!", filename);
+        }
     }
 
     int level_id_checksum;
@@ -650,6 +662,7 @@ void level::load_external(const char* filename) {
         internal_error("Error reading level file!", filename);
     }
 
+    double integrity_checksum = 0.0;
     if (fread(&integrity_checksum, 1, sizeof(integrity_checksum), h) != 8) {
         internal_error("Corrupt .LEV file!", filename);
     }
@@ -713,12 +726,25 @@ void level::load_external(const char* filename) {
     }
 
     if (version == 6) {
+#ifdef DEBUG
+        if (internal) {
+            internal_error("Cannot fseek a .leb file!");
+        }
+#endif
         fseek(h, 100, SEEK_SET);
     }
 
-    double encrypted_polygon_count = 0;
+    double encrypted_polygon_count = 0.0;
+    double encrypted_object_count = 0.0;
     if (fread(&encrypted_polygon_count, 1, sizeof(encrypted_polygon_count), h) != 8) {
         internal_error("Error reading level file!", filename);
+    }
+
+    if (internal) {
+        // object_count is moved out of order in .leb files.
+        if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) != 8) {
+            internal_error("Error reading level file!", filename);
+        }
     }
 
     int polygon_count = (int)(encrypted_polygon_count);
@@ -734,9 +760,10 @@ void level::load_external(const char* filename) {
         polygons[i] = new polygon(h, version);
     }
 
-    double encrypted_object_count = 0;
-    if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) != 8) {
-        internal_error("Error reading level file!", filename);
+    if (!internal) {
+        if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) != 8) {
+            internal_error("Error reading level file!", filename);
+        }
     }
 
     int object_count = (int)(encrypted_object_count);
@@ -751,7 +778,7 @@ void level::load_external(const char* filename) {
     }
 
     if (version == 14) {
-        double encrypted_sprite_count = 0;
+        double encrypted_sprite_count = 0.0;
         if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) != 8) {
             internal_error("Error reading level file!", filename);
         }
@@ -765,6 +792,18 @@ void level::load_external(const char* filename) {
         for (int i = 0; i < sprite_count; i++) {
             sprites[i] = new sprite(h);
         }
+    }
+
+    // Verify checksum
+    double calculated_checksum = checksum();
+    if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
+        external_error("Corrupt .LEV file!", filename);
+    }
+
+    if (internal) {
+        // No topten in internal levels
+        qclose(h);
+        return;
     }
 
     // Top ten (optional)
@@ -790,193 +829,6 @@ void level::load_external(const char* filename) {
     }
 
     fclose(h);
-
-    // Verify checksum
-    double calculated_checksum = checksum();
-    if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
-        external_error("Corrupt .LEV file!", filename);
-    }
-}
-
-void level::load_internal(const char* filename) {
-    lgr_not_found = false;
-    objects_flipped = false;
-    topology_errors = false;
-
-    topten_file_offset = 0;
-    memset(&toptens, 0, sizeof(toptens));
-
-    for (int i = 0; i < MAX_POLYGONS; i++) {
-        polygons[i] = nullptr;
-    }
-    for (int i = 0; i < MAX_OBJECTS; i++) {
-        objects[i] = nullptr;
-    }
-    for (int i = 0; i < MAX_SPRITES; i++) {
-        sprites[i] = nullptr;
-    }
-
-    FILE* h = nullptr;
-    h = qopen(filename, "rb");
-    if (!h) {
-        internal_error("Failed to open level file: ", filename);
-    }
-
-    char tmp[10] = "AAAAA";
-    if (fread(tmp, 1, 5, h) != 5) {
-        internal_error("Error reading level file!", filename);
-    }
-    if (strncmp(tmp, "@@^!@", 5) != 0) {
-        internal_error("Corrupt .LEV file!", filename);
-    }
-
-    level_id = 0;
-    double integrity_checksum = 0;
-    /*int verzio = tmp[4] - '0' + 10*(tmp[3] - '0');
-
-    if( verzio < 6 )
-        external_error( "Corrupt level file!: ", filename );
-
-    if( verzio > 14 )
-        external_error( "Level file's version is too new!: ", filename );
-    */
-    int version = 14;
-
-    int level_id_checksum;
-    if (version >= 13) {
-        if (fread(&level_id_checksum, 1, 2, h) != 2) {
-            internal_error("Error reading level file!", filename);
-        }
-    }
-
-    if (fread(&level_id, 1, sizeof(level_id), h) != 4) {
-        internal_error("Error reading level file!", filename);
-    }
-
-    if (fread(&integrity_checksum, 1, sizeof(integrity_checksum), h) != 8) {
-        internal_error("Corrupt .LEV file!", filename);
-    }
-
-    double integrity_shareware;
-    if (fread(&integrity_shareware, 1, sizeof(integrity_shareware), h) != 8) {
-        internal_error("Error reading level file!", filename);
-    }
-    if (integrity_shareware + integrity_checksum < 9786.0 ||
-        integrity_shareware + integrity_checksum > 36546.0) {
-        internal_error("Corrupt .LEV file!", filename);
-    }
-
-    double integrity_topology_errors;
-    if (fread(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h) != 8) {
-        internal_error("Error reading level file!", filename);
-    }
-    if (integrity_topology_errors + integrity_checksum < 9786.0 ||
-        integrity_topology_errors + integrity_checksum > 36546.0) {
-        internal_error("Corrupt .LEV file!", filename);
-    }
-    if (integrity_topology_errors + integrity_checksum > 20000.0) {
-        topology_errors = true;
-    }
-
-    double integrity_locked;
-    if (fread(&integrity_locked, 1, sizeof(integrity_locked), h) != 8) {
-        internal_error("Error reading level file!", filename);
-    }
-    if (integrity_locked + integrity_checksum < 9875.0 ||
-        integrity_locked + integrity_checksum > 32345.0) {
-        internal_error("Corrupt .LEV file!", filename);
-    }
-
-    int level_name_length = LEVEL_NAME_LENGTH;
-    if (version < 14) {
-        level_name_length = LEVEL_NAME_LENGTH_OLD;
-    }
-    fread(level_name, 1, level_name_length + 1, h);
-    level_name[level_name_length] = 0;
-
-    if (version > 6) {
-        fread(lgr_name, 1, 16, h);
-        lgr_name[15] = 0;
-    } else {
-        strcpy(lgr_name, "default");
-    }
-
-    if (version >= 8) {
-        fread(foreground_name, 1, 10, h);
-        foreground_name[9] = 0;
-        fread(background_name, 1, 10, h);
-        background_name[9] = 0;
-    } else {
-        strcpy(foreground_name, "ground");
-        strcpy(background_name, "sky");
-    }
-
-    if (version < 14) {
-        qseek(h, 100, SEEK_SET);
-    }
-    double encrypted_polygon_count = 0;
-    if (fread(&encrypted_polygon_count, 1, sizeof(encrypted_polygon_count), h) != 8) {
-        internal_error("Error reading level file!", filename);
-    }
-
-    int polygon_count = (int)(encrypted_polygon_count);
-    if (polygon_count > MAX_POLYGONS) {
-        internal_error("Too many polygons in level file!", filename);
-    }
-    if (polygon_count <= 0) {
-        internal_error("Corrupt .LEV file!", filename);
-    }
-
-    double encrypted_object_count = 0;
-    if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) != 8) {
-        internal_error("Error reading level file!", filename);
-    }
-
-    int object_count = (int)(encrypted_object_count);
-    if (object_count > MAX_OBJECTS) {
-        internal_error("Too many objects in level file!", filename);
-    }
-    if (object_count <= 0) {
-        internal_error("Corrupt .LEV file!");
-    }
-
-    for (int i = 0; i < polygon_count; i++) {
-        polygons[i] = new polygon(h, version);
-    }
-
-    for (int i = 0; i < object_count; i++) {
-        objects[i] = new object(h, version);
-    }
-
-    if (version > 6) {
-        double encrypted_sprite_count = 0;
-        if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) != 8) {
-            internal_error("Error reading level file!", filename);
-        }
-
-        int sprite_count = (int)(encrypted_sprite_count);
-        if (sprite_count > MAX_SPRITES) {
-            internal_error("Too many pictures in level file!", filename);
-        }
-        if (sprite_count < 0) {
-            internal_error("Corrupt .LEV file!", filename);
-        }
-
-        if (version < 8 && sprite_count > 0) {
-            internal_error("version < 8 && sprite_count > 0!", filename);
-        }
-
-        for (int i = 0; i < sprite_count; i++) {
-            sprites[i] = new sprite(h);
-        }
-    }
-
-    qclose(h);
-
-    double calculated_checksum = checksum();
-    if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
-        external_error("Corrupt .LEV file!", filename);
-    }
 }
 
 // Generate random level ID.

@@ -53,7 +53,7 @@ elma_sources = files(
     'qopen.cpp',
     'RECORDER.CPP',
     'platform_sdl.cpp',
-    'SKIP.CPP',
+    'skip.cpp',
     'transparency.cpp',
     'state.cpp',
     'segments.cpp',

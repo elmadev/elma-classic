@@ -11,7 +11,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "physics_init.h"
-#include "SKIP.H"
+#include "skip.h"
 #include "TELJES.H"
 #include "TOPOL.H"
 #include "timer.h"

@@ -1,4 +1,4 @@
-#include "SKIP.H"
+#include "skip.h"
 #include "main.h"
 #include "menu_pic.h"
 #include "platform_utils.h"

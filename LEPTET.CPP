@@ -294,7 +294,7 @@ void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1,
 int vizsgalat(motorst* pmot) {
     vect2 t1, t2;
     segment *pv1, *pv2;
-    if (talppontkereses(pmot->head_r, HeadRadius, &t1, &t2, &pv1, &pv2)) {
+    if (get_two_anchor_points(pmot->head_r, HeadRadius, &t1, &t2, &pv1, &pv2)) {
         return 0;
     }
 

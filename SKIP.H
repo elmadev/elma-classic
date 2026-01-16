@@ -1,6 +1,6 @@
 #ifndef SKIP_H
 #define SKIP_H
 
-int skippelheto(int level);
+int is_skippable(int index);
 
 #endif

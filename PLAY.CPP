@@ -737,7 +737,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
                 return 2;
             }
             // SKIP:
-            if (skippelheto(level)) {
+            if (is_skippable(level)) {
                 return 3;
             }
         }

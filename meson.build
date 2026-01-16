@@ -91,11 +91,6 @@ if cpp.get_id() == 'msvc'
         # Override windows subsystem entrypoint to main instead of WinMain
         link_args += ['/ENTRY:mainCRTStartup']
     endif
-
-    if host_machine.cpu_family() == 'x86'
-        # winmm.lib is automatically linked by meson when 64-bit, but not 32-bit
-        link_args += ['winmm.lib']
-    endif
 else
     cpp_args += ['-Wno-deprecated-declarations']
 endif

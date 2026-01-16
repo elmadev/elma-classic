@@ -302,9 +302,9 @@ int vizsgalat(motorst* pmot) {
     while (voltkaja) { // Ha nem volt kaja kilepunk, kulonben vegtelen ciklus
         voltkaja = 0;
         int sorszamtomb[3];
-        sorszamtomb[0] = utkozikesprite(pmot->left_wheel.r, pmot->left_wheel.radius);
-        sorszamtomb[1] = utkozikesprite(pmot->right_wheel.r, pmot->right_wheel.radius);
-        sorszamtomb[2] = utkozikesprite(pmot->head_r, HeadRadius);
+        sorszamtomb[0] = get_touching_object(pmot->left_wheel.r, pmot->left_wheel.radius);
+        sorszamtomb[1] = get_touching_object(pmot->right_wheel.r, pmot->right_wheel.radius);
+        sorszamtomb[2] = get_touching_object(pmot->head_r, HeadRadius);
         for (int i = 0; i < 3; i++) {
             if (sorszamtomb[i] >= 0) {
                 startwavegyujto(WavEvent::None, 0.0, sorszamtomb[i]);

@@ -4,6 +4,6 @@
 class vect2;
 
 // negativ eseten nem utkozik:
-int utkozikesprite(vect2 r, double sugar);
+int get_touching_object(vect2 r, double radius);
 
 #endif

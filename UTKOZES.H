@@ -4,7 +4,9 @@
 class vect2;
 struct segment;
 
-// Talppontszamot adja vissza (0-2):
+// Get up to two points of collision for the circle at position `r` with `radius`.
+// Return the number of anchor points (0-2).
+// Store the anchor points in `point1` and `point2`.
 int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2, segment** seg1,
                           segment** seg2);
 

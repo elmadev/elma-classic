@@ -86,32 +86,10 @@ void rigidbody_movement(rigidbody* rb, vect2 force, double torque, double dt, bo
     int anchor_point_count = 0;
     vect2 point1;
     vect2 point2;
-    segment* line1 = nullptr;
-    segment* line2 = nullptr;
 
     // Get up to two points of collision between wheel and polygons
     if (do_collision) {
-        anchor_point_count =
-            get_two_anchor_points(rb->r, rb->radius, &point1, &point2, &line1, &line2);
-#ifdef DEBUG
-        switch (anchor_point_count) {
-        case 0:
-            if (line1 || line2) {
-                internal_error("rigidbody_movement: 0 anchor_point_count assertion fail!");
-            }
-            break;
-        case 1:
-            if (!line1 || line2) {
-                internal_error("rigidbody_movement: 1 anchor_point_count assertion fail!");
-            }
-            break;
-        case 2:
-            if (!line1 || !line2) {
-                internal_error("rigidbody_movement: 2 anchor_point_count assertion fail!");
-            }
-            break;
-        }
-#endif
+        anchor_point_count = get_two_anchor_points(rb->r, rb->radius, &point1, &point2);
     }
 
     // Move the wheel out of the ground

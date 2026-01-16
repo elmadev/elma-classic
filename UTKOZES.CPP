@@ -47,9 +47,7 @@ static bool get_anchor_point(vect2 r, double radius, segment* seg, vect2* point)
     return true;
 }
 
-int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2, segment** seg1,
-                          segment** seg2) {
-    *seg1 = *seg2 = nullptr;
+int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2) {
     // Iterate through all the lines in one collision cell
     Segments->iterate_collision_grid_cell_segments(r);
     int anchor_point_count = 0;
@@ -64,7 +62,6 @@ int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2, 
             // Verify our second collision
             if (anchor_point_count == 1) {
                 *point2 = point;
-                *seg2 = seg;
                 anchor_point_count++;
                 // If the first and second collision are too close together,
                 // average out the two points and treat it as a single point, then keep searching.
@@ -73,7 +70,6 @@ int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2, 
                 if ((*point1 - *point2).length() < TwoPointDiscriminationDistance) {
                     *point1 = (*point1 + *point2) * 0.5;
                     anchor_point_count = 1;
-                    *seg2 = nullptr;
                 } else {
                     // We found a valid second point, we're done!
                     return anchor_point_count;
@@ -82,7 +78,6 @@ int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2, 
             // Always accept our first collision
             if (anchor_point_count == 0) {
                 *point1 = point;
-                *seg1 = seg;
                 anchor_point_count++;
             }
         }

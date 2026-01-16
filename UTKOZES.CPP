@@ -6,7 +6,7 @@
 
 // Check for collision between a wheel/head of a certain radius, and a provided segment.
 // If there is a collision, return true and get the point of collision along the segment.
-static int get_anchor_point(vect2 r, double radius, segment* seg, vect2* point) {
+static bool get_anchor_point(vect2 r, double radius, segment* seg, vect2* point) {
     // Get relative position
     vect2 rel = r - seg->r;
     // The closest point of collision between a point and line is always perpendicular to the line
@@ -18,10 +18,10 @@ static int get_anchor_point(vect2 r, double radius, segment* seg, vect2* point) 
         if ((r - seg->r).length() < radius) {
             // Return the very start of the segment
             *point = seg->r;
-            return 1;
+            return true;
         } else {
             // Too far, no collision
-            return 0;
+            return false;
         }
     }
     if (position_along_line > seg->length) {
@@ -29,10 +29,10 @@ static int get_anchor_point(vect2 r, double radius, segment* seg, vect2* point) 
         if ((r - (seg->r + seg->unit_vector * seg->length)).length() < radius) {
             // Return the very end of the segment
             *point = seg->r + seg->unit_vector * seg->length;
-            return 1;
+            return true;
         } else {
             // Too far, no collision
-            return 0;
+            return false;
         }
     }
     // We are neither behind nor in front of the segment, so we will collide somewhere in the middle
@@ -40,11 +40,11 @@ static int get_anchor_point(vect2 r, double radius, segment* seg, vect2* point) 
     vect2 n = rotate_90deg(seg->unit_vector);
     double distance = rel * n;
     if (distance < -radius || distance > radius) {
-        return 0;
+        return false;
     }
     // Calculate where along the segment we will touch
     *point = seg->r + seg->unit_vector * position_along_line;
-    return 1;
+    return true;
 }
 
 int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2, segment** seg1,
@@ -54,7 +54,7 @@ int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2, 
     Segments->iterate_collision_grid_cell_segments(r);
     int anchor_point_count = 0;
     segment* seg = nullptr;
-    while ((seg = Segments->next_collision_grid_segment()) != nullptr) {
+    while ((seg = Segments->next_collision_grid_segment())) {
         // Find the point of collision between the wheel/head and the line
         vect2 point;
         if (get_anchor_point(r, radius, seg, &point)) {

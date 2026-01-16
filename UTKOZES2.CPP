@@ -25,12 +25,14 @@ int get_touching_object(vect2 r, double radius) {
             break;
         }
 
+        // Skip Start object and eaten Food
         if (!obj->active) {
             continue;
         }
 
+        // Skip Exit in flagtag mode
         if (obj->type == object::Type::Exit && !Single && Tag) {
-            continue; // Flag Tag-ben nincsen cel
+            continue;
         }
 
         if (obj->canvas_x < objminx || obj->canvas_y < objminy || obj->canvas_x > objmaxx ||
@@ -44,5 +46,6 @@ int get_touching_object(vect2 r, double radius) {
             return i;
         }
     }
+
     return -1;
 }

@@ -3,7 +3,7 @@
 
 class vect2;
 
-// negativ eseten nem utkozik:
+// Return the index of the first object that a head/wheel touches, or -1 if none.
 int get_touching_object(vect2 r, double radius);
 
 #endif

@@ -111,6 +111,15 @@ static void setup_textures(int width, int height) {
     glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA8, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 }
 
+static void setup_render_state() {
+    glUseProgram(ShaderProgram);
+    glBindVertexArray(VAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, IndexTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_1D, PaletteTexture);
+}
+
 static void setup_vertex_data() {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -162,6 +171,7 @@ int gl_init(SDL_Window* sdl_window, int width, int height) {
     }
 
     setup_textures(width, height);
+    setup_render_state();
 
     return 0;
 }

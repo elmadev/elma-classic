@@ -14,7 +14,7 @@ SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
 SDL_Surface* SDLSurfacePaletted;
 
-static RendererType CurrentRenderer = RendererType::Software;
+static RendererType CurrentRenderer;
 
 static bool LeftMouseDownPrev = false;
 static bool RightMouseDownPrev = false;
@@ -30,6 +30,8 @@ void message_box(const char* text) {
 static unsigned char** SurfaceBuffer;
 
 void platform_init() {
+    CurrentRenderer = EolSettings->renderer;
+
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         internal_error(SDL_GetError());
         return;

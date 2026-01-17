@@ -20,6 +20,7 @@ eol_settings::eol_settings() {
     center_camera = false;
     center_map = false;
     map_alignment = MapAlignment::None;
+    renderer = RendererType::Software;
 }
 
 void to_json(json& j, const MapAlignment& m) {
@@ -53,13 +54,35 @@ void from_json(const json& j, MapAlignment& m) {
     }
 }
 
+void to_json(json& j, const RendererType& r) {
+    switch (r) {
+    case RendererType::Software:
+        j = "software";
+        break;
+    case RendererType::OpenGL:
+        j = "opengl";
+        break;
+    }
+}
+
+void from_json(const json& j, RendererType& r) {
+    if (j == "software") {
+        r = RendererType::Software;
+    } else if (j == "opengl") {
+        r = RendererType::OpenGL;
+    } else {
+        throw("[json.exception.type_error.302] (/renderer) invalid value");
+    }
+}
+
 #define FIELD_LIST                                                                                 \
     JSON_FIELD(screen_width)                                                                       \
     JSON_FIELD(screen_height)                                                                      \
     JSON_FIELD(pictures_in_background)                                                             \
     JSON_FIELD(center_camera)                                                                      \
     JSON_FIELD(center_map)                                                                         \
-    JSON_FIELD(map_alignment)
+    JSON_FIELD(map_alignment)                                                                      \
+    JSON_FIELD(renderer)
 
 #define JSON_FIELD(name) {#name, s.name},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

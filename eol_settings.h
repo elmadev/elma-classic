@@ -2,6 +2,7 @@
 #define EOL_SETTINGS
 
 enum class MapAlignment { None, Left, Middle, Right };
+enum class RendererType { Software, OpenGL };
 
 struct eol_settings {
     eol_settings();
@@ -14,6 +15,7 @@ struct eol_settings {
     bool center_camera;
     bool center_map;
     MapAlignment map_alignment;
+    RendererType renderer;
 };
 
 extern eol_settings* EolSettings;

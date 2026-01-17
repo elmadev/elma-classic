@@ -1,5 +1,6 @@
 #include "platform_impl.h"
 #include "editor_dialog.h"
+#include "eol_settings.h"
 #include "EDITUJ.H"
 #include "HANGHIGH.H"
 #include "keys.h"
@@ -12,8 +13,6 @@
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
 SDL_Surface* SDLSurfacePaletted;
-
-enum class RendererType { Software, OpenGL };
 
 static RendererType CurrentRenderer = RendererType::Software;
 

@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include <glad/glad.h>
+#include <cstring>
 
 static const char* VertexShaderSource = R"(
 #version 410 core
@@ -37,6 +38,7 @@ static GLuint VBO = 0;
 static GLuint IndexTexture = 0;
 static GLuint PaletteTexture = 0;
 static GLuint ShaderProgram = 0;
+static GLuint PBO = 0;
 static GLint IndexTexLoc = -1;
 static GLint PaletteTexLoc = -1;
 
@@ -120,6 +122,13 @@ static void setup_render_state() {
     glBindTexture(GL_TEXTURE_1D, PaletteTexture);
 }
 
+static void setup_PBO(int width, int height) {
+    glGenBuffers(1, &PBO);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
+    glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height, nullptr, GL_STREAM_DRAW);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+}
+
 static void setup_vertex_data() {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -171,14 +180,28 @@ int gl_init(SDL_Window* sdl_window, int width, int height) {
     }
 
     setup_textures(width, height);
+    setup_PBO(width, height);
+
     setup_render_state();
 
     return 0;
 }
 
 void gl_upload_frame(const unsigned char* indices) {
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
+    void* ptr = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, FrameWidth * FrameHeight,
+                                 GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+    if (!ptr) {
+        internal_error("Could not map PBO!");
+    }
+
+    memcpy(ptr, indices, FrameWidth * FrameHeight);
+    glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+
     glActiveTexture(GL_TEXTURE0);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, FrameWidth, FrameHeight, GL_RED, GL_UNSIGNED_BYTE, indices);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, FrameWidth, FrameHeight, GL_RED, GL_UNSIGNED_BYTE, 0);
+
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 void gl_update_palette(const void* palette) {
@@ -193,6 +216,10 @@ void gl_cleanup() {
     if (VBO) {
         glDeleteBuffers(1, &VBO);
         VBO = 0;
+    }
+    if (PBO) {
+        glDeleteBuffers(1, &PBO);
+        PBO = 0;
     }
     if (IndexTexture) {
         glDeleteTextures(1, &IndexTexture);

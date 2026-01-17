@@ -150,7 +150,11 @@ palette::palette(unsigned char* palette_data) {
 palette::~palette() { delete[] (SDL_Color*)data; }
 
 void palette::set() {
-    SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, (const SDL_Color*)data, 0, 256);
+    if (CurrentRenderer == RendererType::OpenGL) {
+        gl_update_palette(data);
+    } else {
+        SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, (const SDL_Color*)data, 0, 256);
+    }
 }
 
 void handle_events() {

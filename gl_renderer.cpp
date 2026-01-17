@@ -176,6 +176,12 @@ int gl_init(SDL_Window* sdl_window, int width, int height) {
     return 0;
 }
 
+void gl_update_palette(const void* palette) {
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_1D, PaletteTexture);
+    glTexSubImage1D(GL_TEXTURE_1D, 0, 0, 256, GL_RGBA, GL_UNSIGNED_BYTE, palette);
+}
+
 void gl_cleanup() {
     if (VBO) {
         glDeleteBuffers(1, &VBO);

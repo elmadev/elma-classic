@@ -14,7 +14,7 @@ class pic8;
 extern pic8* BufferMain;
 extern pic8* BufferBall;
 extern abc8* MenuFont;
-extern palette* MenuPal;
+extern palette* MenuPalette;
 extern pic8* Intro;
 
 struct text_line {

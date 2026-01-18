@@ -82,7 +82,7 @@ void loadlgrfile(const char* nev) {
             "This file doesn't exist in the LGR directory, so the DEFAULT.LGR file will be loaded.",
             "This level file will look now different from that it was designed to look.");
         if (!InEditor) {
-            MenuPal->set();
+            MenuPalette->set();
         }
         blit8(BufferMain, BufferBall);
         bltfront(BufferMain);

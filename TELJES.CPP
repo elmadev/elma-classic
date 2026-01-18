@@ -179,7 +179,7 @@ void teljes(void) {
         bltfront( pbuffer );
     } */
 
-    MenuPal->set();
+    MenuPalette->set();
 
     // Ez kell menu_nav-hoz:
     menu_nav_entries_init();

@@ -743,7 +743,7 @@ int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* f
         }
         if (eredmeny == 2) {
             replayprec();
-            MenuPal->set();
+            MenuPalette->set();
         }
         if (eredmeny == 3) {
             if (level != INTERNAL_LEVEL_COUNT - 1) { // Utolso palyat nem lehet menteni
@@ -786,7 +786,7 @@ static void playlevel(int level) {
         Prec1->erase(tmpnev);
         Prec2->erase(tmpnev);
         long ido = lejatszo(tmpnev);
-        MenuPal->set();
+        MenuPalette->set();
         if (Ptop->objects_flipped) {
             internal_error("playlevel-ben Ptop->kerekekfejjellefel!");
         }

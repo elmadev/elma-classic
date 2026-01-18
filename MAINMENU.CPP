@@ -204,7 +204,7 @@ void replay(void) {
                 strcpy(tmp, NavEntriesLeft[pl + 1]);
                 strcat(tmp, ".REC");
                 // 0 param azt jelenti, hogy nem resource filebol olvas:
-                MenuPal->set();
+                MenuPalette->set();
                 kiirloading();
                 long belyeg = loadrecek(tmp, 0);
                 if (access_level_file(Prec1->palyanev) != 0) {
@@ -269,7 +269,7 @@ void replay(void) {
                 }
             }
         }
-        MenuPal->set();
+        MenuPalette->set();
     }
 }
 
@@ -298,10 +298,10 @@ static void demo(void) {
         Prec1->rewind();
         Prec2->rewind();
         if (lejatszo_r(Prec1->palyanev, 0)) {
-            MenuPal->set();
+            MenuPalette->set();
             return;
         }
-        MenuPal->set();
+        MenuPalette->set();
     }
 }
 
@@ -333,7 +333,7 @@ static void kilephakell(void) {
 }
 
 void mainmenu(void) {
-    MenuPal->set();
+    MenuPalette->set();
 
     // State->save_aaa(); ide minek kene?
     menu_nav val;
@@ -356,7 +356,7 @@ void mainmenu(void) {
     while (1) {
         // Korny->pabc_fomenu->write( Korny->picbuffer, 70, 10, "Main menu" );
 
-        // MenuPal->set(); // Torlendo
+        // MenuPalette->set(); // Torlendo
 
         int eredmeny = val.navigate();
 
@@ -394,7 +394,7 @@ void mainmenu(void) {
             editor();
             show_cursor();
             InEditor = false;
-            MenuPal->set();
+            MenuPalette->set();
         }
 
         if (eredmeny == -1) {

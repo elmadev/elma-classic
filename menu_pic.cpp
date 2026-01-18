@@ -27,7 +27,7 @@ abc8* MenuFont = nullptr;
 // Menu red helmet animation
 static anim* Helmet = nullptr;
 
-palette* MenuPal = nullptr;
+palette* MenuPalette = nullptr;
 
 void init_menu_pictures() {
     if (BufferMain) {
@@ -51,7 +51,7 @@ void init_menu_pictures() {
 
     balls_init();
 
-    get_pcx_pal("intro.pcx", &MenuPal);
+    get_pcx_pal("intro.pcx", &MenuPalette);
 }
 
 menu_pic::menu_pic(bool center_vert) {
@@ -233,7 +233,7 @@ void menu_pic::render(bool skip_balls_helmet) {
 
     double time = stopwatch();
     if (IntroAnimation) {
-        MenuPal->set();
+        MenuPalette->set();
         IntroAnimation = false;
         empty_keypress_buffer();
         while (true) {
@@ -499,8 +499,8 @@ void render_error(const char* text1, const char* text2, const char* text3, const
         MenuFont->write_centered(BufferMain, SCREEN_WIDTH / 2, y, ErrorLines[i]);
     }
     // Display the error message
-    if (MenuPal) {
-        MenuPal->set();
+    if (MenuPalette) {
+        MenuPalette->set();
     }
     bltfront(BufferMain);
 }

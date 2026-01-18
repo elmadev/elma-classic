@@ -144,7 +144,7 @@ static void kidoboz(vect2 a, vect2 b, pic8* ppic8, double szelesseg, affine_pic*
     v.y *= MetersToPixels;
     v2fel.x *= MetersToPixels;
     v2fel.y *= MetersToPixels;
-    dobozki(ppic8, pk, v, v2fel * 2.0, a);
+    draw_affine_pic(ppic8, pk, v, v2fel * 2.0, a);
 }
 
 // radius meg nincs megszorozva:
@@ -168,7 +168,7 @@ static void kitag(pic8* ppic8, affine_pic* pk, kisbox* pb) {
     vect2 u = Miar * (pb->x2 - pb->x1);
     vect2 v = Mjar * (pb->y1 - pb->y2);
 
-    dobozki(ppic8, pk, u, v, r);
+    draw_affine_pic(ppic8, pk, u, v, r);
 }
 
 static void kigyuru(pic8* ppic8, int x, int y, unsigned char szin) {
@@ -380,7 +380,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 
     // Ha kell affinitassal torodni:
     int vanforgas = 0;
-    Affinitas = 0;
+    StretchEnabled = 0;
     if (forgas < 0.999) {
         vanforgas = 1;
         // forgast 0, 1 intervallumbol atkonvertaljuk -1, 1 intervallumba:
@@ -416,8 +416,8 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     vect2 fel = rotate_90deg(jobbra);
 
     if (vanforgas) {
-        Affinitas = 1;
-        setaffinitas(kozep, jobbra, forgas, MetersToPixels, MetersToPixels);
+        StretchEnabled = 1;
+        set_stretch_parameters(kozep, jobbra, forgas, MetersToPixels, MetersToPixels);
     }
 
     if (pmot->flipped_bike) {
@@ -589,7 +589,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 
     kidoboz(p_kezfej, p_konyok, ppic, 0.076, pmk->pkisalkar, 0.08, 0.1, pmot->flipped_bike);
 
-    Affinitas = 0;
+    StretchEnabled = 0;
 
     // Kerekek:
     if (!elsokerekrogton || !hatsokerekrogton) {

@@ -6,7 +6,7 @@
 #include <cmath>
 
 // Affinitassal kapcsolatos dolgok:
-int Affinitas = 0;
+int StretchEnabled = 0;
 static double Affinnagysag = 1.0;
 static vect2 Affinkozep = Vect2i;
 static vect2 Affinirany = Vect2i;
@@ -61,22 +61,23 @@ void egysor(unsigned char lyuk, short szam, unsigned char* sor, unsigned char* t
     }
 }
 
-void setaffinitas(vect2 kozep, vect2 irany, double nagysag, double aranyx, double aranyy) {
-    Affinkozep = kozep;
-    irany.normalize();
-    Affinirany = irany;
-    Affinnagysag = nagysag;
-    Affinaranyx = aranyx;
-    Affinaranyy = aranyy;
+void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
+                            double meters_to_pixels_x, double meters_to_pixels_y) {
+    Affinkozep = bike_center;
+    bike_i.normalize();
+    Affinirany = bike_i;
+    Affinnagysag = stretch;
+    Affinaranyx = meters_to_pixels_x;
+    Affinaranyy = meters_to_pixels_y;
 }
 
 // static unsigned char Egysor[400];
 
-void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
-    unsigned char lyuk = pkiskep->transparency;
+void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
+    unsigned char lyuk = aff->transparency;
 
-    // Affinitas:
-    if (Affinitas) {
+    // StretchEnabled:
+    if (StretchEnabled) {
         // Kicsit atalakitja vektorokat:
         // Visszaalakitjuk 1:1-es aspect-ratio-ra r, u, v-t:
         r.x /= Affinaranyx;
@@ -144,7 +145,7 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
     }
     // Most mar biztos, hogy egy kicsit ferde az egesz!
     // Kiveve Affin esetet, amikor azert ez lehetseges:
-    if (Affinitas) {
+    if (StretchEnabled) {
         vizszintes = 1;
         while (vizszintes) {
             vizszintes = 0;
@@ -180,8 +181,8 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
     }
 
     // Inverz matrix kiszamitasa:
-    vect2 uu = u * (1.0 / (pkiskep->width - 1));
-    vect2 vv = v * (1.0 / (pkiskep->height - 1));
+    vect2 uu = u * (1.0 / (aff->width - 1));
+    vect2 vv = v * (1.0 / (aff->height - 1));
     double recdet = 1.0 / (uu.x * vv.y - vv.x * uu.y);
     vect2 invi(vv.y * recdet, -uu.y * recdet);
     vect2 invj(-vv.x * recdet, uu.x * recdet);
@@ -267,7 +268,7 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
     double m1d = u.x / u.y;
     long hatbal2, hatjobb2;
     double m2d = v.x / v.y;
-    if (Affinitas) {
+    if (StretchEnabled) {
         // u es v nem biztos, hogy merolegesek egymasra, ezert szamitas
         // bonyolultab:
         // Most u-ra meroleges eleket intezzuk el:
@@ -366,11 +367,11 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
                     xkiskep += invix;
                     ykiskep += inviy;
                 }
-                unsigned char* cim = ppic8->get_row(ybal);
+                unsigned char* cim = dest->get_row(ybal);
                 cim += xbal;
                 int xhossz = Cxsize - xbal;
-                egysor(lyuk, short(x2 - xbal + 1), cim, pkiskep->pixels, xkiskep, ykiskep, invix,
-                       inviy, xhossz);
+                egysor(lyuk, short(x2 - xbal + 1), cim, aff->pixels, xkiskep, ykiskep, invix, inviy,
+                       xhossz);
             } else {
                 if (x1 > x2 + 1) {
                     return;
@@ -416,10 +417,9 @@ void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r) {
                     xkiskep += invix;
                     ykiskep += inviy;
                 }
-                unsigned char* cim = ppic8->get_row(ybal);
+                unsigned char* cim = dest->get_row(ybal);
                 cim += xbal;
-                egysor(lyuk, short(x2 - x1 + 1), cim, pkiskep->pixels, xkiskep, ykiskep, invix,
-                       inviy);
+                egysor(lyuk, short(x2 - x1 + 1), cim, aff->pixels, xkiskep, ykiskep, invix, inviy);
             } else {
                 if (x1 > x2 + 1) {
                     return;

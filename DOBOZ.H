@@ -5,10 +5,11 @@ class affine_pic;
 class pic8;
 class vect2;
 
-void dobozki(pic8* ppic8, affine_pic* pkiskep, vect2 u, vect2 v, vect2 r);
+void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r);
 
-extern int Affinitas;
+extern int StretchEnabled;
 // kozepet es iranyt majd o megszorozza arany-okkal:
-void setaffinitas(vect2 kozep, vect2 irany, double nagysag, double aranyx, double aranyy);
+void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
+                            double meters_to_pixels_x, double meters_to_pixels_y);
 
 #endif

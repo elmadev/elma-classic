@@ -291,6 +291,12 @@ void segments::setup_collision_grid(double max_radius) {
     miny -= SEGMENTS_BORDER;
     maxx += SEGMENTS_BORDER;
     maxy += SEGMENTS_BORDER;
+#ifdef DEBUG
+    if (SEGMENTS_BORDER < max_radius * 1.5) {
+        internal_error(
+            "segments::setup_collision_grid border buffer too small for collision physics!");
+    }
+#endif
 
     collision_grid_origin = vect2(minx, miny);
     double width = maxx - minx;

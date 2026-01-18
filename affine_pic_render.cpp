@@ -10,8 +10,7 @@ bool StretchEnabled = false;
 static double StretchFactor = 1.0;
 static vect2 StretchCenter = Vect2i;
 static vect2 StretchAxis = Vect2i;
-static double StretchMetersToPixelsX = 1.0;
-static double StretchMetersToPixelsY = 1.0;
+static double StretchMetersToPixels = 1.0;
 
 // Render a horizontal slice of pixels into the `dest` by grabbing a diagonal slice of pixel data
 // from an affine_pic.
@@ -71,13 +70,12 @@ void draw_affine_pic_row(unsigned char transparency, short length, unsigned char
 }
 
 void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
-                            double meters_to_pixels_x, double meters_to_pixels_y) {
+                            double meters_to_pixels) {
     StretchCenter = bike_center;
     bike_i.normalize();
     StretchAxis = bike_i;
     StretchFactor = stretch;
-    StretchMetersToPixelsX = meters_to_pixels_x;
-    StretchMetersToPixelsY = meters_to_pixels_y;
+    StretchMetersToPixels = meters_to_pixels;
 }
 
 void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
@@ -87,12 +85,12 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     if (StretchEnabled) {
         // Convert the coordinates from pixels to meters, since the StretchEnabled vars are in
         // meters
-        r.x /= StretchMetersToPixelsX;
-        r.y /= StretchMetersToPixelsY;
-        u.x /= StretchMetersToPixelsX;
-        u.y /= StretchMetersToPixelsY;
-        v.x /= StretchMetersToPixelsX;
-        v.y /= StretchMetersToPixelsY;
+        r.x /= StretchMetersToPixels;
+        r.y /= StretchMetersToPixels;
+        u.x /= StretchMetersToPixels;
+        u.y /= StretchMetersToPixels;
+        v.x /= StretchMetersToPixels;
+        v.y /= StretchMetersToPixels;
 
         // Stretch coordinate r
         double distance = (r - StretchCenter) * StretchAxis;
@@ -110,12 +108,12 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
         v = v - delta;
 
         // Convert the coordinates back into pixels
-        r.x *= StretchMetersToPixelsX;
-        r.y *= StretchMetersToPixelsY;
-        u.x *= StretchMetersToPixelsX;
-        u.y *= StretchMetersToPixelsY;
-        v.x *= StretchMetersToPixelsX;
-        v.y *= StretchMetersToPixelsY;
+        r.x *= StretchMetersToPixels;
+        r.y *= StretchMetersToPixels;
+        u.x *= StretchMetersToPixels;
+        u.y *= StretchMetersToPixels;
+        v.x *= StretchMetersToPixels;
+        v.y *= StretchMetersToPixels;
     }
 
     // Check if the picture is rotated at a 90-degree offset +- tolerance of MINIMUM_ROTATION.

@@ -417,7 +417,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 
     if (vanforgas) {
         StretchEnabled = true;
-        set_stretch_parameters(kozep, jobbra, forgas, MetersToPixels, MetersToPixels);
+        set_stretch_parameters(kozep, jobbra, forgas, MetersToPixels);
     }
 
     if (pmot->flipped_bike) {

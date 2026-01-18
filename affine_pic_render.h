@@ -23,6 +23,6 @@ extern bool StretchEnabled;
 // `stretch` is the stretch amount (-1.0 to 1.0)
 // `meters_to_pixels_x` / `meters_to_pixels_y` is the zoom amount.
 void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
-                            double meters_to_pixels_x, double meters_to_pixels_y);
+                            double meters_to_pixels);
 
 #endif

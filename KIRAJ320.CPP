@@ -380,7 +380,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 
     // Ha kell affinitassal torodni:
     int vanforgas = 0;
-    StretchEnabled = 0;
+    StretchEnabled = false;
     if (forgas < 0.999) {
         vanforgas = 1;
         // forgast 0, 1 intervallumbol atkonvertaljuk -1, 1 intervallumba:
@@ -416,7 +416,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     vect2 fel = rotate_90deg(jobbra);
 
     if (vanforgas) {
-        StretchEnabled = 1;
+        StretchEnabled = true;
         set_stretch_parameters(kozep, jobbra, forgas, MetersToPixels, MetersToPixels);
     }
 
@@ -589,7 +589,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 
     kidoboz(p_kezfej, p_konyok, ppic, 0.076, pmk->pkisalkar, 0.08, 0.1, pmot->flipped_bike);
 
-    StretchEnabled = 0;
+    StretchEnabled = false;
 
     // Kerekek:
     if (!elsokerekrogton || !hatsokerekrogton) {

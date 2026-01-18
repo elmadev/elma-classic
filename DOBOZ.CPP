@@ -6,14 +6,12 @@
 #include <cmath>
 
 // Affinitassal kapcsolatos dolgok:
-int StretchEnabled = 0;
+bool StretchEnabled = false;
 static double StretchFactor = 1.0;
 static vect2 StretchCenter = Vect2i;
 static vect2 StretchAxis = Vect2i;
 static double StretchMetersToPixelsX = 1.0;
 static double StretchMetersToPixelsY = 1.0;
-
-static double MINIMUM_ROTATION = 0.005;
 
 void draw_affine_pic_row(unsigned char transparency, unsigned char length, unsigned char* dest,
                          unsigned char* source, long source_x, long source_y, long source_dx,
@@ -112,26 +110,27 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     }
 
     // Megnezi, hogy nem tul vizszintes-e:
-    int needs_rotation = 0;
-    int positive_rotation_direction = 0;
+    bool needs_rotation = false;
+    bool positive_rotation_direction = 0;
+    constexpr double MINIMUM_ROTATION = 0.005;
     if (u.x == 0.0) {
-        needs_rotation = 1;
+        needs_rotation = true;
     } else {
         if (fabs(u.y / u.x) < MINIMUM_ROTATION) {
-            needs_rotation = 1;
+            needs_rotation = true;
             if (u.y / u.x > 0) {
-                positive_rotation_direction = 1;
+                positive_rotation_direction = true;
             }
         }
     }
 
     if (v.x == 0.0) {
-        needs_rotation = 1;
+        needs_rotation = true;
     } else {
         if (fabs(v.y / v.x) < MINIMUM_ROTATION) {
-            needs_rotation = 1;
+            needs_rotation = true;
             if (v.y / v.x > 0) {
-                positive_rotation_direction = 1;
+                positive_rotation_direction = true;
             }
         }
     }
@@ -148,32 +147,32 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     // Most mar biztos, hogy egy kicsit ferde az egesz!
     // Kiveve Affin esetet, amikor azert ez lehetseges:
     if (StretchEnabled) {
-        needs_rotation = 1;
+        needs_rotation = true;
         while (needs_rotation) {
-            needs_rotation = 0;
-            if (u.x == 0) {
-                needs_rotation = 1;
+            needs_rotation = false;
+            if (u.x == 0.0) {
+                needs_rotation = true;
             }
             if (fabs(u.y / u.x) < MINIMUM_ROTATION) {
-                needs_rotation = 1;
+                needs_rotation = true;
             }
-            if (u.y == 0) {
-                needs_rotation = 1;
+            if (u.y == 0.0) {
+                needs_rotation = true;
             }
             if (fabs(u.x / u.y) < MINIMUM_ROTATION) {
-                needs_rotation = 1;
+                needs_rotation = true;
             }
-            if (v.x == 0) {
-                needs_rotation = 1;
+            if (v.x == 0.0) {
+                needs_rotation = true;
             }
             if (fabs(v.y / v.x) < MINIMUM_ROTATION) {
-                needs_rotation = 1;
+                needs_rotation = true;
             }
-            if (v.y == 0) {
-                needs_rotation = 1;
+            if (v.y == 0.0) {
+                needs_rotation = true;
             }
             if (fabs(v.x / v.y) < MINIMUM_ROTATION) {
-                needs_rotation = 1;
+                needs_rotation = true;
             }
             if (needs_rotation) {
                 u.rotate(MINIMUM_ROTATION);
@@ -216,12 +215,12 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
             min_value = r.x + u.x + v.x;
         }
     }
-    int possibly_out_of_bounds = 0;
+    bool possibly_out_of_bounds = false;
     if (max_value > Hatarx2) {
-        possibly_out_of_bounds = 1;
+        possibly_out_of_bounds = true;
     }
     if (min_value < Hatarx1) {
-        possibly_out_of_bounds = 1;
+        possibly_out_of_bounds = true;
     }
 
     // A legmagasabban fekvo pontot kell erre valasztani:
@@ -251,10 +250,10 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     }
     max_value = apex.y;
     if (max_value > Hatary2) {
-        possibly_out_of_bounds = 1;
+        possibly_out_of_bounds = true;
     }
     if (min_value < Hatary1) {
-        possibly_out_of_bounds = 1;
+        possibly_out_of_bounds = true;
     }
 
     // if( possibly_out_of_bounds )
@@ -343,7 +342,7 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     if (possibly_out_of_bounds) {
         // Voltkilogas = 1; //Csak teszteleshez
         //  Nagy ciklus kezdetet veszi:
-        while (1) {
+        while (true) {
             // Kiszamoljuk bal es jobb hatarokat ebben a sorban!
             int x1 = *plane1_left_int;
             int xtmp = *plane2_left_int;
@@ -394,7 +393,7 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
         }
     } else {
         // Nagy ciklus kezdetet veszi:
-        while (1) {
+        while (true) {
             // Kiszamoljuk bal es jobb hatarokat ebben a sorban!
             int x1 = *plane1_left_int;
             int xtmp = *plane2_left_int;

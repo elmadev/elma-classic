@@ -260,74 +260,28 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
 
     // For each y, we need to calculate the x range where we need to render the bike.
     // We do this by calculating two different x ranges for the starting apex row y
+    //
     // 1) We extend the lines r->r+u and r+v->r+u+v to height y.
     // We now have an x range plane1_left/plane1_right
-    //
+    // (plane1_right correspondings roughly to apex.x)
     // 2) We extend the lines r->r+v and r+u->r+u+v to height y.
     // We now have a different x range plane2_left/plane2_right
+    // (plane2_left correspondings roughly to apex.x)
     //
     // When the x position is within BOTH plane1_left<->plane1_right and plane2_left<->plane2_right,
     // then we know the pixel should be rendered.
     // We will update these values at every row y using the slope.
-    double plane1_left, plane1_right;
     double plane1_slope = u.x / u.y;
-    double plane2_left, plane2_right;
+    double plane1_left = r.x + (apex_y - r.y) * plane1_slope;
+    double plane1_right = r.x + v.x + (apex_y - r.y - v.y) * plane1_slope;
+    if (plane1_left > plane1_right) {
+        std::swap(plane1_left, plane1_right);
+    }
     double plane2_slope = v.x / v.y;
-    // Calculate the values of plane1/2 left/right.
-    // We start with the more complicated case here, check the alternative branch first to
-    // understand the code.
-    if (StretchEnabled) {
-        // This calculation is more complicated because u and v are not guaranteed to be orthogonal.
-        // `comparison_x` calculates the x value of the line (r+v->r+u+v) when it reaches the same
-        // height as r.y. This way we've manually calculated whether r + u + v is to the right of r.
-        double comparison_x = r.x + v.x - (u.x / u.y) * v.y;
-        if (r.x < comparison_x) {
-            plane1_left = r.x + (apex_y - r.y) * plane1_slope;
-            plane1_right = r.x + v.x + (apex_y - r.y - v.y) * plane1_slope;
-        } else {
-            plane1_right = r.x + (apex_y - r.y) * plane1_slope;
-            plane1_left = r.x + v.x + (apex_y - r.y - v.y) * plane1_slope;
-        }
-        // Similar calculation here but for the other plane (r+u->r+u+v)
-        comparison_x = r.x + u.x - (v.x / v.y) * u.y;
-        if (r.x < comparison_x) {
-            plane2_left = r.x + (apex_y - r.y) * plane2_slope;
-            plane2_right = r.x + u.x + (apex_y - r.y - u.y) * plane2_slope;
-        } else {
-            plane2_right = r.x + (apex_y - r.y) * plane2_slope;
-            plane2_left = r.x + u.x + (apex_y - r.y - u.y) * plane2_slope;
-        }
-    } else {
-        if (v.x > 0) {
-            // (r+u) is more to the left than (r+u+v), even if the picture is upside-down
-            // left: Get the x coordinate of the line r->r+u at height apex_y
-            plane1_left = r.x + (apex_y - r.y) * plane1_slope;
-            // right: Get the x coordinate of the line r+v->r+u+v at height apex_y
-            // (corresponds to apex.x, accounting for rounding)
-            plane1_right = r.x + v.x + (apex_y - r.y - v.y) * plane1_slope;
-        } else {
-            // (r+u+v) is more to the left than (r+u)
-            // right: Get the x coordinate of the line r->r+u at height apex_y
-            plane1_right = r.x + (apex_y - r.y) * plane1_slope;
-            // left = Get the x coordinate of the line r+v->r+u+v at height apex_y
-            // (corresponds to apex.x, accounting for rounding)
-            plane1_left = r.x + v.x + (apex_y - r.y - v.y) * plane1_slope;
-        }
-        if (u.x > 0) {
-            // (r+v) is more to the left than (r+u+v)
-            // left: Get the x coordinate of the line r->r+v at height apex_y
-            // (corresponds to apex.x, accounting for rounding)
-            plane2_left = r.x + (apex_y - r.y) * plane2_slope;
-            // right: Get the x coordinate of the line r+u->r+u+v at height apex_y
-            plane2_right = r.x + u.x + (apex_y - r.y - u.y) * plane2_slope;
-        } else {
-            // (r+u+v) is more to the left than (r+v)
-            // right: Get the x coordinate of the line r->r+v at height apex_y
-            // (corresponds to apex.x, accounting for rounding)
-            plane2_right = r.x + (apex_y - r.y) * plane2_slope;
-            // left: Get the x coordinate of the line r+u->r+u+v at height apex_y
-            plane2_left = r.x + u.x + (apex_y - r.y - u.y) * plane2_slope;
-        }
+    double plane2_left = r.x + (apex_y - r.y) * plane2_slope;
+    double plane2_right = r.x + u.x + (apex_y - r.y - u.y) * plane2_slope;
+    if (plane2_left > plane2_right) {
+        std::swap(plane2_left, plane2_right);
     }
 
     // Apply the affine transformation to the apex to convert from meters to affine_pic pixel

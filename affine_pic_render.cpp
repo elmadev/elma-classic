@@ -189,67 +189,54 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     // inverse_i.y inverse_j.y
 
     // Check to see if any part of the image is out of bounds:
-    // X out of bounds?
-    // Grab the lowest and highest point of the 4 coordinates of the render box
-    double max_value = 0.0;
-    double min_value = 0.0;
+    // Get the min/max values of the drawing area
+    double max_x;
+    double min_x;
     if (u.x > 0) {
         if (v.x > 0) {
-            // u pos, v pos:
-            max_value = r.x + u.x + v.x;
-            min_value = r.x;
+            max_x = r.x + u.x + v.x;
+            min_x = r.x;
         } else {
-            // u pos, v neg:
-            max_value = r.x + u.x;
-            min_value = r.x + v.x;
+            max_x = r.x + u.x;
+            min_x = r.x + v.x;
         }
     } else {
         if (v.x > 0) {
-            // u neg, v pos:
-            max_value = r.x + v.x;
-            min_value = r.x + u.x;
+            max_x = r.x + v.x;
+            min_x = r.x + u.x;
         } else {
-            // u neg, v neg:
-            max_value = r.x;
-            min_value = r.x + u.x + v.x;
+            max_x = r.x;
+            min_x = r.x + u.x + v.x;
         }
     }
-    bool possibly_out_of_bounds = false;
-    if (max_value > Hatarx2) {
-        possibly_out_of_bounds = true;
-    }
-    if (min_value < Hatarx1) {
-        possibly_out_of_bounds = true;
-    }
-    // Y out of bounds?
     // At the same time, let's grab the coordinate of the very top of the image (apex).
+    double min_y;
     vect2 apex;
     if (u.y > 0) {
         if (v.y > 0) {
             // u pos, v pos:
             apex = r + u + v;
-            min_value = r.y;
+            min_y = r.y;
         } else {
             // u pos, v neg:
             apex = r + u;
-            min_value = r.y + v.y;
+            min_y = r.y + v.y;
         }
     } else {
         if (v.y > 0) {
             // u neg, v pos:
             apex = r + v;
-            min_value = r.y + u.y;
+            min_y = r.y + u.y;
         } else {
             // u neg, v neg:
             apex = r;
-            min_value = r.y + u.y + v.y;
+            min_y = r.y + u.y + v.y;
         }
     }
-    max_value = apex.y;
-    if (max_value > Hatary2) {
-        possibly_out_of_bounds = true;
-    }
-    if (min_value < Hatary1) {
+    double max_y = apex.y;
+
+    bool possibly_out_of_bounds = false;
+    if (max_x > Hatarx2 || min_x < Hatarx1 || max_y > Hatary2 || min_y < Hatary1) {
         possibly_out_of_bounds = true;
     }
 

@@ -5,7 +5,7 @@
 #include "vect2.h"
 #include <cmath>
 
-// Affinitassal kapcsolatos dolgok:
+// Affine transformation parameters when bike is turning
 bool StretchEnabled = false;
 static double StretchFactor = 1.0;
 static vect2 StretchCenter = Vect2i;
@@ -13,6 +13,14 @@ static vect2 StretchAxis = Vect2i;
 static double StretchMetersToPixelsX = 1.0;
 static double StretchMetersToPixelsY = 1.0;
 
+// Render a horizontal slice of pixels into the `dest` by grabbing a diagonal slice of pixel data
+// from an affine_pic.
+//
+// `transparency` is the transparent palette id.
+// `length` is the number of pixels to draw in `dest`.
+// `source` is the pixels from an affine_pic.
+// `source_x` / `source_y` is the starting position within the affine_pic's pixels.
+// `source_dx` / `source_dy` is the delta to the next pixel to grab from the affine_pic.
 void draw_affine_pic_row(unsigned char transparency, unsigned char length, unsigned char* dest,
                          unsigned char* source, long source_x, long source_y, long source_dx,
                          long source_dy) {
@@ -20,22 +28,23 @@ void draw_affine_pic_row(unsigned char transparency, unsigned char length, unsig
     source_x_int++;
     short* source_y_int = (short*)(&source_y);
     source_y_int++;
+    // Draw the horizontal row of pixels
     for (short x = 0; x < length; x++) {
+        // Grab the pixel from the affine_pic
         unsigned short fx = *source_x_int;
         unsigned short fy = *source_y_int;
         fy = (unsigned short)((fy << 8) + fx);
-
         unsigned char c = source[fy];
         if (c != transparency) {
             dest[x] = c;
         }
 
+        // Update the affine_pic position from which we copy
         source_x += source_dx;
         source_y += source_dy;
     }
 }
 
-// Ez a fuggveny kilogas eseten hivodik meg, plussz parametere xhossz:
 void draw_affine_pic_row(unsigned char transparency, short length, unsigned char* dest,
                          unsigned char* source, long source_x, long source_y, long source_dx,
                          long source_dy, int length2) {
@@ -71,15 +80,13 @@ void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
     StretchMetersToPixelsY = meters_to_pixels_y;
 }
 
-// static unsigned char Egysor[400];
-
 void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     unsigned char transparency = aff->transparency;
 
-    // StretchEnabled:
+    // Bike is turning! Let's stretch the bike
     if (StretchEnabled) {
-        // Kicsit atalakitja vektorokat:
-        // Visszaalakitjuk 1:1-es aspect-ratio-ra r, u, v-t:
+        // Convert the coordinates from pixels to meters, since the StretchEnabled vars are in
+        // meters
         r.x /= StretchMetersToPixelsX;
         r.y /= StretchMetersToPixelsY;
         u.x /= StretchMetersToPixelsX;
@@ -87,20 +94,22 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
         v.x /= StretchMetersToPixelsX;
         v.y /= StretchMetersToPixelsY;
 
-        // szamitas:
+        // Stretch coordinate r
         double distance = (r - StretchCenter) * StretchAxis;
         vect2 delta = (distance * (1.0 - StretchFactor)) * StretchAxis;
         r = r - delta;
 
+        // Stretch coordinate u
         distance = u * StretchAxis;
         delta = (distance * (1.0 - StretchFactor)) * StretchAxis;
         u = u - delta;
 
+        // Stretch coordinate v
         distance = v * StretchAxis;
         delta = (distance * (1.0 - StretchFactor)) * StretchAxis;
         v = v - delta;
 
-        // Visszaalakitjuk aranyx:aranyy-os aspect-ratio-ra r, u, v-t:
+        // Convert the coordinates back into pixels
         r.x *= StretchMetersToPixelsX;
         r.y *= StretchMetersToPixelsY;
         u.x *= StretchMetersToPixelsX;
@@ -109,32 +118,41 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
         v.y *= StretchMetersToPixelsY;
     }
 
-    // Megnezi, hogy nem tul vizszintes-e:
+    // Check if the picture is rotated at a 90-degree offset +- tolerance of MINIMUM_ROTATION.
+    // The reason why we do this is linear algebra: it is impossible to invert a matrix that
+    // represents a rotation of exactly 0/90/180/270 degrees.
+    //
+    // For small angles, Angle = tan⁻¹(y/x) ≈ y/x, so we skip the trigonometric function for speed.
     bool needs_rotation = false;
     bool positive_rotation_direction = 0;
-    constexpr double MINIMUM_ROTATION = 0.005;
+    constexpr double MINIMUM_ROTATION = 0.005; // radians
     if (u.x == 0.0) {
+        // Perfectly upright
         needs_rotation = true;
     } else {
         if (fabs(u.y / u.x) < MINIMUM_ROTATION) {
+            // Upright within a small tolerance
             needs_rotation = true;
             if (u.y / u.x > 0) {
+                // Is slightly rotated clockwise (as opposed to counter-clockwise)
                 positive_rotation_direction = true;
             }
         }
     }
-
     if (v.x == 0.0) {
+        // Perfectly sideways
         needs_rotation = true;
     } else {
         if (fabs(v.y / v.x) < MINIMUM_ROTATION) {
+            // Sideways within a small tolerance
             needs_rotation = true;
             if (v.y / v.x > 0) {
+                // Is slightly rotated clockwise (as opposed to counter-clockwise)
                 positive_rotation_direction = true;
             }
         }
     }
-
+    // Rotate the picture away from the 90-degree offset
     if (needs_rotation) {
         if (positive_rotation_direction) {
             u.rotate(MINIMUM_ROTATION);
@@ -144,8 +162,9 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
             v.rotate(-MINIMUM_ROTATION);
         }
     }
-    // Most mar biztos, hogy egy kicsit ferde az egesz!
-    // Kiveve Affin esetet, amikor azert ez lehetseges:
+
+    // For turning bike, we give up on a real proper check, and if the bike is still not properly
+    // rotated away from 90-degrees, we just keep rotating it in tiny increments...
     if (StretchEnabled) {
         needs_rotation = true;
         while (needs_rotation) {
@@ -181,32 +200,44 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
         }
     }
 
-    // Inverz matrix kiszamitasa:
+    // Calculate inverse transformation matrix.
+    // u and v describe the render box of the entire image.
+    // u_pixel and b_pixel describe the render box of a single pixel.
     vect2 u_pixel = u * (1.0 / (aff->width - 1));
     vect2 v_pixel = v * (1.0 / (aff->height - 1));
+
+    // Matrix:
+    // u_pixel.x v_pixel.x    i.e.   a b
+    // u_pixel.y v_pixel.y           c d
+    // Inverse of matrix = (1/determinant)* d  -b
+    //                                    -c  a
+    // Determinant of matrix = (ad - bc)
     double determinant_reciprocal = 1.0 / (u_pixel.x * v_pixel.y - v_pixel.x * u_pixel.y);
     vect2 inverse_i(v_pixel.y * determinant_reciprocal, -u_pixel.y * determinant_reciprocal);
     vect2 inverse_j(-v_pixel.x * determinant_reciprocal, u_pixel.x * determinant_reciprocal);
 
-    // Most megnezzuk, hogy nem log-e ki a negy csucs kozul valamelyik
-    // kepernyorol (negy csucs: r, r+u, r+v, r+u+v
+    // Resultant inverse matrix:
+    // inverse_i.x inverse_j.x
+    // inverse_i.y inverse_j.y
 
-    // X irany;
+    // Check to see if any part of the image is out of bounds:
+    // X out of bounds?
+    // Grab the lowest and highest point of the 4 coordinates of the render box
     double max_value = 0.0;
     double min_value = 0.0;
     if (u.x > 0) {
         if (v.x > 0) {
-            // u poz, v poz:
+            // u pos, v pos:
             max_value = r.x + u.x + v.x;
             min_value = r.x;
         } else {
-            // u poz, v neg:
+            // u pos, v neg:
             max_value = r.x + u.x;
             min_value = r.x + v.x;
         }
     } else {
         if (v.x > 0) {
-            // u neg, v poz:
+            // u neg, v pos:
             max_value = r.x + v.x;
             min_value = r.x + u.x;
         } else {
@@ -222,24 +253,22 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     if (min_value < Hatarx1) {
         possibly_out_of_bounds = true;
     }
-
-    // A legmagasabban fekvo pontot kell erre valasztani:
+    // Y out of bounds?
+    // At the same time, let's grab the coordinate of the very top of the image (apex).
     vect2 apex;
-
-    // Y irany;
     if (u.y > 0) {
         if (v.y > 0) {
-            // u poz, v poz:
+            // u pos, v pos:
             apex = r + u + v;
             min_value = r.y;
         } else {
-            // u poz, v neg:
+            // u pos, v neg:
             apex = r + u;
             min_value = r.y + v.y;
         }
     } else {
         if (v.y > 0) {
-            // u neg, v poz:
+            // u neg, v pos:
             apex = r + v;
             min_value = r.y + u.y;
         } else {
@@ -256,38 +285,44 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
         possibly_out_of_bounds = true;
     }
 
-    // if( possibly_out_of_bounds )
-    //	return;
-
-    // Kivalasztjuk egesz kezdopontot:
+    // We are ready to start rendering. Let's start from the apex
     int x_left = (int)(apex.x);
     int y = (int)(apex.y);
     double apex_y = y;
 
-    // Kiszamolja hatarolo egyenesek parametereit:
+    // For each y, we need to calculate the x range where we need to render the bike.
+    // We do this by calculating two different x ranges for the starting apex row y
+    // 1) We extend the lines r->r+u and r+v->r+u+v to height y.
+    // We now have an x range plane1_left/plane1_right
+    //
+    // 2) We extend the lines r->r+v and r+u->r+u+v to height y.
+    // We now have a different x range plane2_left/plane2_right
+    //
+    // When the x position is within BOTH plane1_left<->plane1_right and plane2_left<->plane2_right,
+    // then we know the pixel should be rendered.
+    // We will update these values at every row y using the slope.
     long plane1_left, plane1_right;
     double plane1_slope = u.x / u.y;
     long plane2_left, plane2_right;
     double plane2_slope = v.x / v.y;
+    // Calculate the values of plane1/2 left/right.
+    // We start with the more complicated case here, check the alternative branch first to
+    // understand the code.
     if (StretchEnabled) {
-        // u es v nem biztos, hogy merolegesek egymasra, ezert szamitas
-        // bonyolultab:
-        // Most u-ra meroleges eleket intezzuk el:
-        // megkeressuk r magassagaban nem r-en atmeno u x koordjat:
+        // This calculation is more complicated because u and v are not guaranteed to be orthogonal.
+        // `comparison_x` calculates the x value of the line (r+v->r+u+v) when it reaches the same
+        // height as r.y. This way we've manually calculated whether r + u + v is to the right of r.
         double comparison_x = r.x + v.x - (u.x / u.y) * v.y;
         if (r.x < comparison_x) {
-            // u a ball es u+v a jobb!:
             plane1_left = (r.x + (apex_y - r.y) * plane1_slope) * 65536.0;
             plane1_right = (r.x + v.x + (apex_y - r.y - v.y) * plane1_slope) * 65536.0;
         } else {
             plane1_right = (r.x + (apex_y - r.y) * plane1_slope) * 65536.0;
             plane1_left = (r.x + v.x + (apex_y - r.y - v.y) * plane1_slope) * 65536.0;
         }
-        // Most v-ra meroleges eleket intezzuk el:
-        // megkeressuk r magassagaban nem r-en atmeno v x koordjat:
+        // Similar calculation here but for the other plane (r+u->r+u+v)
         comparison_x = r.x + u.x - (v.x / v.y) * u.y;
         if (r.x < comparison_x) {
-            // v a ball es v+u a jobb!:
             plane2_left = (r.x + (apex_y - r.y) * plane2_slope) * 65536.0;
             plane2_right = (r.x + u.x + (apex_y - r.y - u.y) * plane2_slope) * 65536.0;
         } else {
@@ -295,23 +330,34 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
             plane2_left = (r.x + u.x + (apex_y - r.y - u.y) * plane2_slope) * 65536.0;
         }
     } else {
-        // u es v merolegesek egymasra, ezert szamitas gyors lehet:
-        // Most u-ra meroleges eleket intezzuk el:
         if (v.x > 0) {
-            // u a ball es u+v a jobb!:
+            // (r+u) is more to the left than (r+u+v), even if the picture is upside-down
+            // left: Get the x coordinate of the line r->r+u at height apex_y
             plane1_left = (r.x + (apex_y - r.y) * plane1_slope) * 65536.0;
+            // right: Get the x coordinate of the line r+v->r+u+v at height apex_y
+            // (corresponds to apex.x, accounting for rounding)
             plane1_right = (r.x + v.x + (apex_y - r.y - v.y) * plane1_slope) * 65536.0;
         } else {
+            // (r+u+v) is more to the left than (r+u)
+            // right: Get the x coordinate of the line r->r+u at height apex_y
             plane1_right = (r.x + (apex_y - r.y) * plane1_slope) * 65536.0;
+            // left = Get the x coordinate of the line r+v->r+u+v at height apex_y
+            // (corresponds to apex.x, accounting for rounding)
             plane1_left = (r.x + v.x + (apex_y - r.y - v.y) * plane1_slope) * 65536.0;
         }
-        // Most v-ra meroleges eleket intezzuk el:
         if (u.x > 0) {
-            // v a ball es v+u a jobb!:
+            // (r+v) is more to the left than (r+u+v)
+            // left: Get the x coordinate of the line r->r+v at height apex_y
+            // (corresponds to apex.x, accounting for rounding)
             plane2_left = (r.x + (apex_y - r.y) * plane2_slope) * 65536.0;
+            // right: Get the x coordinate of the line r+u->r+u+v at height apex_y
             plane2_right = (r.x + u.x + (apex_y - r.y - u.y) * plane2_slope) * 65536.0;
         } else {
+            // (r+u+v) is more to the left than (r+v)
+            // right: Get the x coordinate of the line r->r+v at height apex_y
+            // (corresponds to apex.x, accounting for rounding)
             plane2_right = (r.x + (apex_y - r.y) * plane2_slope) * 65536.0;
+            // left: Get the x coordinate of the line r+u->r+u+v at height apex_y
             plane2_left = (r.x + u.x + (apex_y - r.y - u.y) * plane2_slope) * 65536.0;
         }
     }
@@ -319,7 +365,9 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     long plane1_slope_fp = plane1_slope * 65536.0;
     long plane2_slope_fp = plane2_slope * 65536.0;
 
-    // Most kiszamoljuk kis kepen futok elejet:
+    // Apply the affine transformation to the apex to convert from meters to affine_pic pixel
+    // coordinates.
+    // affine_origin = inverted_matrix*diff
     vect2 diff = vect2(x_left, y) - r;
     vect2 affine_origin = vect2(0.5, 0.5) + diff.x * inverse_i + diff.y * inverse_j;
     long affine_x = affine_origin.x * 65536.0;
@@ -339,11 +387,10 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     short* plane2_right_int = (short*)(&plane2_right);
     plane2_right_int++;
 
+    // We add a few extra checks if part of the bike is out of bounds.
+    // The else case is the normal case, only differences are noted here.
     if (possibly_out_of_bounds) {
-        // Voltkilogas = 1; //Csak teszteleshez
-        //  Nagy ciklus kezdetet veszi:
         while (true) {
-            // Kiszamoljuk bal es jobb hatarokat ebben a sorban!
             int x1 = *plane1_left_int;
             int xtmp = *plane2_left_int;
             if (xtmp > x1) {
@@ -355,14 +402,15 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
             if (xtmp < x2) {
                 x2 = xtmp;
             }
-            // x1 elso, x2 utolso hely, amit meg ki kell rakni!
-            if (x1 <= x2 && y < Cysize) { // VALT
-                // Most raallitjuk xbal-t x1-re:
-                while (x_left > x1 && x_left > 0) { // VALT
+            // Extra screen out of bounds check
+            if (x1 <= x2 && y < Cysize) {
+                // Extra screen out of bounds check
+                while (x_left > x1 && x_left > 0) {
                     x_left--;
                     affine_x -= inverse_i_x_fp;
                     affine_y -= inverse_i_y_fp;
                 }
+                // Extra screen out of bounds check
                 while (x_left < x1 || x_left < 0) {
                     x_left++;
                     affine_x += inverse_i_x_fp;
@@ -370,6 +418,7 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                 }
                 unsigned char* dest_target = dest->get_row(y);
                 dest_target += x_left;
+                // Extra out of bounds check (right screen border)
                 int length_to_border = Cxsize - x_left;
                 draw_affine_pic_row(transparency, short(x2 - x_left + 1), dest_target, aff->pixels,
                                     affine_x, affine_y, inverse_i_x_fp, inverse_i_y_fp,
@@ -379,10 +428,10 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                     return;
                 }
             }
-            // Egy sorral lejjebb kell lepni!:
             y--;
-            if (y < 0) { // VALT
-                return;  // VALT
+            // Extra screen out of bounds check
+            if (y < 0) {
+                return;
             }
             affine_x -= inverse_j_x_fp;
             affine_y -= inverse_j_y_fp;
@@ -392,23 +441,24 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
             plane2_right -= plane2_slope_fp;
         }
     } else {
-        // Nagy ciklus kezdetet veszi:
+        // For each row of the destination
         while (true) {
-            // Kiszamoljuk bal es jobb hatarokat ebben a sorban!
+            // Get the left render edge, +1 for safety
             int x1 = *plane1_left_int;
             int xtmp = *plane2_left_int;
             if (xtmp > x1) {
                 x1 = xtmp;
             }
             x1++;
+            // Get the right render edge
             int x2 = *plane1_right_int;
             xtmp = *plane2_right_int;
             if (xtmp < x2) {
                 x2 = xtmp;
             }
-            // x1 elso, x2 utolso hely, amit meg ki kell rakni!
             if (x1 <= x2) {
-                // Most raallitjuk xbal-t x1-re:
+                // If we are drawing at least 1 pixel, we need to update our source pixel position
+                // by moving by the transformed matrix units
                 while (x_left > x1) {
                     x_left--;
                     affine_x -= inverse_i_x_fp;
@@ -419,21 +469,28 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                     affine_x += inverse_i_x_fp;
                     affine_y += inverse_i_y_fp;
                 }
+                // We know our source affine_pic position and our destination position, so let's
+                // draw!
                 unsigned char* dest_target = dest->get_row(y);
                 dest_target += x_left;
                 draw_affine_pic_row(transparency, short(x2 - x1 + 1), dest_target, aff->pixels,
                                     affine_x, affine_y, inverse_i_x_fp, inverse_i_y_fp);
             } else {
+                // If the draw width is 0 pixels, we continue (for very thin images)
+                // If the draw width <= -1, then we are completely done rendering and we stop here
                 if (x1 > x2 + 1) {
                     return;
                 }
             }
-            // Egy sorral lejjebb kell lepni!:
+            // Go to the next row
             y--;
+            // Update our affine_pic source position
             affine_x -= inverse_j_x_fp;
             affine_y -= inverse_j_y_fp;
+            // Slide plane1 to the right with updated positions for the current row
             plane1_left -= plane1_slope_fp;
             plane1_right -= plane1_slope_fp;
+            // Slide plane2 to the left with updated positions for the current row
             plane2_left -= plane2_slope_fp;
             plane2_right -= plane2_slope_fp;
         }

@@ -20,7 +20,7 @@ static double StretchMetersToPixels = 1.0;
 // `source` is the pixels from an affine_pic.
 // `source_x` / `source_y` is the starting position within the affine_pic's pixels.
 // `source_dx` / `source_dy` is the delta to the next pixel to grab from the affine_pic.
-void draw_affine_pic_row(unsigned char transparency, unsigned char length, unsigned char* dest,
+void draw_affine_pic_row(unsigned char transparency, int length, unsigned char* dest,
                          unsigned char* source, long source_x, long source_y, long source_dx,
                          long source_dy) {
     short* source_x_int = (short*)(&source_x);
@@ -28,7 +28,7 @@ void draw_affine_pic_row(unsigned char transparency, unsigned char length, unsig
     short* source_y_int = (short*)(&source_y);
     source_y_int++;
     // Draw the horizontal row of pixels
-    for (short x = 0; x < length; x++) {
+    for (int x = 0; x < length; x++) {
         // Grab the pixel from the affine_pic
         unsigned short fx = *source_x_int;
         unsigned short fy = *source_y_int;
@@ -44,14 +44,14 @@ void draw_affine_pic_row(unsigned char transparency, unsigned char length, unsig
     }
 }
 
-void draw_affine_pic_row(unsigned char transparency, short length, unsigned char* dest,
+void draw_affine_pic_row(unsigned char transparency, int length, unsigned char* dest,
                          unsigned char* source, long source_x, long source_y, long source_dx,
                          long source_dy, int length2) {
     short* source_x_int = (short*)(&source_x);
     source_x_int++;
     short* source_y_int = (short*)(&source_y);
     source_y_int++;
-    for (short x = 0; x < length; x++) {
+    for (int x = 0; x < length; x++) {
         if (x >= length2) {
             return;
         }
@@ -418,7 +418,7 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                 dest_target += x_left;
                 // Extra out of bounds check (right screen border)
                 int length_to_border = Cxsize - x_left;
-                draw_affine_pic_row(transparency, short(x2 - x_left + 1), dest_target, aff->pixels,
+                draw_affine_pic_row(transparency, x2 - x_left + 1, dest_target, aff->pixels,
                                     affine_x, affine_y, inverse_i_x_fp, inverse_i_y_fp,
                                     length_to_border);
             } else {
@@ -471,8 +471,8 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                 // draw!
                 unsigned char* dest_target = dest->get_row(y);
                 dest_target += x_left;
-                draw_affine_pic_row(transparency, short(x2 - x1 + 1), dest_target, aff->pixels,
-                                    affine_x, affine_y, inverse_i_x_fp, inverse_i_y_fp);
+                draw_affine_pic_row(transparency, x2 - x1 + 1, dest_target, aff->pixels, affine_x,
+                                    affine_y, inverse_i_x_fp, inverse_i_y_fp);
             } else {
                 // If the draw width is 0 pixels, we continue (for very thin images)
                 // If the draw width <= -1, then we are completely done rendering and we stop here

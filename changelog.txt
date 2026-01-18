@@ -30,6 +30,7 @@
 * In internal editor, improve mouse lag and fix bug where mouse cursor would sometimes leave visual artifacts when left-clicking in empty space
 * Sometimes there was a missing pixel in the internal editor where two lines touch each other
 * The 3 timers (best time, flag tag time, current time) are now properly centered on screen
+* Fix bike flickering at high zoom
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

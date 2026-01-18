@@ -48,8 +48,9 @@ void platform_init() {
         internal_error(SDL_GetError());
         return;
     }
-    SDLSurfacePaletted = SDL_CreateRGBSurfaceWithFormat(0, SDLSurfaceMain->w, SDLSurfaceMain->h, 0,
-                                                        SDL_PIXELFORMAT_INDEX8);
+
+    SDLSurfacePaletted =
+        SDL_CreateRGBSurfaceWithFormat(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, SDL_PIXELFORMAT_INDEX8);
     if (!SDLSurfacePaletted) {
         internal_error(SDL_GetError());
         return;

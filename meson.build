@@ -69,6 +69,7 @@ elma_sources = files(
     'fs_utils.cpp',
     'object.cpp',
     'sprite.cpp',
+    'gl_renderer.cpp',
     'glad.c',
 )
 
@@ -106,6 +107,8 @@ sdl2_dep = dependency('sdl2',
     }
 )
 
+gl_dep = dependency('gl', required: true)
+
 nlohmann_json_dep = dependency('nlohmann_json')
 
 elma = executable(
@@ -114,6 +117,6 @@ elma = executable(
     include_directories: inc,
     cpp_args: cpp_args,
     link_args: link_args,
-    dependencies: [nlohmann_json_dep, sdl2_dep],
+    dependencies: [nlohmann_json_dep, gl_dep, sdl2_dep],
     win_subsystem: win_subsystem,
 )

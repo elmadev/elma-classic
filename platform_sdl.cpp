@@ -3,6 +3,7 @@
 #include "EDITUJ.H"
 #include "HANGHIGH.H"
 #include "keys.h"
+#include "gl_renderer.h"
 #include "main.h"
 #include "M_PIC.H"
 #include <SDL.h>
@@ -11,6 +12,10 @@
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;
 SDL_Surface* SDLSurfacePaletted;
+
+enum class RendererType { Software, OpenGL };
+
+static RendererType CurrentRenderer = RendererType::Software;
 
 static bool LeftMouseDownPrev = false;
 static bool RightMouseDownPrev = false;
@@ -32,9 +37,16 @@ void platform_init() {
     }
 
     SurfaceBuffer = new unsigned char*[SCREEN_HEIGHT];
+    if (CurrentRenderer == RendererType::OpenGL) {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    }
+
+    int window_flags = CurrentRenderer == RendererType::OpenGL ? SDL_WINDOW_OPENGL : 0;
 
     SDLWindow = SDL_CreateWindow("Elasto Mania", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                 SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+                                 SCREEN_WIDTH, SCREEN_HEIGHT, window_flags);
     if (!SDLWindow) {
         internal_error(SDL_GetError());
         return;
@@ -43,10 +55,19 @@ void platform_init() {
     SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
     SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
 
-    SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
-    if (!SDLSurfaceMain) {
-        internal_error(SDL_GetError());
-        return;
+    if (CurrentRenderer == RendererType::OpenGL) {
+        if (gl_init(SDLWindow, SCREEN_WIDTH, SCREEN_HEIGHT) != 0) {
+            internal_error("Failed to initialize OpenGL renderer");
+            return;
+        }
+
+        SDLSurfaceMain = nullptr; // Not used in GL mode
+    } else {
+        SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
+        if (!SDLSurfaceMain) {
+            internal_error(SDL_GetError());
+            return;
+        }
     }
 
     SDLSurfacePaletted =
@@ -91,8 +112,12 @@ void unlock_backbuffer() {
     }
     SurfaceLocked = false;
 
-    SDL_BlitSurface(SDLSurfacePaletted, NULL, SDLSurfaceMain, NULL);
-    SDL_UpdateWindowSurface(SDLWindow);
+    if (CurrentRenderer == RendererType::OpenGL) {
+        SDL_GL_SwapWindow(SDLWindow);
+    } else {
+        SDL_BlitSurface(SDLSurfacePaletted, NULL, SDLSurfaceMain, NULL);
+        SDL_UpdateWindowSurface(SDLWindow);
+    }
 }
 
 unsigned char** lock_frontbuffer(bool flipped) {

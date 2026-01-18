@@ -22,19 +22,13 @@ static double StretchMetersToPixels = 1.0;
 // `source_x` / `source_y` is the starting position within the affine_pic's pixels.
 // `source_dx` / `source_dy` is the delta to the next pixel to grab from the affine_pic.
 void draw_affine_pic_row(unsigned char transparency, int length, unsigned char* dest,
-                         unsigned char* source, long source_x, long source_y, long source_dx,
-                         long source_dy) {
-    short* source_x_int = (short*)(&source_x);
-    source_x_int++;
-    short* source_y_int = (short*)(&source_y);
-    source_y_int++;
+                         unsigned char* source, double source_x, double source_y, double source_dx,
+                         double source_dy) {
     // Draw the horizontal row of pixels
     for (int x = 0; x < length; x++) {
         // Grab the pixel from the affine_pic
-        unsigned short fx = *source_x_int;
-        unsigned short fy = *source_y_int;
-        fy = (unsigned short)((fy << 8) + fx);
-        unsigned char c = source[fy];
+        int source_offset = ((int)(source_y) << 8) + (int)(source_x);
+        unsigned char c = source[source_offset];
         if (c != transparency) {
             dest[x] = c;
         }
@@ -275,9 +269,9 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     // When the x position is within BOTH plane1_left<->plane1_right and plane2_left<->plane2_right,
     // then we know the pixel should be rendered.
     // We will update these values at every row y using the slope.
-    long plane1_left, plane1_right;
+    double plane1_left, plane1_right;
     double plane1_slope = u.x / u.y;
-    long plane2_left, plane2_right;
+    double plane2_left, plane2_right;
     double plane2_slope = v.x / v.y;
     // Calculate the values of plane1/2 left/right.
     // We start with the more complicated case here, check the alternative branch first to
@@ -288,91 +282,74 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
         // height as r.y. This way we've manually calculated whether r + u + v is to the right of r.
         double comparison_x = r.x + v.x - (u.x / u.y) * v.y;
         if (r.x < comparison_x) {
-            plane1_left = (r.x + (apex_y - r.y) * plane1_slope) * 65536.0;
-            plane1_right = (r.x + v.x + (apex_y - r.y - v.y) * plane1_slope) * 65536.0;
+            plane1_left = r.x + (apex_y - r.y) * plane1_slope;
+            plane1_right = r.x + v.x + (apex_y - r.y - v.y) * plane1_slope;
         } else {
-            plane1_right = (r.x + (apex_y - r.y) * plane1_slope) * 65536.0;
-            plane1_left = (r.x + v.x + (apex_y - r.y - v.y) * plane1_slope) * 65536.0;
+            plane1_right = r.x + (apex_y - r.y) * plane1_slope;
+            plane1_left = r.x + v.x + (apex_y - r.y - v.y) * plane1_slope;
         }
         // Similar calculation here but for the other plane (r+u->r+u+v)
         comparison_x = r.x + u.x - (v.x / v.y) * u.y;
         if (r.x < comparison_x) {
-            plane2_left = (r.x + (apex_y - r.y) * plane2_slope) * 65536.0;
-            plane2_right = (r.x + u.x + (apex_y - r.y - u.y) * plane2_slope) * 65536.0;
+            plane2_left = r.x + (apex_y - r.y) * plane2_slope;
+            plane2_right = r.x + u.x + (apex_y - r.y - u.y) * plane2_slope;
         } else {
-            plane2_right = (r.x + (apex_y - r.y) * plane2_slope) * 65536.0;
-            plane2_left = (r.x + u.x + (apex_y - r.y - u.y) * plane2_slope) * 65536.0;
+            plane2_right = r.x + (apex_y - r.y) * plane2_slope;
+            plane2_left = r.x + u.x + (apex_y - r.y - u.y) * plane2_slope;
         }
     } else {
         if (v.x > 0) {
             // (r+u) is more to the left than (r+u+v), even if the picture is upside-down
             // left: Get the x coordinate of the line r->r+u at height apex_y
-            plane1_left = (r.x + (apex_y - r.y) * plane1_slope) * 65536.0;
+            plane1_left = r.x + (apex_y - r.y) * plane1_slope;
             // right: Get the x coordinate of the line r+v->r+u+v at height apex_y
             // (corresponds to apex.x, accounting for rounding)
-            plane1_right = (r.x + v.x + (apex_y - r.y - v.y) * plane1_slope) * 65536.0;
+            plane1_right = r.x + v.x + (apex_y - r.y - v.y) * plane1_slope;
         } else {
             // (r+u+v) is more to the left than (r+u)
             // right: Get the x coordinate of the line r->r+u at height apex_y
-            plane1_right = (r.x + (apex_y - r.y) * plane1_slope) * 65536.0;
+            plane1_right = r.x + (apex_y - r.y) * plane1_slope;
             // left = Get the x coordinate of the line r+v->r+u+v at height apex_y
             // (corresponds to apex.x, accounting for rounding)
-            plane1_left = (r.x + v.x + (apex_y - r.y - v.y) * plane1_slope) * 65536.0;
+            plane1_left = r.x + v.x + (apex_y - r.y - v.y) * plane1_slope;
         }
         if (u.x > 0) {
             // (r+v) is more to the left than (r+u+v)
             // left: Get the x coordinate of the line r->r+v at height apex_y
             // (corresponds to apex.x, accounting for rounding)
-            plane2_left = (r.x + (apex_y - r.y) * plane2_slope) * 65536.0;
+            plane2_left = r.x + (apex_y - r.y) * plane2_slope;
             // right: Get the x coordinate of the line r+u->r+u+v at height apex_y
-            plane2_right = (r.x + u.x + (apex_y - r.y - u.y) * plane2_slope) * 65536.0;
+            plane2_right = r.x + u.x + (apex_y - r.y - u.y) * plane2_slope;
         } else {
             // (r+u+v) is more to the left than (r+v)
             // right: Get the x coordinate of the line r->r+v at height apex_y
             // (corresponds to apex.x, accounting for rounding)
-            plane2_right = (r.x + (apex_y - r.y) * plane2_slope) * 65536.0;
+            plane2_right = r.x + (apex_y - r.y) * plane2_slope;
             // left: Get the x coordinate of the line r+u->r+u+v at height apex_y
-            plane2_left = (r.x + u.x + (apex_y - r.y - u.y) * plane2_slope) * 65536.0;
+            plane2_left = r.x + u.x + (apex_y - r.y - u.y) * plane2_slope;
         }
     }
-
-    long plane1_slope_fp = plane1_slope * 65536.0;
-    long plane2_slope_fp = plane2_slope * 65536.0;
 
     // Apply the affine transformation to the apex to convert from meters to affine_pic pixel
     // coordinates.
     // affine_origin = inverted_matrix*diff
     vect2 diff = vect2(x_left, y) - r;
     vect2 affine_origin = vect2(0.5, 0.5) + diff.x * inverse_i + diff.y * inverse_j;
-    long affine_x = affine_origin.x * 65536.0;
-    long affine_y = affine_origin.y * 65536.0;
-
-    long inverse_i_x_fp = inverse_i.x * 65536.0;
-    long inverse_i_y_fp = inverse_i.y * 65536.0;
-    long inverse_j_x_fp = inverse_j.x * 65536.0;
-    long inverse_j_y_fp = inverse_j.y * 65536.0;
-
-    short* plane1_left_int = (short*)(&plane1_left);
-    plane1_left_int++;
-    short* plane1_right_int = (short*)(&plane1_right);
-    plane1_right_int++;
-    short* plane2_left_int = (short*)(&plane2_left);
-    plane2_left_int++;
-    short* plane2_right_int = (short*)(&plane2_right);
-    plane2_right_int++;
+    double affine_x = affine_origin.x;
+    double affine_y = affine_origin.y;
 
     // We add a few extra checks if part of the bike is out of bounds.
     // The else case is the normal case, only differences are noted here.
     if (possibly_out_of_bounds) {
         while (true) {
-            int x1 = *plane1_left_int;
-            int xtmp = *plane2_left_int;
+            int x1 = (int)(plane1_left);
+            int xtmp = (int)(plane2_left);
             if (xtmp > x1) {
                 x1 = xtmp;
             }
             x1++;
-            int x2 = *plane1_right_int;
-            xtmp = *plane2_right_int;
+            int x2 = (int)(plane1_right);
+            xtmp = (int)(plane2_right);
             if (xtmp < x2) {
                 x2 = xtmp;
             }
@@ -381,21 +358,21 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                 // Extra screen out of bounds check
                 while (x_left > x1 && x_left > 0) {
                     x_left--;
-                    affine_x -= inverse_i_x_fp;
-                    affine_y -= inverse_i_y_fp;
+                    affine_x -= inverse_i.x;
+                    affine_y -= inverse_i.y;
                 }
                 // Extra screen out of bounds check
                 while (x_left < x1 || x_left < 0) {
                     x_left++;
-                    affine_x += inverse_i_x_fp;
-                    affine_y += inverse_i_y_fp;
+                    affine_x += inverse_i.x;
+                    affine_y += inverse_i.y;
                 }
                 unsigned char* dest_target = dest->get_row(y);
                 dest_target += x_left;
                 // Extra out of bounds check (right screen border)
                 int length = std::min(x2 - x_left + 1, Cxsize - x_left);
                 draw_affine_pic_row(transparency, length, dest_target, aff->pixels, affine_x,
-                                    affine_y, inverse_i_x_fp, inverse_i_y_fp);
+                                    affine_y, inverse_i.x, inverse_i.y);
             } else {
                 if (x1 > x2 + 1) {
                     return;
@@ -406,26 +383,26 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
             if (y < 0) {
                 return;
             }
-            affine_x -= inverse_j_x_fp;
-            affine_y -= inverse_j_y_fp;
-            plane1_left -= plane1_slope_fp;
-            plane1_right -= plane1_slope_fp;
-            plane2_left -= plane2_slope_fp;
-            plane2_right -= plane2_slope_fp;
+            affine_x -= inverse_j.x;
+            affine_y -= inverse_j.y;
+            plane1_left -= plane1_slope;
+            plane1_right -= plane1_slope;
+            plane2_left -= plane2_slope;
+            plane2_right -= plane2_slope;
         }
     } else {
         // For each row of the destination
         while (true) {
             // Get the left render edge, +1 for safety
-            int x1 = *plane1_left_int;
-            int xtmp = *plane2_left_int;
+            int x1 = (int)(plane1_left);
+            int xtmp = (int)(plane2_left);
             if (xtmp > x1) {
                 x1 = xtmp;
             }
             x1++;
             // Get the right render edge
-            int x2 = *plane1_right_int;
-            xtmp = *plane2_right_int;
+            int x2 = (int)(plane1_right);
+            xtmp = (int)(plane2_right);
             if (xtmp < x2) {
                 x2 = xtmp;
             }
@@ -434,20 +411,20 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                 // by moving by the transformed matrix units
                 while (x_left > x1) {
                     x_left--;
-                    affine_x -= inverse_i_x_fp;
-                    affine_y -= inverse_i_y_fp;
+                    affine_x -= inverse_i.x;
+                    affine_y -= inverse_i.y;
                 }
                 while (x_left < x1) {
                     x_left++;
-                    affine_x += inverse_i_x_fp;
-                    affine_y += inverse_i_y_fp;
+                    affine_x += inverse_i.x;
+                    affine_y += inverse_i.y;
                 }
                 // We know our source affine_pic position and our destination position, so let's
                 // draw!
                 unsigned char* dest_target = dest->get_row(y);
                 dest_target += x_left;
                 draw_affine_pic_row(transparency, x2 - x1 + 1, dest_target, aff->pixels, affine_x,
-                                    affine_y, inverse_i_x_fp, inverse_i_y_fp);
+                                    affine_y, inverse_i.x, inverse_i.y);
             } else {
                 // If the draw width is 0 pixels, we continue (for very thin images)
                 // If the draw width <= -1, then we are completely done rendering and we stop here
@@ -458,14 +435,14 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
             // Go to the next row
             y--;
             // Update our affine_pic source position
-            affine_x -= inverse_j_x_fp;
-            affine_y -= inverse_j_y_fp;
+            affine_x -= inverse_j.x;
+            affine_y -= inverse_j.y;
             // Slide plane1 to the right with updated positions for the current row
-            plane1_left -= plane1_slope_fp;
-            plane1_right -= plane1_slope_fp;
+            plane1_left -= plane1_slope;
+            plane1_right -= plane1_slope;
             // Slide plane2 to the left with updated positions for the current row
-            plane2_left -= plane2_slope_fp;
-            plane2_right -= plane2_slope_fp;
+            plane2_left -= plane2_slope;
+            plane2_right -= plane2_slope;
         }
     }
 }

@@ -136,7 +136,17 @@ void menu_options() {
         sprintf(NavEntriesRight[13 + flag_tag_opt], "%dx%d", EolSettings->screen_width,
                 EolSettings->screen_height);
 
-        nav.setup(14 + flag_tag_opt, true);
+        strcpy(NavEntriesLeft[14 + flag_tag_opt], "Renderer:");
+        switch (EolSettings->renderer) {
+        case RendererType::Software:
+            strcpy(NavEntriesRight[14 + flag_tag_opt], "Software");
+            break;
+        case RendererType::OpenGL:
+            strcpy(NavEntriesRight[14 + flag_tag_opt], "OpenGL");
+            break;
+        }
+
+        nav.setup(15 + flag_tag_opt, true);
 
         choice = nav.navigate();
 
@@ -230,6 +240,19 @@ void menu_options() {
             case 1024: {
                 EolSettings->screen_width = 640;
                 EolSettings->screen_height = 480;
+                break;
+            }
+            }
+        }
+
+        if (choice == 14) {
+            switch (EolSettings->renderer) {
+            case RendererType::Software: {
+                EolSettings->renderer = RendererType::OpenGL;
+                break;
+            }
+            case RendererType::OpenGL: {
+                EolSettings->renderer = RendererType::Software;
                 break;
             }
             }

@@ -3,6 +3,7 @@
 #include "KIRAJZOL.H"
 #include "pic8.h"
 #include "vect2.h"
+#include <algorithm>
 #include <cmath>
 
 // Affine transformation parameters when bike is turning
@@ -39,31 +40,6 @@ void draw_affine_pic_row(unsigned char transparency, int length, unsigned char* 
         }
 
         // Update the affine_pic position from which we copy
-        source_x += source_dx;
-        source_y += source_dy;
-    }
-}
-
-void draw_affine_pic_row(unsigned char transparency, int length, unsigned char* dest,
-                         unsigned char* source, long source_x, long source_y, long source_dx,
-                         long source_dy, int length2) {
-    short* source_x_int = (short*)(&source_x);
-    source_x_int++;
-    short* source_y_int = (short*)(&source_y);
-    source_y_int++;
-    for (int x = 0; x < length; x++) {
-        if (x >= length2) {
-            return;
-        }
-        unsigned short fx = *source_x_int;
-        unsigned short fy = *source_y_int;
-        fy = (unsigned short)((fy << 8) + fx);
-
-        unsigned char c = source[fy];
-        if (c != transparency) {
-            dest[x] = c;
-        }
-
         source_x += source_dx;
         source_y += source_dy;
     }
@@ -417,10 +393,9 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                 unsigned char* dest_target = dest->get_row(y);
                 dest_target += x_left;
                 // Extra out of bounds check (right screen border)
-                int length_to_border = Cxsize - x_left;
-                draw_affine_pic_row(transparency, x2 - x_left + 1, dest_target, aff->pixels,
-                                    affine_x, affine_y, inverse_i_x_fp, inverse_i_y_fp,
-                                    length_to_border);
+                int length = std::min(x2 - x_left + 1, Cxsize - x_left);
+                draw_affine_pic_row(transparency, length, dest_target, aff->pixels, affine_x,
+                                    affine_y, inverse_i_x_fp, inverse_i_y_fp);
             } else {
                 if (x1 > x2 + 1) {
                     return;

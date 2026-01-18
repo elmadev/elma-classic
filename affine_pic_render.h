@@ -1,5 +1,5 @@
-#ifndef DOBOZ_H
-#define DOBOZ_H
+#ifndef AFFINE_PIC_RENDER_H
+#define AFFINE_PIC_RENDER_H
 
 class affine_pic;
 class pic8;

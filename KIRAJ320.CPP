@@ -1,6 +1,6 @@
 #include "KIRAJZOL.H"
 #include "anim.h"
-#include "DOBOZ.H"
+#include "affine_pic_render.h"
 #include "ECSET.H"
 #include "EDITUJ.H"
 #include "eol_settings.h"

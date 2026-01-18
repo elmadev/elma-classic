@@ -1,4 +1,4 @@
-#include "DOBOZ.H"
+#include "affine_pic_render.h"
 #include "affine_pic.h"
 #include "KIRAJZOL.H"
 #include "pic8.h"

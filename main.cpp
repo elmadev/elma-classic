@@ -7,7 +7,6 @@
 #include "platform_impl.h"
 #include "TELJES.H"
 #include <cstdio>
-#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <string>

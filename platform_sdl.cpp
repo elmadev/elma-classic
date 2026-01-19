@@ -8,7 +8,7 @@
 #include "main.h"
 #include "M_PIC.H"
 #include <SDL.h>
-#include "scancodes_windows.h"
+#include <sdl/scancodes_windows.h>
 
 SDL_Window* SDLWindow;
 SDL_Surface* SDLSurfaceMain;

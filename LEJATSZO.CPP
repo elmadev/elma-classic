@@ -1,5 +1,5 @@
 #include "LEJATSZO.H"
-#include "directinput_scancodes.h"
+#include <directinput/scancodes.h>
 #include "EDITUJ.H"
 #include "flagtag.h"
 #include "HANGHIGH.H"

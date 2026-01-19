@@ -1,6 +1,6 @@
 #include "state.h"
 #include "best_times.h"
-#include "directinput_scancodes.h"
+#include <directinput/scancodes.h>
 #include "main.h"
 #include "menu_dialog.h"
 #include "platform_utils.h"

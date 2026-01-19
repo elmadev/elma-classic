@@ -185,7 +185,7 @@ static void konvback(char* text) {
     }
 } */
 
-void saveplay(long belyeg) {
+void saveplay(int belyeg) {
     // Korny->pabc_saveplay->write( Korny->picbuffer, 20, 2*SM, "To exit press ESC!" );
     // Korny->pabc_saveplay->write( Korny->picbuffer, 20, 5*SM, "Please enter filename:" );
     // lassufizre( Korny->picbuffer, Korny->pal_saveplay );

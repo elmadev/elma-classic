@@ -50,16 +50,16 @@ recorder::recorder(void) {
     tag = 0;
 
     // Ellenorzes:
-    long hossz = sizeof(float);
+    int hossz = sizeof(float);
     if (hossz != 4) {
         internal_error("float hossz != 4!");
     }
-    hossz = long(Darabszam) * sizeof(float);
+    hossz = Darabszam * sizeof(float);
     if (hossz > 64000l) {
         internal_error("Darabszam*sizeof( float )!");
     }
 
-    hossz = long(Hangdarabszam) * sizeof(egyhang);
+    hossz = Hangdarabszam * sizeof(egyhang);
     if (hossz > 64000l) {
         internal_error("Hangdarabszam*sizeof( egyhang )!");
     }
@@ -499,7 +499,7 @@ static void olvhiba(const char* nev) {
 
 // demo eseten resource file-bol nyit:
 // belyeg-et adja vissza, vagy 0-at:
-long recorder::load(const char* nev, FILE* h, int demo) {
+int recorder::load(const char* nev, FILE* h, int demo) {
     int megvoltnyitva = 0;
     if (h) {
         megvoltnyitva = 1;
@@ -533,7 +533,7 @@ long recorder::load(const char* nev, FILE* h, int demo) {
         internal_error("recorder load-ban betoltve > Darabszam!");
     }
 
-    long verzio = 0;
+    int verzio = 0;
     if (fread(&verzio, 1, 4, h) != 4) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
@@ -556,7 +556,7 @@ long recorder::load(const char* nev, FILE* h, int demo) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
 
-    long belyeg = 0;
+    int belyeg = 0;
     if (fread(&belyeg, 1, 4, h) != 4) {
         olvhiba(nev);
     }
@@ -638,7 +638,7 @@ long recorder::load(const char* nev, FILE* h, int demo) {
         olvhiba(nev);
     }
 
-    long magic = 0;
+    int magic = 0;
     if (fread(&magic, 1, 4, h) != 4) {
         olvhiba(nev);
     }
@@ -680,7 +680,7 @@ static void irhiba(const char* nev) {
     internal_error("Nem sikerult irni recorded file-ba!: ", nev);
 }
 
-void recorder::save(const char* nev, FILE* h, long belyeg, int tag_p) {
+void recorder::save(const char* nev, FILE* h, int belyeg, int tag_p) {
     tag = tag_p;
 
     int megvoltnyitva = 0;
@@ -708,7 +708,7 @@ void recorder::save(const char* nev, FILE* h, long belyeg, int tag_p) {
 
     // Verzio csak 1.2-tol kezdodoen jon bele:
     // Elozoleg itt level volt, ami biztos hogy kisebb volt 120-nal:
-    long verzio = 131;
+    int verzio = 131;
     if (fwrite(&verzio, 1, 4, h) != 4) {
         irhiba(nev);
     }
@@ -790,7 +790,7 @@ void recorder::save(const char* nev, FILE* h, long belyeg, int tag_p) {
         irhiba(nev);
     }
 
-    long magic = MAGICNUMBER;
+    int magic = MAGICNUMBER;
     if (fwrite(&magic, 1, 4, h) != 4) {
         irhiba(nev);
     }
@@ -801,7 +801,7 @@ void recorder::save(const char* nev, FILE* h, long belyeg, int tag_p) {
 }
 
 // demo eseten resource file-bol nyit:
-long loadrecek(const char* nev, int demo) {
+int loadrecek(const char* nev, int demo) {
     // Eloszor megvizsgaljuk, hogy multirec vagy nem:
     FILE* h;
     if (demo) {
@@ -822,7 +822,7 @@ long loadrecek(const char* nev, int demo) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
 
-    long verzio = 0;
+    int verzio = 0;
     if (fread(&verzio, 1, 4, h) != 4) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
     }
@@ -847,7 +847,7 @@ long loadrecek(const char* nev, int demo) {
     }
 
     // Most jon tenyleges beolvasas:
-    long belyeg = 0;
+    int belyeg = 0;
     if (Multirec) {
         FILE* h;
         if (demo) {
@@ -880,7 +880,7 @@ long loadrecek(const char* nev, int demo) {
 }
 
 // belyeg-et adja vissza, vagy 0-at:
-void saverecek(const char* nev, long belyeg, int tag) {
+void saverecek(const char* nev, int belyeg, int tag) {
     if (Multirec) {
         char tmpnev[40];
         sprintf(tmpnev, "rec/%s", nev);

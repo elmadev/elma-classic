@@ -20,14 +20,14 @@ struct egyhang {
     float hangero;
 };
 
-long loadrecek(const char* nev, int demo);
-void saverecek(const char* nev, long belyeg, int tag);
+int loadrecek(const char* nev, int demo);
+void saverecek(const char* nev, int belyeg, int tag);
 
 class recorder {
     // demo eseten resource file-bol nyit:
     // belyeg-et adja vissza, vagy 0-at:
-    friend long loadrecek(const char* nev, int demo);
-    friend void saverecek(const char* nev, long belyeg, int tag);
+    friend int loadrecek(const char* nev, int demo);
+    friend void saverecek(const char* nev, int belyeg, int tag);
     friend void replay(void); // Hogy betolthoz hozzaferjen
 
     float *pk1rx, *pk1ry;
@@ -38,12 +38,12 @@ class recorder {
     unsigned char *pfrekvencia, *psurlero;
     unsigned char* pgazhatra;
 
-    long betoltve;
+    int betoltve;
     int ucsokiadva;
 
     egyhang* phangok;
-    long hangbetoltve;
-    long hangkov;
+    int hangbetoltve;
+    int hangkov;
 
     vect2 ucso_r;
     double ucsot, legkozt;
@@ -52,8 +52,8 @@ class recorder {
     int tag;
     // demo eseten resource file-bol nyit:
     // belyeg-et adja vissza, vagy 0-at:
-    long load(const char* nev, FILE* h, int demo);
-    void save(const char* nev, FILE* h, long belyeg, int tag);
+    int load(const char* nev, FILE* h, int demo);
+    void save(const char* nev, FILE* h, int belyeg, int tag);
 
   public:
     char palyanev[16];

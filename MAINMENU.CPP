@@ -206,7 +206,7 @@ void replay(void) {
                 // 0 param azt jelenti, hogy nem resource filebol olvas:
                 MenuPalette->set();
                 kiirloading();
-                long belyeg = loadrecek(tmp, 0);
+                int belyeg = loadrecek(tmp, 0);
                 if (access_level_file(Prec1->palyanev) != 0) {
                     int c = menu_dialog("Cannot find the lev file that corresponds",
                                         "to the record file!", tmp, Prec1->palyanev);
@@ -236,7 +236,7 @@ void replay(void) {
             strcpy(tmp, NavEntriesLeft[kurrens]);
             strcat(tmp, ".REC");
             kiirloading();
-            long belyeg = loadrecek(tmp, 0);
+            int belyeg = loadrecek(tmp, 0);
             if (CtrlAltPressed) {
                 // loadrecek beallitotta Multirec-et.
                 int ido = Prec1->betoltve;
@@ -287,7 +287,7 @@ static void demo(void) {
         elozodemo = demo;
 
         kiirloading();
-        long belyeg = loadrecek(demonevek[demo], 1);
+        int belyeg = loadrecek(demonevek[demo], 1);
         if (access_level_file(Prec1->palyanev) != 0) {
             internal_error("783654");
         }

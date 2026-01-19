@@ -1,13 +1,13 @@
 #include "editor_dialog.h"
 #include "abc8.h"
 #include "EDITUJ.H"
+#include "keys.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"
 #include "pic8.h"
 #include "platform_impl.h"
 #include "platform_utils.h"
-#include "state.h"
 #include <cctype>
 #include <cstring>
 

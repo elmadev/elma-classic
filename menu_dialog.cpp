@@ -1,7 +1,7 @@
 #include "menu_dialog.h"
+#include "keys.h"
 #include "main.h"
 #include "menu_pic.h"
-#include "state.h"
 #include <cstring>
 
 // Display the menu with the provided text, then return the key pressed by the user.

@@ -1,10 +1,11 @@
 #include "JATEKOS.H"
+#include "keys.h"
 #include "main.h"
 #include "MAINMENU.H"
 #include "menu_nav.h"
 #include "menu_pic.h"
+#include "state.h"
 #include "TELJES.H"
-#include "TOPOL.H"
 #include <cstring>
 
 static int Maxnevhossz = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-nal!

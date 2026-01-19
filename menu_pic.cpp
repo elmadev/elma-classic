@@ -2,12 +2,13 @@
 #include "abc8.h"
 #include "anim.h"
 #include "ball.h"
+#include "keys.h"
 #include "KIRAJZOL.H"
 #include "M_PIC.H"
 #include "main.h"
 #include "pic8.h"
 #include "platform_impl.h"
-#include "TOPOL.H"
+#include "state.h"
 #include <cmath>
 #include <cstring>
 

@@ -2,7 +2,7 @@
 #include "main.h"
 #include "menu_pic.h"
 #include "platform_utils.h"
-#include "TOPOL.H"
+#include "state.h"
 #include <cstdlib>
 #include <cstring>
 

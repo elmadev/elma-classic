@@ -3,7 +3,6 @@
 #include "ball_collision.h"
 #include "EDITUJ.H"
 #include "JATEKOS.H"
-#include "LEJATSZO.H"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_nav.h"
@@ -11,6 +10,7 @@
 #include "physics_init.h"
 #include "pic8.h"
 #include "platform_impl.h"
+#include "RECORDER.H"
 #include "TOPOL.H"
 #include "qopen.h"
 #include <cstring>

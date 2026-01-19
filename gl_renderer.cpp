@@ -1,7 +1,6 @@
 #include "gl_renderer.h"
 #include "main.h"
 
-#include <SDL.h>
 #include <glad/glad.h>
 #include <cstring>
 

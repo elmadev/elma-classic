@@ -2,6 +2,7 @@
 
 ## Major Features
 * Polygons no longer have a per-polygon max vertex count. There is now only a maximum total vertex count for the entire level.
+* Steam elma.res is supported
 
 ## Minor Features
 * Improve picture loading speed by allocating all needed memory at once instead of allocating in blocks of 64 KB (DOS-era restriction)

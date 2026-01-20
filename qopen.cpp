@@ -12,10 +12,12 @@ struct res_file {
 
 constexpr char RES_FILENAME[] = "elma.res";
 constexpr int RES_MAGIC_NUMBER = 1347839;
-constexpr int RES_MAX_FILES = 150;
+constexpr int RES_MAX_FILES_LEGACY = 150;
+constexpr int RES_MAX_FILES = 3000;
 constexpr bool USE_RES_FILE = true;
 
 static res_file* ResFiles = nullptr;
+static int ResMaxFiles;
 static int FileCount = 0;
 
 static void decrypt() {
@@ -27,7 +29,7 @@ static void decrypt() {
     if (!ResFiles) {
         internal_error("ResFiles is NULL!");
     }
-    for (int i = 0; i < RES_MAX_FILES; i++) {
+    for (int i = 0; i < ResMaxFiles; i++) {
         unsigned char* pc = (unsigned char*)(&ResFiles[i]);
         for (int j = 0; j < sizeof(res_file); j++) {
             pc[j] ^= a;
@@ -50,10 +52,6 @@ void init_qopen() {
         return;
     }
 
-    ResFiles = new res_file[RES_MAX_FILES];
-    if (!ResFiles) {
-        external_error("initqopen-ben memory!");
-    }
     FILE* h = fopen(RES_FILENAME, "rb");
     if (!h) {
         external_error("Missing file!: ", RES_FILENAME);
@@ -62,11 +60,26 @@ void init_qopen() {
     if (fread(&FileCount, 1, sizeof(FileCount), h) != 4) {
         internal_error("init_qopen() cannot read FileCount!");
     }
-    if (FileCount <= 0 || FileCount > RES_MAX_FILES) {
-        internal_error("FileCount <= 0 || FileCount > RES_MAX_FILES!");
+
+    // There are two different .res formats, with no explicit versioning.
+    // The only difference is the maximum amount of files allowed in the .res file.
+    // Make an assumption based on the number of files, which .res format is being parsed.
+    if (FileCount < RES_MAX_FILES_LEGACY) {
+        ResMaxFiles = RES_MAX_FILES_LEGACY;
+    } else {
+        ResMaxFiles = RES_MAX_FILES;
     }
 
-    int size = sizeof(res_file[RES_MAX_FILES]);
+    if (FileCount <= 0 || FileCount > ResMaxFiles) {
+        internal_error("FileCount <= 0 || FileCount > ResMaxFiles!");
+    }
+
+    ResFiles = new res_file[ResMaxFiles];
+    if (!ResFiles) {
+        external_error("init_qopen() out of memory!");
+    }
+
+    int size = sizeof(res_file) * ResMaxFiles;
     if (fread(ResFiles, 1, size, h) != size) {
         internal_error("init_qopen() cannot read files!");
     }

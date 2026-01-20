@@ -21,6 +21,10 @@ static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
+// SDL keyboard state and mappings
+static const Uint8* SDLKeyState = nullptr;
+static Keycode SDLToKeycode[SDL_NUM_SCANCODES];
+
 void message_box(const char* text) {
     // As per docs, can be called even before SDL_Init
     // SDLWindow will either be a handle to the window, or nullptr if no parent
@@ -72,6 +76,84 @@ static void create_palette_surface() {
     }
 }
 
+static void initialize_keyboard_mappings() {
+    // Initialize keyboard state and mappings
+    SDLKeyState = SDL_GetKeyboardState(nullptr);
+
+    // Map SDL scancodes to Keycodes
+    for (int i = 0; i < SDL_NUM_SCANCODES; i++) {
+        SDLToKeycode[i] = SDL_SCANCODE_UNKNOWN;
+    }
+
+    SDLToKeycode[SDL_SCANCODE_1] = '1';
+    SDLToKeycode[SDL_SCANCODE_2] = '2';
+    SDLToKeycode[SDL_SCANCODE_3] = '3';
+    SDLToKeycode[SDL_SCANCODE_4] = '4';
+    SDLToKeycode[SDL_SCANCODE_5] = '5';
+    SDLToKeycode[SDL_SCANCODE_6] = '6';
+    SDLToKeycode[SDL_SCANCODE_7] = '7';
+    SDLToKeycode[SDL_SCANCODE_8] = '8';
+    SDLToKeycode[SDL_SCANCODE_9] = '9';
+    SDLToKeycode[SDL_SCANCODE_0] = '0';
+
+    SDLToKeycode[SDL_SCANCODE_A] = 'a';
+    SDLToKeycode[SDL_SCANCODE_B] = 'b';
+    SDLToKeycode[SDL_SCANCODE_C] = 'c';
+    SDLToKeycode[SDL_SCANCODE_D] = 'd';
+    SDLToKeycode[SDL_SCANCODE_E] = 'e';
+    SDLToKeycode[SDL_SCANCODE_F] = 'f';
+    SDLToKeycode[SDL_SCANCODE_G] = 'g';
+    SDLToKeycode[SDL_SCANCODE_H] = 'h';
+    SDLToKeycode[SDL_SCANCODE_I] = 'i';
+    SDLToKeycode[SDL_SCANCODE_J] = 'j';
+    SDLToKeycode[SDL_SCANCODE_K] = 'k';
+    SDLToKeycode[SDL_SCANCODE_L] = 'l';
+    SDLToKeycode[SDL_SCANCODE_M] = 'm';
+    SDLToKeycode[SDL_SCANCODE_N] = 'n';
+    SDLToKeycode[SDL_SCANCODE_O] = 'o';
+    SDLToKeycode[SDL_SCANCODE_P] = 'p';
+    SDLToKeycode[SDL_SCANCODE_Q] = 'q';
+    SDLToKeycode[SDL_SCANCODE_R] = 'r';
+    SDLToKeycode[SDL_SCANCODE_S] = 's';
+    SDLToKeycode[SDL_SCANCODE_T] = 't';
+    SDLToKeycode[SDL_SCANCODE_U] = 'u';
+    SDLToKeycode[SDL_SCANCODE_V] = 'v';
+    SDLToKeycode[SDL_SCANCODE_W] = 'w';
+    SDLToKeycode[SDL_SCANCODE_X] = 'x';
+    SDLToKeycode[SDL_SCANCODE_Y] = 'y';
+    SDLToKeycode[SDL_SCANCODE_Z] = 'z';
+
+    SDLToKeycode[SDL_SCANCODE_SPACE] = ' ';
+    SDLToKeycode[SDL_SCANCODE_PERIOD] = '.';
+
+    SDLToKeycode[SDL_SCANCODE_ESCAPE] = KEY_ESC;
+    SDLToKeycode[SDL_SCANCODE_RETURN] = KEY_ENTER;
+    SDLToKeycode[SDL_SCANCODE_KP_ENTER] = KEY_ENTER; // KP = Keypad
+
+    SDLToKeycode[SDL_SCANCODE_UP] = KEY_UP;
+    SDLToKeycode[SDL_SCANCODE_KP_8] = KEY_UP;
+    SDLToKeycode[SDL_SCANCODE_DOWN] = KEY_DOWN;
+    SDLToKeycode[SDL_SCANCODE_KP_2] = KEY_DOWN;
+    SDLToKeycode[SDL_SCANCODE_LEFT] = KEY_LEFT;
+    SDLToKeycode[SDL_SCANCODE_KP_4] = KEY_LEFT;
+    SDLToKeycode[SDL_SCANCODE_RIGHT] = KEY_RIGHT;
+    SDLToKeycode[SDL_SCANCODE_KP_6] = KEY_RIGHT;
+
+    SDLToKeycode[SDL_SCANCODE_PAGEUP] = KEY_PGUP;
+    SDLToKeycode[SDL_SCANCODE_KP_9] = KEY_PGUP;
+    SDLToKeycode[SDL_SCANCODE_PAGEDOWN] = KEY_PGDOWN;
+    SDLToKeycode[SDL_SCANCODE_KP_3] = KEY_PGDOWN;
+
+    SDLToKeycode[SDL_SCANCODE_DELETE] = KEY_DEL;
+    SDLToKeycode[SDL_SCANCODE_KP_PERIOD] = KEY_DEL;
+    SDLToKeycode[SDL_SCANCODE_BACKSPACE] = KEY_BACKSPACE;
+
+    SDLToKeycode[SDL_SCANCODE_MINUS] = KEY_LEFT;
+    SDLToKeycode[SDL_SCANCODE_KP_MINUS] = KEY_LEFT;
+    SDLToKeycode[SDL_SCANCODE_EQUALS] = KEY_RIGHT;
+    SDLToKeycode[SDL_SCANCODE_KP_PLUS] = KEY_RIGHT;
+}
+
 void platform_init() {
     CurrentRenderer = EolSettings->renderer();
 
@@ -88,6 +170,7 @@ void platform_init() {
     create_window(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
     initialize_renderer();
     create_palette_surface();
+    initialize_keyboard_mappings();
 }
 
 long long get_milliseconds() { return SDL_GetTicks64(); }
@@ -193,6 +276,31 @@ void handle_events() {
                 invalidateegesz();
                 break;
             }
+            break;
+        case SDL_KEYDOWN: {
+            SDL_Scancode scancode = event.key.keysym.scancode;
+            Keycode keycode = SDLToKeycode[scancode];
+            if (keycode == SDL_SCANCODE_UNKNOWN) {
+                break; // Unmapped key
+            }
+
+            // Handle shift for letters
+            if (keycode >= 'a' && keycode <= 'z') {
+                if (SDLKeyState[SDL_SCANCODE_LSHIFT] || SDLKeyState[SDL_SCANCODE_RSHIFT]) {
+                    keycode = keycode + 'A' - 'a';
+                }
+            }
+
+            if (event.key.repeat) {
+                bool allow_repeat = (keycode != KEY_ESC && keycode != KEY_ENTER);
+                if (!allow_repeat) {
+                    break;
+                }
+            }
+
+            add_key_to_buffer(keycode);
+            break;
+        }
         case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {
                 LeftMouseDown = true;
@@ -213,7 +321,6 @@ void handle_events() {
     }
 
     update_key_state();
-    update_keypress_buffer();
 }
 
 void fill_key_state(char* buffer) {

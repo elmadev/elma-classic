@@ -22,6 +22,7 @@ constexpr int MaxKeycode = 256;
 void keys_init();
 void update_keypress_buffer();
 void update_key_state();
+void add_key_to_buffer(Keycode keycode);
 
 Keycode get_keypress();
 void empty_keypress_buffer();

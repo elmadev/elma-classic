@@ -12,6 +12,13 @@ static char KeyState2[MaxKeycode];
 static bool UseKeyState2 = true;
 static Keycode DIKToAscii[MaxKeycode];
 
+void add_key_to_buffer(Keycode keycode) {
+    if (KeyBufferCount >= KeyBufferSize) {
+        return;
+    }
+    KeyBuffer[KeyBufferCount++] = keycode;
+}
+
 // Map DIK codes to ascii (+ a few extra codepoints for special keys)
 void keys_init() {
     DIKToAscii[DIK_1] = '1';

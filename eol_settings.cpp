@@ -42,6 +42,19 @@ void eol_settings::set_zoom_textures(bool zoom_textures) {
     invalidate_lgr_cache();
 }
 
+/*
+ * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
+ *
+ * from_json() / to_json() can be overloaded to provide custom (de)serialisation for types.
+ *
+ * `FIELD_LIST` is a list of all the fields from `eol_settings` to be put into the json.
+ * `JSON_FIELD` for a public field where all values are allowed, or `JSON_FIELD_PRIV` for a private
+ * field that has some constraints. These macros are used to avoid repeating code.
+ *
+ * The value for a missing field when reading the json is the default value set by the
+ * `eol_settings` constructor.
+ */
+
 void to_json(json& j, const MapAlignment& m) {
     switch (m) {
     case MapAlignment::None:

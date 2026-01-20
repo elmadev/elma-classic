@@ -1,5 +1,5 @@
-#ifndef HANGHIGH_H
-#define HANGHIGH_H
+#ifndef SOUND_ENGINE_H
+#define SOUND_ENGINE_H
 
 enum class WavEvent : char {
     None = 0,

@@ -2,7 +2,7 @@
 #include <directinput/scancodes.h>
 #include "EDITUJ.H"
 #include "flagtag.h"
-#include "HANGHIGH.H"
+#include "sound_engine.h"
 #include "KIRAJZOL.H"
 #include "LEPTET.H"
 #include "LGRFILE.H"

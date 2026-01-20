@@ -1,7 +1,7 @@
 #ifndef RECORDER_H
 #define RECORDER_H
 
-#include "HANGHIGH.H"
+#include "sound_engine.h"
 #include "vect2.h"
 #include <cstdio>
 

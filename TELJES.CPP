@@ -11,10 +11,10 @@
 #include "physics_init.h"
 #include "pic8.h"
 #include "platform_impl.h"
-#include "platform_utils.h"
 #include "TOPOL.H"
 #include "qopen.h"
 #include <cstring>
+#include <filesystem>
 
 state* State = NULL;
 
@@ -358,7 +358,7 @@ static void mergeegyfele(topten* pst, topten* pmrg, int single) {
 
 static void mergestatedat(void) {
     char nev[20] = "merge.dat";
-    if (access(nev, 0) != 0) {
+    if (!std::filesystem::exists(nev)) {
         return; // Nincsen merge file
     }
 

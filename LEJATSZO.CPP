@@ -10,11 +10,11 @@
 #include "object.h"
 #include "physics_init.h"
 #include "platform_impl.h"
-#include "platform_utils.h"
 #include "timer.h"
 #include "TOPOL.H"
 #include <cmath>
 #include <cstring>
+#include <filesystem>
 
 // Jatek modja ket fele lehet:
 int Single = 1;
@@ -564,7 +564,7 @@ long lejatszo(const char* filenev) {
             double tpl = double(l) / eltelido;
             tpl *= STOPWATCH_MULTIPLIER * 1000.0;
             int framerate = (int)(tpl);
-            if (access("f_rate.inf", 0) == 0) {
+            if (std::filesystem::exists("f_rate.inf")) {
                 // igyhagyni fopen-t!:
                 FILE* h = fopen("f_rate.inf", "w");
                 if (!h) {
@@ -856,7 +856,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             double tpl = double(l) / eltelido;
             tpl *= STOPWATCH_MULTIPLIER * 1000.0;
             int framerate = (int)(tpl);
-            if (access("f_rate.inf", 0) == 0) {
+            if (std::filesystem::exists("f_rate.inf")) {
                 // igyhagyni fopen-t!:
                 FILE* h = fopen("f_rate.inf", "w");
                 if (!h) {

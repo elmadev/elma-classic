@@ -3,9 +3,9 @@
 #include <directinput/scancodes.h>
 #include "main.h"
 #include "menu_dialog.h"
-#include "platform_utils.h"
 #include "TOPOL.H"
 #include <cstring>
+#include <filesystem>
 
 constexpr int STATE_VERSION = 200;
 
@@ -80,8 +80,8 @@ state::state(const char* filename) {
         filename = STATE_FILENAME;
     }
 
-    // Recreate state.dat if it doesn't exist (or cannot access...?)
-    if (access(filename, 0) != 0) {
+    // Recreate state.dat if it doesn't exist
+    if (!std::filesystem::exists(filename)) {
         save();
         return;
     }

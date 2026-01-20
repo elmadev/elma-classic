@@ -301,6 +301,13 @@ void handle_events() {
             add_key_to_buffer(keycode);
             break;
         }
+        case SDL_MOUSEWHEEL:
+            if (event.wheel.y > 0) {
+                add_key_to_buffer(KEY_UP);
+            } else if (event.wheel.y < 0) {
+                add_key_to_buffer(KEY_DOWN);
+            }
+            break;
         case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {
                 LeftMouseDown = true;

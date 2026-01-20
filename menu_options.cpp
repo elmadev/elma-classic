@@ -1,14 +1,12 @@
 #include "menu_options.h"
 #include "eol_settings.h"
 #include "JATEKOS.H"
-#include "LGRFILE.H"
 #include "LOAD.H"
 #include "menu_controls.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
 #include "TOPOL.H"
 #include <cstring>
-#include "physics_init.h"
 
 void menu_help() {
     menu_pic menu;

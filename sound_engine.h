@@ -28,8 +28,6 @@ void set_friction_volume(double volume);
 // Start a wavbank event
 void start_wav(WavEvent event, double volume);
 
-void delay(int milliseconds);
-
 void sound_mixer(short* buffer, int buffer_length);
 
 #endif

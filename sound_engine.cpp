@@ -437,11 +437,3 @@ void sound_mixer(short* buffer, int buffer_length) {
         }
     }
 }
-
-void delay(int milliseconds) {
-    double current_time = stopwatch();
-    while (stopwatch() / STOPWATCH_MULTIPLIER <
-           current_time / STOPWATCH_MULTIPLIER + milliseconds) {
-        handle_events();
-    }
-}

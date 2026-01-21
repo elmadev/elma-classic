@@ -94,96 +94,94 @@ static int afterplayext( char* filenev, long ido ) {
 
 int abcbenelobb(const char* text1, const char* text2);
 
-static void abcberendez(int szam) {
-    for (int i = 0; i < szam + 3; i++) {
-        for (int j = 0; j < szam - 1; j++) {
+static void sort_external_levels(int count) {
+    for (int i = 0; i < count + 3; i++) {
+        for (int j = 0; j < count - 1; j++) {
             // Ha j es j+1 edik elem forditva van visszacsereljuk oket:
-            char* nev1 = NavEntriesLeft[j];
-            char* nev2 = NavEntriesLeft[j + 1];
-            if (abcbenelobb(nev2, nev1) > 0) {
+            char* name1 = NavEntriesLeft[j];
+            char* name2 = NavEntriesLeft[j + 1];
+            if (abcbenelobb(name2, name1) > 0) {
                 // Csere:
                 char tmp[20];
-                strcpy(tmp, nev1);
-                strcpy(nev1, nev2);
-                strcpy(nev2, tmp);
+                strcpy(tmp, name1);
+                strcpy(name1, name2);
+                strcpy(name2, tmp);
             }
         }
     }
 }
 
 // Nincs h-ja, hanem prototype ki van irva play.cpp-ben:
-void playextmenu(void) {
+void menu_external_levels(void) {
     // Kiirjuk osszes lev file nevet ide:
-    finame fname;
-    bool done = find_first("lev/*.lev", fname);
-    int szam = 0;
+    finame filename;
+    bool done = find_first("lev/*.lev", filename);
+    int count = 0;
     while (!done) {
-        char* filenev = fname;
+        strcpy(NavEntriesLeft[count], filename);
 
-        strcpy(NavEntriesLeft[szam], filenev);
-
-        done = find_next(fname);
-        szam++;
-        if (szam >= NavEntriesLeftMaxLength - 4) {
+        done = find_next(filename);
+        count++;
+        if (count >= NavEntriesLeftMaxLength - 4) {
             done = true;
         }
     }
 
     find_close();
 
-    if (szam <= 0) {
+    if (count <= 0) {
         return;
     }
 
-    abcberendez(szam);
+    sort_external_levels(count);
 
-    int kezdo = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
-    for (int i = 0; i < szam; i++) {
+    int previous_index = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
+    for (int i = 0; i < count; i++) {
         char tmp[50];
         strcpy(tmp, NavEntriesLeft[i]);
         // strcat( tmp, ".lev" );
         if (strcmpi(tmp, State->external_filename) == 0) {
-            kezdo = i;
+            previous_index = i;
         }
     }
 
     // Feltoltottuk neveket, jon valasztas:
     menu_nav val;
-    val.selected_index = kezdo;
+    val.selected_index = previous_index;
     strcpy(val.title, "Select External File!");
 
-    val.setup(szam);
+    val.setup(count);
 
     while (1) {
-        int eredmeny = val.navigate();
-        if (eredmeny < 0) {
+        int choice = val.navigate();
+        if (choice < 0) {
             return;
         }
 
-        char filenev[20];
-        if (strlen(val.entries_left[eredmeny]) > 15) {
-            internal_error("playextmenu-ben val.entries_left[eredmeny] ) > 15!");
+        char filename[20];
+        if (strlen(val.entries_left[choice]) > 15) {
+            internal_error("menu_external_levels() choice > 15!");
         }
-        strcpy(filenev, val.entries_left[eredmeny]);
+        strcpy(filename, val.entries_left[choice]);
 
-        strcpy(State->external_filename, filenev);
+        strcpy(State->external_filename, filename);
 
         while (1) {
             kiirloading();
             // Ha topologiailag hibas lev file (uzenetet load adja):
-            if (!floadlevel_p(filenev)) {
+            if (!floadlevel_p(filename)) {
                 break;
             }
-            Prec1->erase(filenev);
-            Prec2->erase(filenev);
-            int ido = lejatszo(filenev);
+            Prec1->erase(filename);
+            Prec2->erase(filename);
+            int time = lejatszo(filename);
             MenuPalette->set();
-            char valasz[100] = "";
-            idoelintezes(ido, valasz, 0, filenev);
+            char finish_msg[100] = "";
+            idoelintezes(time, finish_msg, 0, filename);
             // Igaz, ha ujra jatszik, hamis ha listat ker:
-            if (!afterplay(0, 0, valasz, filenev)) {
-                Prec1->erase(filenev);
-                Prec2->erase(filenev);
+            if (!afterplay(0, 0, finish_msg, filename)) {
+                Prec1->erase(filename);
+                Prec2->erase(filename);
                 break;
             }
         }

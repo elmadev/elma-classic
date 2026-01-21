@@ -885,8 +885,8 @@ void play(void) {
             // External file lejatszast valasztotta, ilyenkor ha visszajon
             // folytatodik tovabb:
             pjatekos->selected_level = -1;
-            void playextmenu(void);
-            playextmenu();
+            void menu_external_levels(void);
+            menu_external_levels();
         } else {
             // Egy normal level-t valasztott ki:
             playlevel(eredmeny - 1);

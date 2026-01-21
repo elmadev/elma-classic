@@ -60,7 +60,6 @@ elma_sources = files(
     'TELJES.CPP',
     'TOPOL.CPP',
     'UTKOZES.CPP',
-    'UTKOZES2.CPP',
     'menu_nav.cpp',
     'vect2.cpp',
     'eol_settings.cpp',

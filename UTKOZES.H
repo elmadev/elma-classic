@@ -8,4 +8,7 @@ class vect2;
 // Store the anchor points in `point1` and `point2`.
 int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2);
 
+// Return the index of the first object that a head/wheel touches, or -1 if none.
+int get_touching_object(vect2 r, double radius);
+
 #endif

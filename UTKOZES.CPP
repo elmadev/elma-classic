@@ -1,5 +1,4 @@
 #include "UTKOZES.H"
-#include "ECSET.H"
 #include "EDITUJ.H"
 #include "LEJATSZO.H"
 #include "main.h"
@@ -91,16 +90,6 @@ int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2) 
 }
 
 int get_touching_object(vect2 r, double radius) {
-    int balalsox, balalsoy;
-    if (!Pecsetalso) {
-        internal_error("uovruor");
-    }
-    Pecsetalso->getbalalso_int(r, &balalsox, &balalsoy);
-    int objminx = balalsox - 200;
-    int objminy = balalsoy - 200;
-    int objmaxx = balalsox + 200;
-    int objmaxy = balalsoy + 200;
-
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Ptop->objects[i];
         if (!obj) {
@@ -114,11 +103,6 @@ int get_touching_object(vect2 r, double radius) {
 
         // Skip Exit in flagtag mode
         if (obj->type == object::Type::Exit && !Single && Tag) {
-            continue;
-        }
-
-        if (obj->canvas_x < objminx || obj->canvas_y < objminy || obj->canvas_x > objmaxx ||
-            obj->canvas_y > objmaxy) {
             continue;
         }
 

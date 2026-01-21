@@ -9,30 +9,17 @@
 #include "PLAY.H"
 #include "TOPOL.H"
 #include <cstring>
-
-int abcbenelobb(const char* text1, const char* text2);
-
-static void sort_external_levels(int count) {
-    for (int i = 0; i < count + 3; i++) {
-        for (int j = 0; j < count - 1; j++) {
-            char* name1 = NavEntriesLeft[j];
-            char* name2 = NavEntriesLeft[j + 1];
-            if (abcbenelobb(name2, name1) > 0) {
-                char tmp[20];
-                strcpy(tmp, name1);
-                strcpy(name1, name2);
-                strcpy(name2, tmp);
-            }
-        }
-    }
-}
+#include <algorithm>
+#include <string>
+#include <vector>
 
 void menu_external_levels() {
     finame filename;
+    std::vector<std::string> lev_names;
     bool done = find_first("lev/*.lev", filename);
     int count = 0;
     while (!done) {
-        strcpy(NavEntriesLeft[count], filename);
+        lev_names.push_back(filename);
 
         done = find_next(filename);
         count++;
@@ -47,7 +34,11 @@ void menu_external_levels() {
         return;
     }
 
-    sort_external_levels(count);
+    int i = 0;
+    std::sort(lev_names.begin(), lev_names.end());
+    for (std::string& name : lev_names) {
+        strcpy(NavEntriesLeft[i++], name.c_str());
+    }
 
     int previous_index = 0;
     for (int i = 0; i < count; i++) {

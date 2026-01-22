@@ -4,21 +4,19 @@
 #include "state.h"
 #include "vect2.h"
 
+class lgrfile;
+struct motorst;
 class object;
 class polygon;
 class sprite;
-struct motorst;
 
 constexpr int MAX_POLYGONS = 300;
 constexpr int MAX_VERTICES = 5000;
 constexpr int MAX_OBJECTS = 52;
 constexpr int MAX_SPRITES = 5000;
 
-typedef polygon* ptrgyuru;
 constexpr int LEVEL_NAME_LENGTH = 50;
 constexpr int LEVEL_NAME_LENGTH_OLD = 14;
-
-class lgrfile;
 
 class level {
     friend int menu_exit();
@@ -27,19 +25,19 @@ class level {
     friend void invalidate_ptop();
 
     double checksum();
+    void from_file(const char* filename, bool internal);
 
     // Create a default level
     level();
     // Load level from file
     level(const char* filename);
     ~level();
-    void from_file(const char* filename, bool internal);
 
   public:
     int level_id;
     bool lgr_not_found;
     bool topology_errors;
-    ptrgyuru polygons[MAX_POLYGONS]; // Ez csak gany miatt public
+    polygon* polygons[MAX_POLYGONS];
     object* objects[MAX_OBJECTS];
     sprite* sprites[MAX_SPRITES];
     char level_name[LEVEL_NAME_LENGTH + 1];

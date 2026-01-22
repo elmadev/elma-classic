@@ -38,49 +38,6 @@ static char InternalFilePaths[STATE_LEVEL_COUNT + 2][14] = {
 
 static char FgetsBuffer[110];
 
-static bool read_encrypted(void* buffer, int length, FILE* h) {
-    if (fread(buffer, 1, length, h) != length) {
-        return false;
-    }
-    unsigned char* pc = (unsigned char*)buffer;
-    short a = 21;
-    short b = 9783;
-    short c = 3389;
-    for (int i = 0; i < length; i++) {
-        pc[i] ^= a;
-        a %= c;
-        b += a * c;
-        a = 31 * b + c;
-    }
-    return true;
-}
-
-static bool write_encrypted(void* buffer, int length, FILE* h) {
-    unsigned char* pc = (unsigned char*)buffer;
-    short a = 21;
-    short b = 9783;
-    short c = 3389;
-    for (int i = 0; i < length; i++) {
-        pc[i] ^= a;
-        a %= c;
-        b += a * c;
-        a = 31 * b + c;
-    }
-    if (fwrite(buffer, 1, length, h) != length) {
-        return false;
-    }
-    a = 21;
-    b = 9783;
-    c = 3389;
-    for (int i = 0; i < length; i++) {
-        pc[i] ^= a;
-        a %= c;
-        b += a * c;
-        a = 31 * b + c;
-    }
-    return true;
-}
-
 const char* get_internal_level_name(int index) {
     constexpr int INTERNAL_MAX_NAME_LENGTH = 30;
     static char InternalLevelNames[INTERNAL_LEVEL_COUNT][INTERNAL_MAX_NAME_LENGTH + 2] = {};
@@ -593,6 +550,49 @@ level::level(const char* filename) {
     } else {
         from_file(filename, false);
     }
+}
+
+static bool read_encrypted(void* buffer, int length, FILE* h) {
+    if (fread(buffer, 1, length, h) != length) {
+        return false;
+    }
+    unsigned char* pc = (unsigned char*)buffer;
+    short a = 21;
+    short b = 9783;
+    short c = 3389;
+    for (int i = 0; i < length; i++) {
+        pc[i] ^= a;
+        a %= c;
+        b += a * c;
+        a = 31 * b + c;
+    }
+    return true;
+}
+
+static bool write_encrypted(void* buffer, int length, FILE* h) {
+    unsigned char* pc = (unsigned char*)buffer;
+    short a = 21;
+    short b = 9783;
+    short c = 3389;
+    for (int i = 0; i < length; i++) {
+        pc[i] ^= a;
+        a %= c;
+        b += a * c;
+        a = 31 * b + c;
+    }
+    if (fwrite(buffer, 1, length, h) != length) {
+        return false;
+    }
+    a = 21;
+    b = 9783;
+    c = 3389;
+    for (int i = 0; i < length; i++) {
+        pc[i] ^= a;
+        a %= c;
+        b += a * c;
+        a = 31 * b + c;
+    }
+    return true;
 }
 
 void level::from_file(const char* filename, bool internal) {

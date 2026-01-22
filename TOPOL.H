@@ -19,19 +19,8 @@ constexpr int LEVEL_NAME_LENGTH = 50;
 constexpr int LEVEL_NAME_LENGTH_OLD = 14;
 
 class level {
-    friend int menu_exit();
-    friend int floadlevel_e(const char* nev, int forceload);
-    friend int floadlevel_p(const char* nev);
-    friend void invalidate_ptop();
-
     double checksum();
     void from_file(const char* filename, bool internal);
-
-    // Create a default level
-    level();
-    // Load level from file
-    level(const char* filename);
-    ~level();
 
   public:
     int level_id;
@@ -47,6 +36,12 @@ class level {
 
     topten_set toptens;
     int topten_file_offset; // 0 if internal level
+
+    // Create a default level
+    level();
+    // Load level from file
+    level(const char* filename);
+    ~level();
 
     // Delete sprites that don't exist in current lgr, and make sure default ground / sky textures
     // are different.

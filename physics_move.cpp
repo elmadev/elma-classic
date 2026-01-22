@@ -1,8 +1,8 @@
 #include "physics_move.h"
+#include "physics_collision.h"
 #include "physics_init.h"
 #include "RECORDER.H"
 #include "sound_engine.h"
-#include "physics_collision.h"
 #include <cmath>
 
 // Push the wheel out from the ground so it is standing on the anchor point

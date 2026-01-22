@@ -2,9 +2,9 @@
 #include "editor_canvas.h"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
+#include "level.h"
 #include "object.h"
 #include "polygon.h"
-#include "TOPOL.H"
 
 // Visszaadja, hogy volt-e hiba:
 int check_topology(int kelldialog) {

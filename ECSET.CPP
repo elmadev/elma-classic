@@ -4,6 +4,7 @@
 #include "eol_settings.h"
 #include "grass.h"
 #include "polygon.h"
+#include "level.h"
 #include "LGRFILE.H"
 #include "main.h"
 #include "M_PIC.H"
@@ -13,7 +14,6 @@
 #include "pic8.h"
 #include "segments.h"
 #include "sprite.h"
-#include "TOPOL.H"
 #include <cstdint>
 #include <cmath>
 #include <cstring>

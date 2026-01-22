@@ -1,7 +1,7 @@
 #include "segments.h"
+#include "level.h"
 #include "main.h"
 #include "polygon.h"
-#include "TOPOL.H"
 #include <cmath>
 #include <cstring>
 

@@ -2,13 +2,13 @@
 #include "ECSET.H"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
+#include "level.h"
 #include "LGRFILE.H"
 #include "main.h"
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "segments.h"
-#include "TOPOL.H"
 #include <cstring>
 
 int Volttopsave = 0;

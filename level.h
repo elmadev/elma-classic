@@ -1,5 +1,5 @@
-#ifndef TOPOL_H
-#define TOPOL_H
+#ifndef LEVEL_H
+#define LEVEL_H
 
 #include "state.h"
 #include "vect2.h"

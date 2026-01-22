@@ -1,9 +1,9 @@
 #include "polygon.h"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
+#include "level.h"
 #include "main.h"
 #include "platform_utils.h"
-#include "TOPOL.H"
 #include <cmath>
 
 polygon::polygon() {

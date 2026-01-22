@@ -7,6 +7,7 @@
 #include "eol_settings.h"
 #include "grass.h"
 #include "KIRAJZOL.H"
+#include "level.h"
 #include "LOAD.H"
 #include "M_PIC.H"
 #include "main.h"
@@ -15,7 +16,6 @@
 #include "piclist.h"
 #include "platform_impl.h"
 #include "platform_utils.h"
-#include "TOPOL.H"
 #include "sprite.h"
 #include <cstring>
 

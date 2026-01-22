@@ -1,19 +1,19 @@
 #include "LEJATSZO.H"
-#include <directinput/scancodes.h>
 #include "EDITUJ.H"
 #include "flagtag.h"
 #include "sound_engine.h"
 #include "KIRAJZOL.H"
 #include "LEPTET.H"
+#include "level.h"
 #include "LGRFILE.H"
 #include "main.h"
 #include "object.h"
 #include "physics_init.h"
 #include "platform_impl.h"
 #include "timer.h"
-#include "TOPOL.H"
 #include <cmath>
 #include <cstring>
+#include <directinput/scancodes.h>
 #include <filesystem>
 
 // Jatek modja ket fele lehet:

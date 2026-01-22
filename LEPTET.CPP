@@ -1,12 +1,12 @@
 #include "LEPTET.H"
 #include "EDITUJ.H"
+#include "level.h"
 #include "object.h"
+#include "physics_collision.h"
 #include "physics_init.h"
 #include "physics_move.h"
 #include "platform_utils.h"
 #include "RECORDER.H"
-#include "TOPOL.H"
-#include "physics_collision.h"
 #include <cmath>
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi, vect2 sebesseg);

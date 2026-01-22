@@ -5,12 +5,12 @@
 #include "EDITUJ.H"
 #include "platform_impl.h"
 #include "polygon.h"
+#include "level.h"
 #include "LGRFILE.H"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"
 #include "pic8.h"
-#include "TOPOL.H"
 #include "sprite.h"
 
 // int Kurzornegyzet = 0;

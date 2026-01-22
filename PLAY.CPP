@@ -4,6 +4,7 @@
 #include "EDITUJ.H"
 #include "flagtag.h"
 #include "LEJATSZO.H"
+#include "level.h"
 #include "LOAD.H"
 #include "main.h"
 #include "menu_external.h"
@@ -14,7 +15,6 @@
 #include "physics_init.h"
 #include "skip.h"
 #include "TELJES.H"
-#include "TOPOL.H"
 #include "timer.h"
 #include <cstdlib>
 #include <cstring>

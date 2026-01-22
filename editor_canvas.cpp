@@ -1,10 +1,10 @@
 #include "editor_canvas.h"
 #include "EDITUJ.H"
+#include "level.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"
 #include "pic8.h"
-#include "TOPOL.H"
 #include <cmath>
 
 // If false, when drawing lines, immediately update the screen

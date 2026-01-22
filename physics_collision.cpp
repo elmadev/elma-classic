@@ -1,11 +1,11 @@
 #include "physics_collision.h"
 #include "EDITUJ.H"
 #include "LEJATSZO.H"
+#include "level.h"
 #include "main.h"
 #include "object.h"
 #include "physics_init.h"
 #include "segments.h"
-#include "TOPOL.H"
 #include "vect2.h"
 
 // Check for collision between a wheel/head of a certain radius, and a provided segment.

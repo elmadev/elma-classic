@@ -9,6 +9,7 @@
 #include "EDITTOLT.H"
 #include "EDITTOOL.H"
 #include "polygon.h"
+#include "level.h"
 #include "LGRFILE.H"
 #include "LOAD.H"
 #include "M_PIC.H"
@@ -19,7 +20,6 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "sprite.h"
-#include "TOPOL.H"
 #include <cstring>
 
 level* Ptop = NULL;

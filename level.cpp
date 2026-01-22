@@ -1,4 +1,4 @@
-#include "TOPOL.H"
+#include "level.h"
 #include "best_times.h"
 #include "ED_CHECK.H"
 #include "editor_canvas.h"

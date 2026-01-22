@@ -4,6 +4,7 @@
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "fs_utils.h"
+#include "level.h"
 #include "LOAD.H"
 #include "LGRFILE.H"
 #include "M_PIC.H"
@@ -14,7 +15,6 @@
 #include "platform_utils.h"
 #include "polygon.h"
 #include "sprite.h"
-#include "TOPOL.H"
 #include <cstring>
 
 constexpr unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;

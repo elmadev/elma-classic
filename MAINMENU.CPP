@@ -4,6 +4,7 @@
 #include "EDITUJ.H"
 #include "fs_utils.h"
 #include "LEJATSZO.H"
+#include "level.h"
 #include "LOAD.H"
 #include "main.h"
 #include "menu_dialog.h"
@@ -13,7 +14,6 @@
 #include "platform_impl.h"
 #include "PLAY.H"
 #include "TELJES.H"
-#include "TOPOL.H"
 #include <cmath>
 #include <cstdlib>
 #include <cstring>

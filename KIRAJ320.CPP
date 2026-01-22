@@ -6,6 +6,7 @@
 #include "eol_settings.h"
 #include "flagtag.h"
 #include "LEJATSZO.H"
+#include "level.h"
 #include "LGRFILE.H"
 #include "M_PIC.H"
 #include "main.h"
@@ -14,7 +15,6 @@
 #include "platform_utils.h"
 #include "physics_init.h"
 #include "timer.h"
-#include "TOPOL.H"
 #include <algorithm>
 #include <cmath>
 #include <cstring>

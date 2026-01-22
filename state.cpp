@@ -1,10 +1,10 @@
 #include "state.h"
 #include "best_times.h"
-#include <directinput/scancodes.h>
+#include "level.h"
 #include "main.h"
 #include "menu_dialog.h"
-#include "TOPOL.H"
 #include <cstring>
+#include <directinput/scancodes.h>
 #include <filesystem>
 
 constexpr int STATE_VERSION = 200;

@@ -8,7 +8,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "PLAY.H"
-#include "TOPOL.H"
+#include "state.h"
 #include <cstring>
 #include <algorithm>
 #include <string>

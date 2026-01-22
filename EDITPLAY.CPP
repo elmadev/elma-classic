@@ -2,9 +2,9 @@
 #include "EDITTOLT.H"
 #include "EDITUJ.H"
 #include "LEJATSZO.H"
+#include "level.h"
 #include "LOAD.H"
 #include "platform_impl.h"
-#include "TOPOL.H"
 
 void editplay(void) {
     invalidateegesz();

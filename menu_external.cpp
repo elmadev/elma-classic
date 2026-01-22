@@ -1,3 +1,4 @@
+#include "menu_external.h"
 #include "fs_utils.h"
 #include "LEJATSZO.H"
 #include "LOAD.H"

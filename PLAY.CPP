@@ -6,6 +6,7 @@
 #include "LEJATSZO.H"
 #include "LOAD.H"
 #include "main.h"
+#include "menu_external.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
 #include "platform_impl.h"
@@ -885,7 +886,6 @@ void play(void) {
             // External file lejatszast valasztotta, ilyenkor ha visszajon
             // folytatodik tovabb:
             pjatekos->selected_level = -1;
-            void menu_external_levels(void);
             menu_external_levels();
         } else {
             // Egy normal level-t valasztott ki:

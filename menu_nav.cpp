@@ -277,3 +277,5 @@ void menu_nav::render() {
     }
     menu->render();
 }
+
+nav_entry* menu_nav::entry_left(int index) { return &entries_left[index]; }

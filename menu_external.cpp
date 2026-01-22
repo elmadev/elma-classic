@@ -63,10 +63,11 @@ void menu_external_levels() {
         }
 
         char filename[20];
-        if (strlen(val.entries_left[choice]) > 15) {
-            internal_error("menu_external_levels() choice > 15!");
+        nav_entry* entry = val.entry_left(choice);
+        if (strlen(*entry) > 15) {
+            internal_error("menu_external_levels() strlen(entry) > 15!");
         }
-        strcpy(filename, val.entries_left[choice]);
+        strcpy(filename, *entry);
 
         strcpy(State->external_filename, filename);
 

@@ -18,8 +18,6 @@ extern nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 void menu_nav_entries_init();
 
 class menu_nav {
-    friend void menu_external_levels();
-
     nav_entry* entries_left;
     nav_entry* entries_right;
     int length;
@@ -43,6 +41,7 @@ class menu_nav {
                  bool render_only = false);
 
     void render();
+    nav_entry* entry_left(int index);
 
   private:
     int calculate_visible_entries(int extra_lines_length);

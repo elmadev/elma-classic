@@ -6,7 +6,7 @@
 #include "platform_utils.h"
 #include "RECORDER.H"
 #include "TOPOL.H"
-#include "UTKOZES.H"
+#include "physics_collision.h"
 #include <cmath>
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi, vect2 sebesseg);

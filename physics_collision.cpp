@@ -1,4 +1,4 @@
-#include "UTKOZES.H"
+#include "physics_collision.h"
 #include "EDITUJ.H"
 #include "LEJATSZO.H"
 #include "main.h"

@@ -1,5 +1,5 @@
-#ifndef UTKOZES_H
-#define UTKOZES_H
+#ifndef PHYSICS_COLLISION_H
+#define PHYSICS_COLLISION_H
 
 class vect2;
 

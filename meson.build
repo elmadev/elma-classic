@@ -59,7 +59,7 @@ elma_sources = files(
     'segments.cpp',
     'TELJES.CPP',
     'TOPOL.CPP',
-    'UTKOZES.CPP',
+    'physics_collision.cpp',
     'menu_nav.cpp',
     'vect2.cpp',
     'eol_settings.cpp',

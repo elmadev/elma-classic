@@ -80,49 +80,23 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
     }
 
     int source_size = header.data_size;
-    bool bit16 = true;
-
-    bool custom_range = true;
-    if (end <= 0) {
-        custom_range = false;
-    }
     int target_length = end - start;
-    if (!custom_range) {
+    if (end < 0) {
         start = 0;
-        if (bit16) {
-            target_length = source_size / 2;
-        } else {
-            target_length = source_size;
-        }
+        target_length = source_size / 2;
     }
 
-    if (bit16) {
-        if (source_size % 2) {
-            internal_error("16-bit wav file must have an even number of data bytes");
-        }
-        size = target_length;
-        if (start + target_length > source_size / 2) {
-            internal_error("wav::wav end is out of range!");
-        }
-        allocate();
-        qseek(h, start * 2, SEEK_CUR);
-        if (fread(samples, 1, size * 2, h) != size * 2) {
-            internal_error("Failed to read wav file: ", filename);
-        }
-    } else {
-        if (custom_range) {
-            internal_error("8-bit wav file cannot have a custom start or end!");
-        }
-        size = source_size;
-        allocate();
-        if (fread(samples, 1, source_size, h) != source_size) {
-            internal_error("Failed to read wav file: ", filename);
-        }
-        // Convert the data from unsigned char (centered at 128) to short (centered at 0).
-        unsigned char* samples_as_char = (unsigned char*)samples;
-        for (int i = size - 1; i >= 0; i--) {
-            samples[i] = short((((short)(samples_as_char[i])) - 128) << 8);
-        }
+    if (source_size % 2) {
+        internal_error("16-bit wav file must have an even number of data bytes");
+    }
+    size = target_length;
+    if (start + target_length > source_size / 2) {
+        internal_error("wav::wav end is out of range!");
+    }
+    allocate();
+    qseek(h, start * 2, SEEK_CUR);
+    if (fread(samples, 1, size * 2, h) != size * 2) {
+        internal_error("Failed to read wav file: ", filename);
     }
 
     qclose(h);

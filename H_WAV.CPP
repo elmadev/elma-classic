@@ -4,7 +4,7 @@
 #include "qopen.h"
 #include <cstring>
 
-void wav::allocate(void) {
+void wav::allocate() {
     if (size > 1000000) {
         internal_error("wav::alloc size > 1000000!");
     }
@@ -15,16 +15,13 @@ void wav::allocate(void) {
 }
 
 static void assert_filename_is_wav(const char* filename) {
-    int i = strlen(filename) - 1;
-    while (i > 0) {
+    for (int i = strlen(filename) - 1; i > 0; i--) {
         if (filename[i] == '.') {
             if (strcmpi(".wav", &filename[i]) == 0) {
                 return;
-            } else {
-                internal_error("assert_filename_is_wav not .wav!");
             }
+            internal_error("assert_filename_is_wav not .wav!");
         }
-        i--;
     }
     internal_error("assert_filename_is_wav no extension!");
 }
@@ -52,9 +49,10 @@ struct wav_header {
     char data[4];
     int data_size;
 };
+static_assert(sizeof(wav_header) == 44);
 
 wav::wav(const char* filename, double max_volume, int start, int end) {
-    samples = NULL;
+    samples = nullptr;
     assert_filename_is_wav(filename);
     FILE* h = qopen(filename, "rb");
     if (!h) {
@@ -63,20 +61,16 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
 
     // Assume the header follows the specifications for the smallest possible header size
     wav_header header;
-    int header_length = 44;
-    if (sizeof(wav_header) != header_length) {
-        internal_error("sizeof( wav_header ) != 44!");
-    }
-    if (fread(&header, 1, 44, h) != 44) {
+    if (fread(&header, 1, sizeof(wav_header), h) != sizeof(wav_header)) {
         internal_error("Failed to read wav file header!");
     }
 
-    long source_size = header.data_size;
-    int bit16 = 1;
+    int source_size = header.data_size;
+    bool bit16 = true;
 
-    int custom_range = 1;
+    bool custom_range = true;
     if (end <= 0) {
-        custom_range = 0;
+        custom_range = false;
     }
     int target_length = end - start;
     if (!custom_range) {
@@ -174,7 +168,7 @@ void wav::volume(double scale) {
 }
 
 wav2::wav2(wav* source) {
-    deltas = NULL;
+    deltas = nullptr;
     samples = source->samples;
     if (source->size > 64000) {
         internal_error("wav2 size > 64000!");

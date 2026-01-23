@@ -3,7 +3,7 @@
 
 // 11,025 Hz 16-bit mono audio
 class wav {
-    void allocate(void);
+    void allocate();
 
   public:
     signed short* samples;

@@ -36,7 +36,8 @@ void menu_external_levels() {
     }
 
     int i = 0;
-    std::sort(lev_names.begin(), lev_names.end());
+    std::sort(lev_names.begin(), lev_names.end(),
+              [](std::string& a, std::string& b) { return strcmpi(a.c_str(), b.c_str()) < 0; });
     for (std::string& name : lev_names) {
         strcpy(NavEntriesLeft[i++], name.c_str());
     }

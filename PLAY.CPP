@@ -855,6 +855,7 @@ void play(void) {
 
         // Valasztas:
         menu_nav val;
+        val.search_enabled = true;
         val.selected_index = int(pjatekos->selected_level) + 1;
         strcpy(val.title, "Select Level!");
 

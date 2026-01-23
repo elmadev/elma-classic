@@ -4,6 +4,8 @@
 #include "main.h"
 #include "M_PIC.H"
 #include "menu_pic.h"
+#include "platform_utils.h"
+#include <algorithm>
 #include <cstring>
 
 int NavEntriesLeftMaxLength = 1;
@@ -69,6 +71,8 @@ menu_nav::menu_nav() {
     title[0] = 0;
     y_title = 30;
     menu = nullptr;
+    search_enabled = false;
+    search_skip_one = false;
 }
 
 menu_nav::~menu_nav() {
@@ -156,6 +160,8 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
         internal_error("menu_nav::navigate invalid setup!");
     }
 
+    search_input.clear();
+
     // Bound current selection
     if (selected_index > length - 1) {
         selected_index = length - 1;
@@ -177,6 +183,11 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     while (true) {
         while (!render_only && has_keypress()) {
             Keycode c = get_keypress();
+            if (search_enabled && search_handler(c)) {
+                view_index = selected_index - max_visible_entries / 2;
+                rerender = true;
+                break;
+            }
             if (c == KEY_ESC && enable_esc) {
                 CtrlAltPressed = false;
                 return -1;
@@ -241,7 +252,14 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
             }
 
             // Title
-            menu->add_line_centered(title, 320, y_title);
+            if (search_enabled && !search_input.empty()) {
+                std::string search_title = title;
+                search_title.append(": ");
+                search_title.append(search_input);
+                menu->add_line_centered(search_title.c_str(), 320, y_title);
+            } else {
+                menu->add_line_centered(title, 320, y_title);
+            }
 
             // Only the visible menu entries
             for (int i = 0; i < max_visible_entries && i < length - view_index; i++) {
@@ -269,3 +287,70 @@ void menu_nav::render() {
 }
 
 nav_entry* menu_nav::entry_left(int index) { return &entries_left[index]; }
+
+static size_t common_prefix_len(const char* a, const char* b) {
+    size_t n = 0;
+    for (;; ++a, ++b, ++n) {
+        unsigned char ca = std::tolower((unsigned char)*a);
+        unsigned char cb = std::tolower((unsigned char)*b);
+
+        if (ca != cb || ca == 0) {
+            return n;
+        }
+    }
+}
+
+bool menu_nav::search_handler(int code) {
+    if (code == KEY_BACKSPACE) {
+        if (!search_input.empty()) {
+            search_input.pop_back();
+        }
+    } else if (code == KEY_ESC) {
+        if (!search_input.empty()) {
+            search_input.clear();
+        } else {
+            return false;
+        }
+    } else if (code >= '0' && code <= 'z') {
+        if (search_input.size() < MAX_FILENAME_LEN) {
+            search_input.push_back(code);
+        }
+    } else {
+        return false;
+    }
+
+    if (!search_input.empty()) {
+        // Search for an exact prefix match
+        for (int i = search_skip_one ? 1 : 0; i < length; ++i) {
+            if (strnicmp(entries_left[i], search_input.c_str(), search_input.size()) == 0) {
+                selected_index = i;
+                return true;
+            }
+        }
+
+        nav_entry* begin = entries_left;
+        nav_entry* end = entries_left + length;
+        if (search_skip_one) {
+            ++begin;
+        }
+
+        // Search for a reasonable prefix match
+        auto it = std::lower_bound(
+            begin, end, search_input.c_str(),
+            [](const nav_entry& entry, const char* k) { return strcmpi(entry, k) < 0; });
+
+        int i = it - entries_left;
+        if (i != length && i > 0) {
+            size_t a = common_prefix_len(search_input.c_str(), entries_left[i]);
+            size_t b = common_prefix_len(search_input.c_str(), entries_left[i - 1]);
+            // Use the previous entry if it has a longer common prefix
+            if (b >= a) {
+                i -= 1;
+            }
+        }
+
+        selected_index = i;
+    }
+
+    return true;
+}

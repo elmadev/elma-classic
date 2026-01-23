@@ -1,6 +1,8 @@
 #ifndef MENU_NAV_H
 #define MENU_NAV_H
 
+#include <string>
+
 class menu_pic;
 struct text_line;
 
@@ -23,6 +25,7 @@ class menu_nav {
     int length;
     bool two_columns;
     menu_pic* menu;
+    std::string search_input;
 
   public:
     int selected_index;
@@ -33,6 +36,8 @@ class menu_nav {
     int y_title;
     bool enable_esc;
     char title[100];
+    bool search_enabled;
+    bool search_skip_one;
 
     menu_nav();
     ~menu_nav();
@@ -45,6 +50,7 @@ class menu_nav {
 
   private:
     int calculate_visible_entries(int extra_lines_length);
+    bool search_handler(int code);
 };
 
 extern bool CtrlAltPressed;

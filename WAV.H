@@ -1,33 +1,40 @@
 #ifndef WAV_H
 #define WAV_H
 
-// enum { W_MONO = 1, W_LEFT, W_RIGHT };
-
+// 11,025 Hz 16-bit mono audio
 class wav {
-    void allocate(void); // size alapjan lefoglal!
+    void allocate(void);
+
   public:
     signed short* samples;
     unsigned size;
 
-    // maxamplitudo 0 es 1 kozott valtozik!:
+    // Open a wav file. The volume will be scaled based on max_volume (0.0-1.0)
+    // You can skip part of the audio file by setting start and end.
     wav(const char* filename, double max_volume, int start = -1, int end = -1);
-    // Manipulalas:
 
-    // Elejere tesz egy loopot a vegebol:
+    // Loop an audio file.
+    // Cut out the last n samples from the file and fade them into the first n samples.
     void loop(int fade_length);
-    // pwav elejet rateszi vegere:
+    // Fade between two audio files.
+    // The first n samples of "next" are faded into the end of "this".
+    // After, you need to manually cut out the first n samples of next.
     void fade(wav* next, int fade_length);
+    // Multiply the volume
     void volume(double scale);
 };
 
+// Contains 16-bit looping audio played back at variable speed (used for throttle engine sound)
 class wav2 {
     short *samples, *deltas;
     double size, playback_index;
 
   public:
+    // Create a wav2 by copying the data from a wav
     wav2(wav* source);
+    // Select the playback index
     void reset(int index = -1);
-    // dt 65536 szoros:
+    // Advance time by "dt" samples and return the audio sample at this point in time
     short get_next_sample(double dt);
 };
 

@@ -18,7 +18,6 @@ static void assert_filename_is_wav(const char* filename) {
     int i = strlen(filename) - 1;
     while (i > 0) {
         if (filename[i] == '.') {
-            // Most ponton all:
             if (strcmpi(".wav", &filename[i]) == 0) {
                 return;
             } else {
@@ -57,18 +56,17 @@ struct wav_header {
 wav::wav(const char* filename, double max_volume, int start, int end) {
     samples = NULL;
     assert_filename_is_wav(filename);
-    // Lemeri file hosszat:
     FILE* h = qopen(filename, "rb");
     if (!h) {
         internal_error("Failed to open wav file: ", filename);
     }
 
+    // Assume the header follows the specifications for the smallest possible header size
     wav_header header;
     int header_length = 44;
     if (sizeof(wav_header) != header_length) {
         internal_error("sizeof( wav_header ) != 44!");
     }
-
     if (fread(&header, 1, 44, h) != 44) {
         internal_error("Failed to read wav file header!");
     }
@@ -76,7 +74,6 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
     long source_size = header.data_size;
     int bit16 = 1;
 
-    // Reszlet eldontese:
     int custom_range = 1;
     if (end <= 0) {
         custom_range = 0;
@@ -96,7 +93,6 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
     }
 
     if (bit16) {
-        // 16 bites uncompressed:
         if (source_size % 2) {
             internal_error("16-bit wav file must have an even number of data bytes");
         }
@@ -110,7 +106,6 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
             internal_error("Failed to read wav file: ", filename);
         }
     } else {
-        // 8 bites uncompressed:
         if (custom_range) {
             internal_error("8-bit wav file cannot have a custom start or end!");
         }
@@ -119,6 +114,7 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
         if (fread(samples, 1, source_size, h) != source_size) {
             internal_error("Failed to read wav file: ", filename);
         }
+        // Convert the data from unsigned char (centered at 128) to short (centered at 0).
         unsigned char* samples_as_char = (unsigned char*)samples;
         for (int i = size - 1; i >= 0; i--) {
             samples[i] = short((((short)(samples_as_char[i])) - 128) << 8);
@@ -127,7 +123,7 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
 
     qclose(h);
 
-    // Megkeresi maximalis amplitudot:
+    // Calculate the max amplitude
     int max_amplitude = 1;
     for (int i = 0; i < size; i++) {
         if (samples[i] > 0) {
@@ -140,14 +136,13 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
             }
         }
     }
-    // Kiszamolja szorzot:
+    // Scale based on the max amplitude and max volume
     double scale = 32000.0 * max_volume / double(max_amplitude);
     for (int i = 0; i < size; i++) {
         samples[i] *= scale;
     }
 }
 
-// Elejere tesz egy loopot a vegebol, amit aztan le is vag:
 void wav::loop(int fade_length) {
     if (fade_length >= size) {
         internal_error("fade_length >= size!");
@@ -159,7 +154,6 @@ void wav::loop(int fade_length) {
     size -= fade_length;
 }
 
-// pwav elejet rateszi vegere:
 void wav::fade(wav* next, int fade_length) {
     if (fade_length >= size) {
         internal_error("fade_length >= size!");
@@ -179,9 +173,6 @@ void wav::volume(double scale) {
     }
 }
 
-// WAV2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-// short* tomb, mtomb;
 wav2::wav2(wav* source) {
     deltas = NULL;
     samples = source->samples;
@@ -208,7 +199,6 @@ void wav2::reset(int index) {
     }
 }
 
-// dt 65536 szoros:
 short wav2::get_next_sample(double dt) {
     playback_index += dt;
     if (playback_index >= size) {

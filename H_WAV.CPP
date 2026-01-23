@@ -30,21 +30,28 @@ static void nevwavtest(const char* nev) {
     internal_error("nevwavtest-ben nincs .wav!");
 }
 
-struct wavheader {
+// Wav Header specification
+// https://www.mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html
+// We assume the smallest possible wav header, i.e. fmt size is 16,
+// and all optional chunks are skipped.
+struct wav_header {
+    // "riff"
     char riff[4];
-    int hossz1;
+    int riff_size;
+    // "WAVE"
     char wave[4];
-    // format:
+    // "fmt "
     char fmt[4];
-    int miez1;
-    short mod;     // 1 -> 8bit uncompressed
-    short channel; // 1 -> mono, 2 -> stereo
-    unsigned short frekvencia;
-    short miez2, miez3, miez4;
-    int nemkene;
-    // audio data:
+    int fmt_size;
+    short format;
+    short channels;
+    int sample_rate;
+    int byte_rate;
+    short block_align;
+    short bits_per_sample;
+    // "data"
     char data[4];
-    int hossz;
+    int data_size;
 };
 
 wav::wav(const char* nev, double maxamplitudo, int start, int ucsoutani) {
@@ -56,17 +63,17 @@ wav::wav(const char* nev, double maxamplitudo, int start, int ucsoutani) {
         internal_error("Nem tudta megnyitni file-t: ", nev);
     }
 
-    wavheader header;
+    wav_header header;
     int negyvennegy = 44;
-    if (sizeof(wavheader) != negyvennegy) {
-        internal_error("sizeof( wavheader ) != 44!");
+    if (sizeof(wav_header) != negyvennegy) {
+        internal_error("sizeof( wav_header ) != 44!");
     }
 
     if (fread(&header, 1, 44, h) != 44) {
         internal_error("Nem sikerult beolvasni wav-ot!");
     }
 
-    long hossz = header.hossz;
+    long hossz = header.data_size;
     int bit16 = 1;
 
     // Reszlet eldontese:
@@ -84,7 +91,7 @@ wav::wav(const char* nev, double maxamplitudo, int start, int ucsoutani) {
         }
     }
 
-    if (header.channel != 1) {
+    if (header.channels != 1) {
         internal_error("Wav file nem mono!: ", nev);
     }
 

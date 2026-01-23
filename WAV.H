@@ -4,31 +4,31 @@
 // enum { W_MONO = 1, W_LEFT, W_RIGHT };
 
 class wav {
-    void lefoglal(void); // size alapjan lefoglal!
+    void allocate(void); // size alapjan lefoglal!
   public:
-    signed short* tomb;
+    signed short* samples;
     unsigned size;
 
     // maxamplitudo 0 es 1 kozott valtozik!:
-    wav(const char* nev, double maxamplitudo, int start = -1, int ucsoutani = -1);
+    wav(const char* filename, double max_volume, int start = -1, int end = -1);
     // Manipulalas:
 
     // Elejere tesz egy loopot a vegebol:
-    void loopol(int n);
+    void loop(int fade_length);
     // pwav elejet rateszi vegere:
-    void vegereilleszt(wav* pwav, int n);
-    void hangero(double szorzo);
+    void fade(wav* next, int fade_length);
+    void volume(double scale);
 };
 
 class wav2 {
-    short *tomb, *mtomb;
-    double ulsize, ulfuto;
+    short *samples, *deltas;
+    double size, playback_index;
 
   public:
-    wav2(wav* pwav);
-    void reset(int fazis = -1);
+    wav2(wav* source);
+    void reset(int index = -1);
     // dt 65536 szoros:
-    short getnextsample(double dt);
+    short get_next_sample(double dt);
 };
 
 #endif

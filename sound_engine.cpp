@@ -49,7 +49,7 @@ void sound_engine_init() {
 
     // Bike squeak sound
     SoundFriction = new wav("dorzsol.wav", 0.44); // friction
-    SoundFriction->loopol(WAV_FADE_LENGTH);
+    SoundFriction->loop(WAV_FADE_LENGTH);
 
     // Bike engine sound
     double volume = 0.26;
@@ -67,9 +67,9 @@ void sound_engine_init() {
     SoundMotorGas = new wav("harl2.wav", volume, HARL2_MIN_INDEX, HARL2_MAX_INDEX);
 
     // Post-process bike sounds
-    SoundMotorIdle->loopol(WAV_FADE_LENGTH);
-    SoundMotorGas->loopol(WAV_FADE_LENGTH);
-    SoundMotorGasStart->vegereilleszt(SoundMotorGas, WAV_FADE_LENGTH);
+    SoundMotorIdle->loop(WAV_FADE_LENGTH);
+    SoundMotorGas->loop(WAV_FADE_LENGTH);
+    SoundMotorGasStart->fade(SoundMotorGas, WAV_FADE_LENGTH);
 
     // Make gas sound able to be played back at different speeds
     SoundMotorGas1 = new wav2(SoundMotorGas);
@@ -87,7 +87,7 @@ void sound_engine_init() {
 
     // Change from across: lower the volume of idle motor
     // We could have directly done this above as the file was loaded, but we didn't
-    SoundMotorIdle->hangero(0.4);
+    SoundMotorIdle->volume(0.4);
 
     SoundEngineInitialized = true;
 }
@@ -227,7 +227,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 // We're finished with the ignition sound. Transition to idle sound
                 source_length = SoundMotorIgnition->size - mot->playback_index_ignition;
                 mix_into_buffer(&buffer[copied_counter],
-                                &SoundMotorIgnition->tomb[mot->playback_index_ignition],
+                                &SoundMotorIgnition->samples[mot->playback_index_ignition],
                                 source_length);
                 copied_counter += source_length;
                 mot->motor_state = MotorState::Idle;
@@ -236,7 +236,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 // We're not finished with the ignition sound, but the buffer is full
                 source_length = buffer_length - copied_counter;
                 mix_into_buffer(&buffer[copied_counter],
-                                &SoundMotorIgnition->tomb[mot->playback_index_ignition],
+                                &SoundMotorIgnition->samples[mot->playback_index_ignition],
                                 source_length);
                 mot->playback_index_ignition += source_length;
                 return;
@@ -255,13 +255,15 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                     // Copy until the end of the sound effect, then loop
                     source_length = SoundMotorIdle->size - mot->playback_index_idle;
                     mix_into_buffer(&buffer[copied_counter],
-                                    &SoundMotorIdle->tomb[mot->playback_index_idle], source_length);
+                                    &SoundMotorIdle->samples[mot->playback_index_idle],
+                                    source_length);
                     copied_counter += source_length;
                     mot->playback_index_idle = 0;
                 } else {
                     // Buffer is full
                     mix_into_buffer(&buffer[copied_counter],
-                                    &SoundMotorIdle->tomb[mot->playback_index_idle], source_length);
+                                    &SoundMotorIdle->samples[mot->playback_index_idle],
+                                    source_length);
                     mot->playback_index_idle += source_length;
                     return;
                 }
@@ -284,8 +286,9 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 }
                 double fade_percentage = i / (double)(WAV_FADE_LENGTH);
                 buffer[copied_counter + fade_counter] +=
-                    (short)(fade_percentage * SoundMotorGasStart->tomb[i] +
-                            (1 - fade_percentage) * SoundMotorIdle->tomb[mot->playback_index_idle]);
+                    (short)(fade_percentage * SoundMotorGasStart->samples[i] +
+                            (1 - fade_percentage) *
+                                SoundMotorIdle->samples[mot->playback_index_idle]);
                 mot->playback_index_idle++;
                 fade_counter++;
             }
@@ -302,7 +305,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 // We're finished with the start-of-gas sound. Transition to full gas sound
                 source_length = SoundMotorGasStart->size - mot->playback_index_gas_start;
                 mix_into_buffer(&buffer[copied_counter],
-                                &SoundMotorGasStart->tomb[mot->playback_index_gas_start],
+                                &SoundMotorGasStart->samples[mot->playback_index_gas_start],
                                 source_length);
                 copied_counter += source_length;
                 mot->motor_state = MotorState::Gassing;
@@ -315,7 +318,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
             } else {
                 // We're not finished with the start-of-gas sound, but the buffer is full
                 mix_into_buffer(&buffer[copied_counter],
-                                &SoundMotorGasStart->tomb[mot->playback_index_gas_start],
+                                &SoundMotorGasStart->samples[mot->playback_index_gas_start],
                                 source_length);
                 mot->playback_index_gas_start += source_length;
                 return;
@@ -334,11 +337,11 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 for (int i = 0; i < WAV_FADE_LENGTH; i++) {
                     short gas_sample;
                     if (is_motor1) {
-                        gas_sample = SoundMotorGas1->getnextsample(dt);
+                        gas_sample = SoundMotorGas1->get_next_sample(dt);
                     } else {
-                        gas_sample = SoundMotorGas2->getnextsample(dt);
+                        gas_sample = SoundMotorGas2->get_next_sample(dt);
                     }
-                    short idle_sample = SoundMotorIdle->tomb[i];
+                    short idle_sample = SoundMotorIdle->samples[i];
 
                     double fade_percentage = (double)i / WAV_FADE_LENGTH;
                     double gas_fade_percentage = 1.0 - fade_percentage;
@@ -358,9 +361,9 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 }
                 for (int i = 0; i < source_length; i++) {
                     if (is_motor1) {
-                        buffer[copied_counter + i] += SoundMotorGas1->getnextsample(dt);
+                        buffer[copied_counter + i] += SoundMotorGas1->get_next_sample(dt);
                     } else {
-                        buffer[copied_counter + i] += SoundMotorGas2->getnextsample(dt);
+                        buffer[copied_counter + i] += SoundMotorGas2->get_next_sample(dt);
                     }
                     dt += ddt;
                 }
@@ -388,7 +391,7 @@ static void mix_friction(short* buffer, int buffer_length) {
     double delta_volume = (volume_next - volume) / buffer_length;
     int sample_length = SoundFriction->size;
     for (int i = 0; i < buffer_length; i++) {
-        short sample = SoundFriction->tomb[SoundFrictionIndex];
+        short sample = SoundFriction->samples[SoundFrictionIndex];
         SoundFrictionIndex++;
         if (SoundFrictionIndex >= sample_length) {
             SoundFrictionIndex = 0;
@@ -431,7 +434,7 @@ void sound_mixer(short* buffer, int buffer_length) {
                     internal_error("ActiveWavEvents < 0 !");
                 }
             }
-            mix_into_buffer(buffer, &WavEventSound[i]->tomb[WavEventPlaybackIndex[i]], length,
+            mix_into_buffer(buffer, &WavEventSound[i]->samples[WavEventPlaybackIndex[i]], length,
                             WavEventVolume[i]);
             WavEventPlaybackIndex[i] += length;
         }

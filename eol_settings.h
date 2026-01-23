@@ -4,6 +4,19 @@
 enum class MapAlignment { None, Left, Middle, Right };
 enum class RendererType { Software, OpenGL };
 
+template <typename T> struct Default {
+    T value;
+    T def;
+
+    constexpr Default(T default_value)
+        : value(default_value),
+          def(default_value) {}
+
+    operator T() const;
+    Default& operator=(T v);
+    void reset();
+};
+
 template <typename T> struct Clamp {
     T value;
     T min;
@@ -22,7 +35,6 @@ template <typename T> struct Clamp {
 };
 
 struct eol_settings {
-    eol_settings();
     static void read_settings();
     static void write_settings();
 
@@ -56,13 +68,13 @@ struct eol_settings {
   private:
     Clamp<int> screen_width_{640, 640, 10000};
     Clamp<int> screen_height_{480, 480, 10000};
-    bool pictures_in_background_;
-    bool center_camera_;
-    bool center_map_;
-    MapAlignment map_alignment_;
-    RendererType renderer_;
+    Default<bool> pictures_in_background_{false};
+    Default<bool> center_camera_{false};
+    Default<bool> center_map_{false};
+    Default<MapAlignment> map_alignment_{MapAlignment::None};
+    Default<RendererType> renderer_{RendererType::Software};
     Clamp<double> zoom_{0.25, 1.0, 3.0};
-    bool zoom_textures_;
+    Default<bool> zoom_textures_{false};
 };
 
 extern eol_settings* EolSettings;

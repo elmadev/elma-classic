@@ -15,6 +15,15 @@ using json = nlohmann::ordered_json;
 
 #define SETTINGS_JSON "settings.json"
 
+template <typename T> Default<T>::operator T() const { return value; }
+
+template <typename T> Default<T>& Default<T>::operator=(T v) {
+    value = v;
+    return *this;
+}
+
+template <typename T> void Default<T>::reset() { value = def; }
+
 template <typename T> Clamp<T>::operator T() const { return value; }
 
 template <typename T> Clamp<T>& Clamp<T>::operator=(T v) {
@@ -24,17 +33,11 @@ template <typename T> Clamp<T>& Clamp<T>::operator=(T v) {
 
 template <typename T> void Clamp<T>::reset() { value = def; }
 
+template struct Default<bool>;
+template struct Default<MapAlignment>;
+template struct Default<RendererType>;
 template struct Clamp<int>;
 template struct Clamp<double>;
-
-eol_settings::eol_settings() {
-    pictures_in_background_ = false;
-    center_camera_ = false;
-    center_map_ = false;
-    map_alignment_ = MapAlignment::None;
-    zoom_textures_ = false;
-    renderer_ = RendererType::Software;
-}
 
 void eol_settings::set_screen_width(int w) { screen_width_ = w; }
 

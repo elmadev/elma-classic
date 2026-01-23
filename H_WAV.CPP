@@ -169,12 +169,13 @@ wav2::wav2(wav* source) {
     playback_index = 0.0;
 }
 
-void wav2::reset(int index) {
-    if (index < 0) {
-        playback_index = 0.0;
-    } else {
-        playback_index = index;
+void wav2::reset(double index) {
+#ifdef DEBUG
+    if (index < 0.0) {
+        internal_error("wav2::reset out of range!");
     }
+#endif
+    playback_index = index;
 }
 
 short wav2::get_next_sample(double dt) {

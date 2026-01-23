@@ -33,7 +33,7 @@ class wav2 {
     // Create a wav2 by copying the data from a wav
     wav2(wav* source);
     // Select the playback index
-    void reset(int index = -1);
+    void reset(double index = 0.0);
     // Advance time by "dt" samples and return the audio sample at this point in time
     short get_next_sample(double dt);
 };

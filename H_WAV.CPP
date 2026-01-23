@@ -6,28 +6,28 @@
 
 void wav::allocate(void) {
     if (size > 1000000) {
-        internal_error("wav::alloc-ban size > 1000000!");
+        internal_error("wav::alloc size > 1000000!");
     }
     samples = new signed short[size];
     if (!samples) {
-        external_error("wav::alloc-ban memory!");
+        external_error("wav::alloc out of memory!");
     }
 }
 
-static void nevwavtest(const char* nev) {
-    int i = strlen(nev) - 1;
+static void assert_filename_is_wav(const char* filename) {
+    int i = strlen(filename) - 1;
     while (i > 0) {
-        if (nev[i] == '.') {
+        if (filename[i] == '.') {
             // Most ponton all:
-            if (strcmpi(".wav", &nev[i]) == 0) {
+            if (strcmpi(".wav", &filename[i]) == 0) {
                 return;
             } else {
-                internal_error("nevrawtest-ben nincs .raw!");
+                internal_error("assert_filename_is_wav not .wav!");
             }
         }
         i--;
     }
-    internal_error("nevwavtest-ben nincs .wav!");
+    internal_error("assert_filename_is_wav no extension!");
 }
 
 // Wav Header specification
@@ -56,94 +56,94 @@ struct wav_header {
 
 wav::wav(const char* filename, double max_volume, int start, int end) {
     samples = NULL;
-    nevwavtest(filename);
+    assert_filename_is_wav(filename);
     // Lemeri file hosszat:
     FILE* h = qopen(filename, "rb");
     if (!h) {
-        internal_error("Nem tudta megnyitni file-t: ", filename);
+        internal_error("Failed to open wav file: ", filename);
     }
 
     wav_header header;
-    int negyvennegy = 44;
-    if (sizeof(wav_header) != negyvennegy) {
+    int header_length = 44;
+    if (sizeof(wav_header) != header_length) {
         internal_error("sizeof( wav_header ) != 44!");
     }
 
     if (fread(&header, 1, 44, h) != 44) {
-        internal_error("Nem sikerult beolvasni wav-ot!");
+        internal_error("Failed to read wav file header!");
     }
 
-    long hossz = header.data_size;
+    long source_size = header.data_size;
     int bit16 = 1;
 
     // Reszlet eldontese:
-    int reszlet = 1;
+    int custom_range = 1;
     if (end <= 0) {
-        reszlet = 0;
+        custom_range = 0;
     }
-    int reszhossz = end - start;
-    if (!reszlet) {
+    int target_length = end - start;
+    if (!custom_range) {
         start = 0;
         if (bit16) {
-            reszhossz = hossz / 2;
+            target_length = source_size / 2;
         } else {
-            reszhossz = hossz;
+            target_length = source_size;
         }
     }
 
     if (header.channels != 1) {
-        internal_error("Wav file nem mono!: ", filename);
+        internal_error("Wav file is not mono!: ", filename);
     }
 
     if (bit16) {
         // 16 bites uncompressed:
-        if (hossz % 2) {
-            internal_error("16 bites wav-nal nem paros byteszam! (abcd)");
+        if (source_size % 2) {
+            internal_error("16-bit wav file must have an even number of data bytes");
         }
-        size = reszhossz;
-        if (start + reszhossz > hossz / 2) {
-            internal_error("Reszlet kilog wav-bol!");
+        size = target_length;
+        if (start + target_length > source_size / 2) {
+            internal_error("wav::wav end is out of range!");
         }
         allocate();
         qseek(h, start * 2, SEEK_CUR);
         if (fread(samples, 1, size * 2, h) != size * 2) {
-            internal_error("Nem sikerult beolvasni wav-ot!: ", filename);
+            internal_error("Failed to read wav file: ", filename);
         }
     } else {
         // 8 bites uncompressed:
-        if (reszlet) {
-            internal_error("8 bitre meg nincs megirva reszlet!");
+        if (custom_range) {
+            internal_error("8-bit wav file cannot have a custom start or end!");
         }
-        size = hossz;
+        size = source_size;
         allocate();
-        if (fread(samples, 1, hossz, h) != hossz) {
-            internal_error("Nem sikerult beolvasni wav-ot!: ", filename);
+        if (fread(samples, 1, source_size, h) != source_size) {
+            internal_error("Failed to read wav file: ", filename);
         }
-        unsigned char* bytetomb = (unsigned char*)samples;
+        unsigned char* samples_as_char = (unsigned char*)samples;
         for (int i = size - 1; i >= 0; i--) {
-            samples[i] = short((((short)(bytetomb[i])) - 128) << 8);
+            samples[i] = short((((short)(samples_as_char[i])) - 128) << 8);
         }
     }
 
     qclose(h);
 
     // Megkeresi maximalis amplitudot:
-    int maxamp = 1;
+    int max_amplitude = 1;
     for (int i = 0; i < size; i++) {
         if (samples[i] > 0) {
-            if (samples[i] > maxamp) {
-                maxamp = samples[i];
+            if (samples[i] > max_amplitude) {
+                max_amplitude = samples[i];
             }
         } else {
-            if (-samples[i] > maxamp) {
-                maxamp = -samples[i];
+            if (-samples[i] > max_amplitude) {
+                max_amplitude = -samples[i];
             }
         }
     }
     // Kiszamolja szorzot:
-    double szorzo = 32000.0 * max_volume / double(maxamp);
+    double scale = 32000.0 * max_volume / double(max_amplitude);
     for (int i = 0; i < size; i++) {
-        samples[i] *= szorzo;
+        samples[i] *= scale;
     }
 }
 
@@ -153,8 +153,8 @@ void wav::loop(int fade_length) {
         internal_error("fade_length >= size!");
     }
     for (int i = 0; i < fade_length; i++) {
-        double arany = ((double)i) / fade_length;
-        samples[i] = arany * samples[i] + (1 - arany) * samples[size - fade_length + i];
+        double fade = ((double)i) / fade_length;
+        samples[i] = fade * samples[i] + (1 - fade) * samples[size - fade_length + i];
     }
     size -= fade_length;
 }
@@ -168,8 +168,8 @@ void wav::fade(wav* next, int fade_length) {
         internal_error("fade_length >= next->size!");
     }
     for (int i = 0; i < fade_length; i++) {
-        double arany = ((double)i) / fade_length;
-        samples[size - fade_length + i] = (1 - arany) * samples[i] + arany * next->samples[i];
+        double fade = ((double)i) / fade_length;
+        samples[size - fade_length + i] = (1 - fade) * samples[i] + fade * next->samples[i];
     }
 }
 
@@ -186,7 +186,7 @@ wav2::wav2(wav* source) {
     deltas = NULL;
     samples = source->samples;
     if (source->size > 64000) {
-        internal_error("wav2-ben size > 64000!");
+        internal_error("wav2 size > 64000!");
     }
     deltas = new short[source->size];
     if (!deltas) {

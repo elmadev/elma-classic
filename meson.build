@@ -110,7 +110,7 @@ gl_dep = dependency('gl', required: true)
 
 nlohmann_json_dep = dependency('nlohmann_json')
 
-elma = executable(
+executable(
     'elma',
     elma_sources,
     include_directories: inc,

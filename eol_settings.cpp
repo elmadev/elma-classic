@@ -15,14 +15,23 @@ using json = nlohmann::ordered_json;
 
 #define SETTINGS_JSON "settings.json"
 
+template <typename T> Clamp<T>::operator T() const { return value; }
+
+template <typename T> Clamp<T>& Clamp<T>::operator=(T v) {
+    value = (v < min) ? min : (v > max ? max : v);
+    return *this;
+}
+
+template <typename T> void Clamp<T>::reset() { value = def; }
+
+template struct Clamp<int>;
+template struct Clamp<double>;
+
 eol_settings::eol_settings() {
-    screen_width_ = 640;
-    screen_height_ = 480;
     pictures_in_background_ = false;
     center_camera_ = false;
     center_map_ = false;
     map_alignment_ = MapAlignment::None;
-    zoom_ = 1.0;
     zoom_textures_ = false;
     renderer_ = RendererType::Software;
 }
@@ -42,9 +51,8 @@ void eol_settings::set_map_alignment(MapAlignment m) { map_alignment_ = m; }
 void eol_settings::set_renderer(RendererType r) { renderer_ = r; }
 
 void eol_settings::set_zoom(double z) {
-    if (z != zoom_) {
-        zoom_ = (z < MIN_ZOOM) ? MIN_ZOOM : (z > MAX_ZOOM ? MAX_ZOOM : z);
-
+    if (z != zoom_.value) {
+        zoom_ = z;
         set_zoom_factor();
         invalidate_lgr_cache();
     }

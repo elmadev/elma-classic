@@ -4,8 +4,22 @@
 enum class MapAlignment { None, Left, Middle, Right };
 enum class RendererType { Software, OpenGL };
 
-constexpr double MIN_ZOOM = 0.25;
-constexpr double MAX_ZOOM = 3.00;
+template <typename T> struct Clamp {
+    T value;
+    T min;
+    T def;
+    T max;
+
+    constexpr Clamp(T min_val, T def_val, T max_val)
+        : value(def_val),
+          min(min_val),
+          def(def_val),
+          max(max_val) {}
+
+    operator T() const;
+    Clamp& operator=(T v);
+    void reset();
+};
 
 struct eol_settings {
     eol_settings();
@@ -40,14 +54,14 @@ struct eol_settings {
     void set_zoom_textures(bool zoom_textures);
 
   private:
-    int screen_width_;
-    int screen_height_;
+    Clamp<int> screen_width_{640, 640, 10000};
+    Clamp<int> screen_height_{480, 480, 10000};
     bool pictures_in_background_;
     bool center_camera_;
     bool center_map_;
     MapAlignment map_alignment_;
     RendererType renderer_;
-    double zoom_;
+    Clamp<double> zoom_{0.25, 1.0, 3.0};
     bool zoom_textures_;
 };
 

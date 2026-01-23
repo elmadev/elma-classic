@@ -36,6 +36,10 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
    ```
    meson setup build
    ```
+   For a release build use this setup:
+   ```
+   meson setup build -Dbuildtype=release
+   ```
 
 2. Compile the project:
    ```
@@ -43,9 +47,10 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
    ```
 
 3. Run the executable:
-   ```
-   ./build/elma
-   ```
+    ```
+    cd build
+    ./elma
+    ```
 
 ### Common Build Commands
 
@@ -53,6 +58,19 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
 - **Clean**: `meson compile -C build --clean`
 - **Reconfigure**: `meson setup --reconfigure build`
 - **Full rebuild**: `meson setup --wipe build`
+
+### Sanitizers
+
+Use `-Db_sanitize=address` for AddressSanitizer (memory errors, supported by Clang/GCC/MSVC) or `-Db_sanitize=address,undefined` to also enable UndefinedBehaviorSanitizer (Clang/GCC only).
+
+```
+meson setup build -Dbuildtype=debug -Db_sanitize=address,undefined
+```
+
+To turn off
+```
+meson setup build -Dbuildtype=debug -Db_sanitize=none
+```
 
 ### Windows
 

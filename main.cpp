@@ -31,8 +31,8 @@ int main() {
     EolSettings = new eol_settings();
     eol_settings::read_settings();
 
-    SCREEN_WIDTH = EolSettings->screen_width;
-    SCREEN_HEIGHT = EolSettings->screen_height;
+    SCREEN_WIDTH = EolSettings->screen_width();
+    SCREEN_HEIGHT = EolSettings->screen_height();
 
     platform_init();
 

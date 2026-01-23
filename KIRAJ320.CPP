@@ -89,7 +89,7 @@ void beallitmereteket(int splitscreen) {
     Hatary2 = Cysize - 3.0;
 
     // Motoros kepernyo mely reszen helyezkedik el:
-    if (EolSettings->center_camera) {
+    if (EolSettings->center_camera()) {
         Mo_bal = (Cxsize / MetersToPixels) * 0.50;
     } else {
         Mo_bal = (SCREEN_WIDTH / MetersToPixels) * 0.15;
@@ -216,13 +216,13 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
     double Viewxsize_d = Viewxsize * MinimapScaleFactor * PixelsToMeters;
     double Viewysize_d = Viewysize * MinimapScaleFactor * PixelsToMeters;
 
-    double szeltoltav = EolSettings->center_map ? 0.5 : 0.2;
+    double szeltoltav = EolSettings->center_map() ? 0.5 : 0.2;
     double atfuthossz = 1.0 - 2.0 * szeltoltav;
     vect2 sarokbolkozepre(Viewxsize_d * (szeltoltav + baljobb * atfuthossz), Viewysize_d / 2);
     vect2 sarok = motorkozep - sarokbolkozepre;
 
     double align;
-    switch (EolSettings->map_alignment) {
+    switch (EolSettings->map_alignment()) {
     case MapAlignment::None:
         align = baljobb;
         break;
@@ -704,7 +704,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     // Motoros kirajzolasa:
     kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1);
 
-    if (!EolSettings->pictures_in_background) {
+    if (!EolSettings->pictures_in_background()) {
         // Felso ecset kitevese:
         Pecsetfelso->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
     }

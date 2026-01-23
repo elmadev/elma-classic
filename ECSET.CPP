@@ -1990,7 +1990,7 @@ void betoltecseteket(void) {
         internal_error("Nincs eleg memoria Pecsetalso-nak!");
     }
 
-    if (!EolSettings->pictures_in_background) {
+    if (!EolSettings->pictures_in_background()) {
         Pecsetalso->foltoz();
     }
 
@@ -1999,7 +1999,7 @@ void betoltecseteket(void) {
         internal_error("Nincs eleg memoria Pecsetfelso-nak!");
     }
 
-    if (!EolSettings->pictures_in_background) {
+    if (!EolSettings->pictures_in_background()) {
         // Most betesszuk felsobe is 500-nal kozelebbi madarabokat:
         // Es egyben uresse tesszuk alsoban helyuket:
         for (int i = 0; i < Pecsetalso->sorszam; i++) {

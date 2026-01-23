@@ -108,16 +108,16 @@ void menu_options() {
 
         strcpy(NavEntriesLeft[9 + flag_tag_opt], "Pics In Background:");
         strcpy(NavEntriesRight[9 + flag_tag_opt],
-               EolSettings->pictures_in_background ? "Yes" : "No");
+               EolSettings->pictures_in_background() ? "Yes" : "No");
 
         strcpy(NavEntriesLeft[10 + flag_tag_opt], "Centered Camera:");
-        strcpy(NavEntriesRight[10 + flag_tag_opt], EolSettings->center_camera ? "Yes" : "No");
+        strcpy(NavEntriesRight[10 + flag_tag_opt], EolSettings->center_camera() ? "Yes" : "No");
 
         strcpy(NavEntriesLeft[11 + flag_tag_opt], "Centered Minimap:");
-        strcpy(NavEntriesRight[11 + flag_tag_opt], EolSettings->center_map ? "Yes" : "No");
+        strcpy(NavEntriesRight[11 + flag_tag_opt], EolSettings->center_map() ? "Yes" : "No");
 
         strcpy(NavEntriesLeft[12 + flag_tag_opt], "Minimap Alignment:");
-        switch (EolSettings->map_alignment) {
+        switch (EolSettings->map_alignment()) {
         case MapAlignment::None:
             strcpy(NavEntriesRight[12 + flag_tag_opt], "None");
             break;
@@ -133,8 +133,8 @@ void menu_options() {
         }
 
         strcpy(NavEntriesLeft[13 + flag_tag_opt], "Resolution:");
-        sprintf(NavEntriesRight[13 + flag_tag_opt], "%dx%d", EolSettings->screen_width,
-                EolSettings->screen_height);
+        sprintf(NavEntriesRight[13 + flag_tag_opt], "%dx%d", EolSettings->screen_width(),
+                EolSettings->screen_height());
 
         strcpy(NavEntriesLeft[14 + flag_tag_opt], "Zoom:");
         sprintf(NavEntriesRight[14 + flag_tag_opt], "%.2f", EolSettings->zoom());
@@ -143,7 +143,7 @@ void menu_options() {
         strcpy(NavEntriesRight[15 + flag_tag_opt], EolSettings->zoom_textures() ? "Yes" : "No");
 
         strcpy(NavEntriesLeft[16 + flag_tag_opt], "Renderer:");
-        switch (EolSettings->renderer) {
+        switch (EolSettings->renderer()) {
         case RendererType::Software:
             strcpy(NavEntriesRight[16 + flag_tag_opt], "Software");
             break;
@@ -207,45 +207,45 @@ void menu_options() {
         }
 
         if (choice == 9) {
-            EolSettings->pictures_in_background = !EolSettings->pictures_in_background;
+            EolSettings->set_pictures_in_background(!EolSettings->pictures_in_background());
             invalidate_level();
         }
 
         if (choice == 10) {
-            EolSettings->center_camera = !EolSettings->center_camera;
+            EolSettings->set_center_camera(!EolSettings->center_camera());
         }
 
         if (choice == 11) {
-            EolSettings->center_map = !EolSettings->center_map;
+            EolSettings->set_center_map(!EolSettings->center_map());
         }
 
         if (choice == 12) {
-            switch (EolSettings->map_alignment) {
+            switch (EolSettings->map_alignment()) {
             case MapAlignment::None:
-                EolSettings->map_alignment = MapAlignment::Left;
+                EolSettings->set_map_alignment(MapAlignment::Left);
                 break;
             case MapAlignment::Left:
-                EolSettings->map_alignment = MapAlignment::Middle;
+                EolSettings->set_map_alignment(MapAlignment::Middle);
                 break;
             case MapAlignment::Middle:
-                EolSettings->map_alignment = MapAlignment::Right;
+                EolSettings->set_map_alignment(MapAlignment::Right);
                 break;
             case MapAlignment::Right:
-                EolSettings->map_alignment = MapAlignment::None;
+                EolSettings->set_map_alignment(MapAlignment::None);
                 break;
             }
         }
 
         if (choice == 13) {
-            switch (EolSettings->screen_width) {
+            switch (EolSettings->screen_width()) {
             case 640: {
-                EolSettings->screen_width = 1024;
-                EolSettings->screen_height = 768;
+                EolSettings->set_screen_width(1024);
+                EolSettings->set_screen_height(768);
                 break;
             }
             case 1024: {
-                EolSettings->screen_width = 640;
-                EolSettings->screen_height = 480;
+                EolSettings->set_screen_width(640);
+                EolSettings->set_screen_height(480);
                 break;
             }
             }
@@ -264,13 +264,13 @@ void menu_options() {
         }
 
         if (choice == 16) {
-            switch (EolSettings->renderer) {
+            switch (EolSettings->renderer()) {
             case RendererType::Software: {
-                EolSettings->renderer = RendererType::OpenGL;
+                EolSettings->set_renderer(RendererType::OpenGL);
                 break;
             }
             case RendererType::OpenGL: {
-                EolSettings->renderer = RendererType::Software;
+                EolSettings->set_renderer(RendererType::Software);
                 break;
             }
             }

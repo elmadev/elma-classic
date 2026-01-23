@@ -30,7 +30,7 @@ void message_box(const char* text) {
 static unsigned char** SurfaceBuffer;
 
 void platform_init() {
-    CurrentRenderer = EolSettings->renderer;
+    CurrentRenderer = EolSettings->renderer();
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         internal_error(SDL_GetError());

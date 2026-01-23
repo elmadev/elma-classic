@@ -16,16 +16,30 @@ using json = nlohmann::ordered_json;
 #define SETTINGS_JSON "settings.json"
 
 eol_settings::eol_settings() {
-    screen_width = 640;
-    screen_height = 480;
-    pictures_in_background = false;
-    center_camera = false;
-    center_map = false;
-    map_alignment = MapAlignment::None;
+    screen_width_ = 640;
+    screen_height_ = 480;
+    pictures_in_background_ = false;
+    center_camera_ = false;
+    center_map_ = false;
+    map_alignment_ = MapAlignment::None;
     zoom_ = 1.0;
     zoom_textures_ = false;
-    renderer = RendererType::Software;
+    renderer_ = RendererType::Software;
 }
+
+void eol_settings::set_screen_width(int w) { screen_width_ = w; }
+
+void eol_settings::set_screen_height(int h) { screen_height_ = h; }
+
+void eol_settings::set_pictures_in_background(bool b) { pictures_in_background_ = b; }
+
+void eol_settings::set_center_camera(bool b) { center_camera_ = b; }
+
+void eol_settings::set_center_map(bool b) { center_map_ = b; }
+
+void eol_settings::set_map_alignment(MapAlignment m) { map_alignment_ = m; }
+
+void eol_settings::set_renderer(RendererType r) { renderer_ = r; }
 
 void eol_settings::set_zoom(double z) {
     if (z != zoom_) {
@@ -108,15 +122,15 @@ void from_json(const json& j, RendererType& r) {
 }
 
 #define FIELD_LIST                                                                                 \
-    JSON_FIELD(screen_width)                                                                       \
-    JSON_FIELD(screen_height)                                                                      \
-    JSON_FIELD(pictures_in_background)                                                             \
-    JSON_FIELD(center_camera)                                                                      \
-    JSON_FIELD(center_map)                                                                         \
-    JSON_FIELD(map_alignment)                                                                      \
+    JSON_FIELD_PRIV(screen_width)                                                                  \
+    JSON_FIELD_PRIV(screen_height)                                                                 \
+    JSON_FIELD_PRIV(pictures_in_background)                                                        \
+    JSON_FIELD_PRIV(center_camera)                                                                 \
+    JSON_FIELD_PRIV(center_map)                                                                    \
+    JSON_FIELD_PRIV(map_alignment)                                                                 \
     JSON_FIELD_PRIV(zoom)                                                                          \
     JSON_FIELD_PRIV(zoom_textures)                                                                 \
-    JSON_FIELD(renderer)
+    JSON_FIELD_PRIV(renderer)
 
 #define JSON_FIELD(name) {#name, s.name},
 #define JSON_FIELD_PRIV(name) {#name, s.name()},

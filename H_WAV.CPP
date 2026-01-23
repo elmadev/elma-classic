@@ -59,10 +59,24 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
         internal_error("Failed to open wav file: ", filename);
     }
 
-    // Assume the header follows the specifications for the smallest possible header size
     wav_header header;
     if (fread(&header, 1, sizeof(wav_header), h) != sizeof(wav_header)) {
         internal_error("Failed to read wav file header!");
+    }
+    if (header.format != 1) {
+        internal_error("Wav file is not PCM!: ", filename);
+    }
+    if (header.channels != 1) {
+        internal_error("Wav file is not mono!: ", filename);
+    }
+    if (header.fmt_size != 16) {
+        internal_error("Wav file fmt chunk size must be 16!: ", filename);
+    }
+    if (header.block_align != 2) {
+        internal_error("Wav file block align is invalid!: ", filename);
+    }
+    if (header.bits_per_sample != 16) {
+        internal_error("Wav file must be 16-bit!: ", filename);
     }
 
     int source_size = header.data_size;
@@ -80,10 +94,6 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
         } else {
             target_length = source_size;
         }
-    }
-
-    if (header.channels != 1) {
-        internal_error("Wav file is not mono!: ", filename);
     }
 
     if (bit16) {

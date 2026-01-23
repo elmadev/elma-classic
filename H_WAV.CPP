@@ -80,19 +80,19 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
     }
 
     int source_size = header.data_size;
-    int target_length = end - start;
-    if (end < 0) {
-        start = 0;
-        target_length = source_size / 2;
-    }
-
     if (source_size % 2) {
         internal_error("16-bit wav file must have an even number of data bytes");
     }
-    size = target_length;
-    if (start + target_length > source_size / 2) {
+    source_size /= 2;
+
+    if (end < 0) {
+        end = source_size;
+    }
+    if (end > source_size) {
         internal_error("wav::wav end is out of range!");
     }
+    size = end - start;
+
     allocate();
     qseek(h, start * 2, SEEK_CUR);
     if (fread(samples, 1, size * 2, h) != size * 2) {

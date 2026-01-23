@@ -11,7 +11,7 @@ class wav {
 
     // Open a wav file. The volume will be scaled based on max_volume (0.0-1.0)
     // You can skip part of the audio file by setting start and end.
-    wav(const char* filename, double max_volume, int start = -1, int end = -1);
+    wav(const char* filename, double max_volume, int start = 0, int end = -1);
 
     // Loop an audio file.
     // Cut out the last n samples from the file and fade them into the first n samples.

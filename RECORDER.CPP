@@ -51,20 +51,6 @@ recorder::recorder() {
 
     level_filename[0] = 0;
 
-    int hossz = sizeof(float);
-    if (hossz != 4) {
-        internal_error("float hossz != 4!");
-    }
-    hossz = MAX_FRAMES * sizeof(float);
-    if (hossz > 64000l) {
-        internal_error("MAX_FRAMES*sizeof( float )!");
-    }
-
-    hossz = MAX_EVENTS * sizeof(event);
-    if (hossz > 64000l) {
-        internal_error("MAX_EVENTS*sizeof( event )!");
-    }
-
     bike_x = new float[MAX_FRAMES];
     bike_y = new float[MAX_FRAMES];
     left_wheel_x = new short[MAX_FRAMES];

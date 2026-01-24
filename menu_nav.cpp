@@ -166,12 +166,6 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     // Center current selection on the screen
     int view_index = selected_index - max_visible_entries / 2;
     int view_max = length - max_visible_entries;
-    if (view_index > view_max) {
-        view_index = view_max;
-    }
-    if (view_index < 0) {
-        view_index = 0;
-    }
 
     if (menu) {
         delete menu;
@@ -192,48 +186,44 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
                 return selected_index;
             }
             if (c == KEY_UP) {
-                if (selected_index > 0) {
-                    selected_index--;
-                    if (selected_index < view_index) {
-                        view_index--;
-                        rerender = true;
-                    }
-                }
+                selected_index--;
             }
             if (c == KEY_PGUP) {
-                if (selected_index > 0) {
-                    selected_index -= max_visible_entries;
-                    if (selected_index < 0) {
-                        selected_index = 0;
-                    }
-                    if (selected_index < view_index) {
-                        view_index = selected_index;
-                        rerender = true;
-                    }
-                }
+                selected_index -= max_visible_entries;
             }
             if (c == KEY_DOWN) {
-                if (selected_index < length - 1) {
-                    selected_index++;
-                    if (selected_index > view_index + max_visible_entries - 1) {
-                        view_index++;
-                        rerender = true;
-                    }
-                }
+                selected_index++;
             }
             if (c == KEY_PGDOWN) {
-                if (selected_index < length - 1) {
-                    selected_index += max_visible_entries;
-                    if (selected_index >= length) {
-                        selected_index = length - 1;
-                    }
-                    if (selected_index > view_index + max_visible_entries - 1) {
-                        view_index = selected_index - max_visible_entries + 1;
-                        rerender = true;
-                    }
-                }
+                selected_index += max_visible_entries;
             }
         }
+
+        // Limit selected index to valid values
+        if (selected_index < 0) {
+            selected_index = 0;
+        }
+        if (selected_index >= length) {
+            selected_index = length - 1;
+        }
+        // Update view_index and limit to valid values
+        if (selected_index < view_index) {
+            view_index = selected_index;
+            rerender = true;
+        }
+        if (selected_index > view_index + max_visible_entries - 1) {
+            view_index = selected_index - (max_visible_entries - 1);
+            rerender = true;
+        }
+        if (view_index > view_max) {
+            view_index = view_max;
+            rerender = true;
+        }
+        if (view_index < 0) {
+            view_index = 0;
+            rerender = true;
+        }
+
         // Rerender screen only if updated menu position
         if (rerender) {
             rerender = false;

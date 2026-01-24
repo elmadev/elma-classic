@@ -8,21 +8,14 @@
 #include <cstring>
 
 recorder *Rec1 = NULL, *Rec2 = NULL;
-int MultiplayerRec = 0; // Ha multiplayer, akkor ez igaz
+int MultiplayerRec = 0;
 
 #define MAGIC_NUMBER (4796277l)
 
-// #define MAX_FRAMES (10000u)
-// #define MAX_EVENTS (3000u)
-
-// Friss kikomentezes:
-// constexpr int MAX_FRAMES = 14370;
-// constexpr int MAX_EVENTS = 3000;
-
-constexpr int MAX_FRAMES = 8981; // Ot perc
+constexpr int MAX_FRAMES = 8981;
 constexpr int MAX_EVENTS = 3900;
 
-static double FRAME_RATE = 30; // 60;
+static double FRAME_RATE = 30;
 static double TIME_TO_FRAME_INDEX = FRAME_RATE / (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024);
 
 recorder::recorder(void) {
@@ -49,7 +42,6 @@ recorder::recorder(void) {
 
     flagtag_ = 0;
 
-    // Ellenorzes:
     int hossz = sizeof(float);
     if (hossz != 4) {
         internal_error("float hossz != 4!");
@@ -88,9 +80,7 @@ recorder::recorder(void) {
     }
 }
 
-recorder::~recorder(void) {
-    // Ez most nincs megcsinalva!
-}
+recorder::~recorder(void) {}
 
 void recorder::erase(char* lev_filename) {
     if (strlen(lev_filename) > 12) {
@@ -114,7 +104,6 @@ int recorder::flagtag(void) { return flagtag_; }
 
 void recorder::set_flagtag(int flagtag) { flagtag_ = flagtag; }
 
-// Encode framecount into MSB of the flags
 void recorder::encode_frame_count() {
     if (frame_count < 80) {
         return;
@@ -129,7 +118,6 @@ void recorder::encode_frame_count() {
     }
 }
 
-// Check that the framecount matches with the MSB of the flags
 bool recorder::frame_count_integrity() {
     if (frame_count < 80) {
         return true;
@@ -151,8 +139,6 @@ static double BIKE_ROTATION_RATIO = 10000 / (2.0 * PI),
               BIKE_ROTATION_INV_RATIO = 1.0 / BIKE_ROTATION_RATIO;
 static double MOTOR_FREQUENCY_RATIO = 250.0,
               MOTOR_FREQUENCY_INV_RATIO = 1.0 / MOTOR_FREQUENCY_RATIO;
-// static double MOTOR_FREQUENCY_RATIO = 250.0/2.0, 	   MOTOR_FREQUENCY_INV_RATIO = 1.0 /
-// MOTOR_FREQUENCY_RATIO;
 static double FRICTION_VOLUME_RATIO = 250 / 2.0,
               FRICTION_VOLUME_INV_RATIO = 1.0 / FRICTION_VOLUME_RATIO;
 
@@ -213,9 +199,7 @@ int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
                                                           body_y[index2] * index2_weight);
 
     if (index1 >= 2) {
-        // Motor:
-        if (abs(bike_rotation[index1] - bike_rotation[index2]) > 9000) { // 1000
-            // mot->bike.rotation = BIKE_ROTATION_INV_RATIO * bike_rotation[index2];
+        if (abs(bike_rotation[index1] - bike_rotation[index2]) > 9000) {
             if (bike_rotation[index1] > bike_rotation[index2]) {
                 int fixed_rotation = bike_rotation[index1] - 10000;
                 mot->bike.rotation =
@@ -232,9 +216,7 @@ int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
                                                             bike_rotation[index2] * index2_weight);
         }
 
-        // Elso kerek:
-        if (abs(left_wheel_rotation[index1] - left_wheel_rotation[index2]) > 220) { // 50
-            // mot->left_wheel.rotation = WHEEL_ROTATION_INV_RATIO * left_wheel_rotation[index2];
+        if (abs(left_wheel_rotation[index1] - left_wheel_rotation[index2]) > 220) {
             if (left_wheel_rotation[index1] > left_wheel_rotation[index2]) {
                 int fixed_rotation = left_wheel_rotation[index1] - 250;
                 mot->left_wheel.rotation =
@@ -253,9 +235,7 @@ int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
                                             left_wheel_rotation[index2] * index2_weight);
         }
 
-        // Hatso kerek:
         if (abs(right_wheel_rotation[index1] - right_wheel_rotation[index2]) > 220) {
-            // mot->right_wheel.rotation = WHEEL_ROTATION_INV_RATIO * right_wheel_rotation[index2];
             if (right_wheel_rotation[index1] > right_wheel_rotation[index2]) {
                 int fixed_rotation = right_wheel_rotation[index1] - 250;
                 mot->right_wheel.rotation =
@@ -311,17 +291,16 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
             internal_error("time-previous_frame_time == 0.0!");
         }
 #endif
+        // Interpolate bike position but not wheel/head positions, leading to jitters at low fps
         vect2 interpolated_bike_r =
             (mot->bike.r - previous_bike_r) *
                 ((next_frame_time - previous_frame_time) / (time - previous_frame_time)) +
             previous_bike_r;
 
         if (next_frame_index >= MAX_FRAMES) {
-            // betelt:
             return;
         }
 
-        // Beirunk bejegyzesbe:
         int i = next_frame_index;
         bike_x[i] = interpolated_bike_r.x;
         bike_y[i] = interpolated_bike_r.y;
@@ -332,7 +311,6 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         body_x[i] = (mot->body_r.x - mot->bike.r.x) * POSITION_RATIO;
         body_y[i] = (mot->body_r.y - mot->bike.r.y) * POSITION_RATIO;
 
-        // Alfak:
         double bike_rot = mot->bike.rotation;
         while (bike_rot <= 0) {
             bike_rot += TWO_PI;
@@ -342,6 +320,8 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         }
         bike_rotation[i] = bike_rot * BIKE_ROTATION_RATIO;
 
+        // Rotation is constrained between +- Pi, except when doing a break-stretch
+        // During the brake-stretch, the wheel position might become slightly desynced
         if (mot->left_wheel.rotation <= 0) {
             left_wheel_rotation[i] = (mot->left_wheel.rotation + TWO_PI) * WHEEL_ROTATION_RATIO;
         } else {
@@ -371,8 +351,6 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
             flags[i] += 8;
         }
 
-        // flags[i] = char( sound->gas + (mot->hatra<<1) );
-
         if (sound->motor_frequency < 1.0) {
             sound->motor_frequency = 1.0;
         }
@@ -400,7 +378,6 @@ void recorder::store_event(double time, WavEvent event_id, double volume, int ob
             double time2 = events[unsigned(event_count - 1)].time;
             sprintf(tmp, "time1: negative time: %f\n", float(time - time2));
             internal_error(tmp);
-            // internal_error( "recorder::store_event-ban time forditott sorrendben!" );
         }
     }
     events[unsigned(event_count)].time = time;
@@ -410,7 +387,6 @@ void recorder::store_event(double time, WavEvent event_id, double volume, int ob
     event_count++;
 }
 
-// Ha van hang, akkor igazzal ter vissza:
 int recorder::recall_event(double time, WavEvent* event_id, double* volume, int* object_id) {
     if (current_event_index < event_count) {
         if (events[unsigned(current_event_index)].time <= time) {
@@ -428,8 +404,6 @@ static void read_error(const char* filename) {
     internal_error("Failed to read rec file: ", filename);
 }
 
-// demo eseten resource file-bol nyit:
-// belyeg-et adja vissza, vagy 0-at:
 int recorder::load(const char* filename, FILE* h, int demo) {
     int keep_file = 0;
     if (h) {
@@ -469,7 +443,6 @@ int recorder::load(const char* filename, FILE* h, int demo) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
     }
 
-    // Ezt loadrecekben is igazitani kell:
     if (version < 131) {
         external_error("Rec file version is too old!", filename);
     }
@@ -478,7 +451,7 @@ int recorder::load(const char* filename, FILE* h, int demo) {
         external_error("Rec file version is too new!", filename);
     }
 
-    int multiplayer_rec_unused = 0; // Multirec, de ezt mar elintezte loadrecek, aki ezt hivta
+    int multiplayer_rec_unused = 0;
     if (fread(&multiplayer_rec_unused, 1, 4, h) != 4) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
     }
@@ -496,7 +469,6 @@ int recorder::load(const char* filename, FILE* h, int demo) {
     }
 
     int float_length = frame_count * sizeof(float);
-    // int hosszi = frame_count*sizeof( int );
     int char_length = frame_count * sizeof(char);
     int short_length = frame_count * sizeof(short);
 
@@ -534,7 +506,7 @@ int recorder::load(const char* filename, FILE* h, int demo) {
     if (fread(right_wheel_rotation, 1, char_length, h) != char_length) {
         read_error(filename);
     }
-    if (fread(flags, 1, char_length, h) != char_length) { // karakter
+    if (fread(flags, 1, char_length, h) != char_length) {
         read_error(filename);
     }
 
@@ -545,7 +517,6 @@ int recorder::load(const char* filename, FILE* h, int demo) {
         read_error(filename);
     }
 
-    // Hangok:
     if (fread(&event_count, 1, 4, h) != 4) {
         read_error(filename);
     }
@@ -597,7 +568,6 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     }
 
     if (!h) {
-        // Itt meg kell hagyni fopen-t!:
         char path[40];
         sprintf(path, "rec/%s", filename);
         h = fopen(path, "wb");
@@ -610,14 +580,11 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
         save_error(filename);
     }
 
-    // Verzio csak 1.2-tol kezdodoen jon bele:
-    // Elozoleg itt level volt, ami biztos hogy kisebb volt 120-nal:
     int version = 131;
     if (fwrite(&version, 1, 4, h) != 4) {
         save_error(filename);
     }
 
-    // Ezt loadrecekben is olvassa, ugyhogy ennek verzio utan kell maradnia:
     if (fwrite(&MultiplayerRec, 1, 4, h) != 4) {
         save_error(filename);
     }
@@ -635,7 +602,6 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     }
 
     int float_length = frame_count * sizeof(float);
-    // int hosszi = frame_count*sizeof( int );
     int char_length = frame_count * sizeof(char);
     int short_length = frame_count * sizeof(short);
 
@@ -685,7 +651,6 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
         save_error(filename);
     }
 
-    // Hangok:
     if (fwrite(&event_count, 1, 4, h) != 4) {
         save_error(filename);
     }
@@ -704,9 +669,7 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     }
 }
 
-// demo eseten resource file-bol nyit:
 int load_replays(const char* filename, int demo) {
-    // Eloszor megvizsgaljuk, hogy multirec vagy nem:
     FILE* h;
     if (demo) {
         h = qopen(filename, "rb");
@@ -739,7 +702,6 @@ int load_replays(const char* filename, int demo) {
         external_error("Recorded file version is too new!", filename);
     }
 
-    // Betoltjuk Multirec-et:
     if (fread(&MultiplayerRec, 1, 4, h) != 4) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
     }
@@ -750,7 +712,6 @@ int load_replays(const char* filename, int demo) {
         fclose(h);
     }
 
-    // Most jon tenyleges beolvasas:
     int level_id = 0;
     if (MultiplayerRec) {
         FILE* h;
@@ -783,7 +744,6 @@ int load_replays(const char* filename, int demo) {
     return level_id;
 }
 
-// belyeg-et adja vissza, vagy 0-at:
 void save_replays(const char* filename, int level_id, int flagtag) {
     if (MultiplayerRec) {
         char path[40];
@@ -793,8 +753,6 @@ void save_replays(const char* filename, int level_id, int flagtag) {
             external_error("Failed to open rec file for writing!: ", path);
         }
 
-        // Multirec alapjan tudjak, hogy mit kell rec file multirec
-        // rubrikajaba irni:
         Rec1->save(filename, h, level_id, flagtag);
         Rec2->save(filename, h, level_id, flagtag);
 
@@ -803,8 +761,6 @@ void save_replays(const char* filename, int level_id, int flagtag) {
         Rec1->save(filename, NULL, level_id, flagtag);
     }
 }
-
-// WAV GYUJTO:
 
 static int EventBufferLength = 0;
 
@@ -825,7 +781,6 @@ void add_event_buffer(WavEvent event_id, double volume, int object_id) {
 
 void reset_event_buffer(void) { EventBufferLength = 0; }
 
-// Igaz, ha van bent wav:
 int get_event_buffer(WavEvent* event_id, double* volume, int* object_id) {
     if (EventBufferLength == 0) {
         return 0;

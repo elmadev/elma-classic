@@ -24,6 +24,8 @@ static_assert(sizeof(event) == 0x10);
 class recorder {
     friend void replay();
 
+    int frame_count;
+
     float* bike_x;
     float* bike_y;
     short* left_wheel_x;
@@ -32,27 +34,27 @@ class recorder {
     short* right_wheel_y;
     short* body_x;
     short* body_y;
+    short* bike_rotation; // (0-9999)
     // (0-249, glitched 0-255 when brake-stretching)
     unsigned char* left_wheel_rotation;
     unsigned char* right_wheel_rotation;
-    short* bike_rotation; // (0-9999)
+    unsigned char* flags;
     unsigned char* motor_frequency;
     unsigned char* friction_volume;
-    unsigned char* flags;
 
-    int frame_count;
-    bool finished;
-
-    event* events;
     int event_count;
-    int current_event_index;
+    event* events;
 
+    // store/recall vars
+    bool finished;
     vect2 previous_bike_r; // bike position during previous frame
     double previous_frame_time;
     double next_frame_time;
     int next_frame_index;
+    int current_event_index;
 
     int flagtag_;
+
     // Load replay of one bike
     int load(const char* filename, FILE* h, int demo);
     // Save replay of one bike

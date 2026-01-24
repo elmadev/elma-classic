@@ -27,7 +27,8 @@ constexpr int FLAG_FLAGTAG_A = 2;
 constexpr int FLAG_FLAGTAG_IMMUNITY = 3;
 
 recorder::recorder() {
-    level_filename[0] = 0;
+    frame_count = 0;
+
     bike_x = nullptr;
     bike_y = nullptr;
     left_wheel_x = nullptr;
@@ -36,17 +37,19 @@ recorder::recorder() {
     right_wheel_y = nullptr;
     body_x = nullptr;
     body_y = nullptr;
-    left_wheel_rotation = nullptr;
     bike_rotation = nullptr;
+    left_wheel_rotation = nullptr;
     right_wheel_rotation = nullptr;
+    flags = nullptr;
     motor_frequency = nullptr;
     friction_volume = nullptr;
-    flags = nullptr;
+
+    event_count = 0;
     events = nullptr;
 
-    frame_count = 0;
-    event_count = 0;
     flagtag_ = 0;
+
+    level_filename[0] = 0;
 
     int hossz = sizeof(float);
     if (hossz != 4) {
@@ -70,12 +73,12 @@ recorder::recorder() {
     right_wheel_y = new short[MAX_FRAMES];
     body_x = new short[MAX_FRAMES];
     body_y = new short[MAX_FRAMES];
-    left_wheel_rotation = new unsigned char[MAX_FRAMES];
     bike_rotation = new short[MAX_FRAMES];
+    left_wheel_rotation = new unsigned char[MAX_FRAMES];
     right_wheel_rotation = new unsigned char[MAX_FRAMES];
+    flags = new unsigned char[MAX_FRAMES];
     motor_frequency = new unsigned char[MAX_FRAMES];
     friction_volume = new unsigned char[MAX_FRAMES];
-    flags = new unsigned char[MAX_FRAMES];
     events = new event[MAX_EVENTS];
 
     if (!bike_x || !bike_y || !left_wheel_x || !left_wheel_y || !right_wheel_x || !right_wheel_y ||

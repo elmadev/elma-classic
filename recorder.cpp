@@ -194,49 +194,40 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
     mot->body_r.y = mot->bike.r.y + interp / POSITION_RATIO;
 
     if (index1 >= 2) {
-        if (abs(bike_rotation[index1] - bike_rotation[index2]) > 9000) {
-            if (bike_rotation[index1] > bike_rotation[index2]) {
-                int fixed_rotation = bike_rotation[index1] - 10000;
-                interp = fixed_rotation * index1_weight + bike_rotation[index2] * index2_weight;
+        int bike_rot1 = bike_rotation[index1];
+        int bike_rot2 = bike_rotation[index2];
+        if (abs(bike_rot1 - bike_rot2) > 9000) {
+            if (bike_rot1 > bike_rot2) {
+                bike_rot1 -= 10000;
             } else {
-                int fixed_rotation = bike_rotation[index2] - 10000;
-                interp = bike_rotation[index1] * index1_weight + fixed_rotation * index2_weight;
+                bike_rot2 -= 10000;
             }
-        } else {
-            interp = bike_rotation[index1] * index1_weight + bike_rotation[index2] * index2_weight;
         }
+        interp = bike_rot1 * index1_weight + bike_rot2 * index2_weight;
         mot->bike.rotation = interp / BIKE_ROTATION_RATIO;
 
-        if (abs(left_wheel_rotation[index1] - left_wheel_rotation[index2]) > 220) {
-            if (left_wheel_rotation[index1] > left_wheel_rotation[index2]) {
-                int fixed_rotation = left_wheel_rotation[index1] - 250;
-                interp =
-                    fixed_rotation * index1_weight + left_wheel_rotation[index2] * index2_weight;
+        int left_rot1 = left_wheel_rotation[index1];
+        int left_rot2 = left_wheel_rotation[index2];
+        if (abs(left_rot1 - left_rot2) > 220) {
+            if (left_rot1 > left_rot2) {
+                left_rot1 -= 250;
             } else {
-                int fixed_rotation = left_wheel_rotation[index2] - 250;
-                interp =
-                    left_wheel_rotation[index1] * index1_weight + fixed_rotation * index2_weight;
+                left_rot2 -= 250;
             }
-        } else {
-            interp = left_wheel_rotation[index1] * index1_weight +
-                     left_wheel_rotation[index2] * index2_weight;
         }
+        interp = left_rot1 * index1_weight + left_rot2 * index2_weight;
         mot->left_wheel.rotation = interp / WHEEL_ROTATION_RATIO;
 
-        if (abs(right_wheel_rotation[index1] - right_wheel_rotation[index2]) > 220) {
-            if (right_wheel_rotation[index1] > right_wheel_rotation[index2]) {
-                int fixed_rotation = right_wheel_rotation[index1] - 250;
-                interp =
-                    fixed_rotation * index1_weight + right_wheel_rotation[index2] * index2_weight;
+        int right_rot1 = right_wheel_rotation[index1];
+        int right_rot2 = right_wheel_rotation[index2];
+        if (abs(right_rot1 - right_rot2) > 220) {
+            if (right_rot1 > right_rot2) {
+                right_rot1 -= 250;
             } else {
-                int fixed_rotation = right_wheel_rotation[index2] - 250;
-                interp =
-                    right_wheel_rotation[index1] * index1_weight + fixed_rotation * index2_weight;
+                right_rot2 -= 250;
             }
-        } else {
-            interp = right_wheel_rotation[index1] * index1_weight +
-                     right_wheel_rotation[index2] * index2_weight;
         }
+        interp = right_rot1 * index1_weight + right_rot2 * index2_weight;
         mot->right_wheel.rotation = interp / WHEEL_ROTATION_RATIO;
     } else {
         mot->bike.rotation = bike_rotation[index2] / BIKE_ROTATION_RATIO;

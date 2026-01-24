@@ -1,12 +1,13 @@
 #include "recorder.h"
 #include "flagtag.h"
+#include "fs_utils.h"
+#include "level.h"
 #include "main.h"
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "qopen.h"
 #include <cmath>
 #include <cstring>
-#include "fs_utils.h"
 
 recorder* Rec1 = nullptr;
 recorder* Rec2 = nullptr;
@@ -739,7 +740,8 @@ void recorder::save_replays(const char* filename, int level_id, int flagtag) {
     }
 }
 
-constexpr int EVENT_BUFFER_MAX = 200;
+// Max events in one frame: Triple apple bug x MAX_OBJECTS, turn, volt, bump x 2
+constexpr int EVENT_BUFFER_MAX = MAX_OBJECTS * 3 + 100;
 static int EventBufferLength = 0;
 static WavEvent EventBufferEventIds[EVENT_BUFFER_MAX];
 static double EventBufferVolumes[EVENT_BUFFER_MAX];

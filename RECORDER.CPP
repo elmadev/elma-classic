@@ -10,20 +10,20 @@
 recorder *Rec1 = NULL, *Rec2 = NULL;
 int MultiplayerRec = 0; // Ha multiplayer, akkor ez igaz
 
-#define MAGICNUMBER (4796277l)
+#define MAGIC_NUMBER (4796277l)
 
-// #define Darabszam (10000u)
-// #define Hangdarabszam (3000u)
+// #define MAX_FRAMES (10000u)
+// #define MAX_EVENTS (3000u)
 
 // Friss kikomentezes:
-// constexpr int Darabszam = 14370;
-// constexpr int Hangdarabszam = 3000;
+// constexpr int MAX_FRAMES = 14370;
+// constexpr int MAX_EVENTS = 3000;
 
-constexpr int Darabszam = 8981; // Ot perc
-constexpr int Hangdarabszam = 3900;
+constexpr int MAX_FRAMES = 8981; // Ot perc
+constexpr int MAX_EVENTS = 3900;
 
-static double Valtrate = 30; // 60;
-static double Recorderszorzo = Valtrate / (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024);
+static double FRAME_RATE = 30; // 60;
+static double TIME_TO_FRAME_INDEX = FRAME_RATE / (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024);
 
 recorder::recorder(void) {
     level_filename[0] = 0;
@@ -54,37 +54,37 @@ recorder::recorder(void) {
     if (hossz != 4) {
         internal_error("float hossz != 4!");
     }
-    hossz = Darabszam * sizeof(float);
+    hossz = MAX_FRAMES * sizeof(float);
     if (hossz > 64000l) {
-        internal_error("Darabszam*sizeof( float )!");
+        internal_error("MAX_FRAMES*sizeof( float )!");
     }
 
-    hossz = Hangdarabszam * sizeof(event);
+    hossz = MAX_EVENTS * sizeof(event);
     if (hossz > 64000l) {
-        internal_error("Hangdarabszam*sizeof( event )!");
+        internal_error("MAX_EVENTS*sizeof( event )!");
     }
 
-    bike_x = new float[Darabszam];
-    bike_y = new float[Darabszam];
-    left_wheel_x = new short[Darabszam];
-    left_wheel_y = new short[Darabszam];
-    right_wheel_x = new short[Darabszam];
-    right_wheel_y = new short[Darabszam];
-    body_x = new short[Darabszam];
-    body_y = new short[Darabszam];
-    left_wheel_rotation = new unsigned char[Darabszam];
-    bike_rotation = new short[Darabszam];
-    right_wheel_rotation = new unsigned char[Darabszam];
-    motor_frequency = new unsigned char[Darabszam];
-    friction_volume = new unsigned char[Darabszam];
-    flags = new unsigned char[Darabszam];
+    bike_x = new float[MAX_FRAMES];
+    bike_y = new float[MAX_FRAMES];
+    left_wheel_x = new short[MAX_FRAMES];
+    left_wheel_y = new short[MAX_FRAMES];
+    right_wheel_x = new short[MAX_FRAMES];
+    right_wheel_y = new short[MAX_FRAMES];
+    body_x = new short[MAX_FRAMES];
+    body_y = new short[MAX_FRAMES];
+    left_wheel_rotation = new unsigned char[MAX_FRAMES];
+    bike_rotation = new short[MAX_FRAMES];
+    right_wheel_rotation = new unsigned char[MAX_FRAMES];
+    motor_frequency = new unsigned char[MAX_FRAMES];
+    friction_volume = new unsigned char[MAX_FRAMES];
+    flags = new unsigned char[MAX_FRAMES];
 
-    events = new event[Hangdarabszam];
+    events = new event[MAX_EVENTS];
 
     if (!bike_x || !bike_y || !left_wheel_x || !left_wheel_y || !right_wheel_x || !right_wheel_y ||
         !body_x || !body_y || !left_wheel_rotation || !bike_rotation || !right_wheel_rotation ||
         !motor_frequency || !flags || !events || !friction_volume) {
-        external_error("memory");
+        external_error("recorder::recorder out of memory!");
     }
 }
 
@@ -94,7 +94,7 @@ recorder::~recorder(void) {
 
 void recorder::erase(char* lev_filename) {
     if (strlen(lev_filename) > 12) {
-        internal_error("875h8uyf");
+        internal_error("recorder::erase strlen");
     }
     strcpy(level_filename, lev_filename);
     frame_count = 0;
@@ -144,12 +144,17 @@ bool recorder::frame_count_integrity() {
     return encoded_value == frame_count;
 }
 
-static double Korrszorzo = 1000.0, Korrszorzo_rec = 1.0 / Korrszorzo;
-static double Alfaszorzo = 250 / (2.0 * PI), Alfaszorzo_rec = 1.0 / Alfaszorzo;
-static double Alfaszorzo_16 = 10000 / (2.0 * PI), Alfaszorzo_16_rec = 1.0 / Alfaszorzo_16;
-static double Frekvszorzo = 250.0, Frekvszorzo_rec = 1.0 / Frekvszorzo;
-// static double Frekvszorzo = 250.0/2.0, 	   Frekvszorzo_rec = 1.0 / Frekvszorzo;
-static double Surlszorzo = 250 / 2.0, Surlszorzo_rec = 1.0 / Surlszorzo;
+static double POSITION_RATIO = 1000.0, POSITION_RATIO_INV = 1.0 / POSITION_RATIO;
+static double WHEEL_ROTATION_RATIO = 250 / (2.0 * PI),
+              WHEEL_ROTATION_INV_RATIO = 1.0 / WHEEL_ROTATION_RATIO;
+static double BIKE_ROTATION_RATIO = 10000 / (2.0 * PI),
+              BIKE_ROTATION_INV_RATIO = 1.0 / BIKE_ROTATION_RATIO;
+static double MOTOR_FREQUENCY_RATIO = 250.0,
+              MOTOR_FREQUENCY_INV_RATIO = 1.0 / MOTOR_FREQUENCY_RATIO;
+// static double MOTOR_FREQUENCY_RATIO = 250.0/2.0, 	   MOTOR_FREQUENCY_INV_RATIO = 1.0 /
+// MOTOR_FREQUENCY_RATIO;
+static double FRICTION_VOLUME_RATIO = 250 / 2.0,
+              FRICTION_VOLUME_INV_RATIO = 1.0 / FRICTION_VOLUME_RATIO;
 
 // int Mostirdki = 0;
 
@@ -169,18 +174,18 @@ static void filebair( float d1, float d2, float d3 ) {
 
 int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
     if (frame_count <= 0) {
-        internal_error("recall_frame-ban frame_count <= 0!");
+        internal_error("recall_frame frame_count <= 0!");
     }
 
-    int index1 = (int)(Recorderszorzo * time);
-    double suly2 = Recorderszorzo * time - index1;
-    if (suly2 < 0.0) {
-        suly2 = 0.0;
+    int index1 = (int)(TIME_TO_FRAME_INDEX * time);
+    double index2_weight = TIME_TO_FRAME_INDEX * time - index1;
+    if (index2_weight < 0.0) {
+        index2_weight = 0.0;
     }
-    if (suly2 > 1.0) {
-        suly2 = 1.0;
+    if (index2_weight > 1.0) {
+        index2_weight = 1.0;
     }
-    double suly1 = 1.0 - suly2;
+    double index1_weight = 1.0 - index2_weight;
     int index2 = index1 + 1;
 
     if (index1 < 0) {
@@ -204,79 +209,91 @@ int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
         index2 = frame_count - 1;
     }
 
-    mot->bike.r.x = bike_x[index1] * suly1 + bike_x[index2] * suly2;
-    mot->bike.r.y = bike_y[index1] * suly1 + bike_y[index2] * suly2;
-    mot->left_wheel.r.x = mot->bike.r.x + Korrszorzo_rec * (left_wheel_x[index1] * suly1 +
-                                                            left_wheel_x[index2] * suly2);
-    mot->left_wheel.r.y = mot->bike.r.y + Korrszorzo_rec * (left_wheel_y[index1] * suly1 +
-                                                            left_wheel_y[index2] * suly2);
-    mot->right_wheel.r.x = mot->bike.r.x + Korrszorzo_rec * (right_wheel_x[index1] * suly1 +
-                                                             right_wheel_x[index2] * suly2);
-    mot->right_wheel.r.y = mot->bike.r.y + Korrszorzo_rec * (right_wheel_y[index1] * suly1 +
-                                                             right_wheel_y[index2] * suly2);
-    mot->body_r.x =
-        mot->bike.r.x + Korrszorzo_rec * (body_x[index1] * suly1 + body_x[index2] * suly2);
-    mot->body_r.y =
-        mot->bike.r.y + Korrszorzo_rec * (body_y[index1] * suly1 + body_y[index2] * suly2);
+    mot->bike.r.x = bike_x[index1] * index1_weight + bike_x[index2] * index2_weight;
+    mot->bike.r.y = bike_y[index1] * index1_weight + bike_y[index2] * index2_weight;
+    mot->left_wheel.r.x =
+        mot->bike.r.x + POSITION_RATIO_INV * (left_wheel_x[index1] * index1_weight +
+                                              left_wheel_x[index2] * index2_weight);
+    mot->left_wheel.r.y =
+        mot->bike.r.y + POSITION_RATIO_INV * (left_wheel_y[index1] * index1_weight +
+                                              left_wheel_y[index2] * index2_weight);
+    mot->right_wheel.r.x =
+        mot->bike.r.x + POSITION_RATIO_INV * (right_wheel_x[index1] * index1_weight +
+                                              right_wheel_x[index2] * index2_weight);
+    mot->right_wheel.r.y =
+        mot->bike.r.y + POSITION_RATIO_INV * (right_wheel_y[index1] * index1_weight +
+                                              right_wheel_y[index2] * index2_weight);
+    mot->body_r.x = mot->bike.r.x + POSITION_RATIO_INV * (body_x[index1] * index1_weight +
+                                                          body_x[index2] * index2_weight);
+    mot->body_r.y = mot->bike.r.y + POSITION_RATIO_INV * (body_y[index1] * index1_weight +
+                                                          body_y[index2] * index2_weight);
 
     if (index1 >= 2) {
         // Motor:
         if (abs(bike_rotation[index1] - bike_rotation[index2]) > 9000) { // 1000
-            // mot->bike.rotation = Alfaszorzo_16_rec * bike_rotation[index2];
+            // mot->bike.rotation = BIKE_ROTATION_INV_RATIO * bike_rotation[index2];
             if (bike_rotation[index1] > bike_rotation[index2]) {
-                int fixedindex1 = bike_rotation[index1] - 10000;
+                int fixed_rotation = bike_rotation[index1] - 10000;
                 mot->bike.rotation =
-                    Alfaszorzo_16_rec * (fixedindex1 * suly1 + bike_rotation[index2] * suly2);
+                    BIKE_ROTATION_INV_RATIO *
+                    (fixed_rotation * index1_weight + bike_rotation[index2] * index2_weight);
             } else {
-                int fixedindex2 = bike_rotation[index2] - 10000;
-                mot->bike.rotation = Alfaszorzo_16_rec *
-                                     (bike_rotation[index1] * suly1 * suly1 + fixedindex2 * suly2);
+                int fixed_rotation = bike_rotation[index2] - 10000;
+                mot->bike.rotation = BIKE_ROTATION_INV_RATIO *
+                                     (bike_rotation[index1] * index1_weight * index1_weight +
+                                      fixed_rotation * index2_weight);
             }
         } else {
-            mot->bike.rotation =
-                Alfaszorzo_16_rec * (bike_rotation[index1] * suly1 + bike_rotation[index2] * suly2);
+            mot->bike.rotation = BIKE_ROTATION_INV_RATIO * (bike_rotation[index1] * index1_weight +
+                                                            bike_rotation[index2] * index2_weight);
         }
 
         // Elso kerek:
         if (abs(left_wheel_rotation[index1] - left_wheel_rotation[index2]) > 220) { // 50
-            // mot->left_wheel.rotation = Alfaszorzo_rec * left_wheel_rotation[index2];
+            // mot->left_wheel.rotation = WHEEL_ROTATION_INV_RATIO * left_wheel_rotation[index2];
             if (left_wheel_rotation[index1] > left_wheel_rotation[index2]) {
-                int fixedindex1 = left_wheel_rotation[index1] - 250;
+                int fixed_rotation = left_wheel_rotation[index1] - 250;
                 mot->left_wheel.rotation =
-                    Alfaszorzo_rec * (fixedindex1 * suly1 + left_wheel_rotation[index2] * suly2);
+                    WHEEL_ROTATION_INV_RATIO *
+                    (fixed_rotation * index1_weight + left_wheel_rotation[index2] * index2_weight);
             } else {
-                int fixedindex2 = left_wheel_rotation[index2] - 250;
+                int fixed_rotation = left_wheel_rotation[index2] - 250;
                 mot->left_wheel.rotation =
-                    Alfaszorzo_rec *
-                    (left_wheel_rotation[index1] * suly1 * suly1 + fixedindex2 * suly2);
+                    WHEEL_ROTATION_INV_RATIO *
+                    (left_wheel_rotation[index1] * index1_weight * index1_weight +
+                     fixed_rotation * index2_weight);
             }
         } else {
-            mot->left_wheel.rotation = Alfaszorzo_rec * (left_wheel_rotation[index1] * suly1 +
-                                                         left_wheel_rotation[index2] * suly2);
+            mot->left_wheel.rotation =
+                WHEEL_ROTATION_INV_RATIO * (left_wheel_rotation[index1] * index1_weight +
+                                            left_wheel_rotation[index2] * index2_weight);
         }
 
         // Hatso kerek:
         if (abs(right_wheel_rotation[index1] - right_wheel_rotation[index2]) > 220) {
-            // mot->right_wheel.rotation = Alfaszorzo_rec * right_wheel_rotation[index2];
+            // mot->right_wheel.rotation = WHEEL_ROTATION_INV_RATIO * right_wheel_rotation[index2];
             if (right_wheel_rotation[index1] > right_wheel_rotation[index2]) {
-                int fixedindex1 = right_wheel_rotation[index1] - 250;
+                int fixed_rotation = right_wheel_rotation[index1] - 250;
                 mot->right_wheel.rotation =
-                    Alfaszorzo_rec * (fixedindex1 * suly1 + right_wheel_rotation[index2] * suly2);
+                    WHEEL_ROTATION_INV_RATIO *
+                    (fixed_rotation * index1_weight + right_wheel_rotation[index2] * index2_weight);
             } else {
-                int fixedindex2 = right_wheel_rotation[index2] - 250;
+                int fixed_rotation = right_wheel_rotation[index2] - 250;
                 mot->right_wheel.rotation =
-                    Alfaszorzo_rec *
-                    (right_wheel_rotation[index1] * suly1 * suly1 + fixedindex2 * suly2);
+                    WHEEL_ROTATION_INV_RATIO *
+                    (right_wheel_rotation[index1] * index1_weight * index1_weight +
+                     fixed_rotation * index2_weight);
             }
         } else {
-            mot->right_wheel.rotation = Alfaszorzo_rec * (right_wheel_rotation[index1] * suly1 +
-                                                          right_wheel_rotation[index2] * suly2);
+            mot->right_wheel.rotation =
+                WHEEL_ROTATION_INV_RATIO * (right_wheel_rotation[index1] * index1_weight +
+                                            right_wheel_rotation[index2] * index2_weight);
         }
 
     } else {
-        mot->bike.rotation = Alfaszorzo_16_rec * bike_rotation[index2];
-        mot->left_wheel.rotation = Alfaszorzo_rec * left_wheel_rotation[index2];
-        mot->right_wheel.rotation = Alfaszorzo_rec * right_wheel_rotation[index2];
+        mot->bike.rotation = BIKE_ROTATION_INV_RATIO * bike_rotation[index2];
+        mot->left_wheel.rotation = WHEEL_ROTATION_INV_RATIO * left_wheel_rotation[index2];
+        mot->right_wheel.rotation = WHEEL_ROTATION_INV_RATIO * right_wheel_rotation[index2];
     }
 
     // filebair( index2, left_wheel_rotation[index2], mot->left_wheel.rotation );
@@ -292,13 +309,13 @@ int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
         internal_error( "Itt van eredmeny:", tmp );
     }*/
 
-    sound->motor_frequency = Frekvszorzo_rec * motor_frequency[index1] + 1.0;
-    sound->friction_volume = Surlszorzo_rec * friction_volume[index1];
+    sound->motor_frequency = MOTOR_FREQUENCY_INV_RATIO * motor_frequency[index1] + 1.0;
+    sound->friction_volume = FRICTION_VOLUME_INV_RATIO * friction_volume[index1];
 
     return 1;
 }
 
-static const double Reclepesido = 1.0 / Recorderszorzo;
+static const double FRAME_INDEX_TO_TIME = 1.0 / TIME_TO_FRAME_INDEX;
 
 void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
     if (!next_frame_index) {
@@ -318,50 +335,51 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
             internal_error("time-previous_frame_time == 0.0!");
         }
 #endif
-        vect2 kor1r = (mot->bike.r - previous_bike_r) *
-                          ((next_frame_time - previous_frame_time) / (time - previous_frame_time)) +
-                      previous_bike_r;
+        vect2 interpolated_bike_r =
+            (mot->bike.r - previous_bike_r) *
+                ((next_frame_time - previous_frame_time) / (time - previous_frame_time)) +
+            previous_bike_r;
 
-        if (next_frame_index >= Darabszam) {
+        if (next_frame_index >= MAX_FRAMES) {
             // betelt:
             return;
         }
 
         // Beirunk bejegyzesbe:
         int i = next_frame_index;
-        bike_x[i] = kor1r.x;
-        bike_y[i] = kor1r.y;
-        left_wheel_x[i] = (mot->left_wheel.r.x - mot->bike.r.x) * Korrszorzo;
-        left_wheel_y[i] = (mot->left_wheel.r.y - mot->bike.r.y) * Korrszorzo;
-        right_wheel_x[i] = (mot->right_wheel.r.x - mot->bike.r.x) * Korrszorzo;
-        right_wheel_y[i] = (mot->right_wheel.r.y - mot->bike.r.y) * Korrszorzo;
-        body_x[i] = (mot->body_r.x - mot->bike.r.x) * Korrszorzo;
-        body_y[i] = (mot->body_r.y - mot->bike.r.y) * Korrszorzo;
+        bike_x[i] = interpolated_bike_r.x;
+        bike_y[i] = interpolated_bike_r.y;
+        left_wheel_x[i] = (mot->left_wheel.r.x - mot->bike.r.x) * POSITION_RATIO;
+        left_wheel_y[i] = (mot->left_wheel.r.y - mot->bike.r.y) * POSITION_RATIO;
+        right_wheel_x[i] = (mot->right_wheel.r.x - mot->bike.r.x) * POSITION_RATIO;
+        right_wheel_y[i] = (mot->right_wheel.r.y - mot->bike.r.y) * POSITION_RATIO;
+        body_x[i] = (mot->body_r.x - mot->bike.r.x) * POSITION_RATIO;
+        body_y[i] = (mot->body_r.y - mot->bike.r.y) * POSITION_RATIO;
 
         // Alfak:
-        double alfa1 = mot->bike.rotation;
-        while (alfa1 <= 0) {
-            alfa1 += TWO_PI;
+        double bike_rot = mot->bike.rotation;
+        while (bike_rot <= 0) {
+            bike_rot += TWO_PI;
         }
-        while (alfa1 > TWO_PI) {
-            alfa1 -= TWO_PI;
+        while (bike_rot > TWO_PI) {
+            bike_rot -= TWO_PI;
         }
-        bike_rotation[i] = alfa1 * Alfaszorzo_16;
+        bike_rotation[i] = bike_rot * BIKE_ROTATION_RATIO;
 
         if (mot->left_wheel.rotation <= 0) {
-            left_wheel_rotation[i] = (mot->left_wheel.rotation + TWO_PI) * Alfaszorzo;
+            left_wheel_rotation[i] = (mot->left_wheel.rotation + TWO_PI) * WHEEL_ROTATION_RATIO;
         } else {
-            left_wheel_rotation[i] = mot->left_wheel.rotation * Alfaszorzo;
+            left_wheel_rotation[i] = mot->left_wheel.rotation * WHEEL_ROTATION_RATIO;
         }
         if (mot->right_wheel.rotation <= 0) {
-            right_wheel_rotation[i] = (mot->right_wheel.rotation + TWO_PI) * Alfaszorzo;
+            right_wheel_rotation[i] = (mot->right_wheel.rotation + TWO_PI) * WHEEL_ROTATION_RATIO;
         } else {
-            right_wheel_rotation[i] = mot->right_wheel.rotation * Alfaszorzo;
+            right_wheel_rotation[i] = mot->right_wheel.rotation * WHEEL_ROTATION_RATIO;
         }
 
         // Encode gibberish into the 4 MSB of the flags
         // Due to a bug, the gibberish is accidentally sourced from the y value of the bike
-        memcpy(&flags[i], &kor1r.y, 1);
+        memcpy(&flags[i], &interpolated_bike_r.y, 1);
         flags[i] = flags[i] & 0xf0;
 
         if (sound->gas) {
@@ -382,11 +400,11 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         if (sound->motor_frequency < 1.0) {
             sound->motor_frequency = 1.0;
         }
-        motor_frequency[i] = Frekvszorzo * (sound->motor_frequency - 1.0);
-        friction_volume[i] = Surlszorzo * sound->friction_volume;
+        motor_frequency[i] = MOTOR_FREQUENCY_RATIO * (sound->motor_frequency - 1.0);
+        friction_volume[i] = FRICTION_VOLUME_RATIO * sound->friction_volume;
 
         next_frame_index++;
-        next_frame_time += Reclepesido;
+        next_frame_time += FRAME_INDEX_TO_TIME;
         if (time < next_frame_time) {
             previous_bike_r = mot->bike.r;
             previous_frame_time = time;
@@ -397,10 +415,10 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
 }
 
 /*void recorder::store_frames( motorst* mot, double dt, bike_sound* sound ) {
-    int index = Recorderszorzo*dt;
+    int index = TIME_TO_FRAME_INDEX*dt;
     if( index < 0 )
         index = 0;
-    if( index >= Darabszam )
+    if( index >= MAX_FRAMES )
         // betelt:
         return;
     if( index < frame_count-1 )
@@ -431,16 +449,16 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
             alfa1 += TWO_PI;
         while( alfa1 > TWO_PI )
             alfa1 -= TWO_PI;
-        bike_rotation[i] = alfa1*Alfaszorzo_16;
+        bike_rotation[i] = alfa1*BIKE_ROTATION_RATIO;
 
         if( mot->left_wheel.rotation <= 0 )
-            left_wheel_rotation[i] = (mot->left_wheel.rotation + TWO_PI)*Alfaszorzo;
+            left_wheel_rotation[i] = (mot->left_wheel.rotation + TWO_PI)*WHEEL_ROTATION_RATIO;
         else
-            left_wheel_rotation[i] = mot->left_wheel.rotation*Alfaszorzo;
+            left_wheel_rotation[i] = mot->left_wheel.rotation*WHEEL_ROTATION_RATIO;
         if( mot->right_wheel.rotation <= 0 )
-            right_wheel_rotation[i] = (mot->right_wheel.rotation + TWO_PI)*Alfaszorzo;
+            right_wheel_rotation[i] = (mot->right_wheel.rotation + TWO_PI)*WHEEL_ROTATION_RATIO;
         else
-            right_wheel_rotation[i] = mot->right_wheel.rotation*Alfaszorzo;
+            right_wheel_rotation[i] = mot->right_wheel.rotation*WHEEL_ROTATION_RATIO;
 
         if( sound->gas )
             flags[i] = 1;
@@ -458,21 +476,21 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
 
         if( sound->motor_frequency > 2.0 )
             sound->motor_frequency = 2.0;
-        motor_frequency[i] = Frekvszorzo * sound->motor_frequency;
-        friction_volume[i]    = Surlszorzo  * sound->friction_volume;
+        motor_frequency[i] = MOTOR_FREQUENCY_RATIO * sound->motor_frequency;
+        friction_volume[i]    = FRICTION_VOLUME_RATIO  * sound->friction_volume;
     }
     frame_count = index+1;
 }*/
 
 void recorder::store_event(double time, WavEvent event_id, double volume, int object_id) {
-    if (event_count >= Hangdarabszam) {
+    if (event_count >= MAX_EVENTS) {
         return;
     }
     if (event_count > 0) {
         if (events[unsigned(event_count - 1)].time > time + 0.00001) {
             char tmp[50];
-            double t2 = events[unsigned(event_count - 1)].time;
-            sprintf(tmp, "t1: kulonbseg: %f\n", float(time - t2));
+            double time2 = events[unsigned(event_count - 1)].time;
+            sprintf(tmp, "time1: negative time: %f\n", float(time - time2));
             internal_error(tmp);
             // internal_error( "recorder::store_event-ban time forditott sorrendben!" );
         }
@@ -498,62 +516,62 @@ int recorder::recall_event(double time, WavEvent* event_id, double* volume, int*
     return 0;
 }
 
-static void olvhiba(const char* nev) {
-    internal_error("Nem sikerult olvasni recorded file-bol!: ", nev);
+static void read_error(const char* filename) {
+    internal_error("Failed to read rec file: ", filename);
 }
 
 // demo eseten resource file-bol nyit:
 // belyeg-et adja vissza, vagy 0-at:
 int recorder::load(const char* filename, FILE* h, int demo) {
-    int megvoltnyitva = 0;
+    int keep_file = 0;
     if (h) {
-        megvoltnyitva = 1;
+        keep_file = 1;
     }
 
     if (!h) {
         if (demo) {
             h = qopen(filename, "rb");
             if (!h) {
-                internal_error("Nem sikerult megnyitni recorded file-t!: ", filename);
+                internal_error("Failed to open demo file: ", filename);
             }
         } else {
-            char tmpnev[40];
-            sprintf(tmpnev, "rec/%s", filename);
-            h = fopen(tmpnev, "rb");
+            char path[40];
+            sprintf(path, "rec/%s", filename);
+            h = fopen(path, "rb");
             if (!h) {
-                external_error("Could not open for reading record file!:", tmpnev);
+                external_error("Failed to open rec file: ", path);
             }
         }
     }
 
     frame_count = 0;
     if (fread(&frame_count, 1, 4, h) != 4) {
-        olvhiba(filename);
+        read_error(filename);
     }
     if (frame_count <= 0) {
-        internal_error("Nem stimmel frame_count recorded file-ban!: ", filename);
+        internal_error("recorder frame_count <= 0: ", filename);
     }
 
-    if (frame_count > Darabszam) {
-        internal_error("recorder load-ban frame_count > Darabszam!");
+    if (frame_count > MAX_FRAMES) {
+        internal_error("recorder frame_count > MAX_FRAMES!");
     }
 
-    int verzio = 0;
-    if (fread(&verzio, 1, 4, h) != 4) {
+    int version = 0;
+    if (fread(&version, 1, 4, h) != 4) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
     }
 
     // Ezt loadrecekben is igazitani kell:
-    if (verzio < 131) {
-        external_error("Recorded file version is too old!", filename);
+    if (version < 131) {
+        external_error("Rec file version is too old!", filename);
     }
 
-    if (verzio > 131) {
-        external_error("Recorded file version is too new!", filename);
+    if (version > 131) {
+        external_error("Rec file version is too new!", filename);
     }
 
-    int tmp = 0; // Multirec, de ezt mar elintezte loadrecek, aki ezt hivta
-    if (fread(&tmp, 1, 4, h) != 4) {
+    int multiplayer_rec_unused = 0; // Multirec, de ezt mar elintezte loadrecek, aki ezt hivta
+    if (fread(&multiplayer_rec_unused, 1, 4, h) != 4) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
     }
 
@@ -561,73 +579,73 @@ int recorder::load(const char* filename, FILE* h, int demo) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
     }
 
-    int belyeg = 0;
-    if (fread(&belyeg, 1, 4, h) != 4) {
-        olvhiba(filename);
+    int level_id = 0;
+    if (fread(&level_id, 1, 4, h) != 4) {
+        read_error(filename);
     }
     if (fread(level_filename, 1, 16, h) != 16) {
-        olvhiba(filename);
+        read_error(filename);
     }
 
-    int hosszf = frame_count * sizeof(float);
+    int float_length = frame_count * sizeof(float);
     // int hosszi = frame_count*sizeof( int );
-    int hosszc = frame_count * sizeof(char);
-    int hosszs = frame_count * sizeof(short);
+    int char_length = frame_count * sizeof(char);
+    int short_length = frame_count * sizeof(short);
 
-    if (fread(bike_x, 1, hosszf, h) != hosszf) {
-        olvhiba(filename);
+    if (fread(bike_x, 1, float_length, h) != float_length) {
+        read_error(filename);
     }
-    if (fread(bike_y, 1, hosszf, h) != hosszf) {
-        olvhiba(filename);
+    if (fread(bike_y, 1, float_length, h) != float_length) {
+        read_error(filename);
     }
-    if (fread(left_wheel_x, 1, hosszs, h) != hosszs) {
-        olvhiba(filename);
+    if (fread(left_wheel_x, 1, short_length, h) != short_length) {
+        read_error(filename);
     }
-    if (fread(left_wheel_y, 1, hosszs, h) != hosszs) {
-        olvhiba(filename);
+    if (fread(left_wheel_y, 1, short_length, h) != short_length) {
+        read_error(filename);
     }
-    if (fread(right_wheel_x, 1, hosszs, h) != hosszs) {
-        olvhiba(filename);
+    if (fread(right_wheel_x, 1, short_length, h) != short_length) {
+        read_error(filename);
     }
-    if (fread(right_wheel_y, 1, hosszs, h) != hosszs) {
-        olvhiba(filename);
+    if (fread(right_wheel_y, 1, short_length, h) != short_length) {
+        read_error(filename);
     }
-    if (fread(body_x, 1, hosszs, h) != hosszs) {
-        olvhiba(filename);
+    if (fread(body_x, 1, short_length, h) != short_length) {
+        read_error(filename);
     }
-    if (fread(body_y, 1, hosszs, h) != hosszs) {
-        olvhiba(filename);
-    }
-
-    if (fread(bike_rotation, 1, hosszs, h) != hosszs) {
-        olvhiba(filename);
-    }
-    if (fread(left_wheel_rotation, 1, hosszc, h) != hosszc) {
-        olvhiba(filename);
-    }
-    if (fread(right_wheel_rotation, 1, hosszc, h) != hosszc) {
-        olvhiba(filename);
-    }
-    if (fread(flags, 1, hosszc, h) != hosszc) { // karakter
-        olvhiba(filename);
+    if (fread(body_y, 1, short_length, h) != short_length) {
+        read_error(filename);
     }
 
-    if (fread(motor_frequency, 1, hosszc, h) != hosszc) {
-        olvhiba(filename);
+    if (fread(bike_rotation, 1, short_length, h) != short_length) {
+        read_error(filename);
     }
-    if (fread(friction_volume, 1, hosszc, h) != hosszc) {
-        olvhiba(filename);
+    if (fread(left_wheel_rotation, 1, char_length, h) != char_length) {
+        read_error(filename);
+    }
+    if (fread(right_wheel_rotation, 1, char_length, h) != char_length) {
+        read_error(filename);
+    }
+    if (fread(flags, 1, char_length, h) != char_length) { // karakter
+        read_error(filename);
+    }
+
+    if (fread(motor_frequency, 1, char_length, h) != char_length) {
+        read_error(filename);
+    }
+    if (fread(friction_volume, 1, char_length, h) != char_length) {
+        read_error(filename);
     }
 
     // Hangok:
     if (fread(&event_count, 1, 4, h) != 4) {
-        olvhiba(filename);
+        read_error(filename);
     }
     if (event_count < 0) {
-        internal_error("event_count nem stimmel loadban!");
+        internal_error("recorder event_count < 0!");
     }
-    if (event_count > Hangdarabszam) {
-        internal_error("rec load-ban event_count > Hangdarabszam!");
+    if (event_count > MAX_EVENTS) {
+        internal_error("recorder event_count > MAX_EVENTS!");
     }
 
     /*static int elsoszam = 0;
@@ -638,20 +656,20 @@ int recorder::load(const char* filename, FILE* h, int demo) {
     }
     elsoszam = event_count;*/
 
-    int hossz = event_count * sizeof(event);
-    if (fread(events, 1, hossz, h) != hossz) {
-        olvhiba(filename);
+    int event_length = event_count * sizeof(event);
+    if (fread(events, 1, event_length, h) != event_length) {
+        read_error(filename);
     }
 
-    int magic = 0;
-    if (fread(&magic, 1, 4, h) != 4) {
-        olvhiba(filename);
+    int magic_number = 0;
+    if (fread(&magic_number, 1, 4, h) != 4) {
+        read_error(filename);
     }
-    if (magic != MAGICNUMBER) {
-        internal_error("magic != MAGICNUMBER");
+    if (magic_number != MAGIC_NUMBER) {
+        internal_error("magic_number != MAGIC_NUMBER");
     }
 
-    if (!megvoltnyitva) {
+    if (!keep_file) {
         if (demo) {
             qclose(h);
         } else {
@@ -661,7 +679,7 @@ int recorder::load(const char* filename, FILE* h, int demo) {
 
     // if( !frame_count_integrity( this ) )
     //	internal_error( "recorder::load-ban !frame_count_integrity( this )!" );
-    return belyeg;
+    return level_id;
 }
 
 /* 1.0 es 1.1 eseten ez volt:
@@ -681,126 +699,126 @@ int recorder::load(const char* filename, FILE* h, int demo) {
         internal_error( "Nem sikerult irni recorded file-ba!: ", nev );
 */
 
-static void irhiba(const char* nev) {
-    internal_error("Nem sikerult irni recorded file-ba!: ", nev);
+static void save_error(const char* filename) {
+    internal_error("Failed to write rec file: ", filename);
 }
 
 void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     flagtag_ = flagtag;
 
-    int megvoltnyitva = 0;
+    int keep_file = 0;
     if (h) {
-        megvoltnyitva = 1;
+        keep_file = 1;
     }
 
     if (frame_count == 0) {
-        internal_error("save-ben frame_count == 0!");
+        internal_error("recorder save frame_count == 0!");
     }
 
     if (!h) {
         // Itt meg kell hagyni fopen-t!:
-        char tmpnev[40];
-        sprintf(tmpnev, "rec/%s", filename);
-        h = fopen(tmpnev, "wb");
+        char path[40];
+        sprintf(path, "rec/%s", filename);
+        h = fopen(path, "wb");
         if (!h) {
-            internal_error("Could not open for writing record file!: ", tmpnev);
+            internal_error("Failed to open rec file for writing!: ", path);
         }
     }
 
     if (fwrite(&frame_count, 1, 4, h) != 4) {
-        irhiba(filename);
+        save_error(filename);
     }
 
     // Verzio csak 1.2-tol kezdodoen jon bele:
     // Elozoleg itt level volt, ami biztos hogy kisebb volt 120-nal:
-    int verzio = 131;
-    if (fwrite(&verzio, 1, 4, h) != 4) {
-        irhiba(filename);
+    int version = 131;
+    if (fwrite(&version, 1, 4, h) != 4) {
+        save_error(filename);
     }
 
     // Ezt loadrecekben is olvassa, ugyhogy ennek verzio utan kell maradnia:
     if (fwrite(&MultiplayerRec, 1, 4, h) != 4) {
-        irhiba(filename);
+        save_error(filename);
     }
 
     if (fwrite(&flagtag_, 1, 4, h) != 4) {
-        irhiba(filename);
+        save_error(filename);
     }
 
     if (fwrite(&level_id, 1, 4, h) != 4) {
-        irhiba(filename);
+        save_error(filename);
     }
 
     if (fwrite(level_filename, 1, 16, h) != 16) {
-        irhiba(filename);
+        save_error(filename);
     }
 
-    int hosszf = frame_count * sizeof(float);
+    int float_length = frame_count * sizeof(float);
     // int hosszi = frame_count*sizeof( int );
-    int hosszc = frame_count * sizeof(char);
-    int hosszs = frame_count * sizeof(short);
+    int char_length = frame_count * sizeof(char);
+    int short_length = frame_count * sizeof(short);
 
-    if (fwrite(bike_x, 1, hosszf, h) != hosszf) {
-        irhiba(filename);
+    if (fwrite(bike_x, 1, float_length, h) != float_length) {
+        save_error(filename);
     }
-    if (fwrite(bike_y, 1, hosszf, h) != hosszf) {
-        irhiba(filename);
+    if (fwrite(bike_y, 1, float_length, h) != float_length) {
+        save_error(filename);
     }
-    if (fwrite(left_wheel_x, 1, hosszs, h) != hosszs) {
-        irhiba(filename);
+    if (fwrite(left_wheel_x, 1, short_length, h) != short_length) {
+        save_error(filename);
     }
-    if (fwrite(left_wheel_y, 1, hosszs, h) != hosszs) {
-        irhiba(filename);
+    if (fwrite(left_wheel_y, 1, short_length, h) != short_length) {
+        save_error(filename);
     }
-    if (fwrite(right_wheel_x, 1, hosszs, h) != hosszs) {
-        irhiba(filename);
+    if (fwrite(right_wheel_x, 1, short_length, h) != short_length) {
+        save_error(filename);
     }
-    if (fwrite(right_wheel_y, 1, hosszs, h) != hosszs) {
-        irhiba(filename);
-    }
-
-    if (fwrite(body_x, 1, hosszs, h) != hosszs) {
-        irhiba(filename);
-    }
-    if (fwrite(body_y, 1, hosszs, h) != hosszs) {
-        irhiba(filename);
+    if (fwrite(right_wheel_y, 1, short_length, h) != short_length) {
+        save_error(filename);
     }
 
-    if (fwrite(bike_rotation, 1, hosszs, h) != hosszs) {
-        irhiba(filename);
+    if (fwrite(body_x, 1, short_length, h) != short_length) {
+        save_error(filename);
     }
-    if (fwrite(left_wheel_rotation, 1, hosszc, h) != hosszc) {
-        irhiba(filename);
-    }
-    if (fwrite(right_wheel_rotation, 1, hosszc, h) != hosszc) {
-        irhiba(filename);
-    }
-    if (fwrite(flags, 1, hosszc, h) != hosszc) {
-        irhiba(filename);
+    if (fwrite(body_y, 1, short_length, h) != short_length) {
+        save_error(filename);
     }
 
-    if (fwrite(motor_frequency, 1, hosszc, h) != hosszc) {
-        irhiba(filename);
+    if (fwrite(bike_rotation, 1, short_length, h) != short_length) {
+        save_error(filename);
     }
-    if (fwrite(friction_volume, 1, hosszc, h) != hosszc) {
-        irhiba(filename);
+    if (fwrite(left_wheel_rotation, 1, char_length, h) != char_length) {
+        save_error(filename);
+    }
+    if (fwrite(right_wheel_rotation, 1, char_length, h) != char_length) {
+        save_error(filename);
+    }
+    if (fwrite(flags, 1, char_length, h) != char_length) {
+        save_error(filename);
+    }
+
+    if (fwrite(motor_frequency, 1, char_length, h) != char_length) {
+        save_error(filename);
+    }
+    if (fwrite(friction_volume, 1, char_length, h) != char_length) {
+        save_error(filename);
     }
 
     // Hangok:
     if (fwrite(&event_count, 1, 4, h) != 4) {
-        irhiba(filename);
+        save_error(filename);
     }
-    int hossz = event_count * sizeof(event);
-    if (fwrite(events, 1, hossz, h) != hossz) {
-        irhiba(filename);
-    }
-
-    int magic = MAGICNUMBER;
-    if (fwrite(&magic, 1, 4, h) != 4) {
-        irhiba(filename);
+    int event_length = event_count * sizeof(event);
+    if (fwrite(events, 1, event_length, h) != event_length) {
+        save_error(filename);
     }
 
-    if (!megvoltnyitva) {
+    int magic_number = MAGIC_NUMBER;
+    if (fwrite(&magic_number, 1, 4, h) != 4) {
+        save_error(filename);
+    }
+
+    if (!keep_file) {
         fclose(h);
     }
 }
@@ -815,28 +833,28 @@ int load_replays(const char* filename, int demo) {
             external_error("Could not open for reading record file!: !: ", filename);
         }
     } else {
-        char tmpnev[40];
-        sprintf(tmpnev, "rec/%s", filename);
-        h = fopen(tmpnev, "rb");
+        char path[40];
+        sprintf(path, "rec/%s", filename);
+        h = fopen(path, "rb");
         if (!h) {
-            external_error("Could not open for reading record file!:", tmpnev);
+            external_error("Could not open for reading record file!:", path);
         }
     }
-    int tmp = 0; // frame_count (bejegyzes darabszam)
-    if (fread(&tmp, 1, 4, h) != 4) {
+    int frame_count_unused = 0; // frame_count (bejegyzes darabszam)
+    if (fread(&frame_count_unused, 1, 4, h) != 4) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
     }
 
-    int verzio = 0;
-    if (fread(&verzio, 1, 4, h) != 4) {
+    int version = 0;
+    if (fread(&version, 1, 4, h) != 4) {
         internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
     }
 
-    if (verzio < 131) {
+    if (version < 131) {
         external_error("Recorded file version is too old!", filename);
     }
 
-    if (verzio > 131) {
+    if (version > 131) {
         external_error("Recorded file version is too new!", filename);
     }
 
@@ -852,24 +870,24 @@ int load_replays(const char* filename, int demo) {
     }
 
     // Most jon tenyleges beolvasas:
-    int belyeg = 0;
+    int level_id = 0;
     if (MultiplayerRec) {
         FILE* h;
         if (demo) {
             h = qopen(filename, "rb");
             if (!h) {
-                external_error("Could not open for reading demo record file!:", filename);
+                external_error("Failed to open demo file: ", filename);
             }
         } else {
-            char tmpnev[40];
-            sprintf(tmpnev, "rec\\%s", filename);
-            h = fopen(tmpnev, "rb");
+            char path[40];
+            sprintf(path, "rec\\%s", filename);
+            h = fopen(path, "rb");
             if (!h) {
-                external_error("Could not open for reading record file!:", tmpnev);
+                external_error("Failed to open rec file: ", path);
             }
         }
 
-        belyeg = Rec1->load(filename, h, demo);
+        level_id = Rec1->load(filename, h, demo);
         Rec2->load(filename, h, demo);
 
         if (demo) {
@@ -878,20 +896,20 @@ int load_replays(const char* filename, int demo) {
             fclose(h);
         }
     } else {
-        belyeg = Rec1->load(filename, NULL, demo);
+        level_id = Rec1->load(filename, NULL, demo);
     }
 
-    return belyeg;
+    return level_id;
 }
 
 // belyeg-et adja vissza, vagy 0-at:
 void save_replays(const char* filename, int level_id, int flagtag) {
     if (MultiplayerRec) {
-        char tmpnev[40];
-        sprintf(tmpnev, "rec/%s", filename);
-        FILE* h = fopen(tmpnev, "wb");
+        char path[40];
+        sprintf(path, "rec/%s", filename);
+        FILE* h = fopen(path, "wb");
         if (!h) {
-            external_error("Could not open for writing record file!: !: ", tmpnev);
+            external_error("Failed to open rec file for writing!: ", path);
         }
 
         // Multirec alapjan tudjak, hogy mit kell rec file multirec
@@ -907,38 +925,38 @@ void save_replays(const char* filename, int level_id, int flagtag) {
 
 // WAV GYUJTO:
 
-static int Begyujtve = 0;
+static int EventBufferLength = 0;
 
-#define GYUJTODARAB (200)
+#define EVENT_BUFFER_MAX (200)
 
-static WavEvent Azonosito[GYUJTODARAB];
-static double Hangero[GYUJTODARAB];
-static int Objszam[GYUJTODARAB];
+static WavEvent EventBufferEventIds[EVENT_BUFFER_MAX];
+static double EventBufferVolumes[EVENT_BUFFER_MAX];
+static int EventBufferObjectIds[EVENT_BUFFER_MAX];
 
 void add_event_buffer(WavEvent event_id, double volume, int object_id) {
-    if (Begyujtve < GYUJTODARAB) {
-        Azonosito[Begyujtve] = event_id;
-        Hangero[Begyujtve] = volume;
-        Objszam[Begyujtve] = object_id;
-        Begyujtve++;
+    if (EventBufferLength < EVENT_BUFFER_MAX) {
+        EventBufferEventIds[EventBufferLength] = event_id;
+        EventBufferVolumes[EventBufferLength] = volume;
+        EventBufferObjectIds[EventBufferLength] = object_id;
+        EventBufferLength++;
     }
 }
 
-void reset_event_buffer(void) { Begyujtve = 0; }
+void reset_event_buffer(void) { EventBufferLength = 0; }
 
 // Igaz, ha van bent wav:
 int get_event_buffer(WavEvent* event_id, double* volume, int* object_id) {
-    if (Begyujtve == 0) {
+    if (EventBufferLength == 0) {
         return 0;
     }
-    *event_id = Azonosito[0];
-    *volume = Hangero[0];
-    *object_id = Objszam[0];
-    Begyujtve--;
-    for (int i = 0; i < Begyujtve; i++) {
-        Azonosito[i] = Azonosito[i + 1];
-        Hangero[i] = Hangero[i + 1];
-        Objszam[i] = Objszam[i + 1];
+    *event_id = EventBufferEventIds[0];
+    *volume = EventBufferVolumes[0];
+    *object_id = EventBufferObjectIds[0];
+    EventBufferLength--;
+    for (int i = 0; i < EventBufferLength; i++) {
+        EventBufferEventIds[i] = EventBufferEventIds[i + 1];
+        EventBufferVolumes[i] = EventBufferVolumes[i + 1];
+        EventBufferObjectIds[i] = EventBufferObjectIds[i + 1];
     }
     return 1;
 }

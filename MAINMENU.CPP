@@ -206,7 +206,7 @@ void replay(void) {
                 // 0 param azt jelenti, hogy nem resource filebol olvas:
                 MenuPalette->set();
                 kiirloading();
-                int belyeg = load_replays(tmp, 0);
+                int belyeg = recorder::load_replays(tmp, 0);
                 if (access_level_file(Rec1->level_filename) != 0) {
                     int c = menu_dialog("Cannot find the lev file that corresponds",
                                         "to the record file!", tmp, Rec1->level_filename);
@@ -237,7 +237,7 @@ void replay(void) {
             strcpy(tmp, NavEntriesLeft[kurrens]);
             strcat(tmp, ".REC");
             kiirloading();
-            int belyeg = load_replays(tmp, 0);
+            int belyeg = recorder::load_replays(tmp, 0);
             if (CtrlAltPressed) {
                 // loadrecek beallitotta Multirec-et.
                 int ido = Rec1->frame_count;
@@ -288,7 +288,7 @@ static void demo(void) {
         elozodemo = demo;
 
         kiirloading();
-        int belyeg = load_replays(demonevek[demo], 1);
+        int belyeg = recorder::load_replays(demonevek[demo], 1);
         if (access_level_file(Rec1->level_filename) != 0) {
             internal_error("783654");
         }

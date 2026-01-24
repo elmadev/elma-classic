@@ -524,8 +524,7 @@ long lejatszo(const char* filenev) {
             set_motor_frequency(false, valt2.inf.motor_frequency, valt2.inf.gas);
         }
 
-        kulsoresz(Motor1, &State->keys1, &valt1, Rec1, &Viewtime1, eddig, &valt2.showkep,
-                  meghalt1);
+        kulsoresz(Motor1, &State->keys1, &valt1, Rec1, &Viewtime1, eddig, &valt2.showkep, meghalt1);
 
         if (!Single) {
             kulsoresz(Motor2, &State->keys2, &valt2, Rec2, &Viewtime2, eddig, &valt1.showkep,
@@ -651,13 +650,13 @@ long lejatszo(const char* filenev) {
 // char Ccc[] = "Cs1_2";
 
 // Hamissal ter vissza, ha nincsen mar tobb:
-static int replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, recorder* prec,
-                     double eddig, viewtimest* pvt, int* pmasikshow) {
+static bool replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, recorder* prec,
+                      double eddig, viewtimest* pvt, int* pmasikshow) {
 
     toggleresz(popciok, pvalt, &pvt->viewkinreplay, &pvt->timekinreplay, pmasikshow);
 
     // recall koordokat es Hatra-t is beallitja:
-    int visszaad = prec->recall_frame(pmot, eddig, &pvalt->inf);
+    bool visszaad = prec->recall_frame(pmot, eddig, &pvalt->inf);
     szamitfejr(pmot); // mivel nincs leptet ami kiszamolna
     // HANG ELINTEZES:
     WavEvent wavindex;

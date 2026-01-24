@@ -19,39 +19,40 @@ struct event {
     WavEvent event_id;
     float volume; // (0.0 - 0.99)
 };
-
-// Load a singleplayer or multiplayer replay
-int load_replays(const char* filename, int demo);
-// Save a singleplayer or multiplayer replay
-void save_replays(const char* filename, int level_id, int flagtag);
+static_assert(sizeof(event) == 0x10);
 
 class recorder {
-    friend int load_replays(const char* filename, int demo);
-    friend void save_replays(const char* filename, int level_id, int flagtag);
-    friend void replay(void);
+    friend void replay();
 
-    float *bike_x, *bike_y;
-    short *left_wheel_x, *left_wheel_y, *right_wheel_x, *right_wheel_y;
-    short *body_x, *body_y;
+    float* bike_x;
+    float* bike_y;
+    short* left_wheel_x;
+    short* left_wheel_y;
+    short* right_wheel_x;
+    short* right_wheel_y;
+    short* body_x;
+    short* body_y;
     // (0-249, glitched 0-255 when brake-stretching)
-    unsigned char *left_wheel_rotation, *right_wheel_rotation;
+    unsigned char* left_wheel_rotation;
+    unsigned char* right_wheel_rotation;
     short* bike_rotation; // (0-9999)
-    unsigned char *motor_frequency, *friction_volume;
+    unsigned char* motor_frequency;
+    unsigned char* friction_volume;
     unsigned char* flags;
 
     int frame_count;
-    int finished;
+    bool finished;
 
     event* events;
     int event_count;
     int current_event_index;
 
     vect2 previous_bike_r; // bike position during previous frame
-    double previous_frame_time, next_frame_time;
+    double previous_frame_time;
+    double next_frame_time;
     int next_frame_index;
 
     int flagtag_;
-
     // Load replay of one bike
     int load(const char* filename, FILE* h, int demo);
     // Save replay of one bike
@@ -60,19 +61,25 @@ class recorder {
   public:
     char level_filename[16];
 
-    recorder(void);
-    ~recorder(void);
+    recorder();
+    ~recorder();
+
+    // Load a singleplayer or multiplayer replay
+    static int load_replays(const char* filename, int demo);
+    // Save a singleplayer or multiplayer replay
+    static void save_replays(const char* filename, int level_id, int flagtag);
+
     void erase(char* lev_filename);
-    void rewind(void);
-    int recall_frame(motorst* mot, double time, bike_sound* sound);
+    void rewind();
+    bool recall_frame(motorst* mot, double time, bike_sound* sound);
     void store_frames(motorst* mot, double time, bike_sound* sound);
 
     void store_event(double time, WavEvent event_id, double volume, int object_id);
     // Return true if a new event has occurred
-    int recall_event(double time, WavEvent* event_id, double* volume, int* object_id);
+    bool recall_event(double time, WavEvent* event_id, double* volume, int* object_id);
 
-    int flagtag(void);
-    void set_flagtag(int flagtag);
+    bool flagtag();
+    void set_flagtag(bool flagtag);
 
     // Encode framecount into MSB of the flags
     void encode_frame_count();
@@ -80,12 +87,13 @@ class recorder {
     bool frame_count_integrity();
 };
 
-extern recorder *Rec1, *Rec2;
+extern recorder* Rec1;
+extern recorder* Rec2;
 extern int MultiplayerRec;
 
 void add_event_buffer(WavEvent event_id, double volume, int object_id);
-void reset_event_buffer(void);
+void reset_event_buffer();
 // Return true if a new event has been obtained
-int get_event_buffer(WavEvent* event_id, double* volume, int* object_id);
+bool get_event_buffer(WavEvent* event_id, double* volume, int* object_id);
 
 #endif

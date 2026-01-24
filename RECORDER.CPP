@@ -6,40 +6,46 @@
 #include "qopen.h"
 #include <cmath>
 #include <cstring>
+#include "fs_utils.h"
 
-recorder *Rec1 = NULL, *Rec2 = NULL;
+recorder* Rec1 = nullptr;
+recorder* Rec2 = nullptr;
 int MultiplayerRec = 0;
 
-#define MAGIC_NUMBER (4796277l)
+constexpr int MAGIC_NUMBER = 4796277;
 
-constexpr int MAX_FRAMES = 8981;
+constexpr int FRAME_RATE = 30;
+constexpr double TIME_TO_FRAME_INDEX = FRAME_RATE / (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024);
+constexpr double FRAME_INDEX_TO_TIME = 1.0 / TIME_TO_FRAME_INDEX;
+
+constexpr int MAX_FRAMES = FRAME_RATE * 60 * 5 - 19;
 constexpr int MAX_EVENTS = 3900;
 
-static double FRAME_RATE = 30;
-static double TIME_TO_FRAME_INDEX = FRAME_RATE / (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024);
+constexpr int FLAG_GAS = 0;
+constexpr int FLAG_FLIPPED = 1;
+constexpr int FLAG_FLAGTAG_A = 2;
+constexpr int FLAG_FLAGTAG_IMMUNITY = 3;
 
-recorder::recorder(void) {
+recorder::recorder() {
     level_filename[0] = 0;
-    bike_x = NULL;
-    bike_y = NULL;
-    left_wheel_x = NULL;
-    left_wheel_y = NULL;
-    right_wheel_x = NULL;
-    right_wheel_y = NULL;
-    body_x = NULL;
-    body_y = NULL;
-    left_wheel_rotation = NULL;
-    bike_rotation = NULL;
-    right_wheel_rotation = NULL;
-    motor_frequency = NULL;
-    friction_volume = NULL;
-    flags = NULL;
-
-    events = NULL;
+    bike_x = nullptr;
+    bike_y = nullptr;
+    left_wheel_x = nullptr;
+    left_wheel_y = nullptr;
+    right_wheel_x = nullptr;
+    right_wheel_y = nullptr;
+    body_x = nullptr;
+    body_y = nullptr;
+    left_wheel_rotation = nullptr;
+    bike_rotation = nullptr;
+    right_wheel_rotation = nullptr;
+    motor_frequency = nullptr;
+    friction_volume = nullptr;
+    flags = nullptr;
+    events = nullptr;
 
     frame_count = 0;
     event_count = 0;
-
     flagtag_ = 0;
 
     int hossz = sizeof(float);
@@ -70,7 +76,6 @@ recorder::recorder(void) {
     motor_frequency = new unsigned char[MAX_FRAMES];
     friction_volume = new unsigned char[MAX_FRAMES];
     flags = new unsigned char[MAX_FRAMES];
-
     events = new event[MAX_EVENTS];
 
     if (!bike_x || !bike_y || !left_wheel_x || !left_wheel_y || !right_wheel_x || !right_wheel_y ||
@@ -80,29 +85,29 @@ recorder::recorder(void) {
     }
 }
 
-recorder::~recorder(void) {}
+recorder::~recorder() { internal_error("recorder::~recorder not implemented!"); }
 
 void recorder::erase(char* lev_filename) {
-    if (strlen(lev_filename) > 12) {
+    if (strlen(lev_filename) > MAX_FILENAME_LEN + 4) {
         internal_error("recorder::erase strlen");
     }
     strcpy(level_filename, lev_filename);
     frame_count = 0;
     event_count = 0;
-    finished = 0;
+    finished = false;
     current_event_index = 0;
     next_frame_index = 0;
 }
 
-void recorder::rewind(void) {
-    finished = 0;
+void recorder::rewind() {
+    finished = false;
     current_event_index = 0;
     next_frame_index = 0;
 }
 
-int recorder::flagtag(void) { return flagtag_; }
+bool recorder::flagtag() { return (bool)(flagtag_); }
 
-void recorder::set_flagtag(int flagtag) { flagtag_ = flagtag; }
+void recorder::set_flagtag(bool flagtag) { flagtag_ = (int)(flagtag); }
 
 void recorder::encode_frame_count() {
     if (frame_count < 80) {
@@ -132,17 +137,17 @@ bool recorder::frame_count_integrity() {
     return encoded_value == frame_count;
 }
 
-static double POSITION_RATIO = 1000.0, POSITION_RATIO_INV = 1.0 / POSITION_RATIO;
-static double WHEEL_ROTATION_RATIO = 250 / (2.0 * PI),
-              WHEEL_ROTATION_INV_RATIO = 1.0 / WHEEL_ROTATION_RATIO;
-static double BIKE_ROTATION_RATIO = 10000 / (2.0 * PI),
-              BIKE_ROTATION_INV_RATIO = 1.0 / BIKE_ROTATION_RATIO;
-static double MOTOR_FREQUENCY_RATIO = 250.0,
-              MOTOR_FREQUENCY_INV_RATIO = 1.0 / MOTOR_FREQUENCY_RATIO;
-static double FRICTION_VOLUME_RATIO = 250 / 2.0,
-              FRICTION_VOLUME_INV_RATIO = 1.0 / FRICTION_VOLUME_RATIO;
+constexpr double POSITION_RATIO = 1000.0, POSITION_RATIO_INV = 1.0 / POSITION_RATIO;
+constexpr double WHEEL_ROTATION_RATIO = 250 / (2.0 * PI),
+                 WHEEL_ROTATION_INV_RATIO = 1.0 / WHEEL_ROTATION_RATIO;
+constexpr double BIKE_ROTATION_RATIO = 10000 / (2.0 * PI),
+                 BIKE_ROTATION_INV_RATIO = 1.0 / BIKE_ROTATION_RATIO;
+constexpr double MOTOR_FREQUENCY_RATIO = 250.0,
+                 MOTOR_FREQUENCY_INV_RATIO = 1.0 / MOTOR_FREQUENCY_RATIO;
+constexpr double FRICTION_VOLUME_RATIO = 250 / 2.0,
+                 FRICTION_VOLUME_INV_RATIO = 1.0 / FRICTION_VOLUME_RATIO;
 
-int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
+bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
     if (frame_count <= 0) {
         internal_error("recall_frame frame_count <= 0!");
     }
@@ -164,16 +169,17 @@ int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
     if (index2 < 0) {
         index2 = 0;
     }
+
     if (finished) {
         sound->motor_frequency = 1.0;
         sound->gas = 0;
         sound->friction_volume = 0;
-        return 0;
+        return false;
     }
 
     if (index1 >= frame_count - 1) {
         index1 = frame_count - 1;
-        finished = 1;
+        finished = true;
     }
     if (index2 >= frame_count - 1) {
         index2 = frame_count - 1;
@@ -253,30 +259,27 @@ int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
                 WHEEL_ROTATION_INV_RATIO * (right_wheel_rotation[index1] * index1_weight +
                                             right_wheel_rotation[index2] * index2_weight);
         }
-
     } else {
         mot->bike.rotation = BIKE_ROTATION_INV_RATIO * bike_rotation[index2];
         mot->left_wheel.rotation = WHEEL_ROTATION_INV_RATIO * left_wheel_rotation[index2];
         mot->right_wheel.rotation = WHEEL_ROTATION_INV_RATIO * right_wheel_rotation[index2];
     }
 
-    sound->gas = char(flags[index1] & 1);
-    mot->flipped_bike = (flags[index1] & 2) >> 1;
-    FlagTagAHasFlag = (flags[index1] & 4) >> 2;
-    FlagTagImmunity = (flags[index1] & 8) >> 3;
+    sound->gas = char((flags[index1] >> FLAG_GAS) & 1);
+    mot->flipped_bike = (flags[index1] >> FLAG_FLIPPED) & 1;
+    FlagTagAHasFlag = (flags[index1] >> FLAG_FLAGTAG_A) & 1;
+    FlagTagImmunity = (flags[index1] >> FLAG_FLAGTAG_IMMUNITY) & 1;
 
-    sound->motor_frequency = MOTOR_FREQUENCY_INV_RATIO * motor_frequency[index1] + 1.0;
+    sound->motor_frequency = 1.0 + MOTOR_FREQUENCY_INV_RATIO * motor_frequency[index1];
     sound->friction_volume = FRICTION_VOLUME_INV_RATIO * friction_volume[index1];
 
-    return 1;
+    return true;
 }
-
-static const double FRAME_INDEX_TO_TIME = 1.0 / TIME_TO_FRAME_INDEX;
 
 void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
     if (!next_frame_index) {
         previous_bike_r = mot->bike.r;
-        previous_frame_time = -0.00000000001;
+        previous_frame_time = -1E-11;
         next_frame_time = 0.0;
     }
     if (time < next_frame_time) {
@@ -285,7 +288,7 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         return;
     }
 
-    while (1) {
+    while (true) {
 #ifdef DEBUG
         if (time - previous_frame_time == 0.0) {
             internal_error("time-previous_frame_time == 0.0!");
@@ -304,12 +307,12 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         int i = next_frame_index;
         bike_x[i] = interpolated_bike_r.x;
         bike_y[i] = interpolated_bike_r.y;
-        left_wheel_x[i] = (mot->left_wheel.r.x - mot->bike.r.x) * POSITION_RATIO;
-        left_wheel_y[i] = (mot->left_wheel.r.y - mot->bike.r.y) * POSITION_RATIO;
-        right_wheel_x[i] = (mot->right_wheel.r.x - mot->bike.r.x) * POSITION_RATIO;
-        right_wheel_y[i] = (mot->right_wheel.r.y - mot->bike.r.y) * POSITION_RATIO;
-        body_x[i] = (mot->body_r.x - mot->bike.r.x) * POSITION_RATIO;
-        body_y[i] = (mot->body_r.y - mot->bike.r.y) * POSITION_RATIO;
+        left_wheel_x[i] = (short)((mot->left_wheel.r.x - mot->bike.r.x) * POSITION_RATIO);
+        left_wheel_y[i] = (short)((mot->left_wheel.r.y - mot->bike.r.y) * POSITION_RATIO);
+        right_wheel_x[i] = (short)((mot->right_wheel.r.x - mot->bike.r.x) * POSITION_RATIO);
+        right_wheel_y[i] = (short)((mot->right_wheel.r.y - mot->bike.r.y) * POSITION_RATIO);
+        body_x[i] = (short)((mot->body_r.x - mot->bike.r.x) * POSITION_RATIO);
+        body_y[i] = (short)((mot->body_r.y - mot->bike.r.y) * POSITION_RATIO);
 
         double bike_rot = mot->bike.rotation;
         while (bike_rot <= 0) {
@@ -318,19 +321,23 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         while (bike_rot > TWO_PI) {
             bike_rot -= TWO_PI;
         }
-        bike_rotation[i] = bike_rot * BIKE_ROTATION_RATIO;
+        bike_rotation[i] = (short)(bike_rot * BIKE_ROTATION_RATIO);
 
         // Rotation is constrained between +- Pi, except when doing a break-stretch
         // During the brake-stretch, the wheel position might become slightly desynced
         if (mot->left_wheel.rotation <= 0) {
-            left_wheel_rotation[i] = (mot->left_wheel.rotation + TWO_PI) * WHEEL_ROTATION_RATIO;
+            left_wheel_rotation[i] =
+                (unsigned char)((mot->left_wheel.rotation + TWO_PI) * WHEEL_ROTATION_RATIO);
         } else {
-            left_wheel_rotation[i] = mot->left_wheel.rotation * WHEEL_ROTATION_RATIO;
+            left_wheel_rotation[i] =
+                (unsigned char)(mot->left_wheel.rotation * WHEEL_ROTATION_RATIO);
         }
         if (mot->right_wheel.rotation <= 0) {
-            right_wheel_rotation[i] = (mot->right_wheel.rotation + TWO_PI) * WHEEL_ROTATION_RATIO;
+            right_wheel_rotation[i] =
+                (unsigned char)((mot->right_wheel.rotation + TWO_PI) * WHEEL_ROTATION_RATIO);
         } else {
-            right_wheel_rotation[i] = mot->right_wheel.rotation * WHEEL_ROTATION_RATIO;
+            right_wheel_rotation[i] =
+                (unsigned char)(mot->right_wheel.rotation * WHEEL_ROTATION_RATIO);
         }
 
         // Encode gibberish into the 4 MSB of the flags
@@ -339,26 +346,28 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         flags[i] = flags[i] & 0xf0;
 
         if (sound->gas) {
-            flags[i] += 1;
+            flags[i] += 1 << FLAG_GAS;
         }
         if (mot->flipped_bike) {
-            flags[i] += 2;
+            flags[i] += 1 << FLAG_FLIPPED;
         }
         if (FlagTagAHasFlag) {
-            flags[i] += 4;
+            flags[i] += 1 << FLAG_FLAGTAG_A;
         }
         if (FlagTagImmunity) {
-            flags[i] += 8;
+            flags[i] += 1 << FLAG_FLAGTAG_IMMUNITY;
         }
 
         if (sound->motor_frequency < 1.0) {
             sound->motor_frequency = 1.0;
         }
-        motor_frequency[i] = MOTOR_FREQUENCY_RATIO * (sound->motor_frequency - 1.0);
-        friction_volume[i] = FRICTION_VOLUME_RATIO * sound->friction_volume;
+        motor_frequency[i] =
+            (unsigned char)(MOTOR_FREQUENCY_RATIO * (sound->motor_frequency - 1.0));
+        friction_volume[i] = (unsigned char)(FRICTION_VOLUME_RATIO * sound->friction_volume);
 
         next_frame_index++;
         next_frame_time += FRAME_INDEX_TO_TIME;
+
         if (time < next_frame_time) {
             previous_bike_r = mot->bike.r;
             previous_frame_time = time;
@@ -373,31 +382,31 @@ void recorder::store_event(double time, WavEvent event_id, double volume, int ob
         return;
     }
     if (event_count > 0) {
-        if (events[unsigned(event_count - 1)].time > time + 0.00001) {
+        if (events[event_count - 1].time > time + 0.00001) {
             char tmp[50];
-            double time2 = events[unsigned(event_count - 1)].time;
+            double time2 = events[event_count - 1].time;
             sprintf(tmp, "time1: negative time: %f\n", float(time - time2));
             internal_error(tmp);
         }
     }
-    events[unsigned(event_count)].time = time;
-    events[unsigned(event_count)].event_id = event_id;
-    events[unsigned(event_count)].volume = volume;
-    events[unsigned(event_count)].object_id = (short)object_id;
+    events[event_count].time = time;
+    events[event_count].event_id = event_id;
+    events[event_count].volume = volume;
+    events[event_count].object_id = (short)object_id;
     event_count++;
 }
 
-int recorder::recall_event(double time, WavEvent* event_id, double* volume, int* object_id) {
+bool recorder::recall_event(double time, WavEvent* event_id, double* volume, int* object_id) {
     if (current_event_index < event_count) {
-        if (events[unsigned(current_event_index)].time <= time) {
-            *event_id = events[unsigned(current_event_index)].event_id;
-            *volume = events[unsigned(current_event_index)].volume;
-            *object_id = events[unsigned(current_event_index)].object_id;
+        if (events[current_event_index].time <= time) {
+            *event_id = events[current_event_index].event_id;
+            *volume = events[current_event_index].volume;
+            *object_id = events[current_event_index].object_id;
             current_event_index++;
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 static void read_error(const char* filename) {
@@ -405,9 +414,9 @@ static void read_error(const char* filename) {
 }
 
 int recorder::load(const char* filename, FILE* h, int demo) {
-    int keep_file = 0;
+    bool keep_file = false;
     if (h) {
-        keep_file = 1;
+        keep_file = true;
     }
 
     if (!h) {
@@ -427,51 +436,46 @@ int recorder::load(const char* filename, FILE* h, int demo) {
     }
 
     frame_count = 0;
-    if (fread(&frame_count, 1, 4, h) != 4) {
+    if (fread(&frame_count, 1, sizeof(frame_count), h) != 4) {
         read_error(filename);
     }
     if (frame_count <= 0) {
         internal_error("recorder frame_count <= 0: ", filename);
     }
-
     if (frame_count > MAX_FRAMES) {
         internal_error("recorder frame_count > MAX_FRAMES!");
     }
 
     int version = 0;
-    if (fread(&version, 1, 4, h) != 4) {
-        internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
+    if (fread(&version, 1, sizeof(version), h) != 4) {
+        read_error(filename);
     }
-
     if (version < 131) {
         external_error("Rec file version is too old!", filename);
     }
-
     if (version > 131) {
         external_error("Rec file version is too new!", filename);
     }
 
     int multiplayer_rec_unused = 0;
-    if (fread(&multiplayer_rec_unused, 1, 4, h) != 4) {
-        internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
+    if (fread(&multiplayer_rec_unused, 1, sizeof(multiplayer_rec_unused), h) != 4) {
+        read_error(filename);
     }
-
-    if (fread(&flagtag_, 1, 4, h) != 4) {
-        internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
+    if (fread(&flagtag_, 1, sizeof(flagtag_), h) != 4) {
+        read_error(filename);
     }
 
     int level_id = 0;
-    if (fread(&level_id, 1, 4, h) != 4) {
+    if (fread(&level_id, 1, sizeof(level_id), h) != 4) {
         read_error(filename);
     }
-    if (fread(level_filename, 1, 16, h) != 16) {
+    if (fread(level_filename, 1, sizeof(level_filename), h) != 16) {
         read_error(filename);
     }
 
     int float_length = frame_count * sizeof(float);
     int char_length = frame_count * sizeof(char);
     int short_length = frame_count * sizeof(short);
-
     if (fread(bike_x, 1, float_length, h) != float_length) {
         read_error(filename);
     }
@@ -496,7 +500,6 @@ int recorder::load(const char* filename, FILE* h, int demo) {
     if (fread(body_y, 1, short_length, h) != short_length) {
         read_error(filename);
     }
-
     if (fread(bike_rotation, 1, short_length, h) != short_length) {
         read_error(filename);
     }
@@ -509,7 +512,6 @@ int recorder::load(const char* filename, FILE* h, int demo) {
     if (fread(flags, 1, char_length, h) != char_length) {
         read_error(filename);
     }
-
     if (fread(motor_frequency, 1, char_length, h) != char_length) {
         read_error(filename);
     }
@@ -533,7 +535,7 @@ int recorder::load(const char* filename, FILE* h, int demo) {
     }
 
     int magic_number = 0;
-    if (fread(&magic_number, 1, 4, h) != 4) {
+    if (fread(&magic_number, 1, sizeof(magic_number), h) != 4) {
         read_error(filename);
     }
     if (magic_number != MAGIC_NUMBER) {
@@ -558,9 +560,9 @@ static void save_error(const char* filename) {
 void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     flagtag_ = flagtag;
 
-    int keep_file = 0;
+    bool keep_file = false;
     if (h) {
-        keep_file = 1;
+        keep_file = true;
     }
 
     if (frame_count == 0) {
@@ -576,35 +578,29 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
         }
     }
 
-    if (fwrite(&frame_count, 1, 4, h) != 4) {
+    if (fwrite(&frame_count, 1, sizeof(frame_count), h) != 4) {
         save_error(filename);
     }
-
     int version = 131;
-    if (fwrite(&version, 1, 4, h) != 4) {
+    if (fwrite(&version, 1, sizeof(version), h) != 4) {
         save_error(filename);
     }
-
-    if (fwrite(&MultiplayerRec, 1, 4, h) != 4) {
+    if (fwrite(&MultiplayerRec, 1, sizeof(MultiplayerRec), h) != 4) {
         save_error(filename);
     }
-
-    if (fwrite(&flagtag_, 1, 4, h) != 4) {
+    if (fwrite(&flagtag_, 1, sizeof(flagtag_), h) != 4) {
         save_error(filename);
     }
-
-    if (fwrite(&level_id, 1, 4, h) != 4) {
+    if (fwrite(&level_id, 1, sizeof(level_id), h) != 4) {
         save_error(filename);
     }
-
-    if (fwrite(level_filename, 1, 16, h) != 16) {
+    if (fwrite(level_filename, 1, sizeof(level_filename), h) != 16) {
         save_error(filename);
     }
 
     int float_length = frame_count * sizeof(float);
     int char_length = frame_count * sizeof(char);
     int short_length = frame_count * sizeof(short);
-
     if (fwrite(bike_x, 1, float_length, h) != float_length) {
         save_error(filename);
     }
@@ -623,14 +619,12 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     if (fwrite(right_wheel_y, 1, short_length, h) != short_length) {
         save_error(filename);
     }
-
     if (fwrite(body_x, 1, short_length, h) != short_length) {
         save_error(filename);
     }
     if (fwrite(body_y, 1, short_length, h) != short_length) {
         save_error(filename);
     }
-
     if (fwrite(bike_rotation, 1, short_length, h) != short_length) {
         save_error(filename);
     }
@@ -643,7 +637,6 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     if (fwrite(flags, 1, char_length, h) != char_length) {
         save_error(filename);
     }
-
     if (fwrite(motor_frequency, 1, char_length, h) != char_length) {
         save_error(filename);
     }
@@ -660,7 +653,7 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     }
 
     int magic_number = MAGIC_NUMBER;
-    if (fwrite(&magic_number, 1, 4, h) != 4) {
+    if (fwrite(&magic_number, 1, sizeof(magic_number), h) != 4) {
         save_error(filename);
     }
 
@@ -669,7 +662,7 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     }
 }
 
-int load_replays(const char* filename, int demo) {
+int recorder::load_replays(const char* filename, int demo) {
     FILE* h;
     if (demo) {
         h = qopen(filename, "rb");
@@ -684,26 +677,25 @@ int load_replays(const char* filename, int demo) {
             external_error("Could not open for reading record file!:", path);
         }
     }
-    int frame_count_unused = 0; // frame_count (bejegyzes darabszam)
-    if (fread(&frame_count_unused, 1, 4, h) != 4) {
-        internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
+
+    int frame_count_unused = 0;
+    if (fread(&frame_count_unused, 1, sizeof(frame_count_unused), h) != 4) {
+        read_error(filename);
     }
 
     int version = 0;
-    if (fread(&version, 1, 4, h) != 4) {
-        internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
+    if (fread(&version, 1, sizeof(version), h) != 4) {
+        read_error(filename);
     }
-
     if (version < 131) {
         external_error("Recorded file version is too old!", filename);
     }
-
     if (version > 131) {
         external_error("Recorded file version is too new!", filename);
     }
 
-    if (fread(&MultiplayerRec, 1, 4, h) != 4) {
-        internal_error("Nem sikerult olvasni recorded file-bol!: ", filename);
+    if (fread(&MultiplayerRec, 1, sizeof(MultiplayerRec), h) != 4) {
+        read_error(filename);
     }
 
     if (demo) {
@@ -738,13 +730,13 @@ int load_replays(const char* filename, int demo) {
             fclose(h);
         }
     } else {
-        level_id = Rec1->load(filename, NULL, demo);
+        level_id = Rec1->load(filename, nullptr, demo);
     }
 
     return level_id;
 }
 
-void save_replays(const char* filename, int level_id, int flagtag) {
+void recorder::save_replays(const char* filename, int level_id, int flagtag) {
     if (MultiplayerRec) {
         char path[40];
         sprintf(path, "rec/%s", filename);
@@ -752,20 +744,16 @@ void save_replays(const char* filename, int level_id, int flagtag) {
         if (!h) {
             external_error("Failed to open rec file for writing!: ", path);
         }
-
         Rec1->save(filename, h, level_id, flagtag);
         Rec2->save(filename, h, level_id, flagtag);
-
         fclose(h);
     } else {
-        Rec1->save(filename, NULL, level_id, flagtag);
+        Rec1->save(filename, nullptr, level_id, flagtag);
     }
 }
 
+constexpr int EVENT_BUFFER_MAX = 200;
 static int EventBufferLength = 0;
-
-#define EVENT_BUFFER_MAX (200)
-
 static WavEvent EventBufferEventIds[EVENT_BUFFER_MAX];
 static double EventBufferVolumes[EVENT_BUFFER_MAX];
 static int EventBufferObjectIds[EVENT_BUFFER_MAX];
@@ -779,11 +767,11 @@ void add_event_buffer(WavEvent event_id, double volume, int object_id) {
     }
 }
 
-void reset_event_buffer(void) { EventBufferLength = 0; }
+void reset_event_buffer() { EventBufferLength = 0; }
 
-int get_event_buffer(WavEvent* event_id, double* volume, int* object_id) {
+bool get_event_buffer(WavEvent* event_id, double* volume, int* object_id) {
     if (EventBufferLength == 0) {
-        return 0;
+        return false;
     }
     *event_id = EventBufferEventIds[0];
     *volume = EventBufferVolumes[0];
@@ -794,5 +782,5 @@ int get_event_buffer(WavEvent* event_id, double* volume, int* object_id) {
         EventBufferVolumes[i] = EventBufferVolumes[i + 1];
         EventBufferObjectIds[i] = EventBufferObjectIds[i + 1];
     }
-    return 1;
+    return true;
 }

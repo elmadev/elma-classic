@@ -42,6 +42,17 @@ static void decrypt() {
 
 static bool QOpenInitialized = false;
 
+static bool magic_number_at(FILE* h, int offset) {
+    fseek(h, sizeof(FileCount) + sizeof(res_file) * offset, SEEK_SET);
+    int magic_number = 0;
+    if (fread(&magic_number, 1, sizeof(magic_number), h) != 4) {
+        internal_error("init_qopen() cannot read magic_number!");
+    }
+    fseek(h, 0, SEEK_SET);
+
+    return magic_number == RES_MAGIC_NUMBER;
+}
+
 void init_qopen() {
     if (QOpenInitialized) {
         internal_error("init_qopen() already called!");
@@ -57,19 +68,20 @@ void init_qopen() {
         external_error("Missing file!: ", RES_FILENAME);
     }
 
+    // There are two different .res formats, with no explicit versioning.
+    // The only difference is the maximum amount of files allowed in the .res file.
+    // The magic number marking the end of the header will therefore be at different offsets.
+    if (magic_number_at(h, RES_MAX_FILES_LEGACY)) {
+        ResMaxFiles = RES_MAX_FILES_LEGACY;
+    } else if (magic_number_at(h, RES_MAX_FILES)) {
+        ResMaxFiles = RES_MAX_FILES;
+    } else {
+        internal_error(".res file is corrupt!");
+    }
+
     if (fread(&FileCount, 1, sizeof(FileCount), h) != 4) {
         internal_error("init_qopen() cannot read FileCount!");
     }
-
-    // There are two different .res formats, with no explicit versioning.
-    // The only difference is the maximum amount of files allowed in the .res file.
-    // Make an assumption based on the number of files, which .res format is being parsed.
-    if (FileCount < RES_MAX_FILES_LEGACY) {
-        ResMaxFiles = RES_MAX_FILES_LEGACY;
-    } else {
-        ResMaxFiles = RES_MAX_FILES;
-    }
-
     if (FileCount <= 0 || FileCount > ResMaxFiles) {
         internal_error("FileCount <= 0 || FileCount > ResMaxFiles!");
     }
@@ -84,14 +96,6 @@ void init_qopen() {
         internal_error("init_qopen() cannot read files!");
     }
     decrypt();
-
-    int magic_number = 0;
-    if (fread(&magic_number, 1, sizeof(magic_number), h) != 4) {
-        internal_error("init_qopen() cannot read magic_number!");
-    }
-    if (magic_number != RES_MAGIC_NUMBER) {
-        internal_error("init_qopen() invalid magic_number!");
-    }
 
     fclose(h);
 }

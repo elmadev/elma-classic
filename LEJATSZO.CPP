@@ -61,7 +61,7 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
     if (tipus == object::Type::Food) {
         Ptop->objects[sorszam]->active = false;
         (*pkajaszam)++;
-        startwavegyujto(WavEvent::Food, 0.99, -1);
+        add_event_buffer(WavEvent::Food, 0.99, -1);
         switch (Ptop->objects[sorszam]->property) {
         case object::Property::None:
             break;
@@ -120,13 +120,13 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
-            startwavegyujto(WavEvent::RightVolt, 0.99, -1);
+            add_event_buffer(WavEvent::RightVolt, 0.99, -1);
         }
         if (is_key_down(popciok->left_volt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;
-            startwavegyujto(WavEvent::LeftVolt, 0.99, -1);
+            add_event_buffer(WavEvent::LeftVolt, 0.99, -1);
         }
     }
 
@@ -137,10 +137,10 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     int eredmeny = vizsgalat(pmot);
     if (eredmeny == 0) {
         // Beteszunk egy 0 hangot:
-        pvalt->inf.surlero = 0;
-        pvalt->inf.frekvencia = -1;
-        pvalt->inf.gaz = 0;
-        prec->store(pmot, eddig, &pvalt->inf);
+        pvalt->inf.friction_volume = 0;
+        pvalt->inf.motor_frequency = -1;
+        pvalt->inf.gas = 0;
+        prec->store_frames(pmot, eddig, &pvalt->inf);
         if (!Single && Tag) {
             // Flag Tag modban nem allnak meg, hanem visszamennek starthelyre:
             init_motor(pmot);
@@ -172,27 +172,27 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // eddig += dt; // Ezt meg kell ismetelni eggyel feljebb is
     //  Berreges es nyikorgas:
-    pvalt->inf.surlero = kiszamolsurlodast();
+    pvalt->inf.friction_volume = kiszamolsurlodast();
 
     if (pmot->flipped_bike) {
-        pvalt->inf.frekvencia = fabs(pmot->left_wheel.angular_velocity) * 0.025;
+        pvalt->inf.motor_frequency = fabs(pmot->left_wheel.angular_velocity) * 0.025;
     } else {
-        pvalt->inf.frekvencia = fabs(pmot->right_wheel.angular_velocity) * 0.025;
+        pvalt->inf.motor_frequency = fabs(pmot->right_wheel.angular_velocity) * 0.025;
     }
     // Frekvenciat betesszuk 1.0-2.0 tartomanyba:
-    if (pvalt->inf.frekvencia > 30.0) {
-        pvalt->inf.frekvencia = 30.0;
+    if (pvalt->inf.motor_frequency > 30.0) {
+        pvalt->inf.motor_frequency = 30.0;
     }
-    pvalt->inf.frekvencia = 2.0 - exp(-pvalt->inf.frekvencia);
+    pvalt->inf.motor_frequency = 2.0 - exp(-pvalt->inf.motor_frequency);
 
-    pvalt->inf.gaz = (char)is_key_down(popciok->gas);
-    prec->store(pmot, eddig, &pvalt->inf);
+    pvalt->inf.gas = (char)is_key_down(popciok->gas);
+    prec->store_frames(pmot, eddig, &pvalt->inf);
 
     // Egyedi hangok:
     WavEvent wavazonosito;
     double hangero;
     int objszam;
-    while (getwavegyujto(&wavazonosito, &hangero, &objszam)) {
+    while (get_event_buffer(&wavazonosito, &hangero, &objszam)) {
         if (objszam >= 0) {
             int eredmeny = spritefeldolgoz(objszam, &pmot->apple_count, pmot);
             if (eredmeny == 0 || eredmeny == 1) {
@@ -205,7 +205,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
         } else {
             start_wav(wavazonosito, hangero);
         }
-        prec->addhang(eddig, wavazonosito, hangero, objszam);
+        prec->store_event(eddig, wavazonosito, hangero, objszam);
     }
 }
 
@@ -250,7 +250,7 @@ static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig,
         if (prec) {
             // Most kihagyjuk wavgyujtot:
             start_wav(WavEvent::Turn, 0.99);
-            prec->addhang(eddig, WavEvent::Turn, 0.99, -1);
+            prec->store_event(eddig, WavEvent::Turn, 0.99, -1);
         }
     }
 
@@ -332,15 +332,15 @@ long lejatszo(const char* filenev) {
     // Jatekmod eldontese:
     Single = State->single;
     Tag = State->flag_tag;
-    Prec1->settag(Tag);
-    Prec2->settag(Tag);
+    Rec1->set_flagtag(Tag);
+    Rec2->set_flagtag(Tag);
 
     load_best_time(filenev, Single);
 
     if (Single) {
-        Multirec = 0;
+        MultiplayerRec = 0;
     } else {
-        Multirec = 1;
+        MultiplayerRec = 1;
     }
 
     int palmegnincs = 1;
@@ -358,7 +358,7 @@ long lejatszo(const char* filenev) {
     Kitoltestmegrak = Kitoltestmegrakkezd;
 
     double eddig = 0.0;
-    resetwavegyujto();
+    reset_event_buffer();
 
     int plussznyomva = 0;
     int minusznyomva = 0;
@@ -433,11 +433,11 @@ long lejatszo(const char* filenev) {
             }
 
             if (!meghalt1) {
-                belsoresz(Motor1, &State->keys1, &valt1, Prec1, &megvanido1, &meghalt1, eddig, dt);
+                belsoresz(Motor1, &State->keys1, &valt1, Rec1, &megvanido1, &meghalt1, eddig, dt);
             }
 
             if (!Single && !meghalt2) {
-                belsoresz(Motor2, &State->keys2, &valt2, Prec2, &megvanido2, &meghalt2, eddig, dt);
+                belsoresz(Motor2, &State->keys2, &valt2, Rec2, &megvanido2, &meghalt2, eddig, dt);
             }
 
             if (!(meghalt1 && meghalt2)) {
@@ -496,13 +496,13 @@ long lejatszo(const char* filenev) {
                 Mute = true;
                 if (megvanido) {
                     Ptop->unflip_objects();
-                    Prec1->encode_frame_count();
-                    Prec2->encode_frame_count();
+                    Rec1->encode_frame_count();
+                    Rec2->encode_frame_count();
                     return megvanido;
                 } else {
                     Ptop->unflip_objects();
-                    Prec1->encode_frame_count();
-                    Prec2->encode_frame_count();
+                    Rec1->encode_frame_count();
+                    Rec2->encode_frame_count();
                     return -1;
                 }
             }
@@ -516,19 +516,19 @@ long lejatszo(const char* filenev) {
         }
 
         if (Single) {
-            set_friction_volume(valt1.inf.surlero);
-            set_motor_frequency(true, valt1.inf.frekvencia, valt1.inf.gaz);
+            set_friction_volume(valt1.inf.friction_volume);
+            set_motor_frequency(true, valt1.inf.motor_frequency, valt1.inf.gas);
         } else {
-            set_friction_volume(valt1.inf.surlero + valt2.inf.surlero);
-            set_motor_frequency(true, valt1.inf.frekvencia, valt1.inf.gaz);
-            set_motor_frequency(false, valt2.inf.frekvencia, valt2.inf.gaz);
+            set_friction_volume(valt1.inf.friction_volume + valt2.inf.friction_volume);
+            set_motor_frequency(true, valt1.inf.motor_frequency, valt1.inf.gas);
+            set_motor_frequency(false, valt2.inf.motor_frequency, valt2.inf.gas);
         }
 
-        kulsoresz(Motor1, &State->keys1, &valt1, Prec1, &Viewtime1, eddig, &valt2.showkep,
+        kulsoresz(Motor1, &State->keys1, &valt1, Rec1, &Viewtime1, eddig, &valt2.showkep,
                   meghalt1);
 
         if (!Single) {
-            kulsoresz(Motor2, &State->keys2, &valt2, Prec2, &Viewtime2, eddig, &valt1.showkep,
+            kulsoresz(Motor2, &State->keys2, &valt2, Rec2, &Viewtime2, eddig, &valt1.showkep,
                       meghalt2);
         }
 
@@ -580,8 +580,8 @@ long lejatszo(const char* filenev) {
                 fclose(h);
             }
             Ptop->unflip_objects();
-            Prec1->encode_frame_count();
-            Prec2->encode_frame_count();
+            Rec1->encode_frame_count();
+            Rec2->encode_frame_count();
             Masodikmenet = 1;
             return -1;
         }
@@ -657,13 +657,13 @@ static int replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, recor
     toggleresz(popciok, pvalt, &pvt->viewkinreplay, &pvt->timekinreplay, pmasikshow);
 
     // recall koordokat es Hatra-t is beallitja:
-    int visszaad = prec->recall(pmot, eddig, &pvalt->inf);
+    int visszaad = prec->recall_frame(pmot, eddig, &pvalt->inf);
     szamitfejr(pmot); // mivel nincs leptet ami kiszamolna
     // HANG ELINTEZES:
     WavEvent wavindex;
     double hangero;
     int objszam;
-    while (prec->gethang(eddig, &wavindex, &hangero, &objszam)) {
+    while (prec->recall_event(eddig, &wavindex, &hangero, &objszam)) {
         if (objszam >= 0) {
             int tmpi = 0;
             spritefeldolgoz(objszam, &tmpi, pmot);
@@ -709,8 +709,8 @@ static int Elozoshowkep1 = 1, Elozoshowkep2 = 1;
 // Termeszetes befejezes eseten 0-t ad vissza:
 long lejatszo_r(const char* filenev, int showkepmarad) {
     // Jatekmod eldontese:
-    Single = !Multirec;
-    Tag = Prec1->gettag();
+    Single = !MultiplayerRec;
+    Tag = Rec1->flagtag();
 
     load_best_time(filenev, Single);
 
@@ -728,7 +728,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     // Eloszor keretet tobbszor is kirakja kirajzol320:
     Kitoltestmegrak = Kitoltestmegrakkezd;
 
-    resetwavegyujto();
+    reset_event_buffer();
     stopwatch_reset();
 
     int plussznyomva = 0;
@@ -776,12 +776,12 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         double eddig = stopwatch() * 0.0024;
         // recall koordokat es Hatra-t is beallitja:
         int befejezte1 =
-            !replaymag(Motor1, &State->keys1, &valt1, Prec1, eddig, &Viewtime1, &valt2.showkep);
+            !replaymag(Motor1, &State->keys1, &valt1, Rec1, eddig, &Viewtime1, &valt2.showkep);
 
         int befejezte2 = 0;
         if (!Single) {
             befejezte2 =
-                !replaymag(Motor2, &State->keys2, &valt2, Prec2, eddig, &Viewtime2, &valt1.showkep);
+                !replaymag(Motor2, &State->keys2, &valt2, Rec2, eddig, &Viewtime2, &valt1.showkep);
         }
 
         if ((Single && befejezte1) || (!Single && befejezte1 && befejezte2)) {
@@ -817,14 +817,14 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         // HANG ELINTEZES:
         if (Single) {
-            set_motor_frequency(true, valt1.inf.frekvencia, valt1.inf.gaz);
-            // if( valt1.inf.frekvencia > 1.5 )
+            set_motor_frequency(true, valt1.inf.motor_frequency, valt1.inf.gas);
+            // if( valt1.inf.motor_frequency > 1.5 )
             //	internal_error( "> 1.5!" );
-            set_friction_volume(valt1.inf.surlero);
+            set_friction_volume(valt1.inf.friction_volume);
         } else {
-            set_motor_frequency(true, valt1.inf.frekvencia, valt1.inf.gaz);
-            set_motor_frequency(false, valt2.inf.frekvencia, valt2.inf.gaz);
-            set_friction_volume(valt1.inf.surlero + valt2.inf.surlero);
+            set_motor_frequency(true, valt1.inf.motor_frequency, valt1.inf.gas);
+            set_motor_frequency(false, valt2.inf.motor_frequency, valt2.inf.gas);
+            set_friction_volume(valt1.inf.friction_volume + valt2.inf.friction_volume);
         }
 
         // KIRAJZOLAS:

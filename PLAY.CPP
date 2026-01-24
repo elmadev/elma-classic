@@ -371,7 +371,7 @@ void saveplay(int belyeg) {
         }
     }
     strcat(tmp, ".rec");
-    saverecek(tmp, belyeg, State->flag_tag);
+    save_replays(tmp, belyeg, State->flag_tag);
 }
 
 // Idot beirja tablaba, ha kell:
@@ -496,12 +496,12 @@ void idoelintezes(long ido, char* valasz, int level, const char* filenev) {
 }
 
 void replayprec(void) {
-    floadlevel_p(Prec1->palyanev);
+    floadlevel_p(Rec1->level_filename);
     int elso = 1;
     while (1) {
-        Prec1->rewind();
-        Prec2->rewind();
-        if (lejatszo_r(Prec1->palyanev, !elso)) {
+        Rec1->rewind();
+        Rec2->rewind();
+        if (lejatszo_r(Rec1->level_filename, !elso)) {
             if (Ptop->objects_flipped) {
                 internal_error("replayprec-ben Ptop->kerekekfejjellefel!");
             }
@@ -517,8 +517,8 @@ void replayprec(void) {
 void replayjelenlegi(const char* filenev) {
     int elso = 1;
     while (1) {
-        Prec1->rewind();
-        Prec2->rewind();
+        Rec1->rewind();
+        Rec2->rewind();
         if (lejatszo_r(filenev, !elso)) {
             if (Ptop->objects_flipped) {
                 internal_error("replayjelenlegi-ben Ptop->kerekekfejjellefel!");
@@ -784,8 +784,8 @@ static void playlevel(int level) {
         kiirloading();
         floadlevel_p(tmpnev);
 
-        Prec1->erase(tmpnev);
-        Prec2->erase(tmpnev);
+        Rec1->erase(tmpnev);
+        Rec2->erase(tmpnev);
         long ido = lejatszo(tmpnev);
         MenuPalette->set();
         if (Ptop->objects_flipped) {
@@ -812,8 +812,8 @@ static void playlevel(int level) {
             State->save();
         }
         int eredmeny = afterplay(level, ujpalya, valasz, NULL);
-        Prec1->erase(tmpnev);
-        Prec2->erase(tmpnev);
+        Rec1->erase(tmpnev);
+        Rec2->erase(tmpnev);
         if (eredmeny == 0) {
             pjatekos->selected_level = level + ujpalya;
             return;

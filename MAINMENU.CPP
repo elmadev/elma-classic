@@ -206,25 +206,26 @@ void replay(void) {
                 // 0 param azt jelenti, hogy nem resource filebol olvas:
                 MenuPalette->set();
                 kiirloading();
-                int belyeg = loadrecek(tmp, 0);
-                if (access_level_file(Prec1->palyanev) != 0) {
+                int belyeg = load_replays(tmp, 0);
+                if (access_level_file(Rec1->level_filename) != 0) {
                     int c = menu_dialog("Cannot find the lev file that corresponds",
-                                        "to the record file!", tmp, Prec1->palyanev);
+                                        "to the record file!", tmp, Rec1->level_filename);
                     if (c == KEY_ESC) {
                         return;
                     }
                 } else {
-                    floadlevel_p(Prec1->palyanev);
+                    floadlevel_p(Rec1->level_filename);
                     if (Ptop->level_id != belyeg) {
-                        int c = menu_dialog("The level file has changed since the",
-                                            "saving of the record file!", tmp, Prec1->palyanev);
+                        int c =
+                            menu_dialog("The level file has changed since the",
+                                        "saving of the record file!", tmp, Rec1->level_filename);
                         if (c == KEY_ESC) {
                             return;
                         }
                     } else {
-                        Prec1->rewind();
-                        Prec2->rewind();
-                        if (lejatszo_r(Prec1->palyanev, 0)) {
+                        Rec1->rewind();
+                        Rec2->rewind();
+                        if (lejatszo_r(Rec1->level_filename, 0)) {
                             break;
                         }
                     }
@@ -236,12 +237,12 @@ void replay(void) {
             strcpy(tmp, NavEntriesLeft[kurrens]);
             strcat(tmp, ".REC");
             kiirloading();
-            int belyeg = loadrecek(tmp, 0);
+            int belyeg = load_replays(tmp, 0);
             if (CtrlAltPressed) {
                 // loadrecek beallitotta Multirec-et.
-                int ido = Prec1->betoltve;
-                if (Multirec && Prec2->betoltve > ido) {
-                    ido = Prec2->betoltve;
+                int ido = Rec1->frame_count;
+                if (MultiplayerRec && Rec2->frame_count > ido) {
+                    ido = Rec2->frame_count;
                 }
 
                 ido = (int)(ido * 3.3333333333333);
@@ -256,16 +257,16 @@ void replay(void) {
                 menu_dialog(tmp, "The time of this replay file is:", idostr);
                 continue;
             }
-            if (access_level_file(Prec1->palyanev) != 0) {
+            if (access_level_file(Rec1->level_filename) != 0) {
                 menu_dialog("Cannot find the lev file that corresponds", "to the record file!", tmp,
-                            Prec1->palyanev);
+                            Rec1->level_filename);
             } else {
-                floadlevel_p(Prec1->palyanev);
+                floadlevel_p(Rec1->level_filename);
                 if (Ptop->level_id != belyeg) {
                     menu_dialog("The level file has changed since the",
-                                "saving of the record file!", tmp, Prec1->palyanev);
+                                "saving of the record file!", tmp, Rec1->level_filename);
                 } else {
-                    replayjelenlegi(Prec1->palyanev);
+                    replayjelenlegi(Rec1->level_filename);
                 }
             }
         }
@@ -287,17 +288,17 @@ static void demo(void) {
         elozodemo = demo;
 
         kiirloading();
-        int belyeg = loadrecek(demonevek[demo], 1);
-        if (access_level_file(Prec1->palyanev) != 0) {
+        int belyeg = load_replays(demonevek[demo], 1);
+        if (access_level_file(Rec1->level_filename) != 0) {
             internal_error("783654");
         }
-        floadlevel_p(Prec1->palyanev);
+        floadlevel_p(Rec1->level_filename);
         if (Ptop->level_id != belyeg) {
             internal_error("6734654");
         }
-        Prec1->rewind();
-        Prec2->rewind();
-        if (lejatszo_r(Prec1->palyanev, 0)) {
+        Rec1->rewind();
+        Rec2->rewind();
+        if (lejatszo_r(Rec1->level_filename, 0)) {
             MenuPalette->set();
             return;
         }

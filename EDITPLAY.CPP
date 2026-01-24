@@ -20,8 +20,8 @@ void editplay(void) {
 
     floadlevel_p(State->editor_filename);
 
-    Prec1->erase(State->editor_filename);
-    Prec2->erase(State->editor_filename);
+    Rec1->erase(State->editor_filename);
+    Rec2->erase(State->editor_filename);
     lejatszo(State->editor_filename);
 
     empty_keypress_buffer();

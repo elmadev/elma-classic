@@ -306,7 +306,7 @@ int vizsgalat(motorst* pmot) {
         sorszamtomb[2] = get_touching_object(pmot->head_r, HeadRadius);
         for (int i = 0; i < 3; i++) {
             if (sorszamtomb[i] >= 0) {
-                startwavegyujto(WavEvent::None, 0.0, sorszamtomb[i]);
+                add_event_buffer(WavEvent::None, 0.0, sorszamtomb[i]);
                 object* pker = Ptop->get_object(sorszamtomb[i]);
                 if (pker->type == object::Type::Food) {
                     pker->active = false;

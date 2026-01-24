@@ -76,15 +76,15 @@ void menu_external_levels() {
             if (!floadlevel_p(filename)) {
                 break;
             }
-            Prec1->erase(filename);
-            Prec2->erase(filename);
+            Rec1->erase(filename);
+            Rec2->erase(filename);
             int time = lejatszo(filename);
             MenuPalette->set();
             char finish_msg[100] = "";
             idoelintezes(time, finish_msg, 0, filename);
             if (!afterplay(0, 0, finish_msg, filename)) {
-                Prec1->erase(filename);
-                Prec2->erase(filename);
+                Rec1->erase(filename);
+                Rec2->erase(filename);
                 break;
             }
         }

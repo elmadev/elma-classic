@@ -37,7 +37,7 @@ static bool simulate_anchor_point_collision(rigidbody* rb, vect2* point, vect2 f
         if (bump_magnitude >= 0.99) {
             bump_magnitude = 0.99;
         }
-        startwavegyujto(WavEvent::Bump, bump_magnitude, -1);
+        add_event_buffer(WavEvent::Bump, bump_magnitude, -1);
     }
     return true;
 }

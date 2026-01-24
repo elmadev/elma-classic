@@ -24,7 +24,7 @@ struct baljobbvaltozok {
 };
 
 struct valtozok {
-    hanginfo inf;
+    bike_sound inf;
     double surlero;
     double frekvencia;
     double utolsougras;

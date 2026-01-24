@@ -193,47 +193,41 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
     interp = body_y[index1] * index1_weight + body_y[index2] * index2_weight;
     mot->body_r.y = mot->bike.r.y + interp / POSITION_RATIO;
 
-    if (index1 >= 2) {
-        int bike_rot1 = bike_rotation[index1];
-        int bike_rot2 = bike_rotation[index2];
-        if (abs(bike_rot1 - bike_rot2) > 9000) {
-            if (bike_rot1 > bike_rot2) {
-                bike_rot1 -= 10000;
-            } else {
-                bike_rot2 -= 10000;
-            }
+    int bike_rot1 = bike_rotation[index1];
+    int bike_rot2 = bike_rotation[index2];
+    if (abs(bike_rot1 - bike_rot2) > 9000) {
+        if (bike_rot1 > bike_rot2) {
+            bike_rot1 -= 10000;
+        } else {
+            bike_rot2 -= 10000;
         }
-        interp = bike_rot1 * index1_weight + bike_rot2 * index2_weight;
-        mot->bike.rotation = interp / BIKE_ROTATION_RATIO;
-
-        int left_rot1 = left_wheel_rotation[index1];
-        int left_rot2 = left_wheel_rotation[index2];
-        if (abs(left_rot1 - left_rot2) > 220) {
-            if (left_rot1 > left_rot2) {
-                left_rot1 -= 250;
-            } else {
-                left_rot2 -= 250;
-            }
-        }
-        interp = left_rot1 * index1_weight + left_rot2 * index2_weight;
-        mot->left_wheel.rotation = interp / WHEEL_ROTATION_RATIO;
-
-        int right_rot1 = right_wheel_rotation[index1];
-        int right_rot2 = right_wheel_rotation[index2];
-        if (abs(right_rot1 - right_rot2) > 220) {
-            if (right_rot1 > right_rot2) {
-                right_rot1 -= 250;
-            } else {
-                right_rot2 -= 250;
-            }
-        }
-        interp = right_rot1 * index1_weight + right_rot2 * index2_weight;
-        mot->right_wheel.rotation = interp / WHEEL_ROTATION_RATIO;
-    } else {
-        mot->bike.rotation = bike_rotation[index2] / BIKE_ROTATION_RATIO;
-        mot->left_wheel.rotation = left_wheel_rotation[index2] / WHEEL_ROTATION_RATIO;
-        mot->right_wheel.rotation = right_wheel_rotation[index2] / WHEEL_ROTATION_RATIO;
     }
+    interp = bike_rot1 * index1_weight + bike_rot2 * index2_weight;
+    mot->bike.rotation = interp / BIKE_ROTATION_RATIO;
+
+    int left_rot1 = left_wheel_rotation[index1];
+    int left_rot2 = left_wheel_rotation[index2];
+    if (abs(left_rot1 - left_rot2) > 220) {
+        if (left_rot1 > left_rot2) {
+            left_rot1 -= 250;
+        } else {
+            left_rot2 -= 250;
+        }
+    }
+    interp = left_rot1 * index1_weight + left_rot2 * index2_weight;
+    mot->left_wheel.rotation = interp / WHEEL_ROTATION_RATIO;
+
+    int right_rot1 = right_wheel_rotation[index1];
+    int right_rot2 = right_wheel_rotation[index2];
+    if (abs(right_rot1 - right_rot2) > 220) {
+        if (right_rot1 > right_rot2) {
+            right_rot1 -= 250;
+        } else {
+            right_rot2 -= 250;
+        }
+    }
+    interp = right_rot1 * index1_weight + right_rot2 * index2_weight;
+    mot->right_wheel.rotation = interp / WHEEL_ROTATION_RATIO;
 
     sound->gas = char((flags[index1] >> FLAG_GAS) & 1);
     mot->flipped_bike = (flags[index1] >> FLAG_FLIPPED) & 1;

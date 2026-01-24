@@ -35,6 +35,7 @@
 * The 3 timers (best time, flag tag time, current time) are now properly centered on screen
 * Fix bike flickering at high zoom
 * Fix some minor bike jitters in replay playback when bike or wheel rotates past an angle of 0 degrees (upright position)
+* Fix bike/wheel jitters in replay playback in the first 2 frames of the replay
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

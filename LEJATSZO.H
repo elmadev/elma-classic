@@ -1,7 +1,7 @@
 #ifndef LEJATSZO_H
 #define LEJATSZO_H
 
-#include "RECORDER.H"
+#include "recorder.h"
 
 // Jatek modja ket fele lehet:
 extern int Single;

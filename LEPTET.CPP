@@ -6,7 +6,7 @@
 #include "physics_init.h"
 #include "physics_move.h"
 #include "platform_utils.h"
-#include "RECORDER.H"
+#include "recorder.h"
 #include <cmath>
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi, vect2 sebesseg);

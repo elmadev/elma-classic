@@ -51,7 +51,7 @@ elma_sources = files(
     'piclist.cpp',
     'PLAY.CPP',
     'qopen.cpp',
-    'RECORDER.CPP',
+    'recorder.cpp',
     'platform_sdl.cpp',
     'skip.cpp',
     'transparency.cpp',

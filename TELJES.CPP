@@ -10,7 +10,7 @@
 #include "physics_init.h"
 #include "pic8.h"
 #include "platform_impl.h"
-#include "RECORDER.H"
+#include "recorder.h"
 #include "state.h"
 #include "qopen.h"
 #include <cstring>

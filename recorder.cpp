@@ -128,8 +128,10 @@ bool recorder::frame_count_integrity() {
 }
 
 constexpr double POSITION_RATIO = 1000.0;
-constexpr double WHEEL_ROTATION_RATIO = 250 / (2.0 * PI);
-constexpr double BIKE_ROTATION_RATIO = 10000 / (2.0 * PI);
+constexpr int WHEEL_ROTATION_RANGE = 250;
+constexpr double WHEEL_ROTATION_RATIO = WHEEL_ROTATION_RANGE / (2.0 * PI);
+constexpr int BIKE_ROTATION_RANGE = 10000;
+constexpr double BIKE_ROTATION_RATIO = BIKE_ROTATION_RANGE / (2.0 * PI);
 constexpr double MOTOR_FREQUENCY_RATIO = 250.0;
 constexpr double FRICTION_VOLUME_RATIO = 250 / 2.0;
 
@@ -195,11 +197,11 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
 
     int bike_rot1 = bike_rotation[index1];
     int bike_rot2 = bike_rotation[index2];
-    if (abs(bike_rot1 - bike_rot2) > 9000) {
+    if (abs(bike_rot1 - bike_rot2) > BIKE_ROTATION_RANGE / 2) {
         if (bike_rot1 > bike_rot2) {
-            bike_rot1 -= 10000;
+            bike_rot1 -= BIKE_ROTATION_RANGE;
         } else {
-            bike_rot2 -= 10000;
+            bike_rot2 -= BIKE_ROTATION_RANGE;
         }
     }
     interp = bike_rot1 * index1_weight + bike_rot2 * index2_weight;
@@ -207,11 +209,11 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
 
     int left_rot1 = left_wheel_rotation[index1];
     int left_rot2 = left_wheel_rotation[index2];
-    if (abs(left_rot1 - left_rot2) > 220) {
+    if (abs(left_rot1 - left_rot2) > WHEEL_ROTATION_RANGE / 2) {
         if (left_rot1 > left_rot2) {
-            left_rot1 -= 250;
+            left_rot1 -= WHEEL_ROTATION_RANGE;
         } else {
-            left_rot2 -= 250;
+            left_rot2 -= WHEEL_ROTATION_RANGE;
         }
     }
     interp = left_rot1 * index1_weight + left_rot2 * index2_weight;
@@ -219,11 +221,11 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
 
     int right_rot1 = right_wheel_rotation[index1];
     int right_rot2 = right_wheel_rotation[index2];
-    if (abs(right_rot1 - right_rot2) > 220) {
+    if (abs(right_rot1 - right_rot2) > WHEEL_ROTATION_RANGE / 2) {
         if (right_rot1 > right_rot2) {
-            right_rot1 -= 250;
+            right_rot1 -= WHEEL_ROTATION_RANGE;
         } else {
-            right_rot2 -= 250;
+            right_rot2 -= WHEEL_ROTATION_RANGE;
         }
     }
     interp = right_rot1 * index1_weight + right_rot2 * index2_weight;

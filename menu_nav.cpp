@@ -1,4 +1,5 @@
 #include "menu_nav.h"
+#include "eol_settings.h"
 #include "fs_utils.h"
 #include "keys.h"
 #include "main.h"
@@ -7,6 +8,7 @@
 #include "platform_utils.h"
 #include <algorithm>
 #include <cstring>
+#include <directinput/scancodes.h>
 
 int NavEntriesLeftMaxLength = 1;
 
@@ -288,6 +290,14 @@ void menu_nav::render() {
 
 nav_entry* menu_nav::entry_left(int index) { return &entries_left[index]; }
 
+static bool accept_search_input() {
+    if (EolSettings->lctrl_search()) {
+        return is_key_down(DIK_LCONTROL);
+    }
+
+    return true;
+}
+
 static size_t common_prefix_len(const char* a, const char* b) {
     size_t n = 0;
     for (;; ++a, ++b, ++n) {
@@ -311,7 +321,7 @@ bool menu_nav::search_handler(int code) {
         } else {
             return false;
         }
-    } else if (code >= '0' && code <= 'z') {
+    } else if (accept_search_input() && code >= '0' && code <= 'z') {
         if (search_input.size() < MAX_FILENAME_LEN) {
             search_input.push_back(code);
         }

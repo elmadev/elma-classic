@@ -160,7 +160,10 @@ void menu_options() {
             sprintf(NavEntriesRight[17 + flag_tag_opt], "%.2fs", EolSettings->turn_time());
         }
 
-        nav.setup(18 + flag_tag_opt, true);
+        strcpy(NavEntriesLeft[18 + flag_tag_opt], "LCtrl search:");
+        strcpy(NavEntriesRight[18 + flag_tag_opt], EolSettings->lctrl_search() ? "Yes" : "No");
+
+        nav.setup(19 + flag_tag_opt, true);
 
         choice = nav.navigate();
 
@@ -291,6 +294,10 @@ void menu_options() {
             if (old_turn_time == EolSettings->turn_time()) {
                 EolSettings->set_turn_time(0.35);
             }
+        }
+
+        if (choice == 18) {
+            EolSettings->set_lctrl_search(!EolSettings->lctrl_search());
         }
 
         if (flag_tag_opt) {

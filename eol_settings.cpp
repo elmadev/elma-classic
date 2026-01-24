@@ -69,6 +69,8 @@ void eol_settings::set_zoom_textures(bool zoom_textures) {
 
 void eol_settings::set_turn_time(double t) { turn_time_ = t; }
 
+void eol_settings::set_lctrl_search(bool lctrl_search) { lctrl_search_ = lctrl_search; }
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -144,7 +146,8 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(zoom)                                                                               \
     JSON_FIELD(zoom_textures)                                                                      \
     JSON_FIELD(renderer)                                                                           \
-    JSON_FIELD(turn_time)
+    JSON_FIELD(turn_time)                                                                          \
+    JSON_FIELD(lctrl_search)
 
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

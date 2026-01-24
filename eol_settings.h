@@ -68,6 +68,9 @@ struct eol_settings {
     double turn_time() const { return turn_time_; }
     void set_turn_time(double t);
 
+    bool lctrl_search() const { return lctrl_search_; }
+    void set_lctrl_search(bool lctrl_search);
+
   private:
     Clamp<int> screen_width_{640, 640, 10000};
     Clamp<int> screen_height_{480, 480, 10000};
@@ -79,6 +82,7 @@ struct eol_settings {
     Clamp<double> zoom_{0.25, 1.0, 3.0};
     Default<bool> zoom_textures_{false};
     Clamp<double> turn_time_{0.0, 0.35, 0.35};
+    Default<bool> lctrl_search_{false};
 };
 
 extern eol_settings* EolSettings;

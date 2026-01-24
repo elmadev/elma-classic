@@ -156,22 +156,6 @@ static double MOTOR_FREQUENCY_RATIO = 250.0,
 static double FRICTION_VOLUME_RATIO = 250 / 2.0,
               FRICTION_VOLUME_INV_RATIO = 1.0 / FRICTION_VOLUME_RATIO;
 
-// int Mostirdki = 0;
-
-/*static int Filebairsorszam = 0;
-
-static void filebair( float d1, float d2, float d3 ) {
-    FILE* h = fopen( "log.txt", "at" );
-    if( !h )
-        internal_error( "filebair-ban nem nyilik!" );
-
-    fprintf( h, "%d %f %f %f\n", Filebairsorszam, d1, d2, d3 );
-
-
-    Filebairsorszam++;
-    fclose( h );
-}*/
-
 int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
     if (frame_count <= 0) {
         internal_error("recall_frame frame_count <= 0!");
@@ -296,18 +280,10 @@ int recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
         mot->right_wheel.rotation = WHEEL_ROTATION_INV_RATIO * right_wheel_rotation[index2];
     }
 
-    // filebair( index2, left_wheel_rotation[index2], mot->left_wheel.rotation );
     sound->gas = char(flags[index1] & 1);
     mot->flipped_bike = (flags[index1] & 2) >> 1;
     FlagTagAHasFlag = (flags[index1] & 4) >> 2;
     FlagTagImmunity = (flags[index1] & 8) >> 3;
-
-    /*if( Mostirdki ) {
-        char tmp[100];
-        int tmpfreki = motor_frequency[index1];
-        sprintf( tmp, "f:%d, index1:%d", tmpfreki, index1 );
-        internal_error( "Itt van eredmeny:", tmp );
-    }*/
 
     sound->motor_frequency = MOTOR_FREQUENCY_INV_RATIO * motor_frequency[index1] + 1.0;
     sound->friction_volume = FRICTION_VOLUME_INV_RATIO * friction_volume[index1];
@@ -413,74 +389,6 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         }
     }
 }
-
-/*void recorder::store_frames( motorst* mot, double dt, bike_sound* sound ) {
-    int index = TIME_TO_FRAME_INDEX*dt;
-    if( index < 0 )
-        index = 0;
-    if( index >= MAX_FRAMES )
-        // betelt:
-        return;
-    if( index < frame_count-1 )
-        internal_error( "recorder::store_frames-ban index < frame_count-1!" );
-
-    for( int i = frame_count; i <= index; i++ ) {
-        bike_x[i] = mot->bike.r.x;
-        bike_y[i] = mot->bike.r.y;
-        left_wheel_x[i] = (mot->left_wheel.r.x-mot->bike.r.x)*Korrszorzo;
-        left_wheel_y[i] = (mot->left_wheel.r.y-mot->bike.r.y)*Korrszorzo;
-        right_wheel_x[i] = (mot->right_wheel.r.x-mot->bike.r.x)*Korrszorzo;
-        right_wheel_y[i] = (mot->right_wheel.r.y-mot->bike.r.y)*Korrszorzo;
-        body_x[i] = (mot->body_r.x-mot->bike.r.x)*Korrszorzo;
-        body_y[i] = (mot->body_r.y-mot->bike.r.y)*Korrszorzo;
-
-        // torlendo
-        //int hatar = 2000;
-        //if( left_wheel_x[i] > hatar || right_wheel_x[i] > hatar ||
-        //	left_wheel_y[i] > hatar || right_wheel_y[i] > hatar )
-        //	external_error( "Nagyobb 5000-nel!" );
-        //if( left_wheel_x[i] < -hatar || right_wheel_x[i] < -hatar ||
-        //	left_wheel_y[i] < -hatar || right_wheel_y[i] < -hatar )
-        //	external_error( "Kisebb -5000-nel!" );
-
-        // Alfak:
-        double alfa1 = mot->bike.rotation;
-        while( alfa1 <= 0 )
-            alfa1 += TWO_PI;
-        while( alfa1 > TWO_PI )
-            alfa1 -= TWO_PI;
-        bike_rotation[i] = alfa1*BIKE_ROTATION_RATIO;
-
-        if( mot->left_wheel.rotation <= 0 )
-            left_wheel_rotation[i] = (mot->left_wheel.rotation + TWO_PI)*WHEEL_ROTATION_RATIO;
-        else
-            left_wheel_rotation[i] = mot->left_wheel.rotation*WHEEL_ROTATION_RATIO;
-        if( mot->right_wheel.rotation <= 0 )
-            right_wheel_rotation[i] = (mot->right_wheel.rotation + TWO_PI)*WHEEL_ROTATION_RATIO;
-        else
-            right_wheel_rotation[i] = mot->right_wheel.rotation*WHEEL_ROTATION_RATIO;
-
-        if( sound->gas )
-            flags[i] = 1;
-        else
-            flags[i] = 0;
-
-        if( mot->hatra )
-            flags[i] += 2;
-        if( FlagTagAHasFlag )
-            flags[i] += 4;
-        if( FlagTagImmunity )
-            flags[i] += 8;
-
-        //flags[i] = char( sound->gas + (mot->hatra<<1) );
-
-        if( sound->motor_frequency > 2.0 )
-            sound->motor_frequency = 2.0;
-        motor_frequency[i] = MOTOR_FREQUENCY_RATIO * sound->motor_frequency;
-        friction_volume[i]    = FRICTION_VOLUME_RATIO  * sound->friction_volume;
-    }
-    frame_count = index+1;
-}*/
 
 void recorder::store_event(double time, WavEvent event_id, double volume, int object_id) {
     if (event_count >= MAX_EVENTS) {
@@ -648,14 +556,6 @@ int recorder::load(const char* filename, FILE* h, int demo) {
         internal_error("recorder event_count > MAX_EVENTS!");
     }
 
-    /*static int elsoszam = 0;
-    if( elsoszam ) {
-        char tmp11[50];
-        sprintf( tmp11, "1.: %d, 2.: %d", event_count, elsoszam );
-        external_error( tmp11 );
-    }
-    elsoszam = event_count;*/
-
     int event_length = event_count * sizeof(event);
     if (fread(events, 1, event_length, h) != event_length) {
         read_error(filename);
@@ -677,27 +577,8 @@ int recorder::load(const char* filename, FILE* h, int demo) {
         }
     }
 
-    // if( !frame_count_integrity( this ) )
-    //	internal_error( "recorder::load-ban !frame_count_integrity( this )!" );
     return level_id;
 }
-
-/* 1.0 es 1.1 eseten ez volt:
-    h = fopen( nev, "wb" );
-    if( !h )
-        internal_error( "Nem sikerult megnyitni irasra recorded file-t!: ", nev );
-
-    if( fwrite( &frame_count, 1, 4, h ) != 4 )
-        internal_error( "Nem sikerult irni recorded file-ba!: ", nev );
-    if( fwrite( &level, 1, 4, h ) != 4 )
-        internal_error( "Nem sikerult irni recorded file-ba!: ", nev );
-
-
-    long hossz = frame_count*sizeof( float );
-
-    if( fwrite( bike_x, 1, unsigned(hossz), h ) != hossz )
-        internal_error( "Nem sikerult irni recorded file-ba!: ", nev );
-*/
 
 static void save_error(const char* filename) {
     internal_error("Failed to write rec file: ", filename);

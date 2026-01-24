@@ -127,15 +127,11 @@ bool recorder::frame_count_integrity() {
     return encoded_value == frame_count;
 }
 
-constexpr double POSITION_RATIO = 1000.0, POSITION_RATIO_INV = 1.0 / POSITION_RATIO;
-constexpr double WHEEL_ROTATION_RATIO = 250 / (2.0 * PI),
-                 WHEEL_ROTATION_INV_RATIO = 1.0 / WHEEL_ROTATION_RATIO;
-constexpr double BIKE_ROTATION_RATIO = 10000 / (2.0 * PI),
-                 BIKE_ROTATION_INV_RATIO = 1.0 / BIKE_ROTATION_RATIO;
-constexpr double MOTOR_FREQUENCY_RATIO = 250.0,
-                 MOTOR_FREQUENCY_INV_RATIO = 1.0 / MOTOR_FREQUENCY_RATIO;
-constexpr double FRICTION_VOLUME_RATIO = 250 / 2.0,
-                 FRICTION_VOLUME_INV_RATIO = 1.0 / FRICTION_VOLUME_RATIO;
+constexpr double POSITION_RATIO = 1000.0;
+constexpr double WHEEL_ROTATION_RATIO = 250 / (2.0 * PI);
+constexpr double BIKE_ROTATION_RATIO = 10000 / (2.0 * PI);
+constexpr double MOTOR_FREQUENCY_RATIO = 250.0;
+constexpr double FRICTION_VOLUME_RATIO = 250 / 2.0;
 
 bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
     if (frame_count <= 0) {
@@ -177,80 +173,75 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
 
     mot->bike.r.x = bike_x[index1] * index1_weight + bike_x[index2] * index2_weight;
     mot->bike.r.y = bike_y[index1] * index1_weight + bike_y[index2] * index2_weight;
-    mot->left_wheel.r.x =
-        mot->bike.r.x + POSITION_RATIO_INV * (left_wheel_x[index1] * index1_weight +
-                                              left_wheel_x[index2] * index2_weight);
-    mot->left_wheel.r.y =
-        mot->bike.r.y + POSITION_RATIO_INV * (left_wheel_y[index1] * index1_weight +
-                                              left_wheel_y[index2] * index2_weight);
-    mot->right_wheel.r.x =
-        mot->bike.r.x + POSITION_RATIO_INV * (right_wheel_x[index1] * index1_weight +
-                                              right_wheel_x[index2] * index2_weight);
-    mot->right_wheel.r.y =
-        mot->bike.r.y + POSITION_RATIO_INV * (right_wheel_y[index1] * index1_weight +
-                                              right_wheel_y[index2] * index2_weight);
-    mot->body_r.x = mot->bike.r.x + POSITION_RATIO_INV * (body_x[index1] * index1_weight +
-                                                          body_x[index2] * index2_weight);
-    mot->body_r.y = mot->bike.r.y + POSITION_RATIO_INV * (body_y[index1] * index1_weight +
-                                                          body_y[index2] * index2_weight);
+
+    double interp;
+    interp = left_wheel_x[index1] * index1_weight + left_wheel_x[index2] * index2_weight;
+    mot->left_wheel.r.x = mot->bike.r.x + interp / POSITION_RATIO;
+
+    interp = left_wheel_y[index1] * index1_weight + left_wheel_y[index2] * index2_weight;
+    mot->left_wheel.r.y = mot->bike.r.y + interp / POSITION_RATIO;
+
+    interp = right_wheel_x[index1] * index1_weight + right_wheel_x[index2] * index2_weight;
+    mot->right_wheel.r.x = mot->bike.r.x + interp / POSITION_RATIO;
+
+    interp = right_wheel_y[index1] * index1_weight + right_wheel_y[index2] * index2_weight;
+    mot->right_wheel.r.y = mot->bike.r.y + interp / POSITION_RATIO;
+
+    interp = body_x[index1] * index1_weight + body_x[index2] * index2_weight;
+    mot->body_r.x = mot->bike.r.x + interp / POSITION_RATIO;
+
+    interp = body_y[index1] * index1_weight + body_y[index2] * index2_weight;
+    mot->body_r.y = mot->bike.r.y + interp / POSITION_RATIO;
 
     if (index1 >= 2) {
         if (abs(bike_rotation[index1] - bike_rotation[index2]) > 9000) {
             if (bike_rotation[index1] > bike_rotation[index2]) {
                 int fixed_rotation = bike_rotation[index1] - 10000;
-                mot->bike.rotation =
-                    BIKE_ROTATION_INV_RATIO *
-                    (fixed_rotation * index1_weight + bike_rotation[index2] * index2_weight);
+                interp = fixed_rotation * index1_weight + bike_rotation[index2] * index2_weight;
             } else {
                 int fixed_rotation = bike_rotation[index2] - 10000;
-                mot->bike.rotation =
-                    BIKE_ROTATION_INV_RATIO *
-                    (bike_rotation[index1] * index1_weight + fixed_rotation * index2_weight);
+                interp = bike_rotation[index1] * index1_weight + fixed_rotation * index2_weight;
             }
         } else {
-            mot->bike.rotation = BIKE_ROTATION_INV_RATIO * (bike_rotation[index1] * index1_weight +
-                                                            bike_rotation[index2] * index2_weight);
+            interp = bike_rotation[index1] * index1_weight + bike_rotation[index2] * index2_weight;
         }
+        mot->bike.rotation = interp / BIKE_ROTATION_RATIO;
 
         if (abs(left_wheel_rotation[index1] - left_wheel_rotation[index2]) > 220) {
             if (left_wheel_rotation[index1] > left_wheel_rotation[index2]) {
                 int fixed_rotation = left_wheel_rotation[index1] - 250;
-                mot->left_wheel.rotation =
-                    WHEEL_ROTATION_INV_RATIO *
-                    (fixed_rotation * index1_weight + left_wheel_rotation[index2] * index2_weight);
+                interp =
+                    fixed_rotation * index1_weight + left_wheel_rotation[index2] * index2_weight;
             } else {
                 int fixed_rotation = left_wheel_rotation[index2] - 250;
-                mot->left_wheel.rotation =
-                    WHEEL_ROTATION_INV_RATIO *
-                    (left_wheel_rotation[index1] * index1_weight + fixed_rotation * index2_weight);
+                interp =
+                    left_wheel_rotation[index1] * index1_weight + fixed_rotation * index2_weight;
             }
         } else {
-            mot->left_wheel.rotation =
-                WHEEL_ROTATION_INV_RATIO * (left_wheel_rotation[index1] * index1_weight +
-                                            left_wheel_rotation[index2] * index2_weight);
+            interp = left_wheel_rotation[index1] * index1_weight +
+                     left_wheel_rotation[index2] * index2_weight;
         }
+        mot->left_wheel.rotation = interp / WHEEL_ROTATION_RATIO;
 
         if (abs(right_wheel_rotation[index1] - right_wheel_rotation[index2]) > 220) {
             if (right_wheel_rotation[index1] > right_wheel_rotation[index2]) {
                 int fixed_rotation = right_wheel_rotation[index1] - 250;
-                mot->right_wheel.rotation =
-                    WHEEL_ROTATION_INV_RATIO *
-                    (fixed_rotation * index1_weight + right_wheel_rotation[index2] * index2_weight);
+                interp =
+                    fixed_rotation * index1_weight + right_wheel_rotation[index2] * index2_weight;
             } else {
                 int fixed_rotation = right_wheel_rotation[index2] - 250;
-                mot->right_wheel.rotation =
-                    WHEEL_ROTATION_INV_RATIO *
-                    (right_wheel_rotation[index1] * index1_weight + fixed_rotation * index2_weight);
+                interp =
+                    right_wheel_rotation[index1] * index1_weight + fixed_rotation * index2_weight;
             }
         } else {
-            mot->right_wheel.rotation =
-                WHEEL_ROTATION_INV_RATIO * (right_wheel_rotation[index1] * index1_weight +
-                                            right_wheel_rotation[index2] * index2_weight);
+            interp = right_wheel_rotation[index1] * index1_weight +
+                     right_wheel_rotation[index2] * index2_weight;
         }
+        mot->right_wheel.rotation = interp / WHEEL_ROTATION_RATIO;
     } else {
-        mot->bike.rotation = BIKE_ROTATION_INV_RATIO * bike_rotation[index2];
-        mot->left_wheel.rotation = WHEEL_ROTATION_INV_RATIO * left_wheel_rotation[index2];
-        mot->right_wheel.rotation = WHEEL_ROTATION_INV_RATIO * right_wheel_rotation[index2];
+        mot->bike.rotation = bike_rotation[index2] / BIKE_ROTATION_RATIO;
+        mot->left_wheel.rotation = left_wheel_rotation[index2] / WHEEL_ROTATION_RATIO;
+        mot->right_wheel.rotation = right_wheel_rotation[index2] / WHEEL_ROTATION_RATIO;
     }
 
     sound->gas = char((flags[index1] >> FLAG_GAS) & 1);
@@ -258,8 +249,8 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
     FlagTagAHasFlag = (flags[index1] >> FLAG_FLAGTAG_A) & 1;
     FlagTagImmunity = (flags[index1] >> FLAG_FLAGTAG_IMMUNITY) & 1;
 
-    sound->motor_frequency = 1.0 + MOTOR_FREQUENCY_INV_RATIO * motor_frequency[index1];
-    sound->friction_volume = FRICTION_VOLUME_INV_RATIO * friction_volume[index1];
+    sound->motor_frequency = 1.0 + motor_frequency[index1] / MOTOR_FREQUENCY_RATIO;
+    sound->friction_volume = friction_volume[index1] / FRICTION_VOLUME_RATIO;
 
     return true;
 }

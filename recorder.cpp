@@ -202,9 +202,9 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
                     (fixed_rotation * index1_weight + bike_rotation[index2] * index2_weight);
             } else {
                 int fixed_rotation = bike_rotation[index2] - 10000;
-                mot->bike.rotation = BIKE_ROTATION_INV_RATIO *
-                                     (bike_rotation[index1] * index1_weight * index1_weight +
-                                      fixed_rotation * index2_weight);
+                mot->bike.rotation =
+                    BIKE_ROTATION_INV_RATIO *
+                    (bike_rotation[index1] * index1_weight + fixed_rotation * index2_weight);
             }
         } else {
             mot->bike.rotation = BIKE_ROTATION_INV_RATIO * (bike_rotation[index1] * index1_weight +
@@ -221,8 +221,7 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
                 int fixed_rotation = left_wheel_rotation[index2] - 250;
                 mot->left_wheel.rotation =
                     WHEEL_ROTATION_INV_RATIO *
-                    (left_wheel_rotation[index1] * index1_weight * index1_weight +
-                     fixed_rotation * index2_weight);
+                    (left_wheel_rotation[index1] * index1_weight + fixed_rotation * index2_weight);
             }
         } else {
             mot->left_wheel.rotation =
@@ -240,8 +239,7 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
                 int fixed_rotation = right_wheel_rotation[index2] - 250;
                 mot->right_wheel.rotation =
                     WHEEL_ROTATION_INV_RATIO *
-                    (right_wheel_rotation[index1] * index1_weight * index1_weight +
-                     fixed_rotation * index2_weight);
+                    (right_wheel_rotation[index1] * index1_weight + fixed_rotation * index2_weight);
             }
         } else {
             mot->right_wheel.rotation =

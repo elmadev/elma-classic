@@ -319,15 +319,6 @@ void handle_events() {
             break;
         }
     }
-
-    update_key_state();
-}
-
-void fill_key_state(char* buffer) {
-    const unsigned char* state = SDL_GetKeyboardState(NULL);
-    for (int i = 0; i < MaxKeycode; i++) {
-        buffer[i] = state[windows_scancode_table[i]];
-    }
 }
 
 void hide_cursor() { SDL_ShowCursor(SDL_DISABLE); }

@@ -65,8 +65,6 @@ static void mergestatedat(void);
 void teljes(void) {
     init_qopen();
 
-    keys_init();
-
     init_menu_pictures();
 
     State = new state;

@@ -1,7 +1,7 @@
 #ifndef KEYS_H
 #define KEYS_H
 
-// ASCII char defined in keys_init() or one of the special keycodes defined below.
+// ASCII char or one of the special keycodes defined below.
 typedef int Keycode;
 constexpr Keycode KEY_ESC = 1;
 constexpr Keycode KEY_ENTER = 400;
@@ -16,9 +16,6 @@ constexpr Keycode KEY_BACKSPACE = 408;
 
 constexpr int MaxKeycode = 256;
 
-void keys_init();
-void update_keypress_buffer();
-void update_key_state();
 void add_key_to_buffer(Keycode keycode);
 
 Keycode get_keypress();

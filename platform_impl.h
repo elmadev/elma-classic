@@ -25,8 +25,6 @@ void unlock_backbuffer();
 unsigned char** lock_frontbuffer(bool flipped);
 void unlock_frontbuffer();
 
-void fill_key_state(char* buffer);
-
 void get_mouse_position(int* x, int* y);
 void set_mouse_position(int x, int y);
 bool left_mouse_clicked();

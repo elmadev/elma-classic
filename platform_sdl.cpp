@@ -173,6 +173,35 @@ void platform_init() {
     initialize_keyboard_mappings();
 }
 
+void platform_recreate_window() {
+    int x;
+    int y;
+    SDL_GetWindowPosition(SDLWindow, &x, &y);
+
+    int width;
+    int height;
+    SDL_GetWindowSize(SDLWindow, &width, &height);
+
+    gl_cleanup();
+
+    if (SDLSurfacePaletted) {
+        SDL_FreeSurface(SDLSurfacePaletted);
+        SDLSurfacePaletted = nullptr;
+    }
+
+    if (SDLSurfaceMain) {
+        SDL_DestroyWindowSurface(SDLWindow);
+        SDLSurfaceMain = nullptr;
+    }
+
+    SDL_DestroyWindow(SDLWindow);
+    SDLWindow = nullptr;
+
+    create_window(x, y, width, height);
+    initialize_renderer();
+    create_palette_surface();
+}
+
 long long get_milliseconds() { return SDL_GetTicks64(); }
 
 static bool SurfaceLocked = false;

@@ -38,4 +38,6 @@ bool is_ctrl_alt_down();
 bool is_fullscreen();
 long long get_milliseconds();
 
+void platform_recreate_window();
+
 #endif

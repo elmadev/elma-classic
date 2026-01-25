@@ -1,6 +1,9 @@
 #ifndef PLATFORM_IMPL_H
 #define PLATFORM_IMPL_H
 
+// DIK_ Windows scancode
+typedef int DikScancode;
+
 class palette {
     void* data;
 
@@ -30,6 +33,9 @@ bool left_mouse_clicked();
 bool right_mouse_clicked();
 void show_cursor();
 void hide_cursor();
+
+bool is_key_down(DikScancode code);
+bool is_ctrl_alt_down();
 
 bool is_fullscreen();
 long long get_milliseconds();

@@ -1,6 +1,7 @@
 #include "EDITPLAY.H"
 #include "EDITTOLT.H"
 #include "EDITUJ.H"
+#include "keys.h"
 #include "LEJATSZO.H"
 #include "level.h"
 #include "LOAD.H"

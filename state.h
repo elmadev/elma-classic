@@ -1,7 +1,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "keys.h"
+#include "platform_impl.h"
 #include <cstdio>
 
 constexpr int MAX_PLAYERS = 50;

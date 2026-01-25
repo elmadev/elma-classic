@@ -3,6 +3,7 @@
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "fs_utils.h"
+#include "keys.h"
 #include "LEJATSZO.H"
 #include "level.h"
 #include "LOAD.H"

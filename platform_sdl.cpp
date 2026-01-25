@@ -350,6 +350,22 @@ bool right_mouse_clicked() {
     return click;
 }
 
+bool is_key_down(DikScancode code) {
+    if (code < 0 || code >= MaxKeycode) {
+        internal_error("code out of range in is_key_down()!");
+        return false;
+    }
+
+    SDL_Scancode sdl_code = windows_scancode_table[code];
+
+    return SDLKeyState[sdl_code] != 0;
+}
+
+bool is_ctrl_alt_down() {
+    return (SDLKeyState[SDL_SCANCODE_LCTRL] || SDLKeyState[SDL_SCANCODE_RCTRL]) &&
+           (SDLKeyState[SDL_SCANCODE_LALT] || SDLKeyState[SDL_SCANCODE_RALT]);
+}
+
 bool is_fullscreen() {
     Uint32 flags = SDL_GetWindowFlags(SDLWindow);
     return flags & SDL_WINDOW_FULLSCREEN;

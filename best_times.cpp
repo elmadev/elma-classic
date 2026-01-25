@@ -1,5 +1,6 @@
 #include "abc8.h"
 #include "best_times.h"
+#include "keys.h"
 #include "level.h"
 #include "main.h"
 #include "menu_nav.h"

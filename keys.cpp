@@ -1,6 +1,5 @@
 #include "keys.h"
 #include <directinput/scancodes.h>
-#include "main.h"
 #include "platform_impl.h"
 
 constexpr int KeyBufferSize = 30;
@@ -113,20 +112,6 @@ bool has_keypress() {
     handle_events();
     return KeyBufferCount > 0;
 }
-
-bool is_key_down(DikScancode code) {
-    if (code < 0 || code >= MaxKeycode) {
-        internal_error("code out of range in is_key_down()!");
-        return false;
-    }
-    if (UseKeyState2) {
-        return KeyState2[code];
-    } else {
-        return KeyState1[code];
-    }
-}
-
-bool is_ctrl_alt_down() { return is_key_down(DIK_LMENU) && is_key_down(DIK_LCONTROL); }
 
 // Update whether keys are pressed down or not
 void update_key_state() {

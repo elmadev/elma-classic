@@ -3,6 +3,7 @@
 #include "ball_collision.h"
 #include "EDITUJ.H"
 #include "JATEKOS.H"
+#include "keys.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_nav.h"

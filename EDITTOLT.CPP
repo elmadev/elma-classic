@@ -4,6 +4,7 @@
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "fs_utils.h"
+#include "keys.h"
 #include "level.h"
 #include "LOAD.H"
 #include "LGRFILE.H"

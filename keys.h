@@ -1,9 +1,6 @@
 #ifndef KEYS_H
 #define KEYS_H
 
-// DIK_ Windows scancode
-typedef int DikScancode;
-
 // ASCII char defined in keys_init() or one of the special keycodes defined below.
 typedef int Keycode;
 constexpr Keycode KEY_ESC = 1;
@@ -27,8 +24,5 @@ void add_key_to_buffer(Keycode keycode);
 Keycode get_keypress();
 void empty_keypress_buffer();
 bool has_keypress();
-
-bool is_key_down(DikScancode code);
-bool is_ctrl_alt_down();
 
 #endif

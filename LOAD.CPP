@@ -2,6 +2,7 @@
 #include "ECSET.H"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
+#include "keys.h"
 #include "level.h"
 #include "LGRFILE.H"
 #include "main.h"

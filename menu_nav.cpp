@@ -5,6 +5,7 @@
 #include "main.h"
 #include "M_PIC.H"
 #include "menu_pic.h"
+#include "platform_impl.h"
 #include "platform_utils.h"
 #include <algorithm>
 #include <cstring>

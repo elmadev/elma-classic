@@ -8,7 +8,7 @@
 #include "EDITPLAY.H"
 #include "EDITTOLT.H"
 #include "EDITTOOL.H"
-#include "polygon.h"
+#include "keys.h"
 #include "level.h"
 #include "LGRFILE.H"
 #include "LOAD.H"
@@ -19,6 +19,7 @@
 #include "pic8.h"
 #include "platform_impl.h"
 #include "platform_utils.h"
+#include "polygon.h"
 #include "sprite.h"
 #include <cstring>
 

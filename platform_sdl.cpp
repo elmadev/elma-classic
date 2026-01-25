@@ -14,8 +14,6 @@ static SDL_Window* SDLWindow = nullptr;
 static SDL_Surface* SDLSurfaceMain = nullptr;
 static SDL_Surface* SDLSurfacePaletted = nullptr;
 
-static RendererType CurrentRenderer;
-
 static bool LeftMouseDownPrev = false;
 static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
@@ -34,13 +32,13 @@ void message_box(const char* text) {
 static unsigned char** SurfaceBuffer;
 
 static void create_window(int window_pos_x, int window_pos_y, int width, int height) {
-    if (CurrentRenderer == RendererType::OpenGL) {
+    if (EolSettings->renderer() == RendererType::OpenGL) {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     }
 
-    int window_flags = CurrentRenderer == RendererType::OpenGL ? SDL_WINDOW_OPENGL : 0;
+    int window_flags = EolSettings->renderer() == RendererType::OpenGL ? SDL_WINDOW_OPENGL : 0;
 
     SDLWindow =
         SDL_CreateWindow("Elasto Mania", window_pos_x, window_pos_y, width, height, window_flags);
@@ -51,7 +49,7 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
 }
 
 static void initialize_renderer() {
-    if (CurrentRenderer == RendererType::OpenGL) {
+    if (EolSettings->renderer() == RendererType::OpenGL) {
         if (gl_init(SDLWindow, SCREEN_WIDTH, SCREEN_HEIGHT) != 0) {
             internal_error("Failed to initialize OpenGL renderer");
             return;
@@ -155,8 +153,6 @@ static void initialize_keyboard_mappings() {
 }
 
 void platform_init() {
-    CurrentRenderer = EolSettings->renderer();
-
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         internal_error(SDL_GetError());
         return;
@@ -238,7 +234,7 @@ void unlock_backbuffer() {
     }
     SurfaceLocked = false;
 
-    if (CurrentRenderer == RendererType::OpenGL) {
+    if (EolSettings->renderer() == RendererType::OpenGL) {
         gl_upload_frame((unsigned char*)SDLSurfacePaletted->pixels);
         gl_present();
         SDL_GL_SwapWindow(SDLWindow);
@@ -278,7 +274,7 @@ palette::palette(unsigned char* palette_data) {
 palette::~palette() { delete[] (SDL_Color*)data; }
 
 void palette::set() {
-    if (CurrentRenderer == RendererType::OpenGL) {
+    if (EolSettings->renderer() == RendererType::OpenGL) {
         gl_update_palette(data);
     } else {
         SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, (const SDL_Color*)data, 0, 256);

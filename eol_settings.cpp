@@ -1,7 +1,9 @@
 #include "eol_settings.h"
 #include "lgr.h"
 #include "main.h"
+#include "menu_pic.h"
 #include "physics_init.h"
+#include "platform_impl.h"
 #include <fstream>
 #define JSON_DIAGNOSTICS 1
 #include <nlohmann/json.hpp>
@@ -51,7 +53,17 @@ void eol_settings::set_center_map(bool b) { center_map_ = b; }
 
 void eol_settings::set_map_alignment(MapAlignment m) { map_alignment_ = m; }
 
-void eol_settings::set_renderer(RendererType r) { renderer_ = r; }
+void eol_settings::set_renderer(RendererType r) {
+    if (renderer_ == r) {
+        return;
+    }
+
+    renderer_ = r;
+    if (has_window()) {
+        platform_recreate_window();
+        MenuPalette->set();
+    }
+}
 
 void eol_settings::set_zoom(double z) {
     if (z != zoom_) {

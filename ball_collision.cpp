@@ -170,10 +170,10 @@ void simulate_ball_ball_collision(ball* ball1, ball* ball2, double time) {
     }
 }
 
-constexpr int WallLeft = 0;
-const int WallRight = SCREEN_WIDTH;
-constexpr int WallTop = 0;
-const int WallBottom = SCREEN_HEIGHT;
+static int wall_left() { return 0; }
+static int wall_right() { return SCREEN_WIDTH; }
+static int wall_top() { return 0; }
+static int wall_bottom() { return SCREEN_HEIGHT; }
 
 // Get collision time between a ball and wall
 double ball_wall_collision_time(ball* ball, WallId wall) {
@@ -185,34 +185,37 @@ double ball_wall_collision_time(ball* ball, WallId wall) {
         if (ball->v.y >= 0) {
             return NO_COLLISION_TIME;
         }
-        if (ball->keyframe_r.y <= WallTop + ball->radius) {
+        if (ball->keyframe_r.y <= wall_top() + ball->radius) {
             return NO_COLLISION_TIME;
         }
-        return ball->keyframe_time - ((ball->keyframe_r.y - WallTop - ball->radius) / ball->v.y);
+        return ball->keyframe_time - ((ball->keyframe_r.y - wall_top() - ball->radius) / ball->v.y);
     case WallId::Bottom:
         if (ball->v.y <= 0) {
             return NO_COLLISION_TIME;
         }
-        if (ball->keyframe_r.y >= WallBottom - ball->radius) {
+        if (ball->keyframe_r.y >= wall_bottom() - ball->radius) {
             return NO_COLLISION_TIME;
         }
-        return ball->keyframe_time + ((WallBottom - ball->radius - ball->keyframe_r.y) / ball->v.y);
+        return ball->keyframe_time +
+               ((wall_bottom() - ball->radius - ball->keyframe_r.y) / ball->v.y);
     case WallId::Right:
         if (ball->v.x <= 0) {
             return NO_COLLISION_TIME;
         }
-        if (ball->keyframe_r.x >= WallRight - ball->radius) {
+        if (ball->keyframe_r.x >= wall_right() - ball->radius) {
             return NO_COLLISION_TIME;
         }
-        return ball->keyframe_time + ((WallRight - ball->radius - ball->keyframe_r.x) / ball->v.x);
+        return ball->keyframe_time +
+               ((wall_right() - ball->radius - ball->keyframe_r.x) / ball->v.x);
     case WallId::Left:
         if (ball->v.x >= 0) {
             return NO_COLLISION_TIME;
         }
-        if (ball->keyframe_r.x <= WallLeft + ball->radius) {
+        if (ball->keyframe_r.x <= wall_left() + ball->radius) {
             return NO_COLLISION_TIME;
         }
-        return ball->keyframe_time - ((ball->keyframe_r.x - WallLeft - ball->radius) / ball->v.x);
+        return ball->keyframe_time -
+               ((ball->keyframe_r.x - wall_left() - ball->radius) / ball->v.x);
     }
     return NO_COLLISION_TIME;
 }

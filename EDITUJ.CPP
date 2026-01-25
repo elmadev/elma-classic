@@ -10,7 +10,7 @@
 #include "EDITTOOL.H"
 #include "keys.h"
 #include "level.h"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "LOAD.H"
 #include "M_PIC.H"
 #include "main.h"

@@ -6,7 +6,7 @@
 #include "KIRAJZOL.H"
 #include "LEPTET.H"
 #include "level.h"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "main.h"
 #include "object.h"
 #include "physics_init.h"

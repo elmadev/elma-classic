@@ -1,5 +1,5 @@
 #include "best_times.h"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "main.h"
 #include "pic8.h"
 #include "timer.h"

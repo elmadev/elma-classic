@@ -6,7 +6,7 @@
 #include "platform_impl.h"
 #include "polygon.h"
 #include "level.h"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"

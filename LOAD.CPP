@@ -4,7 +4,7 @@
 #include "EDITUJ.H"
 #include "keys.h"
 #include "level.h"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "main.h"
 #include "menu_pic.h"
 #include "physics_init.h"

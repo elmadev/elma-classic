@@ -7,7 +7,7 @@
 #include "keys.h"
 #include "level.h"
 #include "LOAD.H"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"

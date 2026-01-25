@@ -1,5 +1,5 @@
 #include "eol_settings.h"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "main.h"
 #include "physics_init.h"
 #include <fstream>

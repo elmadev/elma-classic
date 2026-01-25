@@ -6,7 +6,7 @@
 #include "EDITTOLT.H"
 #include "EDITUJ.H"
 #include "polygon.h"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "LOAD.H"
 #include "main.h"
 #include "object.h"

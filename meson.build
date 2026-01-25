@@ -40,7 +40,7 @@ elma_sources = files(
     'platform_utils.cpp',
     'LEJATSZO.CPP',
     'LEPTET.CPP',
-    'LGRFILE.CPP',
+    'lgr.cpp',
     'LOAD.CPP',
     'main.cpp',
     'MAINMENU.CPP',

@@ -5,7 +5,7 @@
 #include "grass.h"
 #include "polygon.h"
 #include "level.h"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "main.h"
 #include "M_PIC.H"
 #include "menu_pic.h"

@@ -7,7 +7,7 @@
 #include "flagtag.h"
 #include "LEJATSZO.H"
 #include "level.h"
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "object.h"

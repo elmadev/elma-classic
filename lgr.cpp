@@ -1,4 +1,4 @@
-#include "LGRFILE.H"
+#include "lgr.h"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "affine_pic.h"

@@ -204,6 +204,8 @@ void platform_recreate_window() {
 
 long long get_milliseconds() { return SDL_GetTicks64(); }
 
+bool has_window() { return SDLWindow != nullptr; }
+
 static bool SurfaceLocked = false;
 
 unsigned char** lock_backbuffer(bool flipped) {

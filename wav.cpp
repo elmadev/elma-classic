@@ -117,7 +117,7 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
     // Scale based on the max amplitude and max volume
     double scale = 32000.0 * max_volume / double(max_amplitude);
     for (int i = 0; i < size; i++) {
-        samples[i] *= scale;
+        samples[i] = (short)(samples[i] * scale);
     }
 }
 
@@ -127,7 +127,7 @@ void wav::loop(int fade_length) {
     }
     for (int i = 0; i < fade_length; i++) {
         double fade = ((double)i) / fade_length;
-        samples[i] = fade * samples[i] + (1 - fade) * samples[size - fade_length + i];
+        samples[i] = (short)(fade * samples[i] + (1 - fade) * samples[size - fade_length + i]);
     }
     size -= fade_length;
 }
@@ -141,13 +141,14 @@ void wav::fade(wav* next, int fade_length) {
     }
     for (int i = 0; i < fade_length; i++) {
         double fade = ((double)i) / fade_length;
-        samples[size - fade_length + i] = (1 - fade) * samples[i] + fade * next->samples[i];
+        samples[size - fade_length + i] =
+            (short)((1 - fade) * samples[i] + fade * next->samples[i]);
     }
 }
 
 void wav::volume(double scale) {
     for (int i = 0; i < size; i++) {
-        samples[i] *= scale;
+        samples[i] = (short)(samples[i] * scale);
     }
 }
 

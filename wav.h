@@ -6,7 +6,7 @@ class wav {
     void allocate();
 
   public:
-    signed short* samples;
+    short* samples;
     unsigned size;
 
     // Open a wav file. The volume will be scaled based on max_volume (0.0-1.0)

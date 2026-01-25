@@ -54,7 +54,7 @@ void eol_settings::set_map_alignment(MapAlignment m) { map_alignment_ = m; }
 void eol_settings::set_renderer(RendererType r) { renderer_ = r; }
 
 void eol_settings::set_zoom(double z) {
-    if (z != zoom_.value) {
+    if (z != zoom_) {
         zoom_ = z;
         set_zoom_factor();
         invalidate_lgr_cache();

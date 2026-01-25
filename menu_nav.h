@@ -19,6 +19,8 @@ extern nav_entry NavEntriesRight[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 
 void menu_nav_entries_init();
 
+enum class SearchPattern { None, Sorted, Internals };
+
 class menu_nav {
     nav_entry* entries_left;
     nav_entry* entries_right;
@@ -36,7 +38,7 @@ class menu_nav {
     int y_title;
     bool enable_esc;
     char title[100];
-    bool search_enabled;
+    SearchPattern search_pattern;
     bool search_skip_one;
 
     menu_nav();

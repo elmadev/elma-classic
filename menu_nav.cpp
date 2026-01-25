@@ -73,7 +73,7 @@ menu_nav::menu_nav() {
     title[0] = 0;
     y_title = 30;
     menu = nullptr;
-    search_enabled = false;
+    search_pattern = SearchPattern::None;
     search_skip_one = false;
 }
 
@@ -185,7 +185,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     while (true) {
         while (!render_only && has_keypress()) {
             Keycode c = get_keypress();
-            if (search_enabled && search_handler(c)) {
+            if (search_handler(c)) {
                 view_index = selected_index - max_visible_entries / 2;
                 rerender = true;
                 break;
@@ -254,7 +254,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
             }
 
             // Title
-            if (search_enabled && !search_input.empty()) {
+            if (!search_input.empty()) {
                 std::string search_title = title;
                 search_title.append(": ");
                 search_title.append(search_input);
@@ -311,6 +311,10 @@ static size_t common_prefix_len(const char* a, const char* b) {
 }
 
 bool menu_nav::search_handler(int code) {
+    if (search_pattern == SearchPattern::None) {
+        return false;
+    }
+
     if (code == KEY_BACKSPACE) {
         if (!search_input.empty()) {
             search_input.pop_back();
@@ -321,7 +325,7 @@ bool menu_nav::search_handler(int code) {
         } else {
             return false;
         }
-    } else if (accept_search_input() && code >= '0' && code <= 'z') {
+    } else if (accept_search_input() && ((code >= '0' && code <= 'z') || code == ' ')) {
         if (search_input.size() < MAX_FILENAME_LEN) {
             search_input.push_back(code);
         }
@@ -329,37 +333,70 @@ bool menu_nav::search_handler(int code) {
         return false;
     }
 
-    if (!search_input.empty()) {
-        // Search for an exact prefix match
-        for (int i = search_skip_one ? 1 : 0; i < length; ++i) {
-            if (strnicmp(entries_left[i], search_input.c_str(), search_input.size()) == 0) {
-                selected_index = i;
-                return true;
-            }
-        }
+    if (search_input.empty()) {
+        return true;
+    }
 
-        nav_entry* begin = entries_left;
-        nav_entry* end = entries_left + length;
-        if (search_skip_one) {
-            ++begin;
-        }
+    nav_entry* begin = entries_left;
+    nav_entry* end = entries_left + length;
+    if (search_skip_one) {
+        ++begin;
+    }
 
-        // Search for a reasonable prefix match
-        auto it = std::lower_bound(
+    switch (search_pattern) {
+    case SearchPattern::Sorted: {
+        // Find the entry
+        nav_entry* match = std::lower_bound(
             begin, end, search_input.c_str(),
             [](const nav_entry& entry, const char* k) { return strcmpi(entry, k) < 0; });
+        selected_index = match - entries_left;
 
-        int i = it - entries_left;
-        if (i != length && i > 0) {
-            size_t a = common_prefix_len(search_input.c_str(), entries_left[i]);
-            size_t b = common_prefix_len(search_input.c_str(), entries_left[i - 1]);
+        if (selected_index != length && selected_index > 0 &&
+            strnicmp(*match, search_input.c_str(), search_input.length()) != 0) {
+            size_t a = common_prefix_len(search_input.c_str(), entries_left[selected_index]);
+            size_t b = common_prefix_len(search_input.c_str(), entries_left[selected_index - 1]);
             // Use the previous entry if it has a longer common prefix
             if (b >= a) {
-                i -= 1;
+                selected_index -= 1;
             }
         }
 
-        selected_index = i;
+        break;
+    }
+    case SearchPattern::Internals: {
+        // Try to jump via number input
+        int index_search = -1;
+        try {
+            index_search = std::stoi(search_input);
+        } catch (...) {
+        }
+
+        if (index_search >= 0) {
+            selected_index = index_search;
+            break;
+        }
+
+        // Try to find exact match
+        for (int i = 0; i < length; ++i) {
+            char* text = entries_left[i];
+            // Skip the number prefix
+            if (i >= 1) {
+                text += 2;
+            }
+            if (i >= 10) {
+                text++;
+            }
+
+            if (strnicmp(text, search_input.c_str(), search_input.size()) == 0) {
+                selected_index = i;
+                break;
+            }
+        }
+        break;
+    }
+    case SearchPattern::None:
+        internal_error("search_handler() SearchPattern::None reached!");
+        break;
     }
 
     return true;

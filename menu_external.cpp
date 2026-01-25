@@ -52,7 +52,7 @@ void menu_external_levels() {
     }
 
     menu_nav val;
-    val.search_enabled = true;
+    val.search_pattern = SearchPattern::Sorted;
     val.selected_index = previous_index;
     strcpy(val.title, "Select External File!");
 

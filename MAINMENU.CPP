@@ -174,7 +174,7 @@ void replay(void) {
     }
 
     menu_nav val;
-    val.search_enabled = true;
+    val.search_pattern = SearchPattern::Sorted;
     val.search_skip_one = true;
     val.selected_index = 0;
     strcpy(val.title, "Select replay file!");

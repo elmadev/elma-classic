@@ -32,7 +32,7 @@ elma_sources = files(
     'ball.cpp',
     'ball_collision.cpp',
     'polygon.cpp',
-    'H_WAV.CPP',
+    'wav.cpp',
     'JATEKOS.CPP',
     'KIRAJ320.CPP',
     'affine_pic.cpp',

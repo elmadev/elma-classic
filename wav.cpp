@@ -1,4 +1,4 @@
-#include "WAV.H"
+#include "wav.h"
 #include "main.h"
 #include "platform_utils.h"
 #include "qopen.h"

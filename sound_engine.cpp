@@ -2,7 +2,7 @@
 #include "main.h"
 #include "platform_impl.h"
 #include "state.h"
-#include "WAV.H"
+#include "wav.h"
 #include <cstring>
 
 bool Mute = true;

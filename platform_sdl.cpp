@@ -286,7 +286,7 @@ void palette::set() {
 
 void handle_events() {
 #ifdef __EMSCRIPTEN__
-    emscripten_sleep(100);
+    emscripten_sleep(1);
 #endif
     SDL_Event event;
     while (SDL_PollEvent(&event)) {

@@ -15,6 +15,9 @@ bool find_first(const char* pattern, char* filename_dest) {
     }
 
     FindInProgress = true;
+#ifdef __EMSCRIPTEN__
+    return true;
+#endif
     std::string directory = std::filesystem::path(pattern).parent_path().generic_string();
     CurrentExt = std::filesystem::path(pattern).extension().generic_string();
     try {
@@ -30,6 +33,9 @@ bool find_next(char* filename_dest) {
     if (!FindInProgress) {
         internal_error("Called find_next while no find is in progress!");
     }
+#ifdef __EMSCRIPTEN__
+    return true;
+#endif
 
     while (CurrentIterator != EndIterator) {
         const std::filesystem::directory_entry& entry = *CurrentIterator;

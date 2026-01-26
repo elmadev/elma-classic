@@ -75,39 +75,39 @@ elma_sources = files(
 inc = include_directories('include')
 
 cpp = meson.get_compiler('cpp')
-link_args = []
-cpp_args = []
+link_args = ['-sUSE_SDL=2', '-ooutput.html', '--emrun', '--embed-file','../emscripten_virtual@/','-sASYNCIFY', '-sEXCEPTION_DEBUG', '-sDISABLE_EXCEPTION_CATCHING=0']
+cpp_args = ['-sUSE_SDL=2']
 
 # Required for nlohmann_json on Apple clang < 12
-if cpp.get_id() == 'clang' and cpp.version().version_compare('<12.0')
-    add_project_arguments('-DJSON_HAS_CPP_17', language: 'cpp')
-endif
-
+# if cpp.get_id() == 'clang' and cpp.version().version_compare('<12.0')
+#     add_project_arguments('-DJSON_HAS_CPP_17', language: 'cpp')
+# endif
+# 
 win_subsystem = 'windows'
-if cpp.get_id() == 'msvc'
-    if get_option('buildtype') == 'debug'
-        # Allows printf when debugging
-        win_subsystem = 'console'
-    endif
+# if cpp.get_id() == 'msvc'
+#     if get_option('buildtype') == 'debug'
+#         # Allows printf when debugging
+#         win_subsystem = 'console'
+#     endif
+# 
+#     if win_subsystem == 'windows'
+#         # Override windows subsystem entrypoint to main instead of WinMain
+#         link_args += ['/ENTRY:mainCRTStartup']
+#     endif
+# else
+#     cpp_args += ['-Wno-deprecated-declarations']
+# endif
 
-    if win_subsystem == 'windows'
-        # Override windows subsystem entrypoint to main instead of WinMain
-        link_args += ['/ENTRY:mainCRTStartup']
-    endif
-else
-    cpp_args += ['-Wno-deprecated-declarations']
-endif
-
-sdl2_dep = dependency('sdl2',
-    static: build_machine.system() == 'windows',
-    default_options: {
-        'test': false,
-        'with_main': false,
-    }
-)
-
-gl_dep = dependency('gl', required: true)
-
+# sdl2_dep = dependency('sdl2',
+#     static: build_machine.system() == 'windows',
+#     default_options: {
+#         'test': false,
+#         'with_main': false,
+#     }
+# )
+# 
+# gl_dep = dependency('gl', required: true)
+# 
 nlohmann_json_dep = dependency('nlohmann_json')
 
 executable(
@@ -116,6 +116,6 @@ executable(
     include_directories: inc,
     cpp_args: cpp_args,
     link_args: link_args,
-    dependencies: [nlohmann_json_dep, gl_dep, sdl2_dep],
+    dependencies: [nlohmann_json_dep], # nlohmann_json_dep, gl_dep, sdl2_dep
     win_subsystem: win_subsystem,
 )

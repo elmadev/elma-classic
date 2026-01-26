@@ -1,0 +1,5 @@
+Please put:
+default.lgr
+elma.res
+state.dat
+etc..

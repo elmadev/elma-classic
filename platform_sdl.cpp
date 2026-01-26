@@ -9,6 +9,9 @@
 #include "M_PIC.H"
 #include <SDL.h>
 #include <sdl/scancodes_windows.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 static SDL_Window* SDLWindow = nullptr;
 static SDL_Surface* SDLSurfaceMain = nullptr;
@@ -282,6 +285,9 @@ void palette::set() {
 }
 
 void handle_events() {
+#ifdef __EMSCRIPTEN__
+    emscripten_sleep(100);
+#endif
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {

@@ -8,8 +8,8 @@
 
 sprite::sprite(double x, double y, const char* pic_name, const char* text_name,
                const char* mask_nam) {
-    if (!Plgr) {
-        internal_error("sprite::sprite !Plgr");
+    if (!Lgr) {
+        internal_error("sprite::sprite !Lgr");
     }
     r = vect2(x, y);
     if (strlen(pic_name) > MAX_FILENAME_LEN || strlen(mask_nam) > MAX_FILENAME_LEN ||
@@ -30,34 +30,34 @@ sprite::sprite(double x, double y, const char* pic_name, const char* text_name,
         internal_error("sprite::sprite invalid pic/mask/text combination!");
     }
     if (picture_name[0]) {
-        int index = Plgr->getkepindex(picture_name);
+        int index = Lgr->get_picture_index(picture_name);
         if (index < 0) {
             picture_name[0] = 0;
         } else {
-            wireframe_width = Plgr->kepek[index].xsize * PixelsToMeters;
-            wireframe_height = Plgr->kepek[index].ysize * PixelsToMeters;
-            distance = Plgr->kepek[index].tavolsag;
-            clipping = Plgr->kepek[index].hatarol;
+            wireframe_width = Lgr->pictures[index].width * PixelsToMeters;
+            wireframe_height = Lgr->pictures[index].height * PixelsToMeters;
+            distance = Lgr->pictures[index].default_distance;
+            clipping = Lgr->pictures[index].default_clipping;
         }
     } else {
         if (mask_name[0]) {
-            int index = Plgr->getmaszkindex(mask_name);
+            int index = Lgr->get_mask_index(mask_name);
             if (index < 0) {
                 mask_name[0] = 0;
             } else {
-                wireframe_width = Plgr->maszkok[index].xsize;
-                wireframe_height = Plgr->maszkok[index].ysize;
+                wireframe_width = Lgr->masks[index].width;
+                wireframe_height = Lgr->masks[index].height;
                 wireframe_width *= PixelsToMeters;
                 wireframe_height *= PixelsToMeters;
             }
         }
         if (texture_name[0]) {
-            int index = Plgr->gettexturaindex(texture_name);
+            int index = Lgr->get_texture_index(texture_name);
             if (index < 0) {
                 texture_name[0] = 0;
             } else {
-                distance = Plgr->texturak[index].tavolsag;
-                clipping = Plgr->texturak[index].hatarol;
+                distance = Lgr->textures[index].default_distance;
+                clipping = Lgr->textures[index].default_clipping;
             }
         }
     }

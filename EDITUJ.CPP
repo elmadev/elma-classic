@@ -518,10 +518,10 @@ static void ujrarajzol(int egesz) {
     pop();
 
     if (Tool == T_CREATE_SPRITE) {
-        if (!Plgr) {
+        if (!Lgr) {
             internal_error("89u5t4");
         }
-        kispritenev(Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev, 0,
+        kispritenev(Lgr->editor_picture_name, Lgr->editor_texture_name, Lgr->editor_mask_name, 0,
                     Clipping::Unclipped);
     }
 }
@@ -532,10 +532,10 @@ static void beallitkozelvane(int mx, int my) {
         return;
     }
     if (Tool == T_CREATE_SPRITE) {
-        if (!Plgr) {
+        if (!Lgr) {
             internal_error("7896675");
         }
-        kispritenev(Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev, 0,
+        kispritenev(Lgr->editor_picture_name, Lgr->editor_texture_name, Lgr->editor_mask_name, 0,
                     Clipping::Unclipped);
         return;
     }
@@ -579,12 +579,12 @@ static void beallitkozelvane(int mx, int my) {
     }
 
     /*if( Tool == T_CREATE_SPRITE ) {
-        if( !Plgr )
+        if( !Lgr )
             internal_error( "89u5t4" );
-        if( Plgr->aktivindex >= Plgr->kepszam )
+        if( Lgr->aktivindex >= Lgr->picture_count )
             internal_error( "89045t308u" );
-        kispritenev( Plgr->nevek[Plgr->aktivindex],
-                     Plgr->tavolsagok[Plgr->aktivindex] );
+        kispritenev( Lgr->nevek[Lgr->aktivindex],
+                     Lgr->tavolsagok[Lgr->aktivindex] );
     } */
 
     if (ps) {

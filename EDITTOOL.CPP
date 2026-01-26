@@ -773,27 +773,27 @@ void t_zoomin_mmove(int x, int y) {
 
 // Elougrik dialogus sprite valasztasra:
 void t_create_sprite_nyomva_jobb(void) {
-    // Plgr-en vegzi muveleteit:
-    if (!Plgr) {
+    // Lgr-en vegzi muveleteit:
+    if (!Lgr) {
         internal_error("grtyy");
     }
-    if (Plgr->kepszam <= 0) {
+    if (Lgr->picture_count <= 0) {
         dialog("There are not any pictures in the LGR file!");
         return;
     }
     tolt_pickasprite();
-    /*if( Plgr->aktivindex >= Plgr->kepszam )
+    /*if( Lgr->aktivindex >= Lgr->picture_count )
         internal_error( "[op0fijh" );
-    kispritenev( Plgr->nevek[Plgr->aktivindex],
-                 Plgr->tavolsagok[Plgr->aktivindex],
-                 Plgr->hatarolok[Plgr->aktivindex] );*/
+    kispritenev( Lgr->nevek[Lgr->aktivindex],
+                 Lgr->tavolsagok[Lgr->aktivindex],
+                 Lgr->hatarolok[Lgr->aktivindex] );*/
 }
 
 void t_create_sprite_nyomva(int mx, int my) {
-    if (!Plgr) {
+    if (!Lgr) {
         internal_error("987g45");
     }
-    if (Plgr->kepszam <= 0) {
+    if (Lgr->picture_count <= 0) {
         dialog("There are not any pictures in the LGR file!");
         return;
     }
@@ -810,7 +810,8 @@ void t_create_sprite_nyomva(int mx, int my) {
         return;
     }
 
-    if (!Plgr->aktiv_kepnev[0] && !(Plgr->aktiv_texturanev[0] && Plgr->aktiv_maszknev[0])) {
+    if (!Lgr->editor_picture_name[0] &&
+        !(Lgr->editor_texture_name[0] && Lgr->editor_mask_name[0])) {
         return; // Nincs kitoltve aktiv sprite
     }
 
@@ -818,8 +819,8 @@ void t_create_sprite_nyomva(int mx, int my) {
         if (!Ptop->sprites[i]) {
             double x = pixel_to_meter_x(mx);
             double y = pixel_to_meter_y(my);
-            Ptop->sprites[i] =
-                new sprite(x, y, Plgr->aktiv_kepnev, Plgr->aktiv_texturanev, Plgr->aktiv_maszknev);
+            Ptop->sprites[i] = new sprite(x, y, Lgr->editor_picture_name, Lgr->editor_texture_name,
+                                          Lgr->editor_mask_name);
             invalidate();
             Valtozott = 1;
             return;

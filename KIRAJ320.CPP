@@ -163,7 +163,7 @@ static double Mx = -1, My = -1;
 static vect2 Mi, Mj, Mr;
 static vect2 Miar, Mjar, Mrar; // Ezek meg vannak szorozva Aranyossaggal
 
-static void kitag(pic8* ppic8, affine_pic* pk, kisbox* pb) {
+static void kitag(pic8* ppic8, affine_pic* pk, bike_box* pb) {
     vect2 r = Miar * (pb->x1 + 260 - Mx) + Mjar * (My - (pb->y1 + 260)) + Mrar;
     vect2 u = Miar * (pb->x2 - pb->x1);
     vect2 v = Mjar * (pb->y1 - pb->y2);
@@ -271,20 +271,20 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
         // Potty kirajzolasa View ablakba:
         if (pker->type == object::Type::Food) {
             kigyuru(ppic, pker->minimap_canvas_x - balalsox + vx1,
-                    pker->minimap_canvas_y - balalsoy + vy1, Plgr->viewfood);
+                    pker->minimap_canvas_y - balalsoy + vy1, Lgr->minimap_food_palette_id);
         } else {
             kigyuru(ppic, pker->minimap_canvas_x - balalsox + vx1,
-                    pker->minimap_canvas_y - balalsoy + vy1, Plgr->viewexit[0]);
+                    pker->minimap_canvas_y - balalsoy + vy1, Lgr->minimap_exit_palette_id[0]);
         }
     }
 
     // Most kirajzoljuk motorost:
     // Eldontjuk szineket:
-    unsigned char viewindex1 = Plgr->viewmotorindex1;
-    unsigned char viewindex2 = Plgr->viewmotorindex2;
+    unsigned char viewindex1 = Lgr->minimap_bike1_palette_id;
+    unsigned char viewindex2 = Lgr->minimap_bike2_palette_id;
     if ((State->player1_bike1 && !ajatekos) || (!State->player1_bike1 && ajatekos)) {
-        viewindex1 = Plgr->viewmotorindex2;
-        viewindex2 = Plgr->viewmotorindex1;
+        viewindex1 = Lgr->minimap_bike2_palette_id;
+        viewindex2 = Lgr->minimap_bike1_palette_id;
     }
 
     // Most kirajzoljuk masik (hatso) motorost:
@@ -308,13 +308,13 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
     vx2++;
     vy2++;
     for (int y = vy1; y <= vy2; y++) {
-        ppic->ppixel(vx1, y, Plgr->keretindex);
-        ppic->ppixel(vx2, y, Plgr->keretindex);
+        ppic->ppixel(vx1, y, Lgr->minimap_border_palette_id);
+        ppic->ppixel(vx2, y, Lgr->minimap_border_palette_id);
     }
     unsigned char* sor = ppic->get_row(vy1) + vx1 + 1;
-    memset(sor, Plgr->keretindex, Viewxsize);
+    memset(sor, Lgr->minimap_border_palette_id, Viewxsize);
     sor = ppic->get_row(vy2) + vx1 + 1;
-    memset(sor, Plgr->keretindex, Viewxsize);
+    memset(sor, Lgr->minimap_border_palette_id, Viewxsize);
 }
 
 // Mentes lemezre:
@@ -331,7 +331,7 @@ static void menteshakell(pic8* ppic) {
             }
             if (access(filenev, 0) != 0) {
                 forditkepet(ppic);
-                ppic->save(filenev, Plgr->paltomb);
+                ppic->save(filenev, Lgr->palette_data);
                 forditkepet(ppic);
                 break;
             }
@@ -350,15 +350,15 @@ static void kitolthatteret(pic8* ppic) {
 
             // extern int Debugblt;
             // Debugblt = 1;
-            blit8(ppic, Plgr->pkimarad, x, y);
+            blit8(ppic, Lgr->qframe, x, y);
             // Debugblt = 0;
             //  internal_error( "Itt van 20!" ); idejott
-            x += Plgr->pkimarad->get_width();
+            x += Lgr->qframe->get_width();
 
             // internal_error( tmp ); (21) kiirja x-et 207-nek
         }
         // internal_error( "Itt van 15!" );
-        y += Plgr->pkimarad->get_height();
+        y += Lgr->qframe->get_height();
     }
 }
 
@@ -367,7 +367,7 @@ int Voltkilogas = 0;
 #endif
 
 static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmot, valtozok* pvalt,
-                   motkepek* pmk) {
+                   bike_pics* pmk) {
 
     // Mivel ezeket fv megvaltoztatja:
     double ugrasnagysag = pvalt->ugrasnagysag;
@@ -404,11 +404,11 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     // Kerekek:
     if (elsokerekrogton) {
         kidobozkerek(p_k1, WheelBackgroundRenderRadius, pmot->left_wheel.rotation, ppic,
-                     pmk->pkiskerek);
+                     pmk->wheel);
     }
     if (hatsokerekrogton) {
         kidobozkerek(p_k2, WheelBackgroundRenderRadius, pmot->right_wheel.rotation, ppic,
-                     pmk->pkiskerek);
+                     pmk->wheel);
     }
 
     vect2 kozep = pmot->bike.r - sarok;
@@ -443,11 +443,11 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 
     // Elso felfuggesztes:
     vect2 p_fogantyu = Mi * (365.0 - Mx) + Mj * (My - 292.0) + Mr; // Uj
-    kidoboz(p_k1, p_fogantyu, ppic, 0.06, pmk->pkiselsorud, 0.05, 0.03);
+    kidoboz(p_k1, p_fogantyu, ppic, 0.06, pmk->susp1, 0.05, 0.03);
 
     // Hatso felfuggesztes:
     vect2 p_darab2 = Mi * (370.0 - Mx) + Mj * (My - 520.0) + Mr;
-    kidoboz(p_darab2, p_k2, ppic, 0.06, pmk->pkishatsorud, 0.0, 0.1);
+    kidoboz(p_darab2, p_k2, ppic, 0.06, pmk->susp2, 0.0, 0.1);
 
     // Ha kell zaszlot rajzol:
     int flages = 0;
@@ -471,14 +471,14 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     // 361 jobb hajszalnyit
     vect2 zaszloteto = zaszlotalp + (Mi * 356.0 + Mj * 500.0) * 0.2;
     if (flages) {
-        kidoboz(zaszlotalp, zaszloteto, ppic, 0.2, Plgr->pkiszaszlo, 0.0, 0.0, pmot->flipped_bike);
+        kidoboz(zaszlotalp, zaszloteto, ppic, 0.2, Lgr->flag, 0.0, 0.0, pmot->flipped_bike);
     }
 
     // Motor teste:
-    kitag(ppic, pmk->pkisa, &KisboxA);
-    kitag(ppic, pmk->pkisb, &KisboxB);
-    kitag(ppic, pmk->pkisc, &KisboxC);
-    kitag(ppic, pmk->pkisd, &KisboxD);
+    kitag(ppic, pmk->bike_part1, &BikeBox1);
+    kitag(ppic, pmk->bike_part2, &BikeBox2);
+    kitag(ppic, pmk->bike_part3, &BikeBox3);
+    kitag(ppic, pmk->bike_part4, &BikeBox4);
 
     // Mozgo test:
     vect2 p_vezeto = (pmot->body_r - sarok); // Vezeto
@@ -507,8 +507,8 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     if (pmot->flipped_bike) {
         fejalfa = 0 - fejalfa;
     }
-    kidobozkerek(pmot->head_r - sarok, HeadRadius, pmot->bike.rotation + fejalfa, ppic,
-                 pmk->pkisfej, pmot->flipped_bike);
+    kidobozkerek(pmot->head_r - sarok, HeadRadius, pmot->bike.rotation + fejalfa, ppic, pmk->head,
+                 pmot->flipped_bike);
 
     // Kar ket reszletben:
     vect2 p_kezfej = p_fogantyu;
@@ -577,17 +577,17 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     }
 
     // Lab:
-    kidoboz(p_terd, p_csipo, ppic, 0.14, pmk->pkiscomb, 0.03, 0.1, pmot->flipped_bike);
+    kidoboz(p_terd, p_csipo, ppic, 0.14, pmk->thigh, 0.03, 0.1, pmot->flipped_bike);
 
-    kidoboz(p_labfej, p_terd, ppic, 0.21, pmk->pkislabszar, 0.03, 0.03, pmot->flipped_bike);
+    kidoboz(p_labfej, p_terd, ppic, 0.21, pmk->leg, 0.03, 0.03, pmot->flipped_bike);
 
     // Vezeto:
-    kidoboz(p_csipo, p_valltest, ppic, 0.2, pmk->pkisvezeto, 0.1, 0.05, pmot->flipped_bike);
+    kidoboz(p_csipo, p_valltest, ppic, 0.2, pmk->body, 0.1, 0.05, pmot->flipped_bike);
 
     // Kez:
-    kidoboz(p_konyok, p_vall, ppic, 0.11, pmk->pkisfelkar, 0.08, 0.1, !pmot->flipped_bike);
+    kidoboz(p_konyok, p_vall, ppic, 0.11, pmk->up_arm, 0.08, 0.1, !pmot->flipped_bike);
 
-    kidoboz(p_kezfej, p_konyok, ppic, 0.076, pmk->pkisalkar, 0.08, 0.1, pmot->flipped_bike);
+    kidoboz(p_kezfej, p_konyok, ppic, 0.076, pmk->forarm, 0.08, 0.1, pmot->flipped_bike);
 
     StretchEnabled = false;
 
@@ -601,11 +601,11 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
         }
         if (!elsokerekrogton) {
             kidobozkerek(p_k1, pmot->left_wheel.radius, pmot->left_wheel.rotation, ppic,
-                         pmk->pkiskerek);
+                         pmk->wheel);
         }
         if (!hatsokerekrogton) {
             kidobozkerek(p_k2, pmot->right_wheel.radius, pmot->right_wheel.rotation, ppic,
-                         pmk->pkiskerek);
+                         pmk->wheel);
         }
     }
 }
@@ -650,15 +650,15 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         if (State->animated_objects) {
             switch (pker->type) {
             case object::Type::Food:
-                pobjpic = Plgr->foodtomb[pker->animation % Plgr->foodszam]->get_frame_by_time(t);
+                pobjpic = Lgr->food[pker->animation % Lgr->food_count]->get_frame_by_time(t);
                 dy = (int)(5.0 * sin(t * 15.5 + pker->floating_phase));
                 break;
             case object::Type::Exit:
-                pobjpic = Plgr->pexit->get_frame_by_time(t);
+                pobjpic = Lgr->exit->get_frame_by_time(t);
                 dy = (int)(5.0 * sin(t * 15.5 + pker->floating_phase));
                 break;
             case object::Type::Killer:
-                pobjpic = Plgr->pkiller->get_frame_by_time(t);
+                pobjpic = Lgr->killer->get_frame_by_time(t);
                 break;
             default:
                 internal_error("HIBA6751353");
@@ -667,13 +667,13 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             // Elso frame-et adja vissza mindig:
             switch (pker->type) {
             case object::Type::Food:
-                pobjpic = Plgr->foodtomb[pker->animation % Plgr->foodszam]->get_frame_by_index(0);
+                pobjpic = Lgr->food[pker->animation % Lgr->food_count]->get_frame_by_index(0);
                 break;
             case object::Type::Exit:
-                pobjpic = Plgr->pexit->get_frame_by_index(0);
+                pobjpic = Lgr->exit->get_frame_by_index(0);
                 break;
             case object::Type::Killer:
-                pobjpic = Plgr->pkiller->get_frame_by_index(0);
+                pobjpic = Lgr->killer->get_frame_by_index(0);
                 break;
             default:
                 internal_error("6754783");
@@ -684,11 +684,11 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     }
 
     // Motorosok kirajzolasa:
-    motkepek* pmkepek1 = &Plgr->mkepek1;
-    motkepek* pmkepek2 = &Plgr->mkepek2;
+    bike_pics* pmkepek1 = &Lgr->bike1;
+    bike_pics* pmkepek2 = &Lgr->bike2;
     if ((State->player1_bike1 && !ajatekos) || (!State->player1_bike1 && ajatekos)) {
-        pmkepek1 = &Plgr->mkepek2;
-        pmkepek2 = &Plgr->mkepek1;
+        pmkepek1 = &Lgr->bike2;
+        pmkepek2 = &Lgr->bike1;
     }
 
     if (!Single) {

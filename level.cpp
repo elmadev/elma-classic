@@ -142,7 +142,7 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
 
         // Delete any sprite not existing in lgr, and also set the size of the asset
         if (spr->picture_name[0]) {
-            int index = lgr->getkepindex(spr->picture_name);
+            int index = lgr->get_picture_index(spr->picture_name);
             if (index < 0) {
                 spr->picture_name[0] = 0;
                 delete sprites[i];
@@ -151,23 +151,23 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
                 continue;
             }
 
-            spr->wireframe_width = lgr->kepek[index].xsize * PixelsToMeters;
-            spr->wireframe_height = lgr->kepek[index].ysize * PixelsToMeters;
+            spr->wireframe_width = lgr->pictures[index].width * PixelsToMeters;
+            spr->wireframe_height = lgr->pictures[index].height * PixelsToMeters;
         } else {
             if (spr->mask_name[0]) {
-                int index = lgr->getmaszkindex(spr->mask_name);
+                int index = lgr->get_mask_index(spr->mask_name);
                 if (index < 0) {
                     spr->mask_name[0] = 0;
                     delete sprites[i];
                     sprites[i] = nullptr;
                     sprites_deleted = true;
                 } else {
-                    spr->wireframe_width = lgr->maszkok[index].xsize * PixelsToMeters;
-                    spr->wireframe_height = lgr->maszkok[index].ysize * PixelsToMeters;
+                    spr->wireframe_width = lgr->masks[index].width * PixelsToMeters;
+                    spr->wireframe_height = lgr->masks[index].height * PixelsToMeters;
                 }
 
                 if (spr->texture_name[0]) {
-                    int index = lgr->gettexturaindex(spr->texture_name);
+                    int index = lgr->get_texture_index(spr->texture_name);
                     if (index < 0) {
                         spr->texture_name[0] = 0;
                         delete sprites[i];
@@ -197,33 +197,33 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
     }
 
     // Erase missing texture names
-    if (Plgr->gettexturaindex(foreground_name) < 0) {
+    if (Lgr->get_texture_index(foreground_name) < 0) {
         foreground_name[0] = 0;
     }
 
-    if (Plgr->gettexturaindex(background_name) < 0) {
+    if (Lgr->get_texture_index(background_name) < 0) {
         background_name[0] = 0;
     }
 
-    if (Plgr->texturaszam < 2) {
+    if (Lgr->texture_count < 2) {
         internal_error("Lgr must have at least 2 textures!");
     }
 
     // If we have missing/invalid texture name, replace the name with a texture from the list
     // We grab the lowest index texture where foreground_name != background_name
     if (!foreground_name[0]) {
-        if (strcmpi(background_name, Plgr->texturak[0].nev) != 0) {
-            strcpy(foreground_name, Plgr->texturak[0].nev);
+        if (strcmpi(background_name, Lgr->textures[0].name) != 0) {
+            strcpy(foreground_name, Lgr->textures[0].name);
         } else {
-            strcpy(foreground_name, Plgr->texturak[1].nev);
+            strcpy(foreground_name, Lgr->textures[1].name);
         }
     }
 
     if (!background_name[0]) {
-        if (strcmpi(foreground_name, Plgr->texturak[0].nev) != 0) {
-            strcpy(background_name, Plgr->texturak[0].nev);
+        if (strcmpi(foreground_name, Lgr->textures[0].name) != 0) {
+            strcpy(background_name, Lgr->textures[0].name);
         } else {
-            strcpy(background_name, Plgr->texturak[1].nev);
+            strcpy(background_name, Lgr->textures[1].name);
         }
     }
 

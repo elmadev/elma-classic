@@ -6,13 +6,13 @@ extern int Volttopsave;
 void invalidate_level();
 
 // Beolvas egy level-t ha kell.
-// Torli es kitolti Ptop, Plgr, Segments, ecsetek mutatokat:
+// Torli es kitolti Ptop, Lgr, Segments, ecsetek mutatokat:
 // Ha belso file-ban is megvan palya onnan veszi:
 // Hamissal ter vissza, ha hibas topologiaju level:
 int floadlevel_p(const char* nev);
 
 // Beolvas egy level-t ha kell.
-// Torli es kitolti Ptop, Plgr, mutatokat:
+// Torli es kitolti Ptop, Lgr, mutatokat:
 // Segments es ecseteket torli:
 // Ha belso file-ban is megvan palya onnan veszi:
 // Igaz ha file nem volt lezarva, kulonben new palya hamissal:

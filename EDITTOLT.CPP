@@ -690,13 +690,13 @@ static void makeszinkonvtomb(unsigned char* pal) {
 }
 
 // Szimpla
-static void vegyesblt(pic8* dest, kep* pkep, int x0, int y0) {
+static void vegyesblt(pic8* dest, picture* pkep, int x0, int y0) {
     if (x0 < 0 || y0 < 0 || x0 >= dest->get_width() || y0 >= dest->get_height()) {
         internal_error("7r79yffuew");
     }
 
-    int xsize = pkep->xsize;
-    int ysize = pkep->ysize;
+    int xsize = pkep->width;
+    int ysize = pkep->height;
     int xtullog = 0;
     if (x0 + xsize > dest->get_width()) {
         xsize = dest->get_width() - x0;
@@ -708,7 +708,7 @@ static void vegyesblt(pic8* dest, kep* pkep, int x0, int y0) {
     // Most xsize es ysize mindenkeppen benne van teljesen kepben:
 
     int i = 0;
-    unsigned char* tomb = pkep->adatok;
+    unsigned char* tomb = pkep->data;
     for (int y = y0; y < y0 + ysize; y++) {
         // Egy sor elintezese:
         unsigned char* dsor = dest->get_row(y) + x0;
@@ -749,14 +749,14 @@ static void vegyesblt(pic8* dest, kep* pkep, int x0, int y0) {
 }
 
 // Maszkos:
-static void vegyesblt(pic8* dest, textura* pt, maszk* pm, int x0, int y0) {
+static void vegyesblt(pic8* dest, texture* pt, mask* pm, int x0, int y0) {
     if (x0 < 0 || y0 < 0 || x0 >= dest->get_width() || y0 >= dest->get_height()) {
         internal_error("7r79yffuew");
     }
 
-    pic8* source = pt->ppic;
+    pic8* source = pt->pic;
 
-    int maxysize = pm->ysize;
+    int maxysize = pm->height;
     if (y0 + maxysize > dest->get_height()) {
         maxysize = dest->get_height() - y0;
     }
@@ -769,9 +769,9 @@ static void vegyesblt(pic8* dest, textura* pt, maszk* pm, int x0, int y0) {
         int sx = 0;
         int abszx = x0;
         // Maszkos eljaras:
-        while (pm->adatok[i].tipus != ME_SOREMELES) {
-            if (pm->adatok[i].tipus == ME_TELI) {
-                for (int j = 0; j < pm->adatok[i].hossz; j++) {
+        while (pm->data[i].type != MaskEncoding_EndOfLine) {
+            if (pm->data[i].type == MaskEncoding_Solid) {
+                for (int j = 0; j < pm->data[i].length; j++) {
                     if (abszx < 640) {
                         *dsor = Szinkonvtomb[ssor[sx]];
                     }
@@ -781,10 +781,10 @@ static void vegyesblt(pic8* dest, textura* pt, maszk* pm, int x0, int y0) {
                     abszx++;
                 }
             } else {
-                dsor += pm->adatok[i].hossz;
-                sx += pm->adatok[i].hossz;
+                dsor += pm->data[i].length;
+                sx += pm->data[i].length;
                 sx %= picxsize;
-                abszx += pm->adatok[i].hossz;
+                abszx += pm->data[i].length;
             }
             i++;
         }
@@ -798,19 +798,19 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     int nevszam = 0;
     if (tipus == 1) {
         nev = kepnev;
-        nevszam = Plgr->kepszam;
+        nevszam = Lgr->picture_count;
     }
     if (tipus == 2) {
         nev = texturanev;
-        nevszam = Plgr->texturaszam;
-        if (nevszam >= 1 && Plgr->opentextkimarad) {
+        nevszam = Lgr->texture_count;
+        if (nevszam >= 1 && Lgr->editor_hide_qgrass) {
             // qgrass-t nem jelenitjuk meg (lgr beolvaso lista vegere teszi):
             nevszam--;
         }
     }
     if (tipus == 3) {
         nev = maszknev;
-        nevszam = Plgr->maszkszam;
+        nevszam = Lgr->mask_count;
     }
 
     if (!nev) {
@@ -829,26 +829,26 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
 
     int kur = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
     for (int i = 0; i < nevszam; i++) {
-        if (tipus == 1 && strcmpi(Plgr->kepek[i].nev, nev) == 0) {
+        if (tipus == 1 && strcmpi(Lgr->pictures[i].name, nev) == 0) {
             kur = i;
         }
-        if (tipus == 2 && strcmpi(Plgr->texturak[i].nev, nev) == 0) {
+        if (tipus == 2 && strcmpi(Lgr->textures[i].name, nev) == 0) {
             kur = i;
         }
-        if (tipus == 3 && strcmpi(Plgr->maszkok[i].nev, nev) == 0) {
+        if (tipus == 3 && strcmpi(Lgr->masks[i].name, nev) == 0) {
             kur = i;
         }
     }
 
     if (kur == 0) {
         if (tipus == 1) {
-            strcpy(nev, Plgr->kepek[0].nev);
+            strcpy(nev, Lgr->pictures[0].name);
         }
         if (tipus == 2) {
-            strcpy(nev, Plgr->texturak[0].nev);
+            strcpy(nev, Lgr->textures[0].name);
         }
         if (tipus == 3) {
-            strcpy(nev, Plgr->maszkok[0].nev);
+            strcpy(nev, Lgr->masks[0].name);
         }
     }
 
@@ -896,13 +896,13 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
             if (c == KEY_ENTER) {
                 igazit(&kur, &felso, nevszam, helyszam);
                 if (tipus == 1) {
-                    strcpy(nev, Plgr->kepek[kur].nev);
+                    strcpy(nev, Lgr->pictures[kur].name);
                 }
                 if (tipus == 2) {
-                    strcpy(nev, Plgr->texturak[kur].nev);
+                    strcpy(nev, Lgr->textures[kur].name);
                 }
                 if (tipus == 3) {
-                    strcpy(nev, Plgr->maszkok[kur].nev);
+                    strcpy(nev, Lgr->masks[kur].name);
                 }
                 return;
             }
@@ -945,13 +945,13 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
                     index += felso;
                     if (index < nevszam) {
                         if (tipus == 1) {
-                            strcpy(nev, Plgr->kepek[index].nev);
+                            strcpy(nev, Lgr->pictures[index].name);
                         }
                         if (tipus == 2) {
-                            strcpy(nev, Plgr->texturak[index].nev);
+                            strcpy(nev, Lgr->textures[index].name);
                         }
                         if (tipus == 3) {
-                            strcpy(nev, Plgr->maszkok[index].nev);
+                            strcpy(nev, Lgr->masks[index].name);
                         }
                         return;
                     }
@@ -964,13 +964,13 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
 
             // Nevet beallitjuk kur-nak megfeleloen:
             if (tipus == 1) {
-                strcpy(nev, Plgr->kepek[kur].nev);
+                strcpy(nev, Lgr->pictures[kur].name);
             }
             if (tipus == 2) {
-                strcpy(nev, Plgr->texturak[kur].nev);
+                strcpy(nev, Lgr->textures[kur].name);
             }
             if (tipus == 3) {
-                strcpy(nev, Plgr->maszkok[kur].nev);
+                strcpy(nev, Lgr->masks[kur].name);
             }
 
             push();
@@ -983,33 +983,33 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
 
             if (kepnev[0]) {
                 // Ez egy kep:
-                int index = Plgr->getkepindex(kepnev);
+                int index = Lgr->get_picture_index(kepnev);
                 if (index < 0) {
                     internal_error("hjguyt");
                 }
-                kep* pkep = &Plgr->kepek[index];
+                picture* pkep = &Lgr->pictures[index];
                 vegyesblt(BufferMain, pkep, 10, 10);
-                buffervaltozottx = 10 + pkep->xsize - 1;
-                buffervaltozotty = 10 + pkep->ysize - 1;
+                buffervaltozottx = 10 + pkep->width - 1;
+                buffervaltozotty = 10 + pkep->height - 1;
             }
 
             if (texturanev[0] && maszknev[0]) {
                 // Ez egy texturas maszk:
-                int index = Plgr->gettexturaindex(texturanev);
+                int index = Lgr->get_texture_index(texturanev);
                 if (index < 0) {
                     internal_error(";lgrtijo");
                 }
-                textura* ptextura = &Plgr->texturak[index];
+                texture* ptextura = &Lgr->textures[index];
 
-                index = Plgr->getmaszkindex(maszknev);
+                index = Lgr->get_mask_index(maszknev);
                 if (index < 0) {
                     internal_error("lkjefrg");
                 }
-                maszk* pmaszk = &Plgr->maszkok[index];
+                mask* pmaszk = &Lgr->masks[index];
 
                 vegyesblt(BufferMain, ptextura, pmaszk, 10, 10);
-                buffervaltozottx = 10 + pmaszk->xsize - 1;
-                buffervaltozotty = 10 + pmaszk->ysize - 1;
+                buffervaltozottx = 10 + pmaszk->width - 1;
+                buffervaltozotty = 10 + pmaszk->height - 1;
             }
 
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
@@ -1023,24 +1023,24 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
                 // Kiirjuk nevet:
                 if (tipus == 1) {
                     Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                                 Plgr->kepek[i + felso].nev);
+                                 Lgr->pictures[i + felso].name);
                 }
                 if (tipus == 2) {
                     Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                                 Plgr->texturak[i + felso].nev);
+                                 Lgr->textures[i + felso].name);
                 }
                 if (tipus == 3) {
                     Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                                 Plgr->maszkok[i + felso].nev);
+                                 Lgr->masks[i + felso].name);
                 }
 
                 // Kiirjuk tavot:
                 if (kepnev[0] || texturanev[0]) {
                     int tavolsag = 0;
                     if (kepnev[0]) {
-                        tavolsag = Plgr->kepek[i + felso].tavolsag;
+                        tavolsag = Lgr->pictures[i + felso].default_distance;
                     } else {
-                        tavolsag = Plgr->texturak[i + felso].tavolsag;
+                        tavolsag = Lgr->textures[i + felso].default_distance;
                     }
 
                     char tavstr[20];
@@ -1049,9 +1049,9 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
                     // Kiirjuk hatarolokat:
                     Clipping hatarol = Clipping::Unclipped;
                     if (kepnev[0]) {
-                        hatarol = Plgr->kepek[i + felso].hatarol;
+                        hatarol = Lgr->pictures[i + felso].default_clipping;
                     } else {
-                        hatarol = Plgr->texturak[i + felso].hatarol;
+                        hatarol = Lgr->textures[i + felso].default_clipping;
                     }
 
                     strcpy(tavstr, "U");
@@ -1089,18 +1089,18 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
 }
 
 void tolt_pickasprite(void) {
-    if (!Plgr) {
-        internal_error("tolt_pickasprite-ban !Plgr!");
+    if (!Lgr) {
+        internal_error("tolt_pickasprite-ban !Lgr!");
     }
 
-    makeszinkonvtomb(Plgr->paltomb);
+    makeszinkonvtomb(Lgr->palette_data);
 
     invalidateegesz();
 
     char kepnev[10], texturanev[10], maszknev[10], uresnev[10] = "";
-    strcpy(kepnev, Plgr->aktiv_kepnev);
-    strcpy(texturanev, Plgr->aktiv_texturanev);
-    strcpy(maszknev, Plgr->aktiv_maszknev);
+    strcpy(kepnev, Lgr->editor_picture_name);
+    strcpy(texturanev, Lgr->editor_texture_name);
+    strcpy(maszknev, Lgr->editor_mask_name);
 
     // Koordok megadasa:
     int x1 = 160;
@@ -1128,9 +1128,9 @@ void tolt_pickasprite(void) {
                 return;
             }
             if (c == KEY_ENTER) {
-                strcpy(Plgr->aktiv_kepnev, kepnev);
-                strcpy(Plgr->aktiv_texturanev, texturanev);
-                strcpy(Plgr->aktiv_maszknev, maszknev);
+                strcpy(Lgr->editor_picture_name, kepnev);
+                strcpy(Lgr->editor_texture_name, texturanev);
+                strcpy(Lgr->editor_mask_name, maszknev);
                 return;
             }
         }
@@ -1139,9 +1139,9 @@ void tolt_pickasprite(void) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
-                strcpy(Plgr->aktiv_kepnev, kepnev);
-                strcpy(Plgr->aktiv_texturanev, texturanev);
-                strcpy(Plgr->aktiv_maszknev, maszknev);
+                strcpy(Lgr->editor_picture_name, kepnev);
+                strcpy(Lgr->editor_texture_name, texturanev);
+                strcpy(Lgr->editor_mask_name, maszknev);
                 return;
             }
             if (is_in_box(Moux, Mouy, boxcancel)) {
@@ -1546,20 +1546,20 @@ void setspritetav(sprite* psp) {
             int deftav = -1;
             Clipping defhatarol = Clipping::Unknown;
             if (psp->picture_name[0]) {
-                int index = Plgr->getkepindex(psp->picture_name);
+                int index = Lgr->get_picture_index(psp->picture_name);
                 if (index < 0) {
                     internal_error("iohdiuyde");
                 }
-                deftav = Plgr->kepek[index].tavolsag;
-                defhatarol = Plgr->kepek[index].hatarol;
+                deftav = Lgr->pictures[index].default_distance;
+                defhatarol = Lgr->pictures[index].default_clipping;
             }
             if (psp->texture_name[0]) {
-                int index = Plgr->gettexturaindex(psp->texture_name);
+                int index = Lgr->get_texture_index(psp->texture_name);
                 if (index < 0) {
                     internal_error("u6ythggf");
                 }
-                deftav = Plgr->texturak[index].tavolsag;
-                defhatarol = Plgr->texturak[index].hatarol;
+                deftav = Lgr->textures[index].default_distance;
+                defhatarol = Lgr->textures[index].default_clipping;
             }
             // Tavolsag:
             char tmp[10];
@@ -1990,8 +1990,8 @@ void change_level_properties(void) {
                 if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
                     Valtozott = 1;
                     strcpy(Ptop->lgr_name, lgrnev);
-                    loadlgrfile(Ptop->lgr_name);
-                    if (Ptop->discard_missing_lgr_assets(Plgr)) {
+                    load_lgr_file(Ptop->lgr_name);
+                    if (Ptop->discard_missing_lgr_assets(Lgr)) {
                         dialogselejtez();
                     }
                 }
@@ -2015,8 +2015,8 @@ void change_level_properties(void) {
                 if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
                     Valtozott = 1;
                     strcpy(Ptop->lgr_name, lgrnev);
-                    loadlgrfile(Ptop->lgr_name);
-                    if (Ptop->discard_missing_lgr_assets(Plgr)) {
+                    load_lgr_file(Ptop->lgr_name);
+                    if (Ptop->discard_missing_lgr_assets(Lgr)) {
                         dialogselejtez();
                     }
                 }

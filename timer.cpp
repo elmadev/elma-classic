@@ -193,7 +193,7 @@ void draw_timers(const char* best_time_text, double flag_tag_time, double curren
                  int dest_width, int dest_height) {
     // Store globals
     Dest = dest;
-    ReferencePaletteMap = Plgr->idonegtomb;
+    ReferencePaletteMap = Lgr->timer_palette_map;
 
     // Base timer size
     constexpr double LINE_HEIGHT = 16.0;

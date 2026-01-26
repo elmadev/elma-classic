@@ -321,10 +321,10 @@ void ecset::foldmutatocsere(void) {
         }
         while (fut) {
             if ((pixelek_t)fut->pixelek == PX_FOLD && fut->xsize < SCREEN_WIDTH) {
-                int x = xpos % Plgr->foldxmodulus;
-                int y = i % Plgr->pfold->get_height();
-                fut->pixelek = Plgr->pfold->get_row(y) + x;
-                // fut->pixelek = Plgr->pfold->get_row( 0 ); igy latszik
+                int x = xpos % Lgr->foreground_original_width;
+                int y = i % Lgr->foreground->get_height();
+                fut->pixelek = Lgr->foreground->get_row(y) + x;
+                // fut->pixelek = Lgr->foreground->get_row( 0 ); igy latszik
             }
 
             xpos += fut->xsize;
@@ -369,15 +369,15 @@ void ecset::textura2mutato(void) {
                 kepindex -= 10;
 // Itt van maszk, le kell cserelni:
 #ifdef DEBUG
-                if (kepindex >= Plgr->texturaszam) {
-                    internal_error("ecset::maszkokkitoltese kepindex >= Plgr->kepszam!");
+                if (kepindex >= Lgr->texture_count) {
+                    internal_error("ecset::maszkokkitoltese kepindex >= Lgr->picture_count!");
                 }
-                if (Plgr->texturak[kepindex].origxsize <= 0) {
+                if (Lgr->textures[kepindex].original_width <= 0) {
                     internal_error("7ywijohg!");
                 }
 #endif
-                textura* pt = &Plgr->texturak[kepindex];
-                pic8* ppic = pt->ppic;
+                texture* pt = &Lgr->textures[kepindex];
+                pic8* ppic = pt->pic;
                 int megvan = fut->xsize;
                 int x = xpos;
                 int elso = 1;
@@ -391,7 +391,7 @@ void ecset::textura2mutato(void) {
                     }
                     elso = 0;
 
-                    x %= pt->origxsize;
+                    x %= pt->original_width;
                     int size = megvan;
                     if (x + size > ppic->get_width()) {
                         size = ppic->get_width() - x;
@@ -763,12 +763,12 @@ void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
     int x1 = (int)((psp->r.x - origo.x) * MetersToPixels);
     int y1 = (int)((-psp->r.y - origo.y) * MetersToPixels);
 
-    maszk* pm = &Plgr->maszkok[index_m];
+    mask* pm = &Lgr->masks[index_m];
 
     int tavolsag = psp->distance;
 
-    int xsize = pm->xsize;
-    int ysize = pm->ysize;
+    int xsize = pm->width;
+    int ysize = pm->height;
 
     if (x1 < 120 || x1 + xsize >= maxx - 50) {
         return;
@@ -779,12 +779,12 @@ void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
         // Kep egy soranak elintezese:
         int x = 0;
         // Maszkos eljaras:
-        while (pm->adatok[i].tipus != ME_SOREMELES) {
-            if (pm->adatok[i].tipus == ME_TELI) {
+        while (pm->data[i].type != MaskEncoding_EndOfLine) {
+            if (pm->data[i].type == MaskEncoding_Solid) {
                 addbytesor((unsigned char*)(pixelek_t)(index_t + 10), tavolsag, x1 + x,
-                           x1 + x + pm->adatok[i].hossz - 1, y1 - y, fazis);
+                           x1 + x + pm->data[i].length - 1, y1 - y, fazis);
             }
-            x += pm->adatok[i].hossz;
+            x += pm->data[i].length;
             i++;
         }
         i++;
@@ -814,11 +814,11 @@ void ecset::addspriteok(int fazis) {
             if (!psp->texture_name[0] || !psp->mask_name[0]) {
                 continue;
             }
-            int index_t = Plgr->gettexturaindex(psp->texture_name);
+            int index_t = Lgr->get_texture_index(psp->texture_name);
             if (index_t < 0) {
                 internal_error("tgferg");
             }
-            int index_m = Plgr->getmaszkindex(psp->mask_name);
+            int index_m = Lgr->get_mask_index(psp->mask_name);
             if (index_m < 0) {
                 internal_error("6t7ffrge");
             }
@@ -833,11 +833,11 @@ void ecset::addspriteok(int fazis) {
             internal_error("gkuhlij");
         }
 
-        int index = Plgr->getkepindex(psp->picture_name);
+        int index = Lgr->get_picture_index(psp->picture_name);
         if (index < 0) {
             internal_error("kjhhgfchg");
         }
-        kep* pkep = &Plgr->kepek[index];
+        picture* pkep = &Lgr->pictures[index];
 
         // Egy kep berakasa:
         int x1 = (int)((psp->r.x - origo.x) * MetersToPixels);
@@ -845,14 +845,14 @@ void ecset::addspriteok(int fazis) {
 
         int ujtavolsag = psp->distance;
 
-        int xsize = pkep->xsize;
-        int ysize = pkep->ysize;
+        int xsize = pkep->width;
+        int ysize = pkep->height;
 
         if (x1 < 120 || x1 + xsize >= maxx - 50) {
             return;
         }
 
-        unsigned char* tomb = pkep->adatok;
+        unsigned char* tomb = pkep->data;
 
         if (((pixelek_t)tomb & PIXELMASZK) == 0) {
             external_error("Memory address is less than 2048 (987)!");
@@ -934,7 +934,7 @@ void ecset::kovetotextura(grass* pkov, int index, int xo, int yo, int fazis) {
     strcpy(texturanev, "qgrass");
 
     // Kikeressuk textura indexet:
-    int textindex = Plgr->gettexturaindex(texturanev);
+    int textindex = Lgr->get_texture_index(texturanev);
     if (textindex < 0) {
         internal_error("iygtyrt");
     }
@@ -1115,7 +1115,7 @@ void ecset::kikovetokepek(grass* pkov, int* ytomb, int hossz, int x0, int fazis)
 }
 
 void ecset::addkovetok(int fazis) {
-    if (!Plgr->vanfu) {
+    if (!Lgr->has_grass) {
         return;
     }
     for (int i = 0; i < MAX_POLYGONS; i++) {
@@ -1140,7 +1140,7 @@ void ecset::addkovetok(int fazis) {
             continue;
         }
 
-        grass* pkov = Plgr->pkoveto;
+        grass* pkov = Lgr->grass_pics;
 
         int vonalhossz = 0, x0 = 0;
         if (!create_grass_polygon_heightmap(pgy, Kovetoytomb, &vonalhossz, &x0, KOVVONALHOSSZ,
@@ -1180,10 +1180,10 @@ void ecset::addobjektumok(void) {
 
         // Egy kep berakasa:
         if (view) {
-            unsigned char* mut = Plgr->viewexit;
+            unsigned char* mut = Lgr->minimap_exit_palette_id;
             int ujtavolsag = 498;
             if (pk->type == object::Type::Killer) {
-                mut = Plgr->viewkiller;
+                mut = Lgr->minimap_killer_palette_id;
                 ujtavolsag = 499;
             }
             int x1 = (int)((pk->r.x - origo.x) * (MetersToPixels / MinimapScaleFactor));
@@ -1204,10 +1204,10 @@ void ecset::addobjektumok(void) {
         x1 -= ANIM_WIDTH/2;
         y1 += ANIM_WIDTH/2;
 
-        pic8* ppic = Plgr->pexit;
+        pic8* ppic = Lgr->pexit;
         int ujtavolsag = 498;
         if( pk->type == object::Type::Killer ) {
-            ppic = Plgr->pkiller;
+            ppic = Lgr->pkiller;
             ujtavolsag = 499;
         }
 
@@ -1442,7 +1442,7 @@ static inline void draw_sky(unsigned char* pc, size_t offset, size_t size, bool 
     if (!minimap) {
         memcpy(pc, Foldsor + offset, size);
     } else {
-        memset(pc, Plgr->viewfoldsor, size);
+        memset(pc, Lgr->minimap_foreground_palette_id, size);
     }
 }
 
@@ -1451,7 +1451,7 @@ static inline void draw_default_ground(unsigned char* pc, size_t offset, size_t 
     if (!minimap) {
         memcpy(pc, Egsor + offset, size);
     } else {
-        memset(pc, Plgr->viewegsor, size);
+        memset(pc, Lgr->minimap_background_palette_id, size);
     }
 }
 
@@ -1782,35 +1782,35 @@ void ecset::kitesz(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int 
         internal_error("ecset::kitesz Xe1 < 20 || Xe2 > maxx-20 || ye1 < 20 || ye2 > sorszam-20!");
     }
 
-    int foldymodulus = Plgr->pfold->get_height();
-    int egymodulus = Plgr->peg->get_height();
+    int foldymodulus = Lgr->foreground->get_height();
+    int egymodulus = Lgr->background->get_height();
 
-    int folddx = Xe1 % Plgr->foldxmodulus;
+    int folddx = Xe1 % Lgr->foreground_original_width;
     // int eglassitas = 100;
     int eglassitas = 2;
-    int egdx = (Xe1 / eglassitas) % Plgr->egxmodulus;
+    int egdx = (Xe1 / eglassitas) % Lgr->background_original_width;
 
-    // egetkeszit( Plgr->peg, Xe1, egdx, Plgr->egxmodulus );
+    // egetkeszit( Lgr->peg, Xe1, egdx, Lgr->background_original_width );
 
     int yadd = ye1 - y1;
     if (ajatekos) {
         for (int y = y1; y <= y2; y++) {
             int ye = y + yadd;
-            Foldsor = Plgr->pfold->get_row(ye % foldymodulus) + folddx;
+            Foldsor = Lgr->foreground->get_row(ye % foldymodulus) + folddx;
             // Eg fol-le is scrollozodik:
-            // Egsor = Plgr->peg->get_row( (y-y1+egdy) % egymodulus ) + egdx;
+            // Egsor = Lgr->peg->get_row( (y-y1+egdy) % egymodulus ) + egdx;
 
             // Eg fol-le nem scrollozodik:
-            Egsor = Plgr->peg->get_row((y - y1) % egymodulus) + egdx;
+            Egsor = Lgr->background->get_row((y - y1) % egymodulus) + egdx;
             kiegysor_A(ppic->get_row(y) + x1, ye);
         }
     } else {
         for (int y = y1; y <= y2; y++) {
             int ye = y + yadd;
-            Foldsor = Plgr->pfold->get_row(ye % foldymodulus) + folddx;
-            // Egsor = Plgr->peg->get_row( (ye+egdy) % egymodulus ) +
+            Foldsor = Lgr->foreground->get_row(ye % foldymodulus) + folddx;
+            // Egsor = Lgr->peg->get_row( (ye+egdy) % egymodulus ) +
             //				egdx;
-            Egsor = Plgr->peg->get_row((y - y1) % egymodulus) + egdx;
+            Egsor = Lgr->background->get_row((y - y1) % egymodulus) + egdx;
             kiegysor_B(ppic->get_row(y) + x1, ye);
         }
     }
@@ -1927,13 +1927,13 @@ void ecset::foltoz(void) {
                 kepindex -= 10;
 // Itt van maszk, le kell cserelni:
 #ifdef DEBUG
-                if (kepindex >= Plgr->texturaszam) {
+                if (kepindex >= Lgr->texture_count) {
                     internal_error("egryiegr");
                 }
 #endif
-                textura* pt = &Plgr->texturak[kepindex];
+                texture* pt = &Lgr->textures[kepindex];
 
-                if (pt->foltos && pmd->tavolsag > 500) {
+                if (pt->is_qgrass && pmd->tavolsag > 500) {
                     // Ha egy foltos, 500-nal tavolabbi textura mdarabja:
                     // Vegigmegyunk mdarab-on:
                     int x = xpos;
@@ -1968,7 +1968,7 @@ void ecset::foltoz(void) {
 }
 
 void betoltecseteket(void) {
-    Plgr->betolthattereket();
+    Lgr->reload_default_textures();
 
     Osszegszam = 0; // Ide osszegezzuk osszes lefoglalt szakaszt
 

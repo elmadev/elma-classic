@@ -533,7 +533,7 @@ long lejatszo(const char* filenev) {
 
         if (palmegnincs) {
             palmegnincs = 0;
-            Plgr->pal->set();
+            Lgr->pal->set();
         }
         kirajzol320(eddig, &valt1, &valt2, Viewtime1.viewkinplay, Viewtime1.timekinplay,
                     Viewtime2.viewkinplay, Viewtime2.timekinplay);
@@ -829,7 +829,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         // KIRAJZOLAS:
         if (palmegnincs) {
             palmegnincs = 0;
-            Plgr->pal->set();
+            Lgr->pal->set();
         }
         kirajzol320(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
                     Viewtime2.viewkinreplay, Viewtime2.timekinreplay);

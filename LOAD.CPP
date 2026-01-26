@@ -19,7 +19,7 @@ static char Bentlevelnev[20] = "";
 void invalidate_level() { Volttopsave = 1; }
 
 // Beolvas egy level-t ha kell (nev max 12 karakter).
-// Torli es kitolti Ptop, Plgr, Segments, ecset mutatokat.
+// Torli es kitolti Ptop, Lgr, Segments, ecset mutatokat.
 // Ha belso file-ban is megvan palya onnan veszi:
 // Hamissal ter vissza, ha hibas topologiaju level:
 int floadlevel_p(const char* nev) {
@@ -57,8 +57,8 @@ int floadlevel_p(const char* nev) {
             Ptop = NULL;
             return 0;
         }
-        loadlgrfile(Ptop->lgr_name);
-        Ptop->discard_missing_lgr_assets(Plgr);
+        load_lgr_file(Ptop->lgr_name);
+        Ptop->discard_missing_lgr_assets(Lgr);
 
         if (Segments) {
             delete Segments;
@@ -75,7 +75,7 @@ int floadlevel_p(const char* nev) {
     return 1;
 }
 
-// Torli es kitolti Ptop, Plgr, mutatokat.
+// Torli es kitolti Ptop, Lgr, mutatokat.
 // Segments, ecset mutatokat torli:
 // Ha belso file-ban is megvan palya onnan veszi:
 // Igaz ha file nem volt lezarva, kulonben new palya hamissal:
@@ -102,8 +102,8 @@ int floadlevel_e(const char* nev, int forceload) {
             Ptop = new level(nev);
         }
 
-        loadlgrfile(Ptop->lgr_name);
-        if (Ptop->discard_missing_lgr_assets(Plgr)) {
+        load_lgr_file(Ptop->lgr_name);
+        if (Ptop->discard_missing_lgr_assets(Lgr)) {
             dialogselejtez();
         }
     }

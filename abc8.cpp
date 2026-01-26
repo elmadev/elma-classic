@@ -13,15 +13,15 @@ bool ErrorOnMissingCodepoint = false;
 
 abc8::abc8(const char* filename) {
     spacing = 0;
-    ppsprite = NULL;
-    y_offset = NULL;
+    ppsprite = nullptr;
+    y_offset = nullptr;
     ppsprite = new ptrpic8[256];
     if (!ppsprite) {
         external_error("memory");
         return;
     }
     for (int i = 0; i < 256; i++) {
-        ppsprite[i] = NULL;
+        ppsprite[i] = nullptr;
     }
     y_offset = new short[256];
     if (!y_offset) {
@@ -88,20 +88,20 @@ abc8::abc8(const char* filename) {
     qclose(h);
 }
 
-abc8::~abc8(void) {
+abc8::~abc8() {
     if (ppsprite) {
         for (int i = 0; i < 256; i++) {
             if (ppsprite[i]) {
                 delete ppsprite[i];
-                ppsprite[i] = NULL;
+                ppsprite[i] = nullptr;
             }
         }
         delete ppsprite;
-        ppsprite = NULL;
+        ppsprite = nullptr;
     }
     if (y_offset) {
         delete y_offset;
-        y_offset = NULL;
+        y_offset = nullptr;
     }
 }
 
@@ -126,10 +126,10 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
             if (ErrorOnMissingCodepoint) {
                 internal_error("Missing codepoint in abc8!", error_text);
                 return;
-            } else {
-                text++;
-                continue;
             }
+
+            text++;
+            continue;
         }
         blit8(dest, ppsprite[index], x, y + y_offset[index]);
         x += spacing + ppsprite[index]->get_width();
@@ -157,10 +157,10 @@ int abc8::len(const char* text) {
             if (ErrorOnMissingCodepoint) {
                 internal_error("Missing codepoint in abc8!", error_text);
                 return 0;
-            } else {
-                text++;
-                continue;
             }
+
+            text++;
+            continue;
         }
         width += spacing + ppsprite[index]->get_width();
 

@@ -14,7 +14,7 @@ class abc8 {
 
   public:
     abc8(const char* filename);
-    ~abc8(void);
+    ~abc8();
     void write(pic8* dest, int x, int y, const char* text);
     void write_centered(pic8* dest, int x, int y, const char* text);
     int len(const char* text);

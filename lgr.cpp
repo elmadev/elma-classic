@@ -19,28 +19,11 @@
 #include "sprite.h"
 #include <cstring>
 
-/*void tesztloadlgr( void ) {
-    int a = 1, b = 2, c = 4;
-    for( int i = 0; i < 20; i++ ) {
-        lgrfile* plgr = new lgrfile( "default" );
-        delete plgr;
-        a++;
-        b = a+c;
-    }
-} */
-
 constexpr int Checknumber_lgr = 187565543;
 
 lgrfile* Lgr = NULL; // Az eppen bentlevo lgrfile-ra mutat
 
 static char Bentlgrnev[30] = "";
-
-/*
-bike_box BikeBox1 = { 3, 36, 146, 183 };
-bike_box BikeBox2 = { 32, 184, 146, 297 };
-bike_box BikeBox3 = { 147, 141, 272, 264 };
-bike_box BikeBox4 = { 273, 181, 353, 244 };
-*/
 
 bike_box BikeBox1 = {3, 36, 147, 184};
 bike_box BikeBox2 = {32, 183, 147, 297};
@@ -121,24 +104,12 @@ void load_lgr_file(const char* lgrname) {
 }
 
 static void chopdarab(pic8* pbiker, affine_pic** ppkiskep, bike_box* pbox) {
-    // kivag nagy.tga a.tga 272 275 347 334
-    /*pic8* ppic = new pic8( 347 - 272 + 1, 334 - 275 + 1 );
-    blit8( ppic, pbiker, -(272-260), -(275-260) );
-    bp->pkisa = new affine_pic( NULL, ppic ); // ppic-et ez deleteli is
-    */ // Eddig a regi volt
-
     pic8* ppic = new pic8(pbox->x2 - pbox->x1 + 1, pbox->y2 - pbox->y1 + 1);
     blit8(ppic, pbiker, -pbox->x1, -pbox->y1);
     *ppkiskep = new affine_pic(NULL, ppic); // ppic-et ez deleteli is
 }
 
 void lgrfile::chop_bike(pic8* bike, bike_pics* bp) {
-    // kivag nagy.tga a.tga 272 275 347 334
-    // kivag nagy.tga b.tga 287 334 404 558
-    // kivag nagy.tga c.tga 404 369 451 530
-    // kivag nagy.tga d.tga 451 289 568 538
-    // kivag nagy.tga e.tga 569 474 626 529
-
     chopdarab(bike, &bp->bike_part1, &BikeBox1);
     chopdarab(bike, &bp->bike_part2, &BikeBox2);
     chopdarab(bike, &bp->bike_part3, &BikeBox3);
@@ -552,18 +523,6 @@ lgrfile::lgrfile(const char* lgrname) {
         long kurpos = ftell(h);
         pic8* ppic = new pic8(nev, h);
         fseek(h, kurpos + hossz, SEEK_SET);
-
-        // Kimentjuk osszes kepet:
-        /*static int elso = 1;
-        static unsigned char* savepal = NULL;
-        if( elso ) {
-            elso = 0;
-            savepal = getnewpalfromh( h );
-        }
-        char nev4[50] = "pictmp\\";
-        strcat( nev4, nev );
-        ppic->save( nev4, savepal );
-        */
 
         // Osztalyozzuk nevet:
         // Eloszor kotelezo kepeket nezzuk:
@@ -1174,32 +1133,3 @@ int lgrfile::get_texture_index(const char* name) {
     }
     return -1;
 }
-
-// Ez regi, ez meg kihasznalta, hogy abc sorrendben vannak:
-// Ha nincs ilye nevu, akkor -1-et ad vissza
-/*int lgrfile::getindex( char* nev ) {
-    int di = 1;
-    while( di*2 < kepszam )
-        di *= 2;
-    int i = di;
-    if( kepszam == 1 )
-        i = 0;
-    while( 1 ) {
-        int eredmeny = strcmpi( nevek[i], nev );
-        if( !eredmeny )
-            return i;
-        if( di == 0 )
-            return -1;
-        if( eredmeny < 0 ) {
-            i += di;
-            if( i >= kepszam )
-                i = kepszam-1;
-        }
-        else {
-            i -= di;
-            if( i < 0 )
-                i = 0;
-        }
-        di /= 2;
-    }
-} */

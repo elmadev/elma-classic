@@ -2,7 +2,6 @@
 #define LGRFILE_H
 
 #include "sprite.h"
-#include <cstdio>
 
 class anim;
 class grass;
@@ -65,7 +64,6 @@ struct bike_pics {
     affine_pic* head;
 };
 
-#define MAXKOVETOK (20)
 #define MAX_QFOOD (20) // Valojaban ennek csak 9-nak kene lennie
 
 class lgrfile {
@@ -79,11 +77,8 @@ class lgrfile {
     lgrfile(const char* lgrname); // kiterj es ut nelkul
     ~lgrfile(void);
 
-    int csereljen(int i);
-
   public:
     friend void load_lgr_file(const char* lgrname); // Leiras alul
-    friend void tesztloadlgr(void);
 
     int picture_count;
     picture pictures[MAX_PICTURES];
@@ -145,17 +140,6 @@ extern lgrfile* Lgr; // Az eppen bentlevo lgrfile-ra mutat
 // Ha nincs ilyen nevu file, akkor default-ot olvassa:
 void load_lgr_file(const char* lgrname);
 void invalidate_lgr_cache();
-
-extern int Allandokepszam;
-// [stringek szama][egy string hossza]:
-extern char Allandotomb[28][28];
-
-// Kulonallo exe-be:
-void makelgrfile(void);
-
-// Ez egy kis utility, file bemasolasara nagy file-ba:
-// Ez elso negy byte-ba beirja file hosszat is:
-void filemasolas(FILE* hout, char* nev, char* outnev);
 
 struct bike_box {
     int x1, y1, x2, y2;

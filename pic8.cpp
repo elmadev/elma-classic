@@ -518,6 +518,86 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     return true;
 }
 
+constexpr short BMP_MAGIC = 0x4D42;
+constexpr unsigned int BMP_HEADER_SIZE = 52;
+
+// This is a combination of BITMAPFILEHEADER and BITMAPINFOHEADER.
+// https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapfileheader
+// https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader
+struct bmp_header {
+    unsigned int size;
+    unsigned int reserved;
+    unsigned int offset;
+    unsigned int dib_size;
+    signed int width;
+    signed int height;
+    unsigned short planes;
+    unsigned short bpp;
+    unsigned int compression;
+    unsigned int image_size;
+    signed int x_pixels_per_meter;
+    signed int y_pixels_per_meter;
+    unsigned int num_colors;
+    unsigned int num_important_colors;
+};
+
+static_assert(sizeof(bmp_header) == BMP_HEADER_SIZE);
+
+pic8* pic8::from_bmp(const char* filename) {
+    FILE* h = fopen(filename, "rb");
+    if (!h) {
+        return nullptr;
+    }
+
+    short magic;
+    if (fread(&magic, 1, sizeof(magic), h) != 2 || magic != BMP_MAGIC) {
+        return nullptr;
+    }
+
+    bmp_header header;
+    if (fread(&header, 1, sizeof(header), h) != BMP_HEADER_SIZE) {
+        return nullptr;
+    }
+
+    // Unsupported headers: BITMAPCOREHEADER, OS22XBITMAPHEADER, OS22XBITMAPHEADER
+    if (header.dib_size == 12 || header.dib_size == 64 || header.dib_size == 16) {
+        return nullptr;
+    }
+
+    // Only support:
+    //   - 8 bits-per-pixel (indexed bitmap)
+    //   - positive height (if height is negative pixels are stored top down)
+    if (header.bpp != 8 || header.height < 1) {
+        return nullptr;
+    }
+
+    int width = header.width;
+    int height = header.height;
+
+    pic8* pic = new pic8(width, height);
+
+    // BMP rows are padded.
+    int padded_width = width;
+    if (width % 4) {
+        padded_width += 4 - width % 4;
+    }
+
+    unsigned char* pixels = new unsigned char[padded_width * height];
+    fseek(h, header.offset, SEEK_SET);
+    if (fread(pixels, 1, padded_width * height, h) != padded_width * height) {
+        return nullptr;
+    }
+
+    for (int h = 0; h < height; h++) {
+        // BMP rows are bottom up.
+        int src_row = height - 1 - h;
+        memcpy(pic->get_row(h), &pixels[src_row * padded_width], width);
+    }
+    delete[] pixels;
+
+    return pic;
+}
+
 // Paste source (x1, y1, x2, y2) into dest at (x, y)
 void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2) {
 #ifdef DEBUG

@@ -140,6 +140,39 @@ To format all files in the repository, run the following command:
 
 ---
 
+## Static Analysis with clang-tidy
+
+To catch bugs and improve code quality, use `clang-tidy`.
+
+### Installation
+
+- On macOS:
+  ```
+  $ brew install clang-tidy
+  ```
+
+- On Linux:
+  ```
+  $ sudo apt install clang-tidy-19
+  ```
+
+- On Windows:
+  ```
+  $ pip install clang-tidy~=19.0
+  ```
+
+### Running clang-tidy
+
+To run static analysis on all source files, run the following command:
+
+  ```
+  ninja -C build clang-tidy
+  ```
+
+The checks are configured in the `.clang-tidy` file at the project root.
+
+---
+
 ## VS Code Configuration
 
 VS Code configuration files are provided in the `docs/vscode/` directory for reference. These include:

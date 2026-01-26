@@ -22,7 +22,7 @@
 
 constexpr int MAGIC_NUMBER = 187565543;
 
-lgrfile* Lgr = NULL; // Az eppen bentlevo lgrfile-ra mutat
+lgrfile* Lgr = NULL;
 
 static char CurrentLgrName[30] = "";
 
@@ -36,15 +36,11 @@ void invalidate_lgr_cache() {
     CurrentLgrName[0] = '\0';
 }
 
-// Ha nincs ilyen nevu file, akkor default-ot olvassa:
 void load_lgr_file(const char* lgrname) {
-    // tesztloadlgr();
-    // internal_error( "A" );
-
     if (strlen(lgrname) > MAX_FILENAME_LEN) {
         internal_error("load_lgr_file strlen( lgrname ) > MAX_FILENAME_LEN!");
     }
-
+    // This lgr is already loaded, so skip
     if (strcmpi(lgrname, CurrentLgrName) == 0) {
         return;
     }
@@ -52,15 +48,15 @@ void load_lgr_file(const char* lgrname) {
     char path[30];
     sprintf(path, "lgr/%s.lgr", lgrname);
     if (access(path, 0) != 0) {
+        // LGR not found
         if (!Ptop) {
             internal_error("load_lgr_file !Ptop!");
         }
 
+        // Display warning
         char filename[20];
         strcpy(filename, lgrname);
         strcat(filename, ".LGR");
-
-        // Kiirunk egy uzenetet:
         blit8(BufferBall, BufferMain);
         BufferMain->fill_box(Hatterindex);
         bltfront(BufferMain);
@@ -78,7 +74,7 @@ void load_lgr_file(const char* lgrname) {
         blit8(BufferMain, BufferBall);
         bltfront(BufferMain);
 
-        // (Ptop->lgrnev lehet egy mutato nev-vel)
+        // Set current level's lgr to DEFAULT and then try and load it
         strcpy(Ptop->lgr_name, "DEFAULT");
         Valtozott = 1;
 
@@ -94,7 +90,7 @@ void load_lgr_file(const char* lgrname) {
             external_error("Could not open file LGR\\DEFAULT.LGR!");
         }
     }
-
+    // Actually load the lgr
     strcpy(CurrentLgrName, lgrname);
 
     if (Lgr) {
@@ -107,27 +103,29 @@ void load_lgr_file(const char* lgrname) {
 static void bike_slice(pic8* bike, affine_pic** ret, bike_box* bbox) {
     pic8* slice = new pic8(bbox->x2 - bbox->x1 + 1, bbox->y2 - bbox->y1 + 1);
     blit8(slice, bike, -bbox->x1, -bbox->y1);
-    *ret = new affine_pic(NULL, slice); // ppic-et ez deleteli is
+    *ret = new affine_pic(NULL, slice);
 }
 
+// Slice the bike into 4 sub-components
 void lgrfile::chop_bike(pic8* bike, bike_pics* bp) {
     bike_slice(bike, &bp->bike_part1, &BikeBox1);
     bike_slice(bike, &bp->bike_part2, &BikeBox2);
     bike_slice(bike, &bp->bike_part3, &BikeBox3);
     bike_slice(bike, &bp->bike_part4, &BikeBox4);
 
-    // Most atlatszo szint pkisa alapjan osszesre beallitjuk:
+    // Transparency taken from topleft corner of BikeBox1
     bp->bike_part2->transparency = bp->bike_part3->transparency = bp->bike_part4->transparency =
         bp->bike_part1->transparency;
 }
 
+// Tile a texture horizontally to fit SCREEN_WIDTH.
 static pic8* generate_default_texture(texture* text) {
     int original_width = text->original_width;
     int tiles = 1;
     while (original_width * tiles < SCREEN_WIDTH) {
         tiles++;
     }
-    tiles++; // Igy mar legalabb egy keppel szelesebb SCREEN_WIDTH-nel
+    tiles++;
     pic8* ppic = new pic8(original_width * tiles, text->pic->get_height());
     for (int i = 0; i < tiles; i++) {
         blit8(ppic, text->pic, i * original_width, 0);
@@ -135,7 +133,7 @@ static pic8* generate_default_texture(texture* text) {
     return ppic;
 }
 
-// h-nak pcx file vegen kell allnia:
+// Get the palette data from q1bike.pcx. h file offset must be at the end of the pcx file!
 static unsigned char* create_lgr_palette(FILE* h) {
     unsigned char* pal = new unsigned char[768];
 
@@ -178,21 +176,27 @@ static int get_transparency_palette_id(piclist::Transparency type, pic8* pic) {
 
 static unsigned char* PictureBuffer = NULL;
 
+// Store a picture into the lgr.
+// Compression format:
+//  {
+//   Big-endian unsigned short: transparent length or 0xFFFF if end of row,
+//   Big-endian unsigned short: non-transparent length, (skipped if end of row)
+//   Raw pixel data, (skipped if end of row)
+//  }
 void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
     if (picture_count >= MAX_PICTURES) {
         external_error("Too many pictures in lgr file!");
     }
 
+    // Set picture properties
     picture* new_pic = &pictures[picture_count];
-
     strcpy(new_pic->name, &list->name[index * 10]);
     new_pic->default_distance = list->default_distance[index];
     new_pic->default_clipping = list->default_clipping[index];
-
-    // Beetetjuk kepadatokat:
     new_pic->width = pic->get_width();
     new_pic->height = pic->get_height();
 
+    // Compress picture data
     if (new_pic->width > 60000) {
         external_error("Picture width is too big!", new_pic->name);
     }
@@ -211,33 +215,34 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
 
     int buffer_offset = 0;
     for (int i = 0; i < new_pic->height; i++) {
-        // Egy sor elintezese:
         unsigned char* row = pic->get_row(i);
         if (buffer_offset > PICTURE_MAX_MEMORY) {
             external_error("Picture is too big in lgr file! Picture name:", new_pic->name);
         }
+
         int x = 0;
         while (1) {
-            // Beirjuk uresek szamat:
+            // Skip pixels
             int skip = uresszam(x, new_pic->width, row, (unsigned char)transparency);
             if (skip > 60000) {
                 internal_error("add_picture skip width too long!");
             }
+
             int skip_upper = skip / 256;
             int skip_lower = skip % 256;
             PictureBuffer[buffer_offset] = (unsigned char)skip_upper;
             PictureBuffer[buffer_offset + 1] = (unsigned char)skip_lower;
             x += skip;
             if (x >= new_pic->width) {
-                // Vege sornak:
+                // End of line
                 PictureBuffer[buffer_offset] = 255;
                 PictureBuffer[buffer_offset + 1] = 255;
                 buffer_offset += 2;
                 break;
             }
-            buffer_offset += 2;
 
-            // Beirjuk telik szamat:
+            buffer_offset += 2;
+            // Solid pixels
             int count = teliszam(x, new_pic->width, row, (unsigned char)transparency);
             if (count <= 0) {
                 internal_error("add_picture count width negative!");
@@ -245,18 +250,18 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
             if (count > 60000) {
                 internal_error("add_picture count width too long!");
             }
+
             int count_upper = count / 256;
             int count_lower = count % 256;
             PictureBuffer[buffer_offset] = (unsigned char)count_upper;
             PictureBuffer[buffer_offset + 1] = (unsigned char)count_lower;
-            buffer_offset += 2;
 
-            // Bemasoljuk kep byte-okat:
+            buffer_offset += 2;
             if (buffer_offset + count > PICTURE_MAX_MEMORY) {
                 external_error("Picture is too big in lgr file! Picture name:", new_pic->name);
             }
-            memcpy(&PictureBuffer[buffer_offset], &row[x], count);
 
+            memcpy(&PictureBuffer[buffer_offset], &row[x], count);
             x += count;
             buffer_offset += count;
         }
@@ -276,19 +281,18 @@ void lgrfile::add_texture(pic8* pic, piclist* list, int index) {
         external_error("Too many textures in lgr file!");
     }
 
-    // Megforditjuk textura kepet fejjel lefele:
     forditkepet(pic);
 
     texture* new_text = &textures[texture_count];
-
     if (list) {
+        // Copy all the properties
         strcpy(new_text->name, &list->name[index * 10]);
         new_text->pic = pic;
         new_text->default_distance = list->default_distance[index];
         new_text->default_clipping = list->default_clipping[index];
         new_text->is_qgrass = 0;
     } else {
-        // Csak fu eseten:
+        // QGRASS special case
         strcpy(new_text->name, "qgrass");
         new_text->pic = pic;
         new_text->default_distance = 450;
@@ -307,22 +311,19 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
         external_error("Too many masks in lgr file!");
     }
 
+    // Copy properties
     mask* new_mask = &masks[mask_count];
-
     strcpy(new_mask->name, &list->name[index * 10]);
     new_mask->width = pic->get_width();
     new_mask->height = pic->get_height();
 
-    // Most beeszi adatokat:
+    // Special compression format type
     int buffer_offset = 0;
     int transparency = get_transparency_palette_id(list->transparency[index], pic);
     if (transparency >= 0) {
-        // Van atlatszosag:
         for (int i = 0; i < new_mask->height; i++) {
-            // Kep egy soranak elintezese:
+            // Transparent data
             unsigned char* sor = pic->get_row(i);
-
-            // Atugorja elso ures pixeleket:
             int j = uresszam(0, new_mask->width, sor, (unsigned char)transparency);
             if (j > 0) {
                 MaskBuffer[buffer_offset].type = MaskEncoding_Transparent;
@@ -330,7 +331,7 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
                 buffer_offset++;
             }
             while (j <= new_mask->width - 1) {
-                // Keresi kis szakaszokat:
+                // Solid data
                 int count = teliszam(j, new_mask->width, sor, (unsigned char)transparency);
                 if (count <= 0) {
                     internal_error("add_mask count length negative!");
@@ -345,7 +346,7 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
 
                 j += count;
 
-                // Atugorja ures pixeleket:
+                // Transparent data
                 count = uresszam(j, new_mask->width, sor, (unsigned char)transparency);
                 if (count > 0) {
                     MaskBuffer[buffer_offset].type = MaskEncoding_Transparent;
@@ -354,14 +355,14 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
                 }
                 j += count;
             }
+            // End of row
             MaskBuffer[buffer_offset].type = MaskEncoding_EndOfLine;
             MaskBuffer[buffer_offset].length = 0;
             buffer_offset++;
         }
     } else {
-        // Nincs atlatszosag:
+        // Solid square special case
         for (int i = 0; i < new_mask->height; i++) {
-            // Kep egy soranak elintezese:
             MaskBuffer[buffer_offset].type = MaskEncoding_Solid;
             MaskBuffer[buffer_offset].length = new_mask->width;
             buffer_offset++;
@@ -371,7 +372,6 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
         }
     }
 
-    // Most betesszuk lefoglalt helyre atlatszosag infot:
     new_mask->data = new mask_element[buffer_offset];
     if (!new_mask->data) {
         internal_error("Memory!");
@@ -384,15 +384,15 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
     mask_count++;
 }
 
-// Bemegy egy 768 byte-os paletta es kijon egy 256 byte-os lookup tabla:
-// Idokiiras ez alapjan ir ki minel kontrasztosabb szinnel:
+// Map the 256 lgr palette colors to either the brightest or darkest color
+// Used to draw the timer
 static unsigned char* create_timer_palette_map(unsigned char* pal) {
     unsigned char* map = new unsigned char[260];
     if (!map) {
         internal_error("create_timer_palettemap memory!");
     }
 
-    // Megkeressuk legvilagosabb szint:
+    // Find brightest color of the palette
     int color_value = -1;
     int brightest_color_index = 0;
     for (int i = 0; i < 256; i++) {
@@ -403,7 +403,7 @@ static unsigned char* create_timer_palette_map(unsigned char* pal) {
         }
     }
 
-    // Megkeressuk legsotetebb szint:
+    // Find darkest color of the palette
     color_value = 1000;
     int darkest_color_index = 0;
     for (int i = 0; i < 256; i++) {
@@ -414,9 +414,9 @@ static unsigned char* create_timer_palette_map(unsigned char* pal) {
         }
     }
 
-    // Most lookup tabla minden szinehez hozza rendeljuk feketet (0 index),
-    // vagy legvilagosabbat:
+    // Map each color from the palette to the darkest or brightest color
     for (int i = 0; i < 256; i++) {
+        // Brightest color only if R < 80, G < 80, B < 80
         if ((pal[i * 3] < 80) && (pal[i * 3 + 1] < 80) && (pal[i * 3 + 2] < 80)) {
             map[i] = (unsigned char)brightest_color_index;
         } else {
@@ -427,7 +427,6 @@ static unsigned char* create_timer_palette_map(unsigned char* pal) {
 }
 
 lgrfile::lgrfile(const char* lgrname) {
-    // Lenullaz mindent:
     picture_count = 0;
     mask_count = 0;
     texture_count = 0;
@@ -466,7 +465,7 @@ lgrfile::lgrfile(const char* lgrname) {
 
     double zoom = EolSettings->zoom();
 
-    // Megnyitja file-t:
+    // Load file
     char path[30];
     sprintf(path, "lgr/%s.lgr", lgrname);
     FILE* h = fopen(path, "rb");
@@ -474,6 +473,7 @@ lgrfile::lgrfile(const char* lgrname) {
         external_error("Cannot find file:", path);
     }
 
+    // LGR12
     char version[10];
     if (fread(version, 1, 5, h) != 5) {
         external_error("Corrupt LGR file!:", path);
@@ -486,7 +486,7 @@ lgrfile::lgrfile(const char* lgrname) {
         external_error("LGR file's version is too new!:", path);
     }
 
-    // Most osszes kep szamat taroljuk kepszam-ban, kesobb csak indexeseket:
+    // Pcx object file count
     int pcx_length;
     if (fread(&pcx_length, 1, 4, h) != 4) {
         external_error("Corrupt LGR file!:", path);
@@ -496,18 +496,17 @@ lgrfile::lgrfile(const char* lgrname) {
         external_error("Corrupt LGR file!:", path);
     }
 
-    // Most beolvassuk pictures.lst file binaris valtozatat:
+    // Pictures.lst
     piclist* list = new piclist(h);
     if (!list) {
         internal_error("lgrfile::lgrfile out of memory!");
     }
 
-    // Vegigmegy kepeken:
+    // Iterate through the pcx objects
     pic8* q1bike = NULL;
     pic8* q2bike = NULL;
     pic8* qcolors = NULL;
     for (int i = 0; i < pcx_length; i++) {
-        // Egy kep:
         char asset_filename[30];
         if (fread(asset_filename, 1, 20, h) != 20) {
             external_error("Corrupt LGR file!:", path);
@@ -520,28 +519,25 @@ lgrfile::lgrfile(const char* lgrname) {
             external_error("Corrupt LGR file!:", path);
         }
 
-        // Beolvassuk kepet:
         long curpos = ftell(h);
         pic8* asset_pic = new pic8(asset_filename, h);
         fseek(h, curpos + asset_size, SEEK_SET);
 
-        // Osztalyozzuk nevet:
-        // Eloszor kotelezo kepeket nezzuk:
         if (strcmpi(asset_filename, "q1bike.pcx") == 0) {
             q1bike = asset_pic;
             palette_data = create_lgr_palette(h);
             timer_palette_map = create_timer_palette_map(palette_data);
             pal = new palette(palette_data);
+            // Keep pic8
             continue;
         }
         if (strcmpi(asset_filename, "q2bike.pcx") == 0) {
             q2bike = asset_pic;
+            // Keep pic8
             continue;
         }
 
-        // 1. motoros reszei:
         if (strcmpi(asset_filename, "q1body.pcx") == 0) {
-            // affine_pic konstructor delete-eli ppic-t:
             bike1.body = new affine_pic(NULL, asset_pic);
             continue;
         }
@@ -579,9 +575,7 @@ lgrfile::lgrfile(const char* lgrname) {
             continue;
         }
 
-        // 2. motoros reszei:
         if (strcmpi(asset_filename, "q2body.pcx") == 0) {
-            // affine_pic konstructor delete-eli ppic-t:
             bike2.body = new affine_pic(NULL, asset_pic);
             continue;
         }
@@ -624,7 +618,6 @@ lgrfile::lgrfile(const char* lgrname) {
             continue;
         }
 
-        // Objektumok:
         if (strcmpi(asset_filename, "qkiller.pcx") == 0) {
             killer = new anim(asset_pic, "qkiller.pcx", zoom);
             delete asset_pic;
@@ -640,10 +633,12 @@ lgrfile::lgrfile(const char* lgrname) {
 
         if (strcmpi(asset_filename, "qframe.pcx") == 0) {
             qframe = asset_pic;
+            // Keep pic8
             continue;
         }
         if (strcmpi(asset_filename, "qcolors.pcx") == 0) {
             qcolors = asset_pic;
+            // Keep pic8
             continue;
         }
 
@@ -662,7 +657,7 @@ lgrfile::lgrfile(const char* lgrname) {
             continue;
         }
 
-        // Kovetok:
+        // QUP/QDOWN
         if (strnicmp(asset_filename, "qup_", 4) == 0) {
             grass_pics->add(asset_pic, true);
             continue;
@@ -672,23 +667,22 @@ lgrfile::lgrfile(const char* lgrname) {
             continue;
         }
 
-        // Most mar csak piclistben szereplo kep lehet:
-        // Leszedjuk kiterjesztest:
+        // Truncate file extension
         if (!strchr(asset_filename, '.')) {
             external_error("Cannot find dot in name:", asset_filename);
         }
         *strchr(asset_filename, '.') = 0;
-
         if (strlen(asset_filename) > MAX_FILENAME_LEN) {
             external_error("Filename is too long in LGR file!:", asset_filename, path);
         }
 
-        // Grass:
+        // QGRASS
         if (strcmpi(asset_filename, "qgrass") == 0) {
             add_texture(asset_pic, NULL, 0);
             continue;
         }
 
+        // Generic asset
         int index = list->get_index(asset_filename);
         if (index < 0) {
             external_error("There is no line in PICTURES.LST corresponding to picture:",
@@ -697,7 +691,7 @@ lgrfile::lgrfile(const char* lgrname) {
         if (list->type[index] == piclist::Type::Picture) {
             asset_pic = pic8::scale(asset_pic, zoom);
             add_picture(asset_pic, list, index);
-            delete asset_pic; // Kepre mar nincsen tobbe szuksegunk
+            delete asset_pic;
             asset_pic = NULL;
             continue;
         }
@@ -706,19 +700,20 @@ lgrfile::lgrfile(const char* lgrname) {
                 asset_pic = pic8::scale(asset_pic, zoom);
             }
             add_texture(asset_pic, list, index);
+            // Keep pic8
             continue;
         }
         if (list->type[index] == piclist::Type::Mask) {
             asset_pic = pic8::scale(asset_pic, zoom);
-            // delete-li ppic-et:
             add_mask(asset_pic, list, index);
+            // pic8 deleted by above function
             asset_pic = NULL;
             continue;
         }
-        // Ismeretlen tipus:
         external_error("Corrupt LGR file!:", path);
     }
 
+    // WOF
     int magic_number = 0;
     if (fread(&magic_number, 1, 4, h) != 4) {
         external_error("Corrupt LGR file!:", path);
@@ -729,15 +724,12 @@ lgrfile::lgrfile(const char* lgrname) {
 
     fclose(h);
     h = NULL;
-    // Minden be van olvasva, file le van zarva:
 
-    // Most csinalunk egy kis ellenorzest:
-
+    // Check that the LGR is complete
     if (texture_count < 2) {
         external_error("There must be at least two textures in LGR file!", lgrname);
     }
 
-    // 1. motoros:
     if (!bike1.body) {
         external_error("Picture not found in LGR file!: ", "q1body.pcx", path);
     }
@@ -747,7 +739,6 @@ lgrfile::lgrfile(const char* lgrname) {
     if (!bike1.leg) {
         external_error("Picture not found in LGR file!: ", "q1leg.pcx", path);
     }
-
     if (!q1bike) {
         external_error("Picture not found in LGR file!: ", "q1bike.pcx", path);
     }
@@ -770,7 +761,6 @@ lgrfile::lgrfile(const char* lgrname) {
         external_error("Picture not found in LGR file!: ", "q1head.pcx", path);
     }
 
-    // 2. motoros:
     if (!bike2.body) {
         external_error("Picture not found in LGR file!: ", "q2body.pcx", path);
     }
@@ -780,7 +770,6 @@ lgrfile::lgrfile(const char* lgrname) {
     if (!bike2.leg) {
         external_error("Picture not found in LGR file!: ", "q2leg.pcx", path);
     }
-
     if (!q2bike) {
         external_error("Picture not found in LGR file!: ", "q2bike.pcx", path);
     }
@@ -821,16 +810,15 @@ lgrfile::lgrfile(const char* lgrname) {
         external_error("Picture not found in LGR file!: ", "qcolors.pcx", path);
     }
 
-    // Elintezzuk biker picture-oket:
+    // Create the bike affine_pic
     chop_bike(q1bike, &bike1);
     delete q1bike;
     q1bike = NULL;
-
     chop_bike(q2bike, &bike2);
     delete q2bike;
     q2bike = NULL;
 
-    // Elintezzuk index szineket:
+    // Parse QCOLORS
     minimap_foreground_palette_id = qcolors->gpixel(6, 6 + 0 * 12);
     minimap_background_palette_id = qcolors->gpixel(6, 6 + 1 * 12);
     minimap_border_palette_id = qcolors->gpixel(6, 6 + 2 * 12);
@@ -841,11 +829,12 @@ lgrfile::lgrfile(const char* lgrname) {
     minimap_killer_palette_id[0] = qcolors->gpixel(6, 6 + 8 * 12);
     delete qcolors;
     qcolors = NULL;
-    // ecsetben mutato fog hivatkozni rajuk (max 3 egymas utan):
+
+    // Horizontally extend some QCOLORS
     minimap_exit_palette_id[2] = minimap_exit_palette_id[1] = minimap_exit_palette_id[0];
     minimap_killer_palette_id[2] = minimap_killer_palette_id[1] = minimap_killer_palette_id[0];
 
-    // Most texturakat kibovitjuk vizszintes iranyban:
+    // Horizontally tile textures to a minimum width for faster rendering
     for (int i = 0; i < texture_count; i++) {
         texture* text = &textures[i];
         if (!text->pic) {
@@ -856,7 +845,6 @@ lgrfile::lgrfile(const char* lgrname) {
         if (text->pic->get_width() >= texture_min_width) {
             continue;
         }
-        // Kep tul kicsi, kibovitjuk vizszintes iranyban:
         int tiles = 1;
         while (tiles * text->pic->get_width() < texture_min_width) {
             tiles++;
@@ -869,7 +857,7 @@ lgrfile::lgrfile(const char* lgrname) {
         text->pic = tiled;
     }
 
-    // Most kepeket abc sorrendbe rendezzuk:
+    // Sort pictures using bubble sort
     for (int i = 0; i < picture_count + 2; i++) {
         for (int j = 0; j < picture_count - 1; j++) {
             if (strcmpi(pictures[j].name, pictures[j + 1].name) == 0) {
@@ -877,7 +865,6 @@ lgrfile::lgrfile(const char* lgrname) {
             }
 
             if (strcmpi(pictures[j].name, pictures[j + 1].name) > 0) {
-                // Csere:
                 picture tmp = pictures[j];
                 pictures[j] = pictures[j + 1];
                 pictures[j + 1] = tmp;
@@ -885,7 +872,7 @@ lgrfile::lgrfile(const char* lgrname) {
         }
     }
 
-    // Most maszkokat abc sorrendbe rendezzuk:
+    // Sort masks using bubble sort
     for (int i = 0; i < mask_count + 2; i++) {
         for (int j = 0; j < mask_count - 1; j++) {
             if (strcmpi(masks[j].name, masks[j + 1].name) == 0) {
@@ -901,7 +888,7 @@ lgrfile::lgrfile(const char* lgrname) {
         }
     }
 
-    // Most texturakat abc sorrendbe rendezzuk:
+    // Sort textures using bubble sort (with QGRASS at the very end)
     for (int i = 0; i < texture_count + 2; i++) {
         for (int j = 0; j < texture_count - 1; j++) {
             if (strcmpi(textures[j].name, textures[j + 1].name) == 0) {
@@ -919,20 +906,20 @@ lgrfile::lgrfile(const char* lgrname) {
         }
     }
 
+    // Cleanup
     delete list;
     list = NULL;
 
-    // Pic adatok letrehozasahoz felvett tombot toroljuk, mivel tul nagy:
     if (PictureBuffer) {
         delete PictureBuffer;
         PictureBuffer = NULL;
     }
 
+    // Editor picture selection initialization
     editor_picture_name[0] = 0;
     editor_mask_name[0] = 0;
     editor_texture_name[0] = 0;
 
-    // Most meg food-okat megszamoljuk:
     food_count = 0;
     for (int i = 0; i < 9; i++) {
         if (food[i]) {
@@ -945,6 +932,7 @@ lgrfile::lgrfile(const char* lgrname) {
         external_error("Picture is missing from LGR file:", "qfood1.pcx", path);
     }
 
+    // Check grass
     has_grass = 1;
     editor_hide_qgrass = 1;
     if (get_texture_index("qgrass") < 0) {
@@ -952,7 +940,6 @@ lgrfile::lgrfile(const char* lgrname) {
         editor_hide_qgrass = 0;
     }
     if (grass_pics->length < 2) {
-        // external_error( "Picture not found in LGR file!: ", "qgrass.pcx", path );
         has_grass = 0;
     }
 }
@@ -1056,15 +1043,14 @@ lgrfile::~lgrfile(void) {
     }
 }
 
-// Ezt betoltecseteket hivja (Ptop-bol szedi kep neveket):
 void lgrfile::reload_default_textures(void) {
     if (!Ptop->foreground_name[0] || !Ptop->background_name[0]) {
         internal_error("!Ptop->foreground_name[0] || !Ptop->background_name[0]");
     }
 
+    // Recreate background texture
     if (strcmpi(background_name, Ptop->background_name) != 0) {
         strcpy(background_name, Ptop->background_name);
-        // Nem jo ami bent van:
         if (background) {
             delete background;
         }
@@ -1079,9 +1065,9 @@ void lgrfile::reload_default_textures(void) {
         background = generate_default_texture(text);
     }
 
+    // Recreate foreground texture
     if (strcmpi(foreground_name, Ptop->foreground_name) != 0) {
         strcpy(foreground_name, Ptop->foreground_name);
-        // Nem jo ami bent van:
         if (foreground) {
             delete foreground;
         }
@@ -1097,7 +1083,6 @@ void lgrfile::reload_default_textures(void) {
     }
 }
 
-// Ha nincs ilye nevu, akkor -1-et ad vissza
 int lgrfile::get_picture_index(const char* name) {
     if (!name[0]) {
         return -1;
@@ -1110,7 +1095,6 @@ int lgrfile::get_picture_index(const char* name) {
     return -1;
 }
 
-// Ha nincs ilye nevu, akkor -1-et ad vissza
 int lgrfile::get_mask_index(const char* name) {
     if (!name[0]) {
         return -1;
@@ -1123,7 +1107,6 @@ int lgrfile::get_mask_index(const char* name) {
     return -1;
 }
 
-// Ha nincs ilye nevu, akkor -1-et ad vissza
 int lgrfile::get_texture_index(const char* name) {
     if (!name[0]) {
         return -1;

@@ -33,11 +33,9 @@ struct picture {
     Clipping default_clipping;
 
     int width, height;
-    unsigned char* data; // leiras kovetkezik:
-                         // soronkent ismetlodve: {uresek szama telik szama, adat byte-ok}
-                         // uresek szama 60000 felett eseten uj sor
-                         // tehat minden sor uressel kezdodik
-                         // szamok 2 byte-on tarolodnak elso-t meg kell szorozni 256-tal
+    // Encoded as array of {unsigned BE short skip, unsigned BE short length, char[length] pixels}
+    // Jump to next row when skip length is 2^16 (and skip length/pixels)
+    unsigned char* data;
 };
 
 #define MAX_TEXTURES (100)
@@ -64,63 +62,57 @@ struct bike_pics {
     affine_pic* head;
 };
 
-#define MAX_QFOOD (20) // Valojaban ennek csak 9-nak kene lennie
+#define MAX_QFOOD (20)
 
 class lgrfile {
-    // Konstruktor hasznalja:
     void chop_bike(pic8* bike, bike_pics* bp);
 
     void add_picture(pic8* pic, piclist* list, int index);
     void add_texture(pic8* pic, piclist* list, int index);
     void add_mask(pic8* pic, piclist* list, int index);
 
-    lgrfile(const char* lgrname); // kiterj es ut nelkul
+    lgrfile(const char* lgrname);
     ~lgrfile(void);
 
   public:
-    friend void load_lgr_file(const char* lgrname); // Leiras alul
+    friend void load_lgr_file(const char* lgrname);
 
     int picture_count;
     picture pictures[MAX_PICTURES];
-    int get_picture_index(const char* name); // vagy -1
+    int get_picture_index(const char* name);
 
     int mask_count;
     mask masks[MAX_MASKS];
-    int get_mask_index(const char* name); // vagy -1
+    int get_mask_index(const char* name);
 
     int texture_count;
     texture textures[MAX_TEXTURES];
-    int get_texture_index(const char* name); // vagy -1
+    int get_texture_index(const char* name);
 
     int has_grass;
-    // Textura szelekcio lista utolso eleme kimarad (qgrass):
     int editor_hide_qgrass;
     grass* grass_pics;
 
     unsigned char* palette_data;
     palette* pal;
-    // paltomb alapjan ido kiirashoz negalt 256 byte-os lookup tabla:
     unsigned char* timer_palette_map;
 
     bike_pics bike1;
     bike_pics bike2;
     affine_pic* flag;
 
-    anim *killer, *exit; // Nagy objektumok
+    anim *killer, *exit;
     int food_count;
-    // Ennek indexe 0-tol indul, de ez 1-nek felel meg filenev es
-    // set properties-ben:
     anim* food[MAX_QFOOD];
-    pic8* qframe; // Csokkentett meret eseten ez latszik
+    pic8* qframe;
 
-    // Hater es eloter kepeket mindig kulon vesszuk:
-    pic8 *background, *foreground; // Ezek mar kelloen hosszuak vizszintesen
+    // Current level's default textures, horizontally tiled:
+    pic8 *background, *foreground;
     int background_original_width, foreground_original_width;
     char foreground_name[10], background_name[10];
-    // Ezt betoltecseteket hivja (Ptop-bol szedi kep neveket):
     void reload_default_textures();
 
-    // Ezeket colors.pcx file-bol veszi:
+    // From QCOLORS.pcx
     unsigned char minimap_foreground_palette_id;
     unsigned char minimap_background_palette_id;
     unsigned char minimap_bike1_palette_id;
@@ -130,14 +122,13 @@ class lgrfile {
     unsigned char minimap_food_palette_id;
     unsigned char minimap_killer_palette_id[3];
 
-    // tolt_pickasprite tudja allitani oket egyedul:
+    // Editor's Create Picture settings
     char editor_picture_name[10];
     char editor_mask_name[10];
     char editor_texture_name[10];
 };
 
-extern lgrfile* Lgr; // Az eppen bentlevo lgrfile-ra mutat
-// Ha nincs ilyen nevu file, akkor default-ot olvassa:
+extern lgrfile* Lgr;
 void load_lgr_file(const char* lgrname);
 void invalidate_lgr_cache();
 

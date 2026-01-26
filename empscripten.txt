@@ -24,6 +24,7 @@ settings.json
 3. If on Windows, make sure to cd back to main directory
 4. Update emscripten.ini file path
 On Linux, it would probably be 'emcc' but dunno
-5. meson setup build-em --cross-file emscripten.ini
-6. meson compile -C build-em
-7. emrun build-em/output.html
+5. add files to emscripten_virtual/
+6. meson setup build-em --cross-file emscripten.ini
+7. meson compile -C build-em
+8. emrun build-em/output.html

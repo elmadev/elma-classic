@@ -25,7 +25,7 @@ struct segment_node {
 typedef segment_node* psegment_node;
 
 // Memory structure to allocate data for segment_node
-constexpr int SEGMENT_NODE_BLOCK_LENGTH = 500;
+constexpr int SEGMENT_NODE_BLOCK_LENGTH = 5000;
 struct segment_node_array {
     segment_node nodes[SEGMENT_NODE_BLOCK_LENGTH];
     segment_node_array* next;

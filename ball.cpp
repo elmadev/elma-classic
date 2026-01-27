@@ -18,7 +18,7 @@ static double ElapsedTimeSinceKeyframe = 0.0;
 constexpr int InitColumns = 3;
 constexpr int InitRows = 3;
 
-static void create_balls(void) {
+static void create_balls() {
     BallCount = InitColumns * InitRows;
     Balls = new ball[BallCount];
     for (int x = 0; x < InitColumns; x++) {
@@ -54,7 +54,7 @@ static void create_balls(void) {
 }
 
 // Initialize the balls and collision system
-void balls_init(void) {
+void balls_init() {
     create_balls();
 
     // Create collision grid

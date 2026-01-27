@@ -680,7 +680,7 @@ int recorder::load_replays(const char* filename, int demo) {
             }
         } else {
             char path[40];
-            sprintf(path, "rec\\%s", filename);
+            sprintf(path, "rec/%s", filename);
             h = fopen(path, "rb");
             if (!h) {
                 external_error("Failed to open rec file: ", path);

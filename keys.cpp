@@ -1,12 +1,12 @@
 #include "keys.h"
 #include "platform_impl.h"
 
-constexpr int KeyBufferSize = 30;
-static Keycode KeyBuffer[KeyBufferSize];
+constexpr int KEY_BUFFER_SIZE = 64;
+static Keycode KeyBuffer[KEY_BUFFER_SIZE];
 static int KeyBufferCount = 0;
 
 void add_key_to_buffer(Keycode keycode) {
-    if (KeyBufferCount >= KeyBufferSize) {
+    if (KeyBufferCount >= KEY_BUFFER_SIZE) {
         return;
     }
     KeyBuffer[KeyBufferCount++] = keycode;

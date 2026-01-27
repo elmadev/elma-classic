@@ -56,7 +56,7 @@ class recorder {
     int flagtag_;
 
     // Load replay of one bike
-    int load(const char* filename, FILE* h, int demo);
+    int load(const char* filename, FILE* h, int demo, bool is_first_replay);
     // Save replay of one bike
     void save(const char* filename, FILE* h, int level_id, int flagtag);
 

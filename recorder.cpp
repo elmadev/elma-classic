@@ -379,28 +379,7 @@ static void read_error(const char* filename) {
     internal_error("Failed to read rec file: ", filename);
 }
 
-int recorder::load(const char* filename, FILE* h, int demo) {
-    bool keep_file = false;
-    if (h) {
-        keep_file = true;
-    }
-
-    if (!h) {
-        if (demo) {
-            h = qopen(filename, "rb");
-            if (!h) {
-                internal_error("Failed to open demo file: ", filename);
-            }
-        } else {
-            char path[40];
-            sprintf(path, "rec/%s", filename);
-            h = fopen(path, "rb");
-            if (!h) {
-                external_error("Failed to open rec file: ", path);
-            }
-        }
-    }
-
+int recorder::load(const char* filename, FILE* h, int demo, bool is_first_replay) {
     frame_count = 0;
     if (fread(&frame_count, 1, sizeof(frame_count), h) != 4) {
         read_error(filename);
@@ -423,9 +402,12 @@ int recorder::load(const char* filename, FILE* h, int demo) {
         external_error("Rec file version is too new!", filename);
     }
 
-    int multiplayer_rec_unused = 0;
-    if (fread(&multiplayer_rec_unused, 1, sizeof(multiplayer_rec_unused), h) != 4) {
+    int multiplayer_rec = 0;
+    if (fread(&multiplayer_rec, 1, sizeof(multiplayer_rec), h) != 4) {
         read_error(filename);
+    }
+    if (is_first_replay) {
+        MultiplayerRec = multiplayer_rec;
     }
     if (fread(&flagtag_, 1, sizeof(flagtag_), h) != 4) {
         read_error(filename);
@@ -506,14 +488,6 @@ int recorder::load(const char* filename, FILE* h, int demo) {
     }
     if (magic_number != MAGIC_NUMBER) {
         internal_error("magic_number != MAGIC_NUMBER");
-    }
-
-    if (!keep_file) {
-        if (demo) {
-            qclose(h);
-        } else {
-            fclose(h);
-        }
     }
 
     return level_id;
@@ -629,74 +603,30 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
 }
 
 int recorder::load_replays(const char* filename, int demo) {
-    FILE* h;
+    FILE* h = nullptr;
     if (demo) {
         h = qopen(filename, "rb");
         if (!h) {
-            external_error("Could not open for reading record file!: !: ", filename);
+            external_error("Failed to open demo file: ", filename);
         }
     } else {
         char path[40];
         sprintf(path, "rec/%s", filename);
         h = fopen(path, "rb");
         if (!h) {
-            external_error("Could not open for reading record file!:", path);
+            external_error("Failed to open rec file: ", path);
         }
     }
 
-    int frame_count_unused = 0;
-    if (fread(&frame_count_unused, 1, sizeof(frame_count_unused), h) != 4) {
-        read_error(filename);
-    }
-
-    int version = 0;
-    if (fread(&version, 1, sizeof(version), h) != 4) {
-        read_error(filename);
-    }
-    if (version < 131) {
-        external_error("Recorded file version is too old!", filename);
-    }
-    if (version > 131) {
-        external_error("Recorded file version is too new!", filename);
-    }
-
-    if (fread(&MultiplayerRec, 1, sizeof(MultiplayerRec), h) != 4) {
-        read_error(filename);
+    int level_id = Rec1->load(filename, h, demo, true);
+    if (MultiplayerRec) {
+        Rec2->load(filename, h, demo, false);
     }
 
     if (demo) {
         qclose(h);
     } else {
         fclose(h);
-    }
-
-    int level_id = 0;
-    if (MultiplayerRec) {
-        FILE* h;
-        if (demo) {
-            h = qopen(filename, "rb");
-            if (!h) {
-                external_error("Failed to open demo file: ", filename);
-            }
-        } else {
-            char path[40];
-            sprintf(path, "rec/%s", filename);
-            h = fopen(path, "rb");
-            if (!h) {
-                external_error("Failed to open rec file: ", path);
-            }
-        }
-
-        level_id = Rec1->load(filename, h, demo);
-        Rec2->load(filename, h, demo);
-
-        if (demo) {
-            qclose(h);
-        } else {
-            fclose(h);
-        }
-    } else {
-        level_id = Rec1->load(filename, nullptr, demo);
     }
 
     return level_id;

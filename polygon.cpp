@@ -34,7 +34,7 @@ polygon::~polygon() {
     vertices = nullptr;
 }
 
-void polygon::set_vertex(int v, double x, double y) {
+void polygon::set_vertex(int v, double x, double y) const {
     if (v < 0 || v >= vertex_count) {
         internal_error("polygon::set_vertex v < 0 || v >= vertex_count!");
     }
@@ -42,7 +42,7 @@ void polygon::set_vertex(int v, double x, double y) {
     vertices[v].y = y;
 }
 
-void polygon::render_one_line(int v, bool forward, bool dotted) {
+void polygon::render_one_line(int v, bool forward, bool dotted) const {
     if (v < 0 || v >= vertex_count) {
         internal_error("polygon::render_one_line v < 0 || v >= vertex_count!");
     }
@@ -64,7 +64,7 @@ void polygon::render_outline() {
         internal_error("polygon::render_outline vertex_count < 3 || vertex_count > MAX_VERTICES!");
     }
     for (int i = 0; i < vertex_count; i++) {
-        render_one_line(i, 1, false);
+        render_one_line(i, true, false);
     }
 }
 
@@ -116,7 +116,7 @@ void polygon::delete_vertex(int v) {
     vertex_count--;
 }
 
-double polygon::get_closest_vertex(double x, double y, int* v) {
+double polygon::get_closest_vertex(double x, double y, int* v) const {
     double distance = 1000000000000000.0;
     *v = 0;
     for (int i = 0; i < vertex_count; i++) {
@@ -131,7 +131,7 @@ double polygon::get_closest_vertex(double x, double y, int* v) {
     return sqrt(distance);
 }
 
-int polygon::count_intersections(vect2 r1, vect2 v1) {
+int polygon::count_intersections(vect2 r1, vect2 v1) const {
 #ifdef DEBUG
     if (is_grass) {
         internal_error("polygon::count_intersections grass cannot intersect!");
@@ -159,7 +159,7 @@ int polygon::count_intersections(vect2 r1, vect2 v1) {
     return intersections;
 }
 
-bool polygon::intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect_point) {
+bool polygon::intersection_point(vect2 r1, vect2 v1, int skip_v, vect2* intersect_point) const {
 #ifdef DEBUG
     if (is_grass) {
         internal_error("polygon::intersection_point grass cannot intersect!");
@@ -361,7 +361,7 @@ static void separate_two_stacked_vertices(vect2* a, vect2* b) {
     }
 }
 
-void polygon::separate_stacked_vertices() {
+void polygon::separate_stacked_vertices() const {
     for (int i = 0; i < vertex_count; i++) {
         if (i < vertex_count - 1) {
             separate_two_stacked_vertices(&vertices[i], &vertices[i + 1]);
@@ -374,7 +374,7 @@ void polygon::separate_stacked_vertices() {
 // The function would seem like it actually checks if a
 // polygon is counter-clockwise, but the y-axis is inverted
 // (negative y is up).
-bool polygon::is_clockwise() {
+bool polygon::is_clockwise() const {
 #ifdef DEBUG
     if (is_grass) {
         internal_error("polygon::is_clockwise grass has no orientation!");
@@ -394,16 +394,13 @@ bool polygon::is_clockwise() {
         // Probably a self-intersecting polygon, return false for fun
         return false;
     }
-    if (normalized_angle > 0.0) {
-        // Angle ~= 2*Pi, counter-clockwise
-        return false;
-    } else {
-        // Angle ~= -2*Pi, clockwise
-        return true;
-    }
+
+    // Angle ~= 2*Pi (counter-clockwise) returns false
+    // Angle ~= -2*Pi (clockwise) returns true
+    return normalized_angle < 0.0;
 }
 
-vect2 polygon::center() {
+vect2 polygon::center() const {
     vect2 centerpoint(0.0, 0.0);
     for (int i = 0; i < vertex_count; i++) {
         centerpoint = centerpoint + vertices[i];
@@ -412,7 +409,7 @@ vect2 polygon::center() {
     return centerpoint;
 }
 
-void polygon::update_boundaries(double* x1, double* y1, double* x2, double* y2) {
+void polygon::update_boundaries(double* x1, double* y1, double* x2, double* y2) const {
     for (int i = 0; i < vertex_count; i++) {
         double x = vertices[i].x;
         double y = vertices[i].y;
@@ -431,7 +428,7 @@ void polygon::update_boundaries(double* x1, double* y1, double* x2, double* y2) 
     }
 }
 
-double polygon::checksum() {
+double polygon::checksum() const {
     double sum = 0;
     for (int i = 0; i < vertex_count; i++) {
         sum += vertices[i].x;

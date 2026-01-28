@@ -36,7 +36,7 @@ piclist::piclist(FILE* h) {
 
 int piclist::get_index(const char* pic_name) {
     for (int i = 0; i < length; i++) {
-        if (strcmpi(&name[i * 10], pic_name) == 0) {
+        if (strcmpi(name[i], pic_name) == 0) {
             return i;
         }
     }

@@ -186,7 +186,7 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
 
     // Set picture properties
     picture* new_pic = &pictures[picture_count];
-    strcpy(new_pic->name, &list->name[index * 10]);
+    strcpy(new_pic->name, list->name[index]);
     new_pic->default_distance = list->default_distance[index];
     new_pic->default_clipping = list->default_clipping[index];
     new_pic->width = pic->get_width();
@@ -278,7 +278,7 @@ void lgrfile::add_texture(pic8* pic, piclist* list, int index) {
     texture* new_text = &textures[texture_count];
     if (list) {
         // Copy all the properties
-        strcpy(new_text->name, &list->name[index * 10]);
+        strcpy(new_text->name, list->name[index]);
         new_text->pic = pic;
         new_text->default_distance = list->default_distance[index];
         new_text->default_clipping = list->default_clipping[index];
@@ -304,7 +304,7 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
 
     // Copy properties
     mask* new_mask = &masks[mask_count];
-    strcpy(new_mask->name, &list->name[index * 10]);
+    strcpy(new_mask->name, list->name[index]);
     new_mask->width = pic->get_width();
     new_mask->height = pic->get_height();
 
@@ -332,7 +332,7 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
                 MaskBuffer[buffer_offset].length = count;
                 buffer_offset++;
                 if (buffer_offset > MASK_MAX_MEMORY - 10) {
-                    external_error("Mask picture is too complicated!:", &list->name[index * 10]);
+                    external_error("Mask picture is too complicated!:", list->name[index]);
                 }
 
                 j += count;

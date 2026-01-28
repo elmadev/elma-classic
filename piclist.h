@@ -20,7 +20,7 @@ class piclist {
     enum class Type { Picture = 100, Texture = 101, Mask = 102 };
 
     int length;
-    char name[(MAX_PICLIST_LENGTH + 10) * 10];
+    char name[MAX_PICLIST_LENGTH + 10][10];
     Type type[MAX_PICLIST_LENGTH + 10];
     int default_distance[MAX_PICLIST_LENGTH + 10];
     Clipping default_clipping[MAX_PICLIST_LENGTH + 10];

@@ -167,24 +167,24 @@ static int get_transparency_palette_id(piclist::Transparency type, pic8* pic) {
     return -1;
 }
 
-// Visszaadja hany pixel lyuk szinu x-tol kezdve:
-int uresszam(int x, int xsize, unsigned char* sor, unsigned char lyuk) {
-    int szam = 0;
-    while (x < xsize && sor[x] == lyuk) {
+static int consecutive_transparent_pixels(int x, int pic_width, unsigned char* pic_row,
+                                          unsigned char transparency) {
+    int count = 0;
+    while (x < pic_width && pic_row[x] == transparency) {
         x++;
-        szam++;
+        count++;
     }
-    return szam;
+    return count;
 }
 
-// Visszaadja hany pixel nem lyuk szinu x-tol kezdve:
-int teliszam(int x, int xsize, unsigned char* sor, unsigned char lyuk) {
-    int szam = 0;
-    while (x < xsize && sor[x] != lyuk) {
+static int consecutive_solid_pixels(int x, int pic_width, unsigned char* pic_row,
+                                    unsigned char transparency) {
+    int count = 0;
+    while (x < pic_width && pic_row[x] != transparency) {
         x++;
-        szam++;
+        count++;
     }
-    return szam;
+    return count;
 }
 
 constexpr size_t PICTURE_MAX_MEMORY = 600000;
@@ -238,7 +238,8 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
         int x = 0;
         while (true) {
             // Skip pixels
-            int skip = uresszam(x, new_pic->width, row, (unsigned char)transparency);
+            int skip =
+                consecutive_transparent_pixels(x, new_pic->width, row, (unsigned char)transparency);
             if (skip > 60000) {
                 internal_error("add_picture skip width too long!");
             }
@@ -256,7 +257,8 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
 
             buffer_offset += 2;
             // Solid pixels
-            int count = teliszam(x, new_pic->width, row, (unsigned char)transparency);
+            int count =
+                consecutive_solid_pixels(x, new_pic->width, row, (unsigned char)transparency);
             if (count <= 0) {
                 internal_error("add_picture count width negative!");
             }
@@ -334,7 +336,8 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
         for (int i = 0; i < new_mask->height; i++) {
             // Transparent data
             unsigned char* row = pic->get_row(i);
-            int j = uresszam(0, new_mask->width, row, (unsigned char)transparency);
+            int j = consecutive_transparent_pixels(0, new_mask->width, row,
+                                                   (unsigned char)transparency);
             if (j > 0) {
                 MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
                 MaskBuffer[buffer_offset].length = j;
@@ -342,7 +345,8 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
             }
             while (j <= new_mask->width - 1) {
                 // Solid data
-                int count = teliszam(j, new_mask->width, row, (unsigned char)transparency);
+                int count =
+                    consecutive_solid_pixels(j, new_mask->width, row, (unsigned char)transparency);
                 if (count <= 0) {
                     internal_error("add_mask count length negative!");
                 }
@@ -357,7 +361,8 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
                 j += count;
 
                 // Transparent data
-                count = uresszam(j, new_mask->width, row, (unsigned char)transparency);
+                count = consecutive_transparent_pixels(j, new_mask->width, row,
+                                                       (unsigned char)transparency);
                 if (count > 0) {
                     MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
                     MaskBuffer[buffer_offset].length = count;

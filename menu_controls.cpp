@@ -271,11 +271,7 @@ static void load_control(key_pointers keys, int offset, const char* label, int* 
     const char* key_text = dik_to_string(*key);
     char tmp[20] = "";
     if (!key_text) {
-        if (*key == 0) {
-            strcpy(tmp, "???");
-        } else {
-            sprintf(tmp, "Key code: %d", *key);
-        }
+        sprintf(tmp, "Key code: %d", *key);
         key_text = tmp;
     }
     strcpy(NavEntriesRight[offset], key_text);

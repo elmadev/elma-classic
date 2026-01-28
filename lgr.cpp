@@ -805,15 +805,7 @@ lgrfile::lgrfile(const char* lgrname) {
     }
 
     // Check grass
-    has_grass = true;
-    editor_hide_qgrass = 1;
-    if (get_texture_index("qgrass") < 0) {
-        has_grass = false;
-        editor_hide_qgrass = 0;
-    }
-    if (grass_pics->length < 2) {
-        has_grass = false;
-    }
+    has_grass = get_texture_index("qgrass") >= 0 && grass_pics->length >= 2;
 }
 
 static void delete_bike_pics(bike_pics* bp) {

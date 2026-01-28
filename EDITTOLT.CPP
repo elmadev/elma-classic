@@ -803,10 +803,6 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     if (tipus == 2) {
         nev = texturanev;
         nevszam = Lgr->texture_count;
-        if (nevszam >= 1 && Lgr->editor_hide_qgrass) {
-            // qgrass-t nem jelenitjuk meg (lgr beolvaso lista vegere teszi):
-            nevszam--;
-        }
     }
     if (tipus == 3) {
         nev = maszknev;

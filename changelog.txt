@@ -4,6 +4,7 @@
 * Polygons no longer have a per-polygon max vertex count. There is now only a maximum total vertex count for the entire level.
 * Steam elma.res is supported
 * Elma now honors the local keyboard layout for text input instead of being forced to US qwerty layout
+* QGRASS texture is available in internal editor
 
 ## Major Bug Fixes
 * It is possible to properly collect more than 200 apples in a single frame

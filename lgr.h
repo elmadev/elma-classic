@@ -94,7 +94,6 @@ class lgrfile {
     int get_texture_index(const char* name);
 
     bool has_grass;
-    int editor_hide_qgrass;
     grass* grass_pics;
 
     unsigned char* palette_data;

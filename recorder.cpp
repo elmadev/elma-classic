@@ -261,10 +261,10 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
 
         double bike_rot = mot->bike.rotation;
         while (bike_rot <= 0) {
-            bike_rot += TWO_PI;
+            bike_rot += 2.0 * PI;
         }
-        while (bike_rot > TWO_PI) {
-            bike_rot -= TWO_PI;
+        while (bike_rot > 2.0 * PI) {
+            bike_rot -= 2.0 * PI;
         }
         frames[i].bike_rotation = (short)(bike_rot * BIKE_ROTATION_RATIO);
 
@@ -272,14 +272,14 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         // During the brake-stretch, the wheel position might become slightly desynced
         if (mot->left_wheel.rotation <= 0) {
             frames[i].left_wheel_rotation =
-                (unsigned char)((mot->left_wheel.rotation + TWO_PI) * WHEEL_ROTATION_RATIO);
+                (unsigned char)((mot->left_wheel.rotation + 2.0 * PI) * WHEEL_ROTATION_RATIO);
         } else {
             frames[i].left_wheel_rotation =
                 (unsigned char)(mot->left_wheel.rotation * WHEEL_ROTATION_RATIO);
         }
         if (mot->right_wheel.rotation <= 0) {
             frames[i].right_wheel_rotation =
-                (unsigned char)((mot->right_wheel.rotation + TWO_PI) * WHEEL_ROTATION_RATIO);
+                (unsigned char)((mot->right_wheel.rotation + 2.0 * PI) * WHEEL_ROTATION_RATIO);
         } else {
             frames[i].right_wheel_rotation =
                 (unsigned char)(mot->right_wheel.rotation * WHEEL_ROTATION_RATIO);

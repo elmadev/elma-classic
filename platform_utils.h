@@ -8,8 +8,6 @@
 #endif
 
 constexpr double PI = 3.141592;
-constexpr double HALF_PI = PI * 0.5;
-constexpr double TWO_PI = PI * 2.0;
 
 #ifdef _WIN32
 #define itoa _itoa

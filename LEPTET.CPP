@@ -322,7 +322,7 @@ int vizsgalat(motorst* pmot) {
 static double Oszto = 1.0 / 1.0;
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi_v, vect2 sebesseg_v) {
-    vect2 joirany(cos(pmot->bike.rotation - HALF_PI), sin(pmot->bike.rotation - HALF_PI));
+    vect2 joirany(cos(pmot->bike.rotation - 0.5 * PI), sin(pmot->bike.rotation - 0.5 * PI));
     double fgumi = joirany * fgumi_v;
     double sebesseg = joirany * sebesseg_v;
     if (fgumi <= 0 || sebesseg <= 0) {

@@ -18,6 +18,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "sprite.h"
+#include <algorithm>
 #include <cstring>
 
 constexpr int MAGIC_NUMBER = 187565543;
@@ -760,50 +761,38 @@ lgrfile::lgrfile(const char* lgrname) {
         text->pic = tiled;
     }
 
-    // Sort pictures using bubble sort
-    for (int i = 0; i < picture_count + 2; i++) {
-        for (int j = 0; j < picture_count - 1; j++) {
-            if (strcmpi(pictures[j].name, pictures[j + 1].name) == 0) {
-                external_error("Picture name is duplicated in LGR file!: ", pictures[j].name);
-            }
+    // Sort pictures, masks and textures alphabetically (qgrass at the end)
+    std::sort(pictures, pictures + picture_count,
+              [](const picture& a, const picture& b) { return strcmpi(a.name, b.name) < 0; });
+    std::sort(masks, masks + mask_count,
+              [](const mask& a, const mask& b) { return strcmpi(a.name, b.name) < 0; });
+    std::sort(textures, textures + texture_count, [](const texture& a, const texture& b) {
+        // QGRASS should always be last
+        if (strcmpi(a.name, "qgrass") == 0) {
+            return false;
+        }
+        if (strcmpi(b.name, "qgrass") == 0) {
+            return true;
+        }
+        return strcmpi(a.name, b.name) < 0;
+    });
 
-            if (strcmpi(pictures[j].name, pictures[j + 1].name) > 0) {
-                picture tmp = pictures[j];
-                pictures[j] = pictures[j + 1];
-                pictures[j + 1] = tmp;
-            }
+    // Check for duplicate names in pictures, masks and textures
+    for (int i = 0; i < picture_count - 1; i++) {
+        if (strcmpi(pictures[i].name, pictures[i + 1].name) == 0) {
+            external_error("Picture name is duplicated in LGR file!: ", pictures[i].name);
         }
     }
 
-    // Sort masks using bubble sort
-    for (int i = 0; i < mask_count + 2; i++) {
-        for (int j = 0; j < mask_count - 1; j++) {
-            if (strcmpi(masks[j].name, masks[j + 1].name) == 0) {
-                external_error("Mask name is duplicated in LGR file!: ", masks[j].name);
-            }
-
-            if (strcmpi(masks[j].name, masks[j + 1].name) > 0) {
-                mask tmp = masks[j];
-                masks[j] = masks[j + 1];
-                masks[j + 1] = tmp;
-            }
+    for (int i = 0; i < mask_count - 1; i++) {
+        if (strcmpi(masks[i].name, masks[i + 1].name) == 0) {
+            external_error("Mask name is duplicated in LGR file!: ", masks[i].name);
         }
     }
 
-    // Sort textures using bubble sort (with QGRASS at the very end)
-    for (int i = 0; i < texture_count + 2; i++) {
-        for (int j = 0; j < texture_count - 1; j++) {
-            if (strcmpi(textures[j].name, textures[j + 1].name) == 0) {
-                external_error("Texture name is duplicated in LGR file!: ", textures[j].name);
-            }
-
-            if (strcmpi(textures[j + 1].name, "qgrass") != 0 &&
-                (strcmpi(textures[j].name, textures[j + 1].name) > 0 ||
-                 strcmpi(textures[j].name, "qgrass") == 0)) {
-                texture tmp = textures[j];
-                textures[j] = textures[j + 1];
-                textures[j + 1] = tmp;
-            }
+    for (int i = 0; i < texture_count - 1; i++) {
+        if (strcmpi(textures[i].name, textures[i + 1].name) == 0) {
+            external_error("Texture name is duplicated in LGR file!: ", textures[i].name);
         }
     }
 

@@ -769,8 +769,8 @@ static void vegyesblt(pic8* dest, texture* pt, mask* pm, int x0, int y0) {
         int sx = 0;
         int abszx = x0;
         // Maszkos eljaras:
-        while (pm->data[i].type != MaskEncoding_EndOfLine) {
-            if (pm->data[i].type == MaskEncoding_Solid) {
+        while (pm->data[i].type != MaskEncoding::EndOfLine) {
+            if (pm->data[i].type == MaskEncoding::Solid) {
                 for (int j = 0; j < pm->data[i].length; j++) {
                     if (abszx < 640) {
                         *dsor = Szinkonvtomb[ssor[sx]];

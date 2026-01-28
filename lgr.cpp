@@ -317,7 +317,7 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
             unsigned char* sor = pic->get_row(i);
             int j = uresszam(0, new_mask->width, sor, (unsigned char)transparency);
             if (j > 0) {
-                MaskBuffer[buffer_offset].type = MaskEncoding_Transparent;
+                MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
                 MaskBuffer[buffer_offset].length = j;
                 buffer_offset++;
             }
@@ -328,7 +328,7 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
                     internal_error("add_mask count length negative!");
                 }
 
-                MaskBuffer[buffer_offset].type = MaskEncoding_Solid;
+                MaskBuffer[buffer_offset].type = MaskEncoding::Solid;
                 MaskBuffer[buffer_offset].length = count;
                 buffer_offset++;
                 if (buffer_offset > MASK_MAX_MEMORY - 10) {
@@ -340,24 +340,24 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
                 // Transparent data
                 count = uresszam(j, new_mask->width, sor, (unsigned char)transparency);
                 if (count > 0) {
-                    MaskBuffer[buffer_offset].type = MaskEncoding_Transparent;
+                    MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
                     MaskBuffer[buffer_offset].length = count;
                     buffer_offset++;
                 }
                 j += count;
             }
             // End of row
-            MaskBuffer[buffer_offset].type = MaskEncoding_EndOfLine;
+            MaskBuffer[buffer_offset].type = MaskEncoding::EndOfLine;
             MaskBuffer[buffer_offset].length = 0;
             buffer_offset++;
         }
     } else {
         // Solid square special case
         for (int i = 0; i < new_mask->height; i++) {
-            MaskBuffer[buffer_offset].type = MaskEncoding_Solid;
+            MaskBuffer[buffer_offset].type = MaskEncoding::Solid;
             MaskBuffer[buffer_offset].length = new_mask->width;
             buffer_offset++;
-            MaskBuffer[buffer_offset].type = MaskEncoding_EndOfLine;
+            MaskBuffer[buffer_offset].type = MaskEncoding::EndOfLine;
             MaskBuffer[buffer_offset].length = 0;
             buffer_offset++;
         }

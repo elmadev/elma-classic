@@ -10,11 +10,11 @@ class palette;
 class pic8;
 class piclist;
 
-enum { MaskEncoding_Transparent, MaskEncoding_Solid, MaskEncoding_EndOfLine };
+enum class MaskEncoding { Transparent, Solid, EndOfLine };
 
 struct mask_element {
     int length; // 0 if EndOfLine
-    int type;
+    MaskEncoding type;
 };
 
 constexpr int MAX_MASKS = 200;

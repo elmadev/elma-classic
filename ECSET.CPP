@@ -779,8 +779,8 @@ void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
         // Kep egy soranak elintezese:
         int x = 0;
         // Maszkos eljaras:
-        while (pm->data[i].type != MaskEncoding_EndOfLine) {
-            if (pm->data[i].type == MaskEncoding_Solid) {
+        while (pm->data[i].type != MaskEncoding::EndOfLine) {
+            if (pm->data[i].type == MaskEncoding::Solid) {
                 addbytesor((unsigned char*)(pixelek_t)(index_t + 10), tavolsag, x1 + x,
                            x1 + x + pm->data[i].length - 1, y1 - y, fazis);
             }

@@ -67,9 +67,9 @@ class recorder {
     ~recorder();
 
     // Load a singleplayer or multiplayer replay
-    static int load_replays(const char* filename, int demo);
+    static int load_rec_file(const char* filename, int demo);
     // Save a singleplayer or multiplayer replay
-    static void save_replays(const char* filename, int level_id, int flagtag);
+    static void save_rec_file(const char* filename, int level_id, int flagtag);
 
     void erase(char* lev_filename);
     void rewind();

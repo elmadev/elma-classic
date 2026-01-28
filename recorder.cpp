@@ -602,7 +602,7 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     }
 }
 
-int recorder::load_replays(const char* filename, int demo) {
+int recorder::load_rec_file(const char* filename, int demo) {
     FILE* h = nullptr;
     if (demo) {
         h = qopen(filename, "rb");
@@ -632,7 +632,7 @@ int recorder::load_replays(const char* filename, int demo) {
     return level_id;
 }
 
-void recorder::save_replays(const char* filename, int level_id, int flagtag) {
+void recorder::save_rec_file(const char* filename, int level_id, int flagtag) {
     if (MultiplayerRec) {
         char path[40];
         sprintf(path, "rec/%s", filename);

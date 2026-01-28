@@ -372,7 +372,7 @@ void saveplay(int belyeg) {
         }
     }
     strcat(tmp, ".rec");
-    recorder::save_replays(tmp, belyeg, State->flag_tag);
+    recorder::save_rec_file(tmp, belyeg, State->flag_tag);
 }
 
 // Idot beirja tablaba, ha kell:

@@ -451,10 +451,12 @@ lgrfile::lgrfile(const char* lgrname) {
         external_error("Cannot find file:", path);
     }
 
+#define ERROR_CORRUPT() external_error("Corrupt LGR file!:", path)
+
     // LGR12
     char version[10];
     if (fread(version, 1, 5, h) != 5) {
-        external_error("Corrupt LGR file!:", path);
+        ERROR_CORRUPT();
     }
     version[5] = 0;
     if (strncmp(version, "LGR", 3) != 0) {
@@ -467,11 +469,10 @@ lgrfile::lgrfile(const char* lgrname) {
     // Pcx object file count
     int pcx_length;
     if (fread(&pcx_length, 1, 4, h) != 4) {
-        external_error("Corrupt LGR file!:", path);
+        ERROR_CORRUPT();
     }
-
     if (pcx_length < 10 || pcx_length > 3500) {
-        external_error("Corrupt LGR file!:", path);
+        ERROR_CORRUPT();
     }
 
     // Pictures.lst
@@ -487,14 +488,14 @@ lgrfile::lgrfile(const char* lgrname) {
     for (int i = 0; i < pcx_length; i++) {
         char asset_filename[30];
         if (fread(asset_filename, 1, 20, h) != 20) {
-            external_error("Corrupt LGR file!:", path);
+            ERROR_CORRUPT();
         }
         int asset_size = 0;
         if (fread(&asset_size, 1, 4, h) != 4) {
-            external_error("Corrupt LGR file!:", path);
+            ERROR_CORRUPT();
         }
         if (asset_size < 1 || asset_size > 10000000) {
-            external_error("Corrupt LGR file!:", path);
+            ERROR_CORRUPT();
         }
 
         int curpos = ftell(h);
@@ -515,86 +516,34 @@ lgrfile::lgrfile(const char* lgrname) {
             continue;
         }
 
-        if (strcmpi(asset_filename, "q1body.pcx") == 0) {
-            bike1.body = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q1thigh.pcx") == 0) {
-            bike1.thigh = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q1leg.pcx") == 0) {
-            bike1.leg = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
+#define LOAD_AFFINE(name, destination)                                                             \
+    if (strcmpi(asset_filename, name) == 0) {                                                      \
+        destination = new affine_pic(nullptr, asset_pic);                                          \
+        continue;                                                                                  \
+    }
 
-        if (strcmpi(asset_filename, "q1wheel.pcx") == 0) {
-            bike1.wheel = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q1susp1.pcx") == 0) {
-            bike1.susp1 = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q1susp2.pcx") == 0) {
-            bike1.susp2 = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q1forarm.pcx") == 0) {
-            bike1.forarm = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q1up_arm.pcx") == 0) {
-            bike1.up_arm = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q1head.pcx") == 0) {
-            bike1.head = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
+        LOAD_AFFINE("q1body.pcx", bike1.body);
+        LOAD_AFFINE("q1thigh.pcx", bike1.thigh);
+        LOAD_AFFINE("q1leg.pcx", bike1.leg);
+        LOAD_AFFINE("q1wheel.pcx", bike1.wheel);
+        LOAD_AFFINE("q1susp1.pcx", bike1.susp1);
+        LOAD_AFFINE("q1susp2.pcx", bike1.susp2);
+        LOAD_AFFINE("q1forarm.pcx", bike1.forarm);
+        LOAD_AFFINE("q1up_arm.pcx", bike1.up_arm);
+        LOAD_AFFINE("q1head.pcx", bike1.head);
 
-        if (strcmpi(asset_filename, "q2body.pcx") == 0) {
-            bike2.body = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q2thigh.pcx") == 0) {
-            bike2.thigh = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q2leg.pcx") == 0) {
-            bike2.leg = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
+        LOAD_AFFINE("q2body.pcx", bike2.body);
+        LOAD_AFFINE("q2thigh.pcx", bike2.thigh);
+        LOAD_AFFINE("q2leg.pcx", bike2.leg);
+        LOAD_AFFINE("q2wheel.pcx", bike2.wheel);
+        LOAD_AFFINE("q2susp1.pcx", bike2.susp1);
+        LOAD_AFFINE("q2susp2.pcx", bike2.susp2);
+        LOAD_AFFINE("q2forarm.pcx", bike2.forarm);
+        LOAD_AFFINE("q2up_arm.pcx", bike2.up_arm);
+        LOAD_AFFINE("q2head.pcx", bike2.head);
 
-        if (strcmpi(asset_filename, "q2wheel.pcx") == 0) {
-            bike2.wheel = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q2susp1.pcx") == 0) {
-            bike2.susp1 = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q2susp2.pcx") == 0) {
-            bike2.susp2 = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q2forarm.pcx") == 0) {
-            bike2.forarm = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q2up_arm.pcx") == 0) {
-            bike2.up_arm = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-        if (strcmpi(asset_filename, "q2head.pcx") == 0) {
-            bike2.head = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
-
-        if (strcmpi(asset_filename, "qflag.pcx") == 0) {
-            flag = new affine_pic(nullptr, asset_pic);
-            continue;
-        }
+        LOAD_AFFINE("qflag.pcx", flag);
+#undef LOAD_AFFINE
 
         if (strcmpi(asset_filename, "qkiller.pcx") == 0) {
             killer = new anim(asset_pic, "qkiller.pcx", zoom);
@@ -688,17 +637,19 @@ lgrfile::lgrfile(const char* lgrname) {
             asset_pic = nullptr;
             continue;
         }
-        external_error("Corrupt LGR file!:", path);
+        ERROR_CORRUPT();
     }
 
     // EOF
     int magic_number = 0;
     if (fread(&magic_number, 1, 4, h) != 4) {
-        external_error("Corrupt LGR file!:", path);
+        ERROR_CORRUPT();
     }
     if (magic_number != MAGIC_NUMBER) {
-        external_error("Corrupt LGR file!:", path);
+        ERROR_CORRUPT();
     }
+
+#undef ERROR_CORRUPT
 
     fclose(h);
     h = nullptr;
@@ -708,85 +659,41 @@ lgrfile::lgrfile(const char* lgrname) {
         external_error("There must be at least two textures in LGR file!", lgrname);
     }
 
-    if (!bike1.body) {
-        external_error("Picture not found in LGR file!: ", "q1body.pcx", path);
-    }
-    if (!bike1.thigh) {
-        external_error("Picture not found in LGR file!: ", "q1thigh.pcx", path);
-    }
-    if (!bike1.leg) {
-        external_error("Picture not found in LGR file!: ", "q1leg.pcx", path);
-    }
-    if (!q1bike) {
-        external_error("Picture not found in LGR file!: ", "q1bike.pcx", path);
-    }
-    if (!bike1.wheel) {
-        external_error("Picture not found in LGR file!: ", "q1wheel.pcx", path);
-    }
-    if (!bike1.susp1) {
-        external_error("Picture not found in LGR file!: ", "q1susp1.pcx", path);
-    }
-    if (!bike1.susp2) {
-        external_error("Picture not found in LGR file!: ", "q1susp2.pcx", path);
-    }
-    if (!bike1.forarm) {
-        external_error("Picture not found in LGR file!: ", "q1forarm.pcx", path);
-    }
-    if (!bike1.up_arm) {
-        external_error("Picture not found in LGR file!: ", "q1up_arm.pcx", path);
-    }
-    if (!bike1.head) {
-        external_error("Picture not found in LGR file!: ", "q1head.pcx", path);
+#define ASSERT_EXISTS(var, name)                                                                   \
+    if (!var) {                                                                                    \
+        external_error("Picture not found in LGR file!: ", name, path);                            \
     }
 
-    if (!bike2.body) {
-        external_error("Picture not found in LGR file!: ", "q2body.pcx", path);
-    }
-    if (!bike2.thigh) {
-        external_error("Picture not found in LGR file!: ", "q2thigh.pcx", path);
-    }
-    if (!bike2.leg) {
-        external_error("Picture not found in LGR file!: ", "q2leg.pcx", path);
-    }
-    if (!q2bike) {
-        external_error("Picture not found in LGR file!: ", "q2bike.pcx", path);
-    }
-    if (!bike2.wheel) {
-        external_error("Picture not found in LGR file!: ", "q2wheel.pcx", path);
-    }
-    if (!bike2.susp1) {
-        external_error("Picture not found in LGR file!: ", "q2susp1.pcx", path);
-    }
-    if (!bike2.susp2) {
-        external_error("Picture not found in LGR file!: ", "q2susp2.pcx", path);
-    }
-    if (!bike2.forarm) {
-        external_error("Picture not found in LGR file!: ", "q2forarm.pcx", path);
-    }
-    if (!bike2.up_arm) {
-        external_error("Picture not found in LGR file!: ", "q2up_arm.pcx", path);
-    }
-    if (!bike2.head) {
-        external_error("Picture not found in LGR file!: ", "q2head.pcx", path);
-    }
+    ASSERT_EXISTS(bike1.body, "q1body.pcx");
+    ASSERT_EXISTS(bike1.thigh, "q1thigh.pcx");
+    ASSERT_EXISTS(bike1.leg, "q1leg.pcx");
+    ASSERT_EXISTS(q1bike, "q1bike.pcx");
+    ASSERT_EXISTS(bike1.wheel, "q1wheel.pcx");
+    ASSERT_EXISTS(bike1.susp1, "q1susp1.pcx");
+    ASSERT_EXISTS(bike1.susp2, "q1susp2.pcx");
+    ASSERT_EXISTS(bike1.forarm, "q1forarm.pcx");
+    ASSERT_EXISTS(bike1.up_arm, "q1up_arm.pcx");
+    ASSERT_EXISTS(bike1.head, "q1head.pcx");
 
-    if (!flag) {
-        external_error("Picture not found in LGR file!: ", "qflag.pcx", path);
-    }
+    ASSERT_EXISTS(bike2.body, "q2body.pcx");
+    ASSERT_EXISTS(bike2.thigh, "q2thigh.pcx");
+    ASSERT_EXISTS(bike2.leg, "q2leg.pcx");
+    ASSERT_EXISTS(q2bike, "q2bike.pcx");
+    ASSERT_EXISTS(bike2.wheel, "q2wheel.pcx");
+    ASSERT_EXISTS(bike2.susp1, "q2susp1.pcx");
+    ASSERT_EXISTS(bike2.susp2, "q2susp2.pcx");
+    ASSERT_EXISTS(bike2.forarm, "q2forarm.pcx");
+    ASSERT_EXISTS(bike2.up_arm, "q2up_arm.pcx");
+    ASSERT_EXISTS(bike2.head, "q2head.pcx");
 
-    if (!killer) {
-        external_error("Picture not found in LGR file!: ", "qkiller.pcx", path);
-    }
-    if (!exit) {
-        external_error("Picture not found in LGR file!: ", "qexit.pcx", path);
-    }
+    ASSERT_EXISTS(flag, "qflag.pcx");
 
-    if (!qframe) {
-        external_error("Picture not found in LGR file!: ", "qframe.pcx", path);
-    }
-    if (!qcolors) {
-        external_error("Picture not found in LGR file!: ", "qcolors.pcx", path);
-    }
+    ASSERT_EXISTS(killer, "qkiller.pcx");
+    ASSERT_EXISTS(exit, "qexit.pcx");
+
+    ASSERT_EXISTS(qframe, "qframe.pcx");
+    ASSERT_EXISTS(qcolors, "qcolors.pcx");
+#undef ASSERT_EXISTS
 
     // Create the bike affine_pic
     chop_bike(q1bike, &bike1);

@@ -17,16 +17,12 @@ struct mask_element {
     MaskEncoding type;
 };
 
-constexpr int MAX_MASKS = 200;
-
 struct mask {
     char name[10];
     int width;
     int height;
     mask_element* data;
 };
-
-constexpr int MAX_PICTURES = 1000;
 
 struct picture {
     char name[10];
@@ -38,8 +34,6 @@ struct picture {
     // Jump to next row when skip length is 2^16 (and skip length/pixels)
     unsigned char* data;
 };
-
-constexpr int MAX_TEXTURES = 100;
 
 struct texture {
     char name[10];
@@ -66,6 +60,9 @@ struct bike_pics {
     affine_pic* head;
 };
 
+constexpr int MAX_PICTURES = 1000;
+constexpr int MAX_MASKS = 200;
+constexpr int MAX_TEXTURES = 100;
 constexpr int MAX_QFOOD = 9;
 
 class lgrfile {

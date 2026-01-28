@@ -1180,12 +1180,8 @@ void ecset::addobjektumok(void) {
 
         // Egy kep berakasa:
         if (view) {
-            unsigned char* mut = Lgr->minimap_exit_palette_id;
-            int ujtavolsag = 498;
-            if (pk->type == object::Type::Killer) {
-                mut = Lgr->minimap_killer_palette_id;
-                ujtavolsag = 499;
-            }
+            unsigned char* mut = Lgr->minimap_killer_palette_id;
+            int ujtavolsag = 499;
             int x1 = (int)((pk->r.x - origo.x) * (MetersToPixels / MinimapScaleFactor));
             int y1 = (int)((-pk->r.y - origo.y) * (MetersToPixels / MinimapScaleFactor));
             // Kirakja kis 3x3-as gyurut:

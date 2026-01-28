@@ -802,15 +802,12 @@ lgrfile::lgrfile(const char* lgrname) {
     minimap_border_palette_id = qcolors->gpixel(6, 6 + 2 * 12);
     minimap_bike1_palette_id = qcolors->gpixel(6, 6 + 4 * 12);
     minimap_bike2_palette_id = qcolors->gpixel(6, 6 + 5 * 12);
-    minimap_exit_palette_id[0] = qcolors->gpixel(6, 6 + 6 * 12);
+    minimap_exit_palette_id = qcolors->gpixel(6, 6 + 6 * 12);
     minimap_food_palette_id = qcolors->gpixel(6, 6 + 7 * 12);
     minimap_killer_palette_id[0] = qcolors->gpixel(6, 6 + 8 * 12);
+    minimap_killer_palette_id[2] = minimap_killer_palette_id[1] = minimap_killer_palette_id[0];
     delete qcolors;
     qcolors = nullptr;
-
-    // Horizontally extend some QCOLORS
-    minimap_exit_palette_id[2] = minimap_exit_palette_id[1] = minimap_exit_palette_id[0];
-    minimap_killer_palette_id[2] = minimap_killer_palette_id[1] = minimap_killer_palette_id[0];
 
     // Horizontally tile textures to a minimum width for faster rendering
     for (int i = 0; i < texture_count; i++) {

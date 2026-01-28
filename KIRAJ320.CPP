@@ -274,7 +274,7 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
                     pker->minimap_canvas_y - balalsoy + vy1, Lgr->minimap_food_palette_id);
         } else {
             kigyuru(ppic, pker->minimap_canvas_x - balalsox + vx1,
-                    pker->minimap_canvas_y - balalsoy + vy1, Lgr->minimap_exit_palette_id[0]);
+                    pker->minimap_canvas_y - balalsoy + vy1, Lgr->minimap_exit_palette_id);
         }
     }
 

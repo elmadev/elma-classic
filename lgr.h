@@ -126,7 +126,7 @@ class lgrfile {
     unsigned char minimap_bike1_palette_id;
     unsigned char minimap_bike2_palette_id;
     unsigned char minimap_border_palette_id;
-    unsigned char minimap_exit_palette_id[3];
+    unsigned char minimap_exit_palette_id;
     unsigned char minimap_food_palette_id;
     unsigned char minimap_killer_palette_id[3];
 

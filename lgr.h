@@ -66,7 +66,7 @@ struct bike_pics {
     affine_pic* head;
 };
 
-constexpr int MAX_QFOOD = 20;
+constexpr int MAX_QFOOD = 9;
 
 class lgrfile {
     void chop_bike(pic8* bike, bike_pics* bp);

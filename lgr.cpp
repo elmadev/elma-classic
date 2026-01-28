@@ -621,7 +621,7 @@ lgrfile::lgrfile(const char* lgrname) {
         }
 
         bool is_food = false;
-        for (int foodi = 0; foodi < 9; foodi++) {
+        for (int foodi = 0; foodi < MAX_QFOOD; foodi++) {
             char qfood_name[20];
             sprintf(qfood_name, "qfood%d.pcx", foodi + 1);
             if (strcmpi(asset_filename, qfood_name) == 0) {
@@ -891,7 +891,7 @@ lgrfile::lgrfile(const char* lgrname) {
     editor_texture_name[0] = 0;
 
     food_count = 0;
-    while (food_count < 9 && food[food_count]) {
+    while (food_count < MAX_QFOOD && food[food_count]) {
         food_count++;
     }
     if (food_count < 1) {

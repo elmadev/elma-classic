@@ -128,12 +128,12 @@ void replay(void) {
         char* nev = NavEntriesLeft[szamuk];
         strcpy(nev, fname);
         // Leveszi kiterjesztest:
-        int i = 0;
-        while (nev[i] != '.') {
-            if (!nev[i]) {
-                internal_error("replay-ban nincs pont nevben!: ", nev);
-            }
-            i++;
+        int i = strlen(nev) - 1;
+        while (i >= 0 && nev[i] != '.') {
+            i--;
+        }
+        if (i < 0) {
+            internal_error("replay-ban nincs pont nevben!: ", nev);
         }
         nev[i] = 0;
 

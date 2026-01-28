@@ -167,6 +167,26 @@ static int get_transparency_palette_id(piclist::Transparency type, pic8* pic) {
     return -1;
 }
 
+// Visszaadja hany pixel lyuk szinu x-tol kezdve:
+int uresszam(int x, int xsize, unsigned char* sor, unsigned char lyuk) {
+    int szam = 0;
+    while (x < xsize && sor[x] == lyuk) {
+        x++;
+        szam++;
+    }
+    return szam;
+}
+
+// Visszaadja hany pixel nem lyuk szinu x-tol kezdve:
+int teliszam(int x, int xsize, unsigned char* sor, unsigned char lyuk) {
+    int szam = 0;
+    while (x < xsize && sor[x] != lyuk) {
+        x++;
+        szam++;
+    }
+    return szam;
+}
+
 constexpr size_t PICTURE_MAX_MEMORY = 600000;
 
 static unsigned char* PictureBuffer = nullptr;

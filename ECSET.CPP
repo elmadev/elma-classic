@@ -737,26 +737,6 @@ void ecset::addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int u
     }
 }
 
-// Visszaadja hany pixel lyuk szinu x-tol kezdve:
-int uresszam(int x, int xsize, unsigned char* sor, unsigned char lyuk) {
-    int szam = 0;
-    while (x < xsize && sor[x] == lyuk) {
-        x++;
-        szam++;
-    }
-    return szam;
-}
-
-// Visszaadja hany pixel nem lyuk szinu x-tol kezdve:
-int teliszam(int x, int xsize, unsigned char* sor, unsigned char lyuk) {
-    int szam = 0;
-    while (x < xsize && sor[x] != lyuk) {
-        x++;
-        szam++;
-    }
-    return szam;
-}
-
 // addspriteok hivja:
 void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
     // Egy kep berakasa:

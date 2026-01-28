@@ -123,12 +123,6 @@ extern ecset* Pecsetalso;
 extern ecset* Pecsetfelso;
 extern ecset* Pecsetview;
 
-// Ket kis utility fuggveny (hasznalja oket LGR.CPP):
-// Visszaadja hany pixel lyuk szinu x-tol kezdve:
-int uresszam(int x, int xsize, unsigned char* sor, unsigned char lyuk);
-// Visszaadja hany pixel nem lyuk szinu x-tol kezdve:
-int teliszam(int x, int xsize, unsigned char* sor, unsigned char lyuk);
-
 // betoltecseteket ide osszegzi osszes lefoglalt szakaszt:
 extern int Osszegszam;
 

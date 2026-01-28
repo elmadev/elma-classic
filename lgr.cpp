@@ -22,8 +22,7 @@
 
 constexpr int MAGIC_NUMBER = 187565543;
 
-lgrfile* Lgr = NULL;
-
+lgrfile* Lgr = nullptr;
 static char CurrentLgrName[30] = "";
 
 bike_box BikeBox1 = {3, 36, 147, 184};
@@ -36,17 +35,17 @@ void invalidate_lgr_cache() {
     CurrentLgrName[0] = '\0';
 }
 
-void load_lgr_file(const char* lgrname) {
-    if (strlen(lgrname) > MAX_FILENAME_LEN) {
-        internal_error("load_lgr_file strlen( lgrname ) > MAX_FILENAME_LEN!");
+void load_lgr_file(char* lgr_name) {
+    if (strlen(lgr_name) > MAX_FILENAME_LEN) {
+        internal_error("load_lgr_file strlen( lgr_name ) > MAX_FILENAME_LEN!");
     }
     // This lgr is already loaded, so skip
-    if (strcmpi(lgrname, CurrentLgrName) == 0) {
+    if (strcmpi(lgr_name, CurrentLgrName) == 0) {
         return;
     }
 
     char path[30];
-    sprintf(path, "lgr/%s.lgr", lgrname);
+    sprintf(path, "lgr/%s.lgr", lgr_name);
     if (access(path, 0) != 0) {
         // LGR not found
         if (!Ptop) {
@@ -55,7 +54,7 @@ void load_lgr_file(const char* lgrname) {
 
         // Display warning
         char filename[20];
-        strcpy(filename, lgrname);
+        strcpy(filename, lgr_name);
         strcat(filename, ".LGR");
         blit8(BufferBall, BufferMain);
         BufferMain->fill_box(Hatterindex);
@@ -75,9 +74,8 @@ void load_lgr_file(const char* lgrname) {
         bltfront(BufferMain);
 
         // Set current level's lgr to DEFAULT and then try and load it
-        strcpy(Ptop->lgr_name, "DEFAULT");
+        strcpy(lgr_name, "DEFAULT");
         Valtozott = 1;
-
         if (strcmpi(CurrentLgrName, "DEFAULT") == 0) {
             return;
         }
@@ -91,7 +89,7 @@ void load_lgr_file(const char* lgrname) {
         }
     }
     // Actually load the lgr
-    strcpy(CurrentLgrName, lgrname);
+    strcpy(CurrentLgrName, lgr_name);
 
     if (Lgr) {
         delete Lgr;
@@ -103,7 +101,7 @@ void load_lgr_file(const char* lgrname) {
 static void bike_slice(pic8* bike, affine_pic** ret, bike_box* bbox) {
     pic8* slice = new pic8(bbox->x2 - bbox->x1 + 1, bbox->y2 - bbox->y1 + 1);
     blit8(slice, bike, -bbox->x1, -bbox->y1);
-    *ret = new affine_pic(NULL, slice);
+    *ret = new affine_pic(nullptr, slice);
 }
 
 // Slice the bike into 4 sub-components
@@ -114,23 +112,21 @@ void lgrfile::chop_bike(pic8* bike, bike_pics* bp) {
     bike_slice(bike, &bp->bike_part4, &BikeBox4);
 
     // Transparency taken from topleft corner of BikeBox1
-    bp->bike_part2->transparency = bp->bike_part3->transparency = bp->bike_part4->transparency =
-        bp->bike_part1->transparency;
+    bp->bike_part2->transparency = bp->bike_part1->transparency;
+    bp->bike_part3->transparency = bp->bike_part1->transparency;
+    bp->bike_part4->transparency = bp->bike_part1->transparency;
 }
 
 // Tile a texture horizontally to fit SCREEN_WIDTH.
 static pic8* generate_default_texture(texture* text) {
     int original_width = text->original_width;
-    int tiles = 1;
-    while (original_width * tiles < SCREEN_WIDTH) {
-        tiles++;
-    }
-    tiles++;
-    pic8* ppic = new pic8(original_width * tiles, text->pic->get_height());
+    int tiles = (SCREEN_WIDTH + original_width - 1) / original_width + 1;
+
+    pic8* tiled = new pic8(original_width * tiles, text->pic->get_height());
     for (int i = 0; i < tiles; i++) {
-        blit8(ppic, text->pic, i * original_width, 0);
+        blit8(tiled, text->pic, i * original_width, 0);
     }
-    return ppic;
+    return tiled;
 }
 
 // Get the palette data from q1bike.pcx. h file offset must be at the end of the pcx file!
@@ -172,9 +168,9 @@ static int get_transparency_palette_id(piclist::Transparency type, pic8* pic) {
     return -1;
 }
 
-#define PICTURE_MAX_MEMORY (600000)
+constexpr size_t PICTURE_MAX_MEMORY = 600000;
 
-static unsigned char* PictureBuffer = NULL;
+static unsigned char* PictureBuffer = nullptr;
 
 // Store a picture into the lgr.
 // Compression format:
@@ -221,17 +217,15 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
         }
 
         int x = 0;
-        while (1) {
+        while (true) {
             // Skip pixels
             int skip = uresszam(x, new_pic->width, row, (unsigned char)transparency);
             if (skip > 60000) {
                 internal_error("add_picture skip width too long!");
             }
 
-            int skip_upper = skip / 256;
-            int skip_lower = skip % 256;
-            PictureBuffer[buffer_offset] = (unsigned char)skip_upper;
-            PictureBuffer[buffer_offset + 1] = (unsigned char)skip_lower;
+            PictureBuffer[buffer_offset] = (unsigned char)(skip / 256);
+            PictureBuffer[buffer_offset + 1] = (unsigned char)(skip % 256);
             x += skip;
             if (x >= new_pic->width) {
                 // End of line
@@ -251,10 +245,8 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
                 internal_error("add_picture count width too long!");
             }
 
-            int count_upper = count / 256;
-            int count_lower = count % 256;
-            PictureBuffer[buffer_offset] = (unsigned char)count_upper;
-            PictureBuffer[buffer_offset + 1] = (unsigned char)count_lower;
+            PictureBuffer[buffer_offset] = (unsigned char)(count / 256);
+            PictureBuffer[buffer_offset + 1] = (unsigned char)(count % 256);
 
             buffer_offset += 2;
             if (buffer_offset + count > PICTURE_MAX_MEMORY) {
@@ -290,20 +282,19 @@ void lgrfile::add_texture(pic8* pic, piclist* list, int index) {
         new_text->pic = pic;
         new_text->default_distance = list->default_distance[index];
         new_text->default_clipping = list->default_clipping[index];
-        new_text->is_qgrass = 0;
+        new_text->is_qgrass = false;
     } else {
         // QGRASS special case
         strcpy(new_text->name, "qgrass");
         new_text->pic = pic;
         new_text->default_distance = 450;
         new_text->default_clipping = Clipping::Ground;
-        new_text->is_qgrass = 1;
+        new_text->is_qgrass = true;
     }
-
     texture_count++;
 }
 
-#define MASK_MAX_MEMORY (20000)
+constexpr size_t MASK_MAX_MEMORY = 20000;
 static mask_element MaskBuffer[MASK_MAX_MEMORY];
 
 void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
@@ -387,29 +378,29 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
 // Map the 256 lgr palette colors to either the brightest or darkest color
 // Used to draw the timer
 static unsigned char* create_timer_palette_map(unsigned char* pal) {
-    unsigned char* map = new unsigned char[260];
+    unsigned char* map = new unsigned char[256];
     if (!map) {
         internal_error("create_timer_palettemap memory!");
     }
 
     // Find brightest color of the palette
-    int color_value = -1;
+    int brightest_color_sum = -1;
     int brightest_color_index = 0;
     for (int i = 0; i < 256; i++) {
         int new_value = pal[i * 3] + pal[i * 3 + 1] + pal[i * 3 + 2];
-        if (color_value < new_value) {
-            color_value = new_value;
+        if (brightest_color_sum < new_value) {
+            brightest_color_sum = new_value;
             brightest_color_index = i;
         }
     }
 
     // Find darkest color of the palette
-    color_value = 1000;
+    int darkest_color_sum = 1000;
     int darkest_color_index = 0;
     for (int i = 0; i < 256; i++) {
         int new_value = pal[i * 3] + pal[i * 3 + 1] + pal[i * 3 + 2];
-        if (color_value > new_value) {
-            color_value = new_value;
+        if (darkest_color_sum > new_value) {
+            darkest_color_sum = new_value;
             darkest_color_index = i;
         }
     }
@@ -430,37 +421,24 @@ lgrfile::lgrfile(const char* lgrname) {
     picture_count = 0;
     mask_count = 0;
     texture_count = 0;
-    for (int i = 0; i < MAX_PICTURES; i++) {
-        memset(&pictures[i], 0, sizeof(picture));
-    }
-    for (int i = 0; i < MAX_MASKS; i++) {
-        memset(&masks[i], 0, sizeof(mask));
-    }
-    for (int i = 0; i < MAX_TEXTURES; i++) {
-        memset(&textures[i], 0, sizeof(texture));
-    }
-
-    grass_pics = NULL;
-
-    pal = NULL;
-    palette_data = NULL;
-    timer_palette_map = NULL;
-
+    memset(pictures, 0, sizeof(pictures));
+    memset(masks, 0, sizeof(masks));
+    memset(textures, 0, sizeof(textures));
+    pal = nullptr;
+    palette_data = nullptr;
+    timer_palette_map = nullptr;
     memset(&bike1, 0, sizeof(bike1));
     memset(&bike2, 0, sizeof(bike2));
-    flag = NULL;
-
-    killer = exit = NULL;
-    qframe = NULL;
-
-    background = foreground = NULL;
-    foreground_name[0] = background_name[0] = 0;
-
+    flag = nullptr;
+    killer = nullptr;
+    exit = nullptr;
+    qframe = nullptr;
+    background = nullptr;
+    foreground = nullptr;
+    foreground_name[0] = 0;
+    background_name[0] = 0;
     food_count = 0;
-    for (int i = 0; i < MAX_QFOOD; i++) {
-        food[i] = NULL;
-    }
-
+    memset(food, 0, sizeof(food));
     grass_pics = new grass;
 
     double zoom = EolSettings->zoom();
@@ -503,9 +481,9 @@ lgrfile::lgrfile(const char* lgrname) {
     }
 
     // Iterate through the pcx objects
-    pic8* q1bike = NULL;
-    pic8* q2bike = NULL;
-    pic8* qcolors = NULL;
+    pic8* q1bike = nullptr;
+    pic8* q2bike = nullptr;
+    pic8* qcolors = nullptr;
     for (int i = 0; i < pcx_length; i++) {
         char asset_filename[30];
         if (fread(asset_filename, 1, 20, h) != 20) {
@@ -519,7 +497,7 @@ lgrfile::lgrfile(const char* lgrname) {
             external_error("Corrupt LGR file!:", path);
         }
 
-        long curpos = ftell(h);
+        int curpos = ftell(h);
         pic8* asset_pic = new pic8(asset_filename, h);
         fseek(h, curpos + asset_size, SEEK_SET);
 
@@ -538,96 +516,96 @@ lgrfile::lgrfile(const char* lgrname) {
         }
 
         if (strcmpi(asset_filename, "q1body.pcx") == 0) {
-            bike1.body = new affine_pic(NULL, asset_pic);
+            bike1.body = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q1thigh.pcx") == 0) {
-            bike1.thigh = new affine_pic(NULL, asset_pic);
+            bike1.thigh = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q1leg.pcx") == 0) {
-            bike1.leg = new affine_pic(NULL, asset_pic);
+            bike1.leg = new affine_pic(nullptr, asset_pic);
             continue;
         }
 
         if (strcmpi(asset_filename, "q1wheel.pcx") == 0) {
-            bike1.wheel = new affine_pic(NULL, asset_pic);
+            bike1.wheel = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q1susp1.pcx") == 0) {
-            bike1.susp1 = new affine_pic(NULL, asset_pic);
+            bike1.susp1 = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q1susp2.pcx") == 0) {
-            bike1.susp2 = new affine_pic(NULL, asset_pic);
+            bike1.susp2 = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q1forarm.pcx") == 0) {
-            bike1.forarm = new affine_pic(NULL, asset_pic);
+            bike1.forarm = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q1up_arm.pcx") == 0) {
-            bike1.up_arm = new affine_pic(NULL, asset_pic);
+            bike1.up_arm = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q1head.pcx") == 0) {
-            bike1.head = new affine_pic(NULL, asset_pic);
+            bike1.head = new affine_pic(nullptr, asset_pic);
             continue;
         }
 
         if (strcmpi(asset_filename, "q2body.pcx") == 0) {
-            bike2.body = new affine_pic(NULL, asset_pic);
+            bike2.body = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q2thigh.pcx") == 0) {
-            bike2.thigh = new affine_pic(NULL, asset_pic);
+            bike2.thigh = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q2leg.pcx") == 0) {
-            bike2.leg = new affine_pic(NULL, asset_pic);
+            bike2.leg = new affine_pic(nullptr, asset_pic);
             continue;
         }
 
         if (strcmpi(asset_filename, "q2wheel.pcx") == 0) {
-            bike2.wheel = new affine_pic(NULL, asset_pic);
+            bike2.wheel = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q2susp1.pcx") == 0) {
-            bike2.susp1 = new affine_pic(NULL, asset_pic);
+            bike2.susp1 = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q2susp2.pcx") == 0) {
-            bike2.susp2 = new affine_pic(NULL, asset_pic);
+            bike2.susp2 = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q2forarm.pcx") == 0) {
-            bike2.forarm = new affine_pic(NULL, asset_pic);
+            bike2.forarm = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q2up_arm.pcx") == 0) {
-            bike2.up_arm = new affine_pic(NULL, asset_pic);
+            bike2.up_arm = new affine_pic(nullptr, asset_pic);
             continue;
         }
         if (strcmpi(asset_filename, "q2head.pcx") == 0) {
-            bike2.head = new affine_pic(NULL, asset_pic);
+            bike2.head = new affine_pic(nullptr, asset_pic);
             continue;
         }
 
         if (strcmpi(asset_filename, "qflag.pcx") == 0) {
-            flag = new affine_pic(NULL, asset_pic);
+            flag = new affine_pic(nullptr, asset_pic);
             continue;
         }
 
         if (strcmpi(asset_filename, "qkiller.pcx") == 0) {
             killer = new anim(asset_pic, "qkiller.pcx", zoom);
             delete asset_pic;
-            asset_pic = NULL;
+            asset_pic = nullptr;
             continue;
         }
         if (strcmpi(asset_filename, "qexit.pcx") == 0) {
             exit = new anim(asset_pic, "qexit.pcx", zoom);
             delete asset_pic;
-            asset_pic = NULL;
+            asset_pic = nullptr;
             continue;
         }
 
@@ -642,15 +620,15 @@ lgrfile::lgrfile(const char* lgrname) {
             continue;
         }
 
-        int is_food = 0;
+        bool is_food = false;
         for (int foodi = 0; foodi < 9; foodi++) {
             char qfood_name[20];
             sprintf(qfood_name, "qfood%d.pcx", foodi + 1);
             if (strcmpi(asset_filename, qfood_name) == 0) {
                 food[foodi] = new anim(asset_pic, qfood_name, zoom);
                 delete asset_pic;
-                asset_pic = NULL;
-                is_food = 1;
+                asset_pic = nullptr;
+                is_food = true;
             }
         }
         if (is_food) {
@@ -678,7 +656,7 @@ lgrfile::lgrfile(const char* lgrname) {
 
         // QGRASS
         if (strcmpi(asset_filename, "qgrass") == 0) {
-            add_texture(asset_pic, NULL, 0);
+            add_texture(asset_pic, nullptr, 0);
             continue;
         }
 
@@ -692,7 +670,7 @@ lgrfile::lgrfile(const char* lgrname) {
             asset_pic = pic8::scale(asset_pic, zoom);
             add_picture(asset_pic, list, index);
             delete asset_pic;
-            asset_pic = NULL;
+            asset_pic = nullptr;
             continue;
         }
         if (list->type[index] == piclist::Type::Texture) {
@@ -707,13 +685,13 @@ lgrfile::lgrfile(const char* lgrname) {
             asset_pic = pic8::scale(asset_pic, zoom);
             add_mask(asset_pic, list, index);
             // pic8 deleted by above function
-            asset_pic = NULL;
+            asset_pic = nullptr;
             continue;
         }
         external_error("Corrupt LGR file!:", path);
     }
 
-    // WOF
+    // EOF
     int magic_number = 0;
     if (fread(&magic_number, 1, 4, h) != 4) {
         external_error("Corrupt LGR file!:", path);
@@ -723,7 +701,7 @@ lgrfile::lgrfile(const char* lgrname) {
     }
 
     fclose(h);
-    h = NULL;
+    h = nullptr;
 
     // Check that the LGR is complete
     if (texture_count < 2) {
@@ -813,10 +791,10 @@ lgrfile::lgrfile(const char* lgrname) {
     // Create the bike affine_pic
     chop_bike(q1bike, &bike1);
     delete q1bike;
-    q1bike = NULL;
+    q1bike = nullptr;
     chop_bike(q2bike, &bike2);
     delete q2bike;
-    q2bike = NULL;
+    q2bike = nullptr;
 
     // Parse QCOLORS
     minimap_foreground_palette_id = qcolors->gpixel(6, 6 + 0 * 12);
@@ -828,7 +806,7 @@ lgrfile::lgrfile(const char* lgrname) {
     minimap_food_palette_id = qcolors->gpixel(6, 6 + 7 * 12);
     minimap_killer_palette_id[0] = qcolors->gpixel(6, 6 + 8 * 12);
     delete qcolors;
-    qcolors = NULL;
+    qcolors = nullptr;
 
     // Horizontally extend some QCOLORS
     minimap_exit_palette_id[2] = minimap_exit_palette_id[1] = minimap_exit_palette_id[0];
@@ -841,14 +819,11 @@ lgrfile::lgrfile(const char* lgrname) {
             internal_error("lgrfile::lgrfile texture missing pic!");
         }
         text->original_width = text->pic->get_width();
-        int texture_min_width = 600;
-        if (text->pic->get_width() >= texture_min_width) {
+        constexpr int TEXTURE_MIN_WIDTH = 600;
+        if (text->pic->get_width() >= TEXTURE_MIN_WIDTH) {
             continue;
         }
-        int tiles = 1;
-        while (tiles * text->pic->get_width() < texture_min_width) {
-            tiles++;
-        }
+        int tiles = (TEXTURE_MIN_WIDTH + text->pic->get_width() - 1) / text->pic->get_width();
         pic8* tiled = new pic8(tiles * text->pic->get_width(), text->pic->get_height());
         for (int j = 0; j < tiles; j++) {
             blit8(tiled, text->pic, j * text->pic->get_width(), 0);
@@ -880,7 +855,6 @@ lgrfile::lgrfile(const char* lgrname) {
             }
 
             if (strcmpi(masks[j].name, masks[j + 1].name) > 0) {
-                // Csere:
                 mask tmp = masks[j];
                 masks[j] = masks[j + 1];
                 masks[j + 1] = tmp;
@@ -897,8 +871,7 @@ lgrfile::lgrfile(const char* lgrname) {
 
             if (strcmpi(textures[j + 1].name, "qgrass") != 0 &&
                 (strcmpi(textures[j].name, textures[j + 1].name) > 0 ||
-                 strcmpi(textures[j].name, "qgrass") == 0)) { // qgrass vegere
-                // Csere:
+                 strcmpi(textures[j].name, "qgrass") == 0)) {
                 texture tmp = textures[j];
                 textures[j] = textures[j + 1];
                 textures[j + 1] = tmp;
@@ -908,11 +881,11 @@ lgrfile::lgrfile(const char* lgrname) {
 
     // Cleanup
     delete list;
-    list = NULL;
+    list = nullptr;
 
     if (PictureBuffer) {
         delete PictureBuffer;
-        PictureBuffer = NULL;
+        PictureBuffer = nullptr;
     }
 
     // Editor picture selection initialization
@@ -921,26 +894,22 @@ lgrfile::lgrfile(const char* lgrname) {
     editor_texture_name[0] = 0;
 
     food_count = 0;
-    for (int i = 0; i < 9; i++) {
-        if (food[i]) {
-            food_count = i + 1;
-        } else {
-            break;
-        }
+    while (food_count < 9 && food[food_count]) {
+        food_count++;
     }
     if (food_count < 1) {
         external_error("Picture is missing from LGR file:", "qfood1.pcx", path);
     }
 
     // Check grass
-    has_grass = 1;
+    has_grass = true;
     editor_hide_qgrass = 1;
     if (get_texture_index("qgrass") < 0) {
-        has_grass = 0;
+        has_grass = false;
         editor_hide_qgrass = 0;
     }
     if (grass_pics->length < 2) {
-        has_grass = 0;
+        has_grass = false;
     }
 }
 
@@ -966,36 +935,38 @@ static void delete_bike_pics(bike_pics* bp) {
     delete bp->head;
 }
 
-lgrfile::~lgrfile(void) {
+lgrfile::~lgrfile() {
     for (int i = 0; i < picture_count; i++) {
         if (!pictures[i].data) {
             internal_error("lgrfile::~lgrfile !pictures[i].data");
         }
         delete pictures[i].data;
-        pictures[i].data = NULL;
+        pictures[i].data = nullptr;
     }
     for (int i = 0; i < mask_count; i++) {
         if (!masks[i].data) {
             internal_error("lgrfile::~lgrfile !masks[i].data");
         }
         delete masks[i].data;
-        masks[i].data = NULL;
+        masks[i].data = nullptr;
     }
     for (int i = 0; i < texture_count; i++) {
         if (!textures[i].pic) {
             internal_error("lgrfile::~lgrfile !textures[i].pic");
         }
         delete textures[i].pic;
-        textures[i].pic = NULL;
+        textures[i].pic = nullptr;
     }
 
     if (!grass_pics) {
         internal_error("lgrfile::~lgrfile !grasses");
     }
     delete grass_pics;
-    grass_pics = NULL;
+    grass_pics = nullptr;
 
-    picture_count = mask_count = texture_count = 0;
+    picture_count = 0;
+    mask_count = 0;
+    texture_count = 0;
 
     if (!pal || !palette_data || !timer_palette_map) {
         internal_error("lgrfile::~lgrfile !palette || !pal_data || !timer_palette_map!");
@@ -1003,47 +974,49 @@ lgrfile::~lgrfile(void) {
     delete pal;
     delete palette_data;
     delete timer_palette_map;
-    pal = NULL;
-    palette_data = NULL;
-    timer_palette_map = NULL;
+    pal = nullptr;
+    palette_data = nullptr;
+    timer_palette_map = nullptr;
 
     delete_bike_pics(&bike1);
     delete_bike_pics(&bike2);
+
     if (!flag || !qframe) {
         internal_error("lgrfile::~lgrfile !flag || !frame!");
     }
     delete flag;
     delete qframe;
-    flag = NULL;
-    qframe = NULL;
+    flag = nullptr;
+    qframe = nullptr;
 
     if (!killer || !exit) {
         internal_error("lgrfile::~lgrfile !killer || !exit");
     }
 
     delete killer;
+    killer = nullptr;
     delete exit;
-    killer = exit = NULL;
+    exit = nullptr;
 
     food_count = 0;
     for (int i = 0; i < MAX_QFOOD; i++) {
         if (food[i]) {
             delete food[i];
-            food[i] = NULL;
+            food[i] = nullptr;
         }
     }
 
     if (background) {
         delete background;
-        background = NULL;
+        background = nullptr;
     }
     if (foreground) {
         delete foreground;
-        foreground = NULL;
+        foreground = nullptr;
     }
 }
 
-void lgrfile::reload_default_textures(void) {
+void lgrfile::reload_default_textures() {
     if (!Ptop->foreground_name[0] || !Ptop->background_name[0]) {
         internal_error("!Ptop->foreground_name[0] || !Ptop->background_name[0]");
     }
@@ -1054,7 +1027,7 @@ void lgrfile::reload_default_textures(void) {
         if (background) {
             delete background;
         }
-        background = NULL;
+        background = nullptr;
 
         int index = get_texture_index(background_name);
         if (index < 0) {
@@ -1071,7 +1044,7 @@ void lgrfile::reload_default_textures(void) {
         if (foreground) {
             delete foreground;
         }
-        foreground = NULL;
+        foreground = nullptr;
 
         int index = get_texture_index(foreground_name);
         if (index < 0) {

@@ -17,40 +17,44 @@ struct mask_element {
     int type;
 };
 
-#define MAX_MASKS (200)
+constexpr int MAX_MASKS = 200;
 
 struct mask {
     char name[10];
-    int width, height;
+    int width;
+    int height;
     mask_element* data;
 };
 
-#define MAX_PICTURES (1000)
+constexpr int MAX_PICTURES = 1000;
 
 struct picture {
     char name[10];
     int default_distance;
     Clipping default_clipping;
-
-    int width, height;
+    int width;
+    int height;
     // Encoded as array of {unsigned BE short skip, unsigned BE short length, char[length] pixels}
     // Jump to next row when skip length is 2^16 (and skip length/pixels)
     unsigned char* data;
 };
 
-#define MAX_TEXTURES (100)
+constexpr int MAX_TEXTURES = 100;
 
 struct texture {
     char name[10];
     pic8* pic; // Horizontally tiled
     int default_distance;
     Clipping default_clipping;
-    int is_qgrass;
+    bool is_qgrass;
     int original_width; // Width before horizontal tiling
 };
 
 struct bike_pics {
-    affine_pic *bike_part1, *bike_part2, *bike_part3, *bike_part4;
+    affine_pic* bike_part1;
+    affine_pic* bike_part2;
+    affine_pic* bike_part3;
+    affine_pic* bike_part4;
     affine_pic* body;
     affine_pic* thigh;
     affine_pic* leg;
@@ -62,7 +66,7 @@ struct bike_pics {
     affine_pic* head;
 };
 
-#define MAX_QFOOD (20)
+constexpr int MAX_QFOOD = 20;
 
 class lgrfile {
     void chop_bike(pic8* bike, bike_pics* bp);
@@ -72,10 +76,10 @@ class lgrfile {
     void add_mask(pic8* pic, piclist* list, int index);
 
     lgrfile(const char* lgrname);
-    ~lgrfile(void);
+    ~lgrfile();
 
   public:
-    friend void load_lgr_file(const char* lgrname);
+    friend void load_lgr_file(char* lgrname);
 
     int picture_count;
     picture pictures[MAX_PICTURES];
@@ -89,7 +93,7 @@ class lgrfile {
     texture textures[MAX_TEXTURES];
     int get_texture_index(const char* name);
 
-    int has_grass;
+    bool has_grass;
     int editor_hide_qgrass;
     grass* grass_pics;
 
@@ -101,15 +105,19 @@ class lgrfile {
     bike_pics bike2;
     affine_pic* flag;
 
-    anim *killer, *exit;
+    anim* killer;
+    anim* exit;
     int food_count;
     anim* food[MAX_QFOOD];
     pic8* qframe;
 
     // Current level's default textures, horizontally tiled:
-    pic8 *background, *foreground;
-    int background_original_width, foreground_original_width;
-    char foreground_name[10], background_name[10];
+    pic8* background;
+    pic8* foreground;
+    int background_original_width;
+    int foreground_original_width;
+    char foreground_name[10];
+    char background_name[10];
     void reload_default_textures();
 
     // From QCOLORS.pcx
@@ -129,13 +137,19 @@ class lgrfile {
 };
 
 extern lgrfile* Lgr;
-void load_lgr_file(const char* lgrname);
+void load_lgr_file(char* lgrname);
 void invalidate_lgr_cache();
 
 struct bike_box {
-    int x1, y1, x2, y2;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
 };
 
-extern bike_box BikeBox1, BikeBox2, BikeBox3, BikeBox4;
+extern bike_box BikeBox1;
+extern bike_box BikeBox2;
+extern bike_box BikeBox3;
+extern bike_box BikeBox4;
 
 #endif

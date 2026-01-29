@@ -46,3 +46,14 @@ void strlwr(char* str) {
     }
 }
 #endif
+
+bool is_ascii_character(unsigned char c) { return (c >= 32 && c < 127); }
+
+bool is_char_valid_for_filename(unsigned char c) {
+    if (c == '\\' || c == '/' || c == ':' || c == '*' || c == '?' || c == '\"' || c == '<' ||
+        c == '>' || c == '|') {
+        return false;
+    }
+
+    return is_ascii_character(c);
+}

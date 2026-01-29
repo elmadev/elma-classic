@@ -1,4 +1,5 @@
 #include "menu_nav.h"
+#include "abc8.h"
 #include "eol_settings.h"
 #include "fs_utils.h"
 #include "keys.h"
@@ -326,7 +327,7 @@ bool menu_nav::search_handler(int code) {
         } else {
             return false;
         }
-    } else if (accept_search_input() && ((code >= '0' && code <= 'z') || code == ' ')) {
+    } else if (accept_search_input() && MenuFont->has_char(code)) {
         if (search_input.size() < MAX_FILENAME_LEN) {
             search_input.push_back(code);
         }

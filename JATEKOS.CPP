@@ -1,9 +1,11 @@
 #include "JATEKOS.H"
+#include "abc8.h"
 #include "keys.h"
 #include "main.h"
 #include "MAINMENU.H"
 #include "menu_nav.h"
 #include "menu_pic.h"
+#include "platform_utils.h"
 #include "state.h"
 #include "TELJES.H"
 #include <cstring>
@@ -33,7 +35,7 @@ static int bevesznevet(char* nev, int visszater) {
                     return 1;
                 }
             }
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+            if (MenuFont->has_char(c) && is_char_valid_for_filename(c)) {
                 if (i >= Maxnevhossz) {
                     continue;
                 }

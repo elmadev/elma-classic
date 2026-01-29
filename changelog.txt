@@ -19,6 +19,7 @@
 * Dialog pop-ups are centered on the screen
 * message.inf is no longer required to view error messages, and error messages are now all in English
 * turntime can now be configured
+* You can now type more non-letter symbols in game menus, like saving a replay or level named `!cov!`
 
 ## Minor Bug Fixes
 * Foreground grass was accidentally inefficiently calculated, causing increased load time

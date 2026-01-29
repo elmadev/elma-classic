@@ -590,7 +590,7 @@ int tolt_save_as() {
                 Valtozott = 0;
                 return 1;
             }
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+            if (Pabc2->has_char(c) && is_char_valid_for_filename(c)) {
                 if (strlen(nev) >= 8) {
                     continue;
                 }
@@ -1889,9 +1889,7 @@ static void change_level_name(char* nev) {
             pop();
             return;
         }
-        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ||
-            c == ' ') {
-
+        if (Pabc2->has_char(c) && is_char_valid_for_filename(c)) {
             char tmpfejlec[LEVEL_NAME_LENGTH + 10];
             sprintf(tmpfejlec, "Ext: %s", nev);
 

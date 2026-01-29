@@ -90,7 +90,7 @@ static int bevesznevet(char* nev) {
                     return 1;
                 }
             }
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+            if (MenuFont->has_char(c) && is_char_valid_for_filename(c)) {
                 if (i >= 8) {
                     continue;
                 }

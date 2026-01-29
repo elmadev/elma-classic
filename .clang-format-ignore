@@ -1,2 +1,2 @@
-glad.c
+src/glad/glad.c
 include/glad/glad.h

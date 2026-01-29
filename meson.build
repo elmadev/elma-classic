@@ -69,7 +69,7 @@ elma_sources = files(
     'object.cpp',
     'sprite.cpp',
     'gl_renderer.cpp',
-    'glad.c',
+    'src/glad/glad.c',
 )
 
 inc = include_directories('include')

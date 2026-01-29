@@ -314,8 +314,8 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
     if (transparency >= 0) {
         for (int i = 0; i < new_mask->height; i++) {
             // Transparent data
-            unsigned char* sor = pic->get_row(i);
-            int j = uresszam(0, new_mask->width, sor, (unsigned char)transparency);
+            unsigned char* row = pic->get_row(i);
+            int j = uresszam(0, new_mask->width, row, (unsigned char)transparency);
             if (j > 0) {
                 MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
                 MaskBuffer[buffer_offset].length = j;
@@ -323,7 +323,7 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
             }
             while (j <= new_mask->width - 1) {
                 // Solid data
-                int count = teliszam(j, new_mask->width, sor, (unsigned char)transparency);
+                int count = teliszam(j, new_mask->width, row, (unsigned char)transparency);
                 if (count <= 0) {
                     internal_error("add_mask count length negative!");
                 }
@@ -338,7 +338,7 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
                 j += count;
 
                 // Transparent data
-                count = uresszam(j, new_mask->width, sor, (unsigned char)transparency);
+                count = uresszam(j, new_mask->width, row, (unsigned char)transparency);
                 if (count > 0) {
                     MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
                     MaskBuffer[buffer_offset].length = count;

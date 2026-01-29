@@ -83,47 +83,6 @@ static void initialize_keyboard_mappings() {
         SDLToKeycode[i] = SDL_SCANCODE_UNKNOWN;
     }
 
-    SDLToKeycode[SDL_SCANCODE_1] = '1';
-    SDLToKeycode[SDL_SCANCODE_2] = '2';
-    SDLToKeycode[SDL_SCANCODE_3] = '3';
-    SDLToKeycode[SDL_SCANCODE_4] = '4';
-    SDLToKeycode[SDL_SCANCODE_5] = '5';
-    SDLToKeycode[SDL_SCANCODE_6] = '6';
-    SDLToKeycode[SDL_SCANCODE_7] = '7';
-    SDLToKeycode[SDL_SCANCODE_8] = '8';
-    SDLToKeycode[SDL_SCANCODE_9] = '9';
-    SDLToKeycode[SDL_SCANCODE_0] = '0';
-
-    SDLToKeycode[SDL_SCANCODE_A] = 'a';
-    SDLToKeycode[SDL_SCANCODE_B] = 'b';
-    SDLToKeycode[SDL_SCANCODE_C] = 'c';
-    SDLToKeycode[SDL_SCANCODE_D] = 'd';
-    SDLToKeycode[SDL_SCANCODE_E] = 'e';
-    SDLToKeycode[SDL_SCANCODE_F] = 'f';
-    SDLToKeycode[SDL_SCANCODE_G] = 'g';
-    SDLToKeycode[SDL_SCANCODE_H] = 'h';
-    SDLToKeycode[SDL_SCANCODE_I] = 'i';
-    SDLToKeycode[SDL_SCANCODE_J] = 'j';
-    SDLToKeycode[SDL_SCANCODE_K] = 'k';
-    SDLToKeycode[SDL_SCANCODE_L] = 'l';
-    SDLToKeycode[SDL_SCANCODE_M] = 'm';
-    SDLToKeycode[SDL_SCANCODE_N] = 'n';
-    SDLToKeycode[SDL_SCANCODE_O] = 'o';
-    SDLToKeycode[SDL_SCANCODE_P] = 'p';
-    SDLToKeycode[SDL_SCANCODE_Q] = 'q';
-    SDLToKeycode[SDL_SCANCODE_R] = 'r';
-    SDLToKeycode[SDL_SCANCODE_S] = 's';
-    SDLToKeycode[SDL_SCANCODE_T] = 't';
-    SDLToKeycode[SDL_SCANCODE_U] = 'u';
-    SDLToKeycode[SDL_SCANCODE_V] = 'v';
-    SDLToKeycode[SDL_SCANCODE_W] = 'w';
-    SDLToKeycode[SDL_SCANCODE_X] = 'x';
-    SDLToKeycode[SDL_SCANCODE_Y] = 'y';
-    SDLToKeycode[SDL_SCANCODE_Z] = 'z';
-
-    SDLToKeycode[SDL_SCANCODE_SPACE] = ' ';
-    SDLToKeycode[SDL_SCANCODE_PERIOD] = '.';
-
     SDLToKeycode[SDL_SCANCODE_ESCAPE] = KEY_ESC;
     SDLToKeycode[SDL_SCANCODE_RETURN] = KEY_ENTER;
     SDLToKeycode[SDL_SCANCODE_KP_ENTER] = KEY_ENTER; // KP = Keypad
@@ -308,14 +267,7 @@ void handle_events() {
             SDL_Scancode scancode = event.key.keysym.scancode;
             Keycode keycode = SDLToKeycode[scancode];
             if (keycode == SDL_SCANCODE_UNKNOWN) {
-                break; // Unmapped key
-            }
-
-            // Handle shift for letters
-            if (keycode >= 'a' && keycode <= 'z') {
-                if (SDLKeyState[SDL_SCANCODE_LSHIFT] || SDLKeyState[SDL_SCANCODE_RSHIFT]) {
-                    keycode = keycode + 'A' - 'a';
-                }
+                break; // Not a control mapping - delivered through text input events.
             }
 
             if (event.key.repeat) {
@@ -328,6 +280,9 @@ void handle_events() {
             add_key_to_buffer(keycode);
             break;
         }
+        case SDL_TEXTINPUT:
+            add_text_to_buffer(event.text.text);
+            break;
         case SDL_MOUSEWHEEL:
             if (event.wheel.y > 0) {
                 add_key_to_buffer(KEY_UP);

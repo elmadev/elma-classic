@@ -1,4 +1,5 @@
 #include "KIRAJZOL.H"
+#include "affine_pic.h"
 #include "anim.h"
 #include "affine_pic_render.h"
 #include "ECSET.H"
@@ -56,6 +57,22 @@ double Hatarx1, Hatarx2, Hatary1, Hatary2;
 // View ablak meretei:
 static int Viewxsize, Viewysize;
 static int Viewxorig, Viewxtolas;
+
+affine_pic* shirt = nullptr;
+
+void init_shirt() {
+    constexpr int SHIRT_BMP_WIDTH = 149;
+    constexpr int SHIRT_BMP_HEIGHT = 101;
+
+    pic8* pic_shirt = pic8::from_bmp("bmp/shirt.bmp");
+    if (pic_shirt && pic_shirt->get_width() == SHIRT_BMP_WIDTH &&
+        pic_shirt->get_height() == SHIRT_BMP_HEIGHT) {
+        shirt = new affine_pic(nullptr, pic_shirt);
+        return;
+    }
+
+    delete pic_shirt;
+}
 
 void beallitmereteket(int splitscreen) {
     Cy1Bplayer = 100, Cy2Bplayer = 200;

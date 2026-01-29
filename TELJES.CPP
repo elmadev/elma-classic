@@ -4,6 +4,7 @@
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "JATEKOS.H"
+#include "KIRAJZOL.H"
 #include "keys.h"
 #include "M_PIC.H"
 #include "main.h"
@@ -75,6 +76,7 @@ void teljes(void) {
 
     mergestatedat();
     eol_settings::sync_controls_to_state(State);
+    init_shirt();
 
     init_physics_data();
 

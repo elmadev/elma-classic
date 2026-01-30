@@ -64,29 +64,7 @@ void teljes(void) {
 
     init_physics_data();
 
-    // State->save(); // Itt lehet ures state.dat file-t csinalni
-
-    // Itt lehet cheat playert eloallitani:
-    // Le kell elotte torolni state.dat-ot:
     // cheatplayer();
-
-    // Feltesszuk tile-ot kepre:
-    /*pic8* tmpintro = new pic8( 640, 480 );
-    pic8* tile = new pic8( "introtl.pcx" );
-    int y = 0;
-    while( y < 480 ) {
-        int x = 0;
-        while( x < 640 ) {
-            blit8( tmpintro, tile, x, y );
-            x += tile->get_width();
-        }
-        y += tile->get_height();
-    }
-    pic8* pintro = new pic8( "intro.pcx" );
-    spriteosit( pintro );
-    blit8( tmpintro, pintro );
-    delete pintro; pintro = NULL;
-    delete tile; tile = NULL;*/
 
     // Ezt majd elso kiirloading szabaditja fel (menukep-ben van definialva):
     Intro = new pic8("intro.pcx");
@@ -159,21 +137,6 @@ void teljes(void) {
     }
     internal_error("Ide nem kellett volna jonnie!");
 }
-
-/* Regi kilepes
-void kilep( void ) {
-    pic8* ppic = new pic8( "vegekep.pcx" );
-    palette* pvegepal = NULL;
-    get_pcx_pal( "vegekep.pcx", &pvegepal );
-    pvegepal->set();
-    bltfront( ppic );
-    while( 1 ) {
-        Keycode c = get_keypress();
-        if( c == ' ' || c == KEY_ENTER || c == KEY_ESC ) {
-            quit();
-        }
-    }
-} */
 
 void kilep(void) {
     WallsDisabled = true; // golyok ezentul kimenek falon kivulre

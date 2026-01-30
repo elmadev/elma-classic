@@ -140,11 +140,10 @@ void menu_exit(void) {
     menu->add_line_centered("Thank you for registering the game!", 320, 220);
     menu->add_line_centered("Please do not distribute!", 320, 300);
 
-    double start_time = stopwatch();
+    empty_keypress_buffer();
     while (true) {
         menu->render();
-        double minimum_delay = 50.0;
-        if ((stopwatch() > (start_time + minimum_delay)) && has_keypress()) {
+        if (has_keypress()) {
             Keycode c = get_keypress();
             if (c == ' ' || c == KEY_ENTER || c == KEY_ESC) {
                 quit();

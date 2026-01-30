@@ -47,20 +47,6 @@ void cheatplayer(void) {
     }
 }
 
-/*static void kiraklogot( void ) {
-    menu_pic szl;
-
-    empty_keypress_buffer();
-    while( 1 ) {
-        if( has_keypress() ) {
-            Keycode c = get_keypress();
-            //if( c == KEY_ESC || c == KEY_ENTER )
-                return;
-        }
-        szl.render( 1, 1 );
-    }
-} */
-
 static void mergestatedat(void);
 
 void teljes(void) {
@@ -161,31 +147,10 @@ void teljes(void) {
     delete tmpintro;
     tmpintro = NULL;
 
-    /*delete tmpintro;
-    tmpintro = new pic8( "torol.pcx" );
-    get_keypress();
-    for( int i = 1; i < 480; i += 5  ) {
-        pbuffer->fill_box( BLACK_PALETTE_ID );
-        //blit8( pbuffer, tmpintro, 0, -240+i, 0, 0, 639, 239 );
-        //blit8( pbuffer, tmpintro, 0, 479-i, 0, 240, 639, 479 );
-        blit8( pbuffer, tmpintro, 0, -480+i );
-        blit8( pbuffer, pintro );
-        bltfront( pbuffer );
-    }
-    for( i = 0; i < 480; i += 5  ) {
-        blit8( pbuffer, tmpintro );
-        //blit8( pbuffer, pintro1, i, 0 );
-        //blit8( pbuffer, pintro2, -i, 204 );
-        blit8( pbuffer, pintro, 0, i );
-        bltfront( pbuffer );
-    } */
-
     MenuPalette->set();
 
     // Ez kell menu_nav-hoz:
     menu_nav_entries_init();
-
-    // kiraklogot();
 
     if (State->player_count == 0) {
         newjatekos(1, 0); // Innen nem jon vissza

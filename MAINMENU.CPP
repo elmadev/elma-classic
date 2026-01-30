@@ -332,7 +332,7 @@ static void kilephakell(void) {
 
         State->save();
         State->write_stats();
-        kilep();
+        menu_exit();
     }
 }
 

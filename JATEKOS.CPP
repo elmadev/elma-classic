@@ -27,7 +27,7 @@ static int bevesznevet(char* nev, int visszater) {
                 if (visszater) {
                     return 0;
                 }
-                kilep();
+                menu_exit();
             }
             if (c == KEY_ENTER) {
                 // ENTER
@@ -99,7 +99,7 @@ void newjatekos(int A, int visszater) {
     }
 
     if (State->player_count == 0) {
-        kilep();
+        menu_exit();
     }
 
     if (visszater) {
@@ -145,7 +145,7 @@ void jatekosvalasztas(int A, int visszater) {
         if (visszater) {
             return;
         }
-        kilep();
+        menu_exit();
     }
     if (eredmeny == 0) {
         newjatekos(A, visszater);

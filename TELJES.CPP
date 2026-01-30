@@ -20,36 +20,35 @@
 
 state* State = NULL;
 
-void cheatplayer(void) {
+void test_player(void) {
     // Egyetlen jatekosnak sem szabad lennie:
     if (State->player_count != 0) {
-        internal_error("cheatplayer-ben mar van valaki bejegyezve!");
+        internal_error("test_player requires a fresh state file (player_count)!");
     }
 
     State->player_count = 1;
 
-    int hanypalya = INTERNAL_LEVEL_COUNT;
-    // hanypalya = 40;
+    int completed_count = INTERNAL_LEVEL_COUNT;
 
-    player* pjat = &State->players[0];
-    pjat->levels_completed = hanypalya;
-    strcpy(pjat->name, "Cheat");
-    pjat->selected_level = 0;
+    player* cur_player = &State->players[0];
+    cur_player->levels_completed = completed_count;
+    strcpy(cur_player->name, "Test");
+    cur_player->selected_level = 0;
 
-    for (int i = 0; i < hanypalya; i++) {
-        topten* pidok = &State->toptens[i].single;
-        if (pidok->times_count != 0) {
-            internal_error("cheatplayer-ben bug!");
+    for (int i = 0; i < completed_count; i++) {
+        topten* tten = &State->toptens[i].single;
+        if (tten->times_count != 0) {
+            internal_error("test_player requires a fresh state file (times_count)!");
         }
-        pidok->times_count = 1;
-        pidok->times[0] = 180000l;
-        strcpy(pidok->names1[0], "Cheat");
+        tten->times_count = 1;
+        tten->times[0] = 180000;
+        strcpy(tten->names1[0], "Test");
     }
 }
 
-static void mergestatedat(void);
+static void merge_states(void);
 
-void teljes(void) {
+void menu_intro(void) {
     init_qopen();
 
     init_menu_pictures();
@@ -59,12 +58,12 @@ void teljes(void) {
         external_error("memory");
     }
 
-    mergestatedat();
+    merge_states();
     eol_settings::sync_controls_to_state(State);
 
     init_physics_data();
 
-    // cheatplayer();
+    // test_player();
 
     // Ezt majd elso kiirloading szabaditja fel (menukep-ben van definialva):
     Intro = new pic8("intro.pcx");
@@ -74,20 +73,21 @@ void teljes(void) {
     blit8(Intro, Intro, 321 + 15, 420, 297, 420, 315, 441);
     blit8(Intro, Intro, 321 + 15 + 16, 432, 88, 458, 98, 468);
     spriteosit(Intro);
-    pic8* tmpintro = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT); // ezt majd kesobb szabaditjuk fel
-    tmpintro->fill_box(BLACK_PALETTE_ID);
-    blit8(tmpintro, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,
+    pic8* static_intro_screen =
+        new pic8(SCREEN_WIDTH, SCREEN_HEIGHT); // ezt majd kesobb szabaditjuk fel
+    static_intro_screen->fill_box(BLACK_PALETTE_ID);
+    blit8(static_intro_screen, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,
           SCREEN_HEIGHT / 2 - Intro->get_height() / 2);
 
-    palette* pintropal = NULL;
+    palette* intro_palette = NULL;
     // Gany, ezzel az egy nevvel get_pcx_pal(pic.cpp) elso harom byte-ot 0-azza:
-    get_pcx_pal("intro.pcx", &pintropal);
+    get_pcx_pal("intro.pcx", &intro_palette);
 
     // Hatrebb tettem folyamatos kirakasra (Alt-Tab miatt):
-    pintropal->set();
-    bltfront(tmpintro);
-    delete pintropal;
-    pintropal = NULL;
+    intro_palette->set();
+    bltfront(static_intro_screen);
+    delete intro_palette;
+    intro_palette = NULL;
 
     init_sound();
 
@@ -120,10 +120,10 @@ void teljes(void) {
             get_keypress();
             break;
         }
-        bltfront(tmpintro);
+        bltfront(static_intro_screen);
     }
-    delete tmpintro;
-    tmpintro = NULL;
+    delete static_intro_screen;
+    static_intro_screen = NULL;
 
     MenuPalette->set();
 
@@ -135,20 +135,20 @@ void teljes(void) {
     } else {
         jatekosvalasztas(1, 0); // Innen nem jon vissza
     }
-    internal_error("Ide nem kellett volna jonnie!");
+    internal_error("menu_intro!");
 }
 
-void kilep(void) {
+void menu_exit(void) {
     WallsDisabled = true; // golyok ezentul kimenek falon kivulre
-    menu_pic* pszovlist = new menu_pic;
-    pszovlist->add_line_centered("Thank you for registering the game!", 320, 220);
-    pszovlist->add_line_centered("Please do not distribute!", 320, 300);
+    menu_pic* menu = new menu_pic;
+    menu->add_line_centered("Thank you for registering the game!", 320, 220);
+    menu->add_line_centered("Please do not distribute!", 320, 300);
 
-    double kezdoido = stopwatch();
+    double start_time = stopwatch();
     while (1) {
-        pszovlist->render();
-        double idovaras = 50.0;
-        if ((stopwatch() > (kezdoido + idovaras)) && has_keypress()) {
+        menu->render();
+        double minimum_delay = 50.0;
+        if ((stopwatch() > (start_time + minimum_delay)) && has_keypress()) {
             Keycode c = get_keypress();
             if (c == ' ' || c == KEY_ENTER || c == KEY_ESC) {
                 quit();
@@ -157,142 +157,142 @@ void kilep(void) {
     }
 }
 
-static void mergeegyfele(topten* pst, topten* pmrg, int single) {
-    int idokszama = pst->times_count + pmrg->times_count;
-    int idok[MAX_TIMES * 2];
-    int ujetomb[MAX_TIMES * 2]; // Igaz, ha merge file-bol van ido
-    player_name nevek1[MAX_TIMES * 2];
-    player_name nevek2[MAX_TIMES * 2];
+static void merge_toptens(topten* src, topten* mrg, int single) {
+    int combined_count = src->times_count + mrg->times_count;
+    int times[MAX_TIMES * 2];
+    int from_mrg[MAX_TIMES * 2]; // Igaz, ha merge file-bol van ido
+    player_name names1[MAX_TIMES * 2];
+    player_name names2[MAX_TIMES * 2];
     // Feltoltjuk tablat:
-    for (int i = 0; i < pst->times_count; i++) {
-        idok[i] = pst->times[i];
-        ujetomb[i] = 0;
-        strcpy(nevek1[i], pst->names1[i]);
+    for (int i = 0; i < src->times_count; i++) {
+        times[i] = src->times[i];
+        from_mrg[i] = 0;
+        strcpy(names1[i], src->names1[i]);
         if (single) {
-            *(nevek2[i]) = 0;
+            *(names2[i]) = 0;
         } else {
-            strcpy(nevek2[i], pst->names2[i]);
+            strcpy(names2[i], src->names2[i]);
         }
 
         // Ezzel minden nem VJ32-es idot 50 percre allitom:
         // if( strcmp( names1[i], "VJ32" ) != 0 && strcmp( names2[i], "VJ32" ) )
-        //	idok[i] = 300000;
+        //	times[i] = 300000;
     }
-    for (int i = 0; i < pmrg->times_count; i++) {
-        int idest = pst->times_count + i;
-        idok[idest] = pmrg->times[i];
-        ujetomb[idest] = 1;
-        strcpy(nevek1[idest], pmrg->names1[i]);
+    for (int i = 0; i < mrg->times_count; i++) {
+        int idest = src->times_count + i;
+        times[idest] = mrg->times[i];
+        from_mrg[idest] = 1;
+        strcpy(names1[idest], mrg->names1[i]);
         if (single) {
-            *(nevek2[idest]) = 0;
+            *(names2[idest]) = 0;
         } else {
-            strcpy(nevek2[idest], pmrg->names2[i]);
+            strcpy(names2[idest], mrg->names2[i]);
         }
     }
     // Rendezzuk oket:
-    for (int i = 0; i < idokszama + 4; i++) {
-        for (int j = 0; j < idokszama - 1; j++) {
+    for (int pass = 0; pass < combined_count + 4; pass++) {
+        for (int i = 0; i < combined_count - 1; i++) {
             // Megnezzuk hogy kell-e csere:
             // Eloszor ido szamit, utana elso es masodik nev, majd
             // az hogy merge.dat-bol van-e ido:
 
-            int cserelendo = 0;
-            if (idok[j] > idok[j + 1]) {
-                cserelendo = 1;
+            int swap = 0;
+            if (times[i] > times[i + 1]) {
+                swap = 1;
             }
 
-            if (idok[j] == idok[j + 1]) {
+            if (times[i] == times[i + 1]) {
                 // Idejuk azonos:
-                if (strcmp(nevek1[j], nevek1[j + 1]) == 0) {
-                    if (strcmp(nevek2[j], nevek2[j + 1]) == 0) {
-                        if (ujetomb[j] && !ujetomb[j + 1]) {
-                            cserelendo = 1;
+                if (strcmp(names1[i], names1[i + 1]) == 0) {
+                    if (strcmp(names2[i], names2[i + 1]) == 0) {
+                        if (from_mrg[i] && !from_mrg[i + 1]) {
+                            swap = 1;
                         }
                     } else {
                         // Elso nevig ugyanaz, masodik nev mar nem:
-                        if (strcmp(nevek2[j], nevek2[j + 1]) > 0) {
-                            cserelendo = 1;
+                        if (strcmp(names2[i], names2[i + 1]) > 0) {
+                            swap = 1;
                         }
                     }
                 } else {
                     // Bar idejuk azonos, elso nev mar nem:
-                    if (strcmp(nevek1[j], nevek1[j + 1]) > 0) {
-                        cserelendo = 1;
+                    if (strcmp(names1[i], names1[i + 1]) > 0) {
+                        swap = 1;
                     }
                 }
             }
 
-            if (cserelendo) {
+            if (swap) {
                 // Cserelni kell:
-                int tmp = idok[j];
-                idok[j] = idok[j + 1];
-                idok[j + 1] = tmp;
+                int tmp = times[i];
+                times[i] = times[i + 1];
+                times[i + 1] = tmp;
 
-                tmp = ujetomb[j];
-                ujetomb[j] = ujetomb[j + 1];
-                ujetomb[j + 1] = tmp;
+                tmp = from_mrg[i];
+                from_mrg[i] = from_mrg[i + 1];
+                from_mrg[i + 1] = tmp;
 
-                player_name tmpnev;
-                strcpy(tmpnev, nevek1[j]);
-                strcpy(nevek1[j], nevek1[j + 1]);
-                strcpy(nevek1[j + 1], tmpnev);
+                player_name tmp_name;
+                strcpy(tmp_name, names1[i]);
+                strcpy(names1[i], names1[i + 1]);
+                strcpy(names1[i + 1], tmp_name);
 
-                strcpy(tmpnev, nevek2[j]);
-                strcpy(nevek2[j], nevek2[j + 1]);
-                strcpy(nevek2[j + 1], tmpnev);
+                strcpy(tmp_name, names2[i]);
+                strcpy(names2[i], names2[i + 1]);
+                strcpy(names2[i + 1], tmp_name);
             }
         }
     }
 
     // Most egyforma idoket egy forma versenyzoktol kiszedjuk:
     // (csak az uj idoket):
-    for (int i = 0; i < idokszama + 2; i++) {
-        for (int j = 0; j < idokszama - 1; j++) {
-            if (idok[j] == idok[j + 1] && strcmp(nevek1[j], nevek1[j + 1]) == 0 &&
-                (single || strcmp(nevek2[j], nevek2[j + 1]) == 0) && ujetomb[j + 1]) {
+    for (int pass = 0; pass < combined_count + 2; pass++) {
+        for (int i = 0; i < combined_count - 1; i++) {
+            if (times[i] == times[i + 1] && strcmp(names1[i], names1[i + 1]) == 0 &&
+                (single || strcmp(names2[i], names2[i + 1]) == 0) && from_mrg[i + 1]) {
 
                 // Kiszedjuk j+1 -ediket:
-                for (int k = j + 1; k < idokszama - 1; k++) {
+                for (int j = i + 1; j < combined_count - 1; j++) {
                     // k+1 -ediket k -adikba tesszuk:
-                    idok[k] = idok[k + 1];
-                    ujetomb[k] = ujetomb[k + 1];
-                    strcpy(nevek1[k], nevek1[k + 1]);
-                    strcpy(nevek2[k], nevek2[k + 1]);
+                    times[j] = times[j + 1];
+                    from_mrg[j] = from_mrg[j + 1];
+                    strcpy(names1[j], names1[j + 1]);
+                    strcpy(names2[j], names2[j + 1]);
                 }
-                idokszama--;
+                combined_count--;
                 break; // csak biztonsagert
             }
         }
     }
 
     // Visszairjuk state.dat-ba:
-    if (idokszama > MAX_TIMES) {
-        idokszama = MAX_TIMES;
+    if (combined_count > MAX_TIMES) {
+        combined_count = MAX_TIMES;
     }
-    pst->times_count = idokszama;
+    src->times_count = combined_count;
 
     // Biztonsagi nullazas:
     for (int i = 0; i < MAX_TIMES; i++) {
-        pst->times[i] = -1;
-        *(pst->names1[i]) = 0;
-        *(pst->names2[i]) = 0;
+        src->times[i] = -1;
+        *(src->names1[i]) = 0;
+        *(src->names2[i]) = 0;
     }
     // Masolas:
-    for (int i = 0; i < idokszama; i++) {
-        pst->times[i] = idok[i];
-        strcpy(pst->names1[i], nevek1[i]);
-        strcpy(pst->names2[i], nevek2[i]);
+    for (int i = 0; i < combined_count; i++) {
+        src->times[i] = times[i];
+        strcpy(src->names1[i], names1[i]);
+        strcpy(src->names2[i], names2[i]);
     }
 }
 
-static void mergestatedat(void) {
-    char nev[20] = "merge.dat";
-    if (!std::filesystem::exists(nev)) {
+static void merge_states(void) {
+    char merge_dat[20] = "merge.dat";
+    if (!std::filesystem::exists(merge_dat)) {
         return; // Nincsen merge file
     }
 
-    state* pmerge = new state(nev);
-    if (!pmerge) {
+    state* mrg = new state(merge_dat);
+    if (!mrg) {
         external_error("memory");
     }
 
@@ -300,11 +300,11 @@ static void mergestatedat(void) {
 
     // Most osszefesuljuk besttime tablakat:
     for (int i = 0; i < STATE_LEVEL_COUNT; i++) {
-        mergeegyfele(&State->toptens[i].single, &pmerge->toptens[i].single, 1);
-        mergeegyfele(&State->toptens[i].multi, &pmerge->toptens[i].multi, 0);
+        merge_toptens(&State->toptens[i].single, &mrg->toptens[i].single, 1);
+        merge_toptens(&State->toptens[i].multi, &mrg->toptens[i].multi, 0);
     }
 
-    delete pmerge;
+    delete mrg;
 
     State->save(); // par sorral feljebb van reload
 }

@@ -36,7 +36,7 @@ int main() {
 
     platform_init();
 
-    teljes();
+    menu_intro();
 }
 
 void quit() { exit(0); }

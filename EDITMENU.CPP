@@ -5,7 +5,7 @@
 #include "level.h"
 
 // igaz, ha kilep
-int menu_exit(void) {
+int editor_exit_dialog(void) {
     invalidateegesz();
     if (Valtozott) {
         if (dialog("There are unsaved changes in the level file.",

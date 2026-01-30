@@ -699,7 +699,7 @@ void editor(void) {
                     editplay();
                 }
                 if (c == 'x') {
-                    if (menu_exit()) {
+                    if (editor_exit_dialog()) {
                         push();
                         return;
                     }
@@ -781,7 +781,7 @@ void editor(void) {
                         ujy < EDITOR_MENU_Y + (i + 1) * Menudy) {
                         // i-edik gombot lenyomtak menuben:
                         if (i == 0 && balnyomva) {
-                            if (menu_exit()) {
+                            if (editor_exit_dialog()) {
                                 push();
                                 return;
                             }

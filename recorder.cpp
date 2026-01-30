@@ -8,6 +8,7 @@
 #include "qopen.h"
 #include <cmath>
 #include <cstring>
+#include <numbers>
 
 recorder* Rec1 = nullptr;
 recorder* Rec2 = nullptr;
@@ -104,9 +105,9 @@ bool recorder::frame_count_integrity() {
 
 constexpr double POSITION_RATIO = 1000.0;
 constexpr int WHEEL_ROTATION_RANGE = 250;
-constexpr double WHEEL_ROTATION_RATIO = WHEEL_ROTATION_RANGE / (2.0 * PI);
+constexpr double WHEEL_ROTATION_RATIO = WHEEL_ROTATION_RANGE / (2.0 * std::numbers::pi);
 constexpr int BIKE_ROTATION_RANGE = 10000;
-constexpr double BIKE_ROTATION_RATIO = BIKE_ROTATION_RANGE / (2.0 * PI);
+constexpr double BIKE_ROTATION_RATIO = BIKE_ROTATION_RANGE / (2.0 * std::numbers::pi);
 constexpr double MOTOR_FREQUENCY_RATIO = 250.0;
 constexpr double FRICTION_VOLUME_RATIO = 250 / 2.0;
 
@@ -261,10 +262,10 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
 
         double bike_rot = mot->bike.rotation;
         while (bike_rot <= 0) {
-            bike_rot += 2.0 * PI;
+            bike_rot += 2.0 * std::numbers::pi;
         }
-        while (bike_rot > 2.0 * PI) {
-            bike_rot -= 2.0 * PI;
+        while (bike_rot > 2.0 * std::numbers::pi) {
+            bike_rot -= 2.0 * std::numbers::pi;
         }
         frames[i].bike_rotation = (short)(bike_rot * BIKE_ROTATION_RATIO);
 
@@ -272,14 +273,16 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         // During the brake-stretch, the wheel position might become slightly desynced
         if (mot->left_wheel.rotation <= 0) {
             frames[i].left_wheel_rotation =
-                (unsigned char)((mot->left_wheel.rotation + 2.0 * PI) * WHEEL_ROTATION_RATIO);
+                (unsigned char)((mot->left_wheel.rotation + 2.0 * std::numbers::pi) *
+                                WHEEL_ROTATION_RATIO);
         } else {
             frames[i].left_wheel_rotation =
                 (unsigned char)(mot->left_wheel.rotation * WHEEL_ROTATION_RATIO);
         }
         if (mot->right_wheel.rotation <= 0) {
             frames[i].right_wheel_rotation =
-                (unsigned char)((mot->right_wheel.rotation + 2.0 * PI) * WHEEL_ROTATION_RATIO);
+                (unsigned char)((mot->right_wheel.rotation + 2.0 * std::numbers::pi) *
+                                WHEEL_ROTATION_RATIO);
         } else {
             frames[i].right_wheel_rotation =
                 (unsigned char)(mot->right_wheel.rotation * WHEEL_ROTATION_RATIO);

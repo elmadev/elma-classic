@@ -7,8 +7,6 @@
 #include <io.h>
 #endif
 
-constexpr double PI = 3.141592;
-
 #ifdef _WIN32
 #define itoa _itoa
 #define strcmpi _strcmpi

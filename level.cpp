@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstring>
+#include <numbers>
 
 constexpr int TOP_TEN_HEADER = 6754362;
 constexpr int TOP_TEN_FOOTER = 8674642;
@@ -1111,7 +1112,7 @@ int level::initialize_objects(motorst* mot) {
         object* obj = objects[i];
         if (obj) {
             // Set a random phase to every object
-            obj->floating_phase = random_range(1000) * 2.0 * PI / 1000.0;
+            obj->floating_phase = random_range(1000) * 2.0 * std::numbers::pi / 1000.0;
             obj->active = true;
             if (obj->type == object::Type::Food) {
                 apple_count++;

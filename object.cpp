@@ -3,6 +3,7 @@
 #include "main.h"
 #include "platform_utils.h"
 #include <cmath>
+#include <numbers>
 
 object::object(double x, double y, Type typ) {
     r.x = x;
@@ -17,7 +18,7 @@ void object::render() {
     int slices = 16;
     double radius = 0.4;
 
-    double slice_angle = 2.0 * PI / slices;
+    double slice_angle = 2.0 * std::numbers::pi / slices;
     for (int i = 0; i < slices; i++) {
         double angle1 = i * slice_angle;
         double angle2 = (i + 1) * slice_angle;

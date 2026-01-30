@@ -8,17 +8,18 @@
 #include "platform_utils.h"
 #include "recorder.h"
 #include <cmath>
+#include <numbers>
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi, vect2 sebesseg);
 
 static double Maxsurlodas = 0;
 
 static void szogigazit(double* pd) {
-    if (*pd < -PI) {
-        *pd += 2 * PI;
+    if (*pd < -std::numbers::pi) {
+        *pd += 2 * std::numbers::pi;
     }
-    if (*pd > PI) {
-        *pd -= 2 * PI;
+    if (*pd > std::numbers::pi) {
+        *pd -= 2 * std::numbers::pi;
     }
 }
 
@@ -322,7 +323,8 @@ int vizsgalat(motorst* pmot) {
 static double Oszto = 1.0 / 1.0;
 
 static void surlodasverseny(motorst* pmot, vect2 fgumi_v, vect2 sebesseg_v) {
-    vect2 joirany(cos(pmot->bike.rotation - 0.5 * PI), sin(pmot->bike.rotation - 0.5 * PI));
+    vect2 joirany(cos(pmot->bike.rotation - 0.5 * std::numbers::pi),
+                  sin(pmot->bike.rotation - 0.5 * std::numbers::pi));
     double fgumi = joirany * fgumi_v;
     double sebesseg = joirany * sebesseg_v;
     if (fgumi <= 0 || sebesseg <= 0) {

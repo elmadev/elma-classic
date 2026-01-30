@@ -2,10 +2,10 @@
 #include "ball_handler.h"
 #include "main.h"
 #include "M_PIC.H"
-#include "platform_utils.h"
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <numbers>
 
 int BallCount = 0;
 ball* Balls = nullptr;
@@ -46,7 +46,7 @@ static void create_balls() {
     // Choose a random starting angle for the top-left ball
     srand((unsigned int)time(nullptr));
     double angle = random_range(1000);
-    angle *= 0.5 * PI / 1000.0;
+    angle *= 0.5 * std::numbers::pi / 1000.0;
     angle *= 0.999;
     angle += 0.0005;
     Balls[0].v.x = -sin(angle);

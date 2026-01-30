@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <numbers>
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
 
@@ -401,7 +402,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     if (forgas < 0.999) {
         vanforgas = 1;
         // forgast 0, 1 intervallumbol atkonvertaljuk -1, 1 intervallumba:
-        forgas = -cos(forgas * PI);
+        forgas = -cos(forgas * std::numbers::pi);
     }
 
     vect2 p_k1 = (pmot->left_wheel.r - sarok);

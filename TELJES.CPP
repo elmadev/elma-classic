@@ -97,15 +97,6 @@ void menu_intro(void) {
 
     seteditorpal();
 
-    // Mouse
-    int mmx = 355;
-    int mmy = 265;
-    Moux = mmx;
-    Mouy = mmy;
-    set_mouse_position(mmx, mmy);
-    Moux = mmx;
-    Mouy = mmy;
-
     // Initialize stopwatch, just in case
     stopwatch_reset();
 

@@ -83,8 +83,6 @@ void menu_intro(void) {
     get_pcx_pal("intro.pcx", &intro_palette);
     intro_palette->set();
     bltfront(static_intro_screen);
-    delete intro_palette;
-    intro_palette = nullptr;
 
     init_sound();
 
@@ -123,6 +121,8 @@ void menu_intro(void) {
     static_intro_screen = nullptr;
 
     MenuPalette->set();
+    delete intro_palette;
+    intro_palette = nullptr;
 
     menu_nav_entries_init();
 

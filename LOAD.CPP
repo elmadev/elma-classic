@@ -57,7 +57,7 @@ int floadlevel_p(const char* nev) {
             Ptop = NULL;
             return 0;
         }
-        load_lgr_file(Ptop->lgr_name);
+        lgrfile::load_lgr_file(Ptop->lgr_name);
         Ptop->discard_missing_lgr_assets(Lgr);
 
         if (Segments) {
@@ -102,7 +102,7 @@ int floadlevel_e(const char* nev, int forceload) {
             Ptop = new level(nev);
         }
 
-        load_lgr_file(Ptop->lgr_name);
+        lgrfile::load_lgr_file(Ptop->lgr_name);
         if (Ptop->discard_missing_lgr_assets(Lgr)) {
             dialogselejtez();
         }

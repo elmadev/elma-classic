@@ -1988,7 +1988,7 @@ void change_level_properties(void) {
                 if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
                     Valtozott = 1;
                     strcpy(Ptop->lgr_name, lgrnev);
-                    load_lgr_file(Ptop->lgr_name);
+                    lgrfile::load_lgr_file(Ptop->lgr_name);
                     if (Ptop->discard_missing_lgr_assets(Lgr)) {
                         dialogselejtez();
                     }
@@ -2013,7 +2013,7 @@ void change_level_properties(void) {
                 if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
                     Valtozott = 1;
                     strcpy(Ptop->lgr_name, lgrnev);
-                    load_lgr_file(Ptop->lgr_name);
+                    lgrfile::load_lgr_file(Ptop->lgr_name);
                     if (Ptop->discard_missing_lgr_assets(Lgr)) {
                         dialogselejtez();
                     }

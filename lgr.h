@@ -79,7 +79,7 @@ class lgrfile {
     ~lgrfile();
 
   public:
-    friend void load_lgr_file(char* lgrname);
+    static void load_lgr_file(char* lgr_name);
 
     int picture_count;
     picture pictures[MAX_PICTURES];
@@ -137,7 +137,6 @@ class lgrfile {
 };
 
 extern lgrfile* Lgr;
-void load_lgr_file(char* lgrname);
 void invalidate_lgr_cache();
 
 struct bike_box {

@@ -35,7 +35,7 @@ void invalidate_lgr_cache() {
     CurrentLgrName[0] = '\0';
 }
 
-void load_lgr_file(char* lgr_name) {
+void lgrfile::load_lgr_file(char* lgr_name) {
     if (strlen(lgr_name) > MAX_FILENAME_LEN) {
         internal_error("load_lgr_file strlen( lgr_name ) > MAX_FILENAME_LEN!");
     }

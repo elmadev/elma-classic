@@ -18,7 +18,7 @@
 #include <cstring>
 #include <filesystem>
 
-state* State = NULL;
+state* State = nullptr;
 
 // Create a test player with unlocked levels and dummy times
 void test_player(void) {
@@ -77,20 +77,20 @@ void menu_intro(void) {
           SCREEN_HEIGHT / 2 - Intro->get_height() / 2);
 
     // Display intro.pcx
-    palette* intro_palette = NULL;
+    palette* intro_palette = nullptr;
     get_pcx_pal("intro.pcx", &intro_palette);
     intro_palette->set();
     bltfront(static_intro_screen);
     delete intro_palette;
-    intro_palette = NULL;
+    intro_palette = nullptr;
 
     init_sound();
 
     // Load globals
     Pabc1 = new abc8("kisbetu1.abc"); // "small letter 1"
-    Pabc1->set_spacing(1);
+    Pabc1->set_spacing(true);
     Pabc2 = new abc8("kisbetu2.abc"); // "small letter 2"
-    Pabc2->set_spacing(1);
+    Pabc2->set_spacing(true);
 
     Rec1 = new recorder;
     Rec2 = new recorder;
@@ -110,7 +110,7 @@ void menu_intro(void) {
     stopwatch_reset();
 
     // Await for key input before scrolling intro.pcx
-    while (1) {
+    while (true) {
         if (has_keypress()) {
             get_keypress();
             break;
@@ -118,7 +118,7 @@ void menu_intro(void) {
         bltfront(static_intro_screen);
     }
     delete static_intro_screen;
-    static_intro_screen = NULL;
+    static_intro_screen = nullptr;
 
     MenuPalette->set();
 
@@ -139,7 +139,7 @@ void menu_exit(void) {
     menu->add_line_centered("Please do not distribute!", 320, 300);
 
     double start_time = stopwatch();
-    while (1) {
+    while (true) {
         menu->render();
         double minimum_delay = 50.0;
         if ((stopwatch() > (start_time + minimum_delay)) && has_keypress()) {
@@ -152,13 +152,13 @@ void menu_exit(void) {
 }
 
 // Merge two top tens of one level together
-static void merge_toptens(topten* src, topten* mrg, int single) {
+static void merge_toptens(topten* src, topten* mrg, bool single) {
     int combined_count = src->times_count + mrg->times_count;
 
     // Top ten times
     int times[MAX_TIMES * 2];
     // Whether the time comes from state.dat or merge.dat
-    int from_mrg[MAX_TIMES * 2];
+    bool from_mrg[MAX_TIMES * 2];
     // Player names (two arrays because multiplayer)
     player_name names1[MAX_TIMES * 2];
     player_name names2[MAX_TIMES * 2];
@@ -166,10 +166,10 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
     // state.dat: copy over the top ten data at position 0
     for (int i = 0; i < src->times_count; i++) {
         times[i] = src->times[i];
-        from_mrg[i] = 0;
+        from_mrg[i] = false;
         strcpy(names1[i], src->names1[i]);
         if (single) {
-            *(names2[i]) = 0;
+            names2[i][0] = 0;
         } else {
             strcpy(names2[i], src->names2[i]);
         }
@@ -179,10 +179,10 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
     for (int i = 0; i < mrg->times_count; i++) {
         int idest = src->times_count + i;
         times[idest] = mrg->times[i];
-        from_mrg[idest] = 1;
+        from_mrg[idest] = true;
         strcpy(names1[idest], mrg->names1[i]);
         if (single) {
-            *(names2[idest]) = 0;
+            names2[idest][0] = 0;
         } else {
             strcpy(names2[idest], mrg->names2[i]);
         }
@@ -191,11 +191,11 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
     // Bubble sort
     for (int pass = 0; pass < combined_count + 4; pass++) {
         for (int i = 0; i < combined_count - 1; i++) {
-            int swap = 0;
+            bool swap = false;
 
             // First sort by time
             if (times[i] > times[i + 1]) {
-                swap = 1;
+                swap = true;
             }
 
             if (times[i] == times[i + 1]) {
@@ -204,16 +204,16 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
                     if (strcmp(names2[i], names2[i + 1]) == 0) {
                         // Then prioritize state.dat over merge.dat (already identical?)
                         if (from_mrg[i] && !from_mrg[i + 1]) {
-                            swap = 1;
+                            swap = true;
                         }
                     } else {
                         if (strcmp(names2[i], names2[i + 1]) > 0) {
-                            swap = 1;
+                            swap = true;
                         }
                     }
                 } else {
                     if (strcmp(names1[i], names1[i + 1]) > 0) {
-                        swap = 1;
+                        swap = true;
                     }
                 }
             }
@@ -265,8 +265,8 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
     // Clear the best times
     for (int i = 0; i < MAX_TIMES; i++) {
         src->times[i] = -1;
-        *(src->names1[i]) = 0;
-        *(src->names2[i]) = 0;
+        src->names1[i][0] = 0;
+        src->names2[i][0] = 0;
     }
 
     // Write new data
@@ -279,20 +279,20 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
 
 // Try to merge merge.dat into state.dat
 static void merge_states(void) {
-    char merge_dat[20] = "merge.dat";
-    if (!std::filesystem::exists(merge_dat)) {
+    static const char MERGE_DAT[20] = "merge.dat";
+    if (!std::filesystem::exists(MERGE_DAT)) {
         return;
     }
 
-    state* mrg = new state(merge_dat);
+    state* mrg = new state(MERGE_DAT);
     if (!mrg) {
         external_error("memory");
     }
 
     State->reload_toptens();
     for (int i = 0; i < STATE_LEVEL_COUNT; i++) {
-        merge_toptens(&State->toptens[i].single, &mrg->toptens[i].single, 1);
-        merge_toptens(&State->toptens[i].multi, &mrg->toptens[i].multi, 0);
+        merge_toptens(&State->toptens[i].single, &mrg->toptens[i].single, true);
+        merge_toptens(&State->toptens[i].multi, &mrg->toptens[i].multi, false);
     }
 
     delete mrg;

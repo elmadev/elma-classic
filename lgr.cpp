@@ -43,6 +43,7 @@ void lgrfile::load_lgr_file(char* lgr_name) {
     if (strcmpi(lgr_name, CurrentLgrName) == 0) {
         return;
     }
+    strlwr(lgr_name);
 
     char path[30];
     sprintf(path, "lgr/%s.lgr", lgr_name);
@@ -55,7 +56,7 @@ void lgrfile::load_lgr_file(char* lgr_name) {
         // Display warning
         char filename[20];
         strcpy(filename, lgr_name);
-        strcat(filename, ".LGR");
+        strcat(filename, ".lgr");
         blit8(BufferBall, BufferMain);
         BufferMain->fill_box(Hatterindex);
         bltfront(BufferMain);
@@ -65,7 +66,7 @@ void lgrfile::load_lgr_file(char* lgr_name) {
         dialog(
             "LGR file not found!",
             "The level file uses the pictures that are stored in this LGR file:", filename,
-            "This file doesn't exist in the LGR directory, so the DEFAULT.LGR file will be loaded.",
+            "This file doesn't exist in the LGR directory, so the default.lgr file will be loaded.",
             "This level file will look now different from that it was designed to look.");
         if (!InEditor) {
             MenuPalette->set();
@@ -73,19 +74,17 @@ void lgrfile::load_lgr_file(char* lgr_name) {
         blit8(BufferMain, BufferBall);
         bltfront(BufferMain);
 
-        // Set current level's lgr to DEFAULT and then try and load it
-        strcpy(lgr_name, "DEFAULT");
+        // Modify our input lgr (i.e. our class level) to default and then try and load it
+        strcpy(lgr_name, "default");
         Valtozott = 1;
-        if (strcmpi(CurrentLgrName, "DEFAULT") == 0) {
+        if (strcmpi(CurrentLgrName, "default") == 0) {
             return;
         }
 
         strcpy(path, "lgr/default.lgr");
-        strcpy(CurrentLgrName, "DEFAULT");
-
         Ptop->lgr_not_found = true;
         if (access(path, 0) != 0) {
-            external_error("Could not open file LGR\\DEFAULT.LGR!");
+            external_error("Could not open file lgr/default.lgr!");
         }
     }
     // Actually load the lgr

@@ -23,6 +23,7 @@
 * You can now type more non-letter symbols in game menus, like saving a replay or level named `!cov!`
 
 ## Minor Bug Fixes
+* Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems
 * Foreground grass was accidentally inefficiently calculated, causing increased load time
 * Internal editor's Save As dialog box could cause buffer overflows
 * Internal editor's Save As would sometimes overwrite old files without giving a warning

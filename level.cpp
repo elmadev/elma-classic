@@ -98,7 +98,7 @@ level::level() {
     objects[0] = new object(-2.0, 0.5, object::Type::Exit);
     objects[1] = new object(2.0, 0.5, object::Type::Start);
     strcpy(level_name, "Unnamed");
-    strcpy(lgr_name, "DEFAULT");
+    strcpy(lgr_name, "default");
     strcpy(foreground_name, "ground");
     strcpy(background_name, "sky");
 }

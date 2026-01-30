@@ -67,11 +67,9 @@ void menu_intro(void) {
 
     // test_player();
 
-    // Load intro.pcx and presumably patch the version number
+    // Load intro.pcx and hide the version
     Intro = new pic8("intro.pcx");
-    blit8(Intro, Intro, 321, 420, 297, 420, 315, 441);
-    blit8(Intro, Intro, 321 + 15, 420, 297, 420, 315, 441);
-    blit8(Intro, Intro, 321 + 15 + 16, 432, 88, 458, 98, 468);
+    Intro->fill_box(0, 410, Intro->get_width(), 450, Intro->gpixel(0, 409));
     spriteosit(Intro);
     pic8* static_intro_screen = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     static_intro_screen->fill_box(BLACK_PALETTE_ID);

@@ -20,8 +20,8 @@
 
 state* State = NULL;
 
+// Create a test player with unlocked levels and dummy times
 void test_player(void) {
-    // Egyetlen jatekosnak sem szabad lennie:
     if (State->player_count != 0) {
         internal_error("test_player requires a fresh state file (player_count)!");
     }
@@ -65,25 +65,20 @@ void menu_intro(void) {
 
     // test_player();
 
-    // Ezt majd elso kiirloading szabaditja fel (menukep-ben van definialva):
+    // Load intro.pcx and presumably patch the version number
     Intro = new pic8("intro.pcx");
-    // Itt most atirjuk verziot 1.1-re:
-    // blit8( Intro, Intro, 343, 433, 520, 459, 530, 468 ); // a betu
     blit8(Intro, Intro, 321, 420, 297, 420, 315, 441);
     blit8(Intro, Intro, 321 + 15, 420, 297, 420, 315, 441);
     blit8(Intro, Intro, 321 + 15 + 16, 432, 88, 458, 98, 468);
     spriteosit(Intro);
-    pic8* static_intro_screen =
-        new pic8(SCREEN_WIDTH, SCREEN_HEIGHT); // ezt majd kesobb szabaditjuk fel
+    pic8* static_intro_screen = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     static_intro_screen->fill_box(BLACK_PALETTE_ID);
     blit8(static_intro_screen, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,
           SCREEN_HEIGHT / 2 - Intro->get_height() / 2);
 
+    // Display intro.pcx
     palette* intro_palette = NULL;
-    // Gany, ezzel az egy nevvel get_pcx_pal(pic.cpp) elso harom byte-ot 0-azza:
     get_pcx_pal("intro.pcx", &intro_palette);
-
-    // Hatrebb tettem folyamatos kirakasra (Alt-Tab miatt):
     intro_palette->set();
     bltfront(static_intro_screen);
     delete intro_palette;
@@ -91,10 +86,10 @@ void menu_intro(void) {
 
     init_sound();
 
-    // Egy par beolvasas:
-    Pabc1 = new abc8("kisbetu1.abc");
+    // Load globals
+    Pabc1 = new abc8("kisbetu1.abc"); // "small letter 1"
     Pabc1->set_spacing(1);
-    Pabc2 = new abc8("kisbetu2.abc");
+    Pabc2 = new abc8("kisbetu2.abc"); // "small letter 2"
     Pabc2->set_spacing(1);
 
     Rec1 = new recorder;
@@ -102,7 +97,7 @@ void menu_intro(void) {
 
     seteditorpal();
 
-    // Eger:
+    // Mouse
     int mmx = 355;
     int mmy = 265;
     Moux = mmx;
@@ -111,10 +106,10 @@ void menu_intro(void) {
     Moux = mmx;
     Mouy = mmy;
 
-    // Csak hogy mindig menjen stopper:
+    // Initialize stopwatch, just in case
     stopwatch_reset();
 
-    // Intro keppel varunk, amig nem toltodik be minden:
+    // Await for key input before scrolling intro.pcx
     while (1) {
         if (has_keypress()) {
             get_keypress();
@@ -127,19 +122,18 @@ void menu_intro(void) {
 
     MenuPalette->set();
 
-    // Ez kell menu_nav-hoz:
     menu_nav_entries_init();
 
     if (State->player_count == 0) {
-        newjatekos(1, 0); // Innen nem jon vissza
+        newjatekos(1, 0);
     } else {
-        jatekosvalasztas(1, 0); // Innen nem jon vissza
+        jatekosvalasztas(1, 0);
     }
     internal_error("menu_intro!");
 }
 
 void menu_exit(void) {
-    WallsDisabled = true; // golyok ezentul kimenek falon kivulre
+    WallsDisabled = true;
     menu_pic* menu = new menu_pic;
     menu->add_line_centered("Thank you for registering the game!", 320, 220);
     menu->add_line_centered("Please do not distribute!", 320, 300);
@@ -157,13 +151,19 @@ void menu_exit(void) {
     }
 }
 
+// Merge two top tens of one level together
 static void merge_toptens(topten* src, topten* mrg, int single) {
     int combined_count = src->times_count + mrg->times_count;
+
+    // Top ten times
     int times[MAX_TIMES * 2];
-    int from_mrg[MAX_TIMES * 2]; // Igaz, ha merge file-bol van ido
+    // Whether the time comes from state.dat or merge.dat
+    int from_mrg[MAX_TIMES * 2];
+    // Player names (two arrays because multiplayer)
     player_name names1[MAX_TIMES * 2];
     player_name names2[MAX_TIMES * 2];
-    // Feltoltjuk tablat:
+
+    // state.dat: copy over the top ten data at position 0
     for (int i = 0; i < src->times_count; i++) {
         times[i] = src->times[i];
         from_mrg[i] = 0;
@@ -173,11 +173,9 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
         } else {
             strcpy(names2[i], src->names2[i]);
         }
-
-        // Ezzel minden nem VJ32-es idot 50 percre allitom:
-        // if( strcmp( names1[i], "VJ32" ) != 0 && strcmp( names2[i], "VJ32" ) )
-        //	times[i] = 300000;
     }
+
+    // merge.dat: copy over the top ten data, right after the state.dat times
     for (int i = 0; i < mrg->times_count; i++) {
         int idest = src->times_count + i;
         times[idest] = mrg->times[i];
@@ -189,33 +187,31 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
             strcpy(names2[idest], mrg->names2[i]);
         }
     }
-    // Rendezzuk oket:
+
+    // Bubble sort
     for (int pass = 0; pass < combined_count + 4; pass++) {
         for (int i = 0; i < combined_count - 1; i++) {
-            // Megnezzuk hogy kell-e csere:
-            // Eloszor ido szamit, utana elso es masodik nev, majd
-            // az hogy merge.dat-bol van-e ido:
-
             int swap = 0;
+
+            // First sort by time
             if (times[i] > times[i + 1]) {
                 swap = 1;
             }
 
             if (times[i] == times[i + 1]) {
-                // Idejuk azonos:
+                // Then sort by name
                 if (strcmp(names1[i], names1[i + 1]) == 0) {
                     if (strcmp(names2[i], names2[i + 1]) == 0) {
+                        // Then prioritize state.dat over merge.dat (already identical?)
                         if (from_mrg[i] && !from_mrg[i + 1]) {
                             swap = 1;
                         }
                     } else {
-                        // Elso nevig ugyanaz, masodik nev mar nem:
                         if (strcmp(names2[i], names2[i + 1]) > 0) {
                             swap = 1;
                         }
                     }
                 } else {
-                    // Bar idejuk azonos, elso nev mar nem:
                     if (strcmp(names1[i], names1[i + 1]) > 0) {
                         swap = 1;
                     }
@@ -223,7 +219,6 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
             }
 
             if (swap) {
-                // Cserelni kell:
                 int tmp = times[i];
                 times[i] = times[i + 1];
                 times[i + 1] = tmp;
@@ -244,40 +239,37 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
         }
     }
 
-    // Most egyforma idoket egy forma versenyzoktol kiszedjuk:
-    // (csak az uj idoket):
+    // Remove duplicates
     for (int pass = 0; pass < combined_count + 2; pass++) {
         for (int i = 0; i < combined_count - 1; i++) {
+            // If all data is identical, and if the time comes from mrg, then delete
             if (times[i] == times[i + 1] && strcmp(names1[i], names1[i + 1]) == 0 &&
                 (single || strcmp(names2[i], names2[i + 1]) == 0) && from_mrg[i + 1]) {
-
-                // Kiszedjuk j+1 -ediket:
                 for (int j = i + 1; j < combined_count - 1; j++) {
-                    // k+1 -ediket k -adikba tesszuk:
                     times[j] = times[j + 1];
                     from_mrg[j] = from_mrg[j + 1];
                     strcpy(names1[j], names1[j + 1]);
                     strcpy(names2[j], names2[j + 1]);
                 }
                 combined_count--;
-                break; // csak biztonsagert
+                break;
             }
         }
     }
 
-    // Visszairjuk state.dat-ba:
     if (combined_count > MAX_TIMES) {
         combined_count = MAX_TIMES;
     }
     src->times_count = combined_count;
 
-    // Biztonsagi nullazas:
+    // Clear the best times
     for (int i = 0; i < MAX_TIMES; i++) {
         src->times[i] = -1;
         *(src->names1[i]) = 0;
         *(src->names2[i]) = 0;
     }
-    // Masolas:
+
+    // Write new data
     for (int i = 0; i < combined_count; i++) {
         src->times[i] = times[i];
         strcpy(src->names1[i], names1[i]);
@@ -285,10 +277,11 @@ static void merge_toptens(topten* src, topten* mrg, int single) {
     }
 }
 
+// Try to merge merge.dat into state.dat
 static void merge_states(void) {
     char merge_dat[20] = "merge.dat";
     if (!std::filesystem::exists(merge_dat)) {
-        return; // Nincsen merge file
+        return;
     }
 
     state* mrg = new state(merge_dat);
@@ -297,14 +290,11 @@ static void merge_states(void) {
     }
 
     State->reload_toptens();
-
-    // Most osszefesuljuk besttime tablakat:
     for (int i = 0; i < STATE_LEVEL_COUNT; i++) {
         merge_toptens(&State->toptens[i].single, &mrg->toptens[i].single, 1);
         merge_toptens(&State->toptens[i].multi, &mrg->toptens[i].multi, 0);
     }
 
     delete mrg;
-
-    State->save(); // par sorral feljebb van reload
+    State->save();
 }

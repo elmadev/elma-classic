@@ -15,7 +15,6 @@
 #include "platform_utils.h"
 #include "physics_init.h"
 #include "skip.h"
-#include "TELJES.H"
 #include "timer.h"
 #include <cstdlib>
 #include <cstring>
@@ -345,6 +344,7 @@ void saveplay(int belyeg) {
         sor3[18] = '7';
 
         menu_pic szl;
+        constexpr int SM = 15;
         szl.add_line(sor1, 160, 3 * SM);
         szl.add_line(sor2, 160, 5 * SM);
         szl.add_line(sor3, 160, 7 * SM);

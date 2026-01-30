@@ -7,7 +7,6 @@
 #include "menu_pic.h"
 #include "platform_utils.h"
 #include "state.h"
-#include "TELJES.H"
 #include <cstdlib>
 #include <cstring>
 
@@ -102,10 +101,11 @@ static void render_topten(topten* tten, const char* header, int single) {
             player_text[strlen(player_text) - 1] = 0;
         }
 
-        men.add_line(player_text, player_x, 110 + i * (SM + 19));
+        constexpr int ROW_HEIGHT = 34;
+        men.add_line(player_text, player_x, 110 + i * ROW_HEIGHT);
         char time_text[30];
         centiseconds_to_string(tten->times[i], time_text);
-        men.add_line(time_text, time_x, 110 + i * (SM + 19));
+        men.add_line(time_text, time_x, 110 + i * ROW_HEIGHT);
     }
 
     empty_keypress_buffer();

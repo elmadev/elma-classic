@@ -5,6 +5,4 @@ void menu_intro(void);
 
 void menu_exit(void);
 
-#define SM (15)
-
 #endif

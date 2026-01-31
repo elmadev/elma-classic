@@ -40,6 +40,23 @@ template <typename T> struct Clamp {
 };
 
 class eol_settings {
+    Clamp<int> screen_width_{640, 640, 10000};
+    Clamp<int> screen_height_{480, 480, 10000};
+    Default<bool> pictures_in_background_{false};
+    Default<bool> center_camera_{false};
+    Default<bool> center_map_{false};
+    Default<MapAlignment> map_alignment_{MapAlignment::None};
+    Default<RendererType> renderer_{RendererType::Software};
+    Clamp<double> zoom_{0.25, 1.0, 3.0};
+    Default<bool> zoom_textures_{false};
+    Clamp<double> turn_time_{0.0, 0.35, 0.35};
+    Default<bool> lctrl_search_{false};
+    Default<DikScancode> alovolt_key_player_a_{DIK_UNKNOWN};
+    Default<DikScancode> alovolt_key_player_b_{DIK_UNKNOWN};
+    Default<DikScancode> brake_alias_key_player_a_{DIK_UNKNOWN};
+    Default<DikScancode> brake_alias_key_player_b_{DIK_UNKNOWN};
+    Default<DikScancode> escape_alias_key_{DIK_UNKNOWN};
+
   public:
     static void read_settings();
     static void write_settings();
@@ -98,24 +115,6 @@ class eol_settings {
     DikScancode escape_alias_key() const { return escape_alias_key_; }
     void set_escape_alias_key(DikScancode key);
     DikScancode escape_alias_key_default() const { return escape_alias_key_.def; }
-
-  private:
-    Clamp<int> screen_width_{640, 640, 10000};
-    Clamp<int> screen_height_{480, 480, 10000};
-    Default<bool> pictures_in_background_{false};
-    Default<bool> center_camera_{false};
-    Default<bool> center_map_{false};
-    Default<MapAlignment> map_alignment_{MapAlignment::None};
-    Default<RendererType> renderer_{RendererType::Software};
-    Clamp<double> zoom_{0.25, 1.0, 3.0};
-    Default<bool> zoom_textures_{false};
-    Clamp<double> turn_time_{0.0, 0.35, 0.35};
-    Default<bool> lctrl_search_{false};
-    Default<DikScancode> alovolt_key_player_a_{DIK_UNKNOWN};
-    Default<DikScancode> alovolt_key_player_b_{DIK_UNKNOWN};
-    Default<DikScancode> brake_alias_key_player_a_{DIK_UNKNOWN};
-    Default<DikScancode> brake_alias_key_player_b_{DIK_UNKNOWN};
-    Default<DikScancode> escape_alias_key_{DIK_UNKNOWN};
 };
 
 extern eol_settings* EolSettings;

@@ -81,18 +81,23 @@ class eol_settings {
 
     int alovolt_key_player_a() const { return alovolt_key_player_a_; }
     void set_alovolt_key_player_a(int key);
+    int alovolt_key_player_a_default() const { return alovolt_key_player_a_.def; }
 
     int alovolt_key_player_b() const { return alovolt_key_player_b_; }
     void set_alovolt_key_player_b(int key);
+    int alovolt_key_player_b_default() const { return alovolt_key_player_b_.def; }
 
     int brake_alias_key_player_a() const { return brake_alias_key_player_a_; }
     void set_brake_alias_key_player_a(int key);
+    int brake_alias_key_player_a_default() const { return brake_alias_key_player_a_.def; }
 
     int brake_alias_key_player_b() const { return brake_alias_key_player_b_; }
     void set_brake_alias_key_player_b(int key);
+    int brake_alias_key_player_b_default() const { return brake_alias_key_player_b_.def; }
 
     int escape_alias_key() const { return escape_alias_key_; }
     void set_escape_alias_key(int key);
+    int escape_alias_key_default() const { return escape_alias_key_.def; }
 
   private:
     Clamp<int> screen_width_{640, 640, 10000};

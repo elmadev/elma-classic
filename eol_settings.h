@@ -39,7 +39,8 @@ template <typename T> struct Clamp {
     void reset();
 };
 
-struct eol_settings {
+class eol_settings {
+  public:
     static void read_settings();
     static void write_settings();
     static void sync_controls_to_state(state* s);

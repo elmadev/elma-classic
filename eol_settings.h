@@ -39,6 +39,18 @@ template <typename T> struct Clamp {
     void reset();
 };
 
+// Declares/defines getter/setter/default for a field of `eol_settings`.
+// For a field:
+//   int foo;
+// Expands into:
+//   int foo() const { return foo_; }
+//   void set_foo(int);
+//   int foo_default() const { return foo_.def; }
+#define DECLARE_FIELD_FUNCS(name)                                                                  \
+    decltype(eol_settings::name##_.value) name() const { return name##_; }                         \
+    void set_##name(decltype(eol_settings::name##_.value));                                        \
+    decltype(eol_settings::name##_.value) name##_default() const { return name##_.def; }
+
 class eol_settings {
     Clamp<int> screen_width_{640, 640, 10000};
     Clamp<int> screen_height_{480, 480, 10000};
@@ -63,59 +75,25 @@ class eol_settings {
     static void sync_controls_to_state(state* s);
     static void sync_controls_from_state(state* s);
 
-    int screen_width() const { return screen_width_; }
-    void set_screen_width(int w);
-
-    int screen_height() const { return screen_height_; }
-    void set_screen_height(int h);
-
-    bool pictures_in_background() const { return pictures_in_background_; }
-    void set_pictures_in_background(bool b);
-
-    bool center_camera() const { return center_camera_; }
-    void set_center_camera(bool b);
-
-    bool center_map() const { return center_map_; }
-    void set_center_map(bool b);
-
-    MapAlignment map_alignment() const { return map_alignment_; }
-    void set_map_alignment(MapAlignment m);
-
-    RendererType renderer() const { return renderer_; }
-    void set_renderer(RendererType r);
-
-    double zoom() const { return zoom_; }
-    void set_zoom(double z);
-
-    bool zoom_textures() const { return zoom_textures_; }
-    void set_zoom_textures(bool zoom_textures);
-
-    double turn_time() const { return turn_time_; }
-    void set_turn_time(double t);
-
-    bool lctrl_search() const { return lctrl_search_; }
-    void set_lctrl_search(bool lctrl_search);
-
-    DikScancode alovolt_key_player_a() const { return alovolt_key_player_a_; }
-    void set_alovolt_key_player_a(DikScancode key);
-    DikScancode alovolt_key_player_a_default() const { return alovolt_key_player_a_.def; }
-
-    DikScancode alovolt_key_player_b() const { return alovolt_key_player_b_; }
-    void set_alovolt_key_player_b(DikScancode key);
-    DikScancode alovolt_key_player_b_default() const { return alovolt_key_player_b_.def; }
-
-    DikScancode brake_alias_key_player_a() const { return brake_alias_key_player_a_; }
-    void set_brake_alias_key_player_a(DikScancode key);
-    DikScancode brake_alias_key_player_a_default() const { return brake_alias_key_player_a_.def; }
-
-    DikScancode brake_alias_key_player_b() const { return brake_alias_key_player_b_; }
-    void set_brake_alias_key_player_b(DikScancode key);
-    DikScancode brake_alias_key_player_b_default() const { return brake_alias_key_player_b_.def; }
-
-    DikScancode escape_alias_key() const { return escape_alias_key_; }
-    void set_escape_alias_key(DikScancode key);
-    DikScancode escape_alias_key_default() const { return escape_alias_key_.def; }
+    DECLARE_FIELD_FUNCS(screen_width);
+    DECLARE_FIELD_FUNCS(screen_height);
+    DECLARE_FIELD_FUNCS(pictures_in_background);
+    DECLARE_FIELD_FUNCS(center_camera);
+    DECLARE_FIELD_FUNCS(center_map);
+    DECLARE_FIELD_FUNCS(map_alignment);
+    DECLARE_FIELD_FUNCS(renderer);
+    DECLARE_FIELD_FUNCS(zoom);
+    DECLARE_FIELD_FUNCS(zoom_textures);
+    DECLARE_FIELD_FUNCS(turn_time);
+    DECLARE_FIELD_FUNCS(lctrl_search);
+    DECLARE_FIELD_FUNCS(alovolt_key_player_a);
+    DECLARE_FIELD_FUNCS(alovolt_key_player_b);
+    DECLARE_FIELD_FUNCS(brake_alias_key_player_a);
+    DECLARE_FIELD_FUNCS(brake_alias_key_player_b);
+    DECLARE_FIELD_FUNCS(escape_alias_key);
 };
+
+#undef DECLARE_FIELD_FUNCS
 
 extern eol_settings* EolSettings;
 

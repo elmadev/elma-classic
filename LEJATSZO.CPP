@@ -770,10 +770,49 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     // Motor1->apple_count = Motor2->apple_count = 0;
     long l = 0;
     int jar1 = 1, jar2 = 1;
+
+    double current_replay_time = 0.0;
+    double last_stopwatch = stopwatch();
+    bool paused = false;
+
     while (1) {
         handle_events(); // Billentyut itt olvassuk be
+
+        double now = stopwatch();
+        double dt = (now - last_stopwatch) * 0.0024;
+        last_stopwatch = now;
+
+        double speed = 1.0;
+
+        if (is_key_down(State->key_replay_fast_2x)) {
+            speed *= 2.0;
+        }
+        if (is_key_down(State->key_replay_fast_4x)) {
+            speed *= 4.0;
+        }
+        if (is_key_down(State->key_replay_fast_8x)) {
+            speed *= 8.0;
+        }
+
+        if (is_key_down(State->key_replay_slow_2x)) {
+            speed *= 0.5;
+        }
+        if (is_key_down(State->key_replay_slow_4x)) {
+            speed *= 0.25;
+        }
+
+        if (is_key_down(State->key_replay_pause)) {
+            paused = true;
+        } else {
+            paused = false;
+        }
+
+        if (!paused) {
+            current_replay_time += dt * speed;
+        }
+
         // Kiszamolja mennyit kell leptetni:
-        double eddig = stopwatch() * 0.0024;
+        double eddig = current_replay_time;
         // recall koordokat es Hatra-t is beallitja:
         int befejezte1 =
             !replaymag(Motor1, &State->keys1, &valt1, Rec1, eddig, &Viewtime1, &valt2.showkep);

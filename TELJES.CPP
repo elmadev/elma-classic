@@ -22,7 +22,7 @@
 state* State = nullptr;
 
 // Create a test player with unlocked levels and dummy times
-void test_player(void) {
+void test_player() {
     if (State->player_count != 0) {
         internal_error("test_player requires a fresh state file (player_count)!");
     }
@@ -47,9 +47,9 @@ void test_player(void) {
     }
 }
 
-static void merge_states(void);
+static void merge_states();
 
-void menu_intro(void) {
+void menu_intro() {
     init_qopen();
 
     init_menu_pictures();
@@ -123,7 +123,7 @@ void menu_intro(void) {
     internal_error("menu_intro!");
 }
 
-void menu_exit(void) {
+void menu_exit() {
     WallsDisabled = true;
     menu_pic* menu = new menu_pic;
     menu->add_line_centered("Thank you for registering the game!", 320, 220);
@@ -268,7 +268,7 @@ static void merge_toptens(topten* src, topten* mrg, bool single) {
 }
 
 // Try to merge merge.dat into state.dat
-static void merge_states(void) {
+static void merge_states() {
     static const char MERGE_DAT[20] = "merge.dat";
     if (!std::filesystem::exists(MERGE_DAT)) {
         return;

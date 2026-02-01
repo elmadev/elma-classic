@@ -89,6 +89,11 @@ class state {
                                           const char* text2, const char* text3);
 };
 
+// Create a test player with unlocked levels and dummy times
+void test_player();
+// Try to merge merge.dat into state.dat
+void merge_states();
+
 extern state* State;
 
 #endif

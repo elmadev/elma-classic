@@ -3,9 +3,9 @@
 #include "keys.h"
 #include "M_PIC.H"
 #include "main.h"
+#include "menu_intro.h"
 #include "menu_pic.h"
 #include "platform_impl.h"
-#include "TELJES.H"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>

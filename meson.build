@@ -57,7 +57,7 @@ elma_sources = files(
     'transparency.cpp',
     'state.cpp',
     'segments.cpp',
-    'TELJES.CPP',
+    'menu_intro.cpp',
     'physics_collision.cpp',
     'level.cpp',
     'menu_nav.cpp',

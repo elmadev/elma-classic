@@ -3,11 +3,11 @@
 #include "keys.h"
 #include "main.h"
 #include "MAINMENU.H"
+#include "menu_intro.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
 #include "platform_utils.h"
 #include "state.h"
-#include "TELJES.H"
 #include <cstring>
 
 static int Maxnevhossz = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-nal!

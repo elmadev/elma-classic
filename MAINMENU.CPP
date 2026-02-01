@@ -9,12 +9,12 @@
 #include "LOAD.H"
 #include "main.h"
 #include "menu_dialog.h"
+#include "menu_intro.h"
 #include "menu_nav.h"
 #include "menu_options.h"
 #include "menu_pic.h"
 #include "platform_impl.h"
 #include "PLAY.H"
-#include "TELJES.H"
 #include <cmath>
 #include <cstdlib>
 #include <cstring>

@@ -47,9 +47,7 @@ void menu_intro() {
           SCREEN_HEIGHT / 2 - Intro->get_height() / 2);
 
     // Display intro.pcx
-    palette* intro_palette = nullptr;
-    get_pcx_pal("intro.pcx", &intro_palette);
-    intro_palette->set();
+    MenuPalette->set();
     bltfront(static_intro_screen);
 
     init_sound();
@@ -78,10 +76,6 @@ void menu_intro() {
     }
     delete static_intro_screen;
     static_intro_screen = nullptr;
-
-    MenuPalette->set();
-    delete intro_palette;
-    intro_palette = nullptr;
 
     menu_nav_entries_init();
 

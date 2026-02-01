@@ -398,6 +398,7 @@ player* state::get_player(const char* player_name) {
 }
 
 void test_player() {
+#ifdef DEBUG
     if (State->player_count != 0) {
         internal_error("test_player requires a fresh state file (player_count)!");
     }
@@ -420,6 +421,9 @@ void test_player() {
         tten->times[0] = 180000;
         strcpy(tten->names1[0], "Test");
     }
+#else
+    internal_error("test_player in Release!");
+#endif
 }
 
 // Merge two top tens of one level together

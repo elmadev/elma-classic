@@ -1,13 +1,13 @@
 #ifndef PLAY_H
 #define PLAY_H
 
-void play(void);
+void menu_play(void);
 
 // A jelenleg beolvasott palyan jatszik vissza:
-// Csak afterplay menu replay-ebol szabad hasznalni:
+// Csak menu_level menu replay-ebol szabad hasznalni:
 // Azt a nevet kerik, amit topol::topol kap:
 // BestTime beallitasahoz kell neki:
-void replayjelenlegi(const char* filenev);
+void replay_from_file(const char* filename);
 
 // Vagy level == -1 es belyeg != 0 es filenev == NULL,
 // vagy level >= 0 < 100 es belyeg = 0 es filenev == NULL,
@@ -18,11 +18,13 @@ void replayjelenlegi(const char* filenev);
 // belyeg == 0 eseten internal level file:
 void saveplay(long belyeg);
 
-void idoelintezes(long ido, char* valasz, int level, const char* filenev);
+void update_top_ten(long time, char* time_message, int internal_index,
+                    const char* external_filename);
 // 0-ESC, 1-this level, 2-next level, 3-skip level
 // Ha filenev nem NULL, akkor external file:
-int afterplay(int level, int nextdefault, const char* idoeredmeny, const char* filenev);
+int menu_level(int internal_index, int nav_on_play_next, const char* time_message,
+               const char* external_filename);
 
-void kiirloading(void);
+void loading_screen(void);
 
 #endif

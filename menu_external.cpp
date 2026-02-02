@@ -75,7 +75,7 @@ void menu_external_levels() {
         strcpy(State->external_filename, filename);
 
         while (true) {
-            kiirloading();
+            loading_screen();
             if (!floadlevel_p(filename)) {
                 break;
             }
@@ -84,8 +84,8 @@ void menu_external_levels() {
             int time = lejatszo(filename, F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
             MenuPalette->set();
             char finish_msg[100] = "";
-            idoelintezes(time, finish_msg, 0, filename);
-            if (!afterplay(0, 0, finish_msg, filename)) {
+            update_top_ten(time, finish_msg, 0, filename);
+            if (!menu_level(0, 0, finish_msg, filename)) {
                 Rec1->erase(filename);
                 Rec2->erase(filename);
                 break;

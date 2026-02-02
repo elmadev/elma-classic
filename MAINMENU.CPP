@@ -208,7 +208,7 @@ void replay(void) {
                 strcat(tmp, ".REC");
                 // 0 param azt jelenti, hogy nem resource filebol olvas:
                 MenuPalette->set();
-                kiirloading();
+                loading_screen();
                 int belyeg = recorder::load_rec_file(tmp, 0);
                 if (access_level_file(Rec1->level_filename) != 0) {
                     int c = menu_dialog("Cannot find the lev file that corresponds",
@@ -239,7 +239,7 @@ void replay(void) {
             char tmp[30];
             strcpy(tmp, NavEntriesLeft[kurrens]);
             strcat(tmp, ".REC");
-            kiirloading();
+            loading_screen();
             int belyeg = recorder::load_rec_file(tmp, 0);
             if (CtrlAltPressed) {
                 // loadrecek beallitotta Multirec-et.
@@ -269,7 +269,7 @@ void replay(void) {
                     menu_dialog("The level file has changed since the",
                                 "saving of the record file!", tmp, Rec1->level_filename);
                 } else {
-                    replayjelenlegi(Rec1->level_filename);
+                    replay_from_file(Rec1->level_filename);
                 }
             }
         }
@@ -290,7 +290,7 @@ static void demo(void) {
         }
         elozodemo = demo;
 
-        kiirloading();
+        loading_screen();
         int belyeg = recorder::load_rec_file(demonevek[demo], 1);
         if (access_level_file(Rec1->level_filename) != 0) {
             internal_error("783654");
@@ -369,7 +369,7 @@ void mainmenu(void) {
         // external_error( "Menut mentett menu.pcx file-ba!" );
 
         if (eredmeny == 0) {
-            play();
+            menu_play();
         }
 
         if (eredmeny == 1) {

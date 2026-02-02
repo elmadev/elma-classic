@@ -56,7 +56,7 @@ struct valtozok {
 
 // lejatszo ezt beallitja: 0 -> nem kell kiirni, 1 -> A eloszor, 2 -> B
 // csak akkor A vagy B eloszor, ha mindketten meghaltak, tehat
-// afterplay menu-nek ezt mar feldolgozta elore:
+// menu_level menu-nek ezt mar feldolgozta elore:
 extern int MeghalteloszorAB;
 
 // Ha sikeres szint, ide teszi be hogy ki ment ki:

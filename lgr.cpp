@@ -317,12 +317,14 @@ void lgrfile::add_texture(pic8* pic, piclist* list, int index) {
     texture_count++;
 }
 
+static std::vector<mask_element> MaskBuffer;
+
 static void create_mask(mask* dest, pic8* pic, int transparency) {
     dest->width = pic->get_width();
     dest->height = pic->get_height();
 
     // Special compression format type
-    std::vector<mask_element> MaskBuffer;
+    MaskBuffer.resize(0);
     if (transparency >= 0) {
         for (int i = 0; i < dest->height; i++) {
             unsigned char* row = pic->get_row(i);
@@ -501,6 +503,7 @@ lgrfile::lgrfile(const char* lgrname) {
     pic8* q1bike = nullptr;
     pic8* q2bike = nullptr;
     pic8* qcolors = nullptr;
+    MaskBuffer.reserve(20000);
     for (int i = 0; i < pcx_length; i++) {
         char asset_filename[30];
         if (fread(asset_filename, 1, 20, h) != 20) {
@@ -795,6 +798,9 @@ lgrfile::lgrfile(const char* lgrname) {
         delete PictureBuffer;
         PictureBuffer = nullptr;
     }
+
+    MaskBuffer.resize(0);
+    MaskBuffer.shrink_to_fit();
 
     // Editor picture selection initialization
     editor_picture_name[0] = 0;

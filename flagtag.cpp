@@ -1,7 +1,7 @@
 #include "flagtag.h"
 #include "physics_init.h"
 
-constexpr double WHEEL_DIST_SQURAED = 0.64;
+constexpr double WHEEL_DIST_SQUARED = 0.64;
 constexpr double IMMUNITY_DIST_SQUARED = 1.44;
 
 bool FlagTagAHasFlag = false;
@@ -42,13 +42,13 @@ void flagtag(double time) {
         }
     } else {
         if (points_within_distance(&Motor1->left_wheel.r, &Motor2->left_wheel.r,
-                                   WHEEL_DIST_SQURAED) ||
+                                   WHEEL_DIST_SQUARED) ||
             points_within_distance(&Motor1->left_wheel.r, &Motor2->right_wheel.r,
-                                   WHEEL_DIST_SQURAED) ||
+                                   WHEEL_DIST_SQUARED) ||
             points_within_distance(&Motor1->right_wheel.r, &Motor2->left_wheel.r,
-                                   WHEEL_DIST_SQURAED) ||
+                                   WHEEL_DIST_SQUARED) ||
             points_within_distance(&Motor1->right_wheel.r, &Motor2->right_wheel.r,
-                                   WHEEL_DIST_SQURAED)) {
+                                   WHEEL_DIST_SQUARED)) {
             // Wheels touching
             FlagTagImmunity = true;
             FlagTagAHasFlag = !FlagTagAHasFlag;

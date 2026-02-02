@@ -434,9 +434,7 @@ int menu_level(int internal_index, bool nav_on_play_next, const char* time_messa
         }
         if (choice == 3) {
             // Save play
-            if (internal_index != INTERNAL_LEVEL_COUNT - 1) {
-                menu_save_play(Ptop->level_id);
-            }
+            menu_save_play(Ptop->level_id);
         }
         if (choice == 4) {
             // Best times

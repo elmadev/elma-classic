@@ -28,11 +28,11 @@ static int nemkellszinudb(pic8* ppic, int x, int y, unsigned char szin) {
 
 unsigned char* spriteadat8(pic8* ppic, unsigned char szin, unsigned short* pspritehossz) {
     *pspritehossz = 0;
-    unsigned char* buffer = NULL;
+    unsigned char* buffer = nullptr;
     buffer = new unsigned char[MAXBUFFER];
     if (!buffer) {
         external_error("spriteadat8-ban memory!");
-        return NULL;
+        return nullptr;
     }
     int xsize = ppic->get_width();
     int ysize = ppic->get_height();
@@ -57,19 +57,19 @@ unsigned char* spriteadat8(pic8* ppic, unsigned char szin, unsigned short* pspri
             if (buf >= MAXBUFFER) {
                 internal_error("Nem fer be egy szegmensbe spriteadat!");
                 delete buffer;
-                return NULL;
+                return nullptr;
             }
         }
     }
 
     // Most letrehozunk egy szegmenst, ami csak olyan hosszu, amilyen kell:
 
-    unsigned char* jobuffer = NULL;
+    unsigned char* jobuffer = nullptr;
     jobuffer = new unsigned char[buf];
     if (!jobuffer) {
         external_error("spriteadat8-ban memory!");
         delete buffer;
-        return NULL;
+        return nullptr;
     }
     memcpy(jobuffer, buffer, buf);
 

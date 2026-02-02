@@ -325,37 +325,26 @@ static void create_mask(mask* dest, pic8* pic, int transparency) {
     std::vector<mask_element> MaskBuffer;
     if (transparency >= 0) {
         for (int i = 0; i < dest->height; i++) {
-            // Transparent data
             unsigned char* row = pic->get_row(i);
-            int j =
-                consecutive_transparent_pixels(0, dest->width, row, (unsigned char)transparency);
-            if (j > 0) {
-                mask_element element;
-                element.type = MaskEncoding::Transparent;
-                element.length = j;
-                MaskBuffer.push_back(element);
-            }
-            while (j <= dest->width - 1) {
+            int j = 0;
+            while (j < dest->width) {
+                // Transparent data
+                int skip = consecutive_transparent_pixels(j, dest->width, row,
+                                                          (unsigned char)transparency);
+                if (skip > 0) {
+                    mask_element element;
+                    element.type = MaskEncoding::Transparent;
+                    element.length = skip;
+                    MaskBuffer.push_back(element);
+                }
+                j += skip;
+
                 // Solid data
                 int count =
                     consecutive_solid_pixels(j, dest->width, row, (unsigned char)transparency);
-                if (count <= 0) {
-                    internal_error("add_mask count length negative!");
-                }
-
-                mask_element element;
-                element.type = MaskEncoding::Solid;
-                element.length = count;
-                MaskBuffer.push_back(element);
-
-                j += count;
-
-                // Transparent data
-                count = consecutive_transparent_pixels(j, dest->width, row,
-                                                       (unsigned char)transparency);
                 if (count > 0) {
                     mask_element element;
-                    element.type = MaskEncoding::Transparent;
+                    element.type = MaskEncoding::Solid;
                     element.length = count;
                     MaskBuffer.push_back(element);
                 }

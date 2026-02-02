@@ -6,9 +6,9 @@
 #include "main.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
+#include "menu_play.h"
 #include "platform_impl.h"
 #include "platform_utils.h"
-#include "PLAY.H"
 #include "state.h"
 #include <cstring>
 #include <algorithm>

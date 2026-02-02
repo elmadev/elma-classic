@@ -49,7 +49,7 @@ elma_sources = files(
     'menu_options.cpp',
     'pic8.cpp',
     'piclist.cpp',
-    'PLAY.CPP',
+    'menu_play.cpp',
     'qopen.cpp',
     'recorder.cpp',
     'platform_sdl.cpp',

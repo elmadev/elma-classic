@@ -13,8 +13,8 @@
 #include "menu_nav.h"
 #include "menu_options.h"
 #include "menu_pic.h"
+#include "menu_play.h"
 #include "platform_impl.h"
-#include "PLAY.H"
 #include <cmath>
 #include <cstdlib>
 #include <cstring>

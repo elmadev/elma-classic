@@ -1,5 +1,5 @@
-#ifndef PLAY_H
-#define PLAY_H
+#ifndef MENU_PLAY_H
+#define MENU_PLAY_H
 
 void menu_play();
 

@@ -38,7 +38,7 @@ void flagtag(double time) {
             !points_within_distance(&Motor1->right_wheel.r, &Motor2->right_wheel.r,
                                     IMMUNITY_DIST_SQUARED)) {
             // Now the wheels are far enough apart
-            FlagTagImmunity = 0;
+            FlagTagImmunity = false;
         }
     } else {
         if (points_within_distance(&Motor1->left_wheel.r, &Motor2->left_wheel.r,
@@ -50,7 +50,7 @@ void flagtag(double time) {
             points_within_distance(&Motor1->right_wheel.r, &Motor2->right_wheel.r,
                                    WHEEL_DIST_SQURAED)) {
             // Wheels touching
-            FlagTagImmunity = 1;
+            FlagTagImmunity = true;
             FlagTagAHasFlag = !FlagTagAHasFlag;
         }
     }

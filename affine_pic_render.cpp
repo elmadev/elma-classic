@@ -283,9 +283,8 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     // The else case is the normal case, only differences are noted here.
     if (possibly_out_of_bounds) {
         while (true) {
-            int x1 = (int)(std::max(plane1_left, plane2_left));
-            x1++;
-            int x2 = (int)(std::min(plane1_right, plane2_right));
+            int x1 = (int)(std::ceil(std::max(plane1_left, plane2_left)));
+            int x2 = (int)(std::floor(std::min(plane1_right, plane2_right)));
             // Extra screen out of bounds check
             if (x1 <= x2 && y < Cysize) {
                 // Extra screen out of bounds check
@@ -326,11 +325,10 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     } else {
         // For each row of the destination
         while (true) {
-            // Get the left render edge, +1 for safety
-            int x1 = (int)(std::max(plane1_left, plane2_left));
-            x1++;
-            // Get the right render edge
-            int x2 = (int)(std::min(plane1_right, plane2_right));
+            // Get the left render edge, rounded up
+            int x1 = (int)(std::ceil(std::max(plane1_left, plane2_left)));
+            // Get the right render edge, rounded down
+            int x2 = (int)(std::floor(std::min(plane1_right, plane2_right)));
             if (x1 <= x2) {
                 // If we are drawing at least 1 pixel, we need to update our source pixel position
                 // by moving by the transformed matrix units

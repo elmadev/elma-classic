@@ -57,3 +57,4 @@
 * files.inf (files are read from ../files, instead of elma.res) is no longer supported
 * Debug code to generate elma.res/desclist.txt is removed
 * Level files are always unlocked, and you can no longer Save Lock
+* 1997 Action SuperCross debug message removed from Save Play

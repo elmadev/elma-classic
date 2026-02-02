@@ -197,7 +197,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
                 return -1;
             }
             if (c == KEY_ENTER) {
-                CtrlAltPressed = is_ctrl_alt_down();
+                CtrlAltPressed = is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
                 return selected_index;
             }
             if (c == KEY_UP) {

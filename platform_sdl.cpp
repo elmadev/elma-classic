@@ -341,11 +341,6 @@ bool is_key_down(DikScancode code) {
     return SDLKeyState[sdl_code] != 0;
 }
 
-bool is_ctrl_alt_down() {
-    return (SDLKeyState[SDL_SCANCODE_LCTRL] || SDLKeyState[SDL_SCANCODE_RCTRL]) &&
-           (SDLKeyState[SDL_SCANCODE_LALT] || SDLKeyState[SDL_SCANCODE_RALT]);
-}
-
 bool is_fullscreen() {
     Uint32 flags = SDL_GetWindowFlags(SDLWindow);
     return flags & SDL_WINDOW_FULLSCREEN;

@@ -19,10 +19,9 @@
 #include <cstdlib>
 #include <cstring>
 
-// Siker eseten igazzal ter vissza:
+// Prompt for replay filename and return true if enter, false if esc
 static int menu_prompt_replay_name(char* filename) {
     menu_pic menu;
-
     int i = 0;
     empty_keypress_buffer();
     int rerender = 1;
@@ -34,7 +33,6 @@ static int menu_prompt_replay_name(char* filename) {
                 return 0;
             }
             if (c == KEY_ENTER) {
-                // ENTER
                 if (i > 0) {
                     return 1;
                 }
@@ -49,7 +47,6 @@ static int menu_prompt_replay_name(char* filename) {
                 rerender = 1;
             }
             if (c == KEY_BACKSPACE) {
-                // <- (torles):
                 if (i > 0) {
                     i--;
                     filename[i] = 0;
@@ -59,7 +56,6 @@ static int menu_prompt_replay_name(char* filename) {
         }
         if (rerender) {
             rerender = 0;
-
             menu.clear();
 
             filename[i] = '_';
@@ -68,16 +64,12 @@ static int menu_prompt_replay_name(char* filename) {
             filename[i] = 0;
 
             menu.add_line_centered("Please enter the filename:", 320, 180);
-            // menu.add_line_centered( "Press ESC to exit", 320, 300 );
         }
         menu.render();
     }
 }
 
 void menu_save_play(int level_id) {
-    // Korny->pabc_saveplay->write( Korny->picbuffer, 20, 2*SM, "To exit press ESC!" );
-    // Korny->pabc_saveplay->write( Korny->picbuffer, 20, 5*SM, "Please enter filename:" );
-    // lassufizre( Korny->picbuffer, Korny->pal_saveplay );
     char tmp[20] = "";
     if (!menu_prompt_replay_name(tmp)) {
         return;
@@ -86,18 +78,18 @@ void menu_save_play(int level_id) {
     recorder::save_rec_file(tmp, level_id, State->flag_tag);
 }
 
-// Idot beirja tablaba, ha kell:
 void update_top_ten(long time, char* time_message, int internal_index,
                     const char* external_filename) {
+    // Check if internal or external
     int external_level = 0;
     if (external_filename) {
         external_level = 1;
     }
 
     time_message[0] = 0;
+
+    // Dead
     if (time <= 0) {
-        // Nem fejeztek be:
-        // Azt jelzi menu_nav::navigate-nak, hogy kozepre tegye:
         strcpy(time_message, MENU_CENTER_TEXT "You Failed to Finish!");
         if (MeghalteloszorAB == 1) {
             strcat(time_message, "    (A died first)");
@@ -108,12 +100,11 @@ void update_top_ten(long time, char* time_message, int internal_index,
         return;
     }
 
-    // Befejeztek, kiirjuk idot:
-
     if (!external_level) {
         State->reload_toptens();
     }
 
+    // Display finish time
     char tmp[10];
     centiseconds_to_string(time, tmp);
     if (Single) {
@@ -126,26 +117,25 @@ void update_top_ten(long time, char* time_message, int internal_index,
         }
     }
 
-    // Kivalasztjuk hogy single, vagy multiplayer idok-e:
+    // Grab top ten table
     topten_set* tten_set;
     if (external_level) {
         tten_set = &Ptop->toptens;
     } else {
         tten_set = &State->toptens[internal_index];
     }
-
     topten* tten = &tten_set->single;
     if (!Single) {
         tten = &tten_set->multi;
     }
 
+    // Not in top ten?
     if (tten->times_count == MAX_TIMES && tten->times[MAX_TIMES - 1] < time) {
         return;
     }
 
-    // Felkerult tablara!
+    // First and only time?
     if (tten->times_count == 0) {
-        // Elso ido:
         tten->times_count = 1;
         tten->times[0] = time;
         strcpy(tten->names1[0], State->player1);
@@ -156,22 +146,21 @@ void update_top_ten(long time, char* time_message, int internal_index,
         }
         return;
     }
-    // Tablan van mar mas ido is:
-    // Uzenetek eldontese:
+
+    // Check Best Time, middle time, or last time
     int not_last = 0;
     if (tten->times[unsigned(tten->times_count - 1)] > time) {
-        // Vkit leelozott:
         not_last = 1;
     }
     if (tten->times[0] > time) {
-        // Legjobb ido!:
         strcat(time_message, "     Best Time!");
     } else {
         if (not_last) {
             strcat(time_message, "     You Made the Top Ten");
         }
     }
-    // Beillesztjuk uj idot vegere!:
+
+    // Add your time to the end of the best time list
     if (tten->times_count == MAX_TIMES) {
         tten->times[MAX_TIMES - 1] = time;
         strcpy(tten->names1[MAX_TIMES - 1], State->player1);
@@ -182,11 +171,11 @@ void update_top_ten(long time, char* time_message, int internal_index,
         strcpy(tten->names2[int(tten->times_count)], State->player2);
         tten->times_count++;
     }
-    // Sorrendbe allitjuk idoket:
+
+    // Bubble sort your time to the right position
     for (int i = 0; i < MAX_TIMES + 1; i++) {
         for (int j = 0; j < tten->times_count - 1; j++) {
             if (tten->times[j] > tten->times[j + 1]) {
-                // Csere:
                 long tmp = tten->times[j];
                 tten->times[j] = tten->times[j + 1];
                 tten->times[j + 1] = tmp;
@@ -203,6 +192,7 @@ void update_top_ten(long time, char* time_message, int internal_index,
         }
     }
 
+    // Save external levels (state.dat is not saved)
     if (external_level) {
         Ptop->save_topten(external_filename);
     }
@@ -224,9 +214,6 @@ void replay_previous_run(void) {
     }
 }
 
-// A jelenleg beolvasott palyan jatszik vissza:
-// Azt a nevet kerik, amit topol::topol kap:
-// BestTime beallitasahoz kell neki:
 void replay_from_file(const char* filename) {
     int reset_play_visibility = 1;
     while (1) {
@@ -247,8 +234,6 @@ void replay_from_file(const char* filename) {
 
 static text_line ExtraTimeText[14];
 
-// 0-ESC, 1-this level, 2-next level, 3-skip level
-// Ha filenev nem NULL, akkor external file:
 int menu_level(int internal_index, int nav_on_play_next, const char* time_message,
                const char* external_filename) {
     int external_level = 0;
@@ -259,7 +244,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
     player* player1 = State->get_player(State->player1);
     player* player2 = State->get_player(State->player2);
 
-    // next, skip, kurrens beallitasa:
+    // Determine whether to show Play Next, Skip Level, or neither
     int show_play_next = 0;
     int show_skip_level = 0;
     int default_choice = 0;
@@ -272,7 +257,6 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
             show_skip_level = 1;
         }
         default_choice = nav_on_play_next;
-        // Ellenorzes:
         if (nav_on_play_next && !show_play_next) {
             internal_error("nav_on_play_next && !show_play_next!");
         }
@@ -282,6 +266,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
     }
 
     while (1) {
+        // Title: Level 1: Warm Up or External: Unnamed
         char title[100] = "";
         if (external_level) {
             if (strlen(Ptop->level_name) > LEVEL_NAME_LENGTH) {
@@ -300,6 +285,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
             strcat(title, get_internal_level_name(internal_index));
         }
 
+        // Show either the time_message from update_top_ten or FlagTag info
         if (!Single && Tag) {
             if (FlagTagAStarts) {
                 sprintf(ExtraTimeText[0].text, MENU_CENTER_TEXT "A start with the flag next.");
@@ -315,11 +301,11 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
         } else {
             ExtraTimeText[0].y = 314;
         }
-
         int extra_time_text_length = 1;
 
         if (Single) {
         } else {
+            // Show extra multiplayer information
             int is_flagtag = 0;
             if (Tag) {
                 is_flagtag = 1;
@@ -327,16 +313,19 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
 
             int dx = 0;
             if (!is_flagtag) {
-                dx = 100; // Ha nem kell fogoidot irni, mindent jobbra tolunk
+                dx = 100;
             }
 
             int y1 = 380;
             int y2 = 415;
+
+            // Shorten info if player names are too long
             int long_name = 0;
             if (MenuFont->len(player1->name) > 160 || MenuFont->len(player2->name) > 160) {
                 long_name = 1;
             }
-            // A jatekos:
+
+            // Player A name
             if (long_name) {
                 sprintf(ExtraTimeText[1].text, "Player A: %s", player1->name);
             } else {
@@ -345,10 +334,12 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
             ExtraTimeText[1].x = 10 + dx;
             ExtraTimeText[1].y = y1;
 
+            // Player A apple count
             sprintf(ExtraTimeText[2].text, "%d", Motor1->apple_count);
             ExtraTimeText[2].x = 380 + dx;
             ExtraTimeText[2].y = y1;
 
+            // Player A flag time
             if (is_flagtag) {
                 long time = FlagTimeA * TimeToCentiseconds;
                 centiseconds_to_string(time, ExtraTimeText[3].text);
@@ -360,7 +351,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
                 ExtraTimeText[3].y = 100;
             }
 
-            // B jatekos:
+            // Player B name
             if (long_name) {
                 sprintf(ExtraTimeText[4].text, "Player B: %s", player2->name);
             } else {
@@ -369,10 +360,12 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
             ExtraTimeText[4].x = 10 + dx;
             ExtraTimeText[4].y = y2;
 
+            // Player B apple count
             sprintf(ExtraTimeText[5].text, "%d", Motor2->apple_count);
             ExtraTimeText[5].x = 380 + dx;
             ExtraTimeText[5].y = y2;
 
+            // Player B flag time
             if (is_flagtag) {
                 long time = FlagTimeB * TimeToCentiseconds;
                 centiseconds_to_string(time, ExtraTimeText[6].text);
@@ -385,6 +378,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
                 extra_time_text_length += 5;
             }
 
+            // Shift apple count and flag time right if names too long
             if (long_name) {
                 ExtraTimeText[2].x += 40;
                 ExtraTimeText[3].x += 40;
@@ -393,9 +387,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
             }
         }
 
-        // Valasztas:
         menu_nav nav;
-        // nav.szam = 5+show_play_next+show_skip_level;
         nav.selected_index = default_choice;
         nav.x_left = 230;
         if (Single) {
@@ -417,56 +409,55 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
             strcpy(NavEntriesLeft[2], "Replay");
             strcpy(NavEntriesLeft[3], "Save play");
             strcpy(NavEntriesLeft[4], "Best times");
-            // strcpy( NavEntriesLeft[5], "Main menu" );
         } else {
             strcpy(NavEntriesLeft[0], "Play again");
             strcpy(NavEntriesLeft[1], "Replay");
             strcpy(NavEntriesLeft[2], "Save play");
             strcpy(NavEntriesLeft[3], "Best times");
-            // strcpy( NavEntriesLeft[4], "Main menu" );
         }
 
         nav.setup(4 + show_play_next + show_skip_level);
 
-        // Idoszoveg helyere beirjuk ecset-ben levok lefoglaltak szamat:
-        // sprintf( ExtraTimeText[0].text, "%d", Osszegszam );
-
         int choice = nav.navigate(ExtraTimeText, extra_time_text_length);
         default_choice = choice;
-        // choice-t show_play_next esetere konvertalja:
+
         if (choice > 0 && !show_play_next && !show_skip_level) {
             choice++;
         }
-
-        if (choice < 0 /*|| choice == 5*/) {
+        if (choice < 0) {
+            // Esc
             return 0;
         }
         if (choice == 0) {
+            // Play again
             return 1;
         }
         if (choice == 1) {
-            // Next, vagy skip:
+            // Play next / Skip level
             if (!show_play_next && !show_skip_level) {
                 internal_error("choice == 1 && (!show_play_next && !show_skip_level)!");
             }
             if (show_play_next) {
                 return 2;
             }
-            // SKIP:
             if (is_skippable(internal_index)) {
+                // Only if we are allowed to skip
                 return 3;
             }
         }
         if (choice == 2) {
+            // Replay
             replay_previous_run();
             MenuPalette->set();
         }
         if (choice == 3) {
-            if (internal_index != INTERNAL_LEVEL_COUNT - 1) { // Utolso palyat nem lehet menteni
+            // Save play
+            if (internal_index != INTERNAL_LEVEL_COUNT - 1) {
                 menu_save_play(Ptop->level_id);
             }
         }
         if (choice == 4) {
+            // Best times
             if (external_level) {
                 menu_external_topten(Ptop, Single);
             } else {
@@ -480,7 +471,7 @@ void loading_screen(void) {
     menu_pic menu;
     menu.clear();
     menu.add_line_centered("Loading", 320, 230);
-    menu.render(true); // Golyok nelkul
+    menu.render(true);
 }
 
 static void play_internal(int internal_index) {
@@ -496,47 +487,57 @@ static void play_internal(int internal_index) {
                 sprintf(filename, "QWQUU%d.LEV", internal_index + 1);
             }
         }
-        loading_screen();
-        floadlevel_p(filename);
 
+        loading_screen();
+
+        floadlevel_p(filename);
         Rec1->erase(filename);
         Rec2->erase(filename);
+
         long time = lejatszo(filename, F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
+
         MenuPalette->set();
         if (Ptop->objects_flipped) {
             internal_error("play_internal objects_flipped!");
         }
+
         char time_message[100] = "";
         update_top_ten(time, time_message, internal_index, NULL);
 
+        // Check to see if we unlock a new internal level (only available in singleplayer)
         int unlocked_new_level = 0;
         if (time > 0) {
-            // Sikeres volt szint:
             cur_player->skipped[internal_index] = 0;
             if (cur_player->levels_completed == internal_index && Single) {
-                // Csak SINGLE jatek alatt novelheto levels_completed!!!
-                // Novelte eggyel sikeres palyak szamat:
                 cur_player->levels_completed++;
                 if (cur_player->levels_completed < INTERNAL_LEVEL_COUNT) {
                     unlocked_new_level = 1;
                 }
             }
-            // update_top_ten ido > 0 es nem external eseten reload-olja:
+            // Update state.dat after every finish
             State->save();
         }
+
         int choice = menu_level(internal_index, unlocked_new_level, time_message, NULL);
         Rec1->erase(filename);
         Rec2->erase(filename);
+
         if (choice == 0) {
+            // Esc
             cur_player->selected_level = internal_index + unlocked_new_level;
             return;
         }
+        // Play again
+        // if(choice == 1) {
+        //     continue;
+        // }
         if (choice == 2) {
+            // Play next
             internal_index++;
             cur_player->selected_level = internal_index;
         }
         if (choice == 3) {
-            // Skip level:
+            // Skip level
             if (internal_index != cur_player->levels_completed) {
                 internal_error("internal_index != cur_player->levels_completed!");
             }
@@ -552,21 +553,19 @@ static void play_internal(int internal_index) {
 
 void menu_play(void) {
     while (1) {
+        // Get the total number of levels completed
         player* player1 = State->get_player(State->player1);
         int levels_completed = player1->levels_completed + 1;
         if (!State->single) {
-            // Ha ketten jatszanak, akkor a nagyobb sikeru szamit:
             player* player2 = State->get_player(State->player2);
             if (levels_completed < player2->levels_completed + 1) {
                 levels_completed = player2->levels_completed + 1;
             }
         }
-
         if (levels_completed > INTERNAL_LEVEL_COUNT) {
             levels_completed = INTERNAL_LEVEL_COUNT;
         }
 
-        // Valasztas:
         menu_nav nav;
         nav.search_pattern = SearchPattern::Internals;
         nav.selected_index = int(player1->selected_level) + 1;
@@ -581,7 +580,6 @@ void menu_play(void) {
                 strcat(level_name, "SKIPPED!");
             } else {
                 strcat(level_name, get_internal_level_name(i));
-                // strcat( level_name, "Nincs level nev!" );
             }
             if (strlen(level_name) > NAV_ENTRY_TEXT_MAX_LENGTH - 5) {
                 internal_error("menu_play strlen( level_name ) > NAV_ENTRY_TEXT_MAX_LENGTH-5!");
@@ -590,21 +588,16 @@ void menu_play(void) {
         }
 
         nav.setup(levels_completed + 1);
-        int choice = nav.navigate();
 
+        int choice = nav.navigate();
         if (choice < 0) {
             return;
         }
-
         if (choice == 0) {
-            // External file lejatszast valasztotta, ilyenkor ha visszajon
-            // folytatodik tovabb:
             player1->selected_level = -1;
             menu_external_levels();
         } else {
-            // Egy normal level-t valasztott ki:
             play_internal(choice - 1);
-            // return;
         }
     }
 }

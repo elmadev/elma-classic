@@ -319,35 +319,27 @@ void lgrfile::add_texture(pic8* pic, piclist* list, int index) {
 constexpr size_t MASK_MAX_MEMORY = 20000;
 static mask_element MaskBuffer[MASK_MAX_MEMORY];
 
-void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
-    if (mask_count >= MAX_MASKS) {
-        external_error("Too many masks in lgr file!");
-    }
-
-    // Copy properties
-    mask* new_mask = &masks[mask_count];
-    strcpy(new_mask->name, list->name[index]);
-    new_mask->width = pic->get_width();
-    new_mask->height = pic->get_height();
+static void create_mask(mask* dest, pic8* pic, int transparency) {
+    dest->width = pic->get_width();
+    dest->height = pic->get_height();
 
     // Special compression format type
     int buffer_offset = 0;
-    int transparency = get_transparency_palette_id(list->transparency[index], pic);
     if (transparency >= 0) {
-        for (int i = 0; i < new_mask->height; i++) {
+        for (int i = 0; i < dest->height; i++) {
             // Transparent data
             unsigned char* row = pic->get_row(i);
-            int j = consecutive_transparent_pixels(0, new_mask->width, row,
-                                                   (unsigned char)transparency);
+            int j =
+                consecutive_transparent_pixels(0, dest->width, row, (unsigned char)transparency);
             if (j > 0) {
                 MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
                 MaskBuffer[buffer_offset].length = j;
                 buffer_offset++;
             }
-            while (j <= new_mask->width - 1) {
+            while (j <= dest->width - 1) {
                 // Solid data
                 int count =
-                    consecutive_solid_pixels(j, new_mask->width, row, (unsigned char)transparency);
+                    consecutive_solid_pixels(j, dest->width, row, (unsigned char)transparency);
                 if (count <= 0) {
                     internal_error("add_mask count length negative!");
                 }
@@ -356,13 +348,13 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
                 MaskBuffer[buffer_offset].length = count;
                 buffer_offset++;
                 if (buffer_offset > MASK_MAX_MEMORY - 10) {
-                    external_error("Mask picture is too complicated!:", list->name[index]);
+                    external_error("Mask picture is too complicated!");
                 }
 
                 j += count;
 
                 // Transparent data
-                count = consecutive_transparent_pixels(j, new_mask->width, row,
+                count = consecutive_transparent_pixels(j, dest->width, row,
                                                        (unsigned char)transparency);
                 if (count > 0) {
                     MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
@@ -378,9 +370,9 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
         }
     } else {
         // Solid square special case
-        for (int i = 0; i < new_mask->height; i++) {
+        for (int i = 0; i < dest->height; i++) {
             MaskBuffer[buffer_offset].type = MaskEncoding::Solid;
-            MaskBuffer[buffer_offset].length = new_mask->width;
+            MaskBuffer[buffer_offset].length = dest->width;
             buffer_offset++;
             MaskBuffer[buffer_offset].type = MaskEncoding::EndOfLine;
             MaskBuffer[buffer_offset].length = 0;
@@ -388,15 +380,27 @@ void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
         }
     }
 
-    new_mask->data = new mask_element[buffer_offset];
-    if (!new_mask->data) {
+    dest->data = new mask_element[buffer_offset];
+    if (!dest->data) {
         internal_error("Memory!");
     }
     for (int j = 0; j < buffer_offset; j++) {
-        new_mask->data[j] = MaskBuffer[j];
+        dest->data[j] = MaskBuffer[j];
+    }
+    delete pic;
+}
+
+void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
+    if (mask_count >= MAX_MASKS) {
+        external_error("Too many masks in lgr file!");
     }
 
-    delete pic;
+    // Copy properties
+    mask* dest = &masks[mask_count];
+    strcpy(dest->name, list->name[index]);
+    int transparency = get_transparency_palette_id(list->transparency[index], pic);
+    create_mask(dest, pic, transparency);
+
     mask_count++;
 }
 

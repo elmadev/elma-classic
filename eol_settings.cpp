@@ -39,6 +39,7 @@ template <typename T> void Clamp<T>::reset() { value = def; }
 template struct Default<bool>;
 template struct Default<MapAlignment>;
 template struct Default<RendererType>;
+template struct Default<DikScancode>;
 template struct Clamp<int>;
 template struct Clamp<double>;
 
@@ -84,15 +85,19 @@ void eol_settings::set_turn_time(double t) { turn_time_ = t; }
 
 void eol_settings::set_lctrl_search(bool lctrl_search) { lctrl_search_ = lctrl_search; }
 
-void eol_settings::set_alovolt_key_player_a(int key) { alovolt_key_player_a_ = key; }
+void eol_settings::set_alovolt_key_player_a(DikScancode key) { alovolt_key_player_a_ = key; }
 
-void eol_settings::set_alovolt_key_player_b(int key) { alovolt_key_player_b_ = key; }
+void eol_settings::set_alovolt_key_player_b(DikScancode key) { alovolt_key_player_b_ = key; }
 
-void eol_settings::set_brake_alias_key_player_a(int key) { brake_alias_key_player_a_ = key; }
+void eol_settings::set_brake_alias_key_player_a(DikScancode key) {
+    brake_alias_key_player_a_ = key;
+}
 
-void eol_settings::set_brake_alias_key_player_b(int key) { brake_alias_key_player_b_ = key; }
+void eol_settings::set_brake_alias_key_player_b(DikScancode key) {
+    brake_alias_key_player_b_ = key;
+}
 
-void eol_settings::set_escape_alias_key(int key) { escape_alias_key_ = key; }
+void eol_settings::set_escape_alias_key(DikScancode key) { escape_alias_key_ = key; }
 
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.

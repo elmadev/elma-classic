@@ -19,56 +19,6 @@
 #include <cstdlib>
 #include <cstring>
 
-/*static void betuki( int oszlop, char c ) {
-    int x = 50+oszlop*19;
-    int y = 6*SM + 8;
-    blit8( Korny->picbuffer, Korny->ppic_saveplay, x, y, x, y, x+19, y+30 );
-    if( c == '_' ) {
-        c = '-';
-        y += 11;
-    }
-    char tmp[2] = "Q";
-    tmp[0] = c;
-    Korny->pabc_newjatekos->write( Korny->picbuffer, x, y, tmp );
-    lassufizre( Korny->picbuffer, Korny->pal_newjatekos );
-} */
-
-/*static int bevesznevet( char* nev ) {
-    int i = 0;
-    betuki( 0, '_' );
-    while( 1 ) {
-        empty_keypress_buffer();
-        Keypress c = get_keypress();
-        if( c == KEY_ESC )
-            return 0;
-        if( c == KEY_ENTER ) {
-            // ENTER
-            if( i > 0 ) {
-                nev[i] = 0;
-                return 1;
-            }
-        }
-        if( ( c >= 'A' && c <= 'Z' ) ||
-            ( c >= 'a' && c <= 'z' ) ||
-            ( c >= '0' && c <= '9' ) ) {
-            if( i >= 8 )
-                continue;
-            betuki( i, c );
-            nev[i] = c;
-            i++;
-            betuki( i, '_' );
-        }
-        if( c == KEY_BACKSPACE ) {
-            // <- (torles):
-            if( i > 0 ) {
-                betuki( i, ' ' );
-                i--;
-                betuki( i, '_' );
-            }
-        }
-    }
-}*/
-
 // Siker eseten igazzal ter vissza:
 static int bevesznevet(char* nev) {
     menu_pic szovlist;
@@ -160,31 +110,6 @@ static void konvback(char* text) {
         text++;
     }
 }
-
-/*static void gratulacio( void ) {
-    blit8( Korny->picbuffer, Korny->ppic_fomenu );
-
-    int x1 = 160;
-    int yo = 4;
-    int dy = 24;
-
-    Korny->pabc_fomenu->writekozep( Korny->picbuffer, x1, yo,      "Congratulations!");
-    Korny->pabc_fomenu->writekozep( Korny->picbuffer, x1, yo+dy,   "You have just completed" );
-    Korny->pabc_fomenu->writekozep( Korny->picbuffer, x1, yo+dy*2, "the final level." );
-    Korny->pabc_fomenu->writekozep( Korny->picbuffer, x1, yo+dy*3, "" );
-    Korny->pabc_fomenu->writekozep( Korny->picbuffer, x1, yo+dy*4, "Check out readme.txt on" );
-    Korny->pabc_fomenu->writekozep( Korny->picbuffer, x1, yo+dy*5, "how you can get some" );
-    Korny->pabc_fomenu->writekozep( Korny->picbuffer, x1, yo+dy*6, "more levels for free!" );
-    Korny->pabc_fomenu->writekozep( Korny->picbuffer, x1, yo+dy*7, "Press 'c' to continue!" );
-
-    lassufizre( Korny->picbuffer, Korny->pal_fomenu );
-    while( 1 ) {
-        empty_keypress_buffer();
-        Keypress c = get_keypress();
-        if( c == 'c' || c == 'C' )
-            return;
-    }
-} */
 
 void saveplay(int belyeg) {
     // Korny->pabc_saveplay->write( Korny->picbuffer, 20, 2*SM, "To exit press ESC!" );
@@ -805,8 +730,6 @@ static void playlevel(int level) {
                 pjatekos->levels_completed++;
                 if (pjatekos->levels_completed < INTERNAL_LEVEL_COUNT) {
                     ujpalya = 1;
-                } else {
-                    // Most eloszor sikeresen teljesitette utolso palyat:
                 }
             }
             // idoelintezes ido > 0 es nem external eseten reload-olja:

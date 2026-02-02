@@ -23,11 +23,15 @@ static double StretchMetersToPixels = 1.0;
 // `source_dx` / `source_dy` is the delta to the next pixel to grab from the affine_pic.
 void draw_affine_pic_row(unsigned char transparency, int length, unsigned char* dest,
                          unsigned char* source, double source_x, double source_y, double source_dx,
-                         double source_dy) {
+                         double source_dy, int max) {
     // Draw the horizontal row of pixels
     for (int x = 0; x < length; x++) {
         // Grab the pixel from the affine_pic
         int source_offset = ((int)(source_y) << 8) + (int)(source_x);
+
+        if (source_offset < 0 || source_offset >= max) {
+            continue;
+        }
         unsigned char c = source[source_offset];
         if (c != transparency) {
             dest[x] = c;
@@ -305,7 +309,7 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                 // Extra out of bounds check (right screen border)
                 int length = std::min(x2 - x_left + 1, Cxsize - x_left);
                 draw_affine_pic_row(transparency, length, dest_target, aff->pixels, affine_x,
-                                    affine_y, inverse_i.x, inverse_i.y);
+                                    affine_y, inverse_i.x, inverse_i.y, aff->height * 256);
             } else {
                 if (x1 > x2 + 1) {
                     return;
@@ -349,7 +353,7 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
                 unsigned char* dest_target = dest->get_row(y);
                 dest_target += x_left;
                 draw_affine_pic_row(transparency, x2 - x1 + 1, dest_target, aff->pixels, affine_x,
-                                    affine_y, inverse_i.x, inverse_i.y);
+                                    affine_y, inverse_i.x, inverse_i.y, aff->height * 256);
             } else {
                 // If the draw width is 0 pixels, we continue (for very thin images)
                 // If the draw width <= -1, then we are completely done rendering and we stop here

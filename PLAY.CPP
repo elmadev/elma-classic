@@ -20,21 +20,21 @@
 #include <cstring>
 
 // Prompt for replay filename and return true if enter, false if esc
-static int menu_prompt_replay_name(char* filename) {
+static bool menu_prompt_replay_name(char* filename) {
     menu_pic menu;
     int i = 0;
     empty_keypress_buffer();
-    int rerender = 1;
+    bool rerender = true;
     filename[0] = 0;
-    while (1) {
+    while (true) {
         while (has_keypress()) {
             Keycode c = get_keypress();
             if (c == KEY_ESC) {
-                return 0;
+                return false;
             }
             if (c == KEY_ENTER) {
                 if (i > 0) {
-                    return 1;
+                    return true;
                 }
             }
             if (MenuFont->has_char(c) && is_char_valid_for_filename(c)) {
@@ -44,18 +44,18 @@ static int menu_prompt_replay_name(char* filename) {
                 filename[i] = (char)c;
                 filename[i + 1] = 0;
                 i++;
-                rerender = 1;
+                rerender = true;
             }
             if (c == KEY_BACKSPACE) {
                 if (i > 0) {
                     i--;
                     filename[i] = 0;
-                    rerender = 1;
+                    rerender = true;
                 }
             }
         }
         if (rerender) {
-            rerender = 0;
+            rerender = false;
             menu.clear();
 
             filename[i] = '_';
@@ -69,7 +69,7 @@ static int menu_prompt_replay_name(char* filename) {
     }
 }
 
-void menu_save_play(int level_id) {
+static void menu_save_play(int level_id) {
     char tmp[20] = "";
     if (!menu_prompt_replay_name(tmp)) {
         return;
@@ -78,13 +78,10 @@ void menu_save_play(int level_id) {
     recorder::save_rec_file(tmp, level_id, State->flag_tag);
 }
 
-void update_top_ten(long time, char* time_message, int internal_index,
+void update_top_ten(int time, char* time_message, int internal_index,
                     const char* external_filename) {
     // Check if internal or external
-    int external_level = 0;
-    if (external_filename) {
-        external_level = 1;
-    }
+    bool external_level = external_filename ? true : false;
 
     time_message[0] = 0;
 
@@ -148,10 +145,7 @@ void update_top_ten(long time, char* time_message, int internal_index,
     }
 
     // Check Best Time, middle time, or last time
-    int not_last = 0;
-    if (tten->times[unsigned(tten->times_count - 1)] > time) {
-        not_last = 1;
-    }
+    bool not_last = tten->times[tten->times_count - 1] > time;
     if (tten->times[0] > time) {
         strcat(time_message, "     Best Time!");
     } else {
@@ -176,7 +170,7 @@ void update_top_ten(long time, char* time_message, int internal_index,
     for (int i = 0; i < MAX_TIMES + 1; i++) {
         for (int j = 0; j < tten->times_count - 1; j++) {
             if (tten->times[j] > tten->times[j + 1]) {
-                long tmp = tten->times[j];
+                int tmp = tten->times[j];
                 tten->times[j] = tten->times[j + 1];
                 tten->times[j + 1] = tmp;
 
@@ -198,10 +192,10 @@ void update_top_ten(long time, char* time_message, int internal_index,
     }
 }
 
-void replay_previous_run(void) {
+void replay_previous_run() {
     floadlevel_p(Rec1->level_filename);
-    int reset_player_visibility = 1;
-    while (1) {
+    bool reset_player_visibility = true;
+    while (true) {
         Rec1->rewind();
         Rec2->rewind();
         if (lejatszo_r(Rec1->level_filename, !reset_player_visibility)) {
@@ -210,13 +204,13 @@ void replay_previous_run(void) {
             }
             return;
         }
-        reset_player_visibility = 0;
+        reset_player_visibility = false;
     }
 }
 
 void replay_from_file(const char* filename) {
-    int reset_play_visibility = 1;
-    while (1) {
+    bool reset_play_visibility = true;
+    while (true) {
         Rec1->rewind();
         Rec2->rewind();
         if (lejatszo_r(filename, !reset_play_visibility)) {
@@ -228,18 +222,15 @@ void replay_from_file(const char* filename) {
         if (Ptop->objects_flipped) {
             internal_error("replay_from_file flipped!");
         }
-        reset_play_visibility = 0;
+        reset_play_visibility = false;
     }
 }
 
 static text_line ExtraTimeText[14];
 
-int menu_level(int internal_index, int nav_on_play_next, const char* time_message,
+int menu_level(int internal_index, bool nav_on_play_next, const char* time_message,
                const char* external_filename) {
-    int external_level = 0;
-    if (external_filename) {
-        external_level = 1;
-    }
+    bool external_level = external_filename != nullptr;
 
     player* player1 = State->get_player(State->player1);
     player* player2 = State->get_player(State->player2);
@@ -256,7 +247,9 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
         if (!show_play_next && internal_index < INTERNAL_LEVEL_COUNT - 1) {
             show_skip_level = 1;
         }
-        default_choice = nav_on_play_next;
+        if (nav_on_play_next) {
+            default_choice = 1;
+        }
         if (nav_on_play_next && !show_play_next) {
             internal_error("nav_on_play_next && !show_play_next!");
         }
@@ -265,7 +258,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
         }
     }
 
-    while (1) {
+    while (true) {
         // Title: Level 1: Warm Up or External: Unnamed
         char title[100] = "";
         if (external_level) {
@@ -303,13 +296,9 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
         }
         int extra_time_text_length = 1;
 
-        if (Single) {
-        } else {
+        if (!Single) {
             // Show extra multiplayer information
-            int is_flagtag = 0;
-            if (Tag) {
-                is_flagtag = 1;
-            }
+            bool is_flagtag = Tag;
 
             int dx = 0;
             if (!is_flagtag) {
@@ -320,10 +309,8 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
             int y2 = 415;
 
             // Shorten info if player names are too long
-            int long_name = 0;
-            if (MenuFont->len(player1->name) > 160 || MenuFont->len(player2->name) > 160) {
-                long_name = 1;
-            }
+            bool long_name =
+                MenuFont->len(player1->name) > 160 || MenuFont->len(player2->name) > 160;
 
             // Player A name
             if (long_name) {
@@ -341,7 +328,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
 
             // Player A flag time
             if (is_flagtag) {
-                long time = FlagTimeA * TimeToCentiseconds;
+                int time = FlagTimeA * TimeToCentiseconds;
                 centiseconds_to_string(time, ExtraTimeText[3].text);
                 ExtraTimeText[3].x = 440 + dx;
                 ExtraTimeText[3].y = y1;
@@ -367,7 +354,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
 
             // Player B flag time
             if (is_flagtag) {
-                long time = FlagTimeB * TimeToCentiseconds;
+                int time = FlagTimeB * TimeToCentiseconds;
                 centiseconds_to_string(time, ExtraTimeText[6].text);
                 ExtraTimeText[6].x = 440 + dx;
                 ExtraTimeText[6].y = y2;
@@ -390,13 +377,8 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
         menu_nav nav;
         nav.selected_index = default_choice;
         nav.x_left = 230;
-        if (Single) {
-            nav.y_entries = 110;
-            nav.dy = 42;
-        } else {
-            nav.y_entries = 110;
-            nav.dy = 42;
-        }
+        nav.y_entries = 110;
+        nav.dy = 42;
         strcpy(nav.title, title);
 
         if (show_play_next || show_skip_level) {
@@ -467,7 +449,7 @@ int menu_level(int internal_index, int nav_on_play_next, const char* time_messag
     }
 }
 
-void loading_screen(void) {
+void loading_screen() {
     menu_pic menu;
     menu.clear();
     menu.add_line_centered("Loading", 320, 230);
@@ -476,17 +458,9 @@ void loading_screen(void) {
 
 static void play_internal(int internal_index) {
     player* cur_player = State->get_player(State->player1);
-    while (1) {
+    while (true) {
         char filename[20];
-        if (internal_index + 1 < 10) {
-            sprintf(filename, "QWQUU00%d.LEV", internal_index + 1);
-        } else {
-            if (internal_index + 1 < 100) {
-                sprintf(filename, "QWQUU0%d.LEV", internal_index + 1);
-            } else {
-                sprintf(filename, "QWQUU%d.LEV", internal_index + 1);
-            }
-        }
+        sprintf(filename, "QWQUU%03d.LEV", internal_index + 1);
 
         loading_screen();
 
@@ -494,7 +468,7 @@ static void play_internal(int internal_index) {
         Rec1->erase(filename);
         Rec2->erase(filename);
 
-        long time = lejatszo(filename, F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
+        int time = lejatszo(filename, F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
 
         MenuPalette->set();
         if (Ptop->objects_flipped) {
@@ -502,7 +476,7 @@ static void play_internal(int internal_index) {
         }
 
         char time_message[100] = "";
-        update_top_ten(time, time_message, internal_index, NULL);
+        update_top_ten(time, time_message, internal_index, nullptr);
 
         // Check to see if we unlock a new internal level (only available in singleplayer)
         int unlocked_new_level = 0;
@@ -518,7 +492,7 @@ static void play_internal(int internal_index) {
             State->save();
         }
 
-        int choice = menu_level(internal_index, unlocked_new_level, time_message, NULL);
+        int choice = menu_level(internal_index, unlocked_new_level, time_message, nullptr);
         Rec1->erase(filename);
         Rec2->erase(filename);
 
@@ -551,8 +525,8 @@ static void play_internal(int internal_index) {
     }
 }
 
-void menu_play(void) {
-    while (1) {
+void menu_play() {
+    while (true) {
         // Get the total number of levels completed
         player* player1 = State->get_player(State->player1);
         int levels_completed = player1->levels_completed + 1;
@@ -568,7 +542,7 @@ void menu_play(void) {
 
         menu_nav nav;
         nav.search_pattern = SearchPattern::Internals;
-        nav.selected_index = int(player1->selected_level) + 1;
+        nav.selected_index = player1->selected_level + 1;
         strcpy(nav.title, "Select Level!");
 
         strcpy(NavEntriesLeft[0], "External File");

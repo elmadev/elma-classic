@@ -68,6 +68,12 @@ class eol_settings {
     Default<DikScancode> brake_alias_key_player_a_{DIK_UNKNOWN};
     Default<DikScancode> brake_alias_key_player_b_{DIK_UNKNOWN};
     Default<DikScancode> escape_alias_key_{DIK_UNKNOWN};
+    Default<DikScancode> replay_fast_2x_key_{DIK_UP};
+    Default<DikScancode> replay_fast_4x_key_{DIK_RIGHT};
+    Default<DikScancode> replay_fast_8x_key_{DIK_PRIOR};
+    Default<DikScancode> replay_slow_2x_key_{DIK_DOWN};
+    Default<DikScancode> replay_slow_4x_key_{DIK_NEXT};
+    Default<DikScancode> replay_pause_key_{DIK_SPACE};
 
   public:
     static void read_settings();
@@ -91,6 +97,12 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(brake_alias_key_player_a);
     DECLARE_FIELD_FUNCS(brake_alias_key_player_b);
     DECLARE_FIELD_FUNCS(escape_alias_key);
+    DECLARE_FIELD_FUNCS(replay_fast_2x_key);
+    DECLARE_FIELD_FUNCS(replay_fast_4x_key);
+    DECLARE_FIELD_FUNCS(replay_fast_8x_key);
+    DECLARE_FIELD_FUNCS(replay_slow_2x_key);
+    DECLARE_FIELD_FUNCS(replay_slow_4x_key);
+    DECLARE_FIELD_FUNCS(replay_pause_key);
 };
 
 #undef DECLARE_FIELD_FUNCS

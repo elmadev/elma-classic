@@ -382,6 +382,12 @@ void state::reset_keys() {
     key_decrease_screen_size = DIK_MINUS;
     key_screenshot = DIK_I;
     key_escape_alias = EolSettings->escape_alias_key_default();
+    key_replay_fast_2x = EolSettings->replay_fast_2x_key_default();
+    key_replay_fast_4x = EolSettings->replay_fast_4x_key_default();
+    key_replay_fast_8x = EolSettings->replay_fast_8x_key_default();
+    key_replay_slow_2x = EolSettings->replay_slow_2x_key_default();
+    key_replay_slow_4x = EolSettings->replay_slow_4x_key_default();
+    key_replay_pause = EolSettings->replay_pause_key_default();
 }
 
 player* state::get_player(const char* player_name) {

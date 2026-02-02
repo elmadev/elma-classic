@@ -259,11 +259,14 @@ typedef DikScancode* key_pointers[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
 static key_pointers UniversalKeys; // +/- and Screenshot
 static key_pointers Player1Keys;
 static key_pointers Player2Keys;
+static key_pointers ReplayKeys;
 
-constexpr int UNIVERSAL_KEYS_START = 3;
+constexpr int UNIVERSAL_KEYS_START = 4;
 constexpr int UNIVERSAL_KEYS_END = UNIVERSAL_KEYS_START + 4;
 constexpr int PLAYER_KEYS_START = 0;
 constexpr int PLAYER_KEYS_END = PLAYER_KEYS_START + 10;
+constexpr int REPLAY_KEYS_START = 0;
+constexpr int REPLAY_KEYS_END = REPLAY_KEYS_START + 6;
 
 // Setup the menu to display one control key
 static void load_control(key_pointers keys, int offset, const char* label, int* key) {
@@ -333,11 +336,24 @@ static void load_universal_controls() {
     NavEntriesRight[1][0] = 0;
     strcpy(NavEntriesLeft[2], "Customize Player B");
     NavEntriesRight[2][0] = 0;
+    strcpy(NavEntriesLeft[3], "Customize Replay VCR");
+    NavEntriesRight[3][0] = 0;
     int i = UNIVERSAL_KEYS_START;
     load_control(UniversalKeys, i++, "Inc. Screen Size", &State->key_increase_screen_size);
     load_control(UniversalKeys, i++, "Dec. Screen Size", &State->key_decrease_screen_size);
     load_control(UniversalKeys, i++, "Make a Screenshot", &State->key_screenshot);
     load_control(UniversalKeys, i++, "Escape Alias", &State->key_escape_alias);
+}
+
+// Setup the menu to display the replay controls
+static void load_replay_controls(key_pointers keys) {
+    int i = REPLAY_KEYS_START;
+    load_control(keys, i++, "Fast forward 2x", &State->key_replay_fast_2x);
+    load_control(keys, i++, "Fast forward 4x", &State->key_replay_fast_4x);
+    load_control(keys, i++, "Fast forward 8x", &State->key_replay_fast_8x);
+    load_control(keys, i++, "Slow motion 2x", &State->key_replay_slow_2x);
+    load_control(keys, i++, "Slow motion 4x", &State->key_replay_slow_4x);
+    load_control(keys, i++, "Pause", &State->key_replay_pause);
 }
 
 // Setup the menu to display one player's controls
@@ -383,6 +399,32 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
     }
 }
 
+// Menu to change replay controls
+static void menu_customize_replay(key_pointers keys) {
+    int choice = 0;
+    while (true) {
+        menu_nav nav;
+        nav.selected_index = choice;
+        nav.x_left = 60;
+        nav.x_right = 400;
+        nav.y_entries = 86;
+        nav.dy = 40;
+        strcpy(nav.title, "Customize Replay VCR");
+
+        load_replay_controls(keys);
+
+        nav.setup(REPLAY_KEYS_END, true);
+
+        choice = nav.navigate();
+        if (choice < 0) {
+            return;
+        }
+        if (choice >= 0 && choice < REPLAY_KEYS_END) {
+            prompt_control(REPLAY_KEYS_END, keys, choice);
+        }
+    }
+}
+
 // Menu to customize universal controls or select a player
 void menu_customize_controls() {
     // Initialize these pointers so we can check/modify the values in prompt_control
@@ -414,6 +456,7 @@ void menu_customize_controls() {
             State->reset_keys();
             load_player_controls(Player1Keys, &State->keys1);
             load_player_controls(Player2Keys, &State->keys2);
+            load_replay_controls(ReplayKeys);
             load_universal_controls();
         }
         if (choice == 1) {
@@ -423,6 +466,9 @@ void menu_customize_controls() {
         if (choice == 2) {
             // Customize Player B
             menu_customize_player(Player2Keys, &State->keys2, "B");
+        }
+        if (choice == 3) {
+            menu_customize_replay(ReplayKeys);
         }
         if (choice >= UNIVERSAL_KEYS_START && choice < UNIVERSAL_KEYS_END) {
             // Modify universal control

@@ -72,6 +72,12 @@ class state {
     DikScancode key_decrease_screen_size;
     DikScancode key_screenshot;
     DikScancode key_escape_alias;
+    DikScancode key_replay_fast_2x;
+    DikScancode key_replay_fast_4x;
+    DikScancode key_replay_fast_8x;
+    DikScancode key_replay_slow_2x;
+    DikScancode key_replay_slow_4x;
+    DikScancode key_replay_pause;
 
     char editor_filename[20];
     char external_filename[20];

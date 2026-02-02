@@ -20,6 +20,7 @@
 #include "sprite.h"
 #include <algorithm>
 #include <cstring>
+#include <vector>
 
 constexpr int MAGIC_NUMBER = 187565543;
 
@@ -316,15 +317,12 @@ void lgrfile::add_texture(pic8* pic, piclist* list, int index) {
     texture_count++;
 }
 
-constexpr size_t MASK_MAX_MEMORY = 20000;
-static mask_element MaskBuffer[MASK_MAX_MEMORY];
-
 static void create_mask(mask* dest, pic8* pic, int transparency) {
     dest->width = pic->get_width();
     dest->height = pic->get_height();
 
     // Special compression format type
-    int buffer_offset = 0;
+    std::vector<mask_element> MaskBuffer;
     if (transparency >= 0) {
         for (int i = 0; i < dest->height; i++) {
             // Transparent data
@@ -332,9 +330,10 @@ static void create_mask(mask* dest, pic8* pic, int transparency) {
             int j =
                 consecutive_transparent_pixels(0, dest->width, row, (unsigned char)transparency);
             if (j > 0) {
-                MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
-                MaskBuffer[buffer_offset].length = j;
-                buffer_offset++;
+                mask_element element;
+                element.type = MaskEncoding::Transparent;
+                element.length = j;
+                MaskBuffer.push_back(element);
             }
             while (j <= dest->width - 1) {
                 // Solid data
@@ -344,12 +343,10 @@ static void create_mask(mask* dest, pic8* pic, int transparency) {
                     internal_error("add_mask count length negative!");
                 }
 
-                MaskBuffer[buffer_offset].type = MaskEncoding::Solid;
-                MaskBuffer[buffer_offset].length = count;
-                buffer_offset++;
-                if (buffer_offset > MASK_MAX_MEMORY - 10) {
-                    external_error("Mask picture is too complicated!");
-                }
+                mask_element element;
+                element.type = MaskEncoding::Solid;
+                element.length = count;
+                MaskBuffer.push_back(element);
 
                 j += count;
 
@@ -357,36 +354,37 @@ static void create_mask(mask* dest, pic8* pic, int transparency) {
                 count = consecutive_transparent_pixels(j, dest->width, row,
                                                        (unsigned char)transparency);
                 if (count > 0) {
-                    MaskBuffer[buffer_offset].type = MaskEncoding::Transparent;
-                    MaskBuffer[buffer_offset].length = count;
-                    buffer_offset++;
+                    mask_element element;
+                    element.type = MaskEncoding::Transparent;
+                    element.length = count;
+                    MaskBuffer.push_back(element);
                 }
                 j += count;
             }
             // End of row
-            MaskBuffer[buffer_offset].type = MaskEncoding::EndOfLine;
-            MaskBuffer[buffer_offset].length = 0;
-            buffer_offset++;
+            mask_element element;
+            element.type = MaskEncoding::EndOfLine;
+            element.length = 0;
+            MaskBuffer.push_back(element);
         }
     } else {
         // Solid square special case
         for (int i = 0; i < dest->height; i++) {
-            MaskBuffer[buffer_offset].type = MaskEncoding::Solid;
-            MaskBuffer[buffer_offset].length = dest->width;
-            buffer_offset++;
-            MaskBuffer[buffer_offset].type = MaskEncoding::EndOfLine;
-            MaskBuffer[buffer_offset].length = 0;
-            buffer_offset++;
+            mask_element element;
+            element.type = MaskEncoding::Solid;
+            element.length = dest->width;
+            MaskBuffer.push_back(element);
+            element.type = MaskEncoding::EndOfLine;
+            element.length = 0;
+            MaskBuffer.push_back(element);
         }
     }
 
-    dest->data = new mask_element[buffer_offset];
+    dest->data = new mask_element[MaskBuffer.size()];
     if (!dest->data) {
         internal_error("Memory!");
     }
-    for (int j = 0; j < buffer_offset; j++) {
-        dest->data[j] = MaskBuffer[j];
-    }
+    std::copy(MaskBuffer.begin(), MaskBuffer.end(), dest->data);
     delete pic;
 }
 

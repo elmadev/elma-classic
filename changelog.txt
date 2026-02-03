@@ -26,6 +26,7 @@
 * Key repeat now works in menu so you can hold arrow down to go down or a to save many a.rec
 * You can now use mouse scroll wheel to navigate the menu
 * Elma now saves State.dat when you change options
+* You can now f1-p in editor (same as f1-enter but in editor)
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems

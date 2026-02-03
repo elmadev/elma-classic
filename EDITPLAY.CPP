@@ -7,7 +7,7 @@
 #include "LOAD.H"
 #include "platform_impl.h"
 
-void editplay(void) {
+void editplay(bool view_map) {
     invalidateegesz();
     if (Valtozott || State->editor_filename[0] == 0 || Ptop->topology_errors) {
         if (!tolt_save()) {
@@ -23,7 +23,7 @@ void editplay(void) {
 
     Rec1->erase(State->editor_filename);
     Rec2->erase(State->editor_filename);
-    lejatszo(State->editor_filename, CameraMode::Normal);
+    lejatszo(State->editor_filename, view_map ? CameraMode::MapViewer : CameraMode::Normal);
 
     empty_keypress_buffer();
 

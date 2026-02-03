@@ -22,6 +22,7 @@
 #include "polygon.h"
 #include "sprite.h"
 #include <cstring>
+#include <directinput/scancodes.h>
 
 level* Ptop = NULL;
 
@@ -696,7 +697,7 @@ void editor(void) {
             }
             if (!(Pgy || Pker || Psp || Zoomfogva || Egypont)) {
                 if (c == 'p') {
-                    editplay();
+                    editplay(is_key_down(DIK_F1));
                 }
                 if (c == 'x') {
                     if (editor_exit_dialog()) {
@@ -820,7 +821,7 @@ void editor(void) {
                         }
 
                         if (i == 5 && balnyomva) {
-                            editplay();
+                            editplay(is_key_down(DIK_F1));
                             Tool = T_MOVE;
                         }
                         if (i == 5 && jobbnyomva) {

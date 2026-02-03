@@ -8,6 +8,7 @@
 #include <fstream>
 #define JSON_DIAGNOSTICS 1
 #include <nlohmann/json.hpp>
+#include <utility>
 #ifdef _WIN32
 #include <io.h>
 #else
@@ -40,6 +41,7 @@ template struct Default<bool>;
 template struct Default<MapAlignment>;
 template struct Default<RendererType>;
 template struct Default<DikScancode>;
+template struct Default<std::string>;
 template struct Clamp<int>;
 template struct Clamp<double>;
 
@@ -110,6 +112,13 @@ void eol_settings::set_replay_slow_2x_key(DikScancode key) { replay_slow_2x_key_
 void eol_settings::set_replay_slow_4x_key(DikScancode key) { replay_slow_4x_key_ = key; }
 
 void eol_settings::set_replay_pause_key(DikScancode key) { replay_pause_key_ = key; }
+
+void eol_settings::set_default_lgr_name(std::string name) {
+    if (default_lgr_name_.value != name) {
+        default_lgr_name_ = std::move(name);
+        invalidate_lgr_cache();
+    }
+}
 
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
@@ -198,7 +207,8 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(replay_fast_8x_key)                                                                 \
     JSON_FIELD(replay_slow_2x_key)                                                                 \
     JSON_FIELD(replay_slow_4x_key)                                                                 \
-    JSON_FIELD(replay_pause_key)
+    JSON_FIELD(replay_pause_key)                                                                   \
+    JSON_FIELD(default_lgr_name)
 
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

@@ -10,9 +10,21 @@ extern int Tag; // Van-e fogocska
 
 extern int Legkozment; // kiraj320 ebbol tudja, hogy snapshot-ot keszitsen
 
+enum class CameraMode { Normal, MapViewer };
+
+struct camera {
+    CameraMode mode;
+    double x;
+    double y;
+    double min_x;
+    double min_y;
+    double max_x;
+    double max_y;
+};
+
 // Azt a nevet kerik, amit topol::topol kap:
 // BestTime beallitasahoz kell nekik:
-long lejatszo(const char* filenev);
+long lejatszo(const char* filenev, CameraMode cameramode);
 long lejatszo_r(const char* filenev, int showkepmarad);
 
 struct baljobbvaltozok {

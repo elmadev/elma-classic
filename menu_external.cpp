@@ -1,4 +1,5 @@
 #include "menu_external.h"
+#include "menu_nav.h"
 #include "fs_utils.h"
 #include "LEJATSZO.H"
 #include "LOAD.H"
@@ -80,7 +81,7 @@ void menu_external_levels() {
             }
             Rec1->erase(filename);
             Rec2->erase(filename);
-            int time = lejatszo(filename);
+            int time = lejatszo(filename, F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
             MenuPalette->set();
             char finish_msg[100] = "";
             idoelintezes(time, finish_msg, 0, filename);

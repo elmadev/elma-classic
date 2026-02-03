@@ -787,7 +787,7 @@ static void playlevel(int level) {
 
         Rec1->erase(tmpnev);
         Rec2->erase(tmpnev);
-        long ido = lejatszo(tmpnev);
+        long ido = lejatszo(tmpnev, F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
         MenuPalette->set();
         if (Ptop->objects_flipped) {
             internal_error("playlevel-ben Ptop->kerekekfejjellefel!");

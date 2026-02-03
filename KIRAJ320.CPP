@@ -629,10 +629,14 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 }
 
 static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, valtozok* pvalt,
-                             int viewki, int timeki, motorst* pmot2, valtozok* pvalt2) {
+                             int viewki, int timeki, motorst* pmot2, valtozok* pvalt2,
+                             camera& current_camera) {
 
     // Kiszamoljuk kepernyo bal also sarkat:
     vect2 motorkozep = pmot->bike.r;
+    if (current_camera.mode == CameraMode::MapViewer) {
+        motorkozep = vect2(current_camera.x, current_camera.y);
+    }
 
     vect2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
 
@@ -709,18 +713,20 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         pmkepek2 = &Lgr->bike1;
     }
 
-    if (!Single) {
-        // Hatso motoros kirajzolasa:
-        vect2 kozep(sarok.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
-                    sarok.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
-        double tav = (pmot2->bike.r - kozep).length();
-        if (tav < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters) {
-            kibike(!ajatekos, ppic, t, sarok, pmot2, pvalt2, pmkepek2, nullptr);
+    if (current_camera.mode == CameraMode::Normal) {
+        if (!Single) {
+            // Hatso motoros kirajzolasa:
+            vect2 kozep(sarok.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
+                        sarok.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
+            double tav = (pmot2->bike.r - kozep).length();
+            if (tav < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters) {
+                kibike(!ajatekos, ppic, t, sarok, pmot2, pvalt2, pmkepek2, nullptr);
+            }
         }
-    }
 
-    // Motoros kirajzolasa:
-    kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1, shirt);
+        // Motoros kirajzolasa:
+        kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1, shirt);
+    }
 
     if (!EolSettings->pictures_in_background()) {
         // Felso ecset kitevese:
@@ -774,7 +780,7 @@ static pic8* Bpic = NULL;
 extern int Ucsosurlodas;
 
 void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
-                 int viewki2, int timeki2) {
+                 int viewki2, int timeki2, camera& current_camera) {
 
     int splitscreen = 0;
     int fulljatekosA = 1;
@@ -819,18 +825,22 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
         // 1. Jatekos:
         Bpic->subview(Cx1, Cy1, Cx2, Cy2, npic);
 
-        kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2);
+        kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
+                         current_camera);
 
         // 2. Jatekos:
         Bpic->subview(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
 
-        kirakegyjatekost(0, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1);
+        kirakegyjatekost(0, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
+                         current_camera);
     } else {
         Bpic->subview(Cx1, Cy1, Cx2, Cy2, npic);
         if (fulljatekosA) {
-            kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2);
+            kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
+                             current_camera);
         } else {
-            kirakegyjatekost(0, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1);
+            kirakegyjatekost(0, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
+                             current_camera);
         }
     }
 

@@ -3,6 +3,7 @@
 
 class pic8;
 struct valtozok;
+struct camera;
 
 extern int Voltkilogas; // Csak tesztelesre
 
@@ -22,7 +23,7 @@ void novelkepmeret(void);
 void csokkentkepmeret(void);
 
 void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
-                 int viewki2, int timeki2);
+                 int viewki2, int timeki2, camera& current_camera);
 
 void forditkepet(pic8* ppic);
 

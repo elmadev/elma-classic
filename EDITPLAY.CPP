@@ -23,7 +23,7 @@ void editplay(void) {
 
     Rec1->erase(State->editor_filename);
     Rec2->erase(State->editor_filename);
-    lejatszo(State->editor_filename);
+    lejatszo(State->editor_filename, CameraMode::Normal);
 
     empty_keypress_buffer();
 

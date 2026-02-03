@@ -23,6 +23,8 @@
 * message.inf is no longer required to view error messages, and error messages are now all in English
 * turntime can now be configured
 * You can now type more non-letter symbols in game menus, like saving a replay or level named `!cov!`
+* Key repeat now works in menu so you can hold arrow down to go down or a to save many a.rec
+* You can now use mouse scroll wheel to navigate the menu
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems
@@ -42,6 +44,7 @@
 * Fix bike flickering at high zoom
 * Fix some minor bike jitters in replay playback when bike or wheel rotates past an angle of 0 degrees (upright position)
 * Fix bike/wheel jitters in replay playback in the first 2 frames of the replay
+* Fixed a bug where a replay named a.rec.rec could not be played by elma
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

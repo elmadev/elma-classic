@@ -30,8 +30,12 @@ void itoa(int value, char* str, int base);
 int strcmpi(const char* a, const char* b);
 int strnicmp(const char* a, const char* b, size_t len);
 
+#ifndef __EMSCRIPTEN__
+
 void strupr(char* str);
 void strlwr(char* str);
+
+#endif
 
 #endif
 

@@ -32,6 +32,8 @@ int strnicmp(const char* a, const char* b, size_t len) {
     return v;
 }
 
+#ifndef __EMSCRIPTEN__
+
 void strupr(char* str) {
     while (*str) {
         *str = std::toupper((unsigned char)*str);
@@ -45,6 +47,9 @@ void strlwr(char* str) {
         str++;
     }
 }
+
+#endif
+
 #endif
 
 bool is_ascii_character(unsigned char c) { return (c >= 32 && c < 127); }

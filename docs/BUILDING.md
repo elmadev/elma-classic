@@ -11,16 +11,19 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
 **Meson** (1.10.0 or later) and **Ninja** are required to build this project.
 
 - On macOS:
+
   ```
   brew install meson ninja
   ```
 
 - On Linux:
+
   ```
   sudo apt install meson ninja-build
   ```
 
   Or using pip:
+
   ```
   pip install meson ninja
   ```
@@ -33,24 +36,28 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
 ### Setup
 
 1. Configure the build directory (only needed once):
+
    ```
    meson setup build
    ```
+
    For a release build use this setup:
+
    ```
    meson setup build -Dbuildtype=release
    ```
 
 2. Compile the project:
+
    ```
    meson compile -C build
    ```
 
 3. Run the executable:
-    ```
-    cd build
-    ./elma
-    ```
+   ```
+   cd build
+   ./elma
+   ```
 
 ### Common Build Commands
 
@@ -68,6 +75,7 @@ meson setup build -Dbuildtype=debug -Db_sanitize=address,undefined
 ```
 
 To turn off
+
 ```
 meson setup build -Dbuildtype=debug -Db_sanitize=none
 ```
@@ -103,9 +111,10 @@ To add this terminal to Visual Studio Code, add the following to .vscode/setting
 ```
 
 When running the setup step of meson you will need to pass `--vsenv`, like so:
-   ```
-   meson setup build --vsenv
-   ```
+
+```
+meson setup build --vsenv
+```
 
 ---
 
@@ -116,11 +125,13 @@ To ensure consistent code formatting, use `clang-format`.
 ### Installation
 
 - On macOS:
+
   ```
   $ brew install clang-format
   ```
 
 - On Linux:
+
   ```
   $ sudo apt install clang-format-19
   ```
@@ -134,9 +145,9 @@ To ensure consistent code formatting, use `clang-format`.
 
 To format all files in the repository, run the following command:
 
-  ```
-  ninja -C build clang-format
-  ```
+```
+ninja -C build clang-format
+```
 
 ---
 
@@ -147,11 +158,13 @@ To catch bugs and improve code quality, use `clang-tidy`.
 ### Installation
 
 - On macOS:
+
   ```
   $ brew install clang-tidy
   ```
 
 - On Linux:
+
   ```
   $ sudo apt install clang-tidy-19
   ```
@@ -165,9 +178,9 @@ To catch bugs and improve code quality, use `clang-tidy`.
 
 To run static analysis on all source files, run the following command:
 
-  ```
-  ninja -C build clang-tidy
-  ```
+```
+ninja -C build clang-tidy
+```
 
 The checks are configured in the `.clang-tidy` file at the project root.
 
@@ -183,6 +196,7 @@ VS Code configuration files are provided in the `docs/vscode/` directory for ref
 To use these configurations:
 
 1. Copy the files to your `.vscode/` folder:
+
    ```
    mkdir -p .vscode
    cp docs/vscode/launch.json .vscode/
@@ -204,3 +218,19 @@ To use these configurations:
 Both configurations automatically run the compile task before launching.
 
 ---
+
+## Emscripten (Web)
+
+You can configure a build for a website build by following the following instructions:
+
+1. Download Emscripten and follow installation instructions: https://emscripten.org/docs/getting_started/downloads.html
+2. Make sure `/emsdk/upstream/emscripten/` is added to your PATH
+3. Add files to the (case-sensitive) virtual filesystem at `elma-classic/virtual_directory/`
+   - `elma.res`
+   - `lgr/default.lgr`
+   - Optional: `state.dat`, `lev/`, `rec/`, etc
+4. Configure the meson build directory:
+   - On Windows, run `meson setup build-em --cross-file emscripten-win.ini`
+   - On Unix systems, run `meson setup build-em --cross-file emscripten-unix.ini`
+5. Compile the project: `meson compile -C build-em`
+6. Run the test webserver: `emrun build-em/output.html`

@@ -75,8 +75,10 @@ elma_sources = files(
 inc = include_directories('include')
 
 cpp = meson.get_compiler('cpp')
+
 link_args = []
 cpp_args = []
+dependencies = []
 
 # Required for nlohmann_json on Apple clang < 12
 if cpp.get_id() == 'clang' and cpp.version().version_compare('<12.0')
@@ -94,21 +96,26 @@ if cpp.get_id() == 'msvc'
         # Override windows subsystem entrypoint to main instead of WinMain
         link_args += ['/ENTRY:mainCRTStartup']
     endif
-else
+elif cpp.get_id() == 'clang'
     cpp_args += ['-Wno-deprecated-declarations']
+elif cpp.get_id() == 'emscripten'
+    cpp_args += ['-sUSE_SDL=2']
+    link_args += ['-sUSE_SDL=2', '-ooutput.html', '--emrun', '--embed-file','../virtual_directory@/','-sASYNCIFY', '-sEXCEPTION_DEBUG', '-sDISABLE_EXCEPTION_CATCHING=0', '-sALLOW_MEMORY_GROWTH']
 endif
 
-sdl2_dep = dependency('sdl2',
-    static: build_machine.system() == 'windows',
-    default_options: {
-        'test': false,
-        'with_main': false,
-    }
-)
+if cpp.get_id() != 'emscripten'
+    dependencies += [dependency('sdl2',
+        static: build_machine.system() == 'windows',
+        default_options: {
+            'test': false,
+            'with_main': false,
+        }
+    )]
 
-gl_dep = dependency('gl', required: true)
+    dependencies += [dependency('gl', required: true)]
+endif
 
-nlohmann_json_dep = dependency('nlohmann_json')
+dependencies += [dependency('nlohmann_json')]
 
 executable(
     'elma',
@@ -116,6 +123,6 @@ executable(
     include_directories: inc,
     cpp_args: cpp_args,
     link_args: link_args,
-    dependencies: [nlohmann_json_dep, gl_dep, sdl2_dep],
+    dependencies: dependencies,
     win_subsystem: win_subsystem,
 )

@@ -1,14 +1,18 @@
 #include "menu_options.h"
 #include "eol_settings.h"
+#include "fs_utils.h"
 #include "JATEKOS.H"
 #include "keys.h"
 #include "LOAD.H"
 #include "menu_controls.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
+#include "platform_utils.h"
 #include "state.h"
+#include <algorithm>
 #include <cstring>
 #include <cmath>
+#include <vector>
 
 void menu_help() {
     menu_pic menu;
@@ -53,6 +57,47 @@ void menu_help() {
         }
         menu.render();
     }
+}
+
+static void menu_lgr() {
+    menu_nav nav;
+    nav.search_pattern = SearchPattern::Sorted;
+    strcpy(nav.title, "Pick an LGR!");
+
+    finame filename;
+    std::vector<std::string> lgr_names;
+    bool done = find_first("lgr/*.lgr", filename);
+    while (!done) {
+        constexpr int LGR_EXT_LEN = 4;
+        int len = strlen(filename);
+        lgr_names.emplace_back(filename, len - LGR_EXT_LEN);
+
+        done = find_next(filename);
+        if (lgr_names.size() >= NavEntriesLeftMaxLength - 4) {
+            done = true;
+        }
+    }
+
+    find_close();
+
+    std::sort(lgr_names.begin(), lgr_names.end(),
+              [](std::string& a, std::string& b) { return strcmpi(a.c_str(), b.c_str()) < 0; });
+
+    int i = 0;
+    for (std::string& name : lgr_names) {
+        if (strcmpi(name.c_str(), EolSettings->default_lgr_name().c_str()) == 0) {
+            nav.selected_index = i;
+        }
+        strcpy(NavEntriesLeft[i++], name.c_str());
+    }
+
+    nav.setup(lgr_names.size());
+    int choice = nav.navigate();
+    if (choice < 0) {
+        return;
+    }
+
+    EolSettings->set_default_lgr_name(NavEntriesLeft[choice]);
 }
 
 void menu_options() {
@@ -164,7 +209,10 @@ void menu_options() {
         strcpy(NavEntriesLeft[18 + flag_tag_opt], "LCtrl search:");
         strcpy(NavEntriesRight[18 + flag_tag_opt], EolSettings->lctrl_search() ? "Yes" : "No");
 
-        nav.setup(19 + flag_tag_opt, true);
+        strcpy(NavEntriesLeft[19 + flag_tag_opt], "Default LGR:");
+        strcpy(NavEntriesRight[19 + flag_tag_opt], EolSettings->default_lgr_name().c_str());
+
+        nav.setup(20 + flag_tag_opt, true);
 
         choice = nav.navigate();
 
@@ -300,6 +348,10 @@ void menu_options() {
 
         if (choice == 18) {
             EolSettings->set_lctrl_search(!EolSettings->lctrl_search());
+        }
+
+        if (choice == 19) {
+            menu_lgr();
         }
 
         if (flag_tag_opt) {

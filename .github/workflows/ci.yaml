@@ -27,7 +27,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: python -m pip install meson==1.10.0 ninja
@@ -52,7 +52,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: python -m pip install meson==1.10.0 ninja
@@ -101,6 +101,10 @@ jobs:
           - os: macos-latest
           - os: macos-15-intel
             arch: x86_64
+          - os: ubuntu-latest
+            emscripten: true
+          - os: windows-latest
+            emscripten: true
 
     steps:
       - name: Checkout repository
@@ -110,18 +114,18 @@ jobs:
         uses: actions/cache@v4
         with:
           path: subprojects/packagecache
-          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}-meson-${{ hashFiles('subprojects/*.wrap') }}
+          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}${{ matrix.emscripten && '-emscripten' || '' }}-meson-${{ hashFiles('subprojects/*.wrap') }}
 
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           variant: sccache
-          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}
+          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}${{ matrix.emscripten && '-emscripten' || '' }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: python -m pip install meson==1.10.0 ninja
@@ -133,21 +137,45 @@ jobs:
           sudo apt-get install -y libgl1-mesa-dev
 
       - name: Visual Studio 17
-        if: runner.os == 'windows'
+        if: runner.os == 'windows' && !matrix.emscripten
         uses: microsoft/setup-msbuild@v2
         with:
           vs-version: "[17.1,18.0)"
 
-      - name: Configure
-        if: runner.os == 'windows'
-        run: meson setup build -Dbuildtype=release --vsenv
-
-      - name: Configure
-        if: runner.os != 'windows'
-        run: meson setup build -Dbuildtype=release
+      - name: Emscripten
+        if: matrix.emscripten
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk${{ runner.os == 'windows' && '.bat' || '' }} install latest
+          ./emsdk${{ runner.os == 'windows' && '.bat' || '' }} activate latest
 
       - name: Build
-        run: meson compile -C build
+        if: runner.os == 'windows' && !matrix.emscripten
+        run: |
+          meson setup build -Dbuildtype=release --vsenv
+          meson compile -C build
+
+      - name: Build
+        if: runner.os != 'windows' && !matrix.emscripten
+        run: |
+          meson setup build -Dbuildtype=release
+          meson compile -C build
+
+      - name: Build
+        if: runner.os == 'windows' && matrix.emscripten
+        shell: cmd
+        run: |
+          call ./emsdk/emsdk_env.bat
+          meson setup build -Dbuildtype=release --cross-file emscripten-win.ini
+          meson compile -C build
+
+      - name: Build
+        if: runner.os != 'windows' && matrix.emscripten
+        run: |
+          source ./emsdk/emsdk_env.sh
+          meson setup build -Dbuildtype=release --cross-file emscripten-unix.ini
+          meson compile -C build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

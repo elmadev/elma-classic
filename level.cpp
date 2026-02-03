@@ -161,10 +161,11 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
                     delete sprites[i];
                     sprites[i] = nullptr;
                     sprites_deleted = true;
-                } else {
-                    spr->wireframe_width = lgr->masks[index].width * PixelsToMeters;
-                    spr->wireframe_height = lgr->masks[index].height * PixelsToMeters;
+                    continue;
                 }
+
+                spr->wireframe_width = lgr->masks[index].width * PixelsToMeters;
+                spr->wireframe_height = lgr->masks[index].height * PixelsToMeters;
 
                 if (spr->texture_name[0]) {
                     int index = lgr->get_texture_index(spr->texture_name);

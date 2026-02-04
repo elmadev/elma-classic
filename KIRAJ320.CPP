@@ -800,6 +800,10 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
                 fulljatekosA = 0;
             }
         }
+        if (current_camera.mode == CameraMode::MapViewer) {
+            splitscreen = 0;
+            fulljatekosA = 1;
+        }
     }
 
     pic8* npic = lockbackbuffer_pic();

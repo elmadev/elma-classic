@@ -77,6 +77,7 @@ class recorder {
     // Save a singleplayer or multiplayer replay
     static void save_rec_file(const char* filename, int level_id, int flagtag);
 
+    bool is_empty() { return frame_count == 0; }
     void erase(char* lev_filename);
     void rewind();
     bool recall_frame(motorst* mot, double time, bike_sound* sound);

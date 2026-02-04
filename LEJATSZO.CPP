@@ -757,6 +757,14 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     Single = !MultiplayerRec;
     Tag = Rec1->flagtag();
 
+    // Refuse to play zero-length replays (from map-viewer mode)
+    if (Rec1->is_empty()) {
+        return -2;
+    }
+    if (!Single && Rec2->is_empty()) {
+        return -2;
+    }
+
     load_best_time(filenev, Single);
 
     int palmegnincs = 1;

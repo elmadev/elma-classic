@@ -228,8 +228,8 @@ void replay_from_file(const char* filename) {
 
 static text_line ExtraTimeText[14];
 
-int menu_level(int internal_index, bool nav_on_play_next, const char* time_message,
-               const char* external_filename) {
+MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time_message,
+                     const char* external_filename) {
     bool external_level = external_filename != nullptr;
 
     player* player1 = State->get_player(State->player1);
@@ -407,12 +407,10 @@ int menu_level(int internal_index, bool nav_on_play_next, const char* time_messa
             choice++;
         }
         if (choice < 0) {
-            // Esc
-            return 0;
+            return MenuLevel::Esc;
         }
         if (choice == 0) {
-            // Play again
-            return 1;
+            return MenuLevel::PlayAgain;
         }
         if (choice == 1) {
             // Play next / Skip level
@@ -420,11 +418,10 @@ int menu_level(int internal_index, bool nav_on_play_next, const char* time_messa
                 internal_error("choice == 1 && (!show_play_next && !show_skip_level)!");
             }
             if (show_play_next) {
-                return 2;
+                return MenuLevel::PlayNext;
             }
             if (is_skippable(internal_index)) {
-                // Only if we are allowed to skip
-                return 3;
+                return MenuLevel::Skip;
             }
         }
         if (choice == 2) {
@@ -490,26 +487,22 @@ static void play_internal(int internal_index) {
             State->save();
         }
 
-        int choice = menu_level(internal_index, unlocked_new_level, time_message, nullptr);
+        MenuLevel choice = menu_level(internal_index, unlocked_new_level, time_message, nullptr);
         Rec1->erase(filename);
         Rec2->erase(filename);
 
-        if (choice == 0) {
-            // Esc
+        if (choice == MenuLevel::Esc) {
             cur_player->selected_level = internal_index + unlocked_new_level;
             return;
         }
-        // Play again
-        // if(choice == 1) {
-        //     continue;
-        // }
-        if (choice == 2) {
-            // Play next
+        if (choice == MenuLevel::PlayAgain) {
+            continue;
+        }
+        if (choice == MenuLevel::PlayNext) {
             internal_index++;
             cur_player->selected_level = internal_index;
         }
-        if (choice == 3) {
-            // Skip level
+        if (choice == MenuLevel::Skip) {
             if (internal_index != cur_player->levels_completed) {
                 internal_error("internal_index != cur_player->levels_completed!");
             }

@@ -85,7 +85,7 @@ void menu_external_levels() {
             MenuPalette->set();
             char finish_msg[100] = "";
             update_top_ten(time, finish_msg, 0, filename);
-            if (!menu_level(0, 0, finish_msg, filename)) {
+            if (menu_level(0, 0, finish_msg, filename) == MenuLevel::Esc) {
                 Rec1->erase(filename);
                 Rec2->erase(filename);
                 break;

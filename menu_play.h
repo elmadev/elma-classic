@@ -14,16 +14,10 @@ void replay_from_file(const char* filename);
 void update_top_ten(int time, char* time_message, int internal_index,
                     const char* external_filename);
 
+enum class MenuLevel { Esc, PlayAgain, PlayNext, Skip, BestTimes };
 // Pass either the internal_index or the external_filename
-// Returns selection:
-// 0 = Esc
-// 1 = Play Again
-// 2 = Play Next
-// 3 = Skip
-// Save Play -> submenu
-// 4 = Best Times
-int menu_level(int internal_index, bool nav_on_play_next, const char* time_message,
-               const char* external_filename);
+MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time_message,
+                     const char* external_filename);
 
 void loading_screen();
 

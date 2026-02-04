@@ -1709,11 +1709,11 @@ static void egetkeszit( pic8* peg, int xhely, int xkezd, int xmodulus ) {
 
         Felho = new pic8( "felho.pcx" );
         forditkepet( Felho );
-        spriteosit( Felho );
+        add_transparency( Felho );
 
         Felho2 = new pic8( "felho2.pcx" );
         forditkepet( Felho2 );
-        spriteosit( Felho2 );
+        add_transparency( Felho2 );
     }
 
     // Resetaljuk eget:

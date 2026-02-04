@@ -3,6 +3,7 @@
 
 class pic8;
 
-unsigned char* spriteadat8(pic8* pmask, unsigned char szin, unsigned short* pspritehossz);
+unsigned char* create_transparency_buffer(pic8* pic, unsigned char transparency,
+                                          unsigned short* transparency_length);
 
 #endif

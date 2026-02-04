@@ -40,7 +40,7 @@ void menu_intro() {
     // Load intro.pcx and hide the version
     Intro = new pic8("intro.pcx");
     Intro->fill_box(0, 410, Intro->get_width(), 450, Intro->gpixel(0, 409));
-    spriteosit(Intro);
+    add_transparency(Intro);
     pic8* static_intro_screen = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     static_intro_screen->fill_box(BLACK_PALETTE_ID);
     blit8(static_intro_screen, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,

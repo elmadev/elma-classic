@@ -1,10 +1,8 @@
-#include "transparency.h"
 #include "main.h"
 #include "pic8.h"
 #include <cstring>
 
-#define SPRITE_MAX_BUFFER (20000u)
-static int SPRITE_MAX_RUN_LENGTH = 255;
+constexpr int SPRITE_MAX_RUN_LENGTH = 255;
 
 // Count number of solid pixels starting from x, y, up to a length of 255 or end of row
 static int consecutive_solid_pixels(pic8* pic, int x, int y, unsigned char transparency) {
@@ -31,8 +29,9 @@ static int consecutive_transparent_pixels(pic8* pic, int x, int y, unsigned char
 // Transparency data format:
 //       ['K', length] -> the next length pixels are solid
 //       ['N', length] -> the next length pixels are transparent
-unsigned char* create_transparency_buffer(pic8* pic, unsigned char transparency,
-                                          unsigned short* transparency_length) {
+static unsigned char* create_transparency_buffer(pic8* pic, unsigned char transparency,
+                                                 unsigned short* transparency_length) {
+    constexpr int SPRITE_MAX_BUFFER = 20000;
     *transparency_length = 0;
     unsigned char* buffer = nullptr;
     buffer = new unsigned char[SPRITE_MAX_BUFFER];
@@ -42,7 +41,7 @@ unsigned char* create_transparency_buffer(pic8* pic, unsigned char transparency,
     }
     int xsize = pic->get_width();
     int ysize = pic->get_height();
-    unsigned buffer_length = 0;
+    unsigned int buffer_length = 0;
     for (int y = 0; y < ysize; y++) {
         int x = 0;
         while (x < xsize) {

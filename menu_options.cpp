@@ -170,6 +170,7 @@ void menu_options() {
 
         if (choice < 0) {
             eol_settings::write_settings();
+            State->save();
             return;
         }
 

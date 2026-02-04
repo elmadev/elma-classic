@@ -81,10 +81,9 @@ static unsigned char* create_transparency_buffer(pic8* pic, unsigned char transp
 }
 
 // Generate transparency data with a specified transparency palette index
-void add_transparency(pic8* pic, int transparency) {
-    pic->transparency_data =
-        create_transparency_buffer(pic, transparency, &pic->transparency_data_length);
+void pic8::add_transparency(int transparency) {
+    transparency_data = create_transparency_buffer(this, transparency, &transparency_data_length);
 }
 
 // Generate transparency data using the top-left pixel as the transparency palette index
-void add_transparency(pic8* pic) { add_transparency(pic, pic->gpixel(0, 0)); }
+void pic8::add_transparency() { add_transparency(gpixel(0, 0)); }

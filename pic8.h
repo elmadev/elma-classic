@@ -9,8 +9,6 @@ class pic8 {
   private:
     friend void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2);
     friend void blit8(pic8* dest, pic8* source, int x, int y);
-    friend void add_transparency(pic8* ppic, int index);
-    friend void add_transparency(pic8* ppic);
     friend pic8* lockbackbuffer_pic(bool flipped);
     friend void lockfrontbuffer_pic(bool flipped);
     friend void unlockbackbuffer_pic();
@@ -48,6 +46,9 @@ class pic8 {
     void fill_box(unsigned char index);
     void line(int x1, int y1, int x2, int y2, unsigned char index);
     void subview(int x1, int y1, int x2, int y2, pic8* source);
+
+    void add_transparency(int transparency);
+    void add_transparency();
 };
 
 void blit8(pic8* dest, pic8* source, int x = 0, int y = 0);

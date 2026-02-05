@@ -729,7 +729,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     }
 
     if (!EolSettings->pictures_in_background()) {
-        // Felso ecset kitevese:
+        // Felso canvas kitevese:
         CanvasFront->render(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
     }
 

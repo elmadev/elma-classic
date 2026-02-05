@@ -19,7 +19,7 @@ static char Bentlevelnev[20] = "";
 void invalidate_level() { Volttopsave = 1; }
 
 // Beolvas egy level-t ha kell (nev max 12 karakter).
-// Torli es kitolti Ptop, Lgr, Segments, ecset mutatokat.
+// Torli es kitolti Ptop, Lgr, Segments, canvas mutatokat.
 // Ha belso file-ban is megvan palya onnan veszi:
 // Hamissal ter vissza, ha hibas topologiaju level:
 int floadlevel_p(const char* nev) {
@@ -76,7 +76,7 @@ int floadlevel_p(const char* nev) {
 }
 
 // Torli es kitolti Ptop, Lgr, mutatokat.
-// Segments, ecset mutatokat torli:
+// Segments, canvas mutatokat torli:
 // Ha belso file-ban is megvan palya onnan veszi:
 // Igaz ha file nem volt lezarva, kulonben new palya hamissal:
 int floadlevel_e(const char* nev, int forceload) {

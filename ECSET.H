@@ -3,7 +3,7 @@
 
 #include "vect2.h"
 
-class ecset;
+class canvas;
 class grass;
 struct canvas_chunk_node;
 class pic8;
@@ -12,12 +12,12 @@ struct segment;
 
 // Egy iterator class (inkabb cache) ecsethez (foltoz hasznalja oket):
 class node_finder {
-    ecset* source;
+    canvas* source;
     int current_x, current_y;
     canvas_chunk_node* current_node;
 
   public:
-    node_finder(ecset* src);
+    node_finder(canvas* src);
     canvas_chunk_node* get_chunk(int x, int y);
 };
 
@@ -50,7 +50,7 @@ struct canvas_chunk {
 
 void create_canvases(void);
 
-class ecset {
+class canvas {
     friend void create_canvases(void);
     friend void segedfv(void);
     friend canvas_chunk_node* node_finder::get_chunk(int x, int y);
@@ -110,9 +110,9 @@ class ecset {
 
     void create_front_grass(void);
 
-    ecset(int minimap);      // Ptop es Segments alapjan
-    ecset(ecset* reference); // Ures sortomboket hoz benne letre
-    ~ecset(void);
+    canvas(int minimap);       // Ptop es Segments alapjan
+    canvas(canvas* reference); // Ures sortomboket hoz benne letre
+    ~canvas(void);
 
   public:
     void meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y);
@@ -122,9 +122,9 @@ class ecset {
     // void egetkeszit( void );
 };
 
-extern ecset* CanvasBack;
-extern ecset* CanvasFront;
-extern ecset* CanvasMinimap;
+extern canvas* CanvasBack;
+extern canvas* CanvasFront;
+extern canvas* CanvasMinimap;
 
 // create_canvases ide osszegzi osszes lefoglalt szakaszt:
 extern int Osszegszam;

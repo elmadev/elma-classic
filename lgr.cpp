@@ -20,6 +20,7 @@
 #include "sprite.h"
 #include <algorithm>
 #include <cstring>
+#include <filesystem>
 #include <vector>
 
 constexpr int MAGIC_NUMBER = 187565543;
@@ -37,6 +38,40 @@ void invalidate_lgr_cache() {
     CurrentLgrName[0] = '\0';
 }
 
+static bool try_access_lgr(const char* lgr_name) {
+    char path[30];
+    sprintf(path, "lgr/%s.lgr", lgr_name);
+    if (std::filesystem::exists(path)) {
+        return true;
+    }
+
+    // LGR not found
+    if (!Ptop) {
+        internal_error("load_lgr_file !Ptop!");
+    }
+
+    // Display warning
+    char filename[20];
+    strcpy(filename, lgr_name);
+    strcat(filename, ".lgr");
+    blit8(BufferBall, BufferMain);
+    BufferMain->fill_box(Hatterindex);
+    bltfront(BufferMain);
+    if (!InEditor) {
+        Pal_editor->set();
+    }
+    dialog("LGR file not found!",
+           "The level file uses the pictures that are stored in this LGR file:", filename,
+           "This file doesn't exist in the LGR directory, so the default.lgr file will be loaded.",
+           "This level file will look now different from that it was designed to look.");
+    if (!InEditor) {
+        MenuPalette->set();
+    }
+    blit8(BufferMain, BufferBall);
+    bltfront(BufferMain);
+    return false;
+}
+
 void lgrfile::load_lgr_file(char* lgr_name) {
     if (strlen(lgr_name) > MAX_FILENAME_LEN) {
         internal_error("load_lgr_file strlen( lgr_name ) > MAX_FILENAME_LEN!");
@@ -47,35 +82,7 @@ void lgrfile::load_lgr_file(char* lgr_name) {
     }
     strlwr(lgr_name);
 
-    char path[30];
-    sprintf(path, "lgr/%s.lgr", lgr_name);
-    if (access(path, 0) != 0) {
-        // LGR not found
-        if (!Ptop) {
-            internal_error("load_lgr_file !Ptop!");
-        }
-
-        // Display warning
-        char filename[20];
-        strcpy(filename, lgr_name);
-        strcat(filename, ".lgr");
-        blit8(BufferBall, BufferMain);
-        BufferMain->fill_box(Hatterindex);
-        bltfront(BufferMain);
-        if (!InEditor) {
-            Pal_editor->set();
-        }
-        dialog(
-            "LGR file not found!",
-            "The level file uses the pictures that are stored in this LGR file:", filename,
-            "This file doesn't exist in the LGR directory, so the default.lgr file will be loaded.",
-            "This level file will look now different from that it was designed to look.");
-        if (!InEditor) {
-            MenuPalette->set();
-        }
-        blit8(BufferMain, BufferBall);
-        bltfront(BufferMain);
-
+    if (!try_access_lgr(lgr_name)) {
         // Modify our input lgr (i.e. our class level) to default and then try and load it
         strcpy(lgr_name, "default");
         Valtozott = 1;
@@ -83,6 +90,7 @@ void lgrfile::load_lgr_file(char* lgr_name) {
             return;
         }
 
+        char path[30];
         strcpy(path, "lgr/default.lgr");
         Ptop->lgr_not_found = true;
         if (access(path, 0) != 0) {

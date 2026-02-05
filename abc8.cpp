@@ -5,12 +5,6 @@
 #include "qopen.h"
 #include <cstring>
 
-#ifdef DEBUG
-bool ErrorOnMissingCodepoint = true;
-#else
-bool ErrorOnMissingCodepoint = false;
-#endif
-
 abc8::abc8(const char* filename) {
     spacing = 0;
     ppsprite = nullptr;
@@ -123,11 +117,10 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
             continue;
         }
         if (!ppsprite[index]) {
-            if (ErrorOnMissingCodepoint) {
-                internal_error("Missing codepoint in abc8!", error_text);
-                return;
-            }
-
+#ifdef DEBUG
+            printf("Missing codepoint %c (0x%02X) in abc8 text: \"%s\"\n", index, index,
+                   error_text);
+#endif
             text++;
             continue;
         }
@@ -154,11 +147,10 @@ int abc8::len(const char* text) {
                 text++;
                 continue;
             }
-            if (ErrorOnMissingCodepoint) {
-                internal_error("Missing codepoint in abc8!", error_text);
-                return 0;
-            }
-
+#ifdef DEBUG
+            printf("Missing codepoint %c (0x%02X) in abc8 text: \"%s\"\n", index, index,
+                   error_text);
+#endif
             text++;
             continue;
         }

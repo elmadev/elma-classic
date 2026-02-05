@@ -76,7 +76,7 @@ class lgrfile {
     ~lgrfile();
 
   public:
-    static void load_lgr_file(char* lgr_name);
+    static void load_lgr_file(const char* lgr_name);
 
     int picture_count;
     picture pictures[MAX_PICTURES];

@@ -35,7 +35,7 @@ ecset* CanvasMinimap = NULL;
 
 /*void vizsgal( ecset* pecset ) {
 
-    canvas_chunk_node* futo = pecset->msorok[1071];
+    canvas_chunk_node* futo = pecset->rows_linked[1071];
     int xtomb[40];
     int muttomb[40];
     int kurx = 1;
@@ -60,22 +60,22 @@ static void hibanincsmem(void) {
 }
 
 canvas_chunk_node* ecset::newmdarab(void) {
-    if (tombbenkov >= CHUNK_NODE_BLOCK_LENGTH) {
+    if (node_array_index >= CHUNK_NODE_BLOCK_LENGTH) {
         // Ez a tomb betelt:
-        tombbenkov = 0;
-        kurtomb->next = new canvas_chunk_node_array;
-        if (!kurtomb->next) {
+        node_array_index = 0;
+        node_array_last->next = new canvas_chunk_node_array;
+        if (!node_array_last->next) {
             hibanincsmem();
         }
-        kurtomb = kurtomb->next;
-        kurtomb->next = NULL;
-        tombbenkov++;
-        canvas_chunk_node* ret = &kurtomb->nodes[tombbenkov - 1];
+        node_array_last = node_array_last->next;
+        node_array_last->next = NULL;
+        node_array_index++;
+        canvas_chunk_node* ret = &node_array_last->nodes[node_array_index - 1];
         ret->distance = 0;
         return ret;
     }
-    tombbenkov++;
-    canvas_chunk_node* ret = &kurtomb->nodes[tombbenkov - 1];
+    node_array_index++;
+    canvas_chunk_node* ret = &node_array_last->nodes[node_array_index - 1];
     ret->distance = 0;
     return ret;
 }
@@ -123,32 +123,32 @@ void ecset::getorigoandsize(void) {
         psz = Segments->next_segment();
     }
 
-    if (view) {
+    if (is_minimap) {
         // VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW
         // x-re jol ra lehet hagyni, nem noveli memoria foglalast:
-        origo = vect2(minx - 10000 / MetersToPixels, miny - 4000 / MetersToPixels);
-        xsizedb = (maxx + 10000 / MetersToPixels) - origo.x;
-        ysizedb = (maxy + 4000 / MetersToPixels) - origo.y;
+        origin = vect2(minx - 10000 / MetersToPixels, miny - 4000 / MetersToPixels);
+        width = (maxx + 10000 / MetersToPixels) - origin.x;
+        height = (maxy + 4000 / MetersToPixels) - origin.y;
     } else {
         // x-re jol ra lehet hagyni, nem noveli memoria foglalast:
-        origo = vect2(minx - 10000 / MetersToPixels, miny - 1000 / MetersToPixels);
+        origin = vect2(minx - 10000 / MetersToPixels, miny - 1000 / MetersToPixels);
         // Beallitjuk ugy, hogy mindig pixel felezo helyen legyen origo:
-        meghelyez(&origo.x);
-        meghelyez(&origo.y);
+        meghelyez(&origin.x);
+        meghelyez(&origin.y);
 
-        xsizedb = (maxx + 10000 / MetersToPixels) - origo.x;
-        ysizedb = (maxy + 1000 / MetersToPixels) - origo.y;
+        width = (maxx + 10000 / MetersToPixels) - origin.x;
+        height = (maxy + 1000 / MetersToPixels) - origin.y;
     }
 }
 
 void ecset::addszakasz(segment* psz) {
     vect2 r, v;
-    r = psz->r - origo;
+    r = psz->r - origin;
     r.x *= MetersToPixels;
     r.y *= MetersToPixels;
     v.x = psz->v.x * MetersToPixels;
     v.y = psz->v.y * MetersToPixels;
-    if (view) {
+    if (is_minimap) {
         double szorzo = 1.0 / MinimapScaleFactor;
         r.x *= szorzo;
         r.y *= szorzo;
@@ -194,11 +194,11 @@ void ecset::addszakasz(segment* psz) {
         //	internal_error( "Nagyon kozeli pont!" );
 
         // Hozzacsapjuk hatar pontot sorhoz:
-        if (y < 10 || y >= sorszam) {
-            internal_error("ecset::addszakasz y < 10 || y >= sorszam!");
+        if (y < 10 || y >= pixel_height) {
+            internal_error("ecset::addszakasz y < 10 || y >= pixel_height!");
         }
-        if (x < 10 || x > maxx) {
-            internal_error("ecset::addszakasz x < 10 || x > maxx!");
+        if (x < 10 || x > pixel_width) {
+            internal_error("ecset::addszakasz x < 10 || x > pixel_width!");
         }
 
         canvas_chunk_node* pmd = newmdarab();
@@ -210,7 +210,7 @@ void ecset::addszakasz(segment* psz) {
             pmd->pixels = (unsigned char*)PixelsDefaultBackground;
         }
 
-        canvas_chunk_node* pfut = msorok[y];
+        canvas_chunk_node* pfut = rows_linked[y];
         if (!pfut) {
             internal_error("ecset::addszakasz !pfut!");
         }
@@ -313,9 +313,9 @@ static void rendez(canvas_chunk_node* elso) {
 
 // Rovid folddarabokat atalakitja konkret mutatova:
 void ecset::foldmutatocsere(void) {
-    for (int i = 0; i < sorszam; i++) {
-        canvas_chunk_node* fut = msorok[i];
-        int xpos = kurxposok_A[i];
+    for (int i = 0; i < pixel_height; i++) {
+        canvas_chunk_node* fut = rows_linked[i];
+        int xpos = rows_x1[i];
         if (xpos > 100) {
             internal_error("ecset::foldmutatocsere xpos > 100!");
         }
@@ -335,11 +335,11 @@ void ecset::foldmutatocsere(void) {
 
 // Egymas utani azonos texturakat es ureseket lecsereli egy hosszabbra:
 void ecset::duplaeliminacio(void) {
-    for (int i = 0; i < sorszam; i++) {
+    for (int i = 0; i < pixel_height; i++) {
         int voltvaltozas = 1;
         while (voltvaltozas) {
             voltvaltozas = 0;
-            canvas_chunk_node* fut = msorok[i];
+            canvas_chunk_node* fut = rows_linked[i];
             while (fut && fut->next) {
                 canvas_chunk_node* kov = fut->next;
                 if (((pixelek_t)fut->pixels & PIXELMASZK) == 0 && fut->pixels == kov->pixels) {
@@ -355,9 +355,9 @@ void ecset::duplaeliminacio(void) {
 }
 
 void ecset::textura2mutato(void) {
-    for (int y = 0; y < sorszam; y++) {
-        canvas_chunk_node* fut = msorok[y];
-        int xpos = kurxposok_A[y];
+    for (int y = 0; y < pixel_height; y++) {
+        canvas_chunk_node* fut = rows_linked[y];
+        int xpos = rows_x1[y];
         if (xpos > 100) {
             internal_error("9865fd");
         }
@@ -432,24 +432,24 @@ int Osszegszam = 0;
 void ecset::mutatotlanit(void) {
     // Megszamoljuk osszes mdarab-ot:
     int szam = 0;
-    for (int i = 0; i < sorszam; i++) {
-        szam += megszamol(msorok[i]);
+    for (int i = 0; i < pixel_height; i++) {
+        szam += megszamol(rows_linked[i]);
     }
     Osszegszam += szam;
     // Most lefoglaljuk uj egybefuggo tombot:
-    nagydarabtomb = new canvas_chunk[szam + 10];
-    if (!nagydarabtomb) {
+    chunk_array = new canvas_chunk[szam + 10];
+    if (!chunk_array) {
         hibanincsmem();
     }
     int szammost = 0;
-    for (int i = 0; i < sorszam; i++) {
-        canvas_chunk_node* futo = msorok[i];
-        sorok[i] = &nagydarabtomb[szammost];
-        curdarabok_A[i] = sorok[i];
-        curdarabok_B[i] = sorok[i];
+    for (int i = 0; i < pixel_height; i++) {
+        canvas_chunk_node* futo = rows_linked[i];
+        rows[i] = &chunk_array[szammost];
+        rows_position1[i] = rows[i];
+        rows_position2[i] = rows[i];
         while (futo) {
-            nagydarabtomb[szammost].width = futo->width;
-            nagydarabtomb[szammost].pixels = futo->pixels;
+            chunk_array[szammost].width = futo->width;
+            chunk_array[szammost].pixels = futo->pixels;
 
             futo = futo->next;
             szammost++;
@@ -465,14 +465,14 @@ void ecset::kitoltfoodkoordokat(void) {
         if (!pker) {
             continue;
         }
-        if (view) {
+        if (is_minimap) {
             pker->minimap_canvas_x =
-                (int)((pker->r.x - origo.x) * MetersToPixels / MinimapScaleFactor);
+                (int)((pker->r.x - origin.x) * MetersToPixels / MinimapScaleFactor);
             pker->minimap_canvas_y =
-                (int)((-pker->r.y - origo.y) * MetersToPixels / MinimapScaleFactor);
+                (int)((-pker->r.y - origin.y) * MetersToPixels / MinimapScaleFactor);
         } else {
-            pker->canvas_x = (int)((pker->r.x - origo.x) * MetersToPixels - offset);
-            pker->canvas_y = (int)((-pker->r.y - origo.y) * MetersToPixels - offset);
+            pker->canvas_x = (int)((pker->r.x - origin.x) * MetersToPixels - offset);
+            pker->canvas_y = (int)((-pker->r.y - origin.y) * MetersToPixels - offset);
         }
     }
 }
@@ -681,9 +681,9 @@ void ecset::addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int u
 
     // Beallunk pmd, xpos-sal elso szoba jovo madarab-ra:
     // Visszalepunk amig kell:
-    canvas_chunk_node* pmd = msorok[y];
+    canvas_chunk_node* pmd = rows_linked[y];
     // Pmddd = pmd;
-    int xpos = kurxposok_A[y];
+    int xpos = rows_x1[y];
     if (xpos > 10) {
         internal_error("ecset::addbytesor xpos > 10!");
     }
@@ -742,8 +742,8 @@ void ecset::addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int u
 // addspriteok hivja:
 void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
     // Egy kep berakasa:
-    int x1 = (int)((psp->r.x - origo.x) * MetersToPixels);
-    int y1 = (int)((-psp->r.y - origo.y) * MetersToPixels);
+    int x1 = (int)((psp->r.x - origin.x) * MetersToPixels);
+    int y1 = (int)((-psp->r.y - origin.y) * MetersToPixels);
 
     mask* pm = &Lgr->masks[index_m];
 
@@ -752,7 +752,7 @@ void ecset::addegymaszk(sprite* psp, int index_t, int index_m, int fazis) {
     int xsize = pm->width;
     int ysize = pm->height;
 
-    if (x1 < 120 || x1 + xsize >= maxx - 50) {
+    if (x1 < 120 || x1 + xsize >= pixel_width - 50) {
         return;
     }
 
@@ -822,15 +822,15 @@ void ecset::addspriteok(int fazis) {
         picture* pkep = &Lgr->pictures[index];
 
         // Egy kep berakasa:
-        int x1 = (int)((psp->r.x - origo.x) * MetersToPixels);
-        int y1 = (int)((-psp->r.y - origo.y) * MetersToPixels);
+        int x1 = (int)((psp->r.x - origin.x) * MetersToPixels);
+        int y1 = (int)((-psp->r.y - origin.y) * MetersToPixels);
 
         int ujtavolsag = psp->distance;
 
         int xsize = pkep->width;
         int ysize = pkep->height;
 
-        if (x1 < 120 || x1 + xsize >= maxx - 50) {
+        if (x1 < 120 || x1 + xsize >= pixel_width - 50) {
             return;
         }
 
@@ -861,7 +861,7 @@ void ecset::addspriteok(int fazis) {
                 i += 2;
 
                 // Negativ iranyban haladunk y-on (y1-y):
-                if (y1 - y >= 0 && y1 - y < sorszam) {
+                if (y1 - y >= 0 && y1 - y < pixel_height) {
                     addbytesor(&tomb[i], ujtavolsag, x1 + x, x1 + x + teliszam - 1, y1 - y, fazis);
                 }
 
@@ -1126,7 +1126,7 @@ void ecset::addkovetok(int fazis) {
 
         int vonalhossz = 0, x0 = 0;
         if (!create_grass_polygon_heightmap(pgy, Kovetoytomb, &vonalhossz, &x0, KOVVONALHOSSZ,
-                                            &origo)) {
+                                            &origin)) {
             continue;
         }
         if (vonalhossz > KOVVONALHOSSZ) {
@@ -1145,7 +1145,7 @@ void ecset::addkovetok(int fazis) {
 }
 
 void ecset::addobjektumok(void) {
-    if (!view) {
+    if (!is_minimap) {
         return;
     }
 
@@ -1161,11 +1161,11 @@ void ecset::addobjektumok(void) {
         }
 
         // Egy kep berakasa:
-        if (view) {
+        if (is_minimap) {
             unsigned char* mut = Lgr->minimap_killer_palette_id;
             int ujtavolsag = 499;
-            int x1 = (int)((pk->r.x - origo.x) * (MetersToPixels / MinimapScaleFactor));
-            int y1 = (int)((-pk->r.y - origo.y) * (MetersToPixels / MinimapScaleFactor));
+            int x1 = (int)((pk->r.x - origin.x) * (MetersToPixels / MinimapScaleFactor));
+            int y1 = (int)((-pk->r.y - origin.y) * (MetersToPixels / MinimapScaleFactor));
             // Kirakja kis 3x3-as gyurut:
             addbytesor(mut, ujtavolsag, x1 - 1, x1 + 1, y1 - 1, FAZIS_NEMFOLDEG);
             addbytesor(mut, ujtavolsag, x1 - 1, x1 - 1, y1, FAZIS_NEMFOLDEG);
@@ -1177,8 +1177,8 @@ void ecset::addobjektumok(void) {
 
         /* Ez a resz csak nagy objektumokhoz kellene, de most csak view-val
            foglalkozunk:
-        int x1 = (pk->r.x-origo.x)*MetersToPixels;
-        int y1 = (-pk->r.y-origo.y)*MetersToPixels;
+        int x1 = (pk->r.x-origin.x)*MetersToPixels;
+        int y1 = (-pk->r.y-origin.y)*MetersToPixels;
         x1 -= ANIM_WIDTH/2;
         y1 += ANIM_WIDTH/2;
 
@@ -1212,7 +1212,7 @@ void ecset::addobjektumok(void) {
                     internal_error( "ecset::addspriteok teliszam utan size <= 0!" );
 
                 // Negativ iranyban haladunk y-on (y1-y):
-                if( y1-y >= 0 && y1-y < sorszam )
+                if( y1-y >= 0 && y1-y < pixel_height )
                     addbytesor( &sor[x], ujtavolsag, x1+x, x1+x+size-1,
                                                     y1-y, FAZIS_NEMFOLDEG );
                 x += size;
@@ -1225,8 +1225,8 @@ void ecset::addobjektumok(void) {
 }
 
 void ecset::levon10000t(void) {
-    for (int i = 0; i < sorszam; i++) {
-        canvas_chunk_node* pmd = msorok[i];
+    for (int i = 0; i < pixel_height; i++) {
+        canvas_chunk_node* pmd = rows_linked[i];
         while (pmd) {
             if (pmd->distance >= 10000) {
                 pmd->distance -= 10000;
@@ -1239,59 +1239,59 @@ void ecset::levon10000t(void) {
 
 // Ptop es Segments alapjan:
 ecset::ecset(int view_p) {
-    view = view_p;
+    is_minimap = view_p;
 
     for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
-        msorok[i] = NULL;
-        sorok[i] = NULL;
-        kurxposok_A[i] = 0;
-        kurxposok_B[i] = 0;
-        curdarabok_A[i] = NULL;
-        curdarabok_B[i] = NULL;
+        rows_linked[i] = NULL;
+        rows[i] = NULL;
+        rows_x1[i] = 0;
+        rows_x2[i] = 0;
+        rows_position1[i] = NULL;
+        rows_position2[i] = NULL;
     }
 
     // Inicializaljuk elso node tombot:
-    elsotomb = kurtomb = NULL;
-    tombbenkov = 0;
+    node_array = node_array_last = NULL;
+    node_array_index = 0;
 
-    nagydarabtomb = NULL;
+    chunk_array = NULL;
 
-    xsizedb = ysizedb = 0.0;
-    maxx = sorszam = 0;
+    width = height = 0.0;
+    pixel_width = pixel_height = 0;
 
     if (!Ptop || !Segments) {
         internal_error("ecset::ecset !Ptop || !Segments!");
     }
 
-    elsotomb = new canvas_chunk_node_array;
-    if (!elsotomb) {
+    node_array = new canvas_chunk_node_array;
+    if (!node_array) {
         internal_error("Nincs eleg memoria ecset::ecset!");
     }
-    elsotomb->next = NULL;
-    kurtomb = elsotomb;
+    node_array->next = NULL;
+    node_array_last = node_array;
 
     getorigoandsize();
 
-    if (view) {
+    if (is_minimap) {
         // VIEW VIEW VIEW:
-        maxx = (int)(xsizedb * (MetersToPixels / MinimapScaleFactor));
-        sorszam = (int)(ysizedb * (MetersToPixels / MinimapScaleFactor));
+        pixel_width = (int)(width * (MetersToPixels / MinimapScaleFactor));
+        pixel_height = (int)(height * (MetersToPixels / MinimapScaleFactor));
     } else {
-        maxx = (int)(xsizedb * MetersToPixels);
-        sorszam = (int)(ysizedb * MetersToPixels);
+        pixel_width = (int)(width * MetersToPixels);
+        pixel_height = (int)(height * MetersToPixels);
     }
 
-    if (sorszam - 10 > CANVAS_MAX_HEIGHT) {
-        internal_error("ecset::ecset sorszam-10 > CANVAS_MAX_HEIGHT!");
+    if (pixel_height - 10 > CANVAS_MAX_HEIGHT) {
+        internal_error("ecset::ecset pixel_height-10 > CANVAS_MAX_HEIGHT!");
     }
 
     // Inicializaljuk minden sor elejet foldre:
-    for (int i = 0; i < sorszam; i++) {
-        msorok[i] = newmdarab();
-        msorok[i]->next = NULL;
-        msorok[i]->width = 1;
-        msorok[i]->distance = 0;
-        msorok[i]->pixels = (unsigned char*)PixelsDefaultForeground;
+    for (int i = 0; i < pixel_height; i++) {
+        rows_linked[i] = newmdarab();
+        rows_linked[i]->next = NULL;
+        rows_linked[i]->width = 1;
+        rows_linked[i]->distance = 0;
+        rows_linked[i]->pixels = (unsigned char*)PixelsDefaultForeground;
     }
 
     // Vegigmegyunk osszes szakaszon:
@@ -1303,13 +1303,13 @@ ecset::ecset(int view_p) {
     }
 
     // Sorrendbe rendezzuk egy sor elemeit:
-    for (int i = 0; i < sorszam; i++) {
-        rendez(msorok[i]);
-        kurxposok_A[i] = kurxposok_B[i] = sizeraallit(msorok[i]);
+    for (int i = 0; i < pixel_height; i++) {
+        rendez(rows_linked[i]);
+        rows_x1[i] = rows_x2[i] = sizeraallit(rows_linked[i]);
     }
 
     // Spriteok beadasa:
-    if (!view && State->high_quality) {
+    if (!is_minimap && State->high_quality) {
         addspriteok(FAZIS_FOLD);
         addkovetok(FAZIS_FOLD);
         addspriteok(FAZIS_EG);
@@ -1335,80 +1335,80 @@ ecset::ecset(int view_p) {
 // Ptop es Segments alapjan:
 ecset::ecset(ecset* pold) {
     for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
-        msorok[i] = NULL;
-        sorok[i] = NULL;
-        kurxposok_A[i] = 0;
-        kurxposok_B[i] = 0;
-        curdarabok_A[i] = NULL;
-        curdarabok_B[i] = NULL;
+        rows_linked[i] = NULL;
+        rows[i] = NULL;
+        rows_x1[i] = 0;
+        rows_x2[i] = 0;
+        rows_position1[i] = NULL;
+        rows_position2[i] = NULL;
     }
 
     // Inicializaljuk elso node tombot:
-    elsotomb = kurtomb = NULL;
-    tombbenkov = 0;
+    node_array = node_array_last = NULL;
+    node_array_index = 0;
 
-    nagydarabtomb = NULL;
+    chunk_array = NULL;
 
-    view = 0;
-    xsizedb = ysizedb = 0.0;
-    maxx = sorszam = 0;
+    is_minimap = 0;
+    width = height = 0.0;
+    pixel_width = pixel_height = 0;
 
     if (!Ptop || !Segments) {
         internal_error("ecset::ecset !Ptop || !Segments!");
     }
 
-    elsotomb = new canvas_chunk_node_array;
-    if (!elsotomb) {
+    node_array = new canvas_chunk_node_array;
+    if (!node_array) {
         internal_error("Nincs eleg memoria ecset::ecset!");
     }
-    elsotomb->next = NULL;
-    kurtomb = elsotomb;
+    node_array->next = NULL;
+    node_array_last = node_array;
 
     // getorigoandsize(); ehelyett:
-    origo = pold->origo;
-    xsizedb = pold->xsizedb;
-    ysizedb = pold->ysizedb;
+    origin = pold->origin;
+    width = pold->width;
+    height = pold->height;
 
-    maxx = pold->maxx;
-    sorszam = pold->sorszam;
+    pixel_width = pold->pixel_width;
+    pixel_height = pold->pixel_height;
 
     // Inicializaljuk minden sor elejet uresre:
-    for (int i = 0; i < sorszam; i++) {
-        kurxposok_A[i] = 1;
-        kurxposok_B[i] = 1;
+    for (int i = 0; i < pixel_height; i++) {
+        rows_x1[i] = 1;
+        rows_x2[i] = 1;
 
-        msorok[i] = newmdarab();
-        msorok[i]->next = NULL;
-        msorok[i]->width = 1000000;
-        msorok[i]->distance = 0;
-        msorok[i]->pixels = (unsigned char*)PixelsTransparent;
+        rows_linked[i] = newmdarab();
+        rows_linked[i]->next = NULL;
+        rows_linked[i]->width = 1000000;
+        rows_linked[i]->distance = 0;
+        rows_linked[i]->pixels = (unsigned char*)PixelsTransparent;
     }
 }
 
 ecset::~ecset(void) {
-    if (elsotomb) {
-        internal_error("ecset::~ecset elsotomb");
+    if (node_array) {
+        internal_error("ecset::~ecset node_array");
     }
-    if (!nagydarabtomb) {
-        internal_error("ecset::~ecset !nagydarabtomb!");
+    if (!chunk_array) {
+        internal_error("ecset::~ecset !chunk_array!");
     }
-    delete nagydarabtomb;
-    nagydarabtomb = NULL;
+    delete chunk_array;
+    chunk_array = NULL;
 }
 
 void ecset::deletemdarabok(void) {
-    if (!elsotomb) {
-        internal_error("ecset::deletemdarabok !elsotomb!");
+    if (!node_array) {
+        internal_error("ecset::deletemdarabok !node_array!");
     }
-    canvas_chunk_node_array* cur = elsotomb;
+    canvas_chunk_node_array* cur = node_array;
     while (cur) {
         canvas_chunk_node_array* kov = cur->next;
         delete cur;
         cur = kov;
     }
-    elsotomb = NULL;
+    node_array = NULL;
     for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
-        msorok[i] = NULL;
+        rows_linked[i] = NULL;
     }
 }
 
@@ -1435,8 +1435,8 @@ static inline void draw_default_ground(unsigned char* pc, size_t offset, size_t 
 
 void ecset::kiegysor_A(unsigned char* pc, int ye) {
     // Visszalepunk amig kell:
-    canvas_chunk* pda = curdarabok_A[ye];
-    int xpos = kurxposok_A[ye];
+    canvas_chunk* pda = rows_position1[ye];
+    int xpos = rows_x1[ye];
     while (xpos > Xe1) {
         pda--;
         xpos -= pda->width;
@@ -1447,8 +1447,8 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
         pda++;
     }
     // Elmentjuk kurrens darabot:
-    curdarabok_A[ye] = pda;
-    kurxposok_A[ye] = xpos;
+    rows_position1[ye] = pda;
+    rows_x1[ye] = xpos;
 
     // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
     // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
@@ -1465,11 +1465,11 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
         } else {
             // Eg, Fold, vagy ures:
             if (!pda->pixels) { // Eg
-                draw_default_ground(pc, 0, ujpdaxsize - ures, view);
+                draw_default_ground(pc, 0, ujpdaxsize - ures, is_minimap);
                 return;
             }
             if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
-                draw_sky(pc, 0, ujpdaxsize - ures, view);
+                draw_sky(pc, 0, ujpdaxsize - ures, is_minimap);
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixels != PixelsTransparent) {
@@ -1489,10 +1489,10 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
     } else {
         // Eg, Fold, vagy ures:
         if (!pda->pixels) { // Eg
-            draw_default_ground(pc, 0, size, view);
+            draw_default_ground(pc, 0, size, is_minimap);
         } else {
             if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
-                draw_sky(pc, 0, size, view);
+                draw_sky(pc, 0, size, is_minimap);
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixels != PixelsTransparent) {
@@ -1520,11 +1520,11 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
                 return;
             }
             if (!pda->pixels) {
-                draw_default_ground(pc, xpos - Xe1, Xe2 - xpos + 1, view);
+                draw_default_ground(pc, xpos - Xe1, Xe2 - xpos + 1, is_minimap);
                 return;
             }
             if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
-                draw_sky(pc, xpos - Xe1, Xe2 - xpos + 1, view);
+                draw_sky(pc, xpos - Xe1, Xe2 - xpos + 1, is_minimap);
                 return;
             }
 #ifdef DEBUG
@@ -1540,10 +1540,10 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
             memcpy(pc, pda->pixels, pda->width);
         } else {
             if (!pda->pixels) {
-                draw_default_ground(pc, xpos - Xe1, pda->width, view);
+                draw_default_ground(pc, xpos - Xe1, pda->width, is_minimap);
             } else {
                 if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
-                    draw_sky(pc, xpos - Xe1, pda->width, view);
+                    draw_sky(pc, xpos - Xe1, pda->width, is_minimap);
                 } else {
 #ifdef DEBUG
                     if ((pixelek_t)pda->pixels != PixelsTransparent) {
@@ -1562,8 +1562,8 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
 
 void ecset::kiegysor_B(unsigned char* pc, int ye) {
     // Visszalepunk amig kell:
-    canvas_chunk* pda = curdarabok_B[ye];
-    int xpos = kurxposok_B[ye];
+    canvas_chunk* pda = rows_position2[ye];
+    int xpos = rows_x2[ye];
     while (xpos > Xe1) {
         pda--;
         xpos -= pda->width;
@@ -1574,8 +1574,8 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
         pda++;
     }
     // Elmentjuk kurrens darabot:
-    curdarabok_B[ye] = pda;
-    kurxposok_B[ye] = xpos;
+    rows_position2[ye] = pda;
+    rows_x2[ye] = xpos;
 
     // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
     // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
@@ -1592,11 +1592,11 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
         } else {
             // Eg, Fold, vagy ures:
             if (!pda->pixels) { // Eg
-                draw_default_ground(pc, 0, ujpdaxsize - ures, view);
+                draw_default_ground(pc, 0, ujpdaxsize - ures, is_minimap);
                 return;
             }
             if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
-                draw_sky(pc, 0, ujpdaxsize - ures, view);
+                draw_sky(pc, 0, ujpdaxsize - ures, is_minimap);
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixels != PixelsTransparent) {
@@ -1616,10 +1616,10 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
     } else {
         // Eg, Fold, vagy ures:
         if (!pda->pixels) { // Eg
-            draw_default_ground(pc, 0, size, view);
+            draw_default_ground(pc, 0, size, is_minimap);
         } else {
             if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
-                draw_sky(pc, 0, size, view);
+                draw_sky(pc, 0, size, is_minimap);
             } else {
 #ifdef DEBUG
                 if ((pixelek_t)pda->pixels != PixelsTransparent) {
@@ -1647,11 +1647,11 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
                 return;
             }
             if (!pda->pixels) {
-                draw_default_ground(pc, xpos - Xe1, Xe2 - xpos + 1, view);
+                draw_default_ground(pc, xpos - Xe1, Xe2 - xpos + 1, is_minimap);
                 return;
             }
             if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
-                draw_sky(pc, xpos - Xe1, Xe2 - xpos + 1, view);
+                draw_sky(pc, xpos - Xe1, Xe2 - xpos + 1, is_minimap);
                 return;
             }
 #ifdef DEBUG
@@ -1667,10 +1667,10 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
             memcpy(pc, pda->pixels, pda->width);
         } else {
             if (!pda->pixels) {
-                draw_default_ground(pc, xpos - Xe1, pda->width, view);
+                draw_default_ground(pc, xpos - Xe1, pda->width, is_minimap);
             } else {
                 if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
-                    draw_sky(pc, xpos - Xe1, pda->width, view);
+                    draw_sky(pc, xpos - Xe1, pda->width, is_minimap);
                 } else {
 #ifdef DEBUG
                     if ((pixelek_t)pda->pixels != PixelsTransparent) {
@@ -1688,8 +1688,8 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
 }
 
 void ecset::getbalalso_int(vect2 balalso, int* px, int* py) {
-    vect2 relat = balalso - origo;
-    if (view) {
+    vect2 relat = balalso - origin;
+    if (is_minimap) {
         *px = (int)(relat.x * (MetersToPixels / MinimapScaleFactor)); // Ecset egesz koordinatak
         *py = (int)(relat.y * (MetersToPixels / MinimapScaleFactor)); // Ecset egesz koordinatak
     } else {
@@ -1756,8 +1756,9 @@ void ecset::kitesz(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int 
     Xe2 = Xe1 + x2 - x1;
     int ye2 = ye1 + y2 - y1;
 
-    if (Xe1 < 20 || Xe2 > maxx - 20 || ye1 < 20 || ye2 > sorszam - 20) {
-        internal_error("ecset::kitesz Xe1 < 20 || Xe2 > maxx-20 || ye1 < 20 || ye2 > sorszam-20!");
+    if (Xe1 < 20 || Xe2 > pixel_width - 20 || ye1 < 20 || ye2 > pixel_height - 20) {
+        internal_error(
+            "ecset::kitesz Xe1 < 20 || Xe2 > pixel_width-20 || ye1 < 20 || ye2 > pixel_height-20!");
     }
 
     int foldymodulus = Lgr->foreground->get_height();
@@ -1808,8 +1809,9 @@ void ecset::kiteszview(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, 
     Xe2 = Xe1 + x2 - x1 + 1;
     int ye2 = ye1 + y2 - y1 + 1;
 
-    if (Xe1 < 20 || Xe2 > maxx - 20 || ye1 < 20 || ye2 > sorszam - 20) {
-        internal_error("ecset::kitesz Xe1 < 20 || Xe2 > maxx-20 || ye1 < 20 || ye2 > sorszam-20!");
+    if (Xe1 < 20 || Xe2 > pixel_width - 20 || ye1 < 20 || ye2 > pixel_height - 20) {
+        internal_error(
+            "ecset::kitesz Xe1 < 20 || Xe2 > pixel_width-20 || ye1 < 20 || ye2 > pixel_height-20!");
     }
 
     int yadd = ye1 - y1;
@@ -1886,10 +1888,10 @@ void ecset::foltoz(void) {
 
     // Vegigmegyunk osszes soron alulrol felfele:
     // Azert noveljuk megis y-t, mert fejjel lefele vannak y koordinatak:
-    for (int y = 10; y < sorszam - 10; y++) {
+    for (int y = 10; y < pixel_height - 10; y++) {
         // Vegigmegyunk osszes mdarabon:
-        canvas_chunk_node* pmd = msorok[y];
-        int xpos = kurxposok_A[y];
+        canvas_chunk_node* pmd = rows_linked[y];
+        int xpos = rows_x1[y];
         if (xpos > 10) {
             internal_error("uih67f");
         }
@@ -1980,9 +1982,9 @@ void create_canvases(void) {
     if (!EolSettings->pictures_in_background()) {
         // Most betesszuk felsobe is 500-nal kozelebbi madarabokat:
         // Es egyben uresse tesszuk alsoban helyuket:
-        for (int i = 0; i < CanvasBack->sorszam; i++) {
-            canvas_chunk_node* pmd = CanvasBack->msorok[i];
-            int xpos = CanvasBack->kurxposok_A[i];
+        for (int i = 0; i < CanvasBack->pixel_height; i++) {
+            canvas_chunk_node* pmd = CanvasBack->rows_linked[i];
+            int xpos = CanvasBack->rows_x1[i];
             if (xpos > 100) {
                 internal_error("create_canvases xpos > 100!");
             }
@@ -2049,12 +2051,12 @@ canvas_chunk_node* node_finder::get_chunk(int x, int y) {
         }
     } else {
         // Ujra kell olvasni:
-        if (y < 0 || y >= source->sorszam) {
+        if (y < 0 || y >= source->pixel_height) {
             internal_error("789eygrq");
         }
         current_y = y;
-        current_node = source->msorok[y];
-        current_x = source->kurxposok_A[y];
+        current_node = source->rows_linked[y];
+        current_x = source->rows_x1[y];
         if (current_x > 10) {
             internal_error("y7fjksd");
         }

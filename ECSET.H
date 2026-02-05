@@ -56,25 +56,25 @@ class ecset {
     friend canvas_chunk_node* node_finder::get_chunk(int x, int y);
 
     // madarab allokalas:
-    canvas_chunk_node_array* elsotomb;
-    canvas_chunk_node_array* kurtomb;
-    int tombbenkov;
+    canvas_chunk_node_array* node_array;
+    canvas_chunk_node_array* node_array_last;
+    int node_array_index;
     canvas_chunk_node* newmdarab(void);
     void deletemdarabok(void);
 
-    canvas_chunk* nagydarabtomb;
+    canvas_chunk* chunk_array;
 
-    int view;
-    vect2 origo;
-    double xsizedb, ysizedb;
-    int maxx, sorszam;
-    canvas_chunk_node* msorok[CANVAS_MAX_HEIGHT];
-    canvas_chunk* sorok[CANVAS_MAX_HEIGHT];
+    int is_minimap;
+    vect2 origin;
+    double width, height;
+    int pixel_width, pixel_height;
+    canvas_chunk_node* rows_linked[CANVAS_MAX_HEIGHT];
+    canvas_chunk* rows[CANVAS_MAX_HEIGHT];
     // Kulon van ket jatekosnak:
-    int kurxposok_A[CANVAS_MAX_HEIGHT];            // Eppen hol all mutatohoz tartozo x
-    canvas_chunk* curdarabok_A[CANVAS_MAX_HEIGHT]; // Melyik darab kurrens
-    int kurxposok_B[CANVAS_MAX_HEIGHT];            // Eppen hol all mutatohoz tartozo x
-    canvas_chunk* curdarabok_B[CANVAS_MAX_HEIGHT]; // Melyik darab kurrens
+    int rows_x1[CANVAS_MAX_HEIGHT];                  // Eppen hol all mutatohoz tartozo x
+    canvas_chunk* rows_position1[CANVAS_MAX_HEIGHT]; // Melyik darab kurrens
+    int rows_x2[CANVAS_MAX_HEIGHT];                  // Eppen hol all mutatohoz tartozo x
+    canvas_chunk* rows_position2[CANVAS_MAX_HEIGHT]; // Melyik darab kurrens
 
     void getorigoandsize(void);
     void addszakasz(segment* psz);

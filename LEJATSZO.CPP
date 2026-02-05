@@ -220,6 +220,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     int objszam;
     while (get_event_buffer(&wavazonosito, &hangero, &objszam)) {
         if (objszam >= 0) {
+            int prev_apple_count = pmot->apple_count;
             int eredmeny = spritefeldolgoz(objszam, &pmot->apple_count, pmot);
             if (eredmeny == 0 || eredmeny == 1) {
                 if (eredmeny == 0) {
@@ -227,6 +228,10 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
                 } else {
                     *pmegvanido = eddig * TimeToCentiseconds;
                 }
+            }
+
+            if (prev_apple_count < pmot->apple_count) {
+                pmot->last_apple_time = eddig * TimeToCentiseconds;
             }
         } else {
             start_wav(wavazonosito, hangero);
@@ -710,8 +715,11 @@ static bool replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     int objszam;
     while (prec->recall_event(eddig, &wavindex, &hangero, &objszam)) {
         if (objszam >= 0) {
-            int tmpi = 0;
-            spritefeldolgoz(objszam, &tmpi, pmot);
+            int prev_apple_count = pmot->apple_count;
+            spritefeldolgoz(objszam, &pmot->apple_count, pmot);
+            if (prev_apple_count < pmot->apple_count) {
+                pmot->last_apple_time = eddig * TimeToCentiseconds;
+            }
         } else {
             start_wav(wavindex, hangero);
             if (wavindex == WavEvent::RightVolt) {
@@ -823,7 +831,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
     flagtag_reset();
 
-    // Motor1->apple_count = Motor2->apple_count = 0;
+    Motor1->apple_count = Motor2->apple_count = 0;
     long l = 0;
     int jar1 = 1, jar2 = 1;
 

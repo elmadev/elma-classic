@@ -58,6 +58,7 @@ struct motorst {
     vect2 body_v;
 
     int apple_count;
+    int last_apple_time;
 
     int prev_brake;
     double left_wheel_brake_rotation;

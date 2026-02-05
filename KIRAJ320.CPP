@@ -1,4 +1,5 @@
 #include "KIRAJZOL.H"
+#include "abc8.h"
 #include "affine_pic.h"
 #include "anim.h"
 #include "affine_pic_render.h"
@@ -24,6 +25,8 @@
 
 int Kitoltestmegrak = 0;
 int Kitoltestmegrakkezd = 10;
+
+static abc8* SmallFont = nullptr;
 
 static double Kepmeret = 1.0;
 
@@ -74,7 +77,12 @@ static void init_shirt() {
     delete pic_shirt;
 }
 
-void init_renderer() { init_shirt(); }
+void init_renderer() {
+    init_shirt();
+
+    SmallFont = new abc8("small.abc");
+    SmallFont->set_spacing(1);
+}
 
 void beallitmereteket(int splitscreen) {
     Cy1Bplayer = 100, Cy2Bplayer = 200;

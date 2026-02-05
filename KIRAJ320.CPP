@@ -258,11 +258,11 @@ static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, m
     int vy1 = 1;
     int vy2 = vy1 + Viewysize - 1;
 
-    CanvasMinimap->kiteszview(ajatekos, ppic, sarok, vx1, vy1, vx2, vy2);
+    CanvasMinimap->render_minimap(ajatekos, ppic, sarok, vx1, vy1, vx2, vy2);
 
     // Most kirajzoljuk food-okat:
     int balalsox, balalsoy;
-    CanvasMinimap->getbalalso_int(sarok, &balalsox, &balalsoy);
+    CanvasMinimap->meters_to_pixels(sarok, &balalsox, &balalsoy);
     int objminx = balalsox;
     int objminy = balalsoy;
     int objmaxx = balalsox + Viewxsize - 1;
@@ -641,11 +641,11 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
     vect2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
 
     // ppic->fill_box( 100 );
-    CanvasBack->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+    CanvasBack->render(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
 
     // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
     int balalsox, balalsoy;
-    CanvasBack->getbalalso_int(sarok, &balalsox, &balalsoy);
+    CanvasBack->meters_to_pixels(sarok, &balalsox, &balalsoy);
     int objminx = balalsox - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
     int objminy = balalsoy - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
     int objmaxx = balalsox + SCREEN_WIDTH;
@@ -730,7 +730,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
 
     if (!EolSettings->pictures_in_background()) {
         // Felso ecset kitevese:
-        CanvasFront->kitesz(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+        CanvasFront->render(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
     }
 
     if (viewki) {

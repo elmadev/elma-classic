@@ -59,8 +59,8 @@ class ecset {
     canvas_chunk_node_array* node_array;
     canvas_chunk_node_array* node_array_last;
     int node_array_index;
-    canvas_chunk_node* newmdarab(void);
-    void deletemdarabok(void);
+    canvas_chunk_node* new_node(void);
+    void delete_all_nodes(void);
 
     canvas_chunk* chunk_array;
 
@@ -76,46 +76,48 @@ class ecset {
     int rows_x2[CANVAS_MAX_HEIGHT];                  // Eppen hol all mutatohoz tartozo x
     canvas_chunk* rows_position2[CANVAS_MAX_HEIGHT]; // Melyik darab kurrens
 
-    void getorigoandsize(void);
-    void addszakasz(segment* psz);
+    void set_origin_and_dimensions(void);
+    void draw_segment(segment* seg);
     // Rovid folddarabokat atalakitja konkret mutatova:
-    void foldmutatocsere(void);
+    void default_foreground_to_pointers(void);
     // Egymas utani azonos maszkokat es ureseket lecsereli egy hosszabbra:
-    void duplaeliminacio(void);
-    void textura2mutato(void);
-    void mutatotlanit(void);
+    void merge_redundant_chunks(void);
+    void textures_to_pointers(void);
+    void linked_list_to_array(void);
 
     // Ptop kerek-jeinek egesz koordinatait kitolti:
-    void kitoltfoodkoordokat(void);
+    void calculate_object_positions(void);
 
-    void levon10000t(void);
-    canvas_chunk_node* beepitegymadarabnyit(canvas_chunk_node* pmd, unsigned char* ujpixelek,
-                                            int x1, int ujx1, int ujx2, int ujtavolsag,
-                                            canvas_chunk_node* vege, int* pujavege, int fazis);
-    void addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int ujx2, int y, int fazis);
-    void addegymaszk(sprite* psp, int index_t, int index_m, int fazis);
-    void addspriteok(int fazis);
-    void addobjektumok(void); // Ez most nem view eseten visszter
+    void adjust_background_distance(void);
+    canvas_chunk_node* draw_one_chunk(canvas_chunk_node* dest, unsigned char* source, int dest_x,
+                                      int source_x_left, int source_x_right, int source_dist,
+                                      canvas_chunk_node* dest_prev, int* prev_can_merge,
+                                      int clipping);
+    void draw_pixels(unsigned char* source, int source_dist, int x_left, int x_right, int y,
+                     int clipping);
+    void draw_texture(sprite* spr, int texture_index, int mask_index, int clipping);
+    void draw_sprites(int clipping);
+    void draw_killers(void); // Ez most nem view eseten visszter
 
-    void kovetotextura(grass* pkov, int index, int xo, int yo, int fazis);
-    void kiegykovetokep(grass* pkov, int index, int xo, int yo, int fazis);
-    void kikovetokepek(grass* pkov, int* ytomb, int hossz, int x0, int fazis);
-    void addkovetok(int fazis);
+    void draw_qgrass_texture(grass* gr, int qupdown_index, int x, int y, int clipping);
+    void draw_qupdown(grass* gr, int qupdown_index, int x, int y, int clipping);
+    void draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0, int clipping);
+    void draw_grass_polygons(int clipping);
 
-    void kiegysor_A(unsigned char* pc, int ye);
-    void kiegysor_B(unsigned char* pc, int ye);
+    void render_row1(unsigned char* dest, int y);
+    void render_row2(unsigned char* dest, int y);
     void kiegysor_FF(unsigned char* pc, int ye); // fekete-feher
 
-    void foltoz(void);
+    void create_front_grass(void);
 
-    ecset(int view);    // Ptop es Segments alapjan
-    ecset(ecset* pold); // Ures sortomboket hoz benne letre
+    ecset(int minimap);      // Ptop es Segments alapjan
+    ecset(ecset* reference); // Ures sortomboket hoz benne letre
     ~ecset(void);
 
   public:
-    void getbalalso_int(vect2 balalso, int* px, int* py);
-    void kitesz(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int x2, int y2);
-    void kiteszview(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, int x2, int y2);
+    void meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y);
+    void render(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2);
+    void render_minimap(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2);
 
     // void egetkeszit( void );
 };

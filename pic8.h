@@ -47,7 +47,9 @@ class pic8 {
     void line(int x1, int y1, int x2, int y2, unsigned char index);
     void subview(int x1, int y1, int x2, int y2, pic8* source);
 
+    // Generate transparency data with a specified transparency palette index.
     void add_transparency(int transparency);
+    // Generate transparency data using the top-left pixel as the transparency palette index.
     void add_transparency();
 };
 

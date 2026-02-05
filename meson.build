@@ -54,7 +54,6 @@ elma_sources = files(
     'recorder.cpp',
     'platform_sdl.cpp',
     'skip.cpp',
-    'transparency.cpp',
     'state.cpp',
     'segments.cpp',
     'menu_intro.cpp',

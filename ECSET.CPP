@@ -27,15 +27,15 @@ typedef uintptr_t pixelek_t;
 // static pic8* Hegy1 = NULL;
 // static pic8* Hegy2 = NULL;
 
-ecset* Pecsetalso = NULL;
-ecset* Pecsetfelso = NULL;
-ecset* Pecsetview = NULL;
+ecset* CanvasBack = NULL;
+ecset* CanvasFront = NULL;
+ecset* CanvasMinimap = NULL;
 
 #define PIXELMASZK (~((uintptr_t)0x7FF))
 
 /*void vizsgal( ecset* pecset ) {
 
-    mdarab* futo = pecset->msorok[1071];
+    canvas_chunk_node* futo = pecset->msorok[1071];
     int xtomb[40];
     int muttomb[40];
     int kurx = 1;
@@ -45,7 +45,7 @@ ecset* Pecsetview = NULL;
             internal_error( "i > 38!" );
 
         xtomb[i] = kurx;
-        muttomb[i] = (int)futo->pixelek;
+        muttomb[i] = (int)futo->pixels;
 
         kurx += futo->xsize;
 
@@ -59,24 +59,24 @@ static void hibanincsmem(void) {
                    "Try to set the graphic detail to low at the options.");
 }
 
-mdarab* ecset::newmdarab(void) {
-    if (tombbenkov >= TOMBBENMDARAB) {
+canvas_chunk_node* ecset::newmdarab(void) {
+    if (tombbenkov >= CHUNK_NODE_BLOCK_LENGTH) {
         // Ez a tomb betelt:
         tombbenkov = 0;
-        kurtomb->kovtomb = new mdarabtomb;
-        if (!kurtomb->kovtomb) {
+        kurtomb->next = new canvas_chunk_node_array;
+        if (!kurtomb->next) {
             hibanincsmem();
         }
-        kurtomb = kurtomb->kovtomb;
-        kurtomb->kovtomb = NULL;
+        kurtomb = kurtomb->next;
+        kurtomb->next = NULL;
         tombbenkov++;
-        mdarab* ret = &kurtomb->tomb[tombbenkov - 1];
-        ret->tavolsag = 0;
+        canvas_chunk_node* ret = &kurtomb->nodes[tombbenkov - 1];
+        ret->distance = 0;
         return ret;
     }
     tombbenkov++;
-    mdarab* ret = &kurtomb->tomb[tombbenkov - 1];
-    ret->tavolsag = 0;
+    canvas_chunk_node* ret = &kurtomb->nodes[tombbenkov - 1];
+    ret->distance = 0;
     return ret;
 }
 
@@ -201,47 +201,47 @@ void ecset::addszakasz(segment* psz) {
             internal_error("ecset::addszakasz x < 10 || x > maxx!");
         }
 
-        mdarab* pmd = newmdarab();
-        pmd->pkov = NULL;
-        pmd->xsize = x;
+        canvas_chunk_node* pmd = newmdarab();
+        pmd->next = NULL;
+        pmd->width = x;
         if (foldjon) {
-            pmd->pixelek = (unsigned char*)PX_FOLD;
+            pmd->pixels = (unsigned char*)PixelsDefaultForeground;
         } else {
-            pmd->pixelek = (unsigned char*)PX_EG;
+            pmd->pixels = (unsigned char*)PixelsDefaultBackground;
         }
 
-        mdarab* pfut = msorok[y];
+        canvas_chunk_node* pfut = msorok[y];
         if (!pfut) {
             internal_error("ecset::addszakasz !pfut!");
         }
-        while (pfut->pkov) {
-            pfut = pfut->pkov;
+        while (pfut->next) {
+            pfut = pfut->next;
         }
-        pfut->pkov = pmd;
+        pfut->next = pmd;
     }
 }
 
-static int sizeraallit(mdarab* elso) {
-    int eleje = elso->xsize;
-    mdarab* futo = elso;
+static int sizeraallit(canvas_chunk_node* elso) {
+    int eleje = elso->width;
+    canvas_chunk_node* futo = elso;
     while (futo) {
-        if (futo->pkov) {
-            futo->xsize = futo->pkov->xsize - futo->xsize;
+        if (futo->next) {
+            futo->width = futo->next->width - futo->width;
         } else {
-            futo->xsize = 1000000;
+            futo->width = 1000000;
         }
 
-        futo = futo->pkov;
+        futo = futo->next;
     }
     return eleje;
 }
 
-static void rendez(mdarab* elso) {
+static void rendez(canvas_chunk_node* elso) {
     // Megszamoljuk elemeket:
     int szam = 0;
-    mdarab* futo = elso;
+    canvas_chunk_node* futo = elso;
     while (futo) {
-        futo = futo->pkov;
+        futo = futo->next;
         szam++;
     }
     if (szam <= 0) {
@@ -255,37 +255,37 @@ static void rendez(mdarab* elso) {
     // Sorba rendezunk:
     for (int j = 0; j < szam + 2; j++) {
         futo = elso;
-        futo = futo->pkov;
-        while (futo->pkov) {
-            mdarab* pkov = futo->pkov;
-            if (futo->xsize > pkov->xsize) {
+        futo = futo->next;
+        while (futo->next) {
+            canvas_chunk_node* pkov = futo->next;
+            if (futo->width > pkov->width) {
                 // Csere:
-                int tmp = futo->xsize;
-                futo->xsize = pkov->xsize;
-                pkov->xsize = tmp;
-                unsigned char* ptmp = futo->pixelek;
-                futo->pixelek = pkov->pixelek;
-                pkov->pixelek = ptmp;
+                int tmp = futo->width;
+                futo->width = pkov->width;
+                pkov->width = tmp;
+                unsigned char* ptmp = futo->pixels;
+                futo->pixels = pkov->pixels;
+                pkov->pixels = ptmp;
             }
             futo = pkov;
         }
     }
     // Kikuszoboljuk egy x-en fekvo mdarab-okat:
-    mdarab* futoelozo = elso;
-    futo = futoelozo->pkov;
-    while (futo->pkov) {
-        mdarab* pkov = futo->pkov;
-        if (futo->xsize == pkov->xsize) {
-            if (futo->pixelek == pkov->pixelek) {
+    canvas_chunk_node* futoelozo = elso;
+    futo = futoelozo->next;
+    while (futo->next) {
+        canvas_chunk_node* pkov = futo->next;
+        if (futo->width == pkov->width) {
+            if (futo->pixels == pkov->pixels) {
                 // Azonosak, csak az egyiket vesszuk ki (pkov-et):
-                futo->pkov = pkov->pkov;
+                futo->next = pkov->next;
             } else {
                 // Kulonbozoek, mindkettot kiszedjuk:
-                futoelozo->pkov = pkov->pkov;
+                futoelozo->next = pkov->next;
             }
             // Visszaallunk lanc legelejere:
             futoelozo = elso;
-            futo = futoelozo->pkov;
+            futo = futoelozo->next;
             if (!futo) {
                 return;
             }
@@ -298,10 +298,10 @@ static void rendez(mdarab* elso) {
 
     // Kikuszoboljuk egymas utan fekvo, ugyanazt jelenot mdarab-okat:
     futo = elso;
-    while (futo->pkov) {
-        mdarab* pkov = futo->pkov;
-        if (futo->pixelek == pkov->pixelek) {
-            futo->pkov = pkov->pkov;
+    while (futo->next) {
+        canvas_chunk_node* pkov = futo->next;
+        if (futo->pixels == pkov->pixels) {
+            futo->next = pkov->next;
             // Visszaallunk lanc legelejere:
             futo = elso;
         } else {
@@ -314,21 +314,21 @@ static void rendez(mdarab* elso) {
 // Rovid folddarabokat atalakitja konkret mutatova:
 void ecset::foldmutatocsere(void) {
     for (int i = 0; i < sorszam; i++) {
-        mdarab* fut = msorok[i];
+        canvas_chunk_node* fut = msorok[i];
         int xpos = kurxposok_A[i];
         if (xpos > 100) {
             internal_error("ecset::foldmutatocsere xpos > 100!");
         }
         while (fut) {
-            if ((pixelek_t)fut->pixelek == PX_FOLD && fut->xsize < SCREEN_WIDTH) {
+            if ((pixelek_t)fut->pixels == PixelsDefaultForeground && fut->width < SCREEN_WIDTH) {
                 int x = xpos % Lgr->foreground_original_width;
                 int y = i % Lgr->foreground->get_height();
-                fut->pixelek = Lgr->foreground->get_row(y) + x;
-                // fut->pixelek = Lgr->foreground->get_row( 0 ); igy latszik
+                fut->pixels = Lgr->foreground->get_row(y) + x;
+                // fut->pixels = Lgr->foreground->get_row( 0 ); igy latszik
             }
 
-            xpos += fut->xsize;
-            fut = fut->pkov;
+            xpos += fut->width;
+            fut = fut->next;
         }
     }
 }
@@ -339,16 +339,16 @@ void ecset::duplaeliminacio(void) {
         int voltvaltozas = 1;
         while (voltvaltozas) {
             voltvaltozas = 0;
-            mdarab* fut = msorok[i];
-            while (fut && fut->pkov) {
-                mdarab* kov = fut->pkov;
-                if (((pixelek_t)fut->pixelek & PIXELMASZK) == 0 && fut->pixelek == kov->pixelek) {
-                    fut->pkov = kov->pkov;
-                    fut->xsize += kov->xsize;
+            canvas_chunk_node* fut = msorok[i];
+            while (fut && fut->next) {
+                canvas_chunk_node* kov = fut->next;
+                if (((pixelek_t)fut->pixels & PIXELMASZK) == 0 && fut->pixels == kov->pixels) {
+                    fut->next = kov->next;
+                    fut->width += kov->width;
                     voltvaltozas = 1;
                 }
 
-                fut = fut->pkov;
+                fut = fut->next;
             }
         }
     }
@@ -356,15 +356,15 @@ void ecset::duplaeliminacio(void) {
 
 void ecset::textura2mutato(void) {
     for (int y = 0; y < sorszam; y++) {
-        mdarab* fut = msorok[y];
+        canvas_chunk_node* fut = msorok[y];
         int xpos = kurxposok_A[y];
         if (xpos > 100) {
             internal_error("9865fd");
         }
         while (fut) {
-            int hozzaad = fut->xsize;
+            int hozzaad = fut->width;
 
-            pixelek_t kepindex = (pixelek_t)fut->pixelek;
+            pixelek_t kepindex = (pixelek_t)fut->pixels;
             if (((kepindex & PIXELMASZK) == 0) && (kepindex >= 10)) {
                 kepindex -= 10;
 // Itt van maszk, le kell cserelni:
@@ -378,15 +378,15 @@ void ecset::textura2mutato(void) {
 #endif
                 texture* pt = &Lgr->textures[kepindex];
                 pic8* ppic = pt->pic;
-                int megvan = fut->xsize;
+                int megvan = fut->width;
                 int x = xpos;
                 int elso = 1;
                 while (megvan > 0) {
                     if (!elso) {
                         // Beillesztunk egy uj mdarab-ot:
-                        mdarab* ujdarab = newmdarab();
-                        ujdarab->pkov = fut->pkov;
-                        fut->pkov = ujdarab;
+                        canvas_chunk_node* ujdarab = newmdarab();
+                        ujdarab->next = fut->next;
+                        fut->next = ujdarab;
                         fut = ujdarab;
                     }
                     elso = 0;
@@ -397,9 +397,9 @@ void ecset::textura2mutato(void) {
                         size = ppic->get_width() - x;
                     }
 
-                    fut->xsize = size;
-                    fut->pixelek = ppic->get_row(y % ppic->get_height()) + x;
-                    if (((pixelek_t)fut->pixelek & PIXELMASZK) == 0) {
+                    fut->width = size;
+                    fut->pixels = ppic->get_row(y % ppic->get_height()) + x;
+                    if (((pixelek_t)fut->pixels & PIXELMASZK) == 0) {
                         external_error("Memory address is less than 2048 (723)!");
                     }
 
@@ -408,17 +408,17 @@ void ecset::textura2mutato(void) {
                 }
             }
             xpos += hozzaad;
-            fut = fut->pkov;
+            fut = fut->next;
         }
     }
 }
 
-static int megszamol(mdarab* elso) {
+static int megszamol(canvas_chunk_node* elso) {
     // Megszamoljuk elemeket:
     int szam = 0;
-    mdarab* futo = elso;
+    canvas_chunk_node* futo = elso;
     while (futo) {
-        futo = futo->pkov;
+        futo = futo->next;
         szam++;
     }
     if (szam <= 0) {
@@ -437,21 +437,21 @@ void ecset::mutatotlanit(void) {
     }
     Osszegszam += szam;
     // Most lefoglaljuk uj egybefuggo tombot:
-    nagydarabtomb = new darab[szam + 10];
+    nagydarabtomb = new canvas_chunk[szam + 10];
     if (!nagydarabtomb) {
         hibanincsmem();
     }
     int szammost = 0;
     for (int i = 0; i < sorszam; i++) {
-        mdarab* futo = msorok[i];
+        canvas_chunk_node* futo = msorok[i];
         sorok[i] = &nagydarabtomb[szammost];
         curdarabok_A[i] = sorok[i];
         curdarabok_B[i] = sorok[i];
         while (futo) {
-            nagydarabtomb[szammost].xsize = futo->xsize;
-            nagydarabtomb[szammost].pixelek = futo->pixelek;
+            nagydarabtomb[szammost].width = futo->width;
+            nagydarabtomb[szammost].pixels = futo->pixels;
 
-            futo = futo->pkov;
+            futo = futo->next;
             szammost++;
         }
     }
@@ -479,51 +479,53 @@ void ecset::kitoltfoodkoordokat(void) {
 
 enum { FAZIS_FOLD, FAZIS_EG, FAZIS_NEMFOLDEG, FAZIS_URESRE };
 
-mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x1, int ujx1,
-                                    int ujx2, int ujtavolsag, mdarab* vege, int* pujavege,
-                                    int fazis) {
+canvas_chunk_node* ecset::beepitegymadarabnyit(canvas_chunk_node* pmd, unsigned char* ujpixelek,
+                                               int x1, int ujx1, int ujx2, int ujtavolsag,
+                                               canvas_chunk_node* vege, int* pujavege, int fazis) {
 
-    if ((pixelek_t)ujpixelek == PX_URES) {
+    if ((pixelek_t)ujpixelek == PixelsTransparent) {
         internal_error("ecset::beepitegymadarabnyit-ban nem lehet ureset rarakni!");
     }
 
-    if ((pixelek_t)pmd->pixelek == PX_URES && fazis != FAZIS_URESRE) {
+    if ((pixelek_t)pmd->pixels == PixelsTransparent && fazis != FAZIS_URESRE) {
         internal_error("ecset::beepitegymadarabnyit-ban",
-                       "(int)ujpixelek == PX_URES && fazis != FAZIS_URESRE!");
+                       "(int)ujpixelek == PixelsTransparent && fazis != FAZIS_URESRE!");
     }
 
     // Eldontjuk, hogy ki kell-e egyaltalan rakni:
-    int regitav = pmd->tavolsag;
+    int regitav = pmd->distance;
     int nemrakjaki = 0;
     if (fazis == FAZIS_FOLD) {
-        if ((pixelek_t)pmd->pixelek == PX_FOLD) {
+        if ((pixelek_t)pmd->pixels == PixelsDefaultForeground) {
             regitav = 1000000;
         }
-        if ((pixelek_t)pmd->pixelek == PX_EG) {
+        if ((pixelek_t)pmd->pixels == PixelsDefaultBackground) {
             nemrakjaki = 1;
         }
     }
     if (fazis == FAZIS_EG) {
         ujtavolsag += 10000;
-        if ((pixelek_t)pmd->pixelek == PX_FOLD) {
+        if ((pixelek_t)pmd->pixels == PixelsDefaultForeground) {
             nemrakjaki = 1;
         }
-        if ((pixelek_t)pmd->pixelek == PX_EG) {
+        if ((pixelek_t)pmd->pixels == PixelsDefaultBackground) {
             regitav = 1000000;
         }
     }
     if (fazis == FAZIS_NEMFOLDEG) {
-        if ((pixelek_t)pmd->pixelek == PX_FOLD || (pixelek_t)pmd->pixelek == PX_EG) {
+        if ((pixelek_t)pmd->pixels == PixelsDefaultForeground ||
+            (pixelek_t)pmd->pixels == PixelsDefaultBackground) {
             regitav = 1000000;
         }
     }
 
     if (fazis == FAZIS_URESRE) {
-        if ((pixelek_t)pmd->pixelek == PX_FOLD || (pixelek_t)pmd->pixelek == PX_EG) {
+        if ((pixelek_t)pmd->pixels == PixelsDefaultForeground ||
+            (pixelek_t)pmd->pixels == PixelsDefaultBackground) {
             internal_error(
                 "ecset::beepitegymadarabnyit fazis == FAZIS_LYUKRA, megis fold vagy eg!");
         }
-        if ((pixelek_t)pmd->pixelek == PX_URES) {
+        if ((pixelek_t)pmd->pixels == PixelsTransparent) {
             regitav = 1000000;
         }
     }
@@ -534,7 +536,7 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
     }
 
     // Most mar biztos, hogy kirakjuk:
-    int x2 = x1 + pmd->xsize - 1;
+    int x2 = x1 + pmd->width - 1;
     // Levagdossuk ujx1, ujx2-t:
     if (ujx1 < x1) {
         ujx1 = x1;
@@ -553,14 +555,14 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
     //  ------------------------------------
 
     if (x1 != ujx1 && x2 == ujx2) {
-        mdarab* puj = newmdarab();
-        puj->xsize = ujx2 - ujx1 + 1;
-        puj->pixelek = ujpixelek;
-        puj->tavolsag = ujtavolsag;
-        puj->pkov = pmd->pkov;
+        canvas_chunk_node* puj = newmdarab();
+        puj->width = ujx2 - ujx1 + 1;
+        puj->pixels = ujpixelek;
+        puj->distance = ujtavolsag;
+        puj->next = pmd->next;
 
-        pmd->xsize -= puj->xsize;
-        pmd->pkov = puj;
+        pmd->width -= puj->width;
+        pmd->next = puj;
 
         *pujavege = 1;
         return puj;
@@ -575,33 +577,33 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
             internal_error("8796kuyg76");
         }
         // Ha minden megfelel, atallitjuk *pujavege-t:
-        if (!(*pujavege) && vege->tavolsag == ujtavolsag &&
-            !((pixelek_t)vege->pixelek & PIXELMASZK) && vege->pixelek == ujpixelek) {
+        if (!(*pujavege) && vege->distance == ujtavolsag &&
+            !((pixelek_t)vege->pixels & PIXELMASZK) && vege->pixels == ujpixelek) {
             *pujavege = 1;
         }
         if (*pujavege) {
             int ujsize = ujx2 - ujx1 + 1;
 
-            vege->xsize += ujsize;
-            pmd->xsize -= ujsize;
-            if ((pixelek_t)pmd->pixelek & PIXELMASZK) {
-                pmd->pixelek += ujsize;
+            vege->width += ujsize;
+            pmd->width -= ujsize;
+            if ((pixelek_t)pmd->pixels & PIXELMASZK) {
+                pmd->pixels += ujsize;
             }
 
             *pujavege = 0;
             return pmd;
         } else {
-            mdarab* puj = newmdarab();
-            vege->pkov = puj;
+            canvas_chunk_node* puj = newmdarab();
+            vege->next = puj;
 
-            puj->xsize = ujx2 - ujx1 + 1;
-            puj->pixelek = ujpixelek;
-            puj->tavolsag = ujtavolsag;
-            puj->pkov = pmd;
+            puj->width = ujx2 - ujx1 + 1;
+            puj->pixels = ujpixelek;
+            puj->distance = ujtavolsag;
+            puj->next = pmd;
 
-            pmd->xsize -= puj->xsize;
-            if ((pixelek_t)pmd->pixelek & PIXELMASZK) {
-                pmd->pixelek += puj->xsize;
+            pmd->width -= puj->width;
+            if ((pixelek_t)pmd->pixels & PIXELMASZK) {
+                pmd->pixels += puj->width;
             }
 
             *pujavege = 0;
@@ -618,19 +620,19 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
             internal_error("6fg67r57fu6t");
         }
         // Ha minden megfelel, atallitjuk *pujavege-t:
-        if (!(*pujavege) && vege->tavolsag == ujtavolsag &&
-            !((pixelek_t)vege->pixelek & PIXELMASZK) && vege->pixelek == ujpixelek) {
+        if (!(*pujavege) && vege->distance == ujtavolsag &&
+            !((pixelek_t)vege->pixels & PIXELMASZK) && vege->pixels == ujpixelek) {
             *pujavege = 1;
         }
         if (*pujavege) {
-            vege->xsize += pmd->xsize;
-            vege->pkov = pmd->pkov;
+            vege->width += pmd->width;
+            vege->next = pmd->next;
 
             *pujavege = 1;
             return vege;
         } else {
-            pmd->pixelek = ujpixelek;
-            pmd->tavolsag = ujtavolsag;
+            pmd->pixels = ujpixelek;
+            pmd->distance = ujtavolsag;
 
             *pujavege = 1;
             return pmd;
@@ -642,25 +644,25 @@ mdarab* ecset::beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x
     //  ------------------------------------
 
     if (x1 != ujx1 && x2 != ujx2) {
-        mdarab* puj1 = newmdarab();
-        mdarab* puj2 = newmdarab();
+        canvas_chunk_node* puj1 = newmdarab();
+        canvas_chunk_node* puj2 = newmdarab();
 
-        puj1->xsize = ujx2 - ujx1 + 1;
-        puj1->pixelek = ujpixelek;
-        puj1->tavolsag = ujtavolsag;
-        puj1->pkov = puj2;
+        puj1->width = ujx2 - ujx1 + 1;
+        puj1->pixels = ujpixelek;
+        puj1->distance = ujtavolsag;
+        puj1->next = puj2;
 
-        puj2->xsize = x2 - ujx2;
-        if ((pixelek_t)pmd->pixelek & PIXELMASZK) {
-            puj2->pixelek = pmd->pixelek + (ujx2 + 1 - x1);
+        puj2->width = x2 - ujx2;
+        if ((pixelek_t)pmd->pixels & PIXELMASZK) {
+            puj2->pixels = pmd->pixels + (ujx2 + 1 - x1);
         } else {
-            puj2->pixelek = pmd->pixelek;
+            puj2->pixels = pmd->pixels;
         }
-        puj2->tavolsag = pmd->tavolsag;
-        puj2->pkov = pmd->pkov;
+        puj2->distance = pmd->distance;
+        puj2->next = pmd->next;
 
-        pmd->xsize -= puj1->xsize + puj2->xsize;
-        pmd->pkov = puj1;
+        pmd->width -= puj1->width + puj2->width;
+        pmd->next = puj1;
 
         *pujavege = 0;
         return puj2;
@@ -679,18 +681,18 @@ void ecset::addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int u
 
     // Beallunk pmd, xpos-sal elso szoba jovo madarab-ra:
     // Visszalepunk amig kell:
-    mdarab* pmd = msorok[y];
+    canvas_chunk_node* pmd = msorok[y];
     // Pmddd = pmd;
     int xpos = kurxposok_A[y];
     if (xpos > 10) {
         internal_error("ecset::addbytesor xpos > 10!");
     }
     // Elorelepunk amig kell:
-    mdarab* vege = NULL;
-    while (xpos + pmd->xsize - 1 < ujx1) {
-        xpos += pmd->xsize;
+    canvas_chunk_node* vege = NULL;
+    while (xpos + pmd->width - 1 < ujx1) {
+        xpos += pmd->width;
         vege = pmd;
-        pmd = pmd->pkov;
+        pmd = pmd->next;
         if (!pmd) {
             internal_error("ecset::addbytesor !pmd (1)!");
         }
@@ -702,7 +704,7 @@ void ecset::addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int u
             internal_error("ecset::addbytesor !pmd (2)!");
         }
         int x1 = xpos;
-        int x2 = xpos + pmd->xsize - 1;
+        int x2 = xpos + pmd->width - 1;
         if (ujx2 < x1) {
             internal_error("ecset::addbytesor ujx2 < x1!");
         }
@@ -719,11 +721,11 @@ void ecset::addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int u
             if (ujx1 > x1) {
                 kimaradxsize = ujx1 - x1;
             }
-            kovujpixelek = ujpixelek + (pmd->xsize - kimaradxsize);
+            kovujpixelek = ujpixelek + (pmd->width - kimaradxsize);
         }
 
-        int kovxpos = xpos + pmd->xsize;
-        mdarab* kovpmd = pmd->pkov;
+        int kovxpos = xpos + pmd->width;
+        canvas_chunk_node* kovpmd = pmd->next;
 
         vege = beepitegymadarabnyit(pmd, ujpixelek, xpos, ujx1, ujx2, ujtavolsag, vege, &ujavege,
                                     fazis);
@@ -1224,13 +1226,13 @@ void ecset::addobjektumok(void) {
 
 void ecset::levon10000t(void) {
     for (int i = 0; i < sorszam; i++) {
-        mdarab* pmd = msorok[i];
+        canvas_chunk_node* pmd = msorok[i];
         while (pmd) {
-            if (pmd->tavolsag >= 10000) {
-                pmd->tavolsag -= 10000;
+            if (pmd->distance >= 10000) {
+                pmd->distance -= 10000;
             }
 
-            pmd = pmd->pkov;
+            pmd = pmd->next;
         }
     }
 };
@@ -1239,7 +1241,7 @@ void ecset::levon10000t(void) {
 ecset::ecset(int view_p) {
     view = view_p;
 
-    for (int i = 0; i < MAXECSETSOR; i++) {
+    for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
         msorok[i] = NULL;
         sorok[i] = NULL;
         kurxposok_A[i] = 0;
@@ -1261,11 +1263,11 @@ ecset::ecset(int view_p) {
         internal_error("ecset::ecset !Ptop || !Segments!");
     }
 
-    elsotomb = new mdarabtomb;
+    elsotomb = new canvas_chunk_node_array;
     if (!elsotomb) {
         internal_error("Nincs eleg memoria ecset::ecset!");
     }
-    elsotomb->kovtomb = NULL;
+    elsotomb->next = NULL;
     kurtomb = elsotomb;
 
     getorigoandsize();
@@ -1279,17 +1281,17 @@ ecset::ecset(int view_p) {
         sorszam = (int)(ysizedb * MetersToPixels);
     }
 
-    if (sorszam - 10 > MAXECSETSOR) {
-        internal_error("ecset::ecset sorszam-10 > MAXECSETSOR!");
+    if (sorszam - 10 > CANVAS_MAX_HEIGHT) {
+        internal_error("ecset::ecset sorszam-10 > CANVAS_MAX_HEIGHT!");
     }
 
     // Inicializaljuk minden sor elejet foldre:
     for (int i = 0; i < sorszam; i++) {
         msorok[i] = newmdarab();
-        msorok[i]->pkov = NULL;
-        msorok[i]->xsize = 1;
-        msorok[i]->tavolsag = 0;
-        msorok[i]->pixelek = (unsigned char*)PX_FOLD;
+        msorok[i]->next = NULL;
+        msorok[i]->width = 1;
+        msorok[i]->distance = 0;
+        msorok[i]->pixels = (unsigned char*)PixelsDefaultForeground;
     }
 
     // Vegigmegyunk osszes szakaszon:
@@ -1332,7 +1334,7 @@ ecset::ecset(int view_p) {
 // URES sorokat tesz bele:
 // Ptop es Segments alapjan:
 ecset::ecset(ecset* pold) {
-    for (int i = 0; i < MAXECSETSOR; i++) {
+    for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
         msorok[i] = NULL;
         sorok[i] = NULL;
         kurxposok_A[i] = 0;
@@ -1355,11 +1357,11 @@ ecset::ecset(ecset* pold) {
         internal_error("ecset::ecset !Ptop || !Segments!");
     }
 
-    elsotomb = new mdarabtomb;
+    elsotomb = new canvas_chunk_node_array;
     if (!elsotomb) {
         internal_error("Nincs eleg memoria ecset::ecset!");
     }
-    elsotomb->kovtomb = NULL;
+    elsotomb->next = NULL;
     kurtomb = elsotomb;
 
     // getorigoandsize(); ehelyett:
@@ -1376,10 +1378,10 @@ ecset::ecset(ecset* pold) {
         kurxposok_B[i] = 1;
 
         msorok[i] = newmdarab();
-        msorok[i]->pkov = NULL;
-        msorok[i]->xsize = 1000000;
-        msorok[i]->tavolsag = 0;
-        msorok[i]->pixelek = (unsigned char*)PX_URES;
+        msorok[i]->next = NULL;
+        msorok[i]->width = 1000000;
+        msorok[i]->distance = 0;
+        msorok[i]->pixels = (unsigned char*)PixelsTransparent;
     }
 }
 
@@ -1398,14 +1400,14 @@ void ecset::deletemdarabok(void) {
     if (!elsotomb) {
         internal_error("ecset::deletemdarabok !elsotomb!");
     }
-    mdarabtomb* cur = elsotomb;
+    canvas_chunk_node_array* cur = elsotomb;
     while (cur) {
-        mdarabtomb* kov = cur->kovtomb;
+        canvas_chunk_node_array* kov = cur->next;
         delete cur;
         cur = kov;
     }
     elsotomb = NULL;
-    for (int i = 0; i < MAXECSETSOR; i++) {
+    for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
         msorok[i] = NULL;
     }
 }
@@ -1433,15 +1435,15 @@ static inline void draw_default_ground(unsigned char* pc, size_t offset, size_t 
 
 void ecset::kiegysor_A(unsigned char* pc, int ye) {
     // Visszalepunk amig kell:
-    darab* pda = curdarabok_A[ye];
+    canvas_chunk* pda = curdarabok_A[ye];
     int xpos = kurxposok_A[ye];
     while (xpos > Xe1) {
         pda--;
-        xpos -= pda->xsize;
+        xpos -= pda->width;
     }
     // Elorelepunk amig kell:
-    while (xpos + pda->xsize <= Xe1) {
-        xpos += pda->xsize;
+    while (xpos + pda->width <= Xe1) {
+        xpos += pda->width;
         pda++;
     }
     // Elmentjuk kurrens darabot:
@@ -1453,25 +1455,25 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
     // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
     // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
     int ures = Xe1 - xpos;
-    if (xpos + pda->xsize > Xe2) {
+    if (xpos + pda->width > Xe2) {
         // ATLOG VEGIG:
         int ujpdaxsize = Xe2 - xpos + 1;
         // Ha eppen vegeig log, akkor is ide jon
-        if ((pixelek_t)pda->pixelek & PIXELMASZK) {
+        if ((pixelek_t)pda->pixels & PIXELMASZK) {
             // Normal kep copi:
-            memcpy(pc, &pda->pixelek[Xe1 - xpos], ujpdaxsize - ures);
+            memcpy(pc, &pda->pixels[Xe1 - xpos], ujpdaxsize - ures);
         } else {
             // Eg, Fold, vagy ures:
-            if (!pda->pixelek) { // Eg
+            if (!pda->pixels) { // Eg
                 draw_default_ground(pc, 0, ujpdaxsize - ures, view);
                 return;
             }
-            if ((pixelek_t)pda->pixelek == PX_FOLD) {
+            if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
                 draw_sky(pc, 0, ujpdaxsize - ures, view);
             } else {
 #ifdef DEBUG
-                if ((pixelek_t)pda->pixelek != PX_URES) {
-                    internal_error("(pixelek_t)pda->pixelek != PX_URES iueghyreg!");
+                if ((pixelek_t)pda->pixels != PixelsTransparent) {
+                    internal_error("(pixelek_t)pda->pixels != PixelsTransparent iueghyreg!");
                 }
 #endif
             }
@@ -1480,28 +1482,28 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
     }
 
     // Elso szakasz nem log at vegig:
-    int size = pda->xsize - ures;
-    if ((pixelek_t)pda->pixelek & PIXELMASZK) {
+    int size = pda->width - ures;
+    if ((pixelek_t)pda->pixels & PIXELMASZK) {
         // Normal kep copi:
-        memcpy(pc, &pda->pixelek[Xe1 - xpos], size);
+        memcpy(pc, &pda->pixels[Xe1 - xpos], size);
     } else {
         // Eg, Fold, vagy ures:
-        if (!pda->pixelek) { // Eg
+        if (!pda->pixels) { // Eg
             draw_default_ground(pc, 0, size, view);
         } else {
-            if ((pixelek_t)pda->pixelek == PX_FOLD) {
+            if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
                 draw_sky(pc, 0, size, view);
             } else {
 #ifdef DEBUG
-                if ((pixelek_t)pda->pixelek != PX_URES) {
-                    internal_error("(pixelek_t)pda->pixelek != PX_URES iygvfrgiyvr!");
+                if ((pixelek_t)pda->pixels != PixelsTransparent) {
+                    internal_error("(pixelek_t)pda->pixels != PixelsTransparent iygvfrgiyvr!");
                 }
 #endif
             }
         }
     }
     // Atugrunk kovetkezore:
-    xpos += pda->xsize;
+    xpos += pda->width;
     pda++;
     pc += size;
 
@@ -1510,65 +1512,65 @@ void ecset::kiegysor_A(unsigned char* pc, int ye) {
     // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
     // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
     while (xpos <= Xe2) {
-        if (xpos + pda->xsize > Xe2) {
+        if (xpos + pda->width > Xe2) {
             // Ez az utolso darab, ki is loghat:
-            if ((pixelek_t)pda->pixelek & PIXELMASZK) {
+            if ((pixelek_t)pda->pixels & PIXELMASZK) {
                 // Normal kep copi:
-                memcpy(pc, pda->pixelek, Xe2 - xpos + 1);
+                memcpy(pc, pda->pixels, Xe2 - xpos + 1);
                 return;
             }
-            if (!pda->pixelek) {
+            if (!pda->pixels) {
                 draw_default_ground(pc, xpos - Xe1, Xe2 - xpos + 1, view);
                 return;
             }
-            if ((pixelek_t)pda->pixelek == PX_FOLD) {
+            if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
                 draw_sky(pc, xpos - Xe1, Xe2 - xpos + 1, view);
                 return;
             }
 #ifdef DEBUG
-            if ((pixelek_t)pda->pixelek != PX_URES) {
-                internal_error("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
+            if ((pixelek_t)pda->pixels != PixelsTransparent) {
+                internal_error("(pixelek_t)pda->pixels != PixelsTransparent 653wetgki!");
             }
 #endif
         }
 
         // Ez a darab nem log ki:
-        if ((pixelek_t)pda->pixelek & PIXELMASZK) {
+        if ((pixelek_t)pda->pixels & PIXELMASZK) {
             // Normal kep copi:
-            memcpy(pc, pda->pixelek, pda->xsize);
+            memcpy(pc, pda->pixels, pda->width);
         } else {
-            if (!pda->pixelek) {
-                draw_default_ground(pc, xpos - Xe1, pda->xsize, view);
+            if (!pda->pixels) {
+                draw_default_ground(pc, xpos - Xe1, pda->width, view);
             } else {
-                if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                    draw_sky(pc, xpos - Xe1, pda->xsize, view);
+                if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
+                    draw_sky(pc, xpos - Xe1, pda->width, view);
                 } else {
 #ifdef DEBUG
-                    if ((pixelek_t)pda->pixelek != PX_URES) {
-                        internal_error("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
+                    if ((pixelek_t)pda->pixels != PixelsTransparent) {
+                        internal_error("(pixelek_t)pda->pixels != PixelsTransparent 653wetgki!");
                     }
 #endif
                 }
             }
         }
 
-        xpos += pda->xsize;
-        pc += pda->xsize;
+        xpos += pda->width;
+        pc += pda->width;
         pda++;
     }
 }
 
 void ecset::kiegysor_B(unsigned char* pc, int ye) {
     // Visszalepunk amig kell:
-    darab* pda = curdarabok_B[ye];
+    canvas_chunk* pda = curdarabok_B[ye];
     int xpos = kurxposok_B[ye];
     while (xpos > Xe1) {
         pda--;
-        xpos -= pda->xsize;
+        xpos -= pda->width;
     }
     // Elorelepunk amig kell:
-    while (xpos + pda->xsize <= Xe1) {
-        xpos += pda->xsize;
+    while (xpos + pda->width <= Xe1) {
+        xpos += pda->width;
         pda++;
     }
     // Elmentjuk kurrens darabot:
@@ -1580,25 +1582,25 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
     // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
     // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
     int ures = Xe1 - xpos;
-    if (xpos + pda->xsize > Xe2) {
+    if (xpos + pda->width > Xe2) {
         // ATLOG VEGIG:
         int ujpdaxsize = Xe2 - xpos + 1;
         // Ha eppen vegeig log, akkor is ide jon
-        if ((pixelek_t)pda->pixelek & PIXELMASZK) {
+        if ((pixelek_t)pda->pixels & PIXELMASZK) {
             // Normal kep copi:
-            memcpy(pc, &pda->pixelek[Xe1 - xpos], ujpdaxsize - ures);
+            memcpy(pc, &pda->pixels[Xe1 - xpos], ujpdaxsize - ures);
         } else {
             // Eg, Fold, vagy ures:
-            if (!pda->pixelek) { // Eg
+            if (!pda->pixels) { // Eg
                 draw_default_ground(pc, 0, ujpdaxsize - ures, view);
                 return;
             }
-            if ((pixelek_t)pda->pixelek == PX_FOLD) {
+            if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
                 draw_sky(pc, 0, ujpdaxsize - ures, view);
             } else {
 #ifdef DEBUG
-                if ((pixelek_t)pda->pixelek != PX_URES) {
-                    internal_error("(pixelek_t)pda->pixelek != PX_URES iueghyreg!");
+                if ((pixelek_t)pda->pixels != PixelsTransparent) {
+                    internal_error("(pixelek_t)pda->pixels != PixelsTransparent iueghyreg!");
                 }
 #endif
             }
@@ -1607,28 +1609,28 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
     }
 
     // Elso szakasz nem log at vegig:
-    int size = pda->xsize - ures;
-    if ((pixelek_t)pda->pixelek & PIXELMASZK) {
+    int size = pda->width - ures;
+    if ((pixelek_t)pda->pixels & PIXELMASZK) {
         // Normal kep copi:
-        memcpy(pc, &pda->pixelek[Xe1 - xpos], size);
+        memcpy(pc, &pda->pixels[Xe1 - xpos], size);
     } else {
         // Eg, Fold, vagy ures:
-        if (!pda->pixelek) { // Eg
+        if (!pda->pixels) { // Eg
             draw_default_ground(pc, 0, size, view);
         } else {
-            if ((pixelek_t)pda->pixelek == PX_FOLD) {
+            if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
                 draw_sky(pc, 0, size, view);
             } else {
 #ifdef DEBUG
-                if ((pixelek_t)pda->pixelek != PX_URES) {
-                    internal_error("(pixelek_t)pda->pixelek != PX_URES iygvfrgiyvr!");
+                if ((pixelek_t)pda->pixels != PixelsTransparent) {
+                    internal_error("(pixelek_t)pda->pixels != PixelsTransparent iygvfrgiyvr!");
                 }
 #endif
             }
         }
     }
     // Atugrunk kovetkezore:
-    xpos += pda->xsize;
+    xpos += pda->width;
     pda++;
     pc += size;
 
@@ -1637,50 +1639,50 @@ void ecset::kiegysor_B(unsigned char* pc, int ye) {
     // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
     // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
     while (xpos <= Xe2) {
-        if (xpos + pda->xsize > Xe2) {
+        if (xpos + pda->width > Xe2) {
             // Ez az utolso darab, ki is loghat:
-            if ((pixelek_t)pda->pixelek & PIXELMASZK) {
+            if ((pixelek_t)pda->pixels & PIXELMASZK) {
                 // Normal kep copi:
-                memcpy(pc, pda->pixelek, Xe2 - xpos + 1);
+                memcpy(pc, pda->pixels, Xe2 - xpos + 1);
                 return;
             }
-            if (!pda->pixelek) {
+            if (!pda->pixels) {
                 draw_default_ground(pc, xpos - Xe1, Xe2 - xpos + 1, view);
                 return;
             }
-            if ((pixelek_t)pda->pixelek == PX_FOLD) {
+            if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
                 draw_sky(pc, xpos - Xe1, Xe2 - xpos + 1, view);
                 return;
             }
 #ifdef DEBUG
-            if ((pixelek_t)pda->pixelek != PX_URES) {
-                internal_error("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
+            if ((pixelek_t)pda->pixels != PixelsTransparent) {
+                internal_error("(pixelek_t)pda->pixels != PixelsTransparent 653wetgki!");
             }
 #endif
         }
 
         // Ez a darab nem log ki:
-        if ((pixelek_t)pda->pixelek & PIXELMASZK) {
+        if ((pixelek_t)pda->pixels & PIXELMASZK) {
             // Normal kep copi:
-            memcpy(pc, pda->pixelek, pda->xsize);
+            memcpy(pc, pda->pixels, pda->width);
         } else {
-            if (!pda->pixelek) {
-                draw_default_ground(pc, xpos - Xe1, pda->xsize, view);
+            if (!pda->pixels) {
+                draw_default_ground(pc, xpos - Xe1, pda->width, view);
             } else {
-                if ((pixelek_t)pda->pixelek == PX_FOLD) {
-                    draw_sky(pc, xpos - Xe1, pda->xsize, view);
+                if ((pixelek_t)pda->pixels == PixelsDefaultForeground) {
+                    draw_sky(pc, xpos - Xe1, pda->width, view);
                 } else {
 #ifdef DEBUG
-                    if ((pixelek_t)pda->pixelek != PX_URES) {
-                        internal_error("(pixelek_t)pda->pixelek != PX_URES 653wetgki!");
+                    if ((pixelek_t)pda->pixels != PixelsTransparent) {
+                        internal_error("(pixelek_t)pda->pixelek != PixelsTransparent 653wetgki!");
                     }
 #endif
                 }
             }
         }
 
-        xpos += pda->xsize;
-        pc += pda->xsize;
+        xpos += pda->width;
+        pc += pda->width;
         pda++;
     }
 }
@@ -1824,28 +1826,28 @@ void ecset::kiteszview(int ajatekos, pic8* ppic, vect2 balalso, int x1, int y1, 
     }
 }
 
-static mdarab* Glb_pfoltdarab = NULL;
+static canvas_chunk_node* Glb_pfoltdarab = NULL;
 
-static int ezfolt(int x, int y, mdbiter* piter1) {
+static int ezfolt(int x, int y, node_finder* piter1) {
     if (!Glb_pfoltdarab) {
         internal_error("65rw5r7twe");
     }
 
     // Felette levo sort vizsgaljuk:
-    mdarab* pmd = piter1->getpmd(x, y + 1);
+    canvas_chunk_node* pmd = piter1->get_chunk(x, y + 1);
 
-    pixelek_t kepindex = (pixelek_t)pmd->pixelek;
+    pixelek_t kepindex = (pixelek_t)pmd->pixels;
     if (kepindex < 10) {
         // Ha fold, eg, vagy ures:
         return 0;
     }
 
-    if (pmd->pixelek == Glb_pfoltdarab->pixelek) {
+    if (pmd->pixels == Glb_pfoltdarab->pixels) {
         // Ha meg ez is koveto textura:
         return 0;
     }
 
-    if (pmd->tavolsag > 500) {
+    if (pmd->distance > 500) {
         // Ha nem takarja el motorost:
         return 0;
     }
@@ -1853,7 +1855,7 @@ static int ezfolt(int x, int y, mdbiter* piter1) {
     return 1;
 }
 
-static int getnemfoltszam(int x1, int xkov, int y, mdbiter* piter1) {
+static int getnemfoltszam(int x1, int xkov, int y, node_finder* piter1) {
     int szam = 0;
     for (int x = x1; x < xkov; x++) {
         if (ezfolt(x, y, piter1)) {
@@ -1864,7 +1866,7 @@ static int getnemfoltszam(int x1, int xkov, int y, mdbiter* piter1) {
     return szam;
 }
 
-static int getfoltszam(int x1, int xkov, int y, mdbiter* piter1) {
+static int getfoltszam(int x1, int xkov, int y, node_finder* piter1) {
     int szam = 0;
     for (int x = x1; x < xkov; x++) {
         if (!ezfolt(x, y, piter1)) {
@@ -1878,7 +1880,7 @@ static int getfoltszam(int x1, int xkov, int y, mdbiter* piter1) {
 // Meg akkor kell hivni, amig nincsenek kettevalasztva also-ra es felsore es
 // meg kis folddarabok sincsenek lecserelve:
 void ecset::foltoz(void) {
-    mdbiter* piter1 = new mdbiter(this);
+    node_finder* piter1 = new node_finder(this);
     // addbyte-ban tavolsagot valtakozva adjuk meg, nehogy osszeadja:
     int valtakozo = 0;
 
@@ -1886,19 +1888,19 @@ void ecset::foltoz(void) {
     // Azert noveljuk megis y-t, mert fejjel lefele vannak y koordinatak:
     for (int y = 10; y < sorszam - 10; y++) {
         // Vegigmegyunk osszes mdarabon:
-        mdarab* pmd = msorok[y];
+        canvas_chunk_node* pmd = msorok[y];
         int xpos = kurxposok_A[y];
         if (xpos > 10) {
             internal_error("uih67f");
         }
 
         while (pmd) {
-            int pmdorigxsize = pmd->xsize;
-            mdarab* pmdorigkov = pmd->pkov;
+            int pmdorigxsize = pmd->width;
+            canvas_chunk_node* pmdorigkov = pmd->next;
 
             Glb_pfoltdarab = pmd;
             // Egy madarab-ot elintezunk:
-            pixelek_t kepindex = (pixelek_t)pmd->pixelek;
+            pixelek_t kepindex = (pixelek_t)pmd->pixels;
             if (((kepindex & PIXELMASZK) == 0) && (kepindex >= 10)) {
                 kepindex -= 10;
 // Itt van maszk, le kell cserelni:
@@ -1909,12 +1911,12 @@ void ecset::foltoz(void) {
 #endif
                 texture* pt = &Lgr->textures[kepindex];
 
-                if (pt->is_qgrass && pmd->tavolsag > 500) {
+                if (pt->is_qgrass && pmd->distance > 500) {
                     // Ha egy foltos, 500-nal tavolabbi textura mdarabja:
                     // Vegigmegyunk mdarab-on:
                     int x = xpos;
                     // Ez mar kov mdarab elso pixele:
-                    int xkov = xpos + pmd->xsize;
+                    int xkov = xpos + pmd->width;
                     while (x < xkov) {
                         int nfszam = getnemfoltszam(x, xkov, y, piter1);
                         x += nfszam;
@@ -1923,10 +1925,10 @@ void ecset::foltoz(void) {
                             valtakozo = !valtakozo;
                             if (valtakozo) {
                                 addbytesor( //(unsigned char*)10,
-                                    pmd->pixelek, 223, x, x + foltszam - 1, y, FAZIS_NEMFOLDEG);
+                                    pmd->pixels, 223, x, x + foltszam - 1, y, FAZIS_NEMFOLDEG);
                             } else {
                                 addbytesor( //(unsigned char*)10,
-                                    pmd->pixelek, 224, x, x + foltszam - 1, y, FAZIS_NEMFOLDEG);
+                                    pmd->pixels, 224, x, x + foltszam - 1, y, FAZIS_NEMFOLDEG);
                             }
                         }
                         x += foltszam;
@@ -1943,86 +1945,86 @@ void ecset::foltoz(void) {
     piter1 = NULL;
 }
 
-void betoltecseteket(void) {
+void create_canvases(void) {
     Lgr->reload_default_textures();
 
     Osszegszam = 0; // Ide osszegezzuk osszes lefoglalt szakaszt
 
-    if (Pecsetalso) {
-        delete Pecsetalso;
+    if (CanvasBack) {
+        delete CanvasBack;
     }
-    Pecsetalso = NULL;
-    if (Pecsetfelso) {
-        delete Pecsetfelso;
+    CanvasBack = NULL;
+    if (CanvasFront) {
+        delete CanvasFront;
     }
-    Pecsetfelso = NULL;
-    if (Pecsetview) {
-        delete Pecsetview;
+    CanvasFront = NULL;
+    if (CanvasMinimap) {
+        delete CanvasMinimap;
     }
-    Pecsetview = NULL;
+    CanvasMinimap = NULL;
 
-    Pecsetalso = new ecset(0);
-    if (!Pecsetalso) {
-        internal_error("Nincs eleg memoria Pecsetalso-nak!");
+    CanvasBack = new ecset(0);
+    if (!CanvasBack) {
+        internal_error("Nincs eleg memoria CanvasBack-nak!");
     }
 
     if (!EolSettings->pictures_in_background()) {
-        Pecsetalso->foltoz();
+        CanvasBack->foltoz();
     }
 
-    Pecsetfelso = new ecset(Pecsetalso);
-    if (!Pecsetfelso) {
-        internal_error("Nincs eleg memoria Pecsetfelso-nak!");
+    CanvasFront = new ecset(CanvasBack);
+    if (!CanvasFront) {
+        internal_error("Nincs eleg memoria CanvasFront-nak!");
     }
 
     if (!EolSettings->pictures_in_background()) {
         // Most betesszuk felsobe is 500-nal kozelebbi madarabokat:
         // Es egyben uresse tesszuk alsoban helyuket:
-        for (int i = 0; i < Pecsetalso->sorszam; i++) {
-            mdarab* pmd = Pecsetalso->msorok[i];
-            int xpos = Pecsetalso->kurxposok_A[i];
+        for (int i = 0; i < CanvasBack->sorszam; i++) {
+            canvas_chunk_node* pmd = CanvasBack->msorok[i];
+            int xpos = CanvasBack->kurxposok_A[i];
             if (xpos > 100) {
-                internal_error("betoltecseteket xpos > 100!");
+                internal_error("create_canvases xpos > 100!");
             }
             while (pmd) {
-                if (pmd->tavolsag < 500) {
-                    if ((pixelek_t)pmd->pixelek >= 10) {
-                        Pecsetfelso->addbytesor(pmd->pixelek, pmd->tavolsag, xpos,
-                                                xpos + pmd->xsize - 1, i, FAZIS_URESRE);
-                        pmd->pixelek = (unsigned char*)PX_URES;
+                if (pmd->distance < 500) {
+                    if ((pixelek_t)pmd->pixels >= 10) {
+                        CanvasFront->addbytesor(pmd->pixels, pmd->distance, xpos,
+                                                xpos + pmd->width - 1, i, FAZIS_URESRE);
+                        pmd->pixels = (unsigned char*)PixelsTransparent;
                     }
                 }
-                xpos += pmd->xsize;
-                pmd = pmd->pkov;
+                xpos += pmd->width;
+                pmd = pmd->next;
             }
         }
     }
 
     // Rovid folddarabokat atalakitja konkret mutatova:
-    Pecsetalso->foldmutatocsere();
+    CanvasBack->foldmutatocsere();
     // Egymas utani ket azonos texturat
     // lecsereli egyre (mar beepiteskor is megtortenik nemileg):
-    Pecsetalso->duplaeliminacio();
-    Pecsetalso->textura2mutato(); // Lecsereli textura indexeket mutatokka
-    Pecsetalso->mutatotlanit();   // mdarab lancolt listabol tombot csinal
-    Pecsetalso->deletemdarabok(); // Torli lancolt listat:
+    CanvasBack->duplaeliminacio();
+    CanvasBack->textura2mutato(); // Lecsereli textura indexeket mutatokka
+    CanvasBack->mutatotlanit();   // mdarab lancolt listabol tombot csinal
+    CanvasBack->deletemdarabok(); // Torli lancolt listat:
 
-    Pecsetfelso->duplaeliminacio();
-    Pecsetfelso->textura2mutato();
-    Pecsetfelso->mutatotlanit();
-    Pecsetfelso->deletemdarabok();
+    CanvasFront->duplaeliminacio();
+    CanvasFront->textura2mutato();
+    CanvasFront->mutatotlanit();
+    CanvasFront->deletemdarabok();
 
     // View ecset:
-    Pecsetview = new ecset(1);
-    if (!Pecsetview) {
-        internal_error("Nincs eleg memoria Pecsetview-nak!");
+    CanvasMinimap = new ecset(1);
+    if (!CanvasMinimap) {
+        internal_error("Nincs eleg memoria CanvasMinimap-nak!");
     }
-    Pecsetview->mutatotlanit();
-    Pecsetview->deletemdarabok();
+    CanvasMinimap->mutatotlanit();
+    CanvasMinimap->deletemdarabok();
 
     // Kajak egesz koordjainak kitoltese:
-    Pecsetalso->kitoltfoodkoordokat();
-    Pecsetview->kitoltfoodkoordokat(); // View koordok
+    CanvasBack->kitoltfoodkoordokat();
+    CanvasMinimap->kitoltfoodkoordokat(); // View koordok
 }
 
 void segedfv(void) {
@@ -2031,35 +2033,35 @@ void segedfv(void) {
 }
 
 // Egy iterator class (inkabb cache) ecsethez (foltoz hasznalja oket):
-mdbiter::mdbiter(ecset* pecset_p) {
-    xposbent = -1;
-    ybent = -1;
-    pmd = NULL;
+node_finder::node_finder(ecset* src) {
+    current_x = -1;
+    current_y = -1;
+    current_node = NULL;
 
-    pecset = pecset_p;
+    source = src;
 }
 
-mdarab* mdbiter::getpmd(int x, int y) {
-    if (y == ybent && x >= xposbent) {
-        while (x >= xposbent + pmd->xsize) {
-            xposbent += pmd->xsize;
-            pmd = pmd->pkov;
+canvas_chunk_node* node_finder::get_chunk(int x, int y) {
+    if (y == current_y && x >= current_x) {
+        while (x >= current_x + current_node->width) {
+            current_x += current_node->width;
+            current_node = current_node->next;
         }
     } else {
         // Ujra kell olvasni:
-        if (y < 0 || y >= pecset->sorszam) {
+        if (y < 0 || y >= source->sorszam) {
             internal_error("789eygrq");
         }
-        ybent = y;
-        pmd = pecset->msorok[y];
-        xposbent = pecset->kurxposok_A[y];
-        if (xposbent > 10) {
+        current_y = y;
+        current_node = source->msorok[y];
+        current_x = source->kurxposok_A[y];
+        if (current_x > 10) {
             internal_error("y7fjksd");
         }
-        while (x >= xposbent + pmd->xsize) {
-            xposbent += pmd->xsize;
-            pmd = pmd->pkov;
+        while (x >= current_x + current_node->width) {
+            current_x += current_node->width;
+            current_node = current_node->next;
         }
     }
-    return pmd;
+    return current_node;
 }

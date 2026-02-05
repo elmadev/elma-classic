@@ -5,76 +5,76 @@
 
 class ecset;
 class grass;
-struct mdarab;
+struct canvas_chunk_node;
 class pic8;
 class sprite;
 struct segment;
 
 // Egy iterator class (inkabb cache) ecsethez (foltoz hasznalja oket):
-class mdbiter {
-    ecset* pecset;
-    int xposbent, ybent;
-    mdarab* pmd;
+class node_finder {
+    ecset* source;
+    int current_x, current_y;
+    canvas_chunk_node* current_node;
 
   public:
-    mdbiter(ecset* pecset);
-    mdarab* getpmd(int x, int y);
+    node_finder(ecset* src);
+    canvas_chunk_node* get_chunk(int x, int y);
 };
 
 // Elso par strukturat be lehetne majd vinni cpp-be:
 
-#define PX_FOLD (1)
-#define PX_EG (0)
-#define PX_URES (2)
+#define PixelsDefaultForeground (1)
+#define PixelsDefaultBackground (0)
+#define PixelsTransparent (2)
 
-struct mdarab {
-    mdarab* pkov;
-    int xsize;
-    int tavolsag;
-    unsigned char* pixelek;
+struct canvas_chunk_node {
+    canvas_chunk_node* next;
+    int width;
+    int distance;
+    unsigned char* pixels;
 };
 
-#define TOMBBENMDARAB (10000)
+#define CHUNK_NODE_BLOCK_LENGTH (10000)
 
-struct mdarabtomb {
-    mdarab tomb[TOMBBENMDARAB];
-    mdarabtomb* kovtomb;
+struct canvas_chunk_node_array {
+    canvas_chunk_node nodes[CHUNK_NODE_BLOCK_LENGTH];
+    canvas_chunk_node_array* next;
 };
 
-#define MAXECSETSOR (12000)
+#define CANVAS_MAX_HEIGHT (12000)
 
-struct darab {
-    int xsize;
-    unsigned char* pixelek;
+struct canvas_chunk {
+    int width;
+    unsigned char* pixels;
 };
 
-void betoltecseteket(void);
+void create_canvases(void);
 
 class ecset {
-    friend void betoltecseteket(void);
+    friend void create_canvases(void);
     friend void segedfv(void);
-    friend mdarab* mdbiter::getpmd(int x, int y);
+    friend canvas_chunk_node* node_finder::get_chunk(int x, int y);
 
     // madarab allokalas:
-    mdarabtomb* elsotomb;
-    mdarabtomb* kurtomb;
+    canvas_chunk_node_array* elsotomb;
+    canvas_chunk_node_array* kurtomb;
     int tombbenkov;
-    mdarab* newmdarab(void);
+    canvas_chunk_node* newmdarab(void);
     void deletemdarabok(void);
 
-    darab* nagydarabtomb;
+    canvas_chunk* nagydarabtomb;
 
     int view;
     vect2 origo;
     double xsizedb, ysizedb;
     int maxx, sorszam;
-    mdarab* msorok[MAXECSETSOR];
-    darab* sorok[MAXECSETSOR];
+    canvas_chunk_node* msorok[CANVAS_MAX_HEIGHT];
+    canvas_chunk* sorok[CANVAS_MAX_HEIGHT];
     // Kulon van ket jatekosnak:
-    int kurxposok_A[MAXECSETSOR];     // Eppen hol all mutatohoz tartozo x
-    darab* curdarabok_A[MAXECSETSOR]; // Melyik darab kurrens
-    int kurxposok_B[MAXECSETSOR];     // Eppen hol all mutatohoz tartozo x
-    darab* curdarabok_B[MAXECSETSOR]; // Melyik darab kurrens
+    int kurxposok_A[CANVAS_MAX_HEIGHT];            // Eppen hol all mutatohoz tartozo x
+    canvas_chunk* curdarabok_A[CANVAS_MAX_HEIGHT]; // Melyik darab kurrens
+    int kurxposok_B[CANVAS_MAX_HEIGHT];            // Eppen hol all mutatohoz tartozo x
+    canvas_chunk* curdarabok_B[CANVAS_MAX_HEIGHT]; // Melyik darab kurrens
 
     void getorigoandsize(void);
     void addszakasz(segment* psz);
@@ -89,8 +89,9 @@ class ecset {
     void kitoltfoodkoordokat(void);
 
     void levon10000t(void);
-    mdarab* beepitegymadarabnyit(mdarab* pmd, unsigned char* ujpixelek, int x1, int ujx1, int ujx2,
-                                 int ujtavolsag, mdarab* vege, int* pujavege, int fazis);
+    canvas_chunk_node* beepitegymadarabnyit(canvas_chunk_node* pmd, unsigned char* ujpixelek,
+                                            int x1, int ujx1, int ujx2, int ujtavolsag,
+                                            canvas_chunk_node* vege, int* pujavege, int fazis);
     void addbytesor(unsigned char* ujpixelek, int ujtavolsag, int ujx1, int ujx2, int y, int fazis);
     void addegymaszk(sprite* psp, int index_t, int index_m, int fazis);
     void addspriteok(int fazis);
@@ -119,11 +120,11 @@ class ecset {
     // void egetkeszit( void );
 };
 
-extern ecset* Pecsetalso;
-extern ecset* Pecsetfelso;
-extern ecset* Pecsetview;
+extern ecset* CanvasBack;
+extern ecset* CanvasFront;
+extern ecset* CanvasMinimap;
 
-// betoltecseteket ide osszegzi osszes lefoglalt szakaszt:
+// create_canvases ide osszegzi osszes lefoglalt szakaszt:
 extern int Osszegszam;
 
 #endif

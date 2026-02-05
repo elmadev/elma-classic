@@ -70,7 +70,7 @@ int floadlevel_p(const char* nev) {
             Segments->setup_collision_grid(Motor1->left_wheel.radius);
         }
 
-        betoltecseteket();
+        create_canvases();
     }
     return 1;
 }

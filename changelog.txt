@@ -29,6 +29,7 @@
 * You can now use mouse scroll wheel to navigate the menu
 * Elma now saves State.dat when you change options
 * You can now f1-p in editor (same as f1-enter but in editor)
+* You can now change what LGR to use as the default from inside the options menu
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems

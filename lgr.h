@@ -72,6 +72,7 @@ class lgrfile {
     void add_texture(pic8* pic, piclist* list, int index);
     void add_mask(pic8* pic, piclist* list, int index);
 
+    static bool try_load_lgr(const char* lgr_name);
     lgrfile(const char* lgrname);
     ~lgrfile();
 

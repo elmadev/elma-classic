@@ -99,11 +99,6 @@ void lgrfile::load_lgr_file(const char* lgr_name) {
         internal_error("load_lgr_file strlen( lgr_name ) > MAX_FILENAME_LEN!");
     }
 
-    // This lgr is already loaded, so skip
-    if (strcmpi(lgr_name, CurrentLgrName) == 0) {
-        return;
-    }
-
     char lgr_load_name[MAX_FILENAME_LEN + 1] = {};
     strcpy(lgr_load_name, lgr_name);
     strlwr(lgr_load_name);

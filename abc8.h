@@ -15,6 +15,7 @@ class abc8 {
     ~abc8();
     void write(pic8* dest, int x, int y, const char* text);
     void write_centered(pic8* dest, int x, int y, const char* text);
+    void write_right_align(pic8* dest, int x, int y, const char* text);
     int len(const char* text);
     void set_spacing(int new_spacing);
     bool has_char(unsigned char c) const;

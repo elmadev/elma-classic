@@ -194,3 +194,8 @@ void abc8::write_centered(pic8* dest, int x, int y, const char* text) {
     int width = len(text);
     write(dest, x - width / 2, y, text);
 }
+
+void abc8::write_right_align(pic8* dest, int x, int y, const char* text) {
+    int width = len(text);
+    write(dest, x - width, y, text);
+}

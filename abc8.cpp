@@ -107,16 +107,16 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
     while (*text) {
         int index = (unsigned char)*text;
         // Space character is hardcoded
-        if (index == ' ') {
-            if (this == MenuFont) {
-                x += SpaceWidthMenu;
-            } else {
-                x += SpaceWidth;
-            }
-            text++;
-            continue;
-        }
         if (!ppsprite[index]) {
+            if (index == ' ') {
+                if (this == MenuFont) {
+                    x += SpaceWidthMenu;
+                } else {
+                    x += SpaceWidth;
+                }
+                text++;
+                continue;
+            }
 #ifdef DEBUG
             printf("Missing codepoint %c (0x%02X) in abc8 text: \"%s\"\n", index, index,
                    error_text);
@@ -136,7 +136,7 @@ int abc8::len(const char* text) {
     int width = 0;
     while (*text) {
         int index = (unsigned char)*text;
-        // Space character is hardcoded (slightly different to abc8::write)
+        // Space character is hardcoded
         if (!ppsprite[index]) {
             if (index == ' ') {
                 if (this == MenuFont) {

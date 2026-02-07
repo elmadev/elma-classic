@@ -785,7 +785,7 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         }
     }
 
-    if (pmot->apple_count) {
+    if (pmot->apple_count && EolSettings->show_last_apple_time()) {
         char tmp[100];
         sprintf(tmp, "last apple (%d)        ", pmot->apple_count);
         centiseconds_to_string(pmot->last_apple_time, tmp + strlen(tmp), true, true);

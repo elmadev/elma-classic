@@ -120,6 +120,8 @@ void eol_settings::set_default_lgr_name(std::string name) {
     }
 }
 
+void eol_settings::set_show_last_apple_time(bool show) { show_last_apple_time_ = show; }
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -208,7 +210,8 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(replay_slow_2x_key)                                                                 \
     JSON_FIELD(replay_slow_4x_key)                                                                 \
     JSON_FIELD(replay_pause_key)                                                                   \
-    JSON_FIELD(default_lgr_name)
+    JSON_FIELD(default_lgr_name)                                                                   \
+    JSON_FIELD(show_last_apple_time)
 
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

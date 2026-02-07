@@ -212,7 +212,11 @@ void menu_options() {
         strcpy(NavEntriesLeft[19 + flag_tag_opt], "Default LGR:");
         strcpy(NavEntriesRight[19 + flag_tag_opt], EolSettings->default_lgr_name().c_str());
 
-        nav.setup(20 + flag_tag_opt, true);
+        strcpy(NavEntriesLeft[20 + flag_tag_opt], "Show Apple Time:");
+        strcpy(NavEntriesRight[20 + flag_tag_opt],
+               EolSettings->show_last_apple_time() ? "Yes" : "No");
+
+        nav.setup(21 + flag_tag_opt, true);
 
         choice = nav.navigate();
 
@@ -352,6 +356,10 @@ void menu_options() {
 
         if (choice == 19) {
             menu_lgr();
+        }
+
+        if (choice == 20) {
+            EolSettings->set_show_last_apple_time(!EolSettings->show_last_apple_time());
         }
 
         if (flag_tag_opt) {

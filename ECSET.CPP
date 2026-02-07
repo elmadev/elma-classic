@@ -1647,54 +1647,6 @@ void canvas::meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y) {
     }
 }
 
-/*static int Elsoegkeszit = 1;
-static pic8* Pegbuffer = NULL;
-static pic8* Felho = NULL;
-static pic8* Felho2 = NULL;
-
-static void egetkeszit( pic8* peg, int xhely, int xkezd, int xmodulus ) {
-    if( Elsoegkeszit ) {
-        Elsoegkeszit = 0;
-        Pegbuffer = new pic8( peg->get_width(), peg->get_height() );
-        blit8( Pegbuffer, peg );
-
-        Felho = new pic8( "felho.pcx" );
-        forditkepet( Felho );
-        add_transparency( Felho );
-
-        Felho2 = new pic8( "felho2.pcx" );
-        forditkepet( Felho2 );
-        add_transparency( Felho2 );
-    }
-
-    // Resetaljuk eget:
-    blit8( peg, Pegbuffer );
-
-    // Felho2:
-    double lassitas = 2.5;
-    int modulus = 1000;
-    int dx = -xhely/lassitas;
-    while( dx < 0 )
-        dx += modulus;
-    dx -= modulus;
-    int x = xkezd+dx;
-    blit8( peg, Felho2, x, -80 );
-    x += modulus;
-    blit8( peg, Felho2, x, -80 );
-
-    // Felho1:
-    lassitas = 1.5;
-    modulus = 1000;
-    dx = -xhely/lassitas;
-    while( dx < 0 )
-        dx += modulus;
-    dx -= modulus;
-    x = xkezd+dx;
-    blit8( peg, Felho, x, 0 );
-    x += modulus;
-    blit8( peg, Felho, x, 0 );
-} */
-
 void canvas::render(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2) {
     if (x1 >= x2 || y1 >= y2) {
         internal_error("canvas::render x1 >= x2 || y1 >= y2!");
@@ -1720,8 +1672,6 @@ void canvas::render(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2
     int foreground_x = ViewLeftBorder % Lgr->foreground_original_width;
     int parallax = 2;
     int background_x = (ViewLeftBorder / parallax) % Lgr->background_original_width;
-
-    // egetkeszit( Lgr->peg, ScreenLeftBorder, background_x, Lgr->background_original_width );
 
     // Draw each row
     int canvas_y1 = view_top_border - y1;

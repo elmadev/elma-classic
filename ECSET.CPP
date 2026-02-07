@@ -20,13 +20,6 @@
 
 typedef uintptr_t pixelek_t;
 
-// Regen a file vegen volt egy kikomentezett eget keszit nevu fuggveny is
-// hegyekhez, de ezt 99.05.19-en kiszedtem.
-
-// static pic8* Egtmp = NULL;
-// static pic8* Hegy1 = NULL;
-// static pic8* Hegy2 = NULL;
-
 canvas* CanvasBack = NULL;
 canvas* CanvasFront = NULL;
 canvas* CanvasMinimap = NULL;
@@ -60,33 +53,41 @@ static void memory_error(void) {
 }
 
 canvas_chunk_node* canvas::new_node(void) {
+    // Check to see if we used up all the unused nodes in our memory struct
     if (node_array_index >= CHUNK_NODE_BLOCK_LENGTH) {
-        // Ez a tomb betelt:
+        // Create a new memory struct and reset the index to 0
         node_array_index = 0;
         node_array_last->next = new canvas_chunk_node_array;
         if (!node_array_last->next) {
             memory_error();
         }
+
+        // Point to the new memory struct
         node_array_last = node_array_last->next;
         node_array_last->next = NULL;
+
+        // Return the next unused node
         node_array_index++;
         canvas_chunk_node* new_node = &node_array_last->nodes[node_array_index - 1];
         new_node->distance = 0;
         return new_node;
     }
+
+    // Return the next unused node
     node_array_index++;
     canvas_chunk_node* new_node = &node_array_last->nodes[node_array_index - 1];
     new_node->distance = 0;
     return new_node;
 }
 
+// Round a value in meters so it points to exactly the middle of a pixel
 static void quantize(double* meters) {
     int pixels = (int)(*meters * MetersToPixels);
     *meters = (pixels + 0.5) / MetersToPixels;
 }
 
 void canvas::set_origin_and_dimensions(void) {
-    // Megkeresi burkolokat:
+    // Iterate through all the segments and grab the min/max x/y values
     Segments->iterate_all_segments();
     segment* seg = Segments->next_segment();
     double minx = seg->r.x;
@@ -107,6 +108,9 @@ void canvas::set_origin_and_dimensions(void) {
             maxy = seg->r.y;
         }
 
+        // This code is unnecessary:
+        // We only need to check the end of the line for Verzio Across levels
+        // since all polygons are closed loops in Elma.
         if (seg->r.x + seg->v.x < minx) {
             minx = seg->r.x + seg->v.x;
         }
@@ -124,24 +128,24 @@ void canvas::set_origin_and_dimensions(void) {
     }
 
     if (is_minimap) {
-        // VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW VIEW
-        // x-re jol ra lehet hagyni, nem noveli memoria foglalast:
+        // Minimap, we don't need to quantize
+        // Add a small buffer around the level to avoid crashing from out of bounds
         origin = vect2(minx - 10000 / MetersToPixels, miny - 4000 / MetersToPixels);
         width = (maxx + 10000 / MetersToPixels) - origin.x;
         height = (maxy + 4000 / MetersToPixels) - origin.y;
     } else {
-        // x-re jol ra lehet hagyni, nem noveli memoria foglalast:
+        // Main view, we need to quantize
+        // Add a small buffer around the level to avoid crashing from out of bounds
         origin = vect2(minx - 10000 / MetersToPixels, miny - 1000 / MetersToPixels);
-        // Beallitjuk ugy, hogy mindig pixel felezo helyen legyen origo:
         quantize(&origin.x);
         quantize(&origin.y);
-
         width = (maxx + 10000 / MetersToPixels) - origin.x;
         height = (maxy + 1000 / MetersToPixels) - origin.y;
     }
 }
 
 void canvas::draw_segment(segment* seg) {
+    // Get the line position relative to the origin, converted to pixels
     vect2 r, v;
     r = seg->r - origin;
     r.x *= MetersToPixels;
@@ -149,6 +153,7 @@ void canvas::draw_segment(segment* seg) {
     v.x = seg->v.x * MetersToPixels;
     v.y = seg->v.y * MetersToPixels;
     if (is_minimap) {
+        // Minimap adjustment
         double reciprocal = 1.0 / MinimapScaleFactor;
         r.x *= reciprocal;
         r.y *= reciprocal;
@@ -156,44 +161,42 @@ void canvas::draw_segment(segment* seg) {
         v.y *= reciprocal;
     }
 
-    // Egy kicsit modositjuk palyat, hogy motoros egyforman erintse talajt,
-    // ha kulonbozo iranyokban all:
+    // Quantize to top-left corner of pixel
     r.x -= 0.5;
     r.y -= 0.5;
 
+    // Determine whether the line will generate background or foreground
     int line_direction_negative = v.y < 0;
 
-    // Alulrol felfele mutasson:
+    // If the vector is going in a negative y direction, swap it to go in the positive y direction
     if (v.y < 0) {
         r = r + v;
         v = Vect2null - v;
     }
-    // Nem vizszintes-e?:
+
+    // Don't draw perfectly horizontal lines
     if (v.y < 0.001) {
         return;
     }
-    int ymin = (int)(r.y + 1.0);
-    int ymax = (int)(r.y + v.y);
 
-    /*double kozelseg = 0.000001;
-    if( fabs( double( y1 )-(r.y+1) ) < kozelseg )
-            internal_error( "Nagyon kozeli pont!" );
-    if( fabs( double( y2 )-(r.y+v.y) ) < kozelseg )
-            internal_error( "Nagyon kozeli pont!" );*/
+    // Draw over the target rows
+    int ymin = (int)(r.y + 1.0); // std::ceil(r.y)
+    int ymax = (int)(r.y + v.y); // std::floor((r + v).y)
 
-    // Egyenes egyenletenek parameterei:
+    // Calculate the slope of the line x = ym + b
     double m = v.x / v.y;
+    // Calculate the x-intercept of the line b
     double y1 = r.y;
     double y2 = r.y + v.y;
     double x1 = r.x;
     double x2 = r.x + v.x;
     double b = (x2 * y1 - x1 * y2) / (y1 - y2);
+    // Add a chunk at the appropriate x position for each y position
     for (int y = ymin; y <= ymax; y++) {
-        int x = (int)(m * y + b + 1.0);
-        // if( fabs( double(x)-m*y+a+1.0 ) < kozelseg )
-        //	internal_error( "Nagyon kozeli pont!" );
+        int x = (int)(m * y + b + 1.0); // x = std::ceil(ym + b)
 
-        // Hozzacsapjuk hatar pontot sorhoz:
+        // Make sure we aren't out of bounds.
+        // (shouldn't happen due to margin in set_origin_and_dimensions())
         if (y < 10 || y >= pixel_height) {
             internal_error("canvas::draw_segment y < 10 || y >= pixel_height!");
         }
@@ -201,6 +204,7 @@ void canvas::draw_segment(segment* seg) {
             internal_error("canvas::draw_segment x < 10 || x > pixel_width!");
         }
 
+        // Create a new node
         canvas_chunk_node* node = new_node();
         node->next = NULL;
         node->width = x;
@@ -210,6 +214,7 @@ void canvas::draw_segment(segment* seg) {
             node->pixels = (unsigned char*)PixelsDefaultBackground;
         }
 
+        // Append it to the end of the linked list (linked list is currently not in order)
         canvas_chunk_node* row_nodes = rows_linked[y];
         if (!row_nodes) {
             internal_error("canvas::draw_segment !row_nodes!");
@@ -221,6 +226,8 @@ void canvas::draw_segment(segment* seg) {
     }
 }
 
+// Initially, the chunk keeps track of x position instead of chunk width
+// Convert x position values to chunk width values
 static int xpos_to_width(canvas_chunk_node* row_nodes) {
     int xpos = row_nodes->width;
     canvas_chunk_node* cur_node = row_nodes;
@@ -228,6 +235,7 @@ static int xpos_to_width(canvas_chunk_node* row_nodes) {
         if (cur_node->next) {
             cur_node->width = cur_node->next->width - cur_node->width;
         } else {
+            // Very last chunk has a infinite-ish width
             cur_node->width = 1000000;
         }
 
@@ -236,8 +244,14 @@ static int xpos_to_width(canvas_chunk_node* row_nodes) {
     return xpos;
 }
 
+// Chunks are in an unsorted order when using draw_segment
+// 1) Stable-sort the chunks in order by x position
+// 2) Also merge multiple chunks at the same x position so we don't have 0-width chunks
+//    - foreground/background destroy each other
+//    - fg + fg or bg + bg destroy only 1
+// 3) Merge two adjacent identical chunks (e.g. gr -> gr or bg -> bg)
 static void sort_xpos_and_merge(canvas_chunk_node* row_nodes) {
-    // Megszamoljuk elemeket:
+    // Count the number of chunks in one row so we can bubble sort
     int count = 0;
     canvas_chunk_node* cur_node = row_nodes;
     while (cur_node) {
@@ -247,22 +261,21 @@ static void sort_xpos_and_merge(canvas_chunk_node* row_nodes) {
     if (count <= 0) {
         internal_error("(canvas) sort_xpos_and_merge-ben count <= 0!");
     }
-
     if (count < 2) {
         return;
     }
 
-    // Sorba rendezunk:
+    // Bubble sort
     for (int j = 0; j < count + 2; j++) {
         cur_node = row_nodes;
         cur_node = cur_node->next;
         while (cur_node->next) {
             canvas_chunk_node* next_node = cur_node->next;
             if (cur_node->width > next_node->width) {
-                // Csere:
                 int tmp_xpos = cur_node->width;
                 cur_node->width = next_node->width;
                 next_node->width = tmp_xpos;
+
                 unsigned char* tmp_pixels = cur_node->pixels;
                 cur_node->pixels = next_node->pixels;
                 next_node->pixels = tmp_pixels;
@@ -270,71 +283,70 @@ static void sort_xpos_and_merge(canvas_chunk_node* row_nodes) {
             cur_node = next_node;
         }
     }
-    // Kikuszoboljuk egy x-en fekvo mdarab-okat:
+
+    // Merge chunks at the same position
     canvas_chunk_node* prev_node = row_nodes;
     cur_node = prev_node->next;
     while (cur_node->next) {
         canvas_chunk_node* next_node = cur_node->next;
+        // Check if two nodes with the same x position
         if (cur_node->width == next_node->width) {
             if (cur_node->pixels == next_node->pixels) {
-                // Azonosak, csak az egyiket vesszuk ki (pkov-et):
+                // Identical, delete next_node
                 cur_node->next = next_node->next;
             } else {
-                // Kulonbozoek, mindkettot kiszedjuk:
+                // Different, delete cur_node and next_node
                 prev_node->next = next_node->next;
             }
-            // Visszaallunk lanc legelejere:
+            // Restart the row from the very beginning (not optimized)
             prev_node = row_nodes;
             cur_node = prev_node->next;
             if (!cur_node) {
                 return;
             }
         } else {
-            // Nem volt x-juk azonos, megyunk tovabb:
             prev_node = cur_node;
             cur_node = next_node;
         }
     }
 
-    // Kikuszoboljuk egymas utan fekvo, ugyanazt jelenot mdarab-okat:
+    // Merge identical adjacent chunks
     cur_node = row_nodes;
     while (cur_node->next) {
         canvas_chunk_node* next_node = cur_node->next;
         if (cur_node->pixels == next_node->pixels) {
+            // Identical, delete next_node
             cur_node->next = next_node->next;
-            // Visszaallunk lanc legelejere:
+            // Restart the row from the very beginning (not optimized)
             cur_node = row_nodes;
         } else {
-            // Nem voltak azonosak, megyunk tovabb:
             cur_node = next_node;
         }
     }
 }
 
-// Rovid folddarabokat atalakitja konkret mutatova:
 void canvas::default_foreground_to_pointers(void) {
     for (int i = 0; i < pixel_height; i++) {
         canvas_chunk_node* cur_node = rows_linked[i];
+        // Make sure canvas is unused so far
         int xpos = rows_x1[i];
         if (xpos > 100) {
             internal_error("canvas::default_foreground_to_pointers xpos > 100!");
         }
         while (cur_node) {
+            // Make sure width doesn't exceed the width in generate_default_texture()
             if ((pixelek_t)cur_node->pixels == PixelsDefaultForeground &&
                 cur_node->width < SCREEN_WIDTH) {
                 int x = xpos % Lgr->foreground_original_width;
                 int y = i % Lgr->foreground->get_height();
                 cur_node->pixels = Lgr->foreground->get_row(y) + x;
-                // cur_node->pixels = Lgr->foreground->get_row( 0 ); igy latszik
             }
-
             xpos += cur_node->width;
             cur_node = cur_node->next;
         }
     }
 }
 
-// Egymas utani azonos texturakat es ureseket lecsereli egy hosszabbra:
 void canvas::merge_redundant_chunks(void) {
     for (int i = 0; i < pixel_height; i++) {
         int again = 1;
@@ -343,13 +355,13 @@ void canvas::merge_redundant_chunks(void) {
             canvas_chunk_node* cur_node = rows_linked[i];
             while (cur_node && cur_node->next) {
                 canvas_chunk_node* next_node = cur_node->next;
+                // Merge enums and textures only
                 if (((pixelek_t)cur_node->pixels & PIXELMASZK) == 0 &&
                     cur_node->pixels == next_node->pixels) {
                     cur_node->next = next_node->next;
                     cur_node->width += next_node->width;
                     again = 1;
                 }
-
                 cur_node = cur_node->next;
             }
         }
@@ -359,17 +371,17 @@ void canvas::merge_redundant_chunks(void) {
 void canvas::textures_to_pointers(void) {
     for (int y = 0; y < pixel_height; y++) {
         canvas_chunk_node* cur_node = rows_linked[y];
+        // Make sure canvas is unused so far
         int xpos = rows_x1[y];
         if (xpos > 100) {
             internal_error("canvas::textures_to_pointers xpos > 100");
         }
         while (cur_node) {
             int original_width = cur_node->width;
-
+            // Convert textures to raw pixel data
             pixelek_t texture_index = (pixelek_t)cur_node->pixels;
             if (((texture_index & PIXELMASZK) == 0) && (texture_index >= 10)) {
                 texture_index -= 10;
-// Itt van maszk, le kell cserelni:
 #ifdef DEBUG
                 if (texture_index >= Lgr->texture_count) {
                     internal_error(
@@ -379,6 +391,7 @@ void canvas::textures_to_pointers(void) {
                     internal_error("canvas::textures_to_pointers texture invalid width!");
                 }
 #endif
+                // Split each chunk into multiple chunks based on the texture's width
                 texture* text = &Lgr->textures[texture_index];
                 pic8* pic = text->pic;
                 int remaining_width = cur_node->width;
@@ -386,7 +399,6 @@ void canvas::textures_to_pointers(void) {
                 int first = 1;
                 while (remaining_width > 0) {
                     if (!first) {
-                        // Beillesztunk egy uj mdarab-ot:
                         canvas_chunk_node* node = new_node();
                         node->next = cur_node->next;
                         cur_node->next = node;
@@ -417,7 +429,6 @@ void canvas::textures_to_pointers(void) {
 }
 
 static int list_length(canvas_chunk_node* row_nodes) {
-    // Megszamoljuk elemeket:
     int count = 0;
     canvas_chunk_node* cur_node = row_nodes;
     while (cur_node) {
@@ -431,17 +442,19 @@ static int list_length(canvas_chunk_node* row_nodes) {
 }
 
 void canvas::linked_list_to_array(void) {
-    // Megszamoljuk osszes mdarab-ot:
+    // Total number of still-used chunks
     int count = 0;
     for (int i = 0; i < pixel_height; i++) {
         count += list_length(rows_linked[i]);
     }
 
-    // Most lefoglaljuk uj egybefuggo tombot:
+    // Create more efficient canvas_chunk array
     chunk_array = new canvas_chunk[count + 10];
     if (!chunk_array) {
         memory_error();
     }
+
+    // Copy data
     int offset = 0;
     for (int i = 0; i < pixel_height; i++) {
         canvas_chunk_node* cur_node = rows_linked[i];
@@ -451,14 +464,12 @@ void canvas::linked_list_to_array(void) {
         while (cur_node) {
             chunk_array[offset].width = cur_node->width;
             chunk_array[offset].pixels = cur_node->pixels;
-
             cur_node = cur_node->next;
             offset++;
         }
     }
 }
 
-// Ptop kerek-jeinek egesz koordinatait kitolti:
 void canvas::calculate_object_positions(void) {
     const double offset = ANIM_WIDTH / 2.0 * EolSettings->zoom();
     for (int i = 0; i < MAX_OBJECTS; i++) {
@@ -485,6 +496,7 @@ enum {
     CanvasClipping_Transparent
 };
 
+// source must be aligned to a single chunk.
 canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char* source,
                                           int dest_x, int source_x_left, int source_x_right,
                                           int source_dist, canvas_chunk_node* dest_prev,
@@ -493,13 +505,14 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
     if ((pixelek_t)source == PixelsTransparent) {
         internal_error("canvas::draw_one_chunk source is transparent!");
     }
-
+    // Transparent pixels are only specifically used for the front canvas, so enforce this usage
     if ((pixelek_t)dest->pixels == PixelsTransparent && clipping != CanvasClipping_Transparent) {
         internal_error("canvas::draw_one_chunk",
                        "dest is transparent but clipping is not transparent!");
     }
 
-    // Eldontjuk, hogy ki kell-e egyaltalan rakni:
+    // Validate whether we want to draw based on clipping and distance
+    // Default foreground/background and empty has the lowest-priority distance
     int dest_dist = dest->distance;
     int skip = 0;
     if (clipping == CanvasClipping_Ground) {
@@ -511,6 +524,8 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         }
     }
     if (clipping == CanvasClipping_Sky) {
+        // Background distance needs to be temporarily modified as Sky clipping should never draw on
+        // top of Ground clipping
         source_dist += 10000;
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground) {
             skip = 1;
@@ -527,6 +542,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
     }
 
     if (clipping == CanvasClipping_Transparent) {
+        // Transparent pixels are only specifically used for the front canvas, so enforce this usage
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground ||
             (pixelek_t)dest->pixels == PixelsDefaultBackground) {
             internal_error("canvas::draw_one_chunk",
@@ -537,14 +553,14 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         }
     }
 
+    // Check to see if we actually want to draw it
     if (skip || source_dist >= dest_dist) {
         *prev_can_merge = 0;
         return dest;
     }
 
-    // Most mar biztos, hogy kirakjuk:
+    // Sanity checks, which should already be handled by draw_pixels()
     int dest_x_right = dest_x + dest->width - 1;
-    // Levagdossuk ujx1, ujx2-t:
     if (source_x_left < dest_x) {
         source_x_left = dest_x;
     }
@@ -556,13 +572,12 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
             "canvas::draw_one_chunk source_x_right < dest_x || source_x_left > dest_x_right!");
     }
 
-    // Most kivalasztjuk melyik esettel allunk szemben:
-
+    // Case 1: Right-aligned
     //  ------------------------------------
     //  I              XXXXXXXXXXXXXXXXXXXXI
     //  ------------------------------------
-
     if (dest_x != source_x_left && dest_x_right == source_x_right) {
+        // Split the chunk in two
         canvas_chunk_node* node = new_node();
         node->width = source_x_right - source_x_left + 1;
         node->pixels = source;
@@ -576,22 +591,22 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         return node;
     }
 
+    // Case 2: Left-aligned
     //  ------------------------------------
     //  IXXXXXXXXXXXXXXXXXXXX              I
     //  ------------------------------------
-
     if (dest_x == source_x_left && dest_x_right != source_x_right) {
         if (!dest_prev) {
             internal_error("canvas::draw_one_chunk missing dest_prev!");
         }
-        // Ha minden megfelel, atallitjuk *pujavege-t:
+        // Check if prev chunk is a matching texture, in which case we merge with prev chunk
         if (!(*prev_can_merge) && dest_prev->distance == source_dist &&
             !((pixelek_t)dest_prev->pixels & PIXELMASZK) && dest_prev->pixels == source) {
             *prev_can_merge = 1;
         }
         if (*prev_can_merge) {
+            // Merge with previous chunk (which was right-aligned or matching texture)
             int insertion_width = source_x_right - source_x_left + 1;
-
             dest_prev->width += insertion_width;
             dest->width -= insertion_width;
             if ((pixelek_t)dest->pixels & PIXELMASZK) {
@@ -601,6 +616,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
             *prev_can_merge = 0;
             return dest;
         } else {
+            // Split the chunk in two
             canvas_chunk_node* node = new_node();
             dest_prev->next = node;
 
@@ -619,26 +635,28 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         }
     }
 
+    // Case 3: Left- and right-aligned
     //  ------------------------------------
     //  IXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXI
     //  ------------------------------------
-
     if (dest_x == source_x_left && dest_x_right == source_x_right) {
         if (!dest_prev) {
             internal_error("canvas::draw_one_chunk missing dest_prev!");
         }
-        // Ha minden megfelel, atallitjuk *pujavege-t:
+        // Check if prev chunk is a matching texture, in which case we merge with prev chunk
         if (!(*prev_can_merge) && dest_prev->distance == source_dist &&
             !((pixelek_t)dest_prev->pixels & PIXELMASZK) && dest_prev->pixels == source) {
             *prev_can_merge = 1;
         }
         if (*prev_can_merge) {
+            // Merge with previous chunk (which was right-aligned or matching texture)
             dest_prev->width += dest->width;
             dest_prev->next = dest->next;
 
             *prev_can_merge = 1;
             return dest_prev;
         } else {
+            // Overwrite chunk with new data
             dest->pixels = source;
             dest->distance = source_dist;
 
@@ -647,11 +665,12 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         }
     }
 
+    // Case 4: Neither left- nor right-aligned
     //  ------------------------------------
     //  I             XXXXXXXXXXXX         I
     //  ------------------------------------
-
     if (dest_x != source_x_left && dest_x_right != source_x_right) {
+        // Split the chunk in three
         canvas_chunk_node* node_middle = new_node();
         canvas_chunk_node* node_right = new_node();
 
@@ -680,22 +699,15 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
     return NULL;
 }
 
-// static mdarab* Pmddd = NULL;
-
 void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int x_right, int y,
                          int clipping) {
-    // if( y != 1039 )
-    //	return;
-
-    // Beallunk pmd, xpos-sal elso szoba jovo madarab-ra:
-    // Visszalepunk amig kell:
+    // Make sure canvas is unused so far
     canvas_chunk_node* cur_node = rows_linked[y];
-    // Pmddd = pmd;
     int xpos = rows_x1[y];
     if (xpos > 10) {
         internal_error("canvas::draw_pixels xpos > 10!");
     }
-    // Elorelepunk amig kell:
+    // Find the first chunk onto which we will draw
     canvas_chunk_node* prev_node = NULL;
     while (xpos + cur_node->width - 1 < x_left) {
         xpos += cur_node->width;
@@ -705,7 +717,7 @@ void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int
             internal_error("canvas::draw_pixels !cur_node!");
         }
     }
-    // Most rajta allunk elso mdarabon:
+    // Draw one chunk at a time
     int prev_can_merge = 0;
     while (1) {
         if (!cur_node) {
@@ -716,25 +728,24 @@ void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int
         if (x_right < xpos_left) {
             internal_error("canvas::draw_pixels x_right < xpos_left!");
         }
-
-        // Beallitjuk kovetkezo ertekeket:
         int done = 0;
         if (xpos_right + 1 > x_right) {
             done = 1;
         }
 
+        // Offset the source data if it is a pointer to pixel data
         unsigned char* source_next = source;
         if ((pixelek_t)source_next & PIXELMASZK) {
-            int left_skip = 0; // Elso mdarab eseteben lehetseges csak
+            int left_skip = 0;
             if (x_left > xpos_left) {
                 left_skip = x_left - xpos_left;
             }
             source_next = source + (cur_node->width - left_skip);
         }
 
+        // Draw
         int xpos_next = xpos + cur_node->width;
         canvas_chunk_node* next_node = cur_node->next;
-
         prev_node = draw_one_chunk(cur_node, source, xpos, x_left, x_right, source_dist, prev_node,
                                    &prev_can_merge, clipping);
 
@@ -747,28 +758,25 @@ void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int
     }
 }
 
-// draw_sprites hivja:
 void canvas::draw_texture(sprite* spr, int texture_index, int mask_index, int clipping) {
-    // Egy kep berakasa:
+    // Calculate pixel position
     int x = (int)((spr->r.x - origin.x) * MetersToPixels);
     int y = (int)((-spr->r.y - origin.y) * MetersToPixels);
 
     mask* msk = &Lgr->masks[mask_index];
-
     int distance = spr->distance;
-
     int width = msk->width;
     int height = msk->height;
 
+    // Check out of range textures (x position only)
     if (x < 120 || x + width >= pixel_width - 50) {
         return;
     }
 
+    // Draw the mask
     int offset = 0;
     for (int i = 0; i < height; i++) {
-        // Kep egy soranak elintezese:
         int j = 0;
-        // Maszkos eljaras:
         while (msk->data[offset].type != MaskEncoding::EndOfLine) {
             if (msk->data[offset].type == MaskEncoding::Solid) {
                 draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x + j,
@@ -787,8 +795,7 @@ void canvas::draw_sprites(int clipping) {
         if (!spr) {
             return;
         }
-
-        // Fazis fuggvenyeben csak bizonyos kepeket rakunk be:
+        // Only draw the selected clipping
         if (clipping == CanvasClipping_Ground && spr->clipping != Clipping::Ground) {
             continue;
         }
@@ -800,7 +807,7 @@ void canvas::draw_sprites(int clipping) {
         }
 
         if (spr->picture_name[0] == 0) {
-            // Csak maszkos textura lehet, kulon intezzuk:
+            // Texture/Mask combo
             if (!spr->texture_name[0] || !spr->mask_name[0]) {
                 continue;
             }
@@ -812,76 +819,61 @@ void canvas::draw_sprites(int clipping) {
             if (mask_index < 0) {
                 internal_error("draw_sprites mask_index < 0");
             }
-
-            // Ez egy maszk, innentol teljesen kulon intezzuk el:
             draw_texture(spr, texture_index, mask_index, clipping);
             continue;
         }
-
-        // Ez egy kep:
         if (spr->texture_name[0] || spr->mask_name[0]) {
             internal_error("draw_sprites too many names!");
         }
 
+        // Picture
         int picture_index = Lgr->get_picture_index(spr->picture_name);
         if (picture_index < 0) {
             internal_error("draw_sprites picture_index < 0");
         }
         picture* pict = &Lgr->pictures[picture_index];
 
-        // Egy kep berakasa:
         int x = (int)((spr->r.x - origin.x) * MetersToPixels);
         int y = (int)((-spr->r.y - origin.y) * MetersToPixels);
-
         int distance = spr->distance;
-
         int width = pict->width;
         int height = pict->height;
 
+        // Check out of range pictures (x position only)
         if (x < 120 || x + width >= pixel_width - 50) {
+            // Should continue instead of return here
             return;
         }
 
         unsigned char* pixeldata = pict->data;
-
         if (((pixelek_t)pixeldata & PIXELMASZK) == 0) {
             external_error("Memory address is less than 2048 (987)!");
         }
 
-        // Vegigmegyunk kepen:
-        int offset = 0; // byte index tombben
+        // Draw the picture
+        int offset = 0;
         for (int i = 0; i < height; i++) {
-            // Kep egy soranak elintezese:
             int j = 0;
             while (1) {
-                // Ures elintezes:
                 int skip = pixeldata[offset] * 256 + pixeldata[offset + 1];
                 offset += 2;
-
                 if (skip > 60000) {
                     break;
                 }
-
                 j += skip;
 
-                // Teli elintezes:
                 int count = pixeldata[offset] * 256 + pixeldata[offset + 1];
                 offset += 2;
-
-                // Negativ iranyban haladunk y-on (y1-y):
                 if (y - i >= 0 && y - i < pixel_height) {
                     draw_pixels(&pixeldata[offset], distance, x + j, x + j + count - 1, y - i,
                                 clipping);
                 }
-
                 j += count;
                 offset += count;
             }
         }
     }
 }
-
-// Kovetok beillesztese:
 
 static int consecutive_transparent_pixels(unsigned char* pic_row, int x, int width,
                                           unsigned char transparency) {
@@ -919,34 +911,30 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
         internal_error("draw_qgrass_texture !BufferMain");
     }
 
-    // Most mindig felso:
+    // Grab the QGRASS texture
     int felso = 1;
     int distance = 600;
-
     char texturanev[20];
     strcpy(texturanev, "qgrass");
-
-    // Kikeressuk textura indexet:
     int texture_index = Lgr->get_texture_index(texturanev);
     if (texture_index < 0) {
         internal_error("draw_qgrass_texture texture_index < 0");
     }
 
+    // Grab the QUP/QDOWN image
     pic8* pic = grass->pics[qupdown_index];
     int width = pic->get_width();
     int height = pic->get_height();
     unsigned char transparency = pic->gpixel(0, 0);
 
-    // Toroljuk seged kepet:
-    // BufferMain: 0 -> atlatszo, 1 -> van textura:
+    // Initialize picture buffer
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             BufferMain->ppixel(j, i, 0);
         }
     }
-    // Feltoltjuk segedkepet:
+    // Calculate qupdown mask
     for (int j = 0; j < width; j++) {
-        // Minden oszlopot kitoltunk:
         if (felso) {
             for (int i = 0; i < height; i++) {
                 if (pic->gpixel(j, i) == transparency) {
@@ -966,7 +954,7 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
         }
     }
 
-    // Beadjuk textura darabokat canvas-be:
+    // Draw qupdown mask with qgrass texture
     for (int i = 0; i < height; i++) {
         int j = 0;
         unsigned char* row = BufferMain->get_row(height - 1 - i);
@@ -984,16 +972,15 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
             j += count;
         }
     }
-    // Most beadjuk alul vagy felul megtoldott reszt is:
+
+    // Add 20 pixels of height to grass
     int grass_height_padding = QGRASS_EXTRA_HEIGHT * EolSettings->zoom();
     if (felso) {
-        // Felso:
         for (int y = 0; y < grass_height_padding; y++) {
             draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
                         y + height + y, clipping);
         }
     } else {
-        // Also:
         for (int y = 0; y < grass_height_padding; y++) {
             draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
                         y - 1 - y, clipping);
@@ -1002,21 +989,23 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
 }
 
 void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y, int clipping) {
-
     int distance = 600;
 
+    // Grab the QUP/QDOWN image
     pic8* pic = gr->pics[qupdown_index];
     int width = pic->get_width();
     int height = pic->get_height();
     unsigned char transparency = pic->gpixel(0, 0);
 
-    // Kiszamoljuk kep tetejenek helyet:
     if (gr->is_up[qupdown_index]) {
+        // Slide image down by 20
         y -= GRASS_MARGIN;
     } else {
+        // Slide image down by 20, then down again by the slope
         y -= height - 1 - GRASS_MARGIN;
     }
 
+    // Draw upside down
     for (int i = 0; i < height; i++) {
         int j = 0;
         unsigned char* sor = pic->get_row(height - 1 - i);
@@ -1034,15 +1023,14 @@ void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y, int clippi
         }
     }
 
+    // Draw the QGRASS image on top of the QUP/QDOWN
     if (width > 640 || height > 480) {
 #ifdef DEBUG
         internal_error("7yfg4");
 #endif
         return;
     }
-
     draw_qgrass_texture(gr, qupdown_index, x, y, clipping);
-    // draw_qgrass_texture( 0, pkov, pgy, index, xo, yo, fazis );
 }
 
 void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0,
@@ -1060,14 +1048,15 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
     int y = heightmap[0];
     while (1) {
         if (x >= x0 + heightmap_length) {
-            return; // Befejezte
+            return;
         }
 
-        // Megkeressuk legjobb kepet:
+        // Let's pick the best matching QUP/QDOWN
         int best_score = 10000;
         int best_index = -1;
         int best_slope = 0;
         for (int i = 0; i < gr->length; i++) {
+            // Check each image and choose the one with the smallest y-offset from desired height
             int slope = gr->pics[i]->get_height();
             if (slope < 2 * GRASS_MARGIN + 1) {
                 char tmp[60];
@@ -1088,7 +1077,6 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
             }
 
             int score = abs(y + slope - target_y);
-
             if (score < best_score) {
                 best_score = score;
                 best_index = i;
@@ -1096,23 +1084,25 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
             }
         }
 
-        // Megvan legjobb kep:
+        // Draw the best matching QUP/QDOWN
         if (best_index < 0) {
             internal_error("draw_grass_polygon best_index < 0");
         }
 
         draw_qupdown(gr, best_index, x, y, clipping);
-
         x += gr->pics[best_index]->get_width();
         y += best_slope;
     }
 }
 
 void canvas::draw_grass_polygons(int clipping) {
+    // Only if the lgr has the right assets
     if (!Lgr->has_grass) {
         return;
     }
+
     for (int i = 0; i < MAX_POLYGONS; i++) {
+        // Make sure we are drawing a grass polygon onto the ground
         polygon* poly = Ptop->polygons[i];
         if (!poly) {
             return;
@@ -1122,8 +1112,6 @@ void canvas::draw_grass_polygons(int clipping) {
         }
 
         Clipping valid_clipping = Clipping::Ground;
-
-        // Fazis fuggvenyeben csak bizonyos kepeket rakunk be:
         if (clipping == CanvasClipping_Ground && valid_clipping != Clipping::Ground) {
             continue;
         }
@@ -1136,6 +1124,7 @@ void canvas::draw_grass_polygons(int clipping) {
 
         grass* gr = Lgr->grass_pics;
 
+        // Calculate the grass heightmap
         int heightmap_length = 0, x0 = 0;
         if (!create_grass_polygon_heightmap(poly, GrassHeightmap, &heightmap_length, &x0,
                                             MAX_HEIGHTMAP_LENGTH, &origin)) {
@@ -1145,13 +1134,7 @@ void canvas::draw_grass_polygons(int clipping) {
             internal_error("draw_grass_polygons heightmap_length > MAX_HEIGHTMAP_LENGTH");
         }
 
-        // Kirajzolunk egy minta vonalat kepre:
-        /*static unsigned char kovetchar = 0;
-        for( int x = x0; x < x0 + heightmap_length; x++ ) {
-            draw_pixels( &kovetchar, 100, x, x,
-                        GrassHeightmap[x-x0], clipping );
-        }*/
-
+        // Draw the grass polygon
         draw_grass_polygon(gr, GrassHeightmap, heightmap_length, x0, clipping);
     }
 }
@@ -1172,13 +1155,12 @@ void canvas::draw_killers(void) {
             continue;
         }
 
-        // Egy kep berakasa:
         if (is_minimap) {
+            // Draw a 3x3 square
             unsigned char* source = Lgr->minimap_killer_palette_id;
             int distance = 499;
             int x = (int)((obj->r.x - origin.x) * (MetersToPixels / MinimapScaleFactor));
             int y = (int)((-obj->r.y - origin.y) * (MetersToPixels / MinimapScaleFactor));
-            // Kirakja kis 3x3-as gyurut:
             draw_pixels(source, distance, x - 1, x + 1, y - 1, CanvasClipping_Unclipped);
             draw_pixels(source, distance, x - 1, x - 1, y, CanvasClipping_Unclipped);
             draw_pixels(source, distance, x + 1, x + 1, y, CanvasClipping_Unclipped);
@@ -1240,16 +1222,16 @@ void canvas::adjust_background_distance(void) {
     for (int i = 0; i < pixel_height; i++) {
         canvas_chunk_node* cur_node = rows_linked[i];
         while (cur_node) {
+            // In draw_one_chunk(), we temporarily added distance to properly layer assets
+            // Remove that distance
             if (cur_node->distance >= 10000) {
                 cur_node->distance -= 10000;
             }
-
             cur_node = cur_node->next;
         }
     }
 };
 
-// Ptop es Segments alapjan:
 canvas::canvas(int minimap) {
     is_minimap = minimap;
 
@@ -1261,13 +1243,9 @@ canvas::canvas(int minimap) {
         rows_position1[i] = NULL;
         rows_position2[i] = NULL;
     }
-
-    // Inicializaljuk elso node tombot:
     node_array = node_array_last = NULL;
     node_array_index = 0;
-
     chunk_array = NULL;
-
     width = height = 0.0;
     pixel_width = pixel_height = 0;
 
@@ -1275,6 +1253,7 @@ canvas::canvas(int minimap) {
         internal_error("canvas::canvas !Ptop || !Segments!");
     }
 
+    // Initialize node memory
     node_array = new canvas_chunk_node_array;
     if (!node_array) {
         internal_error("canvas::canvas out of memory!");
@@ -1282,10 +1261,9 @@ canvas::canvas(int minimap) {
     node_array->next = NULL;
     node_array_last = node_array;
 
+    // Set canvas dimensions
     set_origin_and_dimensions();
-
     if (is_minimap) {
-        // VIEW VIEW VIEW:
         pixel_width = (int)(width * (MetersToPixels / MinimapScaleFactor));
         pixel_height = (int)(height * (MetersToPixels / MinimapScaleFactor));
     } else {
@@ -1297,7 +1275,7 @@ canvas::canvas(int minimap) {
         internal_error("canvas::canvas pixel_height-10 > CANVAS_MAX_HEIGHT!");
     }
 
-    // Inicializaljuk minden sor elejet foldre:
+    // Initialize the canvas with a single chunk for every row
     for (int i = 0; i < pixel_height; i++) {
         rows_linked[i] = new_node();
         rows_linked[i]->next = NULL;
@@ -1306,7 +1284,7 @@ canvas::canvas(int minimap) {
         rows_linked[i]->pixels = (unsigned char*)PixelsDefaultForeground;
     }
 
-    // Vegigmegyunk osszes szakaszon:
+    // Draw all the polygon data
     Segments->iterate_all_segments();
     segment* seg = Segments->next_segment();
     while (seg) {
@@ -1314,13 +1292,13 @@ canvas::canvas(int minimap) {
         seg = Segments->next_segment();
     }
 
-    // Sorrendbe rendezzuk egy sor elemeit:
+    // Convert the polygon data into widths instead of x position
     for (int i = 0; i < pixel_height; i++) {
         sort_xpos_and_merge(rows_linked[i]);
         rows_x1[i] = rows_x2[i] = xpos_to_width(rows_linked[i]);
     }
 
-    // Spriteok beadasa:
+    // Handle high quality graphics
     if (!is_minimap && State->high_quality) {
         draw_sprites(CanvasClipping_Ground);
         draw_grass_polygons(CanvasClipping_Ground);
@@ -1331,20 +1309,10 @@ canvas::canvas(int minimap) {
         draw_grass_polygons(CanvasClipping_Unclipped);
     }
 
-    // Itt adtuk be objektumokat:
-    draw_killers(); // Ez most nem view eseten visszater
-
-    // Ezeket vegen kivulrol hivja loadecsetek:
-
-    // Rovid folddarabokat atalakitjuk konkret mutatova:
-    // default_foreground_to_pointers();
-
-    // linked_list_to_array();
-    // delete_all_nodes();
+    // Draw killers into the minimap
+    draw_killers();
 }
 
-// URES sorokat tesz bele:
-// Ptop es Segments alapjan:
 canvas::canvas(canvas* reference) {
     for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
         rows_linked[i] = NULL;
@@ -1354,13 +1322,9 @@ canvas::canvas(canvas* reference) {
         rows_position1[i] = NULL;
         rows_position2[i] = NULL;
     }
-
-    // Inicializaljuk elso node tombot:
     node_array = node_array_last = NULL;
     node_array_index = 0;
-
     chunk_array = NULL;
-
     is_minimap = 0;
     width = height = 0.0;
     pixel_width = pixel_height = 0;
@@ -1369,6 +1333,7 @@ canvas::canvas(canvas* reference) {
         internal_error("canvas::canvas !Ptop || !Segments!");
     }
 
+    // Initialize node memory
     node_array = new canvas_chunk_node_array;
     if (!node_array) {
         internal_error("canvas::canvas out of memory!");
@@ -1376,15 +1341,14 @@ canvas::canvas(canvas* reference) {
     node_array->next = NULL;
     node_array_last = node_array;
 
-    // set_origin_and_dimensions(); ehelyett:
+    // Copy canvas dimensions from reference canvas
     origin = reference->origin;
     width = reference->width;
     height = reference->height;
-
     pixel_width = reference->pixel_width;
     pixel_height = reference->pixel_height;
 
-    // Inicializaljuk minden sor elejet uresre:
+    // Initialize the canvas with a single chunk for every row (already as width)
     for (int i = 0; i < pixel_height; i++) {
         rows_x1[i] = 1;
         rows_x2[i] = 1;
@@ -1447,37 +1411,31 @@ static inline void draw_default_background(unsigned char* dest, size_t offset, s
 }
 
 void canvas::render_row1(unsigned char* dest, int y) {
-    // Visszalepunk amig kell:
+    // Find chunk corresponding to the left of the screen
     canvas_chunk* cur_chunk = rows_position1[y];
     int xpos = rows_x1[y];
+    // Search leftwards using left border of chunk
     while (xpos > ViewLeftBorder) {
         cur_chunk--;
         xpos -= cur_chunk->width;
     }
-    // Elorelepunk amig kell:
+    // Search rightwards using right border of chunk
     while (xpos + cur_chunk->width <= ViewLeftBorder) {
         xpos += cur_chunk->width;
         cur_chunk++;
     }
-    // Elmentjuk kurrens darabot:
+    // Remember our current position
     rows_position1[y] = cur_chunk;
     rows_x1[y] = xpos;
 
-    // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-    // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-    // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-    // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
+    // If the entire row is a single chunk, paste it
     int offset = ViewLeftBorder - xpos;
     if (xpos + cur_chunk->width > ViewRightBorder) {
-        // ATLOG VEGIG:
         int width = ViewRightBorder - xpos + 1;
-        // Ha eppen vegeig log, akkor is ide jon
         if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-            // Normal kep copi:
             memcpy(dest, &cur_chunk->pixels[ViewLeftBorder - xpos], width - offset);
         } else {
-            // Eg, Fold, vagy ures:
-            if (!cur_chunk->pixels) { // Eg
+            if (!cur_chunk->pixels) {
                 draw_default_background(dest, 0, width - offset, is_minimap);
                 return;
             }
@@ -1494,14 +1452,14 @@ void canvas::render_row1(unsigned char* dest, int y) {
         return;
     }
 
-    // Elso szakasz nem log at vegig:
+    // Otherwise we need to split the situation into the first chunk (not left-aligned),
+    // and the remaining chunks (all left-aligned)
+    // First chunk (not left-aligned):
     int size = cur_chunk->width - offset;
     if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-        // Normal kep copi:
         memcpy(dest, &cur_chunk->pixels[ViewLeftBorder - xpos], size);
     } else {
-        // Eg, Fold, vagy ures:
-        if (!cur_chunk->pixels) { // Eg
+        if (!cur_chunk->pixels) {
             draw_default_background(dest, 0, size, is_minimap);
         } else {
             if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
@@ -1515,20 +1473,15 @@ void canvas::render_row1(unsigned char* dest, int y) {
             }
         }
     }
-    // Atugrunk kovetkezore:
     xpos += cur_chunk->width;
     cur_chunk++;
     dest += size;
 
-    // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-    // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-    // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-    // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
+    // Remaining chunks (left-aligned)
     while (xpos <= ViewRightBorder) {
+        // Last chunk (not right-aligned)
         if (xpos + cur_chunk->width > ViewRightBorder) {
-            // Ez az utolso darab, ki is loghat:
             if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-                // Normal kep copi:
                 memcpy(dest, cur_chunk->pixels, ViewRightBorder - xpos + 1);
                 return;
             }
@@ -1549,9 +1502,8 @@ void canvas::render_row1(unsigned char* dest, int y) {
 #endif
         }
 
-        // Ez a darab nem log ki:
+        // Middle chunk (left- and right-aligned)
         if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-            // Normal kep copi:
             memcpy(dest, cur_chunk->pixels, cur_chunk->width);
         } else {
             if (!cur_chunk->pixels) {
@@ -1569,45 +1521,34 @@ void canvas::render_row1(unsigned char* dest, int y) {
                 }
             }
         }
-
         xpos += cur_chunk->width;
         dest += cur_chunk->width;
         cur_chunk++;
     }
 }
 
+// Identical to render_row1 except using rows_position2/rows_x2
 void canvas::render_row2(unsigned char* dest, int y) {
-    // Visszalepunk amig kell:
     canvas_chunk* cur_chunk = rows_position2[y];
     int xpos = rows_x2[y];
     while (xpos > ViewLeftBorder) {
         cur_chunk--;
         xpos -= cur_chunk->width;
     }
-    // Elorelepunk amig kell:
     while (xpos + cur_chunk->width <= ViewLeftBorder) {
         xpos += cur_chunk->width;
         cur_chunk++;
     }
-    // Elmentjuk kurrens darabot:
     rows_position2[y] = cur_chunk;
     rows_x2[y] = xpos;
 
-    // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-    // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-    // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
-    // ELSO SZAKASZ      ELSO SZAKASZ       ELSO SZAKASZ
     int offset = ViewLeftBorder - xpos;
     if (xpos + cur_chunk->width > ViewRightBorder) {
-        // ATLOG VEGIG:
         int width = ViewRightBorder - xpos + 1;
-        // Ha eppen vegeig log, akkor is ide jon
         if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-            // Normal kep copi:
             memcpy(dest, &cur_chunk->pixels[ViewLeftBorder - xpos], width - offset);
         } else {
-            // Eg, Fold, vagy ures:
-            if (!cur_chunk->pixels) { // Eg
+            if (!cur_chunk->pixels) {
                 draw_default_background(dest, 0, width - offset, is_minimap);
                 return;
             }
@@ -1624,14 +1565,11 @@ void canvas::render_row2(unsigned char* dest, int y) {
         return;
     }
 
-    // Elso szakasz nem log at vegig:
     int size = cur_chunk->width - offset;
     if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-        // Normal kep copi:
         memcpy(dest, &cur_chunk->pixels[ViewLeftBorder - xpos], size);
     } else {
-        // Eg, Fold, vagy ures:
-        if (!cur_chunk->pixels) { // Eg
+        if (!cur_chunk->pixels) {
             draw_default_background(dest, 0, size, is_minimap);
         } else {
             if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
@@ -1645,20 +1583,14 @@ void canvas::render_row2(unsigned char* dest, int y) {
             }
         }
     }
-    // Atugrunk kovetkezore:
+
     xpos += cur_chunk->width;
     cur_chunk++;
     dest += size;
 
-    // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-    // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-    // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
-    // BENT KEZDODO SZAKASZOK          BENT KEZDODO SZAKASZOK
     while (xpos <= ViewRightBorder) {
         if (xpos + cur_chunk->width > ViewRightBorder) {
-            // Ez az utolso darab, ki is loghat:
             if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-                // Normal kep copi:
                 memcpy(dest, cur_chunk->pixels, ViewRightBorder - xpos + 1);
                 return;
             }
@@ -1679,9 +1611,7 @@ void canvas::render_row2(unsigned char* dest, int y) {
 #endif
         }
 
-        // Ez a darab nem log ki:
         if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-            // Normal kep copi:
             memcpy(dest, cur_chunk->pixels, cur_chunk->width);
         } else {
             if (!cur_chunk->pixels) {
@@ -1709,11 +1639,11 @@ void canvas::render_row2(unsigned char* dest, int y) {
 void canvas::meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y) {
     vect2 dr = meters - origin;
     if (is_minimap) {
-        *pixel_x = (int)(dr.x * (MetersToPixels / MinimapScaleFactor)); // Ecset egesz koordinatak
-        *pixel_y = (int)(dr.y * (MetersToPixels / MinimapScaleFactor)); // Ecset egesz koordinatak
+        *pixel_x = (int)(dr.x * (MetersToPixels / MinimapScaleFactor));
+        *pixel_y = (int)(dr.y * (MetersToPixels / MinimapScaleFactor));
     } else {
-        *pixel_x = (int)(dr.x * MetersToPixels); // Ecset egesz koordinatak
-        *pixel_y = (int)(dr.y * MetersToPixels); // Ecset egesz koordinatak
+        *pixel_x = (int)(dr.x * MetersToPixels);
+        *pixel_y = (int)(dr.y * MetersToPixels);
     }
 }
 
@@ -1770,6 +1700,7 @@ void canvas::render(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2
         internal_error("canvas::render x1 >= x2 || y1 >= y2!");
     }
 
+    // Convert corner frame of reference from meters to pixels
     int view_top_border = 0;
     meters_to_pixels(corner, &ViewLeftBorder, &view_top_border);
     ViewRightBorder = ViewLeftBorder + x2 - x1;
@@ -1783,27 +1714,23 @@ void canvas::render(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2
             "pixel_height-20!");
     }
 
+    // Calculate the texture graphic offset for the left edge of the screen
     int foreground_height = Lgr->foreground->get_height();
     int background_height = Lgr->background->get_height();
-
     int foreground_x = ViewLeftBorder % Lgr->foreground_original_width;
-    // int eglassitas = 100;
     int parallax = 2;
     int background_x = (ViewLeftBorder / parallax) % Lgr->background_original_width;
 
     // egetkeszit( Lgr->peg, ScreenLeftBorder, background_x, Lgr->background_original_width );
 
+    // Draw each row
     int canvas_y1 = view_top_border - y1;
     if (player1) {
         for (int i = y1; i <= y2; i++) {
             int canvas_y = i + canvas_y1;
+            // Calculate the texture graphic y-offset for the current row
             DefaultForeground =
                 Lgr->foreground->get_row(canvas_y % foreground_height) + foreground_x;
-            // Eg fol-le is scrollozodik:
-            // DefaultBackground = Lgr->peg->get_row( (y-y1+egdy) % background_height ) +
-            // background_x;
-
-            // Eg fol-le nem scrollozodik:
             DefaultBackground =
                 Lgr->background->get_row((i - y1) % background_height) + background_x;
             render_row1(pic->get_row(i) + x1, canvas_y);
@@ -1811,30 +1738,28 @@ void canvas::render(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2
     } else {
         for (int i = y1; i <= y2; i++) {
             int canvas_y = i + canvas_y1;
+            // Calculate the texture graphic y-offset for the current row
             DefaultForeground =
                 Lgr->foreground->get_row(canvas_y % foreground_height) + foreground_x;
-            // DefaultBackground = Lgr->peg->get_row( (ye+egdy) % background_height ) +
-            //				background_x;
             DefaultBackground =
                 Lgr->background->get_row((i - y1) % background_height) + background_x;
             render_row2(pic->get_row(i) + x1, canvas_y);
         }
     }
-
     DefaultForeground = nullptr;
     DefaultBackground = nullptr;
 }
 
-// Szinte ugyanaz, mint kiteszalso:
 void canvas::render_minimap(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2) {
     if (x1 >= x2 || y1 >= y2) {
         internal_error("canvas::render x1 >= x2 || y1 >= y2!");
     }
 
+    // Convert corner frame of reference from meters to pixels
     int view_top_border = 0;
     meters_to_pixels(corner, &ViewLeftBorder, &view_top_border);
-    ViewRightBorder = ViewLeftBorder + x2 - x1 + 1;
-    int view_bottom_border = view_top_border + y2 - y1 + 1;
+    ViewRightBorder = ViewLeftBorder + x2 - x1 + 1;         // Difference from render() -> +1
+    int view_bottom_border = view_top_border + y2 - y1 + 1; // Difference from render() -> +1
 
     if (ViewLeftBorder < 20 || ViewRightBorder > pixel_width - 20 || view_top_border < 20 ||
         view_bottom_border > pixel_height - 20) {
@@ -1844,6 +1769,7 @@ void canvas::render_minimap(int player1, pic8* pic, vect2 corner, int x1, int y1
             "pixel_height-20!");
     }
 
+    // Draw each row
     int canvas_y1 = view_top_border - y1;
     if (player1) {
         for (int y = y1; y <= y2; y++) {
@@ -1860,33 +1786,29 @@ void canvas::render_minimap(int player1, pic8* pic, vect2 corner, int x1, int y1
 
 static canvas_chunk_node* QgrassTextureId = NULL;
 
+// Returns true if the pixel above (x, y) renders in front of the bike
 static int above_is_front(int x, int y, node_finder* finder) {
     if (!QgrassTextureId) {
         internal_error("above_is_front no reference");
     }
-
-    // Felette levo sort vizsgaljuk:
     canvas_chunk_node* chunk = finder->get_chunk(x, y + 1);
-
     pixelek_t kepindex = (pixelek_t)chunk->pixels;
     if (kepindex < 10) {
-        // Ha fold, eg, vagy ures:
         return 0;
     }
-
     if (chunk->pixels == QgrassTextureId->pixels) {
-        // Ha meg ez is koveto textura:
         return 0;
     }
-
+    // Bug: It should actually check if the distance >= 500 to prevent floating
+    // foreground grass
     if (chunk->distance > 500) {
-        // Ha nem takarja el motorost:
         return 0;
     }
-
     return 1;
 }
 
+// Count the number of consecutive pixels located at (x1, y + 1) up to (x2, y + 1)
+// that render behind the bike
 static int consecutive_back(int x1, int x2, int y, node_finder* finder) {
     int count = 0;
     for (int x = x1; x < x2; x++) {
@@ -1898,6 +1820,8 @@ static int consecutive_back(int x1, int x2, int y, node_finder* finder) {
     return count;
 }
 
+// Count the number of consecutive pixels located at (x1, y + 1) up to (x2, y + 1)
+// that render in front of the bike
 static int consecutive_front(int x1, int x2, int y, node_finder* finder) {
     int count = 0;
     for (int x = x1; x < x2; x++) {
@@ -1909,19 +1833,19 @@ static int consecutive_front(int x1, int x2, int y, node_finder* finder) {
     return count;
 }
 
-// Meg akkor kell hivni, amig nincsenek kettevalasztva also-ra es felsore es
-// meg kis folddarabok sincsenek lecserelve:
 void canvas::create_front_grass(void) {
     node_finder* finder = new node_finder(this);
-    // addbyte-ban tavolsagot valtakozva adjuk meg, nehogy osszeadja:
+
+    // A crutch that we use to avoid keeping proper track of our linked lists,
+    // by making sure our chunks don't get merged together.
     int alternate_distance = 0;
 
-    // Vegigmegyunk osszes soron alulrol felfele:
-    // Azert noveljuk megis y-t, mert fejjel lefele vannak y koordinatak:
+    // For each row
     for (int i = 10; i < pixel_height - 10; i++) {
-        // Vegigmegyunk osszes mdarabon:
         canvas_chunk_node* cur_node = rows_linked[i];
         int xpos = rows_x1[i];
+
+        // Make sure canvas is unused so far
         if (xpos > 10) {
             internal_error("create_front_grass xpos > 10");
         }
@@ -1929,48 +1853,41 @@ void canvas::create_front_grass(void) {
         while (cur_node) {
             int node_width = cur_node->width;
             canvas_chunk_node* next_node = cur_node->next;
-
             QgrassTextureId = cur_node;
-            // Egy madarab-ot elintezunk:
+
+            // Only parse back grass
             pixelek_t kepindex = (pixelek_t)cur_node->pixels;
             if (((kepindex & PIXELMASZK) == 0) && (kepindex >= 10)) {
                 kepindex -= 10;
-// Itt van maszk, le kell cserelni:
 #ifdef DEBUG
                 if (kepindex >= Lgr->texture_count) {
                     internal_error("create_front_grass texture id out of range!");
                 }
 #endif
                 texture* text = &Lgr->textures[kepindex];
-
                 if (text->is_qgrass && cur_node->distance > 500) {
-                    // Ha egy foltos, 500-nal tavolabbi textura mdarabja:
-                    // Vegigmegyunk mdarab-on:
+                    // Check to see if the qgrass is touching any front sprites
                     int x1 = xpos;
-                    // Ez mar kov mdarab elso pixele:
                     int x2 = xpos + cur_node->width;
                     while (x1 < x2) {
                         int skip = consecutive_back(x1, x2, i, finder);
                         x1 += skip;
                         int count = consecutive_front(x1, x2, i, finder);
                         if (count > 0) {
+                            // Move qgrass to front
                             alternate_distance = !alternate_distance;
                             if (alternate_distance) {
-                                draw_pixels( //(unsigned char*)10,
-                                    cur_node->pixels, 223, x1, x1 + count - 1, i,
-                                    CanvasClipping_Unclipped);
+                                draw_pixels(cur_node->pixels, 223, x1, x1 + count - 1, i,
+                                            CanvasClipping_Unclipped);
                             } else {
-                                draw_pixels( //(unsigned char*)10,
-                                    cur_node->pixels, 224, x1, x1 + count - 1, i,
-                                    CanvasClipping_Unclipped);
+                                draw_pixels(cur_node->pixels, 224, x1, x1 + count - 1, i,
+                                            CanvasClipping_Unclipped);
                             }
                         }
                         x1 += count;
                     }
                 }
             }
-
-            // Ugrunk kovetkezo mdarab-ra:
             xpos += node_width;
             cur_node = next_node;
         }
@@ -1995,6 +1912,7 @@ void create_canvases(void) {
     }
     CanvasMinimap = NULL;
 
+    // Base back canvas
     CanvasBack = new canvas(0);
     if (!CanvasBack) {
         internal_error("create_canvasses out of memory!");
@@ -2004,26 +1922,30 @@ void create_canvases(void) {
         CanvasBack->create_front_grass();
     }
 
+    // Front canvas
     CanvasFront = new canvas(CanvasBack);
     if (!CanvasFront) {
         internal_error("create_canvasses out of memory!");
     }
 
     if (!EolSettings->pictures_in_background()) {
-        // Most betesszuk felsobe is 500-nal kozelebbi madarabokat:
-        // Es egyben uresse tesszuk alsoban helyuket:
+        // Move over everything with a distance of less than 500
         for (int i = 0; i < CanvasBack->pixel_height; i++) {
             canvas_chunk_node* cur_node = CanvasBack->rows_linked[i];
             int xpos = CanvasBack->rows_x1[i];
+
+            // Make sure canvas is unused so far
             if (xpos > 100) {
                 internal_error("create_canvases xpos > 100!");
             }
+
             while (cur_node) {
                 if (cur_node->distance < 500) {
                     if ((pixelek_t)cur_node->pixels >= 10) {
                         CanvasFront->draw_pixels(cur_node->pixels, cur_node->distance, xpos,
                                                  xpos + cur_node->width - 1, i,
                                                  CanvasClipping_Transparent);
+                        // Delete from back canvas
                         cur_node->pixels = (unsigned char*)PixelsTransparent;
                     }
                 }
@@ -2033,21 +1955,19 @@ void create_canvases(void) {
         }
     }
 
-    // Rovid folddarabokat atalakitja konkret mutatova:
+    // Increase efficiency of canvas for faster rendering
     CanvasBack->default_foreground_to_pointers();
-    // Egymas utani ket azonos texturat
-    // lecsereli egyre (mar beepiteskor is megtortenik nemileg):
     CanvasBack->merge_redundant_chunks();
-    CanvasBack->textures_to_pointers(); // Lecsereli textura indexeket mutatokka
-    CanvasBack->linked_list_to_array(); // mdarab lancolt listabol tombot csinal
-    CanvasBack->delete_all_nodes();     // Torli lancolt listat:
+    CanvasBack->textures_to_pointers();
+    CanvasBack->linked_list_to_array();
+    CanvasBack->delete_all_nodes();
 
     CanvasFront->merge_redundant_chunks();
     CanvasFront->textures_to_pointers();
     CanvasFront->linked_list_to_array();
     CanvasFront->delete_all_nodes();
 
-    // View canvas:
+    // Minimap canvas
     CanvasMinimap = new canvas(1);
     if (!CanvasMinimap) {
         internal_error("create_canvasses out of memory!");
@@ -2055,9 +1975,9 @@ void create_canvases(void) {
     CanvasMinimap->linked_list_to_array();
     CanvasMinimap->delete_all_nodes();
 
-    // Kajak egesz koordjainak kitoltese:
+    // Calculate the rendering position of objects
     CanvasBack->calculate_object_positions();
-    CanvasMinimap->calculate_object_positions(); // View koordok
+    CanvasMinimap->calculate_object_positions();
 }
 
 void segedfv(void) {
@@ -2065,32 +1985,34 @@ void segedfv(void) {
     pe->render_row1(NULL, 0);
 }
 
-// Egy iterator class (inkabb cache) ecsethez (foltoz hasznalja oket):
 node_finder::node_finder(canvas* src) {
     current_x = -1;
     current_y = -1;
     current_node = NULL;
-
     source = src;
 }
 
 canvas_chunk_node* node_finder::get_chunk(int x, int y) {
     if (y == current_y && x >= current_x) {
+        // Shortcut to iterate to the right of our last node
         while (x >= current_x + current_node->width) {
             current_x += current_node->width;
             current_node = current_node->next;
         }
     } else {
-        // Ujra kell olvasni:
+        // Fallback to default case by traversing list normally
         if (y < 0 || y >= source->pixel_height) {
             internal_error("node_finder invalid y");
         }
         current_y = y;
         current_node = source->rows_linked[y];
         current_x = source->rows_x1[y];
+
+        // Make sure canvas is unused so far
         if (current_x > 10) {
             internal_error("node_finder current_x > 10");
         }
+
         while (x >= current_x + current_node->width) {
             current_x += current_node->width;
             current_node = current_node->next;

@@ -26,27 +26,6 @@ canvas* CanvasMinimap = NULL;
 
 #define PIXELMASZK (~((uintptr_t)0x7FF))
 
-/*void vizsgal( canvas* pecset ) {
-
-    canvas_chunk_node* futo = pecset->rows_linked[1071];
-    int xtomb[40];
-    int muttomb[40];
-    int kurx = 1;
-    int i = 0;
-    while( futo ) {
-        if( i > 38 )
-            internal_error( "i > 38!" );
-
-        xtomb[i] = kurx;
-        muttomb[i] = (int)futo->pixels;
-
-        kurx += futo->xsize;
-
-        i++;
-        futo = futo->pkov;
-    }
-}*/
-
 static void memory_error(void) {
     external_error("You do not have enough memory to load this level!",
                    "Try to set the graphic detail to low at the options.");

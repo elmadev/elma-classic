@@ -33,6 +33,7 @@ void show_cursor();
 void hide_cursor();
 
 bool is_key_down(DikScancode code);
+bool was_key_just_pressed(DikScancode code);
 
 bool is_fullscreen();
 long long get_milliseconds();

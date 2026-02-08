@@ -1,6 +1,7 @@
 #include "platform_impl.h"
 #include "editor_dialog.h"
 #include "eol_settings.h"
+#include "eol/eol.h"
 #include "EDITUJ.H"
 #include "sound_engine.h"
 #include "keys.h"
@@ -449,6 +450,7 @@ void handle_events() {
     }
 
     keyboard::end_frame();
+    EolClient->tick();
 }
 
 void hide_cursor() {

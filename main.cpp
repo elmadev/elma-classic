@@ -1,4 +1,5 @@
 #include "editor_canvas.h"
+#include "eol/eol.h"
 #include "eol_settings.h"
 #include "M_PIC.H"
 #include "main.h"
@@ -26,6 +27,7 @@ void delay(int milliseconds) {
 }
 
 eol_settings* EolSettings = nullptr;
+eol* EolClient = nullptr;
 
 int main() {
     util::random::seed();
@@ -38,6 +40,9 @@ int main() {
     editor_canvas_update_resolution();
 
     platform_init();
+
+    EolClient = new eol();
+    EolClient->connect();
 
     menu_intro();
 }

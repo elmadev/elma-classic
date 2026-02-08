@@ -16,4 +16,6 @@ class eol {
     protocol proto;
 };
 
+extern eol* EolClient;
+
 #endif

@@ -17,7 +17,7 @@ extern int Kitoltestmegrak;
 // Es ennyire toltjuk:
 extern int Kitoltestmegrakkezd;
 
-void init_shirt();
+void init_renderer();
 
 void novelkepmeret(void);
 void csokkentkepmeret(void);

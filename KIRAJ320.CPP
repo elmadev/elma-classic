@@ -60,7 +60,7 @@ static int Viewxorig, Viewxtolas;
 
 affine_pic* shirt = nullptr;
 
-void init_shirt() {
+static void init_shirt() {
     constexpr int SHIRT_BMP_WIDTH = 149;
     constexpr int SHIRT_BMP_HEIGHT = 101;
 
@@ -73,6 +73,8 @@ void init_shirt() {
 
     delete pic_shirt;
 }
+
+void init_renderer() { init_shirt(); }
 
 void beallitmereteket(int splitscreen) {
     Cy1Bplayer = 100, Cy2Bplayer = 200;

@@ -31,7 +31,6 @@ void menu_intro() {
 
     merge_states();
     eol_settings::sync_controls_to_state(State);
-    init_shirt();
 
     init_physics_data();
 
@@ -57,6 +56,8 @@ void menu_intro() {
     Pabc1->set_spacing(1);
     Pabc2 = new abc8("kisbetu2.abc"); // "small letter 2"
     Pabc2->set_spacing(1);
+
+    init_renderer();
 
     Rec1 = new recorder;
     Rec2 = new recorder;

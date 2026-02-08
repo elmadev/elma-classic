@@ -266,6 +266,19 @@ void handle_events() {
         case SDL_KEYDOWN: {
             SDL_Scancode scancode = event.key.keysym.scancode;
             Keycode keycode = SDLToKeycode[scancode];
+
+            // SDL doesn't generate text input events when Ctrl is held
+            // Resolve layout-specific keycodes for unmapped keys to support LCtrl search
+            if (EolSettings->lctrl_search() && keycode == SDL_SCANCODE_UNKNOWN) {
+                bool is_lctrl_pressed = event.key.keysym.mod & KMOD_LCTRL;
+                if (is_lctrl_pressed) {
+                    SDL_Keycode sym = SDL_GetKeyFromScancode(scancode);
+                    if (sym > 0 && sym < 128) {
+                        keycode = (Keycode)sym;
+                    }
+                }
+            }
+
             if (keycode == SDL_SCANCODE_UNKNOWN) {
                 break; // Not a control mapping - delivered through text input events.
             }

@@ -477,6 +477,27 @@ static unsigned char* create_timer_palette_map(unsigned char* pal) {
     return map;
 }
 
+#define ERROR_CORRUPT() external_error("Corrupt LGR file!:", path)
+
+// Read "LGR12" or "LGR13"
+static int read_version(FILE* h, const char* path) {
+    char LGRXX[6] = {};
+    if (fread(LGRXX, 1, 5, h) != 5) {
+        ERROR_CORRUPT();
+    }
+    if (strncmp(LGRXX, "LGR", 3) != 0) {
+        external_error("This is not an LGR file!:", path);
+    }
+    if (LGRXX[3] < '0' || LGRXX[3] > '9' || LGRXX[4] < '0' || LGRXX[4] > '9') {
+        external_error("LGR file's version is too new!:", path, nullptr);
+    }
+    int version = (LGRXX[3] - '0') * 10 + (LGRXX[4] - '0');
+    if (version != 12 && version != 13) {
+        external_error("LGR file's version is too new!:", path, nullptr);
+    }
+    return version;
+}
+
 lgrfile::lgrfile(const char* lgrname) {
     picture_count = 0;
     mask_count = 0;
@@ -502,6 +523,7 @@ lgrfile::lgrfile(const char* lgrname) {
     grass_pics = new grass;
 
     double zoom = EolSettings->zoom();
+    double texture_zoom = EolSettings->zoom_textures() ? zoom : 1.0;
 
     // Load file
     char path[30];
@@ -511,20 +533,7 @@ lgrfile::lgrfile(const char* lgrname) {
         external_error("Cannot find file:", path);
     }
 
-#define ERROR_CORRUPT() external_error("Corrupt LGR file!:", path)
-
-    // LGR12
-    char version[10];
-    if (fread(version, 1, 5, h) != 5) {
-        ERROR_CORRUPT();
-    }
-    version[5] = 0;
-    if (strncmp(version, "LGR", 3) != 0) {
-        external_error("This is not an LGR file!:", path);
-    }
-    if (strcmp(version + 3, "12") != 0) {
-        external_error("LGR file's version is too new!:", path);
-    }
+    int version = read_version(h, path);
 
     // Pcx object file count
     int pcx_length;
@@ -551,8 +560,21 @@ lgrfile::lgrfile(const char* lgrname) {
         if (fread(asset_filename, 1, 20, h) != 20) {
             ERROR_CORRUPT();
         }
+
+        // width is unused
+        short target_width = -1;
+        short target_height = -1;
+        if (version == 13) {
+            if (fread(&target_width, 1, sizeof(target_width), h) != 2) {
+                ERROR_CORRUPT();
+            }
+            if (fread(&target_height, 1, sizeof(target_height), h) != 2) {
+                ERROR_CORRUPT();
+            }
+        }
+
         int asset_size = 0;
-        if (fread(&asset_size, 1, 4, h) != 4) {
+        if (fread(&asset_size, 1, sizeof(asset_size), h) != 4) {
             ERROR_CORRUPT();
         }
         if (asset_size < 1 || asset_size > 10000000) {
@@ -562,6 +584,10 @@ lgrfile::lgrfile(const char* lgrname) {
         int curpos = ftell(h);
         pic8* asset_pic = new pic8(asset_filename, h);
         fseek(h, curpos + asset_size, SEEK_SET);
+
+        if (version == 12) {
+            target_height = asset_pic->get_height();
+        }
 
         if (strcmpi(asset_filename, "q1bike.pcx") == 0) {
             q1bike = asset_pic;
@@ -607,13 +633,13 @@ lgrfile::lgrfile(const char* lgrname) {
 #undef LOAD_AFFINE
 
         if (strcmpi(asset_filename, "qkiller.pcx") == 0) {
-            killer = new anim(asset_pic, "qkiller.pcx", zoom);
+            killer = new anim(asset_pic, "qkiller.pcx", target_height, zoom);
             delete asset_pic;
             asset_pic = nullptr;
             continue;
         }
         if (strcmpi(asset_filename, "qexit.pcx") == 0) {
-            exit = new anim(asset_pic, "qexit.pcx", zoom);
+            exit = new anim(asset_pic, "qexit.pcx", target_height, zoom);
             delete asset_pic;
             asset_pic = nullptr;
             continue;
@@ -635,7 +661,7 @@ lgrfile::lgrfile(const char* lgrname) {
             char qfood_name[20];
             sprintf(qfood_name, "qfood%d.pcx", foodi + 1);
             if (strcmpi(asset_filename, qfood_name) == 0) {
-                food[foodi] = new anim(asset_pic, qfood_name, zoom);
+                food[foodi] = new anim(asset_pic, qfood_name, target_height, zoom);
                 delete asset_pic;
                 asset_pic = nullptr;
                 is_food = true;
@@ -647,10 +673,12 @@ lgrfile::lgrfile(const char* lgrname) {
 
         // QUP/QDOWN
         if (strnicmp(asset_filename, "qup_", 4) == 0) {
+            asset_pic = pic8::resize(asset_pic, target_height);
             grass_pics->add(asset_pic, true);
             continue;
         }
         if (strnicmp(asset_filename, "qdown_", 6) == 0) {
+            asset_pic = pic8::resize(asset_pic, target_height);
             grass_pics->add(asset_pic, false);
             continue;
         }
@@ -677,22 +705,20 @@ lgrfile::lgrfile(const char* lgrname) {
                            asset_filename);
         }
         if (list->type[index] == piclist::Type::Picture) {
-            asset_pic = pic8::resize(asset_pic, zoom * asset_pic->get_height());
+            asset_pic = pic8::resize(asset_pic, (int)(zoom * target_height));
             add_picture(asset_pic, list, index);
             delete asset_pic;
             asset_pic = nullptr;
             continue;
         }
         if (list->type[index] == piclist::Type::Texture) {
-            if (EolSettings->zoom_textures()) {
-                asset_pic = pic8::resize(asset_pic, zoom * asset_pic->get_height());
-            }
+            asset_pic = pic8::resize(asset_pic, (int)(texture_zoom * target_height));
             add_texture(asset_pic, list, index);
             // Keep pic8
             continue;
         }
         if (list->type[index] == piclist::Type::Mask) {
-            asset_pic = pic8::resize(asset_pic, zoom * asset_pic->get_height());
+            asset_pic = pic8::resize(asset_pic, (int)(zoom * target_height));
             add_mask(asset_pic, list, index);
             // pic8 deleted by above function
             asset_pic = nullptr;

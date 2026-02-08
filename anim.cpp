@@ -2,35 +2,41 @@
 #include "main.h"
 #include "KIRAJZOL.H"
 #include "pic8.h"
+#include <cstring>
+#include <format>
 
-anim::anim(pic8* source_sheet, const char* error_filename, double scale) {
+anim::anim(pic8* source_sheet, const char* error_filename, int target_height, double zoom) {
     frame_count = 0;
-    for (int i = 0; i < ANIM_MAX_FRAMES; i++) {
-        frames[i] = nullptr;
+    std::memset(frames, 0, sizeof(frames));
+
+    // LGR13 format: target object height must always be ANIM_WIDTH
+    if (target_height != ANIM_WIDTH) {
+        external_error(std::format("Object picture height must be {}", ANIM_WIDTH).c_str(),
+                       error_filename);
     }
 
     // Get total number of animation frames
-    if (source_sheet->get_width() % ANIM_WIDTH) {
-        char tmp[80];
-        sprintf(tmp, "Picture xsize must be a multiple of %d!", ANIM_WIDTH);
-        external_error(tmp, error_filename);
+    int source_height = source_sheet->get_height();
+    int source_width = source_sheet->get_width();
+    if (source_width % source_height) {
+        external_error("Object picture width must be a multiple of its height", error_filename);
     }
-    frame_count = source_sheet->get_width() / ANIM_WIDTH;
+    frame_count = source_width / source_height;
     if (frame_count < 0) {
         internal_error("anim::anim frame_count < 0");
     }
     if (frame_count > ANIM_MAX_FRAMES) {
-        char tmp[80];
-        sprintf(tmp, "Too many frames in picture! Max frame is %d!", ANIM_MAX_FRAMES);
-        external_error(tmp, error_filename);
+        external_error(
+            std::format("Too many frames in picture! Max frame is {}!", ANIM_MAX_FRAMES).c_str(),
+            error_filename);
     }
 
     // Split the source picture into individual frames
+    unsigned char transparency = source_sheet->gpixel(0, 0);
     for (int i = 0; i < frame_count; i++) {
-        frames[i] = new pic8(ANIM_WIDTH, ANIM_WIDTH);
-        unsigned char transparency = source_sheet->gpixel(0, 0);
-        blit8(frames[i], source_sheet, -ANIM_WIDTH * i, 0);
-        frames[i] = pic8::resize(frames[i], ANIM_WIDTH * scale);
+        frames[i] = new pic8(source_height, source_height);
+        blit8(frames[i], source_sheet, -source_height * i, 0);
+        frames[i] = pic8::resize(frames[i], (int)(target_height * zoom));
         forditkepet(frames[i]);
         frames[i]->add_transparency(transparency);
     }

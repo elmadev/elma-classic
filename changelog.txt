@@ -6,6 +6,7 @@
 * Elma now honors the local keyboard layout for text input instead of being forced to US qwerty layout
 * QGRASS texture is available in internal editor
 * Replays: maximum duration increased from 1 hour to about 828 days.
+* Add support for LGR13
 
 ## Major Bug Fixes
 * It is possible to properly collect more than 200 apples in a single frame

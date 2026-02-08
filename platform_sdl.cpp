@@ -344,13 +344,22 @@ bool right_mouse_clicked() {
 }
 
 bool is_key_down(DikScancode code) {
-    if (code < 0 || code >= MaxKeycode) {
+    if (code.key < 0 || code.key >= MaxKeycode) {
+        internal_error("code out of range in is_key_down()!");
+        return false;
+    }
+    if (code.control < 0 || code.control >= MaxKeycode) {
         internal_error("code out of range in is_key_down()!");
         return false;
     }
 
-    SDL_Scancode sdl_code = windows_scancode_table[code];
-
+    if (code.control != DIK_UNKNOWN) {
+        SDL_Scancode sdl_code = windows_scancode_table[code.control];
+        if (SDLKeyState[sdl_code] == 0) {
+            return false;
+        }
+    }
+    SDL_Scancode sdl_code = windows_scancode_table[code.key];
     return SDLKeyState[sdl_code] != 0;
 }
 

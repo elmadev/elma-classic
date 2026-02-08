@@ -7,8 +7,8 @@
 #include "state.h"
 #include <cstring>
 
-const char* dik_to_string(DikScancode keycode) {
-    switch (keycode) {
+const char* scancode_to_string(short scancode) {
+    switch (scancode) {
     case DIK_UNKNOWN:
         return "NONE";
     case DIK_1:
@@ -66,7 +66,7 @@ const char* dik_to_string(DikScancode keycode) {
     case DIK_RETURN:
         return "ENTER";
     case DIK_LCONTROL:
-        return "LEFT CTRL";
+        return "LCTRL";
     case DIK_A:
         return "A";
     case DIK_S:
@@ -92,7 +92,7 @@ const char* dik_to_string(DikScancode keycode) {
     case DIK_GRAVE:
         return "`";
     case DIK_LSHIFT:
-        return "LEFT SHIFT";
+        return "LSHIFT";
     case DIK_BACKSLASH:
         return "\\";
     case DIK_Z:
@@ -116,11 +116,11 @@ const char* dik_to_string(DikScancode keycode) {
     case DIK_SLASH:
         return "SLASH";
     case DIK_RSHIFT:
-        return "RIGHT SHIFT";
+        return "RSHIFT";
     case DIK_MULTIPLY:
         return "PAD_*";
     case DIK_LMENU:
-        return "LEFT ALT";
+        return "LALT";
     case DIK_SPACE:
         return "SPACEBAR";
     case DIK_CAPITAL:
@@ -214,7 +214,7 @@ const char* dik_to_string(DikScancode keycode) {
     case DIK_NUMPADENTER:
         return "PAD_ENTER";
     case DIK_RCONTROL:
-        return "RIGHT CTRL";
+        return "RCTRL";
     case DIK_NUMPADCOMMA:
         return "COMMA";
     case DIK_DIVIDE:
@@ -222,7 +222,7 @@ const char* dik_to_string(DikScancode keycode) {
     case DIK_SYSRQ:
         return "SYSRQ";
     case DIK_RMENU:
-        return "RIGHT ALT";
+        return "RALT";
     case DIK_HOME:
         return "HOME";
     case DIK_UP:
@@ -244,13 +244,32 @@ const char* dik_to_string(DikScancode keycode) {
     case DIK_DELETE:
         return "DEL";
     case DIK_LWIN:
-        return "LEFT WIN";
+        return "LWIN";
     case DIK_RWIN:
-        return "RIGHT WIN";
+        return "RWIN";
     case DIK_APPS:
         return "APPLICATION";
     }
     return NULL;
+}
+
+std::string dik_to_string(DikScancode& key) {
+    std::string ret = "";
+    if (key.control) {
+        const char* text = scancode_to_string(key.control);
+        if (text) {
+            ret += text;
+            ret += " + ";
+        }
+    }
+    const char* text = scancode_to_string(key.key);
+    if (text) {
+        ret += text;
+    } else {
+        ret += "Key code: ";
+        ret += std::to_string(key.key);
+    }
+    return ret;
 }
 
 // A list of pointers to where the keys are stored (somewhere in a state class object)
@@ -269,20 +288,27 @@ constexpr int REPLAY_KEYS_START = 0;
 constexpr int REPLAY_KEYS_END = REPLAY_KEYS_START + 6;
 
 // Setup the menu to display one control key
-static void load_control(key_pointers keys, int offset, const char* label, int* key) {
+static void load_control(key_pointers keys, int offset, const char* label, DikScancode* key) {
     strcpy(NavEntriesLeft[offset], label);
-    const char* key_text = dik_to_string(*key);
-    char tmp[20] = "";
-    if (!key_text) {
-        sprintf(tmp, "Key code: %d", *key);
-        key_text = tmp;
-    }
-    strcpy(NavEntriesRight[offset], key_text);
+    std::string key_text = dik_to_string(*key);
+    strcpy(NavEntriesRight[offset], key_text.c_str());
     keys[offset] = key;
 }
 
+constexpr DikScancode MODIFIERS[] = {DIK_LSHIFT, DIK_RSHIFT, DIK_LCONTROL, DIK_RCONTROL,
+                                     DIK_LMENU,  DIK_RMENU,  DIK_LWIN,     DIK_RWIN};
+
+static bool is_valid_modifier(DikScancode keycode) {
+    for (int i = 0; i < sizeof(MODIFIERS) / sizeof(MODIFIERS[0]); i++) {
+        if (keycode == MODIFIERS[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Await keypress to choose a new key for one control
-static void prompt_control(int length, key_pointers keys, int index) {
+static void prompt_control(int length, key_pointers keys, int index, bool modifier) {
     menu_nav nav;
     nav.selected_index = index;
     nav.x_left = 60;
@@ -297,31 +323,43 @@ static void prompt_control(int length, key_pointers keys, int index) {
     nav.navigate(nullptr, 0, true);
     while (true) {
         handle_events();
-        for (DikScancode keycode = 1; keycode < MaxKeycode; keycode++) {
-            if (is_key_down(DIK_ESCAPE)) {
-                return;
-            }
+        if (is_key_down(DIK_ESCAPE)) {
+            return;
+        }
+        for (int i = 1; i < MaxKeycode; i++) {
+            DikScancode keycode = i;
             if (keycode == DIK_RETURN || keycode == DIK_ESCAPE) {
+                continue;
+            }
+            if (modifier && is_valid_modifier(keycode)) {
                 continue;
             }
             if (!is_key_down(keycode)) {
                 continue;
             }
             // Disallow multiple controls being mapped to the same key
-            for (int i = UNIVERSAL_KEYS_START; i < UNIVERSAL_KEYS_END; i++) {
-                if (*UniversalKeys[i] == keycode) {
-                    *UniversalKeys[i] = 0;
+            for (int j = UNIVERSAL_KEYS_START; j < UNIVERSAL_KEYS_END; j++) {
+                if (*UniversalKeys[j] == i) {
+                    *UniversalKeys[j] = DIK_UNKNOWN;
                 }
             }
-            for (int i = PLAYER_KEYS_START; i < PLAYER_KEYS_END; i++) {
-                if (*Player1Keys[i] == keycode) {
-                    *Player1Keys[i] = 0;
+            for (int j = PLAYER_KEYS_START; j < PLAYER_KEYS_END; j++) {
+                if (*Player1Keys[j] == i) {
+                    *Player1Keys[j] = DIK_UNKNOWN;
                 }
-                if (*Player2Keys[i] == keycode) {
-                    *Player2Keys[i] = 0;
+                if (*Player2Keys[j] == i) {
+                    *Player2Keys[j] = DIK_UNKNOWN;
                 }
             }
-            *keys[index] = keycode;
+            *keys[index] = i;
+            if (modifier) {
+                for (int i = 0; i < sizeof(MODIFIERS) / sizeof(MODIFIERS[0]); i++) {
+                    if (is_key_down(MODIFIERS[i])) {
+                        keys[index]->control = MODIFIERS[i];
+                        break;
+                    }
+                }
+            }
             return;
         }
         nav.render();
@@ -394,7 +432,7 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
             return;
         }
         if (choice >= 0 && choice < PLAYER_KEYS_END) {
-            prompt_control(PLAYER_KEYS_END, keys, choice);
+            prompt_control(PLAYER_KEYS_END, keys, choice, false);
         }
     }
 }
@@ -420,7 +458,7 @@ static void menu_customize_replay(key_pointers keys) {
             return;
         }
         if (choice >= 0 && choice < REPLAY_KEYS_END) {
-            prompt_control(REPLAY_KEYS_END, keys, choice);
+            prompt_control(REPLAY_KEYS_END, keys, choice, false);
         }
     }
 }
@@ -471,7 +509,7 @@ void menu_customize_controls() {
         }
         if (choice >= UNIVERSAL_KEYS_START && choice < UNIVERSAL_KEYS_END) {
             // Modify universal control
-            prompt_control(UNIVERSAL_KEYS_END, UniversalKeys, choice);
+            prompt_control(UNIVERSAL_KEYS_END, UniversalKeys, choice, true);
         }
     }
 }

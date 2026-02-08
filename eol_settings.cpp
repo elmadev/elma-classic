@@ -185,6 +185,10 @@ void from_json(const json& j, RendererType& r) {
     }
 }
 
+void to_json(json& j, const DikScancode& r) { j = (int)(r); }
+
+void from_json(const json& j, DikScancode& r) { r = DikScancode((int)(j)); }
+
 #define FIELD_LIST                                                                                 \
     JSON_FIELD(screen_width)                                                                       \
     JSON_FIELD(screen_height)                                                                      \

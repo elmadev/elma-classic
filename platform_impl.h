@@ -2,7 +2,32 @@
 #define PLATFORM_IMPL_H
 
 // DIK_ Windows scancode
-typedef int DikScancode;
+struct DikScancode {
+    short key;
+    short control;
+
+    constexpr DikScancode() noexcept
+        : control(0),
+          key(0) {}
+
+    constexpr DikScancode(int val) noexcept
+        : control((val & 0xFFFF0000) >> 16),
+          key(val & 0x0000FFFF) {}
+
+    constexpr DikScancode(short control, short k) noexcept
+        : control(control),
+          key(k) {}
+
+    constexpr operator int() const noexcept { return (control << 16) | key; }
+
+    constexpr bool operator==(const DikScancode& b) const noexcept {
+        return key == b.key && control == b.control;
+    }
+
+    constexpr bool operator==(int b) const noexcept { return *this == DikScancode(b); }
+
+    constexpr bool operator!=(const DikScancode& b) const noexcept { return !(*this == b); }
+};
 
 class palette {
     void* data;

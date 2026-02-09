@@ -30,7 +30,7 @@ anim::anim(pic8* source_sheet, const char* error_filename, double scale) {
         frames[i] = new pic8(ANIM_WIDTH, ANIM_WIDTH);
         unsigned char transparency = source_sheet->gpixel(0, 0);
         blit8(frames[i], source_sheet, -ANIM_WIDTH * i, 0);
-        frames[i] = pic8::scale(frames[i], scale);
+        frames[i] = pic8::resize(frames[i], ANIM_WIDTH * scale);
         forditkepet(frames[i]);
         frames[i]->add_transparency(transparency);
     }

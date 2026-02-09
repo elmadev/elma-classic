@@ -81,15 +81,19 @@ pic8::pic8(const char* filename, FILE* h) {
     internal_error("pic8 could not find file extension: ", filename);
 }
 
-pic8* pic8::scale(pic8* src, double scale) {
-    if (scale == 1.0) {
+pic8* pic8::resize(pic8* src, int target_height) {
+    int source_height = src->get_height();
+    int source_width = src->get_width();
+
+    target_height = std::max(target_height, 1);
+    if (source_height == target_height) {
         return src;
     }
 
-    const int scaled_width = std::max((int)(src->get_width() * scale), 1);
-    const int scaled_height = std::max((int)(src->get_height() * scale), 1);
+    double scale = (double)(target_height) / (double)(source_height);
+    int target_width = std::max((int)(source_width * scale), 1);
 
-    pic8* scaled = new pic8(scaled_width, scaled_height);
+    pic8* scaled = new pic8(target_width, target_height);
     blit_scale8(scaled, src);
     delete src;
     return scaled;

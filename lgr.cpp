@@ -677,7 +677,7 @@ lgrfile::lgrfile(const char* lgrname) {
                            asset_filename);
         }
         if (list->type[index] == piclist::Type::Picture) {
-            asset_pic = pic8::scale(asset_pic, zoom);
+            asset_pic = pic8::resize(asset_pic, zoom * asset_pic->get_height());
             add_picture(asset_pic, list, index);
             delete asset_pic;
             asset_pic = nullptr;
@@ -685,14 +685,14 @@ lgrfile::lgrfile(const char* lgrname) {
         }
         if (list->type[index] == piclist::Type::Texture) {
             if (EolSettings->zoom_textures()) {
-                asset_pic = pic8::scale(asset_pic, zoom);
+                asset_pic = pic8::resize(asset_pic, zoom * asset_pic->get_height());
             }
             add_texture(asset_pic, list, index);
             // Keep pic8
             continue;
         }
         if (list->type[index] == piclist::Type::Mask) {
-            asset_pic = pic8::scale(asset_pic, zoom);
+            asset_pic = pic8::resize(asset_pic, zoom * asset_pic->get_height());
             add_mask(asset_pic, list, index);
             // pic8 deleted by above function
             asset_pic = nullptr;

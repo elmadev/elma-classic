@@ -30,7 +30,7 @@ class pic8 {
     pic8(int w, int h);
     pic8(const char* filename, FILE* h = nullptr);
     static pic8* from_bmp(const char* filename);
-    static pic8* scale(pic8* src, double scale);
+    static pic8* resize(pic8* src, int height);
     ~pic8();
     bool save(const char* filename, unsigned char* pal = nullptr, FILE* h = nullptr);
     void ppixel(int x, int y, unsigned char index);

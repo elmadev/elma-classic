@@ -1,0 +1,1 @@
+option('profile_performance', type : 'boolean', value : false, description: 'enable performance timing checks')

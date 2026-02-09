@@ -6,6 +6,10 @@ if get_option('buildtype') == 'debug' or get_option('buildtype') == 'debugoptimi
     add_project_arguments('-DDEBUG', language: 'cpp')
 endif
 
+if get_option('profile_performance') == true
+    add_project_arguments('-DPROFILE_PERFORMANCE', language: 'cpp')
+endif
+
 elma_sources = files(
     'abc8.cpp',
     'physics_init.cpp',
@@ -68,6 +72,7 @@ elma_sources = files(
     'object.cpp',
     'sprite.cpp',
     'gl_renderer.cpp',
+    'src/debug/profiler.cpp',
     'src/glad/glad.c',
 )
 
@@ -84,7 +89,7 @@ endif
 
 win_subsystem = 'windows'
 if cpp.get_id() == 'msvc'
-    if get_option('buildtype') == 'debug'
+    if get_option('buildtype') == 'debug' or get_option('buildtype') == 'debugoptimized' or get_option('profile_performance') == true
         # Allows printf when debugging
         win_subsystem = 'console'
     endif

@@ -45,9 +45,6 @@ struct valtozok {
     int showkep;
 
     int hatranyomva;
-    int viewnyomva;
-    int timenyomva;
-    int showkepnyomva; // multiplayer-ben el lehet tuntetni
 
     double ugrasnagysag;
 

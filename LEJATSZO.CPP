@@ -243,7 +243,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int* ptimekin,
                        int* pmasikshow) {
     // Showkep:
-    if (!pvalt->showkepnyomva && is_key_down(popciok->toggle_visibility)) {
+    if (was_key_just_pressed(popciok->toggle_visibility)) {
         Kitoltestmegrak = Kitoltestmegrakkezd;
         if (!*pmasikshow) {
             // Ha masik jatekos ablaka nem latszott, mindegyik fog latszani:
@@ -253,17 +253,15 @@ static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int
             pvalt->showkep = !pvalt->showkep;
         }
     }
-    pvalt->showkepnyomva = is_key_down(popciok->toggle_visibility);
     // View ablak:
-    if (!pvalt->viewnyomva && is_key_down(popciok->toggle_minimap)) {
+    if (was_key_just_pressed(popciok->toggle_minimap)) {
         *pviewkin = !*pviewkin;
     }
-    pvalt->viewnyomva = is_key_down(popciok->toggle_minimap);
+
     // Ido kint legyen vagy ne:
-    if (!pvalt->timenyomva && is_key_down(popciok->toggle_timer)) {
+    if (was_key_just_pressed(popciok->toggle_timer)) {
         *ptimekin = !*ptimekin;
     }
-    pvalt->timenyomva = is_key_down(popciok->toggle_timer);
 }
 
 static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig, int hatra) {
@@ -391,9 +389,6 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
     double eddig = 0.0;
     reset_event_buffer();
 
-    int plussznyomva = 0;
-    int minusznyomva = 0;
-    int snapnyomva = 0;
     stopwatch_reset();
 
     // Valtozok inicializalasa:
@@ -591,20 +586,17 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
 
         // Egy par kozos toggle:
         // Plusz elintezes:
-        if (!plussznyomva && is_key_down(State->key_increase_screen_size)) {
+        if (was_key_just_pressed(State->key_increase_screen_size)) {
             novelkepmeret();
         }
-        plussznyomva = is_key_down(State->key_increase_screen_size);
         // Minusz elintezes:
-        if (!minusznyomva && is_key_down(State->key_decrease_screen_size)) {
+        if (was_key_just_pressed(State->key_decrease_screen_size)) {
             csokkentkepmeret();
         }
-        minusznyomva = is_key_down(State->key_decrease_screen_size);
         // Snap nyomas elintezese:
-        if (!snapnyomva && is_key_down(State->key_screenshot)) {
+        if (was_key_just_pressed(State->key_screenshot)) {
             Legkozment = 1;
         }
-        snapnyomva = is_key_down(State->key_screenshot);
 
         // Vizsgalat kilepesre:
         if (is_key_down(DIK_ESCAPE) || is_key_down(State->key_escape_alias)) {
@@ -792,10 +784,6 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     reset_event_buffer();
     stopwatch_reset();
 
-    int plussznyomva = 0;
-    int minusznyomva = 0;
-    int snapnyomva = 0;
-
     // Valtozok inicializalasa:
     valtozok valt1; // Inicializalni kell !!!!!!!!!!!!
     memset(&valt1, 0, sizeof(valt1));
@@ -940,23 +928,20 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         // Egy par kozos toggle:
         // Plusz elintezes:
-        if (!plussznyomva && is_key_down(State->key_increase_screen_size)) {
+        if (was_key_just_pressed(State->key_increase_screen_size)) {
             novelkepmeret();
 
             // extern int Mostirdki;
             // Mostirdki = 1;
         }
-        plussznyomva = is_key_down(State->key_increase_screen_size);
         // Minusz elintezes:
-        if (!minusznyomva && is_key_down(State->key_decrease_screen_size)) {
+        if (was_key_just_pressed(State->key_decrease_screen_size)) {
             csokkentkepmeret();
         }
-        minusznyomva = is_key_down(State->key_decrease_screen_size);
         // Snap nyomas elintezese:
-        if (!snapnyomva && is_key_down(State->key_screenshot)) {
+        if (was_key_just_pressed(State->key_screenshot)) {
             Legkozment = 1;
         }
-        snapnyomva = is_key_down(State->key_screenshot);
 
         // Vizsgalat kilepesre:
         if (is_key_down(DIK_ESCAPE)) {

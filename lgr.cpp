@@ -604,8 +604,8 @@ lgrfile::lgrfile(const char* lgrname) {
         }
 
 #define LOAD_AFFINE(name, destination)                                                             \
-    if (strcmpi(asset_filename, name) == 0) {                                                      \
-        destination = new affine_pic(nullptr, asset_pic);                                          \
+    if (strcmpi(asset_filename, (name)) == 0) {                                                    \
+        (destination) = new affine_pic(nullptr, asset_pic);                                        \
         continue;                                                                                  \
     }
 
@@ -998,9 +998,7 @@ void lgrfile::reload_default_textures() {
     // Recreate background texture
     if (strcmpi(background_name, Ptop->background_name) != 0) {
         strcpy(background_name, Ptop->background_name);
-        if (background) {
-            delete background;
-        }
+        delete background;
         background = nullptr;
 
         int index = get_texture_index(background_name);
@@ -1015,9 +1013,7 @@ void lgrfile::reload_default_textures() {
     // Recreate foreground texture
     if (strcmpi(foreground_name, Ptop->foreground_name) != 0) {
         strcpy(foreground_name, Ptop->foreground_name);
-        if (foreground) {
-            delete foreground;
-        }
+        delete foreground;
         foreground = nullptr;
 
         int index = get_texture_index(foreground_name);

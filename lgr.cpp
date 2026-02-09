@@ -18,6 +18,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "sprite.h"
+#include "debug/profiler.h"
 #include <algorithm>
 #include <cstring>
 #include <filesystem>
@@ -499,6 +500,8 @@ static int read_version(FILE* h, const char* path) {
 }
 
 lgrfile::lgrfile(const char* lgrname) {
+    START_TIME(lgr_timer);
+
     picture_count = 0;
     mask_count = 0;
     texture_count = 0;
@@ -885,6 +888,8 @@ lgrfile::lgrfile(const char* lgrname) {
 
     // Check grass
     has_grass = get_texture_index("qgrass") >= 0 && grass_pics->length >= 2;
+
+    END_TIME(lgr_timer, std::format("{}.lgr (zoom={:.2f})", lgrname, zoom));
 }
 
 static void delete_bike_pics(bike_pics* bp) {

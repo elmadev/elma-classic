@@ -8,88 +8,59 @@
 #include "menu_pic.h"
 #include "menu_play.h"
 #include "platform_impl.h"
-#include "platform_utils.h"
 #include "state.h"
 #include <cstring>
-#include <algorithm>
 #include <string>
-#include <vector>
 
-void menu_external_levels() {
-    finame filename;
-    std::vector<std::string> lev_names;
-    bool done = find_first("lev/*.lev", filename);
-    int count = 0;
-    while (!done) {
-        lev_names.push_back(filename);
+static void play_external(const std::string& filename) {
+    if (filename.length() > MAX_FILENAME_LEN + 4) {
+        internal_error("menu_external_levels() entry too long!");
+    }
+    const char* filename_str = filename.c_str();
+    strcpy(State->external_filename, filename_str);
 
-        done = find_next(filename);
-        count++;
-        if (count >= NavEntriesLeftMaxLength - 4) {
-            done = true;
+    while (true) {
+        loading_screen();
+        if (!load_level_play(filename_str)) {
+            return;
+        }
+        Rec1->erase(filename_str);
+        Rec2->erase(filename_str);
+        int time = lejatszo(filename_str, F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
+        MenuPalette->set();
+        char finish_msg[100] = "";
+        update_top_ten(time, finish_msg, 0, filename_str);
+        if (menu_level(0, 0, finish_msg, filename_str) == MenuLevel::Esc) {
+            Rec1->erase(filename_str);
+            Rec2->erase(filename_str);
+            return;
         }
     }
+}
 
+void menu_external_levels() {
+    menu_nav nav("Select External File!");
+    nav.search_pattern = SearchPattern::Sorted;
+
+    finame filename;
+    bool done = find_first("lev/*.lev", filename);
+    while (!done) {
+        nav.add_row(filename, NAV_FUNC() { play_external(left); });
+        done = find_next(filename);
+    }
     find_close();
 
-    if (count <= 0) {
+    if (nav.row_count() <= 0) {
         return;
     }
 
-    int i = 0;
-    std::sort(lev_names.begin(), lev_names.end(),
-              [](std::string& a, std::string& b) { return strcmpi(a.c_str(), b.c_str()) < 0; });
-    for (std::string& name : lev_names) {
-        strcpy(NavEntriesLeft[i++], name.c_str());
-    }
-
-    int previous_index = 0;
-    for (int i = 0; i < count; i++) {
-        char tmp[50];
-        strcpy(tmp, NavEntriesLeft[i]);
-        if (strcmpi(tmp, State->external_filename) == 0) {
-            previous_index = i;
-        }
-    }
-
-    menu_nav_old val;
-    val.search_pattern = SearchPattern::Sorted;
-    val.selected_index = previous_index;
-    strcpy(val.title, "Select External File!");
-
-    val.setup(count);
+    nav.sort_rows();
+    nav.select_row(State->external_filename);
 
     while (true) {
-        int choice = val.navigate();
+        int choice = nav.navigate();
         if (choice < 0) {
             return;
-        }
-
-        char filename[20];
-        nav_entry* entry = val.entry_left(choice);
-        if (strlen(*entry) > 15) {
-            internal_error("menu_external_levels() strlen(entry) > 15!");
-        }
-        strcpy(filename, *entry);
-
-        strcpy(State->external_filename, filename);
-
-        while (true) {
-            loading_screen();
-            if (!load_level_play(filename)) {
-                break;
-            }
-            Rec1->erase(filename);
-            Rec2->erase(filename);
-            int time = lejatszo(filename, F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
-            MenuPalette->set();
-            char finish_msg[100] = "";
-            update_top_ten(time, finish_msg, 0, filename);
-            if (menu_level(0, 0, finish_msg, filename) == MenuLevel::Esc) {
-                Rec1->erase(filename);
-                Rec2->erase(filename);
-                break;
-            }
         }
     }
 }

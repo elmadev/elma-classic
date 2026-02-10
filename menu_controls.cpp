@@ -2,6 +2,7 @@
 #include <directinput/scancodes.h>
 #include "eol_settings.h"
 #include "keys.h"
+#include "main.h"
 #include "menu_nav.h"
 #include "platform_impl.h"
 #include "state.h"
@@ -270,26 +271,21 @@ constexpr int REPLAY_KEYS_START = 0;
 constexpr int REPLAY_KEYS_END = REPLAY_KEYS_START + 6;
 
 // Setup the menu to display one control key
-static void load_control(key_pointers keys, int offset, const char* label, int* key) {
-    strcpy(NavEntriesLeft[offset], label);
-    strcpy(NavEntriesRight[offset], dik_to_string(*key).c_str());
+static void load_control(menu_nav* nav, key_pointers keys, int offset, std::string label,
+                         DikScancode* key) {
     keys[offset] = key;
+    if (!nav) {
+        return;
+    }
+    nav->add_row(std::move(label), dik_to_string(*key));
 }
 
 // Await keypress to choose a new key for one control
-static void prompt_control(int length, key_pointers keys, int index) {
-    menu_nav_old nav;
-    nav.selected_index = index;
-    nav.x_left = 60;
-    nav.x_right = 400;
-    nav.y_entries = 86;
-    nav.dy = 40;
-    strcpy(nav.title, "Customize controls");
-    strcpy(NavEntriesRight[index], "_");
-    nav.setup(length, true);
+static void prompt_control(menu_nav& nav, key_pointers keys, int index) {
+    nav.entry_right(index) = "_";
 
     // Render only!
-    nav.navigate(nullptr, 0, true);
+    nav.navigate(true);
     while (true) {
         handle_events();
         for (DikScancode keycode = 1; keycode < MaxKeycode; keycode++) {
@@ -324,72 +320,60 @@ static void prompt_control(int length, key_pointers keys, int index) {
 }
 
 // Setup the menu to display the universal controls
-static void load_universal_controls() {
-    strcpy(NavEntriesLeft[0], "Reset all controls to default");
-    NavEntriesRight[0][0] = 0;
-    strcpy(NavEntriesLeft[1], "Customize Player A");
-    NavEntriesRight[1][0] = 0;
-    strcpy(NavEntriesLeft[2], "Customize Player B");
-    NavEntriesRight[2][0] = 0;
-    strcpy(NavEntriesLeft[3], "Customize Replay VCR");
-    NavEntriesRight[3][0] = 0;
+static void load_universal_controls(menu_nav* nav) {
     int i = UNIVERSAL_KEYS_START;
-    load_control(UniversalKeys, i++, "Inc. Screen Size", &State->key_increase_screen_size);
-    load_control(UniversalKeys, i++, "Dec. Screen Size", &State->key_decrease_screen_size);
-    load_control(UniversalKeys, i++, "Make a Screenshot", &State->key_screenshot);
-    load_control(UniversalKeys, i++, "Escape Alias", &State->key_escape_alias);
+    load_control(nav, UniversalKeys, i++, "Inc. Screen Size", &State->key_increase_screen_size);
+    load_control(nav, UniversalKeys, i++, "Dec. Screen Size", &State->key_decrease_screen_size);
+    load_control(nav, UniversalKeys, i++, "Make a Screenshot", &State->key_screenshot);
+    load_control(nav, UniversalKeys, i++, "Escape Alias", &State->key_escape_alias);
 }
 
 // Setup the menu to display the replay controls
-static void load_replay_controls(key_pointers keys) {
+static void load_replay_controls(menu_nav* nav, key_pointers keys) {
     int i = REPLAY_KEYS_START;
-    load_control(keys, i++, "Fast forward 2x", &State->key_replay_fast_2x);
-    load_control(keys, i++, "Fast forward 4x", &State->key_replay_fast_4x);
-    load_control(keys, i++, "Fast forward 8x", &State->key_replay_fast_8x);
-    load_control(keys, i++, "Slow motion 2x", &State->key_replay_slow_2x);
-    load_control(keys, i++, "Slow motion 4x", &State->key_replay_slow_4x);
-    load_control(keys, i++, "Pause", &State->key_replay_pause);
+    load_control(nav, keys, i++, "Fast forward 2x", &State->key_replay_fast_2x);
+    load_control(nav, keys, i++, "Fast forward 4x", &State->key_replay_fast_4x);
+    load_control(nav, keys, i++, "Fast forward 8x", &State->key_replay_fast_8x);
+    load_control(nav, keys, i++, "Slow motion 2x", &State->key_replay_slow_2x);
+    load_control(nav, keys, i++, "Slow motion 4x", &State->key_replay_slow_4x);
+    load_control(nav, keys, i++, "Pause", &State->key_replay_pause);
 }
 
 // Setup the menu to display one player's controls
-static void load_player_controls(key_pointers keys, player_keys* player_controls) {
+static void load_player_controls(menu_nav* nav, key_pointers keys, player_keys* player_controls) {
     int i = PLAYER_KEYS_START;
-    load_control(keys, i++, "Throttle", &player_controls->gas);
-    load_control(keys, i++, "Brake", &player_controls->brake);
-    load_control(keys, i++, "Brake Alias", &player_controls->brake_alias);
-    load_control(keys, i++, "Rotate left", &player_controls->left_volt);
-    load_control(keys, i++, "Rotate right", &player_controls->right_volt);
-    load_control(keys, i++, "Alovolt", &player_controls->alovolt);
-    load_control(keys, i++, "Change direction", &player_controls->turn);
-    load_control(keys, i++, "Toggle Navigator", &player_controls->toggle_minimap);
-    load_control(keys, i++, "Toggle Time", &player_controls->toggle_timer);
-    load_control(keys, i++, "Toggle Show/Hide", &player_controls->toggle_visibility);
+    load_control(nav, keys, i++, "Throttle", &player_controls->gas);
+    load_control(nav, keys, i++, "Brake", &player_controls->brake);
+    load_control(nav, keys, i++, "Brake Alias", &player_controls->brake_alias);
+    load_control(nav, keys, i++, "Rotate left", &player_controls->left_volt);
+    load_control(nav, keys, i++, "Rotate right", &player_controls->right_volt);
+    load_control(nav, keys, i++, "Alovolt", &player_controls->alovolt);
+    load_control(nav, keys, i++, "Change direction", &player_controls->turn);
+    load_control(nav, keys, i++, "Toggle Navigator", &player_controls->toggle_minimap);
+    load_control(nav, keys, i++, "Toggle Time", &player_controls->toggle_timer);
+    load_control(nav, keys, i++, "Toggle Show/Hide", &player_controls->toggle_visibility);
 }
 
 // Menu to change controls for one player
 static void menu_customize_player(key_pointers keys, player_keys* player_controls,
-                                  const char* player_letter) {
+                                  std::string player_letter) {
     int choice = 0;
     while (true) {
-        menu_nav_old nav;
-        nav.selected_index = choice;
+        menu_nav nav("Customize Player " + player_letter);
+        nav.select_row(choice);
         nav.x_left = 60;
         nav.x_right = 400;
         nav.y_entries = 86;
         nav.dy = 40;
-        strcpy(nav.title, "Customize Player ");
-        strcat(nav.title, player_letter);
 
-        load_player_controls(keys, player_controls);
-
-        nav.setup(PLAYER_KEYS_END, true);
+        load_player_controls(&nav, keys, player_controls);
 
         choice = nav.navigate();
         if (choice < 0) {
             return;
         }
         if (choice >= PLAYER_KEYS_START && choice < PLAYER_KEYS_END) {
-            prompt_control(PLAYER_KEYS_END, keys, choice);
+            prompt_control(nav, keys, choice);
         }
     }
 }
@@ -398,24 +382,21 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
 static void menu_customize_replay(key_pointers keys) {
     int choice = 0;
     while (true) {
-        menu_nav_old nav;
-        nav.selected_index = choice;
+        menu_nav nav("Customize Replay VCR");
+        nav.select_row(choice);
         nav.x_left = 60;
         nav.x_right = 400;
         nav.y_entries = 86;
         nav.dy = 40;
-        strcpy(nav.title, "Customize Replay VCR");
 
-        load_replay_controls(keys);
-
-        nav.setup(REPLAY_KEYS_END, true);
+        load_replay_controls(&nav, keys);
 
         choice = nav.navigate();
         if (choice < 0) {
             return;
         }
         if (choice >= REPLAY_KEYS_START && choice < REPLAY_KEYS_END) {
-            prompt_control(REPLAY_KEYS_END, keys, choice);
+            prompt_control(nav, keys, choice);
         }
     }
 }
@@ -423,50 +404,39 @@ static void menu_customize_replay(key_pointers keys) {
 // Menu to customize universal controls or select a player
 void menu_customize_controls() {
     // Initialize these pointers so we can check/modify the values in prompt_control
-    load_player_controls(Player1Keys, &State->keys1);
-    load_player_controls(Player2Keys, &State->keys2);
+    load_player_controls(nullptr, Player1Keys, &State->keys1);
+    load_player_controls(nullptr, Player2Keys, &State->keys2);
 
     int choice = 0;
     while (true) {
-        menu_nav_old nav;
-        nav.selected_index = choice;
+        menu_nav nav("Customize controls");
+        nav.select_row(choice);
         nav.x_left = 60;
         nav.x_right = 400;
         nav.y_entries = 86;
         nav.dy = 40;
-        strcpy(nav.title, "Customize controls");
 
-        load_universal_controls();
+        nav.add_row("Reset all controls to default", NAV_FUNC() { State->reset_keys(); });
 
-        nav.setup(UNIVERSAL_KEYS_END, true);
+        nav.add_row(
+            "Customize Player A",
+            NAV_FUNC() { menu_customize_player(Player1Keys, &State->keys1, "A"); });
+
+        nav.add_row(
+            "Customize Player B",
+            NAV_FUNC() { menu_customize_player(Player2Keys, &State->keys2, "B"); });
+
+        nav.add_row("Customize Replay VCR", NAV_FUNC() { menu_customize_replay(ReplayKeys); });
+
+        load_universal_controls(&nav);
 
         choice = nav.navigate();
         if (choice < 0) {
             eol_settings::sync_controls_from_state(State);
             return;
         }
-        if (choice == 0) {
-            // Reset all controls to default
-            State->reset_keys();
-            load_player_controls(Player1Keys, &State->keys1);
-            load_player_controls(Player2Keys, &State->keys2);
-            load_replay_controls(ReplayKeys);
-            load_universal_controls();
-        }
-        if (choice == 1) {
-            // Customize Player A
-            menu_customize_player(Player1Keys, &State->keys1, "A");
-        }
-        if (choice == 2) {
-            // Customize Player B
-            menu_customize_player(Player2Keys, &State->keys2, "B");
-        }
-        if (choice == 3) {
-            menu_customize_replay(ReplayKeys);
-        }
         if (choice >= UNIVERSAL_KEYS_START && choice < UNIVERSAL_KEYS_END) {
-            // Modify universal control
-            prompt_control(UNIVERSAL_KEYS_END, UniversalKeys, choice);
+            prompt_control(nav, UniversalKeys, choice);
         }
     }
 }

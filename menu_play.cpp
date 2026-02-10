@@ -20,6 +20,7 @@
 #include <cstring>
 #include <directinput/scancodes.h>
 #include <format>
+#include <optional>
 
 // Prompt for replay filename and return true if enter, false if esc
 static bool menu_prompt_replay_name(char* filename) {
@@ -90,7 +91,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
 
     // Dead
     if (time <= 0) {
-        strcpy(time_message, MENU_CENTER_TEXT "You Failed to Finish!");
+        strcpy(time_message, "You Failed to Finish!");
         if (MeghalteloszorAB == 1) {
             strcat(time_message, "    (A died first)");
         }
@@ -108,12 +109,12 @@ void update_top_ten(int time, char* time_message, int internal_index,
     char tmp[10];
     centiseconds_to_string(time, tmp);
     if (Single) {
-        sprintf(time_message, MENU_CENTER_TEXT "%s", tmp);
+        sprintf(time_message, "%s", tmp);
     } else {
         if (Aerintetteviragot) {
-            sprintf(time_message, MENU_CENTER_TEXT "A:   %s", tmp);
+            sprintf(time_message, "A:   %s", tmp);
         } else {
-            sprintf(time_message, MENU_CENTER_TEXT "B:   %s", tmp);
+            sprintf(time_message, "B:   %s", tmp);
         }
     }
 
@@ -263,41 +264,31 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
 
     while (true) {
         // Title: Level 1: Warm Up or External: Unnamed
-        char title[100] = "";
+        std::string title;
         if (external_level) {
             if (strlen(Ptop->level_name) > LEVEL_NAME_LENGTH) {
                 internal_error("menu_level level_name too long!");
             }
-            sprintf(title, "External: %s", Ptop->level_name);
-            if (MenuFont->len(title) > 630) {
-                sprintf(title, "Ext: %s", Ptop->level_name);
+            title = std::format("External: {}", Ptop->level_name);
+            if (MenuFont->len(title.c_str()) > 630) {
+                title = std::format("Ext: {}", Ptop->level_name);
             }
         } else {
-            strcpy(title, "Level ");
-            char tmp[10];
-            itoa(internal_index + 1, tmp, 10);
-            strcat(title, tmp);
-            strcat(title, ": ");
-            strcat(title, get_internal_level_name(internal_index));
+            title = std::format("Level {}: {}", internal_index + 1,
+                                get_internal_level_name(internal_index));
         }
 
+        menu_nav nav(title);
+
         // Show either the time_message from update_top_ten or FlagTag info
+        std::string overlay_text;
         if (!Single && Tag) {
-            if (FlagTagAStarts) {
-                ExtraTimeText[0].text = MENU_CENTER_TEXT "A start with the flag next.";
-            } else {
-                ExtraTimeText[0].text = MENU_CENTER_TEXT "B start with the flag next.";
-            }
+            std::string letter = FlagTagAStarts ? "A" : "B";
+            overlay_text = letter + " start with the flag next.";
         } else {
-            ExtraTimeText[0].text = time_message;
+            overlay_text = std::string(time_message);
         }
-        ExtraTimeText[0].x = 320;
-        if (Single) {
-            ExtraTimeText[0].y = 370;
-        } else {
-            ExtraTimeText[0].y = 314;
-        }
-        int extra_time_text_length = 1;
+        nav.add_overlay(overlay_text, 320, Single ? 370 : 314, OverlayAlignment::Centered);
 
         if (!Single) {
             // Show extra multiplayer information
@@ -311,142 +302,84 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
             int y1 = 380;
             int y2 = 415;
 
-            // Shorten info if player names are too long
+            // Adjust horizontal spacing if player names are too long
             bool long_name =
                 MenuFont->len(player1->name) > 160 || MenuFont->len(player2->name) > 160;
+            std::string padding = long_name ? "" : "    ";
 
-            // Player A name
+            // Name
+            nav.add_overlay(std::format("Player A: {}{}", padding, player1->name), 10 + dx, y1);
+            nav.add_overlay(std::format("Player B: {}{}", padding, player2->name), 10 + dx, y2);
+
+            // Adjust horizontal spacing if player names are too long
             if (long_name) {
-                ExtraTimeText[1].text = std::format("Player A: {}", player1->name);
-            } else {
-                ExtraTimeText[1].text = std::format("Player A:     {}", player1->name);
+                dx += 40;
             }
-            ExtraTimeText[1].x = 10 + dx;
-            ExtraTimeText[1].y = y1;
 
-            // Player A apple count
-            ExtraTimeText[2].text = std::to_string(Motor1->apple_count);
-            ExtraTimeText[2].x = 380 + dx;
-            ExtraTimeText[2].y = y1;
+            // Apple count
+            nav.add_overlay(std::to_string(Motor1->apple_count), 380 + dx, y1);
+            nav.add_overlay(std::to_string(Motor2->apple_count), 380 + dx, y2);
 
-            // Player A flag time
+            // Flag time
             if (is_flagtag) {
-                int time = FlagTimeA * TimeToCentiseconds;
-                char time_text[20];
-                centiseconds_to_string(time, time_text);
-                ExtraTimeText[3].text = std::string(time_text);
-                ExtraTimeText[3].x = 440 + dx;
-                ExtraTimeText[3].y = y1;
-            } else {
-                ExtraTimeText[3].text = " ";
-                ExtraTimeText[3].x = 100 + dx;
-                ExtraTimeText[3].y = 100;
-            }
-
-            // Player B name
-            if (long_name) {
-                ExtraTimeText[4].text = std::format("Player B: {}", player2->name);
-            } else {
-                ExtraTimeText[4].text = std::format("Player B:     {}", player2->name);
-            }
-            ExtraTimeText[4].x = 10 + dx;
-            ExtraTimeText[4].y = y2;
-
-            // Player B apple count
-            ExtraTimeText[5].text = std::to_string(Motor2->apple_count);
-            ExtraTimeText[5].x = 380 + dx;
-            ExtraTimeText[5].y = y2;
-
-            // Player B flag time
-            if (is_flagtag) {
-                int time = FlagTimeB * TimeToCentiseconds;
-                char time_text[20];
-                centiseconds_to_string(time, time_text);
-                ExtraTimeText[6].text = std::string(time_text);
-                ExtraTimeText[6].x = 440 + dx;
-                ExtraTimeText[6].y = y2;
-            }
-            if (is_flagtag) {
-                extra_time_text_length += 6;
-            } else {
-                extra_time_text_length += 5;
-            }
-
-            // Shift apple count and flag time right if names too long
-            if (long_name) {
-                ExtraTimeText[2].x += 40;
-                ExtraTimeText[3].x += 40;
-                ExtraTimeText[5].x += 40;
-                ExtraTimeText[6].x += 40;
+                int time1 = FlagTimeA * TimeToCentiseconds;
+                char time_text1[20];
+                centiseconds_to_string(time1, time_text1);
+                nav.add_overlay(std::string(time_text1), 440 + dx, y1);
+                int time2 = FlagTimeB * TimeToCentiseconds;
+                char time_text2[20];
+                centiseconds_to_string(time2, time_text2);
+                nav.add_overlay(std::string(time_text2), 440 + dx, y2);
             }
         }
 
-        menu_nav_old nav;
-        nav.selected_index = default_choice;
         nav.x_left = 230;
         nav.y_entries = 110;
         nav.dy = 42;
-        strcpy(nav.title, title);
 
-        if (show_play_next || show_skip_level) {
-            strcpy(NavEntriesLeft[0], "Play again");
-            if (show_play_next) {
-                strcpy(NavEntriesLeft[1], "Play next");
-            } else {
-                strcpy(NavEntriesLeft[1], "Skip level");
-            }
-            strcpy(NavEntriesLeft[2], "Replay");
-            strcpy(NavEntriesLeft[3], "Save play");
-            strcpy(NavEntriesLeft[4], "Best times");
-        } else {
-            strcpy(NavEntriesLeft[0], "Play again");
-            strcpy(NavEntriesLeft[1], "Replay");
-            strcpy(NavEntriesLeft[2], "Save play");
-            strcpy(NavEntriesLeft[3], "Best times");
+        std::optional<MenuLevel> ret;
+
+        nav.add_row("Play again", NAV_FUNC(&ret) { ret = MenuLevel::PlayAgain; });
+
+        if (show_play_next) {
+            nav.add_row("Play next", NAV_FUNC(&ret) { ret = MenuLevel::PlayNext; });
         }
 
-        nav.setup(4 + show_play_next + show_skip_level);
-
-        int choice = nav.navigate(ExtraTimeText, extra_time_text_length);
-        default_choice = choice;
-
-        if (choice > 0 && !show_play_next && !show_skip_level) {
-            choice++;
+        if (show_skip_level) {
+            nav.add_row(
+                "Skip level", NAV_FUNC(&ret, &internal_index) {
+                    if (is_skippable(internal_index)) {
+                        ret = MenuLevel::Skip;
+                    }
+                });
         }
+
+        nav.add_row(
+            "Replay", NAV_FUNC() {
+                replay_previous_run();
+                MenuPalette->set();
+            });
+
+        nav.add_row("Save play", NAV_FUNC() { menu_save_play(Ptop->level_id); });
+
+        nav.add_row(
+            "Best times", NAV_FUNC(&external_level, &internal_index) {
+                if (external_level) {
+                    menu_external_topten(Ptop, Single);
+                } else {
+                    menu_internal_topten(internal_index, Single);
+                }
+            });
+
+        nav.select_row(default_choice);
+
+        int choice = nav.navigate();
+
         if (choice < 0) {
             return MenuLevel::Esc;
         }
-        if (choice == 0) {
-            return MenuLevel::PlayAgain;
-        }
-        if (choice == 1) {
-            // Play next / Skip level
-            if (!show_play_next && !show_skip_level) {
-                internal_error("choice == 1 && (!show_play_next && !show_skip_level)!");
-            }
-            if (show_play_next) {
-                return MenuLevel::PlayNext;
-            }
-            if (is_skippable(internal_index)) {
-                return MenuLevel::Skip;
-            }
-        }
-        if (choice == 2) {
-            // Replay
-            replay_previous_run();
-            MenuPalette->set();
-        }
-        if (choice == 3) {
-            // Save play
-            menu_save_play(Ptop->level_id);
-        }
-        if (choice == 4) {
-            // Best times
-            if (external_level) {
-                menu_external_topten(Ptop, Single);
-            } else {
-                menu_internal_topten(internal_index, Single);
-            }
+        if (ret) {
+            return *ret;
         }
     }
 }

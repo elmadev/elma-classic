@@ -340,68 +340,31 @@ void mainmenu(void) {
     MenuPalette->set();
 
     // State->save_aaa(); ide minek kene?
-    menu_nav val;
+    menu_nav2 val("Main Menu");
     val.selected_index = 0;
     val.x_left = 200;
     val.y_entries = 100;
     val.dy = 50;
-    strcpy(val.title, "Main Menu");
 
-    strcpy(NavEntriesLeft[0], "Play");
-    strcpy(NavEntriesLeft[1], "Replay");
-    strcpy(NavEntriesLeft[2], "Demo");
-    strcpy(NavEntriesLeft[3], "Options");
-    strcpy(NavEntriesLeft[4], "Help");
-    strcpy(NavEntriesLeft[5], "Best Times");
-    strcpy(NavEntriesLeft[6], "Editor");
-
-    val.setup(7);
-
-    while (1) {
-        // Korny->pabc_fomenu->write( Korny->picbuffer, 70, 10, "Main menu" );
-
-        // MenuPalette->set(); // Torlendo
-
-        int eredmeny = val.navigate();
-
-        // Kimenti menut pcx file-ba:
-        // BufferMain->save( "menu.pcx", Menupaltomb );
-        // external_error( "Menut mentett menu.pcx file-ba!" );
-
-        if (eredmeny == 0) {
-            menu_play();
-        }
-
-        if (eredmeny == 1) {
-            replay();
-        }
-
-        if (eredmeny == 2) {
-            demo();
-        }
-
-        if (eredmeny == 3) {
-            menu_options();
-        }
-
-        if (eredmeny == 4) {
-            menu_help();
-        }
-
-        if (eredmeny == 5) {
-            menu_best_times();
-        }
-
-        if (eredmeny == 6) {
+    val.add_row("Play", "", NAV_LAMBDA { menu_play(); });
+    val.add_row("Replay", "", NAV_LAMBDA { replay(); });
+    val.add_row("Demo", "", NAV_LAMBDA { demo(); });
+    val.add_row("Options", "", NAV_LAMBDA { menu_options(); });
+    val.add_row("Help", "", NAV_LAMBDA { menu_help(); });
+    val.add_row("Best Times", "", NAV_LAMBDA { menu_best_times(); });
+    val.add_row(
+        "Editor", "", NAV_LAMBDA {
             InEditor = true;
             hide_cursor();
             editor();
             show_cursor();
             InEditor = false;
             MenuPalette->set();
-        }
+        });
 
-        if (eredmeny == -1) {
+    while (true) {
+        int choice = val.navigate();
+        if (choice == -1) {
             // State->save_aaa(); kilep majd menti
             kilephakell();
         }

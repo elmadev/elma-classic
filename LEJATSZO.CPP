@@ -454,6 +454,10 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
     double eddig = 0.0;
     reset_event_buffer();
 
+    if (Single) {
+        EolClient->enter_level(filenev, Ptop);
+    }
+
     stopwatch_reset();
 
     // Valtozok inicializalasa:
@@ -607,6 +611,10 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
                 stop_motor_sound(false);
 
                 Mute = true;
+                if (Single) {
+                    EolClient->exit_level(filenev, eddig * TimeToCentiseconds, Motor1->apple_count,
+                                          Kajakell, megvanido ? false : true);
+                }
                 if (megvanido) {
                     Ptop->unflip_objects();
                     Rec1->encode_frame_count();
@@ -693,6 +701,10 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
             Masodikmenet = 1;
+            if (Single) {
+                EolClient->exit_level(filenev, eddig * TimeToCentiseconds, Motor1->apple_count,
+                                      Kajakell, true);
+            }
             return -1;
         }
         l++;

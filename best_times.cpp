@@ -158,15 +158,10 @@ void menu_best_times_choose_level(bool single) {
         visible_levels = INTERNAL_LEVEL_COUNT - 1;
     }
 
-    menu_nav_old nav;
-    nav.selected_index = 0;
+    std::string title = std::format("{} Player Best Times", single ? "Single" : "Multi");
+    menu_nav nav(title);
     nav.x_left = 61;
     nav.x_right = 380;
-    if (single) {
-        strcpy(nav.title, "Single Player Best Times");
-    } else {
-        strcpy(nav.title, "Multi Player Best Times");
-    }
 
     // Draw "1 Warm Up         bestplayer"
     for (int i = 0; i < visible_levels; i++) {
@@ -175,29 +170,24 @@ void menu_best_times_choose_level(bool single) {
             tten = &State->toptens[i].multi;
         }
 
-        // "1 Warm Up"
-        itoa(i + 1, NavEntriesLeft[i], 10);
-        strcat(NavEntriesLeft[i], " ");
-        strcat(NavEntriesLeft[i], get_internal_level_name(i));
-
-        // Best player, if exists
-        strcpy(NavEntriesRight[i], "-");
+        std::string level = std::format("{} {}", i + 1, get_internal_level_name(i));
+        std::string best = "-";
         if (tten->times_count > 0) {
-            strcpy(NavEntriesRight[i], tten->names1[0]);
-            if (!single) {
-                strcat(NavEntriesRight[i], "  ");
-                strcat(NavEntriesRight[i], tten->names2[0]);
+            if (single) {
+                best = tten->names1[0];
+            } else {
+                best = std::format("{}  {}", tten->names1[0], tten->names2[0]);
             }
         }
+
+        nav.add_row(level, best, NAV_FUNC(&single) { menu_internal_topten(choice, single); });
     }
 
-    nav.setup(visible_levels, true);
     while (true) {
         int choice = nav.navigate();
         if (choice < 0) {
             return;
         }
-        menu_internal_topten(choice, single);
     }
 }
 

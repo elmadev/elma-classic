@@ -2,11 +2,10 @@
 #define MENU_PIC_H
 
 #include <string>
+#include <vector>
 
 constexpr unsigned char BLACK_PALETTE_ID = 254;
 constexpr unsigned char GREEN_PALETTE_ID = 248;
-
-constexpr int MENU_MAX_LINES = 200;
 
 class abc8;
 class palette;
@@ -27,14 +26,12 @@ struct text_line {
 class menu_pic {
     int helmet_x;
     int helmet_y;
-    text_line* lines;
-    int line_count;
+    std::vector<text_line> lines;
     bool image_valid;
     bool center_vertically;
 
   public:
     menu_pic(bool center_vert = true);
-    ~menu_pic();
     void add_line(std::string text, int x, int y);
     void add_line_centered(const std::string& text, int x, int y);
     void set_helmet(int x, int y);

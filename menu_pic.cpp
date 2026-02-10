@@ -59,30 +59,12 @@ menu_pic::menu_pic(bool center_vert) {
     center_vertically = center_vert;
     helmet_x = -100;
     helmet_y = -100;
-    line_count = 0;
     image_valid = false;
-    lines = new text_line[MENU_MAX_LINES];
-    if (!lines) {
-        internal_error("menu_pic memory!");
-    }
-}
-
-menu_pic::~menu_pic() {
-    if (!lines) {
-        internal_error("menu_pic::~menu_pic !lines!");
-    }
-    delete[] lines;
-    lines = nullptr;
+    lines.reserve(8);
 }
 
 void menu_pic::add_line(std::string text, int x, int y) {
-    if (line_count >= MENU_MAX_LINES) {
-        internal_error("menu::add_line linecount >= MENU_MAX_LINES");
-    }
-    lines[line_count].text = text;
-    lines[line_count].x = x;
-    lines[line_count].y = y;
-    line_count++;
+    lines.emplace_back(std::move(text), x, y);
     image_valid = false;
 }
 
@@ -97,7 +79,7 @@ void menu_pic::set_helmet(int x, int y) {
 }
 
 void menu_pic::clear() {
-    line_count = 0;
+    lines.resize(0);
     image_valid = false;
 }
 
@@ -218,14 +200,14 @@ void menu_pic::render(bool skip_balls_helmet) {
             y += BackgroundTileMain->get_height();
         }
 
-        for (int i = 0; i < line_count; i++) {
-            int x = lines[i].x + SCREEN_WIDTH / 2 - 320;
-            int y = lines[i].y;
+        for (text_line line : lines) {
+            int x = line.x + SCREEN_WIDTH / 2 - 320;
+            int y = line.y;
             if (center_vertically) {
                 y += SCREEN_HEIGHT / 2 - 240;
             }
-            MenuFont->write(BufferMain, x, y, lines[i].text.c_str());
-            MenuFont->write(BufferBall, x, y, lines[i].text.c_str());
+            MenuFont->write(BufferMain, x, y, line.text.c_str());
+            MenuFont->write(BufferBall, x, y, line.text.c_str());
         }
     }
 
@@ -383,12 +365,12 @@ bool menu_pic::render_intro_anim(double time) {
     }
 
     // The text moves down from -SCREEN_HEIGHT to 0
-    for (int i = 0; i < line_count; i++) {
-        int x = lines[i].x + SCREEN_WIDTH / 2 - 320;
+    for (text_line line : lines) {
+        int x = line.x + SCREEN_WIDTH / 2 - 320;
         if (center_vertically) {
             internal_error("menu_pic::render_intro_anim should not center vertically!");
         }
-        MenuFont->write(ScreenBuffer, x, lines[i].y + frame - SCREEN_HEIGHT, lines[i].text.c_str());
+        MenuFont->write(ScreenBuffer, x, line.y + frame - SCREEN_HEIGHT, line.text.c_str());
     }
 
     // The helmet moves down from -SCREEN_HEIGHT to 0

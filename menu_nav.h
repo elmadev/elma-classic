@@ -111,6 +111,7 @@ class menu_nav {
     }
     void add_overlay(std::string text, int x, int y,
                      OverlayAlignment alignment = OverlayAlignment::Left);
+    void sort_rows();
 
     int navigate(bool render_only = false);
     void render();

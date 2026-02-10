@@ -418,6 +418,12 @@ void menu_nav::add_overlay(std::string text, int x, int y, OverlayAlignment alig
     overlays.emplace_back(std::move(text), x, y, alignment);
 }
 
+void menu_nav::sort_rows() {
+    std::sort(entries.begin() + search_skip, entries.end(), [](nav_row& a, nav_row& b) {
+        return strcmpi(a.text_left.c_str(), b.text_left.c_str()) < 0;
+    });
+}
+
 int menu_nav::calculate_visible_entries() {
     int max_visible_entries = (SCREEN_HEIGHT - y_entries) / dy;
     if (max_visible_entries < 2) {

@@ -192,30 +192,20 @@ void menu_best_times_choose_level(bool single) {
 }
 
 void menu_best_times() {
-    menu_nav_old nav;
-    if (State->single) {
-        nav.selected_index = 0;
-    } else {
-        nav.selected_index = 1;
-    }
+    menu_nav nav("Best Times");
     nav.x_left = 170;
     nav.y_entries = 190;
     nav.dy = 50;
-    strcpy(nav.title, "Best Times");
 
-    strcpy(NavEntriesLeft[0], "Single Player Times");
-    strcpy(NavEntriesLeft[1], "Multi Player Times");
+    nav.add_row("Single Player Times", NAV_FUNC() { menu_best_times_choose_level(true); });
+    nav.add_row("Multi Player Times", NAV_FUNC() { menu_best_times_choose_level(false); });
 
-    nav.setup(2);
+    nav.select_row(State->single ? 0 : 1);
+
     while (true) {
         int choice = nav.navigate();
         if (choice < 0) {
             return;
-        }
-        if (choice == 0) {
-            menu_best_times_choose_level(true);
-        } else {
-            menu_best_times_choose_level(false);
         }
     }
 }

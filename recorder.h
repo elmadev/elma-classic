@@ -42,7 +42,7 @@ struct frame_data {
 static_assert(sizeof(frame_data) == 28);
 
 class recorder {
-    friend void replay();
+    friend void menu_replay();
 
     int frame_count;
 

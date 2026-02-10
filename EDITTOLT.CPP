@@ -31,8 +31,8 @@ static void abcberendez(int nevszam) {
             // Ha j es j+1 edik elem forditva van visszacsereljuk oket:
             char* nev1 = &Soknev[j * 10];
             char* nev2 = &Soknev[(j + 1) * 10];
-            int abcbenelobb(const char* text1, const char* text2);
-            if (abcbenelobb(nev2, nev1)) {
+            int case_insensitive_lexicographical_compare(const char* text1, const char* text2);
+            if (case_insensitive_lexicographical_compare(nev2, nev1)) {
                 // if( strcmp( nev1, nev2 ) > 0 ) {
                 //  Csere:
                 char tmp[20];

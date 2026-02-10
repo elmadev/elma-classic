@@ -48,50 +48,50 @@
 } */
 
 // Ha text1 elobb van abc-ben, igazzal ter vissza:
-int abcbenelobb(const char* text1, const char* text2) {
+int case_insensitive_lexicographical_compare(const char* text1, const char* text2) {
     // Elso betunel bebillennek ha csak kis/nagy-ban ter el:
-    int elobbnagy1 = 0;
-    int elobbnagy2 = 0;
+    int earlier_case1 = 0;
+    int earlier_case2 = 0;
     while (1) {
-        char betu1 = *text1;
-        char betu2 = *text2;
+        char char1 = *text1;
+        char char2 = *text2;
 
-        if (!betu1 && !betu2) {
+        if (!char1 && !char2) {
             // Betuk mind stimmeltek, talan kis/nagybetu nem:
-            if (elobbnagy2) {
+            if (earlier_case2) {
                 return 0;
             }
             return 1;
         }
 
-        if (!betu1) {
+        if (!char1) {
             return 1;
         }
-        if (!betu2) {
+        if (!char2) {
             return 0;
         }
 
-        if (betu1 >= 'a') {
-            betu1 -= 'a' - 'A';
+        if (char1 >= 'a') {
+            char1 -= 'a' - 'A';
         }
-        if (betu2 >= 'a') {
-            betu2 -= 'a' - 'A';
+        if (char2 >= 'a') {
+            char2 -= 'a' - 'A';
         }
-        if (betu1 == betu2) {
-            if (!elobbnagy1 && !elobbnagy2) {
+        if (char1 == char2) {
+            if (!earlier_case1 && !earlier_case2) {
                 if (*text1 < *text2) {
-                    elobbnagy1 = 1;
+                    earlier_case1 = 1;
                 }
                 if (*text2 < *text1) {
-                    elobbnagy2 = 1;
+                    earlier_case2 = 1;
                 }
             }
         } else {
             // internal_error( "Itt van!" );
-            if (betu1 < betu2) {
+            if (char1 < char2) {
                 return 1;
             }
-            if (betu2 < betu1) {
+            if (char2 < char1) {
                 return 0;
             }
         }
@@ -101,12 +101,12 @@ int abcbenelobb(const char* text1, const char* text2) {
     }
 }
 
-static int Megnemrand = 1;
+static int SrandNeeded = 1;
 
-static unsigned int veletlen(void) {
+static unsigned int gen_rand_int(void) {
     // Veletlenszeru lejatszas:
-    if (Megnemrand) {
-        Megnemrand = 0;
+    if (SrandNeeded) {
+        SrandNeeded = 0;
         srand((unsigned)clock());
     }
 
@@ -117,56 +117,57 @@ static unsigned int veletlen(void) {
     return result;
 }
 
-void replay(void) {
+void menu_replay(void) {
     strcpy(NavEntriesLeft[0], "Randomizer");
 
-    finame fname;
-    bool done = find_first("rec/*.rec", fname);
+    finame filename;
+    bool done = find_first("rec/*.rec", filename);
     // Ez mindig eggyel tobb, mint valosag, mivel az elso
     // rubrika mindig 'Randomizer':
-    int szamuk = 1;
-    while (!done && szamuk < NavEntriesLeftMaxLength) {
-        char* nev = NavEntriesLeft[szamuk];
-        strcpy(nev, fname);
+    int count = 1;
+    while (!done && count < NavEntriesLeftMaxLength) {
+        char* name = NavEntriesLeft[count];
+        strcpy(name, filename);
         // Leveszi kiterjesztest:
-        int i = strlen(nev) - 1;
-        while (i >= 0 && nev[i] != '.') {
+        int i = strlen(name) - 1;
+        while (i >= 0 && name[i] != '.') {
             i--;
         }
         if (i < 0) {
-            internal_error("replay-ban nincs pont nevben!: ", nev);
+            internal_error("replay-ban nincs pont nevben!: ", name);
         }
-        nev[i] = 0;
+        name[i] = 0;
 
         // Kisbetusit:
         /*int j = 0;
-        while( nev[j] ) {
-            if( nev[j] >= 'A' && nev[j] <= 'Z' )
-                nev[j] -= 'A'-'a';
+        while( name[j] ) {
+            if( name[j] >= 'A' && name[j] <= 'Z' )
+                name[j] -= 'A'-'a';
             j++;
         }
-        if( strncmp( nev, "r", 1 ) == 0 )
-            nev[0] = 'R';
-            //strcpy( nev, "R" );
+        if( strncmp( name, "r", 1 ) == 0 )
+            name[0] = 'R';
+            //strcpy( name, "R" );
         */
 
-        done = find_next(fname);
-        szamuk++;
-        if (szamuk >= NavEntriesLeftMaxLength - 4) {
+        done = find_next(filename);
+        count++;
+        if (count >= NavEntriesLeftMaxLength - 4) {
             done = 1;
         }
     }
     find_close();
 
-    if (szamuk < 2) {
+    if (count < 2) {
         return;
     }
 
     // ABC sorrendbe rendez:
-    for (int i = 0; i < szamuk + 1; i++) {
-        for (int j = 1; j < szamuk - 1; j++) {
-            if (abcbenelobb(NavEntriesLeft[j + 1], NavEntriesLeft[j])) {
-                // Csere:
+    for (int i = 0; i < count + 1; i++) {
+        for (int j = 1; j < count - 1; j++) {
+            if (case_insensitive_lexicographical_compare(NavEntriesLeft[j + 1],
+                                                         NavEntriesLeft[j])) {
+                // Swap:
                 char tmp[100];
                 strcpy(tmp, NavEntriesLeft[j]);
                 strcpy(NavEntriesLeft[j], NavEntriesLeft[j + 1]);
@@ -175,42 +176,43 @@ void replay(void) {
         }
     }
 
-    menu_nav val;
-    val.search_pattern = SearchPattern::Sorted;
-    val.search_skip_one = true;
-    val.selected_index = 0;
-    strcpy(val.title, "Select replay file!");
+    menu_nav nav;
+    nav.search_pattern = SearchPattern::Sorted;
+    nav.search_skip_one = true;
+    nav.selected_index = 0;
+    strcpy(nav.title, "Select replay file!");
 
-    val.setup(szamuk);
+    nav.setup(count);
 
     while (1) {
-        // Valasztas:
-        int kurrens = val.navigate();
+        // navasztas:
+        int choice = nav.navigate();
 
-        if (kurrens < 0) { // ESC
+        if (choice < 0) { // ESC
             return;
         }
 
-        if (kurrens == 0) {
+        if (choice == 0) {
             // RANDOMIZER:
             // 0-tol kezdve szamolunk:
-            int elozopl = -1;
-            int elozoelottipl = -1;
+            int last_played = -1;
+            int second_last_played = -1;
             while (1) {
-                int pl = veletlen() % (szamuk - 1);
-                while ((pl == elozopl && szamuk > 2) || (pl == elozoelottipl && szamuk > 3)) {
-                    pl = veletlen() % (szamuk - 1);
+                int index = gen_rand_int() % (count - 1);
+                while ((index == last_played && count > 2) ||
+                       (index == second_last_played && count > 3)) {
+                    index = gen_rand_int() % (count - 1);
                 }
-                elozoelottipl = elozopl;
-                elozopl = pl;
+                second_last_played = last_played;
+                last_played = index;
                 // Nev eloallitasa:
                 char tmp[30];
-                strcpy(tmp, NavEntriesLeft[pl + 1]);
+                strcpy(tmp, NavEntriesLeft[index + 1]);
                 strcat(tmp, ".REC");
                 // 0 param azt jelenti, hogy nem resource filebol olvas:
                 MenuPalette->set();
                 loading_screen();
-                int belyeg = recorder::load_rec_file(tmp, 0);
+                int level_id = recorder::load_rec_file(tmp, 0);
                 if (access_level_file(Rec1->level_filename) != 0) {
                     int c = menu_dialog("Cannot find the lev file that corresponds",
                                         "to the record file!", tmp, Rec1->level_filename);
@@ -219,7 +221,7 @@ void replay(void) {
                     }
                 } else {
                     floadlevel_p(Rec1->level_filename);
-                    if (Ptop->level_id != belyeg) {
+                    if (Ptop->level_id != level_id) {
                         int c =
                             menu_dialog("The level file has changed since the",
                                         "saving of the record file!", tmp, Rec1->level_filename);
@@ -238,15 +240,15 @@ void replay(void) {
         } else {
             // Egy rec file lejatszasa:
             char tmp[30];
-            strcpy(tmp, NavEntriesLeft[kurrens]);
+            strcpy(tmp, NavEntriesLeft[choice]);
             strcat(tmp, ".REC");
             loading_screen();
-            int belyeg = recorder::load_rec_file(tmp, 0);
+            int level_id = recorder::load_rec_file(tmp, 0);
             if (F1Pressed) {
                 F1Pressed = false;
                 char msg[128];
                 snprintf(msg, sizeof(msg), "Recording at %d FPS to renders/%s",
-                         EolSettings->recording_fps(), NavEntriesLeft[kurrens]);
+                         EolSettings->recording_fps(), NavEntriesLeft[choice]);
                 int c = menu_dialog("Render replay to video frames?", msg,
                                     "Press Enter to continue, ESC to cancel");
                 if (c == KEY_ENTER) {
@@ -255,7 +257,7 @@ void replay(void) {
                                     "to the record file!", tmp, Rec1->level_filename);
                     } else {
                         floadlevel_p(Rec1->level_filename);
-                        if (Ptop->level_id != belyeg) {
+                        if (Ptop->level_id != level_id) {
                             menu_dialog("The level file has changed since the",
                                         "saving of the record file!", tmp, Rec1->level_filename);
                         } else {
@@ -271,21 +273,21 @@ void replay(void) {
 
             if (CtrlAltPressed) {
                 // loadrecek beallitotta Multirec-et.
-                int ido = Rec1->frame_count;
-                if (MultiplayerRec && Rec2->frame_count > ido) {
-                    ido = Rec2->frame_count;
+                int time = Rec1->frame_count;
+                if (MultiplayerRec && Rec2->frame_count > time) {
+                    time = Rec2->frame_count;
                 }
 
-                ido = (int)(ido * 3.3333333333333);
-                ido -= 2;
-                if (ido < 1) {
-                    ido = 1;
+                time = (int)(time * 3.3333333333333);
+                time -= 2;
+                if (time < 1) {
+                    time = 1;
                 }
 
-                char idostr[25];
-                centiseconds_to_string(ido, idostr);
-                strcat(idostr, "    +- 0.01 sec");
-                menu_dialog(tmp, "The time of this replay file is:", idostr);
+                char time_str[25];
+                centiseconds_to_string(time, time_str);
+                strcat(time_str, "    +- 0.01 sec");
+                menu_dialog(tmp, "The time of this replay file is:", time_str);
                 continue;
             }
             if (access_level_file(Rec1->level_filename) != 0) {
@@ -293,7 +295,7 @@ void replay(void) {
                             Rec1->level_filename);
             } else {
                 floadlevel_p(Rec1->level_filename);
-                if (Ptop->level_id != belyeg) {
+                if (Ptop->level_id != level_id) {
                     menu_dialog("The level file has changed since the",
                                 "saving of the record file!", tmp, Rec1->level_filename);
                 } else {
@@ -305,26 +307,26 @@ void replay(void) {
     }
 }
 
-static void demo(void) {
-    int demoszam = 3;
-    char demonevek[14][14] = {"demor1.rec", "demor2.rec", "demor3.rec"};
+static void menu_demo(void) {
+    int demo_replay_count = 3;
+    char demo_names[14][14] = {"demor1.rec", "demor2.rec", "demor3.rec"};
 
-    int elozodemo = -1;
+    int previous_demo = -1;
 
     while (1) {
-        int demo = veletlen() % demoszam;
-        while (demo == elozodemo) {
-            demo = veletlen() % demoszam;
+        int demo = gen_rand_int() % demo_replay_count;
+        while (demo == previous_demo) {
+            demo = gen_rand_int() % demo_replay_count;
         }
-        elozodemo = demo;
+        previous_demo = demo;
 
         loading_screen();
-        int belyeg = recorder::load_rec_file(demonevek[demo], 1);
+        int level_id = recorder::load_rec_file(demo_names[demo], 1);
         if (access_level_file(Rec1->level_filename) != 0) {
             internal_error("783654");
         }
         floadlevel_p(Rec1->level_filename);
-        if (Ptop->level_id != belyeg) {
+        if (Ptop->level_id != level_id) {
             internal_error("6734654");
         }
         Rec1->rewind();
@@ -337,24 +339,24 @@ static void demo(void) {
     }
 }
 
-static void kilephakell(void) {
-    menu_nav val;
-    val.selected_index = 0;
-    val.x_left = 300;
-    val.y_entries = 200;
-    val.dy = 40;
-    val.y_title = 50; // ezt nem szokas allitani egyebkent
-    val.enable_esc = false;
-    strcpy(val.title, "Do you want to quit?");
+static void menu_prompt_exit(void) {
+    menu_nav nav;
+    nav.selected_index = 0;
+    nav.x_left = 300;
+    nav.y_entries = 200;
+    nav.dy = 40;
+    nav.y_title = 50; // ezt nem szokas allitani egyebkent
+    nav.enable_esc = false;
+    strcpy(nav.title, "Do you want to quit?");
 
     strcpy(NavEntriesLeft[0], "Yes");
     strcpy(NavEntriesLeft[1], "No");
 
-    val.setup(2);
+    nav.setup(2);
 
-    int eredmeny = val.navigate();
+    int choice = nav.navigate();
 
-    if (eredmeny == 0) {
+    if (choice == 0) {
         // Ezt csak watmment.exe-ben szabad kikomentezni:
         State->reload_toptens();
 
@@ -368,12 +370,12 @@ void menu_main(void) {
     MenuPalette->set();
 
     // State->save_aaa(); ide minek kene?
-    menu_nav val;
-    val.selected_index = 0;
-    val.x_left = 200;
-    val.y_entries = 100;
-    val.dy = 50;
-    strcpy(val.title, "Main Menu");
+    menu_nav nav;
+    nav.selected_index = 0;
+    nav.x_left = 200;
+    nav.y_entries = 100;
+    nav.dy = 50;
+    strcpy(nav.title, "Main Menu");
 
     strcpy(NavEntriesLeft[0], "Play");
     strcpy(NavEntriesLeft[1], "Replay");
@@ -383,44 +385,44 @@ void menu_main(void) {
     strcpy(NavEntriesLeft[5], "Best Times");
     strcpy(NavEntriesLeft[6], "Editor");
 
-    val.setup(7);
+    nav.setup(7);
 
     while (1) {
         // Korny->pabc_fomenu->write( Korny->picbuffer, 70, 10, "Main menu" );
 
         // MenuPalette->set(); // Torlendo
 
-        int eredmeny = val.navigate();
+        int choice = nav.navigate();
 
         // Kimenti menut pcx file-ba:
         // BufferMain->save( "menu.pcx", Menupaltomb );
         // external_error( "Menut mentett menu.pcx file-ba!" );
 
-        if (eredmeny == 0) {
+        if (choice == 0) {
             menu_play();
         }
 
-        if (eredmeny == 1) {
-            replay();
+        if (choice == 1) {
+            menu_replay();
         }
 
-        if (eredmeny == 2) {
-            demo();
+        if (choice == 2) {
+            menu_demo();
         }
 
-        if (eredmeny == 3) {
+        if (choice == 3) {
             menu_options();
         }
 
-        if (eredmeny == 4) {
+        if (choice == 4) {
             menu_help();
         }
 
-        if (eredmeny == 5) {
+        if (choice == 5) {
             menu_best_times();
         }
 
-        if (eredmeny == 6) {
+        if (choice == 6) {
             InEditor = true;
             hide_cursor();
             editor();
@@ -429,9 +431,9 @@ void menu_main(void) {
             MenuPalette->set();
         }
 
-        if (eredmeny == -1) {
+        if (choice == -1) {
             // State->save_aaa(); kilep majd menti
-            kilephakell();
+            menu_prompt_exit();
         }
     }
 }

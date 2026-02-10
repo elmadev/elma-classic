@@ -47,9 +47,9 @@
     }
 } */
 
-// Ha text1 elobb van abc-ben, igazzal ter vissza:
+// Returns true if text1 is earlier in the alphabet than text2
 int case_insensitive_lexicographical_compare(const char* text1, const char* text2) {
-    // Elso betunel bebillennek ha csak kis/nagy-ban ter el:
+    // If they differ only by case, we track which one had the precedence
     int earlier_case1 = 0;
     int earlier_case2 = 0;
     while (1) {
@@ -57,7 +57,7 @@ int case_insensitive_lexicographical_compare(const char* text1, const char* text
         char char2 = *text2;
 
         if (!char1 && !char2) {
-            // Betuk mind stimmeltek, talan kis/nagybetu nem:
+            // Letters matched, maybe case difference decides:
             if (earlier_case2) {
                 return 0;
             }
@@ -87,7 +87,6 @@ int case_insensitive_lexicographical_compare(const char* text1, const char* text
                 }
             }
         } else {
-            // internal_error( "Itt van!" );
             if (char1 < char2) {
                 return 1;
             }
@@ -104,7 +103,6 @@ int case_insensitive_lexicographical_compare(const char* text1, const char* text
 static int SrandNeeded = 1;
 
 static unsigned int gen_rand_int(void) {
-    // Veletlenszeru lejatszas:
     if (SrandNeeded) {
         SrandNeeded = 0;
         srand((unsigned)clock());
@@ -122,13 +120,12 @@ void menu_replay(void) {
 
     finame filename;
     bool done = find_first("rec/*.rec", filename);
-    // Ez mindig eggyel tobb, mint valosag, mivel az elso
-    // rubrika mindig 'Randomizer':
+    // This is always one more than reality, since the first entry is always 'Randomizer':
     int count = 1;
     while (!done && count < NavEntriesLeftMaxLength) {
         char* name = NavEntriesLeft[count];
         strcpy(name, filename);
-        // Leveszi kiterjesztest:
+        // Remove extension:
         int i = strlen(name) - 1;
         while (i >= 0 && name[i] != '.') {
             i--;
@@ -137,18 +134,6 @@ void menu_replay(void) {
             internal_error("replay-ban nincs pont nevben!: ", name);
         }
         name[i] = 0;
-
-        // Kisbetusit:
-        /*int j = 0;
-        while( name[j] ) {
-            if( name[j] >= 'A' && name[j] <= 'Z' )
-                name[j] -= 'A'-'a';
-            j++;
-        }
-        if( strncmp( name, "r", 1 ) == 0 )
-            name[0] = 'R';
-            //strcpy( name, "R" );
-        */
 
         done = find_next(filename);
         count++;
@@ -162,7 +147,7 @@ void menu_replay(void) {
         return;
     }
 
-    // ABC sorrendbe rendez:
+    // Sort alphabetically:
     for (int i = 0; i < count + 1; i++) {
         for (int j = 1; j < count - 1; j++) {
             if (case_insensitive_lexicographical_compare(NavEntriesLeft[j + 1],
@@ -188,13 +173,12 @@ void menu_replay(void) {
         // navasztas:
         int choice = nav.navigate();
 
-        if (choice < 0) { // ESC
+        if (choice < 0) {
             return;
         }
 
         if (choice == 0) {
-            // RANDOMIZER:
-            // 0-tol kezdve szamolunk:
+            // Randomizer
             int last_played = -1;
             int second_last_played = -1;
             while (1) {
@@ -205,11 +189,10 @@ void menu_replay(void) {
                 }
                 second_last_played = last_played;
                 last_played = index;
-                // Nev eloallitasa:
+                // Generate name:
                 char tmp[30];
                 strcpy(tmp, NavEntriesLeft[index + 1]);
                 strcat(tmp, ".REC");
-                // 0 param azt jelenti, hogy nem resource filebol olvas:
                 MenuPalette->set();
                 loading_screen();
                 int level_id = recorder::load_rec_file(tmp, 0);
@@ -238,7 +221,7 @@ void menu_replay(void) {
                 }
             }
         } else {
-            // Egy rec file lejatszasa:
+            // Play a rec file:
             char tmp[30];
             strcpy(tmp, NavEntriesLeft[choice]);
             strcat(tmp, ".REC");
@@ -272,7 +255,6 @@ void menu_replay(void) {
             }
 
             if (CtrlAltPressed) {
-                // loadrecek beallitotta Multirec-et.
                 int time = Rec1->frame_count;
                 if (MultiplayerRec && Rec2->frame_count > time) {
                     time = Rec2->frame_count;
@@ -345,7 +327,7 @@ static void menu_prompt_exit(void) {
     nav.x_left = 300;
     nav.y_entries = 200;
     nav.dy = 40;
-    nav.y_title = 50; // ezt nem szokas allitani egyebkent
+    nav.y_title = 50;
     nav.enable_esc = false;
     strcpy(nav.title, "Do you want to quit?");
 
@@ -357,7 +339,6 @@ static void menu_prompt_exit(void) {
     int choice = nav.navigate();
 
     if (choice == 0) {
-        // Ezt csak watmment.exe-ben szabad kikomentezni:
         State->reload_toptens();
 
         State->save();
@@ -369,7 +350,6 @@ static void menu_prompt_exit(void) {
 void menu_main(void) {
     MenuPalette->set();
 
-    // State->save_aaa(); ide minek kene?
     menu_nav nav;
     nav.selected_index = 0;
     nav.x_left = 200;
@@ -388,15 +368,7 @@ void menu_main(void) {
     nav.setup(7);
 
     while (1) {
-        // Korny->pabc_fomenu->write( Korny->picbuffer, 70, 10, "Main menu" );
-
-        // MenuPalette->set(); // Torlendo
-
         int choice = nav.navigate();
-
-        // Kimenti menut pcx file-ba:
-        // BufferMain->save( "menu.pcx", Menupaltomb );
-        // external_error( "Menut mentett menu.pcx file-ba!" );
 
         if (choice == 0) {
             menu_play();
@@ -432,7 +404,6 @@ void menu_main(void) {
         }
 
         if (choice == -1) {
-            // State->save_aaa(); kilep majd menti
             menu_prompt_exit();
         }
     }

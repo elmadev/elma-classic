@@ -2,7 +2,6 @@
 #include "abc8.h"
 #include "eol_settings.h"
 #include "fs_utils.h"
-#include "keys.h"
 #include "main.h"
 #include "M_PIC.H"
 #include "platform_impl.h"
@@ -538,7 +537,7 @@ void menu_nav::render() { menu->render(); }
 
 std::string& menu_nav::entry_left(int index) { return entries[index].text_left; }
 
-bool menu_nav::search_handler(int code) {
+bool menu_nav::search_handler(Keycode code) {
     if (search_pattern == SearchPattern::None) {
         return false;
     }

@@ -1,6 +1,7 @@
 #ifndef MENU_NAV_H
 #define MENU_NAV_H
 
+#include "keys.h"
 #include "menu_pic.h"
 #include <memory>
 #include <string>
@@ -96,7 +97,7 @@ class menu_nav {
 
   private:
     int calculate_visible_entries(int extra_lines_length);
-    bool search_handler(int code);
+    bool search_handler(Keycode code);
 };
 
 #endif

@@ -16,7 +16,7 @@
 #include "menu_pic.h"
 #include "menu_play.h"
 #include "platform_impl.h"
-#include <cmath>
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -26,7 +26,7 @@ int case_insensitive_lexicographical_compare(const char* text1, const char* text
     // If they differ only by case, we track which one had the precedence
     int earlier_case1 = 0;
     int earlier_case2 = 0;
-    while (1) {
+    while (true) {
         char char1 = *text1;
         char char2 = *text2;
 
@@ -76,7 +76,7 @@ int case_insensitive_lexicographical_compare(const char* text1, const char* text
 
 static int SrandNeeded = 1;
 
-static unsigned int gen_rand_int(void) {
+static unsigned int gen_rand_int() {
     if (SrandNeeded) {
         SrandNeeded = 0;
         srand((unsigned)clock());
@@ -89,7 +89,7 @@ static unsigned int gen_rand_int(void) {
     return result;
 }
 
-void menu_replay(void) {
+void menu_replay() {
     strcpy(NavEntriesLeft[0], "Randomizer");
 
     finame filename;
@@ -112,7 +112,7 @@ void menu_replay(void) {
         done = find_next(filename);
         count++;
         if (count >= NavEntriesLeftMaxLength - 4) {
-            done = 1;
+            done = true;
         }
     }
     find_close();
@@ -143,8 +143,7 @@ void menu_replay(void) {
 
     nav.setup(count);
 
-    while (1) {
-        // navasztas:
+    while (true) {
         int choice = nav.navigate();
 
         if (choice < 0) {
@@ -155,7 +154,7 @@ void menu_replay(void) {
             // Randomizer
             int last_played = -1;
             int second_last_played = -1;
-            while (1) {
+            while (true) {
                 int index = gen_rand_int() % (count - 1);
                 while ((index == last_played && count > 2) ||
                        (index == second_last_played && count > 3)) {
@@ -236,9 +235,7 @@ void menu_replay(void) {
 
                 time = (int)(time * 3.3333333333333);
                 time -= 2;
-                if (time < 1) {
-                    time = 1;
-                }
+                time = std::max(time, 1);
 
                 char time_str[25];
                 centiseconds_to_string(time, time_str);
@@ -263,16 +260,17 @@ void menu_replay(void) {
     }
 }
 
-static void menu_demo(void) {
-    int demo_replay_count = 3;
-    char demo_names[14][14] = {"demor1.rec", "demor2.rec", "demor3.rec"};
+static void menu_demo() {
+    constexpr int DEMO_REPLAY_COUNT = 3;
+    char demo_names[DEMO_REPLAY_COUNT][MAX_FILENAME_LEN + 4] = {"demor1.rec", "demor2.rec",
+                                                                "demor3.rec"};
 
     int previous_demo = -1;
 
-    while (1) {
-        int demo = gen_rand_int() % demo_replay_count;
+    while (true) {
+        int demo = gen_rand_int() % DEMO_REPLAY_COUNT;
         while (demo == previous_demo) {
-            demo = gen_rand_int() % demo_replay_count;
+            demo = gen_rand_int() % DEMO_REPLAY_COUNT;
         }
         previous_demo = demo;
 
@@ -297,7 +295,7 @@ static void menu_demo(void) {
     }
 }
 
-static void menu_prompt_exit(void) {
+static void menu_prompt_exit() {
     menu_nav nav;
     nav.selected_index = 0;
     nav.x_left = 300;
@@ -323,7 +321,7 @@ static void menu_prompt_exit(void) {
     }
 }
 
-void menu_main(void) {
+void menu_main() {
     MenuPalette->set();
 
     menu_nav nav;
@@ -343,7 +341,7 @@ void menu_main(void) {
 
     nav.setup(7);
 
-    while (1) {
+    while (true) {
         int choice = nav.navigate();
 
         if (choice == 0) {

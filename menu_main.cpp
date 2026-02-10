@@ -16,62 +16,12 @@
 #include "menu_pic.h"
 #include "menu_play.h"
 #include "platform_impl.h"
+#include "platform_utils.h"
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
-
-// Returns true if text1 is earlier in the alphabet than text2
-int case_insensitive_lexicographical_compare(const char* text1, const char* text2) {
-    // If they differ only by case, we track which one had the precedence
-    int earlier_case1 = 0;
-    int earlier_case2 = 0;
-    while (true) {
-        char char1 = *text1;
-        char char2 = *text2;
-
-        if (!char1 && !char2) {
-            // Letters matched, maybe case difference decides:
-            if (earlier_case2) {
-                return 0;
-            }
-            return 1;
-        }
-
-        if (!char1) {
-            return 1;
-        }
-        if (!char2) {
-            return 0;
-        }
-
-        if (char1 >= 'a') {
-            char1 -= 'a' - 'A';
-        }
-        if (char2 >= 'a') {
-            char2 -= 'a' - 'A';
-        }
-        if (char1 == char2) {
-            if (!earlier_case1 && !earlier_case2) {
-                if (*text1 < *text2) {
-                    earlier_case1 = 1;
-                }
-                if (*text2 < *text1) {
-                    earlier_case2 = 1;
-                }
-            }
-        } else {
-            if (char1 < char2) {
-                return 1;
-            }
-            if (char2 < char1) {
-                return 0;
-            }
-        }
-
-        text1++;
-        text2++;
-    }
-}
+#include <string>
+#include <vector>
 
 static unsigned int gen_rand_int() {
     unsigned int result = 0;
@@ -82,14 +32,12 @@ static unsigned int gen_rand_int() {
 }
 
 void menu_replay() {
-    strcpy(NavEntriesLeft[0], "Randomizer");
-
     finame filename;
+    std::vector<std::string> replay_names;
     bool done = find_first("rec/*.rec", filename);
-    // This is always one more than reality, since the first entry is always 'Randomizer':
-    int count = 1;
-    while (!done && count < NavEntriesLeftMaxLength) {
-        char* name = NavEntriesLeft[count];
+
+    while (!done) {
+        finame name;
         strcpy(name, filename);
         // Remove extension:
         int i = strlen(name) - 1;
@@ -101,30 +49,29 @@ void menu_replay() {
         }
         name[i] = 0;
 
+        replay_names.emplace_back(name);
+
         done = find_next(filename);
-        count++;
-        if (count >= NavEntriesLeftMaxLength - 4) {
+        if (replay_names.size() >= NavEntriesLeftMaxLength - 4) {
             done = true;
         }
     }
     find_close();
 
-    if (count < 2) {
+    if (replay_names.empty()) {
         return;
     }
 
-    // Sort alphabetically:
-    for (int i = 0; i < count + 1; i++) {
-        for (int j = 1; j < count - 1; j++) {
-            if (case_insensitive_lexicographical_compare(NavEntriesLeft[j + 1],
-                                                         NavEntriesLeft[j])) {
-                // Swap:
-                char tmp[100];
-                strcpy(tmp, NavEntriesLeft[j]);
-                strcpy(NavEntriesLeft[j], NavEntriesLeft[j + 1]);
-                strcpy(NavEntriesLeft[j + 1], tmp);
-            }
-        }
+    std::sort(replay_names.begin(), replay_names.end(),
+              [](const std::string& a, const std::string& b) {
+                  return strcmpi(a.c_str(), b.c_str()) < 0;
+              });
+
+    int count = 0;
+    strcpy(NavEntriesLeft[count++], "Randomizer");
+
+    for (const auto& name : replay_names) {
+        strcpy(NavEntriesLeft[count++], name.c_str());
     }
 
     menu_nav nav;

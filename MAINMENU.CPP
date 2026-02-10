@@ -105,7 +105,7 @@ void menu_replay(void) {
             i--;
         }
         if (i < 0) {
-            internal_error("replay-ban nincs pont nevben!: ", name);
+            internal_error("menu_replay: no dot in name!: ", name);
         }
         name[i] = 0;
 
@@ -279,11 +279,13 @@ static void menu_demo(void) {
         loading_screen();
         int level_id = recorder::load_rec_file(demo_names[demo], 1);
         if (access_level_file(Rec1->level_filename) != 0) {
-            internal_error("783654");
+            internal_error("menu_demo: cannot find level file for demo replay: ",
+                           Rec1->level_filename);
         }
         floadlevel_p(Rec1->level_filename);
         if (Ptop->level_id != level_id) {
-            internal_error("6734654");
+            internal_error("menu_demo: level file changed since demo replay was made: ",
+                           Rec1->level_filename);
         }
         Rec1->rewind();
         Rec2->rewind();

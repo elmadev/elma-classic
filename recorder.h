@@ -42,8 +42,6 @@ struct frame_data {
 static_assert(sizeof(frame_data) == 28);
 
 class recorder {
-    friend void menu_replay();
-
     int frame_count_;
 
     std::vector<frame_data> frames;
@@ -78,6 +76,7 @@ class recorder {
     static void save_rec_file(const char* filename, int level_id, int flagtag);
 
     bool is_empty() { return frame_count_ == 0; }
+    int frame_count() const { return frame_count_; }
     void erase(char* lev_filename);
     void rewind();
     bool recall_frame(motorst* mot, double time, bike_sound* sound);

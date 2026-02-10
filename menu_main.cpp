@@ -31,7 +31,7 @@ static unsigned int gen_rand_int() {
     return result;
 }
 
-void menu_replay() {
+static void menu_replay() {
     finame filename;
     std::vector<std::string> replay_names;
     bool done = find_first("rec/*.rec", filename);
@@ -166,9 +166,9 @@ void menu_replay() {
             }
 
             if (CtrlAltPressed) {
-                int time = Rec1->frame_count;
-                if (MultiplayerRec && Rec2->frame_count > time) {
-                    time = Rec2->frame_count;
+                int time = Rec1->frame_count();
+                if (MultiplayerRec && Rec2->frame_count() > time) {
+                    time = Rec2->frame_count();
                 }
 
                 time = (int)(time * 3.3333333333333);

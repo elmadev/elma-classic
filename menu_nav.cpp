@@ -424,6 +424,16 @@ void menu_nav::sort_rows() {
     });
 }
 
+void menu_nav::select_row(const std::string& left) {
+    std::vector<nav_row>::iterator it = find_if(
+        entries.begin(), entries.end(), [left](const nav_row& c) { return left == c.text_left; });
+    selected_index = it - entries.begin();
+    if (selected_index == row_count()) {
+        // Not found
+        selected_index = 0;
+    }
+}
+
 int menu_nav::calculate_visible_entries() {
     int max_visible_entries = (SCREEN_HEIGHT - y_entries) / dy;
     if (max_visible_entries < 2) {

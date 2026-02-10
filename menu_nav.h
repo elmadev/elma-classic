@@ -89,9 +89,9 @@ class menu_nav {
     std::vector<nav_overlay> overlays;
     std::unique_ptr<menu_pic> menu;
     std::string search_input;
+    int selected_index;
 
   public:
-    int selected_index;
     int x_left;
     int y_entries;
     int dy;
@@ -112,6 +112,8 @@ class menu_nav {
     void add_overlay(std::string text, int x, int y,
                      OverlayAlignment alignment = OverlayAlignment::Left);
     void sort_rows();
+    void select_row(int index) { selected_index = index; }
+    void select_row(const std::string& left);
 
     int navigate(bool render_only = false);
     void render();

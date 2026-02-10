@@ -405,3 +405,288 @@ bool menu_nav::search_handler(int code) {
 
     return true;
 }
+
+menu_nav2::menu_nav2(std::string titl)
+    : selected_index(0),
+      x_left(200),
+      y_entries(90),
+      dy(33),
+      enable_esc(true),
+      title(titl),
+      y_title(30),
+      search_pattern(SearchPattern::None),
+      search_skip(0) {
+    entries.reserve(20);
+    menu = std::make_unique<menu_pic>(false);
+}
+
+int menu_nav2::total_entries() { return entries.size(); }
+
+int menu_nav2::calculate_visible_entries() {
+    // Calculate ideal number of rows
+    int max_visible_entries = (SCREEN_HEIGHT - y_entries) / dy;
+    if (max_visible_entries < 2) {
+        max_visible_entries = 2;
+    }
+    // Calculate max number of rows given menu_pic limitations
+    // Account for extra lines as well as title line
+    int max_value = MENU_MAX_LINES - extra_lines.size() - 1;
+    max_value /= 2;
+    return std::min(max_visible_entries, max_value);
+}
+
+int menu_nav2::prompt_choice(bool render_only) {
+    if (total_entries() < 1) {
+        internal_error("menu_nav::navigate no rows!");
+    }
+
+    search_input.clear();
+
+    // Bound current selection
+    if (selected_index > total_entries() - 1) {
+        selected_index = total_entries() - 1;
+    }
+
+    int max_visible_entries = calculate_visible_entries();
+
+    // Center current selection on the screen
+    int view_index = selected_index - max_visible_entries / 2;
+    int view_max = total_entries() - max_visible_entries;
+
+    empty_keypress_buffer();
+    bool rerender = true;
+    while (true) {
+        while (!render_only && has_keypress()) {
+            Keycode c = get_keypress();
+            if (search_handler(c)) {
+                view_index = selected_index - max_visible_entries / 2;
+                rerender = true;
+                break;
+            }
+            if (c == KEY_ESC && enable_esc) {
+                CtrlAltPressed = false;
+                F1Pressed = false;
+                return -1;
+            }
+            if (c == KEY_ENTER) {
+                CtrlAltPressed = is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
+                F1Pressed = is_key_down(DIK_F1);
+                return selected_index;
+            }
+            if (c == KEY_UP) {
+                selected_index--;
+            }
+            if (c == KEY_PGUP) {
+                selected_index -= max_visible_entries;
+            }
+            if (c == KEY_DOWN) {
+                selected_index++;
+            }
+            if (c == KEY_PGDOWN) {
+                selected_index += max_visible_entries;
+            }
+        }
+
+        // Limit selected index to valid values
+        if (selected_index < 0) {
+            selected_index = 0;
+        }
+        if (selected_index >= total_entries()) {
+            selected_index = total_entries() - 1;
+        }
+        // Update view_index and limit to valid values
+        if (selected_index < view_index) {
+            view_index = selected_index;
+            rerender = true;
+        }
+        if (selected_index > view_index + max_visible_entries - 1) {
+            view_index = selected_index - (max_visible_entries - 1);
+            rerender = true;
+        }
+        if (view_index > view_max) {
+            view_index = view_max;
+            rerender = true;
+        }
+        if (view_index < 0) {
+            view_index = 0;
+            rerender = true;
+        }
+
+        // Rerender screen only if updated menu position
+        if (rerender) {
+            rerender = false;
+            menu->clear();
+
+            // Fixed-position extra text lines
+            for (text_line line : extra_lines) {
+                if (strncmp(line.text, MENU_CENTER_TEXT, sizeof(MENU_CENTER_TEXT) - 1) == 0) {
+                    menu->add_line_centered(&line.text[sizeof(MENU_CENTER_TEXT) - 1], line.x,
+                                            line.y);
+                } else {
+                    menu->add_line(line.text, line.x, line.y);
+                }
+            }
+
+            // Title
+            if (!search_input.empty()) {
+                std::string search_title = title + ": " + search_input;
+                menu->add_line_centered(search_title.c_str(), 320, y_title);
+            } else {
+                menu->add_line_centered(title.c_str(), 320, y_title);
+            }
+
+            // Only the visible menu entries
+            for (int i = 0; i < max_visible_entries && i < total_entries() - view_index; i++) {
+                menu->add_line(entries[view_index + i].text_left, x_left, y_entries + i * dy);
+            }
+            for (int i = 0; i < max_visible_entries && i < total_entries() - view_index; i++) {
+                menu->add_line(entries[view_index + i].text_right, x_right, y_entries + i * dy);
+            }
+        }
+        menu->set_helmet(x_left - 30, y_entries + (selected_index - view_index) * dy);
+        menu->render();
+        if (render_only) {
+            return 0;
+        }
+    }
+}
+
+void menu_nav2::render_pic() { menu->render(); }
+
+int menu_nav2::navigate(bool render_only) {
+    // Get choice from menu
+    int choice = prompt_choice(render_only);
+    if (choice == -1) {
+        return choice;
+    }
+    // Run the handler
+    nav_row& entry = entries[choice];
+    nav_func* f = entry.handler;
+    if (CtrlAltPressed) {
+        f = entry.ctrl_alt_handler;
+    }
+    if (F1Pressed) {
+        f = entry.f1_handler;
+    }
+    if (f) {
+        f(choice, entry.text_left, entry.text_right);
+    }
+    return choice;
+}
+
+static void set_nav_entry(nav_entry text, std::string str) {
+    if (str.length() > NAV_ENTRY_TEXT_MAX_LENGTH) {
+        internal_error("Menu text too long:", str.c_str());
+    }
+    std::strncpy(text, str.c_str(), NAV_ENTRY_TEXT_MAX_LENGTH);
+}
+
+// Add a new option in the options menu
+void menu_nav2::add_row(std::string left, std::string right, nav_func* handle,
+                        nav_func* handle_ctrl_alt, nav_func* handle_f1) {
+    nav_row row;
+
+    // Text
+    set_nav_entry(row.text_left, left);
+    set_nav_entry(row.text_right, right);
+
+    // Handlers (ctrl_alt and f1 use the normal handler if unspecified
+    // nullptr will make ctrl_alt or f1 do nothing
+    row.handler = handle;
+    row.ctrl_alt_handler = handle_ctrl_alt;
+    row.f1_handler = handle_f1;
+
+    entries.push_back(row);
+}
+
+bool menu_nav2::search_handler(int code) {
+    if (search_pattern == SearchPattern::None) {
+        return false;
+    }
+
+    if (code == KEY_BACKSPACE) {
+        if (!search_input.empty()) {
+            search_input.pop_back();
+        }
+    } else if (code == KEY_ESC) {
+        if (!search_input.empty()) {
+            search_input.clear();
+        } else {
+            return false;
+        }
+    } else if (accept_search_input() && MenuFont->has_char(code)) {
+        if (search_input.size() < MAX_FILENAME_LEN) {
+            search_input.push_back(code);
+        }
+    } else {
+        return false;
+    }
+
+    if (search_input.empty()) {
+        return true;
+    }
+
+    using it = std::vector<nav_row>::iterator;
+    it begin = entries.begin();
+    begin += search_skip;
+    it end = entries.end();
+
+    switch (search_pattern) {
+    case SearchPattern::Sorted: {
+        // Find the entry
+        it match = std::lower_bound(
+            begin, end, search_input.c_str(),
+            [](const nav_row& entry, const char* k) { return strcmpi(entry.text_left, k) < 0; });
+        selected_index = match - entries.begin();
+
+        if (selected_index != total_entries() && selected_index > 0 &&
+            strnicmp(match->text_left, search_input.c_str(), search_input.length()) != 0) {
+            size_t a = common_prefix_len(search_input.c_str(), entries[selected_index].text_left);
+            size_t b =
+                common_prefix_len(search_input.c_str(), entries[selected_index - 1].text_left);
+            // Use the previous entry if it has a longer common prefix
+            if (b >= a) {
+                selected_index -= 1;
+            }
+        }
+
+        break;
+    }
+    case SearchPattern::Internals: {
+        // Try to jump via number input
+        int index_search = -1;
+        try {
+            index_search = std::stoi(search_input);
+        } catch (...) {
+        }
+
+        if (index_search >= 0) {
+            selected_index = index_search;
+            break;
+        }
+
+        // Try to find exact match
+        for (int i = 0; i < total_entries(); ++i) {
+            char* text = entries[i].text_left;
+            // Skip the number prefix
+            if (i >= 1) {
+                text += 2;
+            }
+            if (i >= 10) {
+                text++;
+            }
+
+            if (strnicmp(text, search_input.c_str(), search_input.size()) == 0) {
+                selected_index = i;
+                break;
+            }
+        }
+        break;
+    }
+    case SearchPattern::None:
+        internal_error("search_handler() SearchPattern::None reached!");
+        break;
+    }
+
+    return true;
+}

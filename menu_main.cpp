@@ -1,4 +1,4 @@
-#include "MAINMENU.H"
+#include "menu_main.h"
 #include "best_times.h"
 #include "editor_dialog.h"
 #include "EDITUJ.H"

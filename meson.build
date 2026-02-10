@@ -43,7 +43,7 @@ elma_sources = files(
     'lgr.cpp',
     'LOAD.CPP',
     'main.cpp',
-    'MAINMENU.CPP',
+    'menu_main.cpp',
     'menu_external.cpp',
     'menu_pic.cpp',
     'menu_options.cpp',

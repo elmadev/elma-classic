@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cstring>
 #include <cmath>
+#include <format>
 #include <vector>
 
 void menu_help() {
@@ -103,123 +104,191 @@ static void menu_lgr() {
 void menu_options() {
     int choice = 0;
     while (true) {
-        menu_nav_old nav;
-        nav.selected_index = choice;
+        menu_nav nav("Options");
+        nav.select_row(choice);
         nav.x_left = 72;
         nav.x_right = 390;
         nav.y_entries = 77;
         nav.dy = 36;
-        strcpy(nav.title, "Options");
 
-        int flag_tag_opt = 0;
-        strcpy(NavEntriesLeft[0], "Play mode:");
-        if (State->single) {
-            strcpy(NavEntriesRight[0], "Single Player");
-        } else {
-            strcpy(NavEntriesRight[0], "Multiplayer");
-            flag_tag_opt = 1;
+        nav.add_row(
+            "Play mode:", State->single ? "Single Player" : "Multiplayer",
+            NAV_FUNC() { State->single = !State->single; });
+
+        if (!State->single) {
+            nav.add_row(
+                "Flag Tag:", State->flag_tag ? "On" : "Off",
+                NAV_FUNC() { State->flag_tag = !State->flag_tag; });
         }
 
-        if (flag_tag_opt) {
-            strcpy(NavEntriesLeft[1], "Flag Tag:");
-            if (State->flag_tag) {
-                strcpy(NavEntriesRight[1], "On");
-            } else {
-                strcpy(NavEntriesRight[1], "Off");
-            }
-        }
+        nav.add_row("Player A:", State->player1, NAV_FUNC() { jatekosvalasztas(1, 1); });
 
-        strcpy(NavEntriesLeft[1 + flag_tag_opt], "Player A:");
-        strcpy(NavEntriesRight[1 + flag_tag_opt], State->player1);
+        nav.add_row("Player B:", State->player2, NAV_FUNC() { jatekosvalasztas(0, 1); });
 
-        strcpy(NavEntriesLeft[2 + flag_tag_opt], "Player B:");
-        strcpy(NavEntriesRight[2 + flag_tag_opt], State->player2);
+        nav.add_row(
+            "Sound:", State->sound_on ? "Enabled" : "Disabled",
+            NAV_FUNC() { State->sound_on = !State->sound_on; });
 
-        strcpy(NavEntriesLeft[3 + flag_tag_opt], "Sound:");
-        strcpy(NavEntriesRight[3 + flag_tag_opt], State->sound_on ? "Enabled" : "Disabled");
+        nav.add_row(
+            "Animated Menus:", State->animated_menus ? "Yes" : "No",
+            NAV_FUNC() { State->animated_menus = !State->animated_menus; });
 
-        strcpy(NavEntriesLeft[4 + flag_tag_opt], "Animated Menus:");
-        strcpy(NavEntriesRight[4 + flag_tag_opt], State->animated_menus ? "Yes" : "No");
+        nav.add_row(
+            "Video Detail:", State->high_quality ? "High" : "Low", NAV_FUNC() {
+                State->high_quality = !State->high_quality;
+                invalidate_level();
+            });
 
-        strcpy(NavEntriesLeft[5 + flag_tag_opt], "Video Detail:");
-        strcpy(NavEntriesRight[5 + flag_tag_opt], State->high_quality ? "High" : "Low");
+        nav.add_row(
+            "Animated Objects:", State->animated_objects ? "Yes" : "No",
+            NAV_FUNC() { State->animated_objects = !State->animated_objects; });
 
-        strcpy(NavEntriesLeft[6 + flag_tag_opt], "Animated Objects:");
-        strcpy(NavEntriesRight[6 + flag_tag_opt], State->animated_objects ? "Yes" : "No");
+        nav.add_row(
+            "Swap Bikes:", State->player1_bike1 ? "No" : "Yes",
+            NAV_FUNC() { State->player1_bike1 = !State->player1_bike1; });
 
-        strcpy(NavEntriesLeft[7 + flag_tag_opt], "Swap Bikes:");
-        strcpy(NavEntriesRight[7 + flag_tag_opt], State->player1_bike1 ? "No" : "Yes");
+        nav.add_row("Customize Controls ...", NAV_FUNC() { menu_customize_controls(); });
 
-        strcpy(NavEntriesLeft[8 + flag_tag_opt], "Customize Controls ...");
-        strcpy(NavEntriesRight[8 + flag_tag_opt], "");
+        nav.add_row(
+            "Pics In Background:", EolSettings->pictures_in_background() ? "Yes" : "No",
+            NAV_FUNC() {
+                EolSettings->set_pictures_in_background(!EolSettings->pictures_in_background());
+                invalidate_level();
+            });
 
-        strcpy(NavEntriesLeft[9 + flag_tag_opt], "Pics In Background:");
-        strcpy(NavEntriesRight[9 + flag_tag_opt],
-               EolSettings->pictures_in_background() ? "Yes" : "No");
+        nav.add_row(
+            "Centered Camera:", EolSettings->center_camera() ? "Yes" : "No",
+            NAV_FUNC() { EolSettings->set_center_camera(!EolSettings->center_camera()); });
 
-        strcpy(NavEntriesLeft[10 + flag_tag_opt], "Centered Camera:");
-        strcpy(NavEntriesRight[10 + flag_tag_opt], EolSettings->center_camera() ? "Yes" : "No");
+        nav.add_row(
+            "Centered Minimap:", EolSettings->center_map() ? "Yes" : "No",
+            NAV_FUNC() { EolSettings->set_center_map(!EolSettings->center_map()); });
 
-        strcpy(NavEntriesLeft[11 + flag_tag_opt], "Centered Minimap:");
-        strcpy(NavEntriesRight[11 + flag_tag_opt], EolSettings->center_map() ? "Yes" : "No");
+        nav.add_row(
+            "Minimap Alignment:",
+            [] {
+                switch (EolSettings->map_alignment()) {
+                case MapAlignment::None:
+                    return "None";
+                case MapAlignment::Left:
+                    return "Left";
+                case MapAlignment::Middle:
+                    return "Middle";
+                case MapAlignment::Right:
+                    return "Right";
+                }
+                return "";
+            }(),
+            NAV_FUNC() {
+                switch (EolSettings->map_alignment()) {
+                case MapAlignment::None:
+                    EolSettings->set_map_alignment(MapAlignment::Left);
+                    return;
+                case MapAlignment::Left:
+                    EolSettings->set_map_alignment(MapAlignment::Middle);
+                    return;
+                case MapAlignment::Middle:
+                    EolSettings->set_map_alignment(MapAlignment::Right);
+                    return;
+                case MapAlignment::Right:
+                    EolSettings->set_map_alignment(MapAlignment::None);
+                    return;
+                }
+            });
 
-        strcpy(NavEntriesLeft[12 + flag_tag_opt], "Minimap Alignment:");
-        switch (EolSettings->map_alignment()) {
-        case MapAlignment::None:
-            strcpy(NavEntriesRight[12 + flag_tag_opt], "None");
-            break;
-        case MapAlignment::Left:
-            strcpy(NavEntriesRight[12 + flag_tag_opt], "Left");
-            break;
-        case MapAlignment::Middle:
-            strcpy(NavEntriesRight[12 + flag_tag_opt], "Middle");
-            break;
-        case MapAlignment::Right:
-            strcpy(NavEntriesRight[12 + flag_tag_opt], "Right");
-            break;
-        }
+        nav.add_row(
+            "Resolution:",
+            std::format("{}x{}", EolSettings->screen_width(), EolSettings->screen_height()),
+            NAV_FUNC() {
+                switch (EolSettings->screen_width()) {
+                case 640:
+                    EolSettings->set_screen_width(1024);
+                    EolSettings->set_screen_height(768);
+                    return;
+                case 1024:
+                    EolSettings->set_screen_width(640);
+                    EolSettings->set_screen_height(480);
+                    return;
+                }
+            });
 
-        strcpy(NavEntriesLeft[13 + flag_tag_opt], "Resolution:");
-        sprintf(NavEntriesRight[13 + flag_tag_opt], "%dx%d", EolSettings->screen_width(),
-                EolSettings->screen_height());
+        nav.add_row(
+            "Zoom:", std::format("{:.2f}", EolSettings->zoom()), NAV_FUNC() {
+                double old_zoom = EolSettings->zoom();
+                EolSettings->set_zoom(old_zoom + 0.25);
+                if (old_zoom == EolSettings->zoom()) {
+                    EolSettings->set_zoom(0.25);
+                }
+            });
 
-        strcpy(NavEntriesLeft[14 + flag_tag_opt], "Zoom:");
-        sprintf(NavEntriesRight[14 + flag_tag_opt], "%.2f", EolSettings->zoom());
+        nav.add_row(
+            "Zoom Textures:", EolSettings->zoom_textures() ? "Yes" : "No",
+            NAV_FUNC() { EolSettings->set_zoom_textures(!EolSettings->zoom_textures()); });
 
-        strcpy(NavEntriesLeft[15 + flag_tag_opt], "Zoom Textures:");
-        strcpy(NavEntriesRight[15 + flag_tag_opt], EolSettings->zoom_textures() ? "Yes" : "No");
+        nav.add_row(
+            "Renderer:",
+            [] {
+                switch (EolSettings->renderer()) {
+                case RendererType::Software:
+                    return "Software";
+                case RendererType::OpenGL:
+                    return "OpenGL";
+                }
+                return "";
+            }(),
+            NAV_FUNC() {
+                switch (EolSettings->renderer()) {
+                case RendererType::Software:
+                    EolSettings->set_renderer(RendererType::OpenGL);
+                    return;
+                case RendererType::OpenGL:
+                    EolSettings->set_renderer(RendererType::Software);
+                    return;
+                }
+            });
 
-        strcpy(NavEntriesLeft[16 + flag_tag_opt], "Renderer:");
-        switch (EolSettings->renderer()) {
-        case RendererType::Software:
-            strcpy(NavEntriesRight[16 + flag_tag_opt], "Software");
-            break;
-        case RendererType::OpenGL:
-            strcpy(NavEntriesRight[16 + flag_tag_opt], "OpenGL");
-            break;
-        }
+        nav.add_row(
+            "Turn Time:",
+            [] {
+                if (EolSettings->turn_time() == 0.0) {
+                    return std::string("Instant");
+                } else {
+                    return std::format("{:.2f}s", EolSettings->turn_time());
+                }
+            }(),
+            NAV_FUNC() {
+                double old_turn_time = EolSettings->turn_time();
+                double new_turn_time = std::round((old_turn_time - 0.10) * 100.0) / 100.0;
+                EolSettings->set_turn_time(new_turn_time);
+                if (old_turn_time == EolSettings->turn_time()) {
+                    EolSettings->set_turn_time(0.35);
+                }
+            });
 
-        strcpy(NavEntriesLeft[17 + flag_tag_opt], "Turn Time:");
-        if (EolSettings->turn_time() == 0.0) {
-            strcpy(NavEntriesRight[17 + flag_tag_opt], "Instant");
-        } else {
-            sprintf(NavEntriesRight[17 + flag_tag_opt], "%.2fs", EolSettings->turn_time());
-        }
+        nav.add_row(
+            "LCtrl search:", EolSettings->lctrl_search() ? "Yes" : "No",
+            NAV_FUNC() { EolSettings->set_lctrl_search(!EolSettings->lctrl_search()); });
 
-        strcpy(NavEntriesLeft[18 + flag_tag_opt], "LCtrl search:");
-        strcpy(NavEntriesRight[18 + flag_tag_opt], EolSettings->lctrl_search() ? "Yes" : "No");
+        nav.add_row("Default LGR:", EolSettings->default_lgr_name(), NAV_FUNC() { menu_lgr(); });
 
-        strcpy(NavEntriesLeft[19 + flag_tag_opt], "Default LGR:");
-        strcpy(NavEntriesRight[19 + flag_tag_opt], EolSettings->default_lgr_name().c_str());
+        nav.add_row(
+            "Show Apple Time:", EolSettings->show_last_apple_time() ? "Yes" : "No", NAV_FUNC() {
+                EolSettings->set_show_last_apple_time(!EolSettings->show_last_apple_time());
+            });
 
-        strcpy(NavEntriesLeft[20 + flag_tag_opt], "Show Apple Time:");
-        strcpy(NavEntriesRight[20 + flag_tag_opt],
-               EolSettings->show_last_apple_time() ? "Yes" : "No");
-
-        strcpy(NavEntriesLeft[21 + flag_tag_opt], "Record Replay FPS:");
-        sprintf(NavEntriesRight[21 + flag_tag_opt], "%d", EolSettings->recording_fps());
-
-        nav.setup(22 + flag_tag_opt, true);
+        nav.add_row(
+            "Record Replay FPS:", std::to_string(EolSettings->recording_fps()), NAV_FUNC() {
+                int old_fps = EolSettings->recording_fps();
+                int new_fps;
+                if (old_fps == 30) {
+                    new_fps = 60;
+                } else if (old_fps == 60) {
+                    new_fps = 120;
+                } else {
+                    new_fps = 30;
+                }
+                EolSettings->set_recording_fps(new_fps);
+            });
 
         choice = nav.navigate();
 
@@ -227,159 +296,6 @@ void menu_options() {
             eol_settings::write_settings();
             State->save();
             return;
-        }
-
-        if (choice == 0) {
-            State->single = !State->single;
-        }
-
-        if (choice == 1 && flag_tag_opt) {
-            State->flag_tag = !State->flag_tag;
-        }
-
-        if (flag_tag_opt) {
-            choice -= 1;
-        }
-
-        if (choice == 1) {
-            jatekosvalasztas(1, 1);
-        }
-
-        if (choice == 2) {
-            jatekosvalasztas(0, 1);
-        }
-
-        if (choice == 3) {
-            State->sound_on = !State->sound_on;
-        }
-
-        if (choice == 4) {
-            State->animated_menus = !State->animated_menus;
-        }
-
-        if (choice == 5) {
-            State->high_quality = !State->high_quality;
-            invalidate_level();
-        }
-
-        if (choice == 6) {
-            State->animated_objects = !State->animated_objects;
-        }
-
-        if (choice == 7) {
-            State->player1_bike1 = !State->player1_bike1;
-        }
-
-        if (choice == 8) {
-            menu_customize_controls();
-        }
-
-        if (choice == 9) {
-            EolSettings->set_pictures_in_background(!EolSettings->pictures_in_background());
-            invalidate_level();
-        }
-
-        if (choice == 10) {
-            EolSettings->set_center_camera(!EolSettings->center_camera());
-        }
-
-        if (choice == 11) {
-            EolSettings->set_center_map(!EolSettings->center_map());
-        }
-
-        if (choice == 12) {
-            switch (EolSettings->map_alignment()) {
-            case MapAlignment::None:
-                EolSettings->set_map_alignment(MapAlignment::Left);
-                break;
-            case MapAlignment::Left:
-                EolSettings->set_map_alignment(MapAlignment::Middle);
-                break;
-            case MapAlignment::Middle:
-                EolSettings->set_map_alignment(MapAlignment::Right);
-                break;
-            case MapAlignment::Right:
-                EolSettings->set_map_alignment(MapAlignment::None);
-                break;
-            }
-        }
-
-        if (choice == 13) {
-            switch (EolSettings->screen_width()) {
-            case 640: {
-                EolSettings->set_screen_width(1024);
-                EolSettings->set_screen_height(768);
-                break;
-            }
-            case 1024: {
-                EolSettings->set_screen_width(640);
-                EolSettings->set_screen_height(480);
-                break;
-            }
-            }
-        }
-
-        if (choice == 14) {
-            double old_zoom = EolSettings->zoom();
-            EolSettings->set_zoom(old_zoom + 0.25);
-            if (old_zoom == EolSettings->zoom()) {
-                EolSettings->set_zoom(0.25);
-            }
-        }
-
-        if (choice == 15) {
-            EolSettings->set_zoom_textures(!EolSettings->zoom_textures());
-        }
-
-        if (choice == 16) {
-            switch (EolSettings->renderer()) {
-            case RendererType::Software: {
-                EolSettings->set_renderer(RendererType::OpenGL);
-                break;
-            }
-            case RendererType::OpenGL: {
-                EolSettings->set_renderer(RendererType::Software);
-                break;
-            }
-            }
-        }
-
-        if (choice == 17) {
-            double old_turn_time = EolSettings->turn_time();
-            double new_turn_time = std::round((old_turn_time - 0.10) * 100.0) / 100.0;
-            EolSettings->set_turn_time(new_turn_time);
-            if (old_turn_time == EolSettings->turn_time()) {
-                EolSettings->set_turn_time(0.35);
-            }
-        }
-
-        if (choice == 18) {
-            EolSettings->set_lctrl_search(!EolSettings->lctrl_search());
-        }
-
-        if (choice == 19) {
-            menu_lgr();
-        }
-
-        if (choice == 20) {
-            EolSettings->set_show_last_apple_time(!EolSettings->show_last_apple_time());
-        }
-
-        if (choice == 21) {
-            int old_fps = EolSettings->recording_fps();
-            int new_fps;
-            if (old_fps == 30) {
-                new_fps = 60;
-            } else if (old_fps == 60) {
-                new_fps = 120;
-            } else {
-                new_fps = 30;
-            }
-            EolSettings->set_recording_fps(new_fps);
-        }
-
-        if (flag_tag_opt) {
-            choice += 1;
         }
     }
 }

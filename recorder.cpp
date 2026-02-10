@@ -31,7 +31,7 @@ constexpr int FLAG_FLAGTAG_A = 2;
 constexpr int FLAG_FLAGTAG_IMMUNITY = 3;
 
 recorder::recorder() {
-    frame_count = 0;
+    frame_count_ = 0;
     event_count = 0;
     flagtag_ = 0;
     level_filename[0] = 0;
@@ -47,7 +47,7 @@ void recorder::erase(char* lev_filename) {
         internal_error("recorder::erase strlen");
     }
     strcpy(level_filename, lev_filename);
-    frame_count = 0;
+    frame_count_ = 0;
     event_count = 0;
     finished = false;
     current_event_index = 0;
@@ -75,10 +75,10 @@ bool recorder::flagtag() { return (bool)(flagtag_); }
 void recorder::set_flagtag(bool flagtag) { flagtag_ = (int)(flagtag); }
 
 void recorder::encode_frame_count() {
-    if (frame_count < 80) {
+    if (frame_count_ < 80) {
         return;
     }
-    unsigned int encoded_value = frame_count;
+    unsigned int encoded_value = frame_count_;
     for (int i = 0; i < 32; i++) {
         frames[40 + i].flags = frames[40 + i].flags & 0x7F;
         if (encoded_value & 1) {
@@ -89,7 +89,7 @@ void recorder::encode_frame_count() {
 }
 
 bool recorder::frame_count_integrity() {
-    if (frame_count < 80) {
+    if (frame_count_ < 80) {
         return true;
     }
     unsigned int encoded_value = 0;
@@ -99,7 +99,7 @@ bool recorder::frame_count_integrity() {
             encoded_value += 1;
         }
     }
-    return encoded_value == frame_count;
+    return encoded_value == frame_count_;
 }
 
 constexpr double POSITION_RATIO = 1000.0;
@@ -111,8 +111,8 @@ constexpr double MOTOR_FREQUENCY_RATIO = 250.0;
 constexpr double FRICTION_VOLUME_RATIO = 250 / 2.0;
 
 bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
-    if (frame_count <= 0) {
-        internal_error("recall_frame frame_count <= 0!");
+    if (frame_count_ <= 0) {
+        internal_error("recall_frame frame_count_ <= 0!");
     }
 
     int index1 = (int)(TIME_TO_FRAME_INDEX * time);
@@ -140,12 +140,12 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
         return false;
     }
 
-    if (index1 >= frame_count - 1) {
-        index1 = frame_count - 1;
+    if (index1 >= frame_count_ - 1) {
+        index1 = frame_count_ - 1;
         finished = true;
     }
-    if (index2 >= frame_count - 1) {
-        index2 = frame_count - 1;
+    if (index2 >= frame_count_ - 1) {
+        index2 = frame_count_ - 1;
     }
 
     mot->bike.r.x = frames[index1].bike_x * index1_weight + frames[index2].bike_x * index2_weight;
@@ -316,7 +316,7 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
         if (time < next_frame_time) {
             previous_bike_r = mot->bike.r;
             previous_frame_time = time;
-            frame_count = next_frame_index;
+            frame_count_ = next_frame_index;
             return;
         }
     }
@@ -361,15 +361,15 @@ static void read_error(const char* filename) {
 }
 
 int recorder::load(const char* filename, FILE* h, int demo, bool is_first_replay) {
-    frame_count = 0;
-    if (fread(&frame_count, 1, sizeof(frame_count), h) != 4) {
+    frame_count_ = 0;
+    if (fread(&frame_count_, 1, sizeof(frame_count_), h) != 4) {
         read_error(filename);
     }
-    if (frame_count <= 0) {
-        internal_error("recorder frame_count <= 0: ", filename);
+    if (frame_count_ <= 0) {
+        internal_error("recorder frame_count_ <= 0: ", filename);
     }
 
-    frames.resize(frame_count);
+    frames.resize(frame_count_);
 
     int version = 0;
     if (fread(&version, 1, sizeof(version), h) != 4) {
@@ -403,7 +403,7 @@ int recorder::load(const char* filename, FILE* h, int demo, bool is_first_replay
 
 #define READ_FIELD(field)                                                                          \
     {                                                                                              \
-        for (int i = 0; i < frame_count; i++) {                                                    \
+        for (int i = 0; i < frame_count_; i++) {                                                   \
             if (fread(&frames[i].field, 1, sizeof(frames[i].field), h) !=                          \
                 sizeof(frames[i].field)) {                                                         \
                 read_error(filename);                                                              \
@@ -463,8 +463,8 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
         keep_file = true;
     }
 
-    if (frame_count == 0) {
-        internal_error("recorder save frame_count == 0!");
+    if (frame_count_ == 0) {
+        internal_error("recorder save frame_count_ == 0!");
     }
 
     if (!h) {
@@ -476,7 +476,7 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
         }
     }
 
-    if (fwrite(&frame_count, 1, sizeof(frame_count), h) != 4) {
+    if (fwrite(&frame_count_, 1, sizeof(frame_count_), h) != 4) {
         save_error(filename);
     }
     int version = 131;
@@ -498,7 +498,7 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
 
 #define WRITE_FIELD(field)                                                                         \
     {                                                                                              \
-        for (int i = 0; i < frame_count; i++) {                                                    \
+        for (int i = 0; i < frame_count_; i++) {                                                   \
             if (fwrite(&frames[i].field, 1, sizeof(frames[i].field), h) !=                         \
                 sizeof(frames[i].field)) {                                                         \
                 save_error(filename);                                                              \

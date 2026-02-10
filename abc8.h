@@ -1,6 +1,8 @@
 #ifndef ABC8_H
 #define ABC8_H
 
+#include "keys.h"
+
 class pic8;
 typedef pic8* ptrpic8;
 
@@ -18,7 +20,7 @@ class abc8 {
     void write_right_align(pic8* dest, int x, int y, const char* text);
     int len(const char* text);
     void set_spacing(int new_spacing);
-    bool has_char(unsigned char c) const;
+    bool has_char(Keycode c) const;
 };
 
 #endif

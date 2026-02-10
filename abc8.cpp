@@ -6,6 +6,8 @@
 #include <cstring>
 #include <string>
 
+constexpr int MAX_CODEPOINT = 256;
+
 static void close_file(FILE* h, bool res_file) {
     if (res_file) {
         qclose(h);
@@ -18,20 +20,20 @@ abc8::abc8(const char* filename) {
     spacing = 0;
     ppsprite = nullptr;
     y_offset = nullptr;
-    ppsprite = new ptrpic8[256];
+    ppsprite = new ptrpic8[MAX_CODEPOINT];
     if (!ppsprite) {
         external_error("memory");
         return;
     }
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MAX_CODEPOINT; i++) {
         ppsprite[i] = nullptr;
     }
-    y_offset = new short[256];
+    y_offset = new short[MAX_CODEPOINT];
     if (!y_offset) {
         external_error("memory");
         return;
     }
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MAX_CODEPOINT; i++) {
         y_offset[i] = 0;
     }
 
@@ -66,7 +68,7 @@ abc8::abc8(const char* filename) {
         close_file(h, res_file);
         return;
     }
-    if (sprite_count <= 0 || sprite_count > 256) {
+    if (sprite_count <= 0 || sprite_count > MAX_CODEPOINT) {
         internal_error("Invalid codepoint count for abc8 file: ", filename);
     }
     for (int i = 0; i < sprite_count; i++) {
@@ -103,7 +105,7 @@ abc8::abc8(const char* filename) {
 
 abc8::~abc8() {
     if (ppsprite) {
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < MAX_CODEPOINT; i++) {
             if (ppsprite[i]) {
                 delete ppsprite[i];
                 ppsprite[i] = nullptr;
@@ -182,7 +184,10 @@ int abc8::len(const char* text) {
 
 void abc8::set_spacing(int new_spacing) { spacing = new_spacing; }
 
-bool abc8::has_char(unsigned char c) const {
+bool abc8::has_char(Keycode c) const {
+    if (c >= MAX_CODEPOINT) {
+        return false;
+    }
     // Space is always supported (handled specially in write)
     if (c == ' ') {
         return true;

@@ -118,7 +118,8 @@ class menu_nav {
     int navigate(bool render_only = false);
     void render();
     size_t row_count() { return entries.size(); }
-    std::string& entry_left(int index);
+    std::string& entry_left(int index) { return entries[index].text_left; }
+    std::string& entry_right(int index) { return entries[index].text_right; }
 
   private:
     int prompt_choice(bool render_only);

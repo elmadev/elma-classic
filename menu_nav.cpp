@@ -569,8 +569,6 @@ int menu_nav::navigate(bool render_only) {
 
 void menu_nav::render() { menu->render(); }
 
-std::string& menu_nav::entry_left(int index) { return entries[index].text_left; }
-
 bool menu_nav::search_handler(Keycode code) {
     if (search_pattern == SearchPattern::None) {
         return false;

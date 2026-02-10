@@ -37,19 +37,7 @@ void menu_replay() {
     bool done = find_first("rec/*.rec", filename);
 
     while (!done) {
-        finame name;
-        strcpy(name, filename);
-        // Remove extension:
-        int i = strlen(name) - 1;
-        while (i >= 0 && name[i] != '.') {
-            i--;
-        }
-        if (i < 0) {
-            internal_error("menu_replay: no dot in name!: ", name);
-        }
-        name[i] = 0;
-
-        replay_names.emplace_back(name);
+        replay_names.emplace_back(filename);
 
         done = find_next(filename);
         if (replay_names.size() >= NavEntriesLeftMaxLength - 4) {
@@ -70,8 +58,21 @@ void menu_replay() {
     int count = 0;
     strcpy(NavEntriesLeft[count++], "Randomizer");
 
-    for (const auto& name : replay_names) {
-        strcpy(NavEntriesLeft[count++], name.c_str());
+    for (const auto& full_name : replay_names) {
+        finame display_name;
+        strcpy(display_name, full_name.c_str());
+
+        // Remove extension for display:
+        int i = strlen(display_name) - 1;
+        while (i >= 0 && display_name[i] != '.') {
+            i--;
+        }
+        if (i < 0) {
+            internal_error("menu_replay: no dot in name!: ", full_name.c_str());
+        }
+        display_name[i] = 0;
+
+        strcpy(NavEntriesLeft[count++], display_name);
     }
 
     menu_nav nav;
@@ -101,25 +102,24 @@ void menu_replay() {
                 }
                 second_last_played = last_played;
                 last_played = index;
-                // Generate name:
-                char tmp[30];
-                strcpy(tmp, NavEntriesLeft[index + 1]);
-                strcat(tmp, ".REC");
+
                 MenuPalette->set();
                 loading_screen();
-                int level_id = recorder::load_rec_file(tmp, 0);
+
+                int level_id = recorder::load_rec_file(replay_names[index].c_str(), 0);
                 if (access_level_file(Rec1->level_filename) != 0) {
                     int c = menu_dialog("Cannot find the lev file that corresponds",
-                                        "to the record file!", tmp, Rec1->level_filename);
+                                        "to the record file!", replay_names[index].c_str(),
+                                        Rec1->level_filename);
                     if (c == KEY_ESC) {
                         return;
                     }
                 } else {
                     floadlevel_p(Rec1->level_filename);
                     if (Ptop->level_id != level_id) {
-                        int c =
-                            menu_dialog("The level file has changed since the",
-                                        "saving of the record file!", tmp, Rec1->level_filename);
+                        int c = menu_dialog("The level file has changed since the",
+                                            "saving of the record file!",
+                                            replay_names[index].c_str(), Rec1->level_filename);
                         if (c == KEY_ESC) {
                             return;
                         }
@@ -133,12 +133,10 @@ void menu_replay() {
                 }
             }
         } else {
+            const char* replay_name = replay_names[choice - 1].c_str();
             // Play a rec file:
-            char tmp[30];
-            strcpy(tmp, NavEntriesLeft[choice]);
-            strcat(tmp, ".REC");
             loading_screen();
-            int level_id = recorder::load_rec_file(tmp, 0);
+            int level_id = recorder::load_rec_file(replay_name, 0);
             if (F1Pressed) {
                 F1Pressed = false;
                 char msg[128];
@@ -149,16 +147,17 @@ void menu_replay() {
                 if (c == KEY_ENTER) {
                     if (access_level_file(Rec1->level_filename) != 0) {
                         menu_dialog("Cannot find the lev file that corresponds",
-                                    "to the record file!", tmp, Rec1->level_filename);
+                                    "to the record file!", replay_name, Rec1->level_filename);
                     } else {
                         floadlevel_p(Rec1->level_filename);
                         if (Ptop->level_id != level_id) {
                             menu_dialog("The level file has changed since the",
-                                        "saving of the record file!", tmp, Rec1->level_filename);
+                                        "saving of the record file!", replay_name,
+                                        Rec1->level_filename);
                         } else {
                             Rec1->rewind();
                             Rec2->rewind();
-                            render_replay(Rec1->level_filename, tmp);
+                            render_replay(Rec1->level_filename, replay_name);
                         }
                     }
                 }
@@ -179,17 +178,17 @@ void menu_replay() {
                 char time_str[25];
                 centiseconds_to_string(time, time_str);
                 strcat(time_str, "    +- 0.01 sec");
-                menu_dialog(tmp, "The time of this replay file is:", time_str);
+                menu_dialog(replay_name, "The time of this replay file is:", time_str);
                 continue;
             }
             if (access_level_file(Rec1->level_filename) != 0) {
-                menu_dialog("Cannot find the lev file that corresponds", "to the record file!", tmp,
-                            Rec1->level_filename);
+                menu_dialog("Cannot find the lev file that corresponds", "to the record file!",
+                            replay_name, Rec1->level_filename);
             } else {
                 floadlevel_p(Rec1->level_filename);
                 if (Ptop->level_id != level_id) {
                     menu_dialog("The level file has changed since the",
-                                "saving of the record file!", tmp, Rec1->level_filename);
+                                "saving of the record file!", replay_name, Rec1->level_filename);
                 } else {
                     replay_from_file(Rec1->level_filename);
                 }

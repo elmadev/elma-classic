@@ -408,7 +408,7 @@ menu_nav::menu_nav(std::string title)
     enable_esc = true;
     y_title = 30;
     search_pattern = SearchPattern::None;
-    search_skip_one = false;
+    search_skip = 0;
 }
 
 void menu_nav::add_row(std::string left, std::string right) {
@@ -566,11 +566,8 @@ bool menu_nav::search_handler(int code) {
     }
 
     using iter = std::vector<nav_row>::iterator;
-    iter begin = entries.begin();
+    iter begin = entries.begin() + search_skip;
     iter end = entries.end();
-    if (search_skip_one) {
-        ++begin;
-    }
 
     switch (search_pattern) {
     case SearchPattern::Sorted: {

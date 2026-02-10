@@ -82,6 +82,7 @@ class menu_nav {
     std::string title;
     SearchPattern search_pattern;
     bool search_skip_one;
+    int search_skip;
 
     menu_nav(std::string title);
 

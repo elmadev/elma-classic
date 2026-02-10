@@ -75,22 +75,19 @@ menu_pic::~menu_pic() {
     lines = nullptr;
 }
 
-void menu_pic::add_line(const char* text, int x, int y) {
-    if (strlen(text) > MENU_LINE_LENGTH) {
-        internal_error("menu::add_line strlen(text) > MENU_LINE_LENGTH");
-    }
+void menu_pic::add_line(std::string text, int x, int y) {
     if (line_count >= MENU_MAX_LINES) {
         internal_error("menu::add_line linecount >= MENU_MAX_LINES");
     }
-    strcpy(lines[line_count].text, text);
+    lines[line_count].text = text;
     lines[line_count].x = x;
     lines[line_count].y = y;
     line_count++;
     image_valid = false;
 }
 
-void menu_pic::add_line_centered(const char* text, int x, int y) {
-    add_line(text, x - MenuFont->len(text) / 2, y);
+void menu_pic::add_line_centered(const std::string& text, int x, int y) {
+    add_line(text, x - MenuFont->len(text.c_str()) / 2, y);
 }
 
 // Set red helmet pixel position
@@ -227,8 +224,8 @@ void menu_pic::render(bool skip_balls_helmet) {
             if (center_vertically) {
                 y += SCREEN_HEIGHT / 2 - 240;
             }
-            MenuFont->write(BufferMain, x, y, lines[i].text);
-            MenuFont->write(BufferBall, x, y, lines[i].text);
+            MenuFont->write(BufferMain, x, y, lines[i].text.c_str());
+            MenuFont->write(BufferBall, x, y, lines[i].text.c_str());
         }
     }
 
@@ -391,7 +388,7 @@ bool menu_pic::render_intro_anim(double time) {
         if (center_vertically) {
             internal_error("menu_pic::render_intro_anim should not center vertically!");
         }
-        MenuFont->write(ScreenBuffer, x, lines[i].y + frame - SCREEN_HEIGHT, lines[i].text);
+        MenuFont->write(ScreenBuffer, x, lines[i].y + frame - SCREEN_HEIGHT, lines[i].text.c_str());
     }
 
     // The helmet moves down from -SCREEN_HEIGHT to 0

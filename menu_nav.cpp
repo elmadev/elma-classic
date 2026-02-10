@@ -248,10 +248,10 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
 
             // Fixed-position extra text lines
             for (int i = 0; i < extra_lines_length; i++) {
-                if (strncmp(extra_lines[i].text, MENU_CENTER_TEXT, sizeof(MENU_CENTER_TEXT) - 1) ==
-                    0) {
-                    menu->add_line_centered(&extra_lines[i].text[sizeof(MENU_CENTER_TEXT) - 1],
-                                            extra_lines[i].x, extra_lines[i].y);
+                if (extra_lines[i].text.starts_with(MENU_CENTER_TEXT)) {
+                    menu->add_line_centered(
+                        extra_lines[i].text.substr(sizeof(MENU_CENTER_TEXT) - 1), extra_lines[i].x,
+                        extra_lines[i].y);
                 } else {
                     menu->add_line(extra_lines[i].text, extra_lines[i].x, extra_lines[i].y);
                 }

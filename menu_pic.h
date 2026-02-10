@@ -1,10 +1,11 @@
 #ifndef MENU_PIC_H
 #define MENU_PIC_H
 
+#include <string>
+
 constexpr unsigned char BLACK_PALETTE_ID = 254;
 constexpr unsigned char GREEN_PALETTE_ID = 248;
 
-constexpr int MENU_LINE_LENGTH = 100;
 constexpr int MENU_MAX_LINES = 200;
 
 class abc8;
@@ -18,7 +19,7 @@ extern palette* MenuPalette;
 extern pic8* Intro;
 
 struct text_line {
-    char text[MENU_LINE_LENGTH + 2];
+    std::string text;
     int x;
     int y;
 };
@@ -34,8 +35,8 @@ class menu_pic {
   public:
     menu_pic(bool center_vert = true);
     ~menu_pic();
-    void add_line(const char* text, int x, int y);
-    void add_line_centered(const char* text, int x, int y);
+    void add_line(std::string text, int x, int y);
+    void add_line_centered(const std::string& text, int x, int y);
     void set_helmet(int x, int y);
     void clear();
     void render(bool skip_balls_helmet = false);

@@ -18,6 +18,7 @@
 #include "timer.h"
 #include <cstdlib>
 #include <cstring>
+#include <format>
 
 // Prompt for replay filename and return true if enter, false if esc
 static bool menu_prompt_replay_name(char* filename) {
@@ -281,12 +282,12 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
         // Show either the time_message from update_top_ten or FlagTag info
         if (!Single && Tag) {
             if (FlagTagAStarts) {
-                sprintf(ExtraTimeText[0].text, MENU_CENTER_TEXT "A start with the flag next.");
+                ExtraTimeText[0].text = MENU_CENTER_TEXT "A start with the flag next.";
             } else {
-                sprintf(ExtraTimeText[0].text, MENU_CENTER_TEXT "B start with the flag next.");
+                ExtraTimeText[0].text = MENU_CENTER_TEXT "B start with the flag next.";
             }
         } else {
-            strcpy(ExtraTimeText[0].text, time_message);
+            ExtraTimeText[0].text = time_message;
         }
         ExtraTimeText[0].x = 320;
         if (Single) {
@@ -314,48 +315,52 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
 
             // Player A name
             if (long_name) {
-                sprintf(ExtraTimeText[1].text, "Player A: %s", player1->name);
+                ExtraTimeText[1].text = std::format("Player A: {}", player1->name);
             } else {
-                sprintf(ExtraTimeText[1].text, "Player A:     %s", player1->name);
+                ExtraTimeText[1].text = std::format("Player A:     {}", player1->name);
             }
             ExtraTimeText[1].x = 10 + dx;
             ExtraTimeText[1].y = y1;
 
             // Player A apple count
-            sprintf(ExtraTimeText[2].text, "%d", Motor1->apple_count);
+            ExtraTimeText[2].text = std::to_string(Motor1->apple_count);
             ExtraTimeText[2].x = 380 + dx;
             ExtraTimeText[2].y = y1;
 
             // Player A flag time
             if (is_flagtag) {
                 int time = FlagTimeA * TimeToCentiseconds;
-                centiseconds_to_string(time, ExtraTimeText[3].text);
+                char time_text[20];
+                centiseconds_to_string(time, time_text);
+                ExtraTimeText[3].text = std::string(time_text);
                 ExtraTimeText[3].x = 440 + dx;
                 ExtraTimeText[3].y = y1;
             } else {
-                strcpy(ExtraTimeText[3].text, " ");
+                ExtraTimeText[3].text = " ";
                 ExtraTimeText[3].x = 100 + dx;
                 ExtraTimeText[3].y = 100;
             }
 
             // Player B name
             if (long_name) {
-                sprintf(ExtraTimeText[4].text, "Player B: %s", player2->name);
+                ExtraTimeText[4].text = std::format("Player B: {}", player2->name);
             } else {
-                sprintf(ExtraTimeText[4].text, "Player B:     %s", player2->name);
+                ExtraTimeText[4].text = std::format("Player B:     {}", player2->name);
             }
             ExtraTimeText[4].x = 10 + dx;
             ExtraTimeText[4].y = y2;
 
             // Player B apple count
-            sprintf(ExtraTimeText[5].text, "%d", Motor2->apple_count);
+            ExtraTimeText[5].text = std::to_string(Motor2->apple_count);
             ExtraTimeText[5].x = 380 + dx;
             ExtraTimeText[5].y = y2;
 
             // Player B flag time
             if (is_flagtag) {
                 int time = FlagTimeB * TimeToCentiseconds;
-                centiseconds_to_string(time, ExtraTimeText[6].text);
+                char time_text[20];
+                centiseconds_to_string(time, time_text);
+                ExtraTimeText[6].text = std::string(time_text);
                 ExtraTimeText[6].x = 440 + dx;
                 ExtraTimeText[6].y = y2;
             }

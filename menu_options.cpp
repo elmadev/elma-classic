@@ -61,44 +61,26 @@ void menu_help() {
 }
 
 static void menu_lgr() {
-    menu_nav_old nav;
+    menu_nav nav("Pick an LGR!");
     nav.search_pattern = SearchPattern::Sorted;
-    strcpy(nav.title, "Pick an LGR!");
 
     finame filename;
-    std::vector<std::string> lgr_names;
     bool done = find_first("lgr/*.lgr", filename);
     while (!done) {
         constexpr int LGR_EXT_LEN = 4;
         int len = strlen(filename);
-        lgr_names.emplace_back(filename, len - LGR_EXT_LEN);
+        std::string lgrname = std::string(filename, len - LGR_EXT_LEN);
+
+        nav.add_row(lgrname, NAV_FUNC() { EolSettings->set_default_lgr_name(left); });
 
         done = find_next(filename);
-        if (lgr_names.size() >= NavEntriesLeftMaxLength - 4) {
-            done = true;
-        }
     }
-
     find_close();
 
-    std::sort(lgr_names.begin(), lgr_names.end(),
-              [](std::string& a, std::string& b) { return strcmpi(a.c_str(), b.c_str()) < 0; });
+    nav.sort_rows();
+    nav.select_row(EolSettings->default_lgr_name());
 
-    int i = 0;
-    for (std::string& name : lgr_names) {
-        if (strcmpi(name.c_str(), EolSettings->default_lgr_name().c_str()) == 0) {
-            nav.selected_index = i;
-        }
-        strcpy(NavEntriesLeft[i++], name.c_str());
-    }
-
-    nav.setup(lgr_names.size());
-    int choice = nav.navigate();
-    if (choice < 0) {
-        return;
-    }
-
-    EolSettings->set_default_lgr_name(NavEntriesLeft[choice]);
+    nav.navigate();
 }
 
 void menu_options() {

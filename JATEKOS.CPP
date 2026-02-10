@@ -111,8 +111,8 @@ void newjatekos(int A, int visszater) {
 
 void jatekosvalasztas(int A, int visszater) {
     // Valasztas:
-    menu_nav* pval = NULL;
-    pval = new menu_nav;
+    menu_nav_old* pval = NULL;
+    pval = new menu_nav_old;
     char* eddigjatekos = NULL;
     if (A) {
         eddigjatekos = State->player1;

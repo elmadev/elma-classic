@@ -158,7 +158,7 @@ void menu_best_times_choose_level(bool single) {
         visible_levels = INTERNAL_LEVEL_COUNT - 1;
     }
 
-    menu_nav nav;
+    menu_nav_old nav;
     nav.selected_index = 0;
     nav.x_left = 61;
     nav.x_right = 380;
@@ -202,7 +202,7 @@ void menu_best_times_choose_level(bool single) {
 }
 
 void menu_best_times() {
-    menu_nav nav;
+    menu_nav_old nav;
     if (State->single) {
         nav.selected_index = 0;
     } else {

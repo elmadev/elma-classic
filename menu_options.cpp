@@ -60,7 +60,7 @@ void menu_help() {
 }
 
 static void menu_lgr() {
-    menu_nav nav;
+    menu_nav_old nav;
     nav.search_pattern = SearchPattern::Sorted;
     strcpy(nav.title, "Pick an LGR!");
 
@@ -103,7 +103,7 @@ static void menu_lgr() {
 void menu_options() {
     int choice = 0;
     while (true) {
-        menu_nav nav;
+        menu_nav_old nav;
         nav.selected_index = choice;
         nav.x_left = 72;
         nav.x_right = 390;

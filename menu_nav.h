@@ -21,7 +21,7 @@ void menu_nav_entries_init();
 
 enum class SearchPattern { None, Sorted, Internals };
 
-class menu_nav {
+class menu_nav_old {
     nav_entry* entries_left;
     nav_entry* entries_right;
     int length;
@@ -41,8 +41,8 @@ class menu_nav {
     SearchPattern search_pattern;
     bool search_skip_one;
 
-    menu_nav();
-    ~menu_nav();
+    menu_nav_old();
+    ~menu_nav_old();
     void setup(int len, bool two_col = false);
     int navigate(text_line* extra_lines = nullptr, int extra_lines_length = 0,
                  bool render_only = false);

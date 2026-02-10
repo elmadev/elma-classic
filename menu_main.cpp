@@ -75,7 +75,7 @@ static void menu_replay() {
         strcpy(NavEntriesLeft[count++], display_name);
     }
 
-    menu_nav nav;
+    menu_nav_old nav;
     nav.search_pattern = SearchPattern::Sorted;
     nav.search_skip_one = true;
     nav.selected_index = 0;
@@ -234,7 +234,7 @@ static void menu_demo() {
 }
 
 static void menu_prompt_exit() {
-    menu_nav nav;
+    menu_nav_old nav;
     nav.selected_index = 0;
     nav.x_left = 300;
     nav.y_entries = 200;
@@ -262,7 +262,7 @@ static void menu_prompt_exit() {
 void menu_main() {
     MenuPalette->set();
 
-    menu_nav nav;
+    menu_nav_old nav;
     nav.selected_index = 0;
     nav.x_left = 200;
     nav.y_entries = 100;

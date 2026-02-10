@@ -283,7 +283,7 @@ static void load_control(key_pointers keys, int offset, const char* label, int* 
 
 // Await keypress to choose a new key for one control
 static void prompt_control(int length, key_pointers keys, int index) {
-    menu_nav nav;
+    menu_nav_old nav;
     nav.selected_index = index;
     nav.x_left = 60;
     nav.x_right = 400;
@@ -376,7 +376,7 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
                                   const char* player_letter) {
     int choice = 0;
     while (true) {
-        menu_nav nav;
+        menu_nav_old nav;
         nav.selected_index = choice;
         nav.x_left = 60;
         nav.x_right = 400;
@@ -403,7 +403,7 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
 static void menu_customize_replay(key_pointers keys) {
     int choice = 0;
     while (true) {
-        menu_nav nav;
+        menu_nav_old nav;
         nav.selected_index = choice;
         nav.x_left = 60;
         nav.x_right = 400;
@@ -433,7 +433,7 @@ void menu_customize_controls() {
 
     int choice = 0;
     while (true) {
-        menu_nav nav;
+        menu_nav_old nav;
         nav.selected_index = choice;
         nav.x_left = 60;
         nav.x_right = 400;

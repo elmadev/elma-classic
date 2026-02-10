@@ -379,7 +379,7 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
             }
         }
 
-        menu_nav nav;
+        menu_nav_old nav;
         nav.selected_index = default_choice;
         nav.x_left = 230;
         nav.y_entries = 110;
@@ -536,7 +536,7 @@ void menu_play() {
             levels_completed = INTERNAL_LEVEL_COUNT;
         }
 
-        menu_nav nav;
+        menu_nav_old nav;
         nav.search_pattern = SearchPattern::Internals;
         nav.selected_index = player1->selected_level + 1;
         strcpy(nav.title, "Select Level!");

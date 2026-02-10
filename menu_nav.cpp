@@ -63,7 +63,7 @@ void menu_nav_entries_init() {
     }
 }
 
-menu_nav::menu_nav() {
+menu_nav_old::menu_nav_old() {
     entries_left = nullptr;
     entries_right = nullptr;
     length = 0;
@@ -79,7 +79,7 @@ menu_nav::menu_nav() {
     search_skip_one = false;
 }
 
-menu_nav::~menu_nav() {
+menu_nav_old::~menu_nav_old() {
     if (entries_left) {
         delete[] entries_left;
     }
@@ -102,7 +102,7 @@ menu_nav::~menu_nav() {
 }
 
 // Load the menu with data from NavEntriesLeft and, if two columns, NavEntriesRight
-void menu_nav::setup(int len, bool two_col) {
+void menu_nav_old::setup(int len, bool two_col) {
     if (entries_left) {
         internal_error("menu_nav::setup called twice!");
     }
@@ -143,7 +143,7 @@ void menu_nav::setup(int len, bool two_col) {
 bool CtrlAltPressed = false;
 bool F1Pressed = false;
 
-int menu_nav::calculate_visible_entries(int extra_lines_length) {
+int menu_nav_old::calculate_visible_entries(int extra_lines_length) {
     int max_visible_entries = (SCREEN_HEIGHT - y_entries) / dy;
     if (max_visible_entries < 2) {
         max_visible_entries = 2;
@@ -152,7 +152,7 @@ int menu_nav::calculate_visible_entries(int extra_lines_length) {
 }
 
 // Render menu and return selected index (or -1 if Esc)
-int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool render_only) {
+int menu_nav_old::navigate(text_line* extra_lines, int extra_lines_length, bool render_only) {
     if (length < 1) {
         internal_error("menu_nav::navigate invalid setup!");
     }
@@ -277,14 +277,14 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     }
 }
 
-void menu_nav::render() {
+void menu_nav_old::render() {
     if (!menu) {
         internal_error("menu_nav::render !menu");
     }
     menu->render();
 }
 
-nav_entry* menu_nav::entry_left(int index) { return &entries_left[index]; }
+nav_entry* menu_nav_old::entry_left(int index) { return &entries_left[index]; }
 
 static bool accept_search_input() {
     if (EolSettings->lctrl_search()) {
@@ -306,7 +306,7 @@ static size_t common_prefix_len(const char* a, const char* b) {
     }
 }
 
-bool menu_nav::search_handler(int code) {
+bool menu_nav_old::search_handler(int code) {
     if (search_pattern == SearchPattern::None) {
         return false;
     }

@@ -1,6 +1,8 @@
 #ifndef MENU_NAV_H
 #define MENU_NAV_H
 
+#include "menu_pic.h"
+#include <memory>
 #include <string>
 
 class menu_pic;
@@ -63,7 +65,7 @@ class menu_nav {
     nav_entry* entries_right;
     int length;
     bool two_columns;
-    menu_pic* menu;
+    std::unique_ptr<menu_pic> menu;
     std::string search_input;
 
   public:

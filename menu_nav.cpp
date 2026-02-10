@@ -5,7 +5,6 @@
 #include "keys.h"
 #include "main.h"
 #include "M_PIC.H"
-#include "menu_pic.h"
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include <algorithm>
@@ -399,7 +398,8 @@ bool menu_nav_old::search_handler(int code) {
 }
 
 menu_nav::menu_nav(std::string title)
-    : title(std::move(title)) {
+    : menu(std::make_unique<menu_pic>(false)),
+      title(std::move(title)) {
     entries_left = nullptr;
     entries_right = nullptr;
     length = 0;
@@ -409,7 +409,6 @@ menu_nav::menu_nav(std::string title)
     dy = 33;
     enable_esc = true;
     y_title = 30;
-    menu = nullptr;
     search_pattern = SearchPattern::None;
     search_skip_one = false;
 }
@@ -420,9 +419,6 @@ menu_nav::~menu_nav() {
     }
     if (entries_right) {
         delete[] entries_right;
-    }
-    if (menu) {
-        delete menu;
     }
 
     entries_left = nullptr;
@@ -501,11 +497,6 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     // Center current selection on the screen
     int view_index = selected_index - max_visible_entries / 2;
     int view_max = length - max_visible_entries;
-
-    if (menu) {
-        delete menu;
-    }
-    menu = new menu_pic(false);
 
     empty_keypress_buffer();
     bool rerender = true;
@@ -607,12 +598,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     }
 }
 
-void menu_nav::render() {
-    if (!menu) {
-        internal_error("menu_nav::render !menu");
-    }
-    menu->render();
-}
+void menu_nav::render() { menu->render(); }
 
 nav_entry* menu_nav::entry_left(int index) { return &entries_left[index]; }
 

@@ -67,8 +67,21 @@ struct nav_row {
     std::string text_right;
 };
 
+enum class OverlayAlignment {
+    Left,
+    Centered,
+};
+
+struct nav_overlay {
+    std::string text;
+    int x;
+    int y;
+    OverlayAlignment alignment;
+};
+
 class menu_nav {
     std::vector<nav_row> entries;
+    std::vector<nav_overlay> overlays;
     std::unique_ptr<menu_pic> menu;
     std::string search_input;
 
@@ -88,15 +101,16 @@ class menu_nav {
     menu_nav(std::string title);
 
     void add_row(std::string left, std::string right);
+    void add_overlay(std::string text, int x, int y,
+                     OverlayAlignment alignment = OverlayAlignment::Left);
 
-    int navigate(text_line* extra_lines = nullptr, int extra_lines_length = 0,
-                 bool render_only = false);
+    int navigate(bool render_only = false);
     void render();
     size_t row_count() { return entries.size(); }
     std::string& entry_left(int index);
 
   private:
-    int calculate_visible_entries(int extra_lines_length);
+    int calculate_visible_entries();
     bool search_handler(Keycode code);
 };
 

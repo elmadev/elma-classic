@@ -414,7 +414,11 @@ void menu_nav::add_row(std::string left, std::string right) {
     entries.emplace_back(std::move(left), std::move(right));
 }
 
-int menu_nav::calculate_visible_entries(int extra_lines_length) {
+void menu_nav::add_overlay(std::string text, int x, int y, OverlayAlignment alignment) {
+    overlays.emplace_back(std::move(text), x, y, alignment);
+}
+
+int menu_nav::calculate_visible_entries() {
     int max_visible_entries = (SCREEN_HEIGHT - y_entries) / dy;
     if (max_visible_entries < 2) {
         max_visible_entries = 2;
@@ -423,7 +427,7 @@ int menu_nav::calculate_visible_entries(int extra_lines_length) {
 }
 
 // Render menu and return selected index (or -1 if Esc)
-int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool render_only) {
+int menu_nav::navigate(bool render_only) {
     if (row_count() < 1) {
         internal_error("menu_nav::navigate invalid setup!");
     }
@@ -433,7 +437,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     // Bound current selection
     selected_index = std::min(selected_index, (int)row_count() - 1);
 
-    int max_visible_entries = calculate_visible_entries(extra_lines_length);
+    int max_visible_entries = calculate_visible_entries();
 
     // Center current selection on the screen
     int view_index = selected_index - max_visible_entries / 2;
@@ -498,14 +502,15 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
             rerender = false;
             menu->clear();
 
-            // Fixed-position extra text lines
-            for (int i = 0; i < extra_lines_length; i++) {
-                if (extra_lines[i].text.starts_with(MENU_CENTER_TEXT)) {
-                    menu->add_line_centered(
-                        extra_lines[i].text.substr(sizeof(MENU_CENTER_TEXT) - 1), extra_lines[i].x,
-                        extra_lines[i].y);
-                } else {
-                    menu->add_line(extra_lines[i].text, extra_lines[i].x, extra_lines[i].y);
+            // Overlays
+            for (nav_overlay overlay : overlays) {
+                switch (overlay.alignment) {
+                case OverlayAlignment::Centered:
+                    menu->add_line_centered(overlay.text, overlay.x, overlay.y);
+                    break;
+                case OverlayAlignment::Left:
+                    menu->add_line(overlay.text, overlay.x, overlay.y);
+                    break;
                 }
             }
 

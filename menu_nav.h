@@ -74,11 +74,11 @@ class menu_nav {
     int x_right;
     int y_title;
     bool enable_esc;
-    char title[100];
+    std::string title;
     SearchPattern search_pattern;
     bool search_skip_one;
 
-    menu_nav();
+    menu_nav(std::string title);
     ~menu_nav();
     void setup(int len, bool two_col = false);
     int navigate(text_line* extra_lines = nullptr, int extra_lines_length = 0,

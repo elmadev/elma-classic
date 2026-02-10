@@ -398,7 +398,8 @@ bool menu_nav_old::search_handler(int code) {
     return true;
 }
 
-menu_nav::menu_nav() {
+menu_nav::menu_nav(std::string title)
+    : title(std::move(title)) {
     entries_left = nullptr;
     entries_right = nullptr;
     length = 0;
@@ -407,7 +408,6 @@ menu_nav::menu_nav() {
     y_entries = 90;
     dy = 33;
     enable_esc = true;
-    title[0] = 0;
     y_title = 30;
     menu = nullptr;
     search_pattern = SearchPattern::None;
@@ -583,10 +583,8 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
 
             // Title
             if (!search_input.empty()) {
-                std::string search_title = title;
-                search_title.append(": ");
-                search_title.append(search_input);
-                menu->add_line_centered(search_title.c_str(), 320, y_title);
+                std::string search_title = title + ": " + search_input;
+                menu->add_line_centered(search_title, 320, y_title);
             } else {
                 menu->add_line_centered(title, 320, y_title);
             }

@@ -310,30 +310,25 @@ static void demo(void) {
 }
 
 static void kilephakell(void) {
-    menu_nav val;
+    menu_nav2 val("Do you want to quit?");
     val.selected_index = 0;
     val.x_left = 300;
     val.y_entries = 200;
     val.dy = 40;
     val.y_title = 50; // ezt nem szokas allitani egyebkent
     val.enable_esc = false;
-    strcpy(val.title, "Do you want to quit?");
 
-    strcpy(NavEntriesLeft[0], "Yes");
-    strcpy(NavEntriesLeft[1], "No");
+    val.add_row(
+        "Yes", "", NAV_LAMBDA {
+            // Ezt csak watmment.exe-ben szabad kikomentezni:
+            State->reload_toptens();
 
-    val.setup(2);
-
-    int eredmeny = val.navigate();
-
-    if (eredmeny == 0) {
-        // Ezt csak watmment.exe-ben szabad kikomentezni:
-        State->reload_toptens();
-
-        State->save();
-        State->write_stats();
-        menu_exit();
-    }
+            State->save();
+            State->write_stats();
+            menu_exit();
+        });
+    val.add_row("No", "");
+    val.navigate();
 }
 
 void mainmenu(void) {

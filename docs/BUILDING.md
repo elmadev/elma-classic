@@ -5,22 +5,26 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
 ### Prerequisites
 
 - **C++ compiler** (GCC, Clang, or MSVC)
+- **Python**
 
 ### Installing Meson and Ninja
 
 **Meson** (1.10.0 or later) and **Ninja** are required to build this project.
 
 - On macOS:
+
   ```
   brew install meson ninja
   ```
 
 - On Linux:
+
   ```
   sudo apt install meson ninja-build
   ```
 
   Or using pip:
+
   ```
   pip install meson ninja
   ```
@@ -33,44 +37,80 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
 ### Setup
 
 1. Configure the build directory (only needed once):
+
    ```
    meson setup build
    ```
+
    For a release build use this setup:
+
    ```
    meson setup build -Dbuildtype=release
    ```
 
 2. Compile the project:
+
    ```
    meson compile -C build
    ```
 
-3. Run the executable:
-    ```
-    cd build
-    ./elma
-    ```
+3. Copy files to build folder:
 
-### Common Build Commands
+   ```
+   build/elma.res
+   build/lgr/default.lgr
+   build/fonts/small.abc
+   etc
+   ```
 
+4. Run the executable:
+   ```
+   cd build
+   ./elma
+   ```
+
+### Configuration
+
+You can list all of the options using `meson configure build` and set an option using `meson configure build -Doption=value`
+
+Built-in options are documented at https://mesonbuild.com/Builtin-options.html.
+
+Custom options are documented in the repository file `meson.options`
+
+However, here are the relevant options:
+
+#### buildtype
+
+`meson configure build -Dbuildtype=`
+
+- `debug` - Extra checks with errors or warnings
+- `debugoptimized` - Debug, but O2-optimized build
+- `release` - O3-optimized build
+
+#### b_sanitize
+
+`meson configure build -Db_sanitize=`
+
+- `none` - No sanitizer
+- `address` - Add AddressSanitizer (memory errors, support by Clang/GCC/MSVC)
+- `address,undefined` - Add AddressSanitizer and UndefinedBehaviourSanitizer (Clang/GCC only)
+
+#### profile_performance
+
+`meson configure build -Dprofile_performance=`
+
+- `false` - Disabled
+- `true`- Enable performance timing checks
+
+### Common Commands
+
+- **Setup**: `meson setup build`
 - **Build**: `meson compile -C build`
 - **Clean**: `meson compile -C build --clean`
-- **Reconfigure**: `meson setup --reconfigure build`
-- **Full rebuild**: `meson setup --wipe build`
-
-### Sanitizers
-
-Use `-Db_sanitize=address` for AddressSanitizer (memory errors, supported by Clang/GCC/MSVC) or `-Db_sanitize=address,undefined` to also enable UndefinedBehaviorSanitizer (Clang/GCC only).
-
-```
-meson setup build -Dbuildtype=debug -Db_sanitize=address,undefined
-```
-
-To turn off
-```
-meson setup build -Dbuildtype=debug -Db_sanitize=none
-```
+- **Full Rebuild**: `meson setup --wipe build`
+- **Reconfigure Options**: `meson setup --reconfigure build`
+- **List Options**: `meson configure build`
+- **Set Options**: `meson configure build -Doption=value`
 
 ### Windows
 
@@ -103,9 +143,10 @@ To add this terminal to Visual Studio Code, add the following to .vscode/setting
 ```
 
 When running the setup step of meson you will need to pass `--vsenv`, like so:
-   ```
-   meson setup build --vsenv
-   ```
+
+```
+meson setup build --vsenv
+```
 
 ---
 
@@ -116,11 +157,13 @@ To ensure consistent code formatting, use `clang-format`.
 ### Installation
 
 - On macOS:
+
   ```
   $ brew install clang-format
   ```
 
 - On Linux:
+
   ```
   $ sudo apt install clang-format-19
   ```
@@ -134,9 +177,9 @@ To ensure consistent code formatting, use `clang-format`.
 
 To format all files in the repository, run the following command:
 
-  ```
-  ninja -C build clang-format
-  ```
+```
+ninja -C build clang-format
+```
 
 ---
 
@@ -147,11 +190,13 @@ To catch bugs and improve code quality, use `clang-tidy`.
 ### Installation
 
 - On macOS:
+
   ```
   $ brew install clang-tidy
   ```
 
 - On Linux:
+
   ```
   $ sudo apt install clang-tidy-19
   ```
@@ -165,9 +210,9 @@ To catch bugs and improve code quality, use `clang-tidy`.
 
 To run static analysis on all source files, run the following command:
 
-  ```
-  ninja -C build clang-tidy
-  ```
+```
+ninja -C build clang-tidy
+```
 
 The checks are configured in the `.clang-tidy` file at the project root.
 
@@ -183,6 +228,7 @@ VS Code configuration files are provided in the `docs/vscode/` directory for ref
 To use these configurations:
 
 1. Copy the files to your `.vscode/` folder:
+
    ```
    mkdir -p .vscode
    cp docs/vscode/launch.json .vscode/

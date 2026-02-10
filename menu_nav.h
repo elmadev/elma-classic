@@ -3,6 +3,7 @@
 
 #include "keys.h"
 #include "menu_pic.h"
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -62,9 +63,13 @@ class menu_nav_old {
 extern bool CtrlAltPressed;
 extern bool F1Pressed;
 
+#define NAV_FUNC(...) [__VA_ARGS__](int choice, std::string& left, std::string& right)
+using nav_func = std::function<void(int, std::string&, std::string&)>;
+
 struct nav_row {
     std::string text_left;
     std::string text_right;
+    nav_func handler;
 };
 
 enum class OverlayAlignment {
@@ -100,7 +105,7 @@ class menu_nav {
 
     menu_nav(std::string title);
 
-    void add_row(std::string left, std::string right);
+    void add_row(std::string left, std::string right, nav_func handler = nullptr);
     void add_overlay(std::string text, int x, int y,
                      OverlayAlignment alignment = OverlayAlignment::Left);
 
@@ -110,6 +115,7 @@ class menu_nav {
     std::string& entry_left(int index);
 
   private:
+    int prompt_choice(bool render_only);
     int calculate_visible_entries();
     bool search_handler(Keycode code);
 };

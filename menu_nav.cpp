@@ -410,8 +410,8 @@ menu_nav::menu_nav(std::string title)
     search_skip = 0;
 }
 
-void menu_nav::add_row(std::string left, std::string right) {
-    entries.emplace_back(std::move(left), std::move(right));
+void menu_nav::add_row(std::string left, std::string right, nav_func handler) {
+    entries.emplace_back(std::move(left), std::move(right), std::move(handler));
 }
 
 void menu_nav::add_overlay(std::string text, int x, int y, OverlayAlignment alignment) {
@@ -427,9 +427,9 @@ int menu_nav::calculate_visible_entries() {
 }
 
 // Render menu and return selected index (or -1 if Esc)
-int menu_nav::navigate(bool render_only) {
+int menu_nav::prompt_choice(bool render_only) {
     if (row_count() < 1) {
-        internal_error("menu_nav::navigate invalid setup!");
+        internal_error("menu_nav::prompt_choice no rows!");
     }
 
     search_input.clear();
@@ -533,9 +533,25 @@ int menu_nav::navigate(bool render_only) {
         menu->set_helmet(x_left - 30, y_entries + (selected_index - view_index) * dy);
         menu->render();
         if (render_only) {
-            return 0;
+            return -1;
         }
     }
+}
+
+int menu_nav::navigate(bool render_only) {
+    // Get choice from menu
+    int choice = prompt_choice(render_only);
+    if (choice == -1) {
+        return choice;
+    }
+
+    // Run the handler
+    nav_row& entry = entries[choice];
+    nav_func& f = entry.handler;
+    if (f) {
+        f(choice, entry.text_left, entry.text_right);
+    }
+    return choice;
 }
 
 void menu_nav::render() { menu->render(); }

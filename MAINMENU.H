@@ -3,6 +3,4 @@
 
 void menu_main(void);
 
-// void showinstruct( void );
-
 #endif

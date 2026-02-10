@@ -21,32 +21,6 @@
 #include <cstring>
 #include <ctime>
 
-/*void showinstruct( void ) {
-    blit8( Korny->picbuffer, Korny->ppic_help );
-
-    int x1 = 160;
-    int yo = 4;
-    int dy = 24;
-
-    Korny->pabc_help->writekozep( Korny->picbuffer, x1, yo,      "After you have eaten all the");
-    Korny->pabc_help->writekozep( Korny->picbuffer, x1, yo+dy,   "foods, touch the flower!" );
-    Korny->pabc_help->writekozep( Korny->picbuffer, x1, yo+dy*2, "" );
-    Korny->pabc_help->writekozep( Korny->picbuffer, x1, yo+dy*3, "Use the four arrow keys and" );
-    Korny->pabc_help->writekozep( Korny->picbuffer, x1, yo+dy*4, "the space bar!" );
-    Korny->pabc_help->writekozep( Korny->picbuffer, x1, yo+dy*5, "" );
-    Korny->pabc_help->writekozep( Korny->picbuffer, x1, yo+dy*6, "For more info, go to help" );
-    Korny->pabc_help->writekozep( Korny->picbuffer, x1, yo+dy*7, "from main menu!" );
-
-    lassufizre( Korny->picbuffer, Korny->pal_help );
-    int done = 0;
-    empty_keypress_buffer();
-    while( !done ) {
-        get_keypress();
-        //if( c == KEY_ESC || c == KEY_ENTER )
-        done = 1;
-    }
-} */
-
 // Returns true if text1 is earlier in the alphabet than text2
 int case_insensitive_lexicographical_compare(const char* text1, const char* text2) {
     // If they differ only by case, we track which one had the precedence

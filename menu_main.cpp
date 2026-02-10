@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
-#include <ctime>
 
 // Returns true if text1 is earlier in the alphabet than text2
 int case_insensitive_lexicographical_compare(const char* text1, const char* text2) {
@@ -74,14 +73,7 @@ int case_insensitive_lexicographical_compare(const char* text1, const char* text
     }
 }
 
-static int SrandNeeded = 1;
-
 static unsigned int gen_rand_int() {
-    if (SrandNeeded) {
-        SrandNeeded = 0;
-        srand((unsigned)clock());
-    }
-
     unsigned int result = 0;
     for (int i = 0; i < 4; i++) {
         result = (result << 8) | (rand() & 0xFF);

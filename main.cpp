@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <string>
 
 static double StopwatchStartTime = 0.0;
@@ -28,6 +29,8 @@ void delay(int milliseconds) {
 eol_settings* EolSettings = nullptr;
 
 int main() {
+    srand((unsigned)clock());
+
     EolSettings = new eol_settings();
     eol_settings::read_settings();
 

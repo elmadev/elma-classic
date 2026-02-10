@@ -1,3 +1,5 @@
+#include "platform_utils.h"
+
 #ifndef _WIN32
 #include <cassert>
 #include <cstring>
@@ -47,9 +49,12 @@ void strlwr(char* str) {
 }
 #endif
 
-bool is_ascii_character(unsigned char c) { return (c >= 32 && c < 127); }
+bool is_ascii_character(Keycode c) { return (c >= 32 && c < 127); }
 
-bool is_char_valid_for_filename(unsigned char c) {
+bool is_char_valid_for_filename(Keycode c) {
+    if (c >= 256) {
+        return false;
+    }
     if (c == '\\' || c == '/' || c == ':' || c == '*' || c == '?' || c == '\"' || c == '<' ||
         c == '>' || c == '|') {
         return false;

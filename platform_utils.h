@@ -1,6 +1,7 @@
 #ifndef PLATFORM_UTILS_H
 #define PLATFORM_UTILS_H
 
+#include "keys.h"
 #ifndef _WIN32
 #include <unistd.h>
 #else
@@ -18,8 +19,8 @@ constexpr double PI = 3.141592;
 #define strupr _strupr
 #endif
 
-bool is_ascii_character(unsigned char c);
-bool is_char_valid_for_filename(unsigned char c);
+bool is_ascii_character(Keycode c);
+bool is_char_valid_for_filename(Keycode c);
 
 #ifndef _WIN32
 

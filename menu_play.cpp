@@ -536,38 +536,25 @@ void menu_play() {
             levels_completed = INTERNAL_LEVEL_COUNT;
         }
 
-        menu_nav_old nav;
+        menu_nav nav("Select Level!");
         nav.search_pattern = SearchPattern::Internals;
-        nav.selected_index = player1->selected_level + 1;
-        strcpy(nav.title, "Select Level!");
+        nav.select_row(player1->selected_level + 1);
 
-        strcpy(NavEntriesLeft[0], "External File");
+        nav.add_row(
+            "External File", NAV_FUNC(&player1) {
+                player1->selected_level = -1;
+                menu_external_levels();
+            });
+
         for (int i = 0; i < levels_completed; i++) {
-            char level_name[NAV_ENTRY_TEXT_MAX_LENGTH];
-            itoa(i + 1, level_name, 10);
-            strcat(level_name, " ");
-            if (player1->skipped[i]) {
-                strcat(level_name, "SKIPPED!");
-            } else {
-                strcat(level_name, get_internal_level_name(i));
-            }
-            if (strlen(level_name) > NAV_ENTRY_TEXT_MAX_LENGTH - 5) {
-                internal_error("menu_play strlen( level_name ) > NAV_ENTRY_TEXT_MAX_LENGTH-5!");
-            }
-            strcpy(NavEntriesLeft[i + 1], level_name);
+            std::string level_name = std::format(
+                "{} {}", i + 1, player1->skipped[i] ? "SKIPPED!" : get_internal_level_name(i));
+            nav.add_row(level_name, NAV_FUNC() { play_internal(choice - 1); });
         }
-
-        nav.setup(levels_completed + 1);
 
         int choice = nav.navigate();
         if (choice < 0) {
             return;
-        }
-        if (choice == 0) {
-            player1->selected_level = -1;
-            menu_external_levels();
-        } else {
-            play_internal(choice - 1);
         }
     }
 }

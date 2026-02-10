@@ -57,6 +57,21 @@ void eol::sync_players_online_table() {
     }
 }
 
+void eol::enter_level(const char* level_name, const level* lev) {
+    struct enter_level el{.lev = lev, .name = level_name};
+    proto.send(el);
+}
+
+void eol::exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
+                     bool dead) {
+    struct exit_level fl{.name = level_name,
+                         .time = time,
+                         .apple_count = apple_count,
+                         .level_apple_count = level_apple_count,
+                         .dead = dead};
+    proto.send(fl);
+}
+
 void eol::set_table(TableType table) {
     eol_table* new_table = nullptr;
     switch (table) {

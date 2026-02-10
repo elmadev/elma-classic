@@ -8,6 +8,7 @@ class null_protocol {
     null_protocol(eol&) {}
     void connect() {}
     void tick() {}
+    template <typename T> void send(const T&) {}
 };
 
 #endif

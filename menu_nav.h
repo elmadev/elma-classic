@@ -106,6 +106,9 @@ class menu_nav {
     menu_nav(std::string title);
 
     void add_row(std::string left, std::string right, nav_func handler = nullptr);
+    void add_row(const std::string& left, const nav_func& handler = nullptr) {
+        add_row(left, "", handler);
+    }
     void add_overlay(std::string text, int x, int y,
                      OverlayAlignment alignment = OverlayAlignment::Left);
 

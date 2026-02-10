@@ -77,7 +77,7 @@ class recorder {
 
     bool is_empty() const { return frame_count_ == 0; }
     int frame_count() const { return frame_count_; }
-    void erase(char* lev_filename);
+    void erase(const char* lev_filename);
     void rewind();
     bool recall_frame(motorst* mot, double time, bike_sound* sound);
     void store_frames(motorst* mot, double time, bike_sound* sound);

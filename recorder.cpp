@@ -43,7 +43,7 @@ recorder::recorder() {
 
 recorder::~recorder() { internal_error("recorder::~recorder not implemented!"); }
 
-void recorder::erase(char* lev_filename) {
+void recorder::erase(const char* lev_filename) {
     if (strlen(lev_filename) > MAX_FILENAME_LEN + 4) {
         internal_error("recorder::erase strlen");
     }

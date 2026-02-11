@@ -116,7 +116,7 @@ static void betolt(const char* nev) {
     strcpy(State->editor_filename, tmp);
 
     Valtozott = 0;
-    if (!floadlevel_e(tmp, 1)) {
+    if (!load_level_editor(tmp, 1)) {
         State->editor_filename[0] = 0;
     }
 
@@ -561,7 +561,7 @@ void tolt_new(void) {
     }
 
     Valtozott = 0;
-    floadlevel_e("_uj_topol_");
+    load_level_editor("_uj_topol_");
     State->editor_filename[0] = 0;
     zoom_fill();
 }
@@ -2039,7 +2039,7 @@ void change_level_properties(void) {
                     strcpy(Ptop->lgr_name, lgrnev);
                     lgrfile::load_lgr_file(Ptop->lgr_name);
                     if (Ptop->discard_missing_lgr_assets(Lgr)) {
-                        dialogselejtez();
+                        dialog_warn_lgr_assets_deleted();
                     }
                 }
                 return;
@@ -2064,7 +2064,7 @@ void change_level_properties(void) {
                     strcpy(Ptop->lgr_name, lgrnev);
                     lgrfile::load_lgr_file(Ptop->lgr_name);
                     if (Ptop->discard_missing_lgr_assets(Lgr)) {
-                        dialogselejtez();
+                        dialog_warn_lgr_assets_deleted();
                     }
                 }
                 return;

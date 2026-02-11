@@ -19,7 +19,7 @@ void editplay(bool view_map) {
         return;
     }
 
-    floadlevel_p(State->editor_filename);
+    load_level_play(State->editor_filename);
 
     Rec1->erase(State->editor_filename);
     Rec2->erase(State->editor_filename);

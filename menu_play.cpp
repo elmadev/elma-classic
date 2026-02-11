@@ -193,7 +193,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
 }
 
 void replay_previous_run() {
-    floadlevel_p(Rec1->level_filename);
+    load_level_play(Rec1->level_filename);
     bool reset_player_visibility = true;
     while (true) {
         Rec1->rewind();
@@ -459,7 +459,7 @@ static void play_internal(int internal_index) {
 
         loading_screen();
 
-        floadlevel_p(filename);
+        load_level_play(filename);
         Rec1->erase(filename);
         Rec2->erase(filename);
 

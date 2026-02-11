@@ -115,7 +115,7 @@ static void menu_replay() {
                         return;
                     }
                 } else {
-                    floadlevel_p(Rec1->level_filename);
+                    load_level_play(Rec1->level_filename);
                     if (Ptop->level_id != level_id) {
                         int c = menu_dialog("The level file has changed since the",
                                             "saving of the record file!",
@@ -149,7 +149,7 @@ static void menu_replay() {
                         menu_dialog("Cannot find the lev file that corresponds",
                                     "to the record file!", replay_name, Rec1->level_filename);
                     } else {
-                        floadlevel_p(Rec1->level_filename);
+                        load_level_play(Rec1->level_filename);
                         if (Ptop->level_id != level_id) {
                             menu_dialog("The level file has changed since the",
                                         "saving of the record file!", replay_name,
@@ -185,7 +185,7 @@ static void menu_replay() {
                 menu_dialog("Cannot find the lev file that corresponds", "to the record file!",
                             replay_name, Rec1->level_filename);
             } else {
-                floadlevel_p(Rec1->level_filename);
+                load_level_play(Rec1->level_filename);
                 if (Ptop->level_id != level_id) {
                     menu_dialog("The level file has changed since the",
                                 "saving of the record file!", replay_name, Rec1->level_filename);
@@ -218,7 +218,7 @@ static void menu_demo() {
             internal_error("menu_demo: cannot find level file for demo replay: ",
                            Rec1->level_filename);
         }
-        floadlevel_p(Rec1->level_filename);
+        load_level_play(Rec1->level_filename);
         if (Ptop->level_id != level_id) {
             internal_error("menu_demo: level file changed since demo replay was made: ",
                            Rec1->level_filename);

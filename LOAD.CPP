@@ -12,25 +12,25 @@
 #include "segments.h"
 #include <cstring>
 
-int Volttopsave = 0;
+int ReloadLevel = 0;
 
 static char Bentlevelnev[20] = "";
 
-void invalidate_level() { Volttopsave = 1; }
+void invalidate_level() { ReloadLevel = 1; }
 
 // Beolvas egy level-t ha kell (nev max 12 karakter).
 // Torli es kitolti Ptop, Lgr, Segments, canvas mutatokat.
 // Ha belso file-ban is megvan palya onnan veszi:
 // Hamissal ter vissza, ha hibas topologiaju level:
-int floadlevel_p(const char* nev) {
+int load_level_play(const char* nev) {
     if (!nev) {
-        internal_error("floadlevel_p-ben !nev!");
+        internal_error("load_level_play-ben !nev!");
     }
     if (strlen(nev) > 12 || !nev[0]) {
-        internal_error("floadlevel_p-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
+        internal_error("load_level_play-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
     }
-    if (Volttopsave || !Ptop || !Segments || strcmpi(nev, Bentlevelnev) != 0) {
-        Volttopsave = 0;
+    if (ReloadLevel || !Ptop || !Segments || strcmpi(nev, Bentlevelnev) != 0) {
+        ReloadLevel = 0;
         // Ujra be kell olvasni palyat:
         strcpy(Bentlevelnev, nev);
         if (Ptop) {
@@ -79,17 +79,17 @@ int floadlevel_p(const char* nev) {
 // Segments, canvas mutatokat torli:
 // Ha belso file-ban is megvan palya onnan veszi:
 // Igaz ha file nem volt lezarva, kulonben new palya hamissal:
-int floadlevel_e(const char* nev, int forceload) {
+int load_level_editor(const char* nev, int forceload) {
     int levoltzarva = 0;
 
     if (!nev) {
-        internal_error("floadlevel_e-ben !nev!");
+        internal_error("load_level_editor-ben !nev!");
     }
     if (strlen(nev) > 12 || !nev[0]) {
-        internal_error("floadlevel_e-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
+        internal_error("load_level_editor-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
     }
-    if (forceload || Volttopsave || !Ptop || strcmpi(nev, Bentlevelnev) != 0) {
-        Volttopsave = 0;
+    if (forceload || ReloadLevel || !Ptop || strcmpi(nev, Bentlevelnev) != 0) {
+        ReloadLevel = 0;
         // Ujra be kell olvasni palyat:
         strcpy(Bentlevelnev, nev);
         if (Ptop) {
@@ -104,7 +104,7 @@ int floadlevel_e(const char* nev, int forceload) {
 
         lgrfile::load_lgr_file(Ptop->lgr_name);
         if (Ptop->discard_missing_lgr_assets(Lgr)) {
-            dialogselejtez();
+            dialog_warn_lgr_assets_deleted();
         }
     }
 
@@ -130,7 +130,7 @@ void invalidate_ptop(void) {
     }
 }
 
-void dialogselejtez(void) {
+void dialog_warn_lgr_assets_deleted(void) {
     dialog("The LGR file has changed since the last edition of this level and",
            "some parts (pictures, textures or border polygons) of the level",
            "must have been deleted!", "", "!!!!IMPORTANT!!!!",

@@ -76,7 +76,7 @@ void menu_external_levels() {
 
         while (true) {
             loading_screen();
-            if (!floadlevel_p(filename)) {
+            if (!load_level_play(filename)) {
                 break;
             }
             Rec1->erase(filename);

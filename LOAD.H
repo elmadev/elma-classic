@@ -3,8 +3,6 @@
 
 #define DEFAULT_LEVEL_FILENAME "_uj_topol_"
 
-extern bool ReloadLevel;
-
 void invalidate_level();
 
 bool load_level_play(const char* levelname);

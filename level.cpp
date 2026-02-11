@@ -855,8 +855,9 @@ static int generate_level_id(double checksum) {
 void level::save(const char* filename, bool skip_topology) {
     constexpr bool SAVE_INTERNAL = false;
 
+    invalidate_level();
+
     memset(&toptens, 0, sizeof(toptens));
-    ReloadLevel = true;
     if (objects_flipped) {
         internal_error("level::save objects_flipped!");
     }

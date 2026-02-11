@@ -13,8 +13,7 @@
 #include <cstring>
 #include "fs_utils.h"
 
-bool ReloadLevel = false;
-
+static bool ReloadLevel = false;
 static char CurrentLevelName[20] = "";
 
 void invalidate_level() { ReloadLevel = true; }

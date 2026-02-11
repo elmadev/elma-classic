@@ -11,8 +11,6 @@ bool load_level_play(const char* levelname);
 
 bool load_level_editor(const char* levelname, int reload = 0);
 
-void invalidate_ptop();
-
 void dialog_warn_lgr_assets_deleted();
 
 #endif

@@ -35,7 +35,7 @@ bike_box BikeBox3 = {146, 141, 273, 264};
 bike_box BikeBox4 = {272, 181, 353, 244};
 
 void invalidate_lgr_cache() {
-    invalidate_ptop();
+    invalidate_level();
     CurrentLgrName[0] = '\0';
 }
 

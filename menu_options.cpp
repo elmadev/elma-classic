@@ -259,7 +259,7 @@ void menu_options() {
 
         if (choice == 5) {
             State->high_quality = !State->high_quality;
-            invalidate_ptop();
+            invalidate_level();
         }
 
         if (choice == 6) {

@@ -106,11 +106,6 @@ bool load_level_editor(const char* levelname, int reload) {
     return true;
 }
 
-void invalidate_ptop() {
-    delete Ptop;
-    Ptop = nullptr;
-}
-
 void dialog_warn_lgr_assets_deleted() {
     dialog("The LGR file has changed since the last edition of this level and",
            "some parts (pictures, textures or border polygons) of the level",

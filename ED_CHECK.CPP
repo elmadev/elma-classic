@@ -49,41 +49,41 @@ bool check_topology(bool show_dialog) {
     // Check for intersecting lines
     for (int i = 0; i < MAX_POLYGONS; i++) {
         polygon* poly1 = Ptop->polygons[i];
-        if (poly1 && !poly1->is_grass) {
-            for (int j = 0; j < poly1->vertex_count; j++) {
-                // Get a line from poly1
-                vect2 r = poly1->vertices[j];
-                vect2 v;
-                if (j == poly1->vertex_count - 1) {
-                    v = poly1->vertices[0] - r;
-                } else {
-                    v = poly1->vertices[j + 1] - r;
+        if (!poly1 || poly1->is_grass) {
+            continue;
+        }
+        for (int j = 0; j < poly1->vertex_count; j++) {
+            // Get a line from poly1
+            vect2 r = poly1->vertices[j];
+            vect2 v;
+            if (j == poly1->vertex_count - 1) {
+                v = poly1->vertices[0] - r;
+            } else {
+                v = poly1->vertices[j + 1] - r;
+            }
+            // Check for intersection against every other line in the level
+            for (int k = 0; k < MAX_POLYGONS; k++) {
+                polygon* poly2 = Ptop->polygons[k];
+                if (!poly2 || poly2->is_grass) {
+                    continue;
                 }
-                // Check for intersection against every other line in the level
-                for (int k = 0; k < MAX_POLYGONS; k++) {
-                    polygon* poly2 = Ptop->polygons[k];
-                    if (poly2 && !poly2->is_grass) {
-                        bool has_intersection = false;
-                        vect2 intersection_point;
-                        if (poly1 == poly2) {
-                            // Exclude checking line against itself
-                            has_intersection =
-                                poly2->intersection_point(r, v, j, &intersection_point);
-                        } else {
-                            has_intersection =
-                                poly2->intersection_point(r, v, -1, &intersection_point);
-                        }
-                        if (has_intersection) {
-                            if (show_dialog) {
-                                zoom(intersection_point, 0.0000001);
-                                dialog("Error: Two lines are intersecting each others!",
-                                       "After this dialog you will see the intersection.",
-                                       "Use Zoomout to see where it is located!");
-                                invalidateegesz();
-                            }
-                            return true;
-                        }
+                bool has_intersection = false;
+                vect2 intersection_point;
+                if (poly1 == poly2) {
+                    // Exclude checking line against itself
+                    has_intersection = poly2->intersection_point(r, v, j, &intersection_point);
+                } else {
+                    has_intersection = poly2->intersection_point(r, v, -1, &intersection_point);
+                }
+                if (has_intersection) {
+                    if (show_dialog) {
+                        zoom(intersection_point, 0.0000001);
+                        dialog("Error: Two lines are intersecting each others!",
+                               "After this dialog you will see the intersection.",
+                               "Use Zoomout to see where it is located!");
+                        invalidateegesz();
                     }
+                    return true;
                 }
             }
         }

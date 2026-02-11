@@ -112,28 +112,6 @@ bool check_topology(bool show_dialog) {
         }
     }
 
-    // Make sure start object isn't in the ground
-    for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
-        if (obj && obj->type == object::Type::Start) {
-            if (!Ptop->is_sky(NULL, &obj->r)) {
-                if (show_dialog) {
-                    dialog("Error: The start object, which determines the place of the left wheel "
-                           "when you start to",
-                           "play on a particular level, is inside ground!",
-                           "If you cannot resolve this error message, you should try to move this "
-                           "object inside",
-                           "ground, because it is possible that you have mixed up which is the "
-                           "ground and",
-                           "which is the air.", "After this dialog you will see the object.",
-                           "Use Zoomout to see where it is located!");
-                    zoom(obj->r, 1.5);
-                }
-                return true;
-            }
-        }
-    }
-
     if (show_dialog) {
         dialog("Everything seems to be all right.");
     }

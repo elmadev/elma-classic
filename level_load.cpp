@@ -2,6 +2,7 @@
 #include "ECSET.H"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
+#include "fs_utils.h"
 #include "keys.h"
 #include "level.h"
 #include "lgr.h"
@@ -10,8 +11,8 @@
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "segments.h"
+#include "debug/profiler.h"
 #include <cstring>
-#include "fs_utils.h"
 
 static bool ReloadLevel = false;
 static char CurrentLevelName[20] = "";
@@ -73,6 +74,7 @@ bool load_level_play(const char* levelname) {
         lgrfile::load_lgr_file(Ptop->lgr_name);
         Ptop->discard_missing_lgr_assets(Lgr);
 
+        START_TIME(segments_timer);
         delete Segments;
         Segments = new segments(Ptop);
         if (HeadRadius > Motor1->left_wheel.radius) {
@@ -80,6 +82,7 @@ bool load_level_play(const char* levelname) {
         } else {
             Segments->setup_collision_grid(Motor1->left_wheel.radius);
         }
+        END_TIME(segments_timer, std::format("{} Segments", levelname))
 
         create_canvases();
     }

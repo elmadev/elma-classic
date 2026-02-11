@@ -76,10 +76,6 @@ void newjatekos(int A, int visszater) {
     if (State->player_count >= MAX_PLAYERS - 1) {
         external_error("Sorry, no more players can get onto the list!");
     }
-    int maxrub = NavEntriesLeftMaxLength;
-    if (MAX_PLAYERS > maxrub) {
-        internal_error("MAX_PLAYERS > NavEntriesLeftMaxLength!");
-    }
 
     if (bevesznevet(State->players[int(State->player_count)].name, visszater)) {
         if (A) {

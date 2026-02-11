@@ -1,4 +1,4 @@
-#include "EDITHELP.H"
+#include "editor_help.h"
 #include "editor_dialog.h"
 
 void editor_help() {

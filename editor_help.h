@@ -1,5 +1,5 @@
-#ifndef EDITHELP_H
-#define EDITHELP_H
+#ifndef EDITOR_HELP_H
+#define EDITOR_HELP_H
 
 void editor_help();
 

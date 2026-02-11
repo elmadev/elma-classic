@@ -24,7 +24,7 @@ elma_sources = files(
     'affine_pic_render.cpp',
     'D_PIC.CPP',
     'ECSET.CPP',
-    'EDITHELP.CPP',
+    'editor_help.cpp',
     'EDITMENU.CPP',
     'EDITPLAY.CPP',
     'EDITTOLT.CPP',

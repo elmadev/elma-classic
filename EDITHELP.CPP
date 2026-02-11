@@ -1,7 +1,7 @@
 #include "EDITHELP.H"
 #include "editor_dialog.h"
 
-void editor_help(void) {
+void editor_help() {
     dialog("GENERAL HELP",
            "On the left of the screen is a column of buttons. The buttons in the upper half are",
            "command buttons, that means they will take action at the moment you click on them with",
@@ -15,50 +15,41 @@ void editor_help(void) {
            "Load the tutor1.lev file to take a first look on a level design.");
 }
 
-void editor_help_exit(void) {
-    dialog(
-        //"EXIT HELP SCREEN",
-        "With the Exit button you can exit the editor.",
-        "If there are any unsaved changes in the level file in the editor, a dialog will",
-        "appear asking if you really want to exit without saving these changes.");
+void editor_help_exit() {
+    dialog("With the Exit button you can exit the editor.",
+           "If there are any unsaved changes in the level file in the editor, a dialog will",
+           "appear asking if you really want to exit without saving these changes.");
 }
 
-void editor_help_zoom_out(void) {
-    dialog(
-        //"ZOOM OUT HELP SCREEN",
-        "With the Zoom Out button you can make larger the view window of the editor.",
-        "In the upper right corner you can always see the actual zoom value. If this value is 1",
-        "you cannot make the zoom window any larger.");
+void editor_help_zoom_out() {
+    dialog("With the Zoom Out button you can make larger the view window of the editor.",
+           "In the upper right corner you can always see the actual zoom value. If this value is 1",
+           "you cannot make the zoom window any larger.");
 }
 
-void editor_help_save(void) {
-    dialog(
-        //"SAVE HELP SCREEN",
-        "With the Save button you can save the content of the editor to a level file.",
-        "The name of the level file is always displayed at the top of the screen.",
-        "If you haven't named your file, you will be prompted for a file name.",
-        "In this case you must enter the name without an extension and a path, as the '.LEV'",
-        "extension will be automatically added and you can save the file only in your current",
-        "directory.");
+void editor_help_save() {
+    dialog("With the Save button you can save the content of the editor to a level file.",
+           "The name of the level file is always displayed at the top of the screen.",
+           "If you haven't named your file, you will be prompted for a file name.",
+           "In this case you must enter the name without an extension and a path, as the '.LEV'",
+           "extension will be automatically added and you can save the file only in your current",
+           "directory.");
 }
 
-void editor_help_save_as(void) {
-    dialog(
-        //"SAVE AS HELP SCREEN",
-        "With the Save As button you can save the content of the editor to a level file",
-        "with a new name.",
-        "You will be prompted for a file name. You must enter the name without an extension and",
-        "a path, as the '.LEV' extension will be automatically added and you can save the file",
-        "only in your current directory.",
-        "If you click on the Save Locked button, you can lock the saved file. This means you",
-        "cannot load it into the editor any more. You should do this if you are ready with a",
-        "level, or when you give your level file to somebody and do not want he/she to modify",
-        "your original file. You can read more about this in EDITOR.TXT!");
+void editor_help_save_as() {
+    dialog("With the Save As button you can save the content of the editor to a level file",
+           "with a new name.",
+           "You will be prompted for a file name. You must enter the name without an extension and",
+           "a path, as the '.LEV' extension will be automatically added and you can save the file",
+           "only in your current directory.",
+           "If you click on the Save Locked button, you can lock the saved file. This means you",
+           "cannot load it into the editor any more. You should do this if you are ready with a",
+           "level, or when you give your level file to somebody and do not want he/she to modify",
+           "your original file. You can read more about this in EDITOR.TXT!");
 }
 
-void editor_help_open(void) {
+void editor_help_open() {
     dialog(
-        //"OPEN HELP SCREEN",
         "With the Open button you can open a level file in the editor.",
         "A dialog will appear with a list of the level files (all files with .LEV extension) in",
         "the current directory. You can pick the desired file with one mouse click on the name of",
@@ -70,119 +61,44 @@ void editor_help_open(void) {
         "of the Open button, then use the Save As button to give a name to your file.");
 }
 
-void editor_help_new(void) {
-    dialog(
-        //"NEW HELP SCREEN",
-        "With the New button you can start to edit a new level file in the editor.");
+void editor_help_new() {
+    dialog("With the New button you can start to edit a new level file in the editor.");
 }
 
-void editor_help_save_and_play(void) {
+void editor_help_save_and_play() {
     dialog(
-        //"SAVE AND PLAY HELP SCREEN",
         "With the Save and Play button you can try out the level that you are currently editing.",
         "You can press the P shortcut key also to try your level.",
         "The content of the editor will be saved to disk before you can play.");
 }
 
-void editor_help_zoom_fill(void) {
-    dialog(
-        //"ZOOM FILL HELP SCREEN",
-        "With the Zoom Fill button you can make the view window fit the entire content of",
-        "the editor.");
+void editor_help_zoom_fill() {
+    dialog("With the Zoom Fill button you can make the view window fit the entire content of",
+           "the editor.");
 }
 
-void editor_help_check_topology(void) {
-    dialog(
-        //"CHECK HELP SCREEN",
-        "With the Check Topology button you can check the level you are editing for any",
-        "basic errors. Before you want to try a level, you may want to check it first.",
-        "When check finds the first error, it will display a dialog box with an error message,",
-        "then it will zoom in onto the exact location of the error.",
-        "Until you correct all errors you cannot play on the level,"
-        "though you can save it to a file.");
+void editor_help_check_topology() {
+    dialog("With the Check Topology button you can check the level you are editing for any",
+           "basic errors. Before you want to try a level, you may want to check it first.",
+           "When check finds the first error, it will display a dialog box with an error message,",
+           "then it will zoom in onto the exact location of the error.",
+           "Until you correct all errors you cannot play on the level,"
+           "though you can save it to a file.");
 }
 
-void editor_help_properties(void) {
-    dialog(
-        //"LEVEL NAME HELP SCREEN",
-        "With the Properties button you can set four level properties:", "the background texture,",
-        "the foreground texture,", "the name of the level (not the file name) and the designer,",
-        "the LGR file name.");
+void editor_help_properties() {
+    dialog("With the Properties button you can set four level properties:",
+           "the background texture,", "the foreground texture,",
+           "the name of the level (not the file name) and the designer,", "the LGR file name.");
 }
 
-void editor_help_view_options(void) {
+void editor_help_view_options() {
     dialog("With the View Options button you can chooses what type of things should be displayed",
            "and what type of things should be hidden in the editor window.");
 }
 
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-// TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
-
-void editor_help_move(void) {
+void editor_help_move() {
     dialog(
-        //"MOVE TOOL HELP SCREEN",
         "With the Move tool you can move vertices, objects and pictures",
         "Click the left mouse button near a vertex or the center of an object to grab it. If you "
         "want",
@@ -193,18 +109,15 @@ void editor_help_move(void) {
         "pictures.", "You cannot set the properties of the Start, Exit and Killer objects.");
 }
 
-void editor_help_zoom_in(void) {
-    dialog(
-        //"ZOOM IN TOOL HELP SCREEN",
-        "With the Zoom In tool you can zoom the view window into any part of the window",
-        "you see at the moment. Click the left mouse button to place the first corner of",
-        "the window, then click again to place the second corner.",
-        "You can press ESC or click the right mouse button to cancel the operation.");
+void editor_help_zoom_in() {
+    dialog("With the Zoom In tool you can zoom the view window into any part of the window",
+           "you see at the moment. Click the left mouse button to place the first corner of",
+           "the window, then click again to place the second corner.",
+           "You can press ESC or click the right mouse button to cancel the operation.");
 }
 
-void editor_help_create_vertex(void) {
+void editor_help_create_vertex() {
     dialog(
-        //"CREATE VERTEX TOOL HELP SCREEN",
         "With the Create Vertex tool you can create new vertices. If you click the left",
         "mouse button near an existing vertex, you will add vertices to an existing polygon.",
         "If you click far from any vertices, you will create the first vertex of a new polygon.",
@@ -223,52 +136,43 @@ void editor_help_create_vertex(void) {
         "by the normal polygons).");
 }
 
-void editor_help_delete_vertex(void) {
-    dialog(
-        //"DELETE VERTEX TOOL HELP SCREEN",
-        "With the Delete Vertex tool you can delete vertices. Just click the left mouse",
-        "button near a vertex and it will disappear. You cannot delete any vertices of a",
-        "polygon if it has only three vertices. To delete the entire polygon, use",
-        "the Delete Polygon tool.");
+void editor_help_delete_vertex() {
+    dialog("With the Delete Vertex tool you can delete vertices. Just click the left mouse",
+           "button near a vertex and it will disappear. You cannot delete any vertices of a",
+           "polygon if it has only three vertices. To delete the entire polygon, use",
+           "the Delete Polygon tool.");
 }
 
-void editor_help_delete_polygon(void) {
-    dialog(
-        //"DELETE POLYGON TOOL HELP SCREEN",
-        "With the Delete Polygon tool you can delete polygons. Just click the left mouse",
-        "button near a vertex of a polygon and the polygon will disappear. You cannot",
-        "delete all the polygons, at least one polygon must exist at any given time in",
-        "the editor.");
+void editor_help_delete_polygon() {
+    dialog("With the Delete Polygon tool you can delete polygons. Just click the left mouse",
+           "button near a vertex of a polygon and the polygon will disappear. You cannot",
+           "delete all the polygons, at least one polygon must exist at any given time in",
+           "the editor.");
 }
 
-void editor_help_create_food(void) {
-    dialog(
-        //"CREATE FOOD TOOL HELP SCREEN",
-        "With the Create Food tool you can create new food objects. Just click the left",
-        "mouse button to place a new food object. You can see an 'F' inside the food objects.", "",
-        "To set the gravity property of a food object, use the move tool",
-        "and click with the right mouse button!");
+void editor_help_create_food() {
+    dialog("With the Create Food tool you can create new food objects. Just click the left",
+           "mouse button to place a new food object. You can see an 'F' inside the food objects.",
+           "", "To set the gravity property of a food object, use the move tool",
+           "and click with the right mouse button!");
 }
 
-void editor_help_create_killer(void) {
+void editor_help_create_killer() {
     dialog(
-        //"CREATE KILLER TOOL HELP SCREEN",
         "With the Create Killer tool you can create new killer objects. Just click the left",
         "mouse button to place a new killer object. You can see a 'K' inside the killer objects.");
 }
 
-void editor_help_delete_object(void) {
+void editor_help_delete_object() {
     dialog(
-        //"DELETE OBJECT TOOL HELP SCREEN",
         "With the Delete Object tool you can delete food and killer objects. Just click the left",
         "mouse button near the center of an object and it will disappear.",
         "You can only delete the food and killer objects, which have either an 'F' or 'K' inside.",
         "You cannot delete the start and exit objects, which has an 'S' or 'E' inside.");
 }
 
-void editor_help_create_sprite(void) {
+void editor_help_create_sprite() {
     dialog(
-        //"CREATE SPRITE TOOL HELP SCREEN",
         "With the Create Picture tool you can create new pictures. Just click the left",
         "mouse button where you want to place the selected picture.", "",
         "But first you must select a picture by clicking the right mouse button anywhere above",
@@ -285,9 +189,7 @@ void editor_help_create_sprite(void) {
         "U-Unclipped.");
 }
 
-void editor_help_delete_sprite(void) {
-    dialog(
-        //"DELETE SPRITE TOOL HELP SCREEN",
-        "With the Delete Picture tool you can delete pictures. Just click the left",
-        "mouse button near the up-left corner of a picture and it will disappear.");
+void editor_help_delete_sprite() {
+    dialog("With the Delete Picture tool you can delete pictures. Just click the left",
+           "mouse button near the up-left corner of a picture and it will disappear.");
 }

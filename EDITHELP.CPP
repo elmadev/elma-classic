@@ -41,11 +41,7 @@ void editor_help_save_as() {
            "with a new name.",
            "You will be prompted for a file name. You must enter the name without an extension and",
            "a path, as the '.LEV' extension will be automatically added and you can save the file",
-           "only in your current directory.",
-           "If you click on the Save Locked button, you can lock the saved file. This means you",
-           "cannot load it into the editor any more. You should do this if you are ready with a",
-           "level, or when you give your level file to somebody and do not want he/she to modify",
-           "your original file. You can read more about this in EDITOR.TXT!");
+           "only in your current directory.");
 }
 
 void editor_help_open() {

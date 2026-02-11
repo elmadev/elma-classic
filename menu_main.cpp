@@ -259,59 +259,29 @@ static void menu_prompt_exit() {
 void menu_main() {
     MenuPalette->set();
 
-    menu_nav_old nav;
-    nav.selected_index = 0;
+    menu_nav nav("Main Menu");
     nav.x_left = 200;
     nav.y_entries = 100;
     nav.dy = 50;
-    strcpy(nav.title, "Main Menu");
 
-    strcpy(NavEntriesLeft[0], "Play");
-    strcpy(NavEntriesLeft[1], "Replay");
-    strcpy(NavEntriesLeft[2], "Demo");
-    strcpy(NavEntriesLeft[3], "Options");
-    strcpy(NavEntriesLeft[4], "Help");
-    strcpy(NavEntriesLeft[5], "Best Times");
-    strcpy(NavEntriesLeft[6], "Editor");
-
-    nav.setup(7);
-
-    while (true) {
-        int choice = nav.navigate();
-
-        if (choice == 0) {
-            menu_play();
-        }
-
-        if (choice == 1) {
-            menu_replay();
-        }
-
-        if (choice == 2) {
-            menu_demo();
-        }
-
-        if (choice == 3) {
-            menu_options();
-        }
-
-        if (choice == 4) {
-            menu_help();
-        }
-
-        if (choice == 5) {
-            menu_best_times();
-        }
-
-        if (choice == 6) {
+    nav.add_row("Play", NAV_FUNC() { menu_play(); });
+    nav.add_row("Replay", NAV_FUNC() { menu_replay(); });
+    nav.add_row("Demo", NAV_FUNC() { menu_demo(); });
+    nav.add_row("Options", NAV_FUNC() { menu_options(); });
+    nav.add_row("Help", NAV_FUNC() { menu_help(); });
+    nav.add_row("Best Times", NAV_FUNC() { menu_best_times(); });
+    nav.add_row(
+        "Editor", NAV_FUNC() {
             InEditor = true;
             hide_cursor();
             editor();
             show_cursor();
             InEditor = false;
             MenuPalette->set();
-        }
+        });
 
+    while (true) {
+        int choice = nav.navigate();
         if (choice == -1) {
             menu_prompt_exit();
         }

@@ -4,15 +4,15 @@
 void editor_help() {
     dialog("GENERAL HELP",
            "On the left of the screen is a column of buttons. The buttons in the upper half are",
-           "command buttons, that means they will take action at the moment you click on them with",
+           "command buttons. That means they will take action at the moment you click on them with",
            "the left mouse button. The buttons in the lower half are the tool selection buttons.",
            "If you click on them with the left mouse button, you select a tool. You can use a tool",
-           "in the working area of the screen. A one line help of the current tool is always "
+           "in the working area of the screen. A one-line help of the current tool is always "
            "displayed",
            "at the top of your screen.", "",
            "You can get help on the command and tool selection buttons by clicking on any of them",
            "with the right mouse button.", "",
-           "Load the tutor1.lev file to take a first look on a level design.");
+           "Load the tutor1.lev file to take a first look at a level design.");
 }
 
 void editor_help_exit() {
@@ -51,8 +51,7 @@ void editor_help_open() {
         "the current directory. You can pick the desired file with one mouse click on the name of",
         "the file or by pressing ENTER when the name of the file is highlighted.",
         "You can use the two long buttons at the top and the bottom to go up and down in the list.",
-        "You can use the Up, Down, PageUp, PageDown and Esc keys also."
-        "",
+        "You can use the Up, Down, PageUp, PageDown and Esc keys also.",
         "If you want to open a new file with a new name, you should choose the New button instead",
         "of the Open button, then use the Save As button to give a name to your file.");
 }
@@ -78,7 +77,7 @@ void editor_help_check_topology() {
            "basic errors. Before you want to try a level, you may want to check it first.",
            "When check finds the first error, it will display a dialog box with an error message,",
            "then it will zoom in onto the exact location of the error.",
-           "Until you correct all errors you cannot play on the level,"
+           "Until you correct all errors, you cannot play on the level,"
            "though you can save it to a file.");
 }
 
@@ -89,7 +88,7 @@ void editor_help_properties() {
 }
 
 void editor_help_view_options() {
-    dialog("With the View Options button you can chooses what type of things should be displayed",
+    dialog("With the View Options button you can choose what type of things should be displayed",
            "and what type of things should be hidden in the editor window.");
 }
 
@@ -164,7 +163,7 @@ void editor_help_delete_object() {
         "With the Delete Object tool you can delete food and killer objects. Just click the left",
         "mouse button near the center of an object and it will disappear.",
         "You can only delete the food and killer objects, which have either an 'F' or 'K' inside.",
-        "You cannot delete the start and exit objects, which has an 'S' or 'E' inside.");
+        "You cannot delete the start and exit objects, which have an 'S' or 'E' inside.");
 }
 
 void editor_help_create_sprite() {
@@ -187,5 +186,5 @@ void editor_help_create_sprite() {
 
 void editor_help_delete_sprite() {
     dialog("With the Delete Picture tool you can delete pictures. Just click the left",
-           "mouse button near the up-left corner of a picture and it will disappear.");
+           "mouse button near the top-left corner of a picture and it will disappear.");
 }

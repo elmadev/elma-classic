@@ -52,6 +52,7 @@
 * Fix some minor bike jitters in replay playback when bike or wheel rotates past an angle of 0 degrees (upright position)
 * Fix bike/wheel jitters in replay playback in the first 2 frames of the replay
 * Fixed a bug where a replay named a.rec.rec could not be played by elma
+* Some minor grammatical or spelling mistakes are fixed
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

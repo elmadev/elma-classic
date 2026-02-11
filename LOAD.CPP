@@ -18,28 +18,21 @@ static char CurrentLevelName[20] = "";
 
 void invalidate_level() { ReloadLevel = 1; }
 
-// Beolvas egy level-t ha kell (nev max 12 karakter).
-// Torli es kitolti Ptop, Lgr, Segments, canvas mutatokat.
-// Ha belso file-ban is megvan palya onnan veszi:
-// Hamissal ter vissza, ha hibas topologiaju level:
 int load_level_play(const char* levelname) {
     if (!levelname) {
-        internal_error("load_level_play-ben !levelname!");
+        internal_error("load_level_play !levelname!");
     }
     if (strlen(levelname) > 12 || !levelname[0]) {
-        internal_error("load_level_play-ben strlen( levelname ) > 12 || !levelname[0]!: ",
-                       levelname);
+        internal_error("load_level_play strlen( levelname ) > 12 || !levelname[0]!: ", levelname);
     }
     if (ReloadLevel || !Ptop || !Segments || strcmpi(levelname, CurrentLevelName) != 0) {
         ReloadLevel = 0;
-        // Ujra be kell olvasni palyat:
         strcpy(CurrentLevelName, levelname);
         if (Ptop) {
             delete Ptop;
         }
         Ptop = new level(levelname);
         if (Ptop->topology_errors) {
-            // Kiir hiba uzenetet:
             menu_pic menu;
             menu.add_line_centered("Level file has some topology errors!", 320, 190);
             menu.add_line_centered("Use the editor to fix them!", 320, 240);
@@ -76,23 +69,17 @@ int load_level_play(const char* levelname) {
     return 1;
 }
 
-// Torli es kitolti Ptop, Lgr, mutatokat.
-// Segments, canvas mutatokat torli:
-// Ha belso file-ban is megvan palya onnan veszi:
-// Igaz ha file nem volt lezarva, kulonben new palya hamissal:
 int load_level_editor(const char* levelname, int reload) {
     int locked = 0;
 
     if (!levelname) {
-        internal_error("load_level_editor-ben !levelname!");
+        internal_error("load_level_editor !levelname!");
     }
     if (strlen(levelname) > 12 || !levelname[0]) {
-        internal_error("load_level_editor-ben strlen( levelname ) > 12 || !levelname[0]!: ",
-                       levelname);
+        internal_error("load_level_editor strlen( levelname ) > 12 || !levelname[0]!: ", levelname);
     }
     if (reload || ReloadLevel || !Ptop || strcmpi(levelname, CurrentLevelName) != 0) {
         ReloadLevel = 0;
-        // Ujra be kell olvasni palyat:
         strcpy(CurrentLevelName, levelname);
         if (Ptop) {
             delete Ptop;
@@ -110,12 +97,12 @@ int load_level_editor(const char* levelname, int reload) {
         }
     }
 
-    if (Segments) { // ervenytelenites
+    // Forces a reload in load_level_play
+    if (Segments) {
         delete Segments;
     }
     Segments = NULL;
 
-    // Ha vannak benne idok, figyelmeztetes:
     if (Ptop->toptens.single.times_count > 0 || Ptop->toptens.multi.times_count > 0) {
         dialog("Warning!", "The level file you are opening has some best times.",
                "If you save this level file, these times will be erased!");
@@ -124,7 +111,6 @@ int load_level_editor(const char* levelname, int reload) {
     return !locked;
 }
 
-// Opciok minibike-ja hasznalja:
 void invalidate_ptop(void) {
     if (Ptop) {
         delete Ptop;

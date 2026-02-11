@@ -106,7 +106,7 @@ static void menu_replay() {
                 MenuPalette->set();
                 loading_screen();
 
-                int level_id = recorder::load_rec_file(replay_names[index].c_str(), 0);
+                int level_id = recorder::load_rec_file(replay_names[index].c_str(), false);
                 if (access_level_file(Rec1->level_filename) != 0) {
                     int c = menu_dialog("Cannot find the lev file that corresponds",
                                         "to the record file!", replay_names[index].c_str(),
@@ -136,7 +136,7 @@ static void menu_replay() {
             const char* replay_name = replay_names[choice - 1].c_str();
             // Play a rec file:
             loading_screen();
-            int level_id = recorder::load_rec_file(replay_name, 0);
+            int level_id = recorder::load_rec_file(replay_name, false);
             if (F1Pressed) {
                 F1Pressed = false;
                 char msg[128];
@@ -213,7 +213,7 @@ static void menu_demo() {
         previous_demo = demo;
 
         loading_screen();
-        int level_id = recorder::load_rec_file(demo_names[demo], 1);
+        int level_id = recorder::load_rec_file(demo_names[demo], true);
         if (access_level_file(Rec1->level_filename) != 0) {
             internal_error("menu_demo: cannot find level file for demo replay: ",
                            Rec1->level_filename);

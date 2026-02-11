@@ -60,7 +60,7 @@ class recorder {
     int flagtag_;
 
     // Load replay of one bike
-    int load(const char* filename, FILE* h, int demo, bool is_first_replay);
+    int load(const char* filename, FILE* h, bool is_first_replay);
     // Save replay of one bike
     void save(const char* filename, FILE* h, int level_id, int flagtag);
 
@@ -71,11 +71,11 @@ class recorder {
     ~recorder();
 
     // Load a singleplayer or multiplayer replay
-    static int load_rec_file(const char* filename, int demo);
+    static int load_rec_file(const char* filename, bool demo);
     // Save a singleplayer or multiplayer replay
     static void save_rec_file(const char* filename, int level_id, int flagtag);
 
-    bool is_empty() { return frame_count_ == 0; }
+    bool is_empty() const { return frame_count_ == 0; }
     int frame_count() const { return frame_count_; }
     void erase(char* lev_filename);
     void rewind();
@@ -86,8 +86,8 @@ class recorder {
     // Return true if a new event has occurred
     bool recall_event(double time, WavEvent* event_id, double* volume, int* object_id);
 
-    bool flagtag();
-    void set_flagtag(bool flagtag);
+    bool flagtag() const { return (bool)(flagtag_); };
+    void set_flagtag(bool flagtag) { flagtag_ = (int)(flagtag); }
 
     // Encode framecount into MSB of the flags
     void encode_frame_count();

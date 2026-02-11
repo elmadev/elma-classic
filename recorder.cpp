@@ -6,6 +6,7 @@
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "qopen.h"
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 
@@ -70,10 +71,6 @@ void recorder::rewind() {
     next_frame_index = 0;
 }
 
-bool recorder::flagtag() { return (bool)(flagtag_); }
-
-void recorder::set_flagtag(bool flagtag) { flagtag_ = (int)(flagtag); }
-
 void recorder::encode_frame_count() {
     if (frame_count_ < 80) {
         return;
@@ -117,21 +114,13 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
 
     int index1 = (int)(TIME_TO_FRAME_INDEX * time);
     double index2_weight = TIME_TO_FRAME_INDEX * time - index1;
-    if (index2_weight < 0.0) {
-        index2_weight = 0.0;
-    }
-    if (index2_weight > 1.0) {
-        index2_weight = 1.0;
-    }
+    index2_weight = std::max(index2_weight, 0.0);
+    index2_weight = std::min(index2_weight, 1.0);
     double index1_weight = 1.0 - index2_weight;
     int index2 = index1 + 1;
 
-    if (index1 < 0) {
-        index1 = 0;
-    }
-    if (index2 < 0) {
-        index2 = 0;
-    }
+    index1 = std::max(index1, 0);
+    index2 = std::max(index2, 0);
 
     if (finished) {
         sound->motor_frequency = 1.0;
@@ -144,9 +133,7 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
         index1 = frame_count_ - 1;
         finished = true;
     }
-    if (index2 >= frame_count_ - 1) {
-        index2 = frame_count_ - 1;
-    }
+    index2 = std::min(index2, frame_count_ - 1);
 
     mot->bike.r.x = frames[index1].bike_x * index1_weight + frames[index2].bike_x * index2_weight;
     mot->bike.r.y = frames[index1].bike_y * index1_weight + frames[index2].bike_y * index2_weight;
@@ -303,9 +290,7 @@ void recorder::store_frames(motorst* mot, double time, bike_sound* sound) {
             frames[i].flags += 1 << FLAG_FLAGTAG_IMMUNITY;
         }
 
-        if (sound->motor_frequency < 1.0) {
-            sound->motor_frequency = 1.0;
-        }
+        sound->motor_frequency = std::max(sound->motor_frequency, 1.0);
         frames[i].motor_frequency =
             (unsigned char)(MOTOR_FREQUENCY_RATIO * (sound->motor_frequency - 1.0));
         frames[i].friction_volume = (unsigned char)(FRICTION_VOLUME_RATIO * sound->friction_volume);
@@ -360,7 +345,7 @@ static void read_error(const char* filename) {
     internal_error("Failed to read rec file: ", filename);
 }
 
-int recorder::load(const char* filename, FILE* h, int demo, bool is_first_replay) {
+int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
     frame_count_ = 0;
     if (fread(&frame_count_, 1, sizeof(frame_count_), h) != 4) {
         read_error(filename);
@@ -539,7 +524,7 @@ void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
     }
 }
 
-int recorder::load_rec_file(const char* filename, int demo) {
+int recorder::load_rec_file(const char* filename, bool demo) {
     FILE* h = nullptr;
     if (demo) {
         h = qopen(filename, "rb");
@@ -555,9 +540,9 @@ int recorder::load_rec_file(const char* filename, int demo) {
         }
     }
 
-    int level_id = Rec1->load(filename, h, demo, true);
+    int level_id = Rec1->load(filename, h, true);
     if (MultiplayerRec) {
-        Rec2->load(filename, h, demo, false);
+        Rec2->load(filename, h, false);
     }
 
     if (demo) {

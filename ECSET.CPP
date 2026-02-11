@@ -427,15 +427,13 @@ static int megszamol(canvas_chunk_node* elso) {
     return szam;
 }
 
-int Osszegszam = 0;
-
 void canvas::linked_list_to_array(void) {
     // Megszamoljuk osszes mdarab-ot:
     int szam = 0;
     for (int i = 0; i < pixel_height; i++) {
         szam += megszamol(rows_linked[i]);
     }
-    Osszegszam += szam;
+
     // Most lefoglaljuk uj egybefuggo tombot:
     chunk_array = new canvas_chunk[szam + 10];
     if (!chunk_array) {
@@ -1948,8 +1946,6 @@ void canvas::create_front_grass(void) {
 
 void create_canvases(void) {
     Lgr->reload_default_textures();
-
-    Osszegszam = 0; // Ide osszegezzuk osszes lefoglalt szakaszt
 
     if (CanvasBack) {
         delete CanvasBack;

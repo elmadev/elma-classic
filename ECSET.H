@@ -126,7 +126,4 @@ extern canvas* CanvasBack;
 extern canvas* CanvasFront;
 extern canvas* CanvasMinimap;
 
-// create_canvases ide osszegzi osszes lefoglalt szakaszt:
-extern int Osszegszam;
-
 #endif

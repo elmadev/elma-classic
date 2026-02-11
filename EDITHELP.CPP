@@ -1,7 +1,7 @@
 #include "EDITHELP.H"
 #include "editor_dialog.h"
 
-void edithelp(void) {
+void editor_help(void) {
     dialog("GENERAL HELP",
            "On the left of the screen is a column of buttons. The buttons in the upper half are",
            "command buttons, that means they will take action at the moment you click on them with",
@@ -15,7 +15,7 @@ void edithelp(void) {
            "Load the tutor1.lev file to take a first look on a level design.");
 }
 
-void menuhelp_exit(void) {
+void editor_help_exit(void) {
     dialog(
         //"EXIT HELP SCREEN",
         "With the Exit button you can exit the editor.",
@@ -23,7 +23,7 @@ void menuhelp_exit(void) {
         "appear asking if you really want to exit without saving these changes.");
 }
 
-void menuhelp_zoomout(void) {
+void editor_help_zoom_out(void) {
     dialog(
         //"ZOOM OUT HELP SCREEN",
         "With the Zoom Out button you can make larger the view window of the editor.",
@@ -31,7 +31,7 @@ void menuhelp_zoomout(void) {
         "you cannot make the zoom window any larger.");
 }
 
-void menuhelp_save(void) {
+void editor_help_save(void) {
     dialog(
         //"SAVE HELP SCREEN",
         "With the Save button you can save the content of the editor to a level file.",
@@ -42,7 +42,7 @@ void menuhelp_save(void) {
         "directory.");
 }
 
-void menuhelp_save_as(void) {
+void editor_help_save_as(void) {
     dialog(
         //"SAVE AS HELP SCREEN",
         "With the Save As button you can save the content of the editor to a level file",
@@ -56,7 +56,7 @@ void menuhelp_save_as(void) {
         "your original file. You can read more about this in EDITOR.TXT!");
 }
 
-void menuhelp_open(void) {
+void editor_help_open(void) {
     dialog(
         //"OPEN HELP SCREEN",
         "With the Open button you can open a level file in the editor.",
@@ -70,13 +70,13 @@ void menuhelp_open(void) {
         "of the Open button, then use the Save As button to give a name to your file.");
 }
 
-void menuhelp_new(void) {
+void editor_help_new(void) {
     dialog(
         //"NEW HELP SCREEN",
         "With the New button you can start to edit a new level file in the editor.");
 }
 
-void menuhelp_play(void) {
+void editor_help_save_and_play(void) {
     dialog(
         //"SAVE AND PLAY HELP SCREEN",
         "With the Save and Play button you can try out the level that you are currently editing.",
@@ -84,14 +84,14 @@ void menuhelp_play(void) {
         "The content of the editor will be saved to disk before you can play.");
 }
 
-void menuhelp_zoom_fill(void) {
+void editor_help_zoom_fill(void) {
     dialog(
         //"ZOOM FILL HELP SCREEN",
         "With the Zoom Fill button you can make the view window fit the entire content of",
         "the editor.");
 }
 
-void menuhelp_check(void) {
+void editor_help_check_topology(void) {
     dialog(
         //"CHECK HELP SCREEN",
         "With the Check Topology button you can check the level you are editing for any",
@@ -102,7 +102,7 @@ void menuhelp_check(void) {
         "though you can save it to a file.");
 }
 
-void menuhelp_properties(void) {
+void editor_help_properties(void) {
     dialog(
         //"LEVEL NAME HELP SCREEN",
         "With the Properties button you can set four level properties:", "the background texture,",
@@ -110,7 +110,7 @@ void menuhelp_properties(void) {
         "the LGR file name.");
 }
 
-void menuhelp_view(void) {
+void editor_help_view_options(void) {
     dialog("With the View Options button you can chooses what type of things should be displayed",
            "and what type of things should be hidden in the editor window.");
 }
@@ -180,7 +180,7 @@ void menuhelp_view(void) {
 // TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
 // TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK TOOLOK
 
-void menuhelp_move(void) {
+void editor_help_move(void) {
     dialog(
         //"MOVE TOOL HELP SCREEN",
         "With the Move tool you can move vertices, objects and pictures",
@@ -193,7 +193,7 @@ void menuhelp_move(void) {
         "pictures.", "You cannot set the properties of the Start, Exit and Killer objects.");
 }
 
-void menuhelp_zoom_in(void) {
+void editor_help_zoom_in(void) {
     dialog(
         //"ZOOM IN TOOL HELP SCREEN",
         "With the Zoom In tool you can zoom the view window into any part of the window",
@@ -202,7 +202,7 @@ void menuhelp_zoom_in(void) {
         "You can press ESC or click the right mouse button to cancel the operation.");
 }
 
-void menuhelp_create_vertex(void) {
+void editor_help_create_vertex(void) {
     dialog(
         //"CREATE VERTEX TOOL HELP SCREEN",
         "With the Create Vertex tool you can create new vertices. If you click the left",
@@ -223,7 +223,7 @@ void menuhelp_create_vertex(void) {
         "by the normal polygons).");
 }
 
-void menuhelp_delete_vertex(void) {
+void editor_help_delete_vertex(void) {
     dialog(
         //"DELETE VERTEX TOOL HELP SCREEN",
         "With the Delete Vertex tool you can delete vertices. Just click the left mouse",
@@ -232,7 +232,7 @@ void menuhelp_delete_vertex(void) {
         "the Delete Polygon tool.");
 }
 
-void menuhelp_delete_polygon(void) {
+void editor_help_delete_polygon(void) {
     dialog(
         //"DELETE POLYGON TOOL HELP SCREEN",
         "With the Delete Polygon tool you can delete polygons. Just click the left mouse",
@@ -241,7 +241,7 @@ void menuhelp_delete_polygon(void) {
         "the editor.");
 }
 
-void menuhelp_create_food(void) {
+void editor_help_create_food(void) {
     dialog(
         //"CREATE FOOD TOOL HELP SCREEN",
         "With the Create Food tool you can create new food objects. Just click the left",
@@ -250,14 +250,14 @@ void menuhelp_create_food(void) {
         "and click with the right mouse button!");
 }
 
-void menuhelp_create_killer(void) {
+void editor_help_create_killer(void) {
     dialog(
         //"CREATE KILLER TOOL HELP SCREEN",
         "With the Create Killer tool you can create new killer objects. Just click the left",
         "mouse button to place a new killer object. You can see a 'K' inside the killer objects.");
 }
 
-void menuhelp_delete_object(void) {
+void editor_help_delete_object(void) {
     dialog(
         //"DELETE OBJECT TOOL HELP SCREEN",
         "With the Delete Object tool you can delete food and killer objects. Just click the left",
@@ -266,7 +266,7 @@ void menuhelp_delete_object(void) {
         "You cannot delete the start and exit objects, which has an 'S' or 'E' inside.");
 }
 
-void menuhelp_create_sprite(void) {
+void editor_help_create_sprite(void) {
     dialog(
         //"CREATE SPRITE TOOL HELP SCREEN",
         "With the Create Picture tool you can create new pictures. Just click the left",
@@ -285,7 +285,7 @@ void menuhelp_create_sprite(void) {
         "U-Unclipped.");
 }
 
-void menuhelp_delete_sprite(void) {
+void editor_help_delete_sprite(void) {
     dialog(
         //"DELETE SPRITE TOOL HELP SCREEN",
         "With the Delete Picture tool you can delete pictures. Just click the left",

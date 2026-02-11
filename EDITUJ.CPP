@@ -788,14 +788,14 @@ void editor(void) {
                             }
                         }
                         if (i == 0 && jobbnyomva) {
-                            menuhelp_exit();
+                            editor_help_exit();
                         }
 
                         if (i == 1 && balnyomva) {
                             tolt_new();
                         }
                         if (i == 1 && jobbnyomva) {
-                            menuhelp_new();
+                            editor_help_new();
                         }
 
                         if (i == 2 && balnyomva) {
@@ -803,21 +803,21 @@ void editor(void) {
                         }
 
                         if (i == 2 && jobbnyomva) {
-                            menuhelp_open();
+                            editor_help_open();
                         }
 
                         if (i == 3 && balnyomva) {
                             tolt_save_as();
                         }
                         if (i == 3 && jobbnyomva) {
-                            menuhelp_save_as();
+                            editor_help_save_as();
                         }
 
                         if (i == 4 && balnyomva) {
                             tolt_save();
                         }
                         if (i == 4 && jobbnyomva) {
-                            menuhelp_save();
+                            editor_help_save();
                         }
 
                         if (i == 5 && balnyomva) {
@@ -825,28 +825,28 @@ void editor(void) {
                             Tool = T_MOVE;
                         }
                         if (i == 5 && jobbnyomva) {
-                            menuhelp_play();
+                            editor_help_save_and_play();
                         }
 
                         if (i == 6 && balnyomva) {
                             check_topology(1);
                         }
                         if (i == 6 && jobbnyomva) {
-                            menuhelp_check();
+                            editor_help_check_topology();
                         }
 
                         if (i == 7 && balnyomva) {
                             change_level_properties();
                         }
                         if (i == 7 && jobbnyomva) {
-                            menuhelp_properties();
+                            editor_help_properties();
                         }
 
                         if (i == 8 && balnyomva) {
                             menu_zoomout();
                         }
                         if (i == 8 && jobbnyomva) {
-                            menuhelp_zoomout();
+                            editor_help_zoom_out();
                         }
 
                         if (i == 9 && balnyomva) {
@@ -855,7 +855,7 @@ void editor(void) {
                             invalidate();
                         }
                         if (i == 9 && jobbnyomva) {
-                            menuhelp_zoom_fill();
+                            editor_help_zoom_fill();
                         }
 
                         if (i == 10 && balnyomva) {
@@ -863,11 +863,11 @@ void editor(void) {
                         }
                         // menu_set_lgr_file();
                         if (i == 10 && jobbnyomva) {
-                            menuhelp_view();
+                            editor_help_view_options();
                         }
 
                         if (i == 11) {
-                            edithelp();
+                            editor_help();
                         }
 
                         // Toolok:
@@ -878,34 +878,34 @@ void editor(void) {
                         } else {
                             // Jobb gomb nyomva:
                             if (i == Elsotool + 0) {
-                                menuhelp_move();
+                                editor_help_move();
                             }
                             if (i == Elsotool + 1) {
-                                menuhelp_zoom_in();
+                                editor_help_zoom_in();
                             }
                             if (i == Elsotool + 2) {
-                                menuhelp_create_vertex();
+                                editor_help_create_vertex();
                             }
                             if (i == Elsotool + 3) {
-                                menuhelp_delete_vertex();
+                                editor_help_delete_vertex();
                             }
                             if (i == Elsotool + 4) {
-                                menuhelp_delete_polygon();
+                                editor_help_delete_polygon();
                             }
                             if (i == Elsotool + 5) {
-                                menuhelp_create_food();
+                                editor_help_create_food();
                             }
                             if (i == Elsotool + 6) {
-                                menuhelp_create_killer();
+                                editor_help_create_killer();
                             }
                             if (i == Elsotool + 7) {
-                                menuhelp_delete_object();
+                                editor_help_delete_object();
                             }
                             if (i == Elsotool + 8) {
-                                menuhelp_create_sprite();
+                                editor_help_create_sprite();
                             }
                             if (i == Elsotool + 9) {
-                                menuhelp_delete_sprite();
+                                editor_help_delete_sprite();
                             }
                         }
                     }

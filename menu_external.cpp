@@ -10,12 +10,13 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "state.h"
+#include "directinput/scancodes.h"
 #include <cstring>
 #include <algorithm>
 #include <string>
 #include <vector>
 
-void play_external(std::string filename) {
+void play_external(std::string filename, bool map_viewer) {
     if (filename.length() > MAX_FILENAME_LEN + 4) {
         internal_error("menu_external_levels() entry too long!");
     }
@@ -29,7 +30,7 @@ void play_external(std::string filename) {
         Rec1->erase(filename.c_str());
         Rec2->erase(filename.c_str());
         int time =
-            lejatszo(filename.c_str(), F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
+            lejatszo(filename.c_str(), map_viewer ? CameraMode::MapViewer : CameraMode::Normal);
         MenuPalette->set();
         char finish_msg[100] = "";
         update_top_ten(time, finish_msg, 0, filename.c_str());
@@ -48,7 +49,7 @@ void menu_external_levels() {
     finame filename;
     bool done = find_first("lev/*.lev", filename);
     while (!done) {
-        nav.add_row(filename, NAV_FUNC() { play_external(left); });
+        nav.add_row(filename, NAV_FUNC() { play_external(left, is_key_down(DIK_F1)); });
         done = find_next(filename);
     }
     find_close();

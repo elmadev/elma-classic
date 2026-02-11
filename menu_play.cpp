@@ -16,6 +16,7 @@
 #include "physics_init.h"
 #include "skip.h"
 #include "timer.h"
+#include "directinput/scancodes.h"
 #include <cstdlib>
 #include <cstring>
 #include <format>
@@ -388,7 +389,7 @@ void loading_screen() {
     menu.render(true);
 }
 
-static void play_internal(int internal_index) {
+static void play_internal(int internal_index, bool map_viewer) {
     player* cur_player = State->get_player(State->player1);
     while (true) {
         char filename[20];
@@ -400,7 +401,7 @@ static void play_internal(int internal_index) {
         Rec1->erase(filename);
         Rec2->erase(filename);
 
-        int time = lejatszo(filename, F1Pressed ? CameraMode::MapViewer : CameraMode::Normal);
+        int time = lejatszo(filename, map_viewer ? CameraMode::MapViewer : CameraMode::Normal);
 
         MenuPalette->set();
         if (Ptop->objects_flipped) {
@@ -481,7 +482,7 @@ void menu_play() {
         for (int i = 0; i < levels_completed; i++) {
             std::string level_name = std::format(
                 "{} {}", i + 1, player1->skipped[i] ? "SKIPPED!" : get_internal_level_name(i));
-            nav.add_row(level_name, NAV_FUNC() { play_internal(choice - 1); });
+            nav.add_row(level_name, NAV_FUNC() { play_internal(choice - 1, is_key_down(DIK_F1)); });
         }
 
         int choice = nav.navigate();

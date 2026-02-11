@@ -30,7 +30,7 @@ elma_sources = files(
     'EDITTOLT.CPP',
     'EDITTOOL.CPP',
     'EDITUJ.CPP',
-    'ED_CHECK.CPP',
+    'editor_topology.cpp',
     'flagtag.cpp',
     'ball_handler.cpp',
     'ball.cpp',

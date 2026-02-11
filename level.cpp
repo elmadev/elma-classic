@@ -1,6 +1,6 @@
 #include "level.h"
 #include "best_times.h"
-#include "ED_CHECK.H"
+#include "editor_topology.h"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
 #include "EDITTOLT.H"

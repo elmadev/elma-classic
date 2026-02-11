@@ -77,8 +77,6 @@ void menu_intro() {
     delete static_intro_screen;
     static_intro_screen = nullptr;
 
-    menu_nav_entries_init();
-
     if (State->player_count == 0) {
         newjatekos(1, 0);
     } else {

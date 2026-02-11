@@ -6,7 +6,7 @@
 #include "fs_utils.h"
 #include "keys.h"
 #include "level.h"
-#include "LOAD.H"
+#include "level_load.h"
 #include "lgr.h"
 #include "M_PIC.H"
 #include "main.h"

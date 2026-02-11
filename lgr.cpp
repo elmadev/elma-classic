@@ -9,7 +9,7 @@
 #include "grass.h"
 #include "KIRAJZOL.H"
 #include "level.h"
-#include "LOAD.H"
+#include "level_load.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"

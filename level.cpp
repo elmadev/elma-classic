@@ -7,7 +7,7 @@
 #include "EDITUJ.H"
 #include "polygon.h"
 #include "lgr.h"
-#include "LOAD.H"
+#include "level_load.h"
 #include "main.h"
 #include "object.h"
 #include "physics_init.h"

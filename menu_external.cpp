@@ -2,7 +2,7 @@
 #include "menu_nav.h"
 #include "fs_utils.h"
 #include "LEJATSZO.H"
-#include "LOAD.H"
+#include "level_load.h"
 #include "main.h"
 #include "menu_nav.h"
 #include "menu_pic.h"

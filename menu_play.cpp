@@ -6,7 +6,7 @@
 #include "keys.h"
 #include "LEJATSZO.H"
 #include "level.h"
-#include "LOAD.H"
+#include "level_load.h"
 #include "main.h"
 #include "menu_external.h"
 #include "menu_nav.h"

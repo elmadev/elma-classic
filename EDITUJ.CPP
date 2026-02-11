@@ -11,7 +11,7 @@
 #include "keys.h"
 #include "level.h"
 #include "lgr.h"
-#include "LOAD.H"
+#include "level_load.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"

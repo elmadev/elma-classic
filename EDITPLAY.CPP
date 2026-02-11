@@ -4,7 +4,7 @@
 #include "keys.h"
 #include "LEJATSZO.H"
 #include "level.h"
-#include "LOAD.H"
+#include "level_load.h"
 #include "platform_impl.h"
 
 void editplay(bool view_map) {

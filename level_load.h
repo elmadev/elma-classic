@@ -1,5 +1,5 @@
-#ifndef LOAD_H
-#define LOAD_H
+#ifndef LEVEL_LOAD_H
+#define LEVEL_LOAD_H
 
 #define DEFAULT_LEVEL_FILENAME "_uj_topol_"
 

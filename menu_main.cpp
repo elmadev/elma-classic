@@ -234,29 +234,26 @@ static void menu_demo() {
 }
 
 static void menu_prompt_exit() {
-    menu_nav_old nav;
-    nav.selected_index = 0;
+    menu_nav nav("Do you want to quit?");
     nav.x_left = 300;
     nav.y_entries = 200;
     nav.dy = 40;
     nav.y_title = 50;
     nav.enable_esc = false;
-    strcpy(nav.title, "Do you want to quit?");
 
-    strcpy(NavEntriesLeft[0], "Yes");
-    strcpy(NavEntriesLeft[1], "No");
+    nav.add_row(
+        "Yes", NAV_FUNC() {
+            State->reload_toptens();
 
-    nav.setup(2);
+            State->save();
+            State->write_stats();
 
-    int choice = nav.navigate();
+            menu_exit();
+        });
 
-    if (choice == 0) {
-        State->reload_toptens();
+    nav.add_row("No");
 
-        State->save();
-        State->write_stats();
-        menu_exit();
-    }
+    nav.navigate();
 }
 
 void menu_main() {

@@ -18,20 +18,39 @@ static char CurrentLevelName[20] = "";
 
 void invalidate_level() { ReloadLevel = true; }
 
-bool load_level_play(const char* levelname) {
+// return true if Ptop is reloaded, false if Ptop is unchanged
+static bool load_level(const char* levelname) {
     if (!levelname) {
         internal_error("load_level_play !levelname!");
     }
-    if (strlen(levelname) > MAX_FILENAME_EXT_LEN || !levelname[0]) {
-        internal_error(
-            "load_level_play strlen( levelname ) > MAX_FILENAME_EXT_LEN || !levelname[0]!: ",
-            levelname);
+    size_t len = strlen(levelname);
+    if (len > MAX_FILENAME_EXT_LEN || len <= 0) {
+        internal_error("load_level_play levelname length invalid!", levelname);
     }
-    if (ReloadLevel || !Ptop || !Segments || strcmpi(levelname, CurrentLevelName) != 0) {
-        ReloadLevel = false;
-        strcpy(CurrentLevelName, levelname);
-        delete Ptop;
+
+    if (!ReloadLevel && Ptop && strcmpi(levelname, CurrentLevelName) == 0) {
+        return false;
+    }
+
+    ReloadLevel = false;
+    strcpy(CurrentLevelName, levelname);
+
+    delete Ptop;
+    if (strcmpi(levelname, DEFAULT_LEVEL_FILENAME) == 0) {
+        Ptop = new level;
+        CurrentLevelName[0] = 0;
+    } else {
         Ptop = new level(levelname);
+    }
+
+    return true;
+}
+
+bool load_level_play(const char* levelname) {
+    if (!Segments) {
+        invalidate_level();
+    }
+    if (load_level(levelname)) {
         if (Ptop->topology_errors) {
             menu_pic menu;
             menu.add_line_centered("Level file has some topology errors!", 320, 190);
@@ -46,11 +65,11 @@ bool load_level_play(const char* levelname) {
                 }
                 menu.render();
             }
-
             delete Ptop;
             Ptop = nullptr;
             return false;
         }
+
         lgrfile::load_lgr_file(Ptop->lgr_name);
         Ptop->discard_missing_lgr_assets(Lgr);
 
@@ -68,32 +87,14 @@ bool load_level_play(const char* levelname) {
 }
 
 bool load_level_editor(const char* levelname) {
-    if (!levelname) {
-        internal_error("load_level_editor !levelname!");
-    }
-    if (strlen(levelname) > MAX_FILENAME_EXT_LEN || !levelname[0]) {
-        internal_error(
-            "load_level_editor strlen( levelname ) > MAX_FILENAME_EXT_LEN || !levelname[0]!: ",
-            levelname);
-    }
-    if (ReloadLevel || !Ptop || strcmpi(levelname, CurrentLevelName) != 0) {
-        ReloadLevel = false;
-        strcpy(CurrentLevelName, levelname);
-        delete Ptop;
-        if (strcmpi(levelname, DEFAULT_LEVEL_FILENAME) == 0) {
-            Ptop = new level;
-            CurrentLevelName[0] = 0;
-        } else {
-            Ptop = new level(levelname);
-        }
-
+    if (load_level(levelname)) {
         lgrfile::load_lgr_file(Ptop->lgr_name);
         if (Ptop->discard_missing_lgr_assets(Lgr)) {
             dialog_warn_lgr_assets_deleted();
         }
     }
 
-    // Forces a reload in load_level_play
+    // Segments are not properly updated in the editor
     delete Segments;
     Segments = nullptr;
 

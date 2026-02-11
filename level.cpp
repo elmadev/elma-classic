@@ -863,7 +863,7 @@ void level::save(const char* filename, bool skip_topology) {
     if (skip_topology) {
         topology_errors = false;
     } else {
-        topology_errors = check_topology(0);
+        topology_errors = check_topology(false);
     }
 
     char path[40];

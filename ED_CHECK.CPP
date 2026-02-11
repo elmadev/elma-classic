@@ -6,7 +6,7 @@
 #include "object.h"
 #include "polygon.h"
 
-int check_topology(int show_dialog) {
+bool check_topology(bool show_dialog) {
     dialog("Checking Topology, please wait!", DIALOG_BUTTONS, DIALOG_RETURN);
 
     // Enforce a minimum distance between all points in a polygon.
@@ -42,10 +42,8 @@ int check_topology(int show_dialog) {
             sprintf(tmp2, "There are %d vertices now in the level.", vertex_count);
             dialog(tmp1, tmp2, "Please delete some vertices or polygons from this level!");
             invalidateegesz();
-            return 1;
-        } else {
-            return 1;
         }
+        return true;
     }
 
     // Check for intersecting lines
@@ -82,10 +80,8 @@ int check_topology(int show_dialog) {
                                        "After this dialog you will see the intersection.",
                                        "Use Zoomout to see where it is located!");
                                 invalidateegesz();
-                                return 1;
-                            } else {
-                                return 1;
                             }
+                            return true;
                         }
                     }
                 }
@@ -110,10 +106,8 @@ int check_topology(int show_dialog) {
                            "After this dialog you will see the object.",
                            "Use Zoomout to see where it is located!");
                     invalidateegesz();
-                    return 1;
-                } else {
-                    return 1;
                 }
+                return true;
             }
         }
     }
@@ -135,7 +129,7 @@ int check_topology(int show_dialog) {
                            "Use Zoomout to see where it is located!");
                     zoom(obj->r, 1.5);
                 }
-                return 1;
+                return true;
             }
         }
     }
@@ -143,5 +137,5 @@ int check_topology(int show_dialog) {
     if (show_dialog) {
         dialog("Everything seems to be all right.");
     }
-    return 0;
+    return false;
 }

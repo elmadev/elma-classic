@@ -829,7 +829,7 @@ void editor(void) {
                         }
 
                         if (i == 6 && balnyomva) {
-                            check_topology(1);
+                            check_topology(true);
                         }
                         if (i == 6 && jobbnyomva) {
                             editor_help_check_topology();

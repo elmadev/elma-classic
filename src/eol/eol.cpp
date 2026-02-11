@@ -13,3 +13,5 @@ void eol::process(const login& l) {
         StatusMessages->add("login unsuccessful");
     }
 }
+
+void eol::process(const new_kuski& nk) { kuskis.push_back(nk.k); }

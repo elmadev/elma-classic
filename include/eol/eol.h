@@ -3,6 +3,7 @@
 
 #include "eol/eol_events.h"
 #include "eol/null_protocol.h"
+#include <vector>
 
 using protocol = null_protocol;
 
@@ -14,11 +15,13 @@ class eol {
     void tick() { proto.tick(); }
 
     void process(const login&);
+    void process(const new_kuski&);
 
   private:
     protocol proto;
     unsigned int id;
     unsigned int id2;
+    std::vector<kuski> kuskis;
 };
 
 extern eol* EolClient;

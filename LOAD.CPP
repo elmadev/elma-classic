@@ -11,33 +11,34 @@
 #include "platform_utils.h"
 #include "segments.h"
 #include <cstring>
+#include "fs_utils.h"
 
-int ReloadLevel = 0;
+bool ReloadLevel = false;
 
 static char CurrentLevelName[20] = "";
 
-void invalidate_level() { ReloadLevel = 1; }
+void invalidate_level() { ReloadLevel = true; }
 
-int load_level_play(const char* levelname) {
+bool load_level_play(const char* levelname) {
     if (!levelname) {
         internal_error("load_level_play !levelname!");
     }
-    if (strlen(levelname) > 12 || !levelname[0]) {
-        internal_error("load_level_play strlen( levelname ) > 12 || !levelname[0]!: ", levelname);
+    if (strlen(levelname) > MAX_FILENAME_EXT_LEN || !levelname[0]) {
+        internal_error(
+            "load_level_play strlen( levelname ) > MAX_FILENAME_EXT_LEN || !levelname[0]!: ",
+            levelname);
     }
     if (ReloadLevel || !Ptop || !Segments || strcmpi(levelname, CurrentLevelName) != 0) {
-        ReloadLevel = 0;
+        ReloadLevel = false;
         strcpy(CurrentLevelName, levelname);
-        if (Ptop) {
-            delete Ptop;
-        }
+        delete Ptop;
         Ptop = new level(levelname);
         if (Ptop->topology_errors) {
             menu_pic menu;
             menu.add_line_centered("Level file has some topology errors!", 320, 190);
             menu.add_line_centered("Use the editor to fix them!", 320, 240);
             empty_keypress_buffer();
-            while (1) {
+            while (true) {
                 if (has_keypress()) {
                     Keycode c = get_keypress();
                     if (c == KEY_ESC || c == KEY_ENTER) {
@@ -48,15 +49,13 @@ int load_level_play(const char* levelname) {
             }
 
             delete Ptop;
-            Ptop = NULL;
-            return 0;
+            Ptop = nullptr;
+            return false;
         }
         lgrfile::load_lgr_file(Ptop->lgr_name);
         Ptop->discard_missing_lgr_assets(Lgr);
 
-        if (Segments) {
-            delete Segments;
-        }
+        delete Segments;
         Segments = new segments(Ptop);
         if (HeadRadius > Motor1->left_wheel.radius) {
             Segments->setup_collision_grid(HeadRadius);
@@ -66,25 +65,23 @@ int load_level_play(const char* levelname) {
 
         create_canvases();
     }
-    return 1;
+    return true;
 }
 
-int load_level_editor(const char* levelname, int reload) {
-    int locked = 0;
-
+bool load_level_editor(const char* levelname, int reload) {
     if (!levelname) {
         internal_error("load_level_editor !levelname!");
     }
-    if (strlen(levelname) > 12 || !levelname[0]) {
-        internal_error("load_level_editor strlen( levelname ) > 12 || !levelname[0]!: ", levelname);
+    if (strlen(levelname) > MAX_FILENAME_EXT_LEN || !levelname[0]) {
+        internal_error(
+            "load_level_editor strlen( levelname ) > MAX_FILENAME_EXT_LEN || !levelname[0]!: ",
+            levelname);
     }
     if (reload || ReloadLevel || !Ptop || strcmpi(levelname, CurrentLevelName) != 0) {
-        ReloadLevel = 0;
+        ReloadLevel = false;
         strcpy(CurrentLevelName, levelname);
-        if (Ptop) {
-            delete Ptop;
-        }
-        if (strcmpi(levelname, "_uj_topol_") == 0) {
+        delete Ptop;
+        if (strcmpi(levelname, DEFAULT_LEVEL_FILENAME) == 0) {
             Ptop = new level;
             CurrentLevelName[0] = 0;
         } else {
@@ -98,30 +95,26 @@ int load_level_editor(const char* levelname, int reload) {
     }
 
     // Forces a reload in load_level_play
-    if (Segments) {
-        delete Segments;
-    }
-    Segments = NULL;
+    delete Segments;
+    Segments = nullptr;
 
     if (Ptop->toptens.single.times_count > 0 || Ptop->toptens.multi.times_count > 0) {
         dialog("Warning!", "The level file you are opening has some best times.",
                "If you save this level file, these times will be erased!");
     }
 
-    return !locked;
+    return true;
 }
 
-void invalidate_ptop(void) {
-    if (Ptop) {
-        delete Ptop;
-        Ptop = 0;
-    }
+void invalidate_ptop() {
+    delete Ptop;
+    Ptop = nullptr;
 }
 
-void dialog_warn_lgr_assets_deleted(void) {
+void dialog_warn_lgr_assets_deleted() {
     dialog("The LGR file has changed since the last edition of this level and",
            "some parts (pictures, textures or border polygons) of the level",
            "must have been deleted!", "", "!!!!IMPORTANT!!!!",
-           "If you do not want to loose these parts, do not save this level",
+           "If you do not want to lose these parts, do not save this level",
            "on its original name!");
 }

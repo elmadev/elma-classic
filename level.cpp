@@ -856,7 +856,7 @@ void level::save(const char* filename, bool skip_topology) {
     constexpr bool SAVE_INTERNAL = false;
 
     memset(&toptens, 0, sizeof(toptens));
-    ReloadLevel = 1;
+    ReloadLevel = true;
     if (objects_flipped) {
         internal_error("level::save objects_flipped!");
     }

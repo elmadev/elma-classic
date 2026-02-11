@@ -646,7 +646,7 @@ void editor(void) {
 
     Valtozott = 0;
     if (State->editor_filename[0] == 0) {
-        load_level_editor("_uj_topol_");
+        load_level_editor(DEFAULT_LEVEL_FILENAME);
     } else {
         if (!load_level_editor(State->editor_filename)) {
             State->editor_filename[0] = 0;

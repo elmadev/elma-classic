@@ -561,7 +561,7 @@ void tolt_new(void) {
     }
 
     Valtozott = 0;
-    load_level_editor("_uj_topol_");
+    load_level_editor(DEFAULT_LEVEL_FILENAME);
     State->editor_filename[0] = 0;
     zoom_fill();
 }

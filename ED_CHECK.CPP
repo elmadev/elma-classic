@@ -6,11 +6,11 @@
 #include "object.h"
 #include "polygon.h"
 
-// Visszaadja, hogy volt-e hiba:
 int check_topology(int show_dialog) {
     dialog("Checking Topology, please wait!", DIALOG_BUTTONS, DIALOG_RETURN);
 
-    // Eloszor egymason fekvo szomszedos pontokat valasztjuk szet:
+    // Enforce a minimum distance between all points in a polygon.
+    // Randomly nudge them further apart
     for (int i = 0; i < MAX_POLYGONS; i++) {
         polygon* poly = Ptop->polygons[i];
         if (poly) {
@@ -18,15 +18,15 @@ int check_topology(int show_dialog) {
         }
     }
 
-    // Most megszuntetjuk hegyes szogeket:
+    // Enforce a minimum angle for all vertices. Nudge them apart if needed
     for (int i = 0; i < MAX_POLYGONS; i++) {
         polygon* poly = Ptop->polygons[i];
         if (poly && !poly->is_grass) {
-            poly->is_clockwise(); // Ez automatikusan megcsinalja:
+            poly->is_clockwise();
         }
     }
 
-    // Most megnezzuk, hogy nincs-e tul sok pont osszesen:
+    // Limit the maximum number of vertices
     int vertex_count = 0;
     for (int i = 0; i < MAX_POLYGONS; i++) {
         polygon* poly = Ptop->polygons[i];
@@ -48,11 +48,12 @@ int check_topology(int show_dialog) {
         }
     }
 
-    // Most megnezzuk, hogy nincsenek-e egymast metszo vonalak:
+    // Check for intersecting lines
     for (int i = 0; i < MAX_POLYGONS; i++) {
         polygon* poly1 = Ptop->polygons[i];
         if (poly1 && !poly1->is_grass) {
             for (int j = 0; j < poly1->vertex_count; j++) {
+                // Get a line from poly1
                 vect2 r = poly1->vertices[j];
                 vect2 v;
                 if (j == poly1->vertex_count - 1) {
@@ -60,14 +61,14 @@ int check_topology(int show_dialog) {
                 } else {
                     v = poly1->vertices[j + 1] - r;
                 }
-                // Megvan r, v szakasz, amirol el kell donteni, hogy van-e
-                // metszespontja akarmi massal:
+                // Check for intersection against every other line in the level
                 for (int k = 0; k < MAX_POLYGONS; k++) {
                     polygon* poly2 = Ptop->polygons[k];
                     if (poly2 && !poly2->is_grass) {
                         bool has_intersection = false;
                         vect2 intersection_point;
                         if (poly1 == poly2) {
+                            // Exclude checking line against itself
                             has_intersection =
                                 poly2->intersection_point(r, v, j, &intersection_point);
                         } else {
@@ -92,7 +93,7 @@ int check_topology(int show_dialog) {
         }
     }
 
-    // Most megnezzuk, hogy nincs-e kintlevo objektum:
+    // Make sure objects are not outside of level borders
     double x1, y1, x2, y2;
     Ptop->get_boundaries(&x1, &y1, &x2, &y2, false);
     x1 -= 1.0;
@@ -117,7 +118,7 @@ int check_topology(int show_dialog) {
         }
     }
 
-    // Most megnezzuk, hogy bal kerek nincs-e kint:
+    // Make sure start object isn't in the ground
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Ptop->objects[i];
         if (obj && obj->type == object::Type::Start) {

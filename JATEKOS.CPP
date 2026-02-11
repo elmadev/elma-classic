@@ -9,6 +9,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "state.h"
+#include <directinput/scancodes.h>
 #include <cstring>
 #include <directinput/scancodes.h>
 
@@ -111,86 +112,75 @@ void newjatekos(int A, int visszater) {
 
 void jatekosvalasztas(int A, int visszater) {
     // Valasztas:
-    menu_nav_old* pval = NULL;
-    pval = new menu_nav_old;
+    menu_nav nav("Choose Player");
+
     char* eddigjatekos = NULL;
     if (A) {
         eddigjatekos = State->player1;
     } else {
         eddigjatekos = State->player2;
     }
-    strcpy(pval->title, "Choose Player");
 
-    strcpy(NavEntriesLeft[0], "Create New Player");
-    pval->selected_index = 0;
+    nav.add_row("Create New Player", NAV_FUNC(&A, &visszater) { newjatekos(A, visszater); });
+
     for (int i = 0; i < State->player_count; i++) {
-        if (strlen(State->players[i].name) > NAV_ENTRY_TEXT_MAX_LENGTH) {
-            internal_error("Tul hosszu nev jatekosvalasztas-ban!");
-        }
-        strcpy(NavEntriesLeft[i + 1], State->players[i].name);
+        nav.add_row(
+            State->players[i].name, NAV_FUNC(&A, &visszater) {
+                bool delete_player =
+                    visszater && is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
+                if (!delete_player) {
+                    // Normal behaviour - select player
+                    if (A) {
+                        strcpy(State->player1, left.c_str());
+                    } else {
+                        strcpy(State->player2, left.c_str());
+                    }
+                } else {
+                    // Try to delete player
+                    if (State->player_count <= 1) {
+                        return;
+                    }
 
-        if (strcmp(eddigjatekos, State->players[i].name) == 0) {
-            pval->selected_index = i + 1;
-        }
+                    // Use index in case we have two duplicate player names
+                    // There should be a create player check to prevent this because it's buggy
+                    // but at the moment there's no check
+                    int torlendo = choice - 1;
+
+                    // Megjegyezzuk hogy A vagy B nem torolt jatekos-e veletlenul:
+                    int atorlodott = 0;
+                    if (strcmp(State->player1, left.c_str()) == 0) {
+                        atorlodott = 1;
+                    }
+                    int btorlodott = 0;
+                    if (strcmp(State->player2, left.c_str()) == 0) {
+                        btorlodott = 1;
+                    }
+
+                    // Toroljuk jatekost, tobbit elore hozzuk eggyel:
+                    for (int i = torlendo; i < State->player_count - 1; i++) {
+                        // i-edik helyre elore hozzuk i+1-edik helyrol:
+                        State->players[i] = State->players[i + 1];
+                    }
+                    State->player_count--;
+
+                    if (atorlodott) {
+                        strcpy(State->player1, State->players[0].name);
+                    }
+                    if (btorlodott) {
+                        strcpy(State->player2, State->players[0].name);
+                    }
+                }
+            });
     }
 
-    pval->setup(State->player_count + 1);
+    nav.select_row(eddigjatekos);
 
-    int eredmeny = pval->navigate();
-
-    delete pval;
-    pval = NULL;
+    int eredmeny = nav.navigate();
 
     if (eredmeny < 0) {
-        if (visszater) {
-            return;
+        if (!visszater) {
+            menu_exit();
         }
-        menu_exit();
-    }
-    if (eredmeny == 0) {
-        newjatekos(A, visszater);
-        return;
-    }
-
-    if (CtrlAltPressed && visszater) {
-        // Ezt a jatekost akarja torolni (opciokbol hivva):
-        if (State->player_count <= 1) {
-            return;
-        }
-
-        int torlendo = eredmeny - 1;
-
-        // Megjegyezzuk hogy A vagy B nem torolt jatekos-e veletlenul:
-        int atorlodott = 0;
-        if (strcmp(State->player1, State->players[torlendo].name) == 0) {
-            atorlodott = 1;
-        }
-        int btorlodott = 0;
-        if (strcmp(State->player2, State->players[torlendo].name) == 0) {
-            btorlodott = 1;
-        }
-
-        // Toroljuk jatekost, tobbit elore hozzuk eggyel:
-        for (int i = torlendo; i < State->player_count - 1; i++) {
-            // i-edik helyre elore hozzuk i+1-edik helyrol:
-            State->players[i] = State->players[i + 1];
-        }
-        State->player_count--;
-
-        if (atorlodott) {
-            strcpy(State->player1, State->players[0].name);
-        }
-        if (btorlodott) {
-            strcpy(State->player2, State->players[0].name);
-        }
-
-        return;
-    }
-
-    if (A) {
-        strcpy(State->player1, State->players[eredmeny - 1].name);
-    } else {
-        strcpy(State->player2, State->players[eredmeny - 1].name);
     }
 
     if (visszater) {

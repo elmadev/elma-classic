@@ -116,7 +116,8 @@ static void betolt(const char* nev) {
     strcpy(State->editor_filename, tmp);
 
     Valtozott = 0;
-    if (!load_level_editor(tmp, 1)) {
+    invalidate_level();
+    if (!load_level_editor(tmp)) {
         State->editor_filename[0] = 0;
     }
 

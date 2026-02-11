@@ -67,7 +67,7 @@ bool load_level_play(const char* levelname) {
     return true;
 }
 
-bool load_level_editor(const char* levelname, int reload) {
+bool load_level_editor(const char* levelname) {
     if (!levelname) {
         internal_error("load_level_editor !levelname!");
     }
@@ -76,7 +76,7 @@ bool load_level_editor(const char* levelname, int reload) {
             "load_level_editor strlen( levelname ) > MAX_FILENAME_EXT_LEN || !levelname[0]!: ",
             levelname);
     }
-    if (reload || ReloadLevel || !Ptop || strcmpi(levelname, CurrentLevelName) != 0) {
+    if (ReloadLevel || !Ptop || strcmpi(levelname, CurrentLevelName) != 0) {
         ReloadLevel = false;
         strcpy(CurrentLevelName, levelname);
         delete Ptop;

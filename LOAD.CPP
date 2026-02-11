@@ -14,7 +14,7 @@
 
 int ReloadLevel = 0;
 
-static char Bentlevelnev[20] = "";
+static char CurrentLevelName[20] = "";
 
 void invalidate_level() { ReloadLevel = 1; }
 
@@ -22,26 +22,27 @@ void invalidate_level() { ReloadLevel = 1; }
 // Torli es kitolti Ptop, Lgr, Segments, canvas mutatokat.
 // Ha belso file-ban is megvan palya onnan veszi:
 // Hamissal ter vissza, ha hibas topologiaju level:
-int load_level_play(const char* nev) {
-    if (!nev) {
-        internal_error("load_level_play-ben !nev!");
+int load_level_play(const char* levelname) {
+    if (!levelname) {
+        internal_error("load_level_play-ben !levelname!");
     }
-    if (strlen(nev) > 12 || !nev[0]) {
-        internal_error("load_level_play-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
+    if (strlen(levelname) > 12 || !levelname[0]) {
+        internal_error("load_level_play-ben strlen( levelname ) > 12 || !levelname[0]!: ",
+                       levelname);
     }
-    if (ReloadLevel || !Ptop || !Segments || strcmpi(nev, Bentlevelnev) != 0) {
+    if (ReloadLevel || !Ptop || !Segments || strcmpi(levelname, CurrentLevelName) != 0) {
         ReloadLevel = 0;
         // Ujra be kell olvasni palyat:
-        strcpy(Bentlevelnev, nev);
+        strcpy(CurrentLevelName, levelname);
         if (Ptop) {
             delete Ptop;
         }
-        Ptop = new level(nev);
+        Ptop = new level(levelname);
         if (Ptop->topology_errors) {
             // Kiir hiba uzenetet:
-            menu_pic szl;
-            szl.add_line_centered("Level file has some topology errors!", 320, 190);
-            szl.add_line_centered("Use the editor to fix them!", 320, 240);
+            menu_pic menu;
+            menu.add_line_centered("Level file has some topology errors!", 320, 190);
+            menu.add_line_centered("Use the editor to fix them!", 320, 240);
             empty_keypress_buffer();
             while (1) {
                 if (has_keypress()) {
@@ -50,7 +51,7 @@ int load_level_play(const char* nev) {
                         break;
                     }
                 }
-                szl.render();
+                menu.render();
             }
 
             delete Ptop;
@@ -79,27 +80,28 @@ int load_level_play(const char* nev) {
 // Segments, canvas mutatokat torli:
 // Ha belso file-ban is megvan palya onnan veszi:
 // Igaz ha file nem volt lezarva, kulonben new palya hamissal:
-int load_level_editor(const char* nev, int forceload) {
-    int levoltzarva = 0;
+int load_level_editor(const char* levelname, int reload) {
+    int locked = 0;
 
-    if (!nev) {
-        internal_error("load_level_editor-ben !nev!");
+    if (!levelname) {
+        internal_error("load_level_editor-ben !levelname!");
     }
-    if (strlen(nev) > 12 || !nev[0]) {
-        internal_error("load_level_editor-ben strlen( nev ) > 12 || !nev[0]!: ", nev);
+    if (strlen(levelname) > 12 || !levelname[0]) {
+        internal_error("load_level_editor-ben strlen( levelname ) > 12 || !levelname[0]!: ",
+                       levelname);
     }
-    if (forceload || ReloadLevel || !Ptop || strcmpi(nev, Bentlevelnev) != 0) {
+    if (reload || ReloadLevel || !Ptop || strcmpi(levelname, CurrentLevelName) != 0) {
         ReloadLevel = 0;
         // Ujra be kell olvasni palyat:
-        strcpy(Bentlevelnev, nev);
+        strcpy(CurrentLevelName, levelname);
         if (Ptop) {
             delete Ptop;
         }
-        if (strcmpi(nev, "_uj_topol_") == 0) {
+        if (strcmpi(levelname, "_uj_topol_") == 0) {
             Ptop = new level;
-            Bentlevelnev[0] = 0;
+            CurrentLevelName[0] = 0;
         } else {
-            Ptop = new level(nev);
+            Ptop = new level(levelname);
         }
 
         lgrfile::load_lgr_file(Ptop->lgr_name);
@@ -119,7 +121,7 @@ int load_level_editor(const char* nev, int forceload) {
                "If you save this level file, these times will be erased!");
     }
 
-    return !levoltzarva;
+    return !locked;
 }
 
 // Opciok minibike-ja hasznalja:

@@ -256,7 +256,8 @@ std::string dik_to_string(DikScancode keycode) {
 }
 
 // A list of pointers to where the keys are stored (somewhere in a state class object)
-typedef DikScancode* key_pointers[NAV_ENTRIES_RIGHT_MAX_LENGTH + 1];
+constexpr size_t KEY_POINTERS_MAX = 20;
+typedef DikScancode* key_pointers[KEY_POINTERS_MAX];
 
 static key_pointers UniversalKeys; // +/- and Screenshot
 static key_pointers Player1Keys;
@@ -265,10 +266,15 @@ static key_pointers ReplayKeys;
 
 constexpr int UNIVERSAL_KEYS_START = 4;
 constexpr int UNIVERSAL_KEYS_END = UNIVERSAL_KEYS_START + 4;
+static_assert(KEY_POINTERS_MAX > UNIVERSAL_KEYS_END);
+
 constexpr int PLAYER_KEYS_START = 0;
 constexpr int PLAYER_KEYS_END = PLAYER_KEYS_START + 10;
+static_assert(KEY_POINTERS_MAX > PLAYER_KEYS_END);
+
 constexpr int REPLAY_KEYS_START = 0;
 constexpr int REPLAY_KEYS_END = REPLAY_KEYS_START + 6;
+static_assert(KEY_POINTERS_MAX > REPLAY_KEYS_END);
 
 // Setup the menu to display one control key
 static void load_control(menu_nav* nav, key_pointers keys, int offset, std::string label,

@@ -554,7 +554,8 @@ bool menu_nav::search_handler(int code) {
             return false;
         }
     } else if (accept_search_input() && MenuFont->has_char(code)) {
-        if (search_input.size() < MAX_FILENAME_LEN) {
+        const size_t max_len = search_pattern == SearchPattern::Internals ? 20 : MAX_FILENAME_LEN;
+        if (search_input.size() < max_len) {
             search_input.push_back(code);
         }
     } else {

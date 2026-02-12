@@ -43,6 +43,10 @@ struct exit_level {
     bool dead;
 };
 
+struct clear_spy_data {
+    unsigned int kuski_id;
+};
+
 struct show_table {
     TableType table;
 };

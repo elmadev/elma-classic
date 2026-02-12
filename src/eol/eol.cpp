@@ -80,7 +80,25 @@ void eol::process(const chat_message& msg) {
     Console->add_line(line, console::LineType::Chat);
 }
 
+void eol::process(const spy_data& sd) {
+    kuski* k = get_kuski(kuskis_, sd.kuski_id);
+    if (k) {
+        k->add_spy_data(sd);
+    }
+}
+
+void eol::process(const clear_spy_data& sd) {
+    kuski* k = get_kuski(kuskis_, sd.kuski_id);
+    if (k) {
+        k->clear_spy_data();
+    }
+}
+
 void eol::enter_level(const char* level_name, const level* lev) {
+    for (kuski& k : kuskis_) {
+        k.clear_spy_data();
+    }
+
     struct enter_level el{.lev = lev, .name = level_name};
     proto.send(el);
 }
@@ -123,3 +141,9 @@ void eol::render_table(pic8& dest, abc8& title_font, abc8& data_font) const {
 
     cur_table->render(dest, title_font, data_font, eol_table::Align::Center);
 }
+
+const struct spy_data* kuski::spy_data() const { return data ? &*data : nullptr; }
+
+void kuski::add_spy_data(const struct spy_data& sd) { data = sd; }
+
+void kuski::clear_spy_data() { data = std::nullopt; }

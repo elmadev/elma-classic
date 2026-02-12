@@ -432,9 +432,7 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
     search_input.clear();
 
     // Bound current selection
-    if (selected_index > row_count() - 1) {
-        selected_index = row_count() - 1;
-    }
+    selected_index = std::min(selected_index, (int)row_count() - 1);
 
     int max_visible_entries = calculate_visible_entries(extra_lines_length);
 
@@ -476,12 +474,8 @@ int menu_nav::navigate(text_line* extra_lines, int extra_lines_length, bool rend
         }
 
         // Limit selected index to valid values
-        if (selected_index < 0) {
-            selected_index = 0;
-        }
-        if (selected_index >= row_count()) {
-            selected_index = row_count() - 1;
-        }
+        selected_index = std::max(selected_index, 0);
+        selected_index = std::min(selected_index, (int)row_count() - 1);
         // Update view_index and limit to valid values
         if (selected_index < view_index) {
             view_index = selected_index;

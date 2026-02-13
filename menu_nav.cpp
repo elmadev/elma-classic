@@ -454,12 +454,9 @@ int menu_nav::prompt_choice(bool render_only) {
                 break;
             }
             if (c == KEY_ESC && enable_esc) {
-                CtrlAltPressed = false;
                 return -1;
             }
             if (c == KEY_ENTER) {
-                CtrlAltPressed = is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
-                F1Pressed = is_key_down(DIK_F1);
                 return selected_index;
             }
             if (c == KEY_UP) {

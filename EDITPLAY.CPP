@@ -27,19 +27,5 @@ void editor_play(bool view_map) {
 
     empty_keypress_buffer();
 
-    // Visszaallitjuk eredeti allapotot:
     Pal_editor->set();
-
-    /*initmou( 640, 480 );
-
-    // Megprobaljuk kozepre hozni egeret:
-    for( int i = 0; i < 1000; i++ )
-        get_mouse_position( &Moux, &Mouy );
-    int mmx = 300;
-    int mmy = 255;
-    Moux = mmx;
-    Mouy = mmy;
-    set_mouse_position( mmx, mmy );
-    Moux = mmx;
-    Mouy = mmy;*/
 }

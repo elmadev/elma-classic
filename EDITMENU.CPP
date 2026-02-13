@@ -3,23 +3,22 @@
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "level.h"
+#include "level_load.h"
 
-// igaz, ha kilep
-int editor_dialog_exit(void) {
+bool editor_dialog_exit() {
     invalidateegesz();
     if (Valtozott) {
         if (dialog("There are unsaved changes in the level file.",
-                   "If you exit now, you will loose these changes.", "Do you still want to exit?",
+                   "If you exit now, you will lose these changes.", "Do you still want to exit?",
                    DIALOG_BUTTONS, "Yes", "No") == 1) {
-            return 0;
+            return false;
         }
     }
-    delete Ptop;
-    Ptop = NULL;
-    return 1;
+    invalidate_level();
+    return true;
 }
 
-void editor_zoom_out(void) {
+void editor_zoom_out() {
     zoom_out();
     invalidate();
 }

@@ -714,7 +714,7 @@ void editor(void) {
             }
             if (!(Pgy || Pker || Psp || Zoomfogva || Egypont)) {
                 if (c == 'p') {
-                    editplay(is_key_down(DIK_F1));
+                    editor_play(is_key_down(DIK_F1));
                 }
                 if (c == 'x') {
                     if (editor_dialog_exit()) {
@@ -838,7 +838,7 @@ void editor(void) {
                         }
 
                         if (i == 5 && balnyomva) {
-                            editplay(is_key_down(DIK_F1));
+                            editor_play(is_key_down(DIK_F1));
                             Tool = T_MOVE;
                         }
                         if (i == 5 && jobbnyomva) {

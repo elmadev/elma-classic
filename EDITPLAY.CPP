@@ -7,7 +7,7 @@
 #include "level_load.h"
 #include "platform_impl.h"
 
-void editplay(bool view_map) {
+void editor_play(bool view_map) {
     invalidateegesz();
     if (Valtozott || State->editor_filename[0] == 0 || Ptop->topology_errors) {
         if (!tolt_save()) {

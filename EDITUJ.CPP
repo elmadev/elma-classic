@@ -700,7 +700,7 @@ void editor(void) {
                     editplay(is_key_down(DIK_F1));
                 }
                 if (c == 'x') {
-                    if (editor_exit_dialog()) {
+                    if (editor_dialog_exit()) {
                         push();
                         return;
                     }
@@ -712,7 +712,7 @@ void editor(void) {
                     tolt_save();
                 }
                 if (c == 'z') {
-                    menu_zoomout();
+                    editor_zoom_out();
                 }
 
                 if (c == 'i') {
@@ -782,7 +782,7 @@ void editor(void) {
                         ujy < EDITOR_MENU_Y + (i + 1) * Menudy) {
                         // i-edik gombot lenyomtak menuben:
                         if (i == 0 && balnyomva) {
-                            if (editor_exit_dialog()) {
+                            if (editor_dialog_exit()) {
                                 push();
                                 return;
                             }
@@ -843,7 +843,7 @@ void editor(void) {
                         }
 
                         if (i == 8 && balnyomva) {
-                            menu_zoomout();
+                            editor_zoom_out();
                         }
                         if (i == 8 && jobbnyomva) {
                             editor_help_zoom_out();

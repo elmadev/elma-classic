@@ -71,7 +71,7 @@ menu_pic::~menu_pic() {
     if (!lines) {
         internal_error("menu_pic::~menu_pic !lines!");
     }
-    delete lines;
+    delete[] lines;
     lines = nullptr;
 }
 

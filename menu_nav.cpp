@@ -404,6 +404,7 @@ menu_nav::menu_nav(std::string title)
     x_left = 200;
     y_entries = 90;
     dy = 33;
+    x_right = 240; // dummy value
     enable_esc = true;
     y_title = 30;
     search_pattern = SearchPattern::None;

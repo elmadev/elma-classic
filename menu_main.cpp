@@ -30,6 +30,32 @@ static unsigned int gen_rand_int() {
     return result;
 }
 
+enum class LoadReplayResult { Success, Fail, Abort };
+
+static LoadReplayResult load_replay(const std::string& filename) {
+    MenuPalette->set();
+    loading_screen();
+
+    int level_id = recorder::load_rec_file(filename.c_str(), false);
+
+    if (access_level_file(Rec1->level_filename) != 0) {
+        DikScancode key =
+            menu_dialog("Cannot find the lev file that corresponds", "to the record file!",
+                        filename.c_str(), Rec1->level_filename);
+        return key == KEY_ESC ? LoadReplayResult::Abort : LoadReplayResult::Fail;
+    }
+    load_level_play(Rec1->level_filename);
+
+    if (Ptop->level_id != level_id) {
+        DikScancode key =
+            menu_dialog("The level file has changed since the", "saving of the record file!",
+                        filename.c_str(), Rec1->level_filename);
+        return key == KEY_ESC ? LoadReplayResult::Abort : LoadReplayResult::Fail;
+    }
+
+    return LoadReplayResult::Success;
+}
+
 static void menu_replay() {
     finame filename;
     std::vector<std::string> replay_names;
@@ -83,6 +109,7 @@ static void menu_replay() {
     nav.setup(count);
 
     while (true) {
+        MenuPalette->set();
         int choice = nav.navigate();
 
         if (choice < 0) {
@@ -102,40 +129,20 @@ static void menu_replay() {
                 second_last_played = last_played;
                 last_played = index;
 
-                MenuPalette->set();
-                loading_screen();
-
-                int level_id = recorder::load_rec_file(replay_names[index].c_str(), false);
-                if (access_level_file(Rec1->level_filename) != 0) {
-                    DikScancode c = menu_dialog("Cannot find the lev file that corresponds",
-                                                "to the record file!", replay_names[index].c_str(),
-                                                Rec1->level_filename);
-                    if (c == DIK_ESCAPE) {
-                        return;
+                LoadReplayResult loaded = load_replay(replay_names[index]);
+                if (loaded == LoadReplayResult::Success) {
+                    Rec1->rewind();
+                    Rec2->rewind();
+                    if (lejatszo_r(Rec1->level_filename, 0)) {
+                        break;
                     }
-                } else {
-                    load_level_play(Rec1->level_filename);
-                    if (Ptop->level_id != level_id) {
-                        DikScancode c = menu_dialog(
-                            "The level file has changed since the", "saving of the record file!",
-                            replay_names[index].c_str(), Rec1->level_filename);
-                        if (c == DIK_ESCAPE) {
-                            return;
-                        }
-                    } else {
-                        Rec1->rewind();
-                        Rec2->rewind();
-                        if (lejatszo_r(Rec1->level_filename, 0)) {
-                            break;
-                        }
-                    }
+                } else if (loaded == LoadReplayResult::Abort) {
+                    return;
                 }
             }
         } else {
             const char* replay_name = replay_names[choice - 1].c_str();
             // Play a rec file:
-            loading_screen();
-            int level_id = recorder::load_rec_file(replay_name, false);
             if (F1Pressed) {
                 F1Pressed = false;
                 char msg[128];
@@ -144,27 +151,21 @@ static void menu_replay() {
                 DikScancode c = menu_dialog("Render replay to video frames?", msg,
                                             "Press Enter to continue, ESC to cancel");
                 if (c == DIK_RETURN) {
-                    if (access_level_file(Rec1->level_filename) != 0) {
-                        menu_dialog("Cannot find the lev file that corresponds",
-                                    "to the record file!", replay_name, Rec1->level_filename);
-                    } else {
-                        load_level_play(Rec1->level_filename);
-                        if (Ptop->level_id != level_id) {
-                            menu_dialog("The level file has changed since the",
-                                        "saving of the record file!", replay_name,
-                                        Rec1->level_filename);
-                        } else {
-                            Rec1->rewind();
-                            Rec2->rewind();
-                            render_replay(Rec1->level_filename, replay_name);
-                        }
+                    if (load_replay(replay_name) == LoadReplayResult::Success) {
+                        Rec1->rewind();
+                        Rec2->rewind();
+                        render_replay(Rec1->level_filename, replay_name);
                     }
                 }
-                MenuPalette->set();
                 continue;
             }
 
-            if (CtrlAltPressed) {
+            else if (CtrlAltPressed) {
+                MenuPalette->set();
+                loading_screen();
+
+                recorder::load_rec_file(replay_name, false);
+
                 int time = Rec1->frame_count();
                 if (MultiplayerRec && Rec2->frame_count() > time) {
                     time = Rec2->frame_count();
@@ -179,21 +180,12 @@ static void menu_replay() {
                 strcat(time_str, "    +- 0.01 sec");
                 menu_dialog(replay_name, "The time of this replay file is:", time_str);
                 continue;
-            }
-            if (access_level_file(Rec1->level_filename) != 0) {
-                menu_dialog("Cannot find the lev file that corresponds", "to the record file!",
-                            replay_name, Rec1->level_filename);
             } else {
-                load_level_play(Rec1->level_filename);
-                if (Ptop->level_id != level_id) {
-                    menu_dialog("The level file has changed since the",
-                                "saving of the record file!", replay_name, Rec1->level_filename);
-                } else {
+                if (load_replay(replay_name) == LoadReplayResult::Success) {
                     replay_from_file(Rec1->level_filename);
                 }
             }
         }
-        MenuPalette->set();
     }
 }
 

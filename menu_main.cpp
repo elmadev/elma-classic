@@ -30,6 +30,27 @@ static unsigned int gen_rand_int() {
     return result;
 }
 
+static void replay_time(const std::string& filename) {
+    MenuPalette->set();
+    loading_screen();
+
+    recorder::load_rec_file(filename.c_str(), false);
+
+    int time = Rec1->frame_count();
+    if (MultiplayerRec && Rec2->frame_count() > time) {
+        time = Rec2->frame_count();
+    }
+
+    time = (int)(time * 3.3333333333333);
+    time -= 2;
+    time = std::max(time, 1);
+
+    char time_str[25];
+    centiseconds_to_string(time, time_str);
+    strcat(time_str, "    +- 0.01 sec");
+    menu_dialog(filename.c_str(), "The time of this replay file is:", time_str);
+}
+
 enum class LoadReplayResult { Success, Fail, Abort };
 
 static LoadReplayResult load_replay(const std::string& filename) {
@@ -158,28 +179,8 @@ static void menu_replay() {
                     }
                 }
                 continue;
-            }
-
-            else if (CtrlAltPressed) {
-                MenuPalette->set();
-                loading_screen();
-
-                recorder::load_rec_file(replay_name, false);
-
-                int time = Rec1->frame_count();
-                if (MultiplayerRec && Rec2->frame_count() > time) {
-                    time = Rec2->frame_count();
-                }
-
-                time = (int)(time * 3.3333333333333);
-                time -= 2;
-                time = std::max(time, 1);
-
-                char time_str[25];
-                centiseconds_to_string(time, time_str);
-                strcat(time_str, "    +- 0.01 sec");
-                menu_dialog(replay_name, "The time of this replay file is:", time_str);
-                continue;
+            } else if (CtrlAltPressed) {
+                replay_time(replay_name);
             } else {
                 if (load_replay(replay_name) == LoadReplayResult::Success) {
                     replay_from_file(Rec1->level_filename);

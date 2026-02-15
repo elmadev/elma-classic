@@ -125,61 +125,45 @@ static void replay_randomizer(std::vector<std::string>& filenames) {
 }
 
 static void menu_replay() {
-    finame filename;
     std::vector<std::string> replay_names;
-    bool done = find_first("rec/*.rec", filename);
 
+    menu_nav nav("Select replay file!");
+    nav.add_row("Randomizer", NAV_FUNC(&replay_names) { replay_randomizer(replay_names); });
+
+    finame filename;
+    bool done = find_first("rec/*.rec", filename);
     while (!done) {
         replay_names.emplace_back(filename);
 
+        constexpr int EXT_LEN = 4;
+        int len = strlen(filename);
+        std::string short_name = std::string(filename, len - EXT_LEN);
+        nav.add_row(
+            short_name, NAV_FUNC(filename) {
+                if (is_key_down(DIK_F1)) {
+                    replay_render(filename);
+                } else if (is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU)) {
+                    replay_time(filename);
+                } else {
+                    replay_play(filename);
+                }
+            });
+
         done = find_next(filename);
-        if (replay_names.size() >= NavEntriesLeftMaxLength - 4) {
-            done = true;
-        }
     }
     find_close();
 
-    if (replay_names.empty()) {
+    nav.search_pattern = SearchPattern::Sorted;
+    nav.search_skip = 1;
+    nav.sort_rows();
+
+    if (nav.row_count() <= 1) {
         return;
     }
-
-    std::sort(replay_names.begin(), replay_names.end(),
-              [](const std::string& a, const std::string& b) {
-                  return strcmpi(a.c_str(), b.c_str()) < 0;
-              });
-
-    int count = 0;
-    strcpy(NavEntriesLeft[count++], "Randomizer");
-
-    for (const auto& full_name : replay_names) {
-        finame display_name;
-        strcpy(display_name, full_name.c_str());
-
-        // Remove extension for display:
-        int i = strlen(display_name) - 1;
-        while (i >= 0 && display_name[i] != '.') {
-            i--;
-        }
-        if (i < 0) {
-            internal_error("menu_replay: no dot in name!: ", full_name.c_str());
-        }
-        display_name[i] = 0;
-
-        strcpy(NavEntriesLeft[count++], display_name);
-    }
-
-    menu_nav_old nav;
-    nav.search_pattern = SearchPattern::Sorted;
-    nav.search_skip_one = true;
-    nav.selected_index = 0;
-    strcpy(nav.title, "Select replay file!");
-
-    nav.setup(count);
 
     while (true) {
         MenuPalette->set();
         int choice = nav.navigate();
-
         if (choice < 0) {
             return;
         }

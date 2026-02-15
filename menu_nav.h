@@ -63,7 +63,9 @@ class menu_nav_old {
 extern bool CtrlAltPressed;
 extern bool F1Pressed;
 
-#define NAV_FUNC(...) [__VA_ARGS__](int choice, std::string& left, std::string& right)
+#define NAV_FUNC(...)                                                                              \
+    [__VA_ARGS__]([[maybe_unused]] int choice, [[maybe_unused]] std::string& left,                 \
+                  [[maybe_unused]] std::string& right)
 using nav_func = std::function<void(int, std::string&, std::string&)>;
 
 struct nav_row {

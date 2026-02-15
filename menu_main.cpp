@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
+#include <format>
 #include <string>
 #include <vector>
 
@@ -162,20 +163,19 @@ static void menu_replay() {
                 }
             }
         } else {
-            const char* replay_name = replay_names[choice - 1].c_str();
+            const std::string& replay_name = replay_names[choice - 1];
             // Play a rec file:
             if (F1Pressed) {
                 F1Pressed = false;
-                char msg[128];
-                snprintf(msg, sizeof(msg), "Recording at %d FPS to renders/%s",
-                         EolSettings->recording_fps(), NavEntriesLeft[choice]);
-                DikScancode c = menu_dialog("Render replay to video frames?", msg,
+                std::string msg = std::format("Recording at {} FPS to renders/{}",
+                                              EolSettings->recording_fps(), NavEntriesLeft[choice]);
+                DikScancode c = menu_dialog("Render replay to video frames?", msg.c_str(),
                                             "Press Enter to continue, ESC to cancel");
                 if (c == DIK_RETURN) {
                     if (load_replay(replay_name) == LoadReplayResult::Success) {
                         Rec1->rewind();
                         Rec2->rewind();
-                        render_replay(Rec1->level_filename, replay_name);
+                        render_replay(Rec1->level_filename, replay_name.c_str());
                     }
                 }
                 continue;

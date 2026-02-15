@@ -25,7 +25,6 @@ elma_sources = files(
     'D_PIC.CPP',
     'ECSET.CPP',
     'editor_help.cpp',
-    'EDITPLAY.CPP',
     'EDITTOLT.CPP',
     'EDITTOOL.CPP',
     'EDITUJ.CPP',

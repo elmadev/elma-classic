@@ -3,11 +3,11 @@
 #include "editor_help.h"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
-#include "EDITPLAY.H"
 #include "EDITTOLT.H"
 #include "EDITTOOL.H"
 #include "editor_topology.h"
 #include "keys.h"
+#include "LEJATSZO.H"
 #include "level.h"
 #include "lgr.h"
 #include "level_load.h"
@@ -611,6 +611,29 @@ static void toolvaltas(int t) {
 }
 
 // static int Mouseinited = 0;
+
+static void editor_play(bool view_map) {
+    invalidateegesz();
+    if (Valtozott || State->editor_filename[0] == 0 || Ptop->topology_errors) {
+        if (!tolt_save()) {
+            return;
+        }
+    }
+
+    if (Ptop->topology_errors) {
+        return;
+    }
+
+    load_level_play(State->editor_filename);
+
+    Rec1->erase(State->editor_filename);
+    Rec2->erase(State->editor_filename);
+    lejatszo(State->editor_filename, view_map ? CameraMode::MapViewer : CameraMode::Normal);
+
+    empty_keypress_buffer();
+
+    Pal_editor->set();
+}
 
 static bool editor_dialog_exit() {
     invalidateegesz();

@@ -94,6 +94,31 @@ static void replay_render(std::string filename) {
     }
 }
 
+static void randomizer(std::vector<std::string>& filenames) {
+    int count = filenames.end() - filenames.begin();
+    int last_played = -1;
+    int second_last_played = -1;
+    while (true) {
+        int index = gen_rand_int() % count;
+        while ((index == last_played && count > 1) || (index == second_last_played && count > 2)) {
+            index = gen_rand_int() % count;
+        }
+        second_last_played = last_played;
+        last_played = index;
+
+        Keycode warning = load_replay(filenames[index]);
+        if (!warning) {
+            Rec1->rewind();
+            Rec2->rewind();
+            if (lejatszo_r(Rec1->level_filename, 0)) {
+                return;
+            }
+        } else if (warning == KEY_ESC) {
+            return;
+        }
+    }
+}
+
 static void menu_replay() {
     finame filename;
     std::vector<std::string> replay_names;
@@ -155,29 +180,7 @@ static void menu_replay() {
         }
 
         if (choice == 0) {
-            // Randomizer
-            int last_played = -1;
-            int second_last_played = -1;
-            while (true) {
-                int index = gen_rand_int() % (count - 1);
-                while ((index == last_played && count > 2) ||
-                       (index == second_last_played && count > 3)) {
-                    index = gen_rand_int() % (count - 1);
-                }
-                second_last_played = last_played;
-                last_played = index;
-
-                Keycode warning = load_replay(replay_names[index]);
-                if (!warning) {
-                    Rec1->rewind();
-                    Rec2->rewind();
-                    if (lejatszo_r(Rec1->level_filename, 0)) {
-                        break;
-                    }
-                } else if (warning == KEY_ESC) {
-                    break;
-                }
-            }
+            randomizer(replay_names);
         } else {
             std::string replay_name = replay_names[choice - 1];
             // Play a rec file:

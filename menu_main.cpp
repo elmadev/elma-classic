@@ -78,6 +78,27 @@ static LoadReplayResult load_replay(const std::string& filename) {
     return LoadReplayResult::Success;
 }
 
+static void replay_play(const std::string& filename) {
+    if (load_replay(filename) == LoadReplayResult::Success) {
+        replay_from_file(Rec1->level_filename);
+    }
+}
+
+static void replay_render(const std::string& filename) {
+    setup_render_directory(filename);
+    std::string msg = std::format("Recording at {} FPS to {}", EolSettings->recording_fps(),
+                                  VideoOutputDirectory);
+    DikScancode c = menu_dialog("Render replay to video frames?", msg.c_str(),
+                                "Press Enter to continue, ESC to cancel");
+    if (c == DIK_RETURN) {
+        if (load_replay(filename) == LoadReplayResult::Success) {
+            Rec1->rewind();
+            Rec2->rewind();
+            render_replay(Rec1->level_filename, filename.c_str());
+        }
+    }
+}
+
 static void menu_replay() {
     finame filename;
     std::vector<std::string> replay_names;
@@ -167,25 +188,11 @@ static void menu_replay() {
             // Play a rec file:
             if (F1Pressed) {
                 F1Pressed = false;
-                setup_render_directory(replay_name);
-                std::string msg = std::format("Recording at {} FPS to {}",
-                                              EolSettings->recording_fps(), VideoOutputDirectory);
-                DikScancode c = menu_dialog("Render replay to video frames?", msg.c_str(),
-                                            "Press Enter to continue, ESC to cancel");
-                if (c == DIK_RETURN) {
-                    if (load_replay(replay_name) == LoadReplayResult::Success) {
-                        Rec1->rewind();
-                        Rec2->rewind();
-                        render_replay(Rec1->level_filename, replay_name.c_str());
-                    }
-                }
-                continue;
+                replay_render(replay_name);
             } else if (CtrlAltPressed) {
                 replay_time(replay_name);
             } else {
-                if (load_replay(replay_name) == LoadReplayResult::Success) {
-                    replay_from_file(Rec1->level_filename);
-                }
+                replay_play(replay_name);
             }
         }
     }

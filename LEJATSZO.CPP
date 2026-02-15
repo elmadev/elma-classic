@@ -963,13 +963,12 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 }
 
 // Sets the path of VideoOutputDirectory to "./renders/{replay_stem}/"
-static void setup_render_directory(const char* replay_filename) {
-    std::string safe_name(replay_filename);
-    if (safe_name.length() > MAX_FILENAME_LEN + 4) {
-        safe_name.resize(MAX_FILENAME_LEN + 4);
+void setup_render_directory(std::string replay_filename) {
+    if (replay_filename.length() > MAX_FILENAME_LEN + 4) {
+        replay_filename.resize(MAX_FILENAME_LEN + 4);
     }
 
-    std::filesystem::path p(safe_name);
+    std::filesystem::path p(replay_filename);
     std::string stem = p.stem().string();
     std::filesystem::path out_dir = std::filesystem::path("renders") / stem;
     std::error_code ec;
@@ -985,7 +984,6 @@ void render_replay(const char* level_filename, const char* replay_filename) {
     Single = !MultiplayerRec;
     Tag = Rec1->flagtag();
     setup_gameloop(level_filename);
-    setup_render_directory(replay_filename);
 
     valtozok valt1;
     memset(&valt1, 0, sizeof(valt1));

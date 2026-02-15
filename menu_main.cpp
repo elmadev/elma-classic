@@ -132,7 +132,7 @@ static void menu_replay() {
                         break;
                     }
                 } else if (warning == KEY_ESC) {
-                    return;
+                    break;
                 }
             }
         } else {

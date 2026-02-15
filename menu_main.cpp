@@ -137,7 +137,7 @@ static void menu_replay() {
                         break;
                     }
                 } else if (loaded == LoadReplayResult::Abort) {
-                    return;
+                    break;
                 }
             }
         } else {

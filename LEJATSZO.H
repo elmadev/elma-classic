@@ -30,6 +30,8 @@ struct camera {
 // BestTime beallitasahoz kell nekik:
 long lejatszo(const char* filenev, CameraMode cameramode);
 long lejatszo_r(const char* filenev, int showkepmarad);
+
+void setup_render_directory(const std::string& replay_filename);
 void render_replay(const char* level_filename, const char* replay_filename);
 
 struct baljobbvaltozok {

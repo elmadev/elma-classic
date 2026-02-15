@@ -167,8 +167,9 @@ static void menu_replay() {
             // Play a rec file:
             if (F1Pressed) {
                 F1Pressed = false;
-                std::string msg = std::format("Recording at {} FPS to renders/{}",
-                                              EolSettings->recording_fps(), NavEntriesLeft[choice]);
+                setup_render_directory(replay_name);
+                std::string msg = std::format("Recording at {} FPS to {}",
+                                              EolSettings->recording_fps(), VideoOutputDirectory);
                 DikScancode c = menu_dialog("Render replay to video frames?", msg.c_str(),
                                             "Press Enter to continue, ESC to cancel");
                 if (c == DIK_RETURN) {

@@ -189,10 +189,9 @@ static void menu_replay() {
         } else {
             const std::string& replay_name = replay_names[choice - 1];
             // Play a rec file:
-            if (F1Pressed) {
-                F1Pressed = false;
+            if (is_key_down(DIK_F1)) {
                 replay_render(replay_name);
-            } else if (CtrlAltPressed) {
+            } else if (is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU)) {
                 replay_time(replay_name);
             } else {
                 replay_play(replay_name);

@@ -1,6 +1,8 @@
 #ifndef PLATFORM_IMPL_H
 #define PLATFORM_IMPL_H
 
+#include <string>
+
 class pic8;
 
 // DIK_ Windows scancode
@@ -54,6 +56,9 @@ int get_mouse_wheel_delta();
 
 void set_input_suppressed(bool suppressed);
 bool is_input_suppressed();
+
+std::string get_clipboard_text();
+bool is_shortcut_modifier_down();
 
 bool is_fullscreen();
 long long get_milliseconds();

@@ -36,6 +36,19 @@ void console::deactivate_input() {
     cursor_pos_ = 0;
 }
 
+void console::paste_text(std::string_view text) {
+    if (!input_active_) {
+        return;
+    }
+
+    for (char c : text) {
+        if (c >= 32 && c < 127 && (int)input_buffer_.size() < MAX_INPUT_LENGTH) {
+            input_buffer_.insert(input_buffer_.begin() + cursor_pos_, c);
+            cursor_pos_++;
+        }
+    }
+}
+
 void console::handle_input() {
     if (!input_active_) {
         return;
@@ -51,6 +64,14 @@ void console::handle_input() {
 
     if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_F9)) {
         deactivate_input();
+        return;
+    }
+
+    if (was_key_just_pressed(DIK_V) && is_shortcut_modifier_down()) {
+        std::string clipboard = get_clipboard_text();
+        if (!clipboard.empty()) {
+            paste_text(clipboard);
+        }
         return;
     }
 

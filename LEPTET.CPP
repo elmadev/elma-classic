@@ -308,60 +308,32 @@ void simulate_bike_physics(motorst* mot, double time, double dt, bool gas, bool 
     }
 
     // Update the body position and bike/wheel positions based on gravity
+    vect2 direction;
     switch (mot->gravity_direction) {
     case MotorGravity::Down:
-        body_movement(mot, vect2(0.0, -1.0), i1, j1, dt);
-        rigidbody_movement(&mot->bike,
-                           force_body_from_left_wheel + force_body_from_right_wheel -
-                               Vect2j * mot->bike.mass * Gravity,
-                           torque_body_from_left_wheel + torque_body_from_right_wheel, dt, false);
-        rigidbody_movement(&mot->left_wheel,
-                           force_left_wheel - Vect2j * mot->left_wheel.mass * Gravity,
-                           torque_left_wheel, dt, true);
-        rigidbody_movement(&mot->right_wheel,
-                           force_right_wheel - Vect2j * mot->right_wheel.mass * Gravity,
-                           torque_right_wheel, dt, true);
+        direction = vect2(0.0, -1.0);
         break;
     case MotorGravity::Up:
-        body_movement(mot, vect2(0.0, 1.0), i1, j1, dt);
-        rigidbody_movement(&mot->bike,
-                           force_body_from_left_wheel + force_body_from_right_wheel +
-                               Vect2j * mot->bike.mass * Gravity,
-                           torque_body_from_left_wheel + torque_body_from_right_wheel, dt, false);
-        rigidbody_movement(&mot->left_wheel,
-                           force_left_wheel + Vect2j * mot->left_wheel.mass * Gravity,
-                           torque_left_wheel, dt, true);
-        rigidbody_movement(&mot->right_wheel,
-                           force_right_wheel + Vect2j * mot->right_wheel.mass * Gravity,
-                           torque_right_wheel, dt, true);
+        direction = vect2(0.0, 1.0);
         break;
     case MotorGravity::Left:
-        body_movement(mot, vect2(-1.0, 0.0), i1, j1, dt);
-        rigidbody_movement(&mot->bike,
-                           force_body_from_left_wheel + force_body_from_right_wheel -
-                               Vect2i * mot->bike.mass * Gravity,
-                           torque_body_from_left_wheel + torque_body_from_right_wheel, dt, false);
-        rigidbody_movement(&mot->left_wheel,
-                           force_left_wheel - Vect2i * mot->left_wheel.mass * Gravity,
-                           torque_left_wheel, dt, true);
-        rigidbody_movement(&mot->right_wheel,
-                           force_right_wheel - Vect2i * mot->right_wheel.mass * Gravity,
-                           torque_right_wheel, dt, true);
+        direction = vect2(-1.0, 0.0);
         break;
     case MotorGravity::Right:
-        body_movement(mot, vect2(1.0, 0.0), i1, j1, dt);
-        rigidbody_movement(&mot->bike,
-                           force_body_from_left_wheel + force_body_from_right_wheel +
-                               Vect2i * mot->bike.mass * Gravity,
-                           torque_body_from_left_wheel + torque_body_from_right_wheel, dt, false);
-        rigidbody_movement(&mot->left_wheel,
-                           force_left_wheel + Vect2i * mot->left_wheel.mass * Gravity,
-                           torque_left_wheel, dt, true);
-        rigidbody_movement(&mot->right_wheel,
-                           force_right_wheel + Vect2i * mot->right_wheel.mass * Gravity,
-                           torque_right_wheel, dt, true);
+        direction = vect2(1.0, 0.0);
         break;
     }
+    body_movement(mot, direction, i1, j1, dt);
+    rigidbody_movement(&mot->bike,
+                       force_body_from_left_wheel + force_body_from_right_wheel +
+                           direction * mot->bike.mass * Gravity,
+                       torque_body_from_left_wheel + torque_body_from_right_wheel, dt, false);
+    rigidbody_movement(&mot->left_wheel,
+                       force_left_wheel + direction * mot->left_wheel.mass * Gravity,
+                       torque_left_wheel, dt, true);
+    rigidbody_movement(&mot->right_wheel,
+                       force_right_wheel + direction * mot->right_wheel.mass * Gravity,
+                       torque_right_wheel, dt, true);
 
     // Lastly, calculate the head position based on the body position
     set_head_position(mot);

@@ -17,6 +17,7 @@
 #include "polygon.h"
 #include "sprite.h"
 #include <cstring>
+#include <directinput/scancodes.h>
 
 constexpr unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;
 
@@ -277,37 +278,30 @@ void tolt_open(void) {
     int felso = 0;
     int eddigfelso = -1;
     int eddigkur = 0;
-    empty_keypress_buffer();
-    // Azert 1, hogy ha lenyomott gombbal erkezett,
-    // ne tekintse lenyomottnak:
-    left_mouse_clicked();
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return;
-            }
-            if (c == KEY_ENTER) {
-                igazit(&kur, &felso, nevszam, helyszam);
-                betolt(&Soknev[kur * 10]);
-                return;
-            }
-            if (c == KEY_UP) {
-                kur--;
-            }
-            if (c == KEY_PGUP) {
-                kur -= helyszam - 1;
-            }
-            if (c == KEY_DOWN) {
-                kur++;
-            }
-            if (c == KEY_PGDOWN) {
-                kur += helyszam - 1;
-            }
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            igazit(&kur, &felso, nevszam, helyszam);
+            betolt(&Soknev[kur * 10]);
+            return;
+        }
+        if (was_key_pressed_or_repeated(DIK_UP)) {
+            kur--;
+        }
+        if (was_key_pressed_or_repeated(DIK_PRIOR)) {
+            kur -= helyszam - 1;
+        }
+        if (was_key_pressed_or_repeated(DIK_DOWN)) {
+            kur++;
+        }
+        if (was_key_pressed_or_repeated(DIK_NEXT)) {
+            kur += helyszam - 1;
         }
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxle)) {
@@ -450,40 +444,35 @@ void kivalasztkezdetit(void) {
     int eddigfelso = -1;
 
     int eddigkur = 0;
-    empty_keypress_buffer();
-    left_mouse_clicked();
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return;
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            igazit(&kur, &felso, nevszam, helyszam);
+            char* nev = &Soknev[kur * 10];
+            if (strlen(nev) > 8) {
+                internal_error("iovfgsdgffiufi");
             }
-            if (c == KEY_ENTER) {
-                igazit(&kur, &felso, nevszam, helyszam);
-                char* nev = &Soknev[kur * 10];
-                if (strlen(nev) > 8) {
-                    internal_error("iovfgsdgffiufi");
-                }
-                strcpy(State->editor_filename, nev);
-                strcat(State->editor_filename, ".lev");
-                return;
-            }
-            if (c == KEY_UP) {
-                kur--;
-            }
-            if (c == KEY_PGUP) {
-                kur -= helyszam - 1;
-            }
-            if (c == KEY_DOWN) {
-                kur++;
-            }
-            if (c == KEY_PGDOWN) {
-                kur += helyszam - 1;
-            }
+            strcpy(State->editor_filename, nev);
+            strcat(State->editor_filename, ".lev");
+            return;
+        }
+        if (was_key_pressed_or_repeated(DIK_UP)) {
+            kur--;
+        }
+        if (was_key_pressed_or_repeated(DIK_PRIOR)) {
+            kur -= helyszam - 1;
+        }
+        if (was_key_pressed_or_repeated(DIK_DOWN)) {
+            kur++;
+        }
+        if (was_key_pressed_or_repeated(DIK_NEXT)) {
+            kur += helyszam - 1;
         }
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxle)) {
@@ -597,13 +586,11 @@ int tolt_save_as() {
     bltfront(BufferMain, boxnagy.x1, boxnagy.y1, boxnagy.x2, boxnagy.y2);
     pop();
 
-    empty_keypress_buffer();
     char nev[20] = "";
     int i = 0;
-    left_mouse_clicked();
-    right_mouse_clicked();
     char eddignev[10] = "$%...%^&";
     while (1) {
+        handle_events();
         if (strcmp(eddignev, nev) != 0) {
             strcpy(eddignev, nev);
 
@@ -619,15 +606,11 @@ int tolt_save_as() {
             Pabc2->write(BufferMain, 290 + Pabc1->len(tmp), 255, "-");
             bltfront(BufferMain, ex1, ey1, ex2, ey2);
         }
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return 0;
-            }
-            if (c == KEY_ENTER) {
-                if (nev[0] == 0) {
-                    continue;
-                }
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return 0;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            if (nev[0] != 0) {
                 // Most mentunk:
                 // Eloallitjuk nevet:
                 strcat(nev, ".lev");
@@ -644,28 +627,14 @@ int tolt_save_as() {
                 Valtozott = 0;
                 return 1;
             }
-            if (Pabc2->has_char(c) && is_char_valid_for_filename(c)) {
-                if (strlen(nev) >= 8) {
-                    continue;
-                }
-                // c-t beillesztjuk i. helyre:
-                int hossz = strlen(nev);
-                for (int j = hossz; j >= i; j--) {
-                    nev[j + 1] = nev[j];
-                }
-                nev[i] = (char)c;
-                i++;
+        }
+        if (was_key_pressed_or_repeated(DIK_BACK)) {
+            // Torles:
+            int ikesebbnulla = 0;
+            if (i <= 0) {
+                ikesebbnulla = 1;
             }
-            if (c == KEY_BACKSPACE) {
-
-                // Torles:
-                int ikesebbnulla = 0;
-                if (i <= 0) {
-                    ikesebbnulla = 1;
-                }
-                if ((nev[0] == 0) || ikesebbnulla) {
-                    continue;
-                }
+            if (!((nev[0] == 0) || ikesebbnulla)) {
                 // Kiszedjuk i-1-edik helyrol karaktert:
                 int hossz = strlen(nev);
                 for (int j = i - 1; j < hossz; j++) {
@@ -673,51 +642,68 @@ int tolt_save_as() {
                 }
                 i--;
             }
-            if (c == KEY_DEL) {
-                // Torles:
-                if ((nev[0] == 0) || (i >= (int)strlen(nev))) {
-                    continue;
-                }
+        }
+        if (was_key_pressed_or_repeated(DIK_DELETE)) {
+            // Torles:
+            if (!((nev[0] == 0) || (i >= (int)strlen(nev)))) {
                 // Kiszedjuk i-1-edik helyrol karaktert:
                 int hossz = strlen(nev);
                 for (int j = i; j < hossz; j++) {
                     nev[j] = nev[j + 1];
                 }
             }
-            if (c == KEY_LEFT && i > 0) {
+        }
+        if (was_key_pressed_or_repeated(DIK_LEFT)) {
+            if (i > 0) {
                 i--;
                 eddignev[0] = 0;
             }
-            if (c == KEY_RIGHT && i < (int)strlen(nev)) {
+        }
+        if (was_key_pressed_or_repeated(DIK_RIGHT)) {
+            if (i < (int)strlen(nev)) {
                 i++;
                 eddignev[0] = 0;
             }
         }
-        if (right_mouse_clicked()) {
+        while (has_text_input()) {
+            char c = pop_text_input();
+            if (Pabc2->has_char(c) && is_char_valid_for_filename(c)) {
+                if (strlen(nev) < 8) {
+                    // c-t beillesztjuk i. helyre:
+                    int hossz = strlen(nev);
+                    for (int j = hossz; j >= i; j--) {
+                        nev[j + 1] = nev[j];
+                    }
+                    nev[i] = c;
+                    i++;
+                }
+            }
+        }
+        if (was_right_mouse_just_clicked()) {
             return 0;
         }
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxsave)) {
-                if (nev[0] == 0) {
-                    continue;
-                }
-                // Most mentunk:
-                // Eloallitjuk nevet:
-                strcat(nev, ".lev");
-                char tmpnev[40];
-                strcpy(tmpnev, "lev/");
-                strcat(tmpnev, nev);
-                if (access(tmpnev, 0) == 0) {
-                    if (dialog("File exists, overwrite?", nev, DIALOG_BUTTONS, "Yes", "No") == 1) {
-                        return 0;
+                if (nev[0] != 0) {
+                    // Most mentunk:
+                    // Eloallitjuk nevet:
+                    strcat(nev, ".lev");
+                    char tmpnev[40];
+                    strcpy(tmpnev, "lev/");
+                    strcat(tmpnev, nev);
+                    if (access(tmpnev, 0) == 0) {
+                        if (dialog("File exists, overwrite?", nev, DIALOG_BUTTONS, "Yes", "No") ==
+                            1) {
+                            return 0;
+                        }
                     }
+                    Ptop->save(nev);
+                    strcpy(State->editor_filename, nev);
+                    Valtozott = 0;
+                    return 1;
                 }
-                Ptop->save(nev);
-                strcpy(State->editor_filename, nev);
-                Valtozott = 0;
-                return 1;
             }
         }
         update_and_draw_cursor();
@@ -922,8 +908,6 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     int felso = 0;
     int eddigfelso = -1;
     int eddigkur = 0;
-    empty_keypress_buffer();
-
     // Masodik bufferben mindig ilyenkor benne van eredeti kep:
     int buffervaltozottx = 0;
     int buffervaltozotty = 0;
@@ -933,44 +917,39 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     // internal_error( "golyo mentve!" );
     pop();
 
-    // Azert hogy ha mar le volt nyomva, ne nyomodjon ujra:
-    left_mouse_clicked();
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                strcpy(nev, orignev);
-                return;
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            strcpy(nev, orignev);
+            return;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            igazit(&kur, &felso, nevszam, helyszam);
+            if (tipus == 1) {
+                strcpy(nev, Lgr->pictures[kur].name);
             }
-            if (c == KEY_ENTER) {
-                igazit(&kur, &felso, nevszam, helyszam);
-                if (tipus == 1) {
-                    strcpy(nev, Lgr->pictures[kur].name);
-                }
-                if (tipus == 2) {
-                    strcpy(nev, Lgr->textures[kur].name);
-                }
-                if (tipus == 3) {
-                    strcpy(nev, Lgr->masks[kur].name);
-                }
-                return;
+            if (tipus == 2) {
+                strcpy(nev, Lgr->textures[kur].name);
             }
-            if (c == KEY_UP) {
-                kur--;
+            if (tipus == 3) {
+                strcpy(nev, Lgr->masks[kur].name);
             }
-            if (c == KEY_PGUP) {
-                kur -= helyszam - 1;
-            }
-            if (c == KEY_DOWN) {
-                kur++;
-            }
-            if (c == KEY_PGDOWN) {
-                kur += helyszam - 1;
-            }
+            return;
+        }
+        if (was_key_pressed_or_repeated(DIK_UP)) {
+            kur--;
+        }
+        if (was_key_pressed_or_repeated(DIK_PRIOR)) {
+            kur -= helyszam - 1;
+        }
+        if (was_key_pressed_or_repeated(DIK_DOWN)) {
+            kur++;
+        }
+        if (was_key_pressed_or_repeated(DIK_NEXT)) {
+            kur += helyszam - 1;
         }
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxle)) {
@@ -1166,26 +1145,20 @@ void tolt_pickasprite(void) {
     box boxok = {x1 + 50, y2 - 30, x1 + 100, y2 - 10};
     box boxcancel = {x1 + 130, y2 - 30, x1 + 180, y2 - 10};
 
-    empty_keypress_buffer();
-
-    left_mouse_clicked();
     int invalid = 1;
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return;
-            }
-            if (c == KEY_ENTER) {
-                strcpy(Lgr->editor_picture_name, kepnev);
-                strcpy(Lgr->editor_texture_name, texturanev);
-                strcpy(Lgr->editor_mask_name, maszknev);
-                return;
-            }
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            strcpy(Lgr->editor_picture_name, kepnev);
+            strcpy(Lgr->editor_texture_name, texturanev);
+            strcpy(Lgr->editor_mask_name, maszknev);
+            return;
         }
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
@@ -1353,36 +1326,31 @@ int tolt_picklgrfile(char* lgrnev) {
     int felso = 0;
     int eddigfelso = -1;
     int eddigkur = 0;
-    empty_keypress_buffer();
-    left_mouse_clicked();
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return 0;
-            }
-            if (c == KEY_ENTER) {
-                igazit(&kur, &felso, nevszam, helyszam);
-                strcpy(lgrnev, &Soknev[kur * 10]);
-                return 1;
-            }
-            if (c == KEY_UP) {
-                kur--;
-            }
-            if (c == KEY_PGUP) {
-                kur -= helyszam - 1;
-            }
-            if (c == KEY_DOWN) {
-                kur++;
-            }
-            if (c == KEY_PGDOWN) {
-                kur += helyszam - 1;
-            }
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return 0;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            igazit(&kur, &felso, nevszam, helyszam);
+            strcpy(lgrnev, &Soknev[kur * 10]);
+            return 1;
+        }
+        if (was_key_pressed_or_repeated(DIK_UP)) {
+            kur--;
+        }
+        if (was_key_pressed_or_repeated(DIK_PRIOR)) {
+            kur -= helyszam - 1;
+        }
+        if (was_key_pressed_or_repeated(DIK_DOWN)) {
+            kur++;
+        }
+        if (was_key_pressed_or_repeated(DIK_NEXT)) {
+            kur += helyszam - 1;
         }
 
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxle)) {
@@ -1450,10 +1418,10 @@ int tolt_picklgrfile(char* lgrnev) {
 static int tavolsagbeir(pic8* ppic, box abox, int tavolsag) {
     push();
 
-    empty_keypress_buffer();
     int valtozott = 1;
     int oldtavolsag = tavolsag;
     while (1) {
+        handle_events();
         if (valtozott) {
             valtozott = 0;
             char tmp[10];
@@ -1461,26 +1429,28 @@ static int tavolsagbeir(pic8* ppic, box abox, int tavolsag) {
             boxbair(ppic, abox, Feherszin, tmp, 1);
             bltfront(ppic, abox.x1, abox.y1, abox.x2, abox.y2);
         }
-        Keycode c = get_keypress();
-        if (c == KEY_ESC) {
+        if (was_key_just_pressed(DIK_ESCAPE)) {
             pop();
             return oldtavolsag;
         }
-        if (c == KEY_ENTER) {
+        if (was_key_just_pressed(DIK_RETURN)) {
             pop();
             return tavolsag;
         }
-        if (c >= '0' && c <= '9') {
-            if (tavolsag < 100) {
-                tavolsag *= 10;
-                tavolsag += c - '0';
-                valtozott = 1;
-            }
-        }
-        if (c == KEY_BACKSPACE) {
+        if (was_key_pressed_or_repeated(DIK_BACK)) {
             if (tavolsag > 0) {
                 tavolsag /= 10;
                 valtozott = 1;
+            }
+        }
+        while (has_text_input()) {
+            char c = pop_text_input();
+            if (c >= '0' && c <= '9') {
+                if (tavolsag < 100) {
+                    tavolsag *= 10;
+                    tavolsag += c - '0';
+                    valtozott = 1;
+                }
             }
         }
     }
@@ -1490,24 +1460,26 @@ static Clipping hatarolbeir(pic8* ppic, box abox, Clipping hatarol) {
     push();
     boxbair(ppic, abox, Feherszin, "", 1);
     bltfront(ppic, abox.x1, abox.y1, abox.x2, abox.y2);
-    empty_keypress_buffer();
     while (1) {
-        Keycode c = get_keypress();
-        if (c == KEY_ESC) {
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
             pop();
             return hatarol;
         }
-        if (c == 'u' || c == 'U') {
-            pop();
-            return Clipping::Unclipped;
-        }
-        if (c == 'g' || c == 'G') {
-            pop();
-            return Clipping::Ground;
-        }
-        if (c == 's' || c == 'S') {
-            pop();
-            return Clipping::Sky;
+        while (has_text_input()) {
+            char c = pop_text_input();
+            if (c == 'u' || c == 'U') {
+                pop();
+                return Clipping::Unclipped;
+            }
+            if (c == 'g' || c == 'G') {
+                pop();
+                return Clipping::Ground;
+            }
+            if (c == 's' || c == 'S') {
+                pop();
+                return Clipping::Sky;
+            }
         }
     }
 }
@@ -1527,27 +1499,23 @@ void setspritetav(sprite* psp) {
     box boxclipp = {x1 + 181, y1 + 118, x1 + 181 + 34, y1 + 118 + 16};
 
     int kepvaltozott = 1;
-    left_mouse_clicked();
     int tavolsag = psp->distance;
     Clipping hatarol = psp->clipping;
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return;
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            if (psp->distance != tavolsag || psp->clipping != hatarol) {
+                Valtozott = 1;
             }
-            if (c == KEY_ENTER) {
-                if (psp->distance != tavolsag || psp->clipping != hatarol) {
-                    Valtozott = 1;
-                }
-                psp->distance = tavolsag;
-                psp->clipping = hatarol;
-                return;
-            }
+            psp->distance = tavolsag;
+            psp->clipping = hatarol;
+            return;
         }
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
@@ -1678,28 +1646,24 @@ void set_gyuru_attributes(polygon* pgy) {
     box boxkoveto = {boxx1, y1 + 35, boxx1 + 30, y1 + 55};
 
     int kepvaltozott = 1;
-    left_mouse_clicked();
 
     int koveto = pgy->is_grass;
 
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return;
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            // Meg van ismetelve OK-nal is lejjebb:
+            if (pgy->is_grass != koveto) {
+                Valtozott = 1;
             }
-            if (c == KEY_ENTER) {
-                // Meg van ismetelve OK-nal is lejjebb:
-                if (pgy->is_grass != koveto) {
-                    Valtozott = 1;
-                }
-                pgy->is_grass = koveto;
-                return;
-            }
+            pgy->is_grass = koveto;
+            return;
         }
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
@@ -1819,17 +1783,13 @@ void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoo
     pop();
 
     // Most jon ciklus:
-    left_mouse_clicked();
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return;
-            }
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return;
         }
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxcancel)) {
@@ -1843,15 +1803,22 @@ void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoo
                                       boxanimszam.y1 + 18, "-");
                 bltfront(BufferMain, x1, y1, x2, y2);
 
-                empty_keypress_buffer();
                 while (1) {
+                    handle_events();
                     // Kirajzolta dobozba kurzort, most 1..9, vagy ESC-et var:
-                    Keycode c = get_keypress();
-                    if (c == KEY_ESC) {
+                    if (was_key_just_pressed(DIK_ESCAPE)) {
                         break;
                     }
-                    if (c >= '1' && c <= '9') {
-                        *pfoodsorszam = c - '1';
+                    bool got_digit = false;
+                    while (has_text_input()) {
+                        char c = pop_text_input();
+                        if (c >= '1' && c <= '9') {
+                            *pfoodsorszam = c - '1';
+                            got_digit = true;
+                            break;
+                        }
+                    }
+                    if (got_digit) {
                         break;
                     }
                 }
@@ -1906,9 +1873,9 @@ static void change_level_name(char* nev) {
     int x2 = 600;
     int y2 = 280;
 
-    empty_keypress_buffer();
     int i = 0;
     while (1) {
+        handle_events();
         // Kiir:
         BufferMain->fill_box(x1, y1, x2, y2, Save_as_box_szin);
         BufferMain->line(x1, y1, x2, y1, Save_as_szelszin);
@@ -1926,63 +1893,64 @@ static void change_level_name(char* nev) {
         Pabc2->write(BufferMain, kezdes + Pabc1->len(tmp), 255, "-");
         bltfront(BufferMain, x1, y1, x2, y2);
 
-        Keycode c = get_keypress();
-        if (c == KEY_ESC) {
+        if (was_key_just_pressed(DIK_ESCAPE)) {
             strcpy(nev, orignev);
             pop();
             return;
         }
-        if (c == KEY_ENTER) {
-            if (nev[0] == 0) {
-                continue;
+        if (was_key_just_pressed(DIK_RETURN)) {
+            if (nev[0] != 0) {
+                pop();
+                return;
             }
-            pop();
-            return;
         }
-        if (Pabc2->has_char(c) && is_char_valid_for_filename(c)) {
-            char tmpfejlec[LEVEL_NAME_LENGTH + 10];
-            sprintf(tmpfejlec, "Ext: %s", nev);
-
-            if (strlen(nev) >= LEVEL_NAME_LENGTH || MenuFont->len(tmpfejlec) > 625) {
-                continue;
-            }
-
-            // c-t beillesztjuk i. helyre:
-            int hossz = strlen(nev);
-            for (int j = hossz; j >= i; j--) {
-                nev[j + 1] = nev[j];
-            }
-            nev[i] = (char)c;
-            i++;
-        }
-        if (c == KEY_BACKSPACE) {
+        if (was_key_pressed_or_repeated(DIK_BACK)) {
             // Torles:
-            if (nev[0] == 0 || i <= 0) {
-                continue;
+            if (nev[0] != 0 && i > 0) {
+                // Kiszedjuk i-1-edik helyrol karaktert:
+                int hossz = strlen(nev);
+                for (int j = i - 1; j < hossz; j++) {
+                    nev[j] = nev[j + 1];
+                }
+                i--;
             }
-            // Kiszedjuk i-1-edik helyrol karaktert:
-            int hossz = strlen(nev);
-            for (int j = i - 1; j < hossz; j++) {
-                nev[j] = nev[j + 1];
-            }
-            i--;
         }
-        if (c == KEY_DEL) {
+        if (was_key_pressed_or_repeated(DIK_DELETE)) {
             // Torles:
-            if (nev[0] == 0 || i >= (int)strlen(nev)) {
-                continue;
-            }
-            // Kiszedjuk i-1-edik helyrol karaktert:
-            int hossz = strlen(nev);
-            for (int j = i; j < hossz; j++) {
-                nev[j] = nev[j + 1];
+            if (nev[0] != 0 && i < (int)strlen(nev)) {
+                // Kiszedjuk i-1-edik helyrol karaktert:
+                int hossz = strlen(nev);
+                for (int j = i; j < hossz; j++) {
+                    nev[j] = nev[j + 1];
+                }
             }
         }
-        if (c == KEY_LEFT && i > 0) {
-            i--;
+        if (was_key_pressed_or_repeated(DIK_LEFT)) {
+            if (i > 0) {
+                i--;
+            }
         }
-        if (c == KEY_RIGHT && i < (int)strlen(nev)) {
-            i++;
+        if (was_key_pressed_or_repeated(DIK_RIGHT)) {
+            if (i < (int)strlen(nev)) {
+                i++;
+            }
+        }
+        while (has_text_input()) {
+            char c = pop_text_input();
+            if (Pabc2->has_char(c) && is_char_valid_for_filename(c)) {
+                char tmpfejlec[LEVEL_NAME_LENGTH + 10];
+                sprintf(tmpfejlec, "Ext: %s", nev);
+
+                if (strlen(nev) < LEVEL_NAME_LENGTH && MenuFont->len(tmpfejlec) <= 625) {
+                    // c-t beillesztjuk i. helyre:
+                    int hossz = strlen(nev);
+                    for (int j = hossz; j >= i; j--) {
+                        nev[j + 1] = nev[j];
+                    }
+                    nev[i] = c;
+                    i++;
+                }
+            }
         }
     }
 }
@@ -2016,38 +1984,34 @@ void change_level_properties(void) {
     box boxlevelname = {boxx1, y1 + 85, boxx1 + 320, y1 + 105};
     box boxlgrfile = {boxx1, y1 + 110, boxx1 + 80, y1 + 130};
 
-    left_mouse_clicked();
     int invalid = 1;
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return;
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            if (strcmpi(Ptop->foreground_name, fgnev) != 0 ||
+                strcmpi(Ptop->background_name, bgnev) != 0 ||
+                strcmp(Ptop->level_name, levelname) != 0) {
+                Valtozott = 1;
             }
-            if (c == KEY_ENTER) {
-                if (strcmpi(Ptop->foreground_name, fgnev) != 0 ||
-                    strcmpi(Ptop->background_name, bgnev) != 0 ||
-                    strcmp(Ptop->level_name, levelname) != 0) {
-                    Valtozott = 1;
-                }
-                strcpy(Ptop->foreground_name, fgnev);
-                strcpy(Ptop->background_name, bgnev);
-                strcpy(Ptop->level_name, levelname);
+            strcpy(Ptop->foreground_name, fgnev);
+            strcpy(Ptop->background_name, bgnev);
+            strcpy(Ptop->level_name, levelname);
 
-                if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
-                    Valtozott = 1;
-                    strcpy(Ptop->lgr_name, lgrnev);
-                    lgrfile::load_lgr_file(Ptop->lgr_name);
-                    if (Ptop->discard_missing_lgr_assets(Lgr)) {
-                        dialog_warn_lgr_assets_deleted();
-                    }
+            if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
+                Valtozott = 1;
+                strcpy(Ptop->lgr_name, lgrnev);
+                lgrfile::load_lgr_file(Ptop->lgr_name);
+                if (Ptop->discard_missing_lgr_assets(Lgr)) {
+                    dialog_warn_lgr_assets_deleted();
                 }
-                return;
             }
+            return;
         }
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
@@ -2181,18 +2145,14 @@ void setviewoptions(void) {
     box boxkoveto = {x1 + 110, y1 + 40, x1 + 140, y1 + 60};
     box boxkepek = {x1 + 110, y1 + 65, x1 + 140, y1 + 85};
 
-    left_mouse_clicked();
     int invalid = 1;
     while (1) {
-        // Nezzuk gombokat:
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC || c == KEY_ENTER) {
-                return;
-            }
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
+            return;
         }
         // Eger lenyomas:
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {

@@ -7,6 +7,7 @@
 #include "gl_renderer.h"
 #include "main.h"
 #include "M_PIC.H"
+#include <directinput/scancodes.h>
 #include <SDL.h>
 #include <sdl/scancodes_windows.h>
 
@@ -362,6 +363,16 @@ bool is_key_down(DikScancode code) {
 bool was_key_just_pressed(DikScancode code) {
     SDL_Scancode sdl_code = windows_scancode_table[code];
     return SDLKeyState[sdl_code] != 0 && SDLKeyStatePrev[sdl_code] == 0;
+}
+
+DikScancode get_any_key_just_pressed() {
+    for (int i = 0; i < MaxKeycode; i++) {
+        if (was_key_just_pressed(i)) {
+            return i;
+        }
+    }
+
+    return DIK_UNKNOWN;
 }
 
 bool is_fullscreen() {

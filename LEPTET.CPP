@@ -409,8 +409,7 @@ static void update_friction_volume(motorst* mot, vect2 wheel_displacement,
         return;
     }
 
-    constexpr double FRICTION_VOLUME_COEFFICIENT = 1.0 / 1.0;
-    double friction_volume = upwards_displacement * upwards_velocity * FRICTION_VOLUME_COEFFICIENT;
+    double friction_volume = upwards_displacement * upwards_velocity;
     if (friction_volume > MaxFrictionVolume) {
         MaxFrictionVolume = friction_volume;
     }

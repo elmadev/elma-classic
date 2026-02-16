@@ -1,6 +1,8 @@
 #include "LEJATSZO.H"
 #include "EDITUJ.H"
+#include "eol/console.h"
 #include "eol_settings.h"
+#include "keys.h"
 #include "flagtag.h"
 #include "fs_utils.h"
 #include "sound_engine.h"
@@ -32,6 +34,22 @@ int VideoFrameIndex = 0;
 std::string VideoOutputDirectory;
 
 static int Kajakell;
+
+static bool handle_chat_input() {
+    bool was_active = Console->is_input_active();
+    if (Console->is_input_active()) {
+        Console->handle_input();
+        while (pop_text_input() != 0) {
+        }
+        set_input_suppressed(true);
+    } else if (was_key_just_pressed(DIK_F9)) {
+        Console->activate_input();
+        while (pop_text_input() != 0) {
+        }
+        set_input_suppressed(true);
+    }
+    return was_active;
+}
 
 static void update_freecam(double dt, camera& current_camera) {
     double speed = 30.0;
@@ -459,6 +477,9 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         */
 
         handle_events(); // Billentyut itt olvassuk be
+
+        bool chat_was_active = handle_chat_input();
+
         while (eddig <= cel - 0.000001) {
             // char tmp[10];
             // sprintf( tmp, "Gaz kodja: %d", (int)State->keys1.gas );
@@ -597,8 +618,11 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
             Legkozment = 1;
         }
 
+        set_input_suppressed(false);
+
         // Vizsgalat kilepesre:
-        if (is_key_down(DIK_ESCAPE) || is_key_down(State->key_escape_alias)) {
+        if (!chat_was_active &&
+            (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {
             MeghalteloszorAB = 0;
             double eltelido = stopwatch();
             // Motor hangjat kikapcsolja:
@@ -839,6 +863,8 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     while (1) {
         handle_events(); // Billentyut itt olvassuk be
 
+        bool chat_was_active = handle_chat_input();
+
         double now = stopwatch();
         double dt = (now - last_stopwatch) * 0.0024;
         last_stopwatch = now;
@@ -960,8 +986,10 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             Legkozment = 1;
         }
 
+        set_input_suppressed(false);
+
         // Vizsgalat kilepesre:
-        if (is_key_down(DIK_ESCAPE)) {
+        if (!chat_was_active && was_key_just_pressed(DIK_ESCAPE)) {
             double eltelido = stopwatch();
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;

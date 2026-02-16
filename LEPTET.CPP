@@ -367,12 +367,12 @@ void simulate_bike_physics(motorst* mot, double time, double dt, bool gas, bool 
     set_head_position(mot);
 }
 
-int check_object_collision(motorst* mot) {
+BikeState check_object_collision(motorst* mot) {
     // If the head touches any line, we are dead
     vect2 point1;
     vect2 point2;
     if (get_two_anchor_points(mot->head_r, HeadRadius, &point1, &point2)) {
-        return 0;
+        return BikeState::Dead;
     }
 
     // Collect all the object event interactions (but don't parse the interactions just yet)
@@ -394,7 +394,7 @@ int check_object_collision(motorst* mot) {
             }
         }
     }
-    return 2;
+    return BikeState::Normal;
 }
 
 // Calculate bike squeak sound. Save the loudest squeak sound (since we have up to 4 wheels)

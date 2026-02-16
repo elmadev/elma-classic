@@ -73,8 +73,7 @@ static void initsoundlejatszoban(void) {
 static viewtimest Viewtime1 = {1, 0, 1, 0};
 static viewtimest Viewtime2 = {1, 0, 1, 0};
 
-// 0-meghalt, 1-megnyerte, 2-semmi kulonos:
-static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
+static BikeState spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
     if (sorszam < 0 || sorszam >= MAX_OBJECTS) {
         internal_error("spritefeldolgoz-ban sorszam < 0 || sorszam >= MAXKEREK!");
     }
@@ -85,7 +84,7 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
     object::Type tipus = Ptop->objects[sorszam]->type;
 
     if (tipus == object::Type::Killer) {
-        return 0;
+        return BikeState::Dead;
     }
     if (tipus == object::Type::Food) {
         Ptop->objects[sorszam]->active = false;
@@ -107,14 +106,14 @@ static int spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
             pmot->gravity_direction = MotorGravity::Right;
             break;
         }
-        return 2;
+        return BikeState::Normal;
     }
     if (tipus == object::Type::Exit) {
         if (Motor1->apple_count + Motor2->apple_count >= Kajakell) {
-            return 1;
+            return BikeState::Finish;
         }
     }
-    return 2;
+    return BikeState::Normal;
 }
 
 static double baljobbszamol(double eltelt, int hatra) {
@@ -165,8 +164,8 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
                           is_key_down(popciok->brake) || is_key_down(popciok->brake_alias), ugrik1,
                           ugrik2);
 
-    int eredmeny = check_object_collision(pmot);
-    if (eredmeny == 0) {
+    BikeState eredmeny = check_object_collision(pmot);
+    if (eredmeny == BikeState::Dead) {
         // Beteszunk egy 0 hangot:
         pvalt->inf.friction_volume = 0;
         pvalt->inf.motor_frequency = -1;
@@ -226,9 +225,9 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     while (get_event_buffer(&wavazonosito, &hangero, &objszam)) {
         if (objszam >= 0) {
             int prev_apple_count = pmot->apple_count;
-            int eredmeny = spritefeldolgoz(objszam, &pmot->apple_count, pmot);
-            if (eredmeny == 0 || eredmeny == 1) {
-                if (eredmeny == 0) {
+            BikeState eredmeny = spritefeldolgoz(objszam, &pmot->apple_count, pmot);
+            if (eredmeny == BikeState::Dead || eredmeny == BikeState::Finish) {
+                if (eredmeny == BikeState::Dead) {
                     *pmeghalt = 1;
                 } else {
                     *pmegvanido = eddig * TimeToCentiseconds;

@@ -3,7 +3,6 @@
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "fs_utils.h"
-#include "keys.h"
 #include "level.h"
 #include "lgr.h"
 #include "main.h"
@@ -56,16 +55,7 @@ bool load_level_play(const char* levelname) {
             menu_pic menu;
             menu.add_line_centered("Level file has some topology errors!", 320, 190);
             menu.add_line_centered("Use the editor to fix them!", 320, 240);
-            empty_keypress_buffer();
-            while (true) {
-                if (has_keypress()) {
-                    Keycode c = get_keypress();
-                    if (c == KEY_ESC || c == KEY_ENTER) {
-                        break;
-                    }
-                }
-                menu.render();
-            }
+            menu.loop();
             delete Ptop;
             Ptop = nullptr;
             return false;

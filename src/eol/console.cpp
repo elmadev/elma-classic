@@ -9,7 +9,9 @@
 
 console* Console = nullptr;
 
-console::console() {}
+console::console() {
+    register_command("clear", "Clear chat history", [this](std::string_view) { clear(); });
+}
 
 void console::add_line(std::string text) {
     lines_.push_back(std::move(text));
@@ -41,7 +43,7 @@ void console::handle_input() {
 
     if (was_key_just_pressed(DIK_RETURN)) {
         if (!input_buffer_.empty()) {
-            add_line(input_buffer_);
+            submit_input();
         }
         deactivate_input();
         return;
@@ -83,6 +85,42 @@ void console::handle_input() {
         if (c >= 32 && c < 127 && (int)input_buffer_.size() < MAX_INPUT_LENGTH) {
             input_buffer_.insert(input_buffer_.begin() + cursor_pos_, c);
             cursor_pos_++;
+        }
+    }
+}
+
+void console::register_command(std::string_view name, std::string_view description,
+                            std::function<void(std::string_view args)> callback) {
+    commands_[std::string(name)] = {std::string(description), std::move(callback)};
+}
+
+void console::submit_input() {
+    if (input_buffer_.empty()) {
+        return;
+    }
+
+    if (input_buffer_[0] == '!') {
+        std::string_view input(input_buffer_);
+        input.remove_prefix(1);
+
+        // Split into command name and args
+        auto space = input.find(' ');
+        std::string cmd_name(input.substr(0, space));
+        std::string_view args;
+        if (space != std::string_view::npos) {
+            args = input.substr(space + 1);
+        }
+
+        auto it = commands_.find(cmd_name);
+        if (it != commands_.end()) {
+            it->second.callback(args);
+        } else {
+            add_line("Unknown command: !" + cmd_name);
+        }
+    } else {
+        add_line(input_buffer_);
+        if (on_chat_message) {
+            on_chat_message(input_buffer_);
         }
     }
 }

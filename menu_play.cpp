@@ -18,41 +18,42 @@
 #include "timer.h"
 #include <cstdlib>
 #include <cstring>
+#include <directinput/scancodes.h>
 #include <format>
 
 // Prompt for replay filename and return true if enter, false if esc
 static bool menu_prompt_replay_name(char* filename) {
     menu_pic menu;
     int i = 0;
-    empty_keypress_buffer();
     bool rerender = true;
     filename[0] = 0;
     while (true) {
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                return false;
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return false;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            if (i > 0) {
+                return true;
             }
-            if (c == KEY_ENTER) {
-                if (i > 0) {
-                    return true;
-                }
+        }
+        if (was_key_down(DIK_BACK)) {
+            if (i > 0) {
+                i--;
+                filename[i] = 0;
+                rerender = true;
             }
+        }
+        while (has_text_input()) {
+            char c = pop_text_input();
             if (MenuFont->has_char(c) && is_char_valid_for_filename(c)) {
                 if (i >= 8) {
                     continue;
                 }
-                filename[i] = (char)c;
+                filename[i] = c;
                 filename[i + 1] = 0;
                 i++;
                 rerender = true;
-            }
-            if (c == KEY_BACKSPACE) {
-                if (i > 0) {
-                    i--;
-                    filename[i] = 0;
-                    rerender = true;
-                }
             }
         }
         if (rerender) {

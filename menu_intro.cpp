@@ -16,7 +16,7 @@
 #include "state.h"
 #include "qopen.h"
 #include <cstring>
-#include <filesystem>
+#include <directinput/scancodes.h>
 
 void menu_intro() {
     init_qopen();
@@ -68,8 +68,8 @@ void menu_intro() {
 
     // Await for key input before scrolling intro.pcx
     while (true) {
-        if (has_keypress()) {
-            get_keypress();
+        handle_events();
+        if (get_any_key_just_pressed()) {
             break;
         }
         bltfront(static_intro_screen);

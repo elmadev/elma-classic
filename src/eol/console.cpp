@@ -10,6 +10,12 @@
 
 console* Console = nullptr;
 
+void console::register_console_commands() {
+    register_command("clear", [this](std::string_view) { clear(); });
+    register_command("dev", [this](std::string_view) { mode = Mode::Console; });
+    register_command("chat", [this](std::string_view) { mode = Mode::Chat; });
+}
+
 void console::add_line(std::string text, LineType type) {
     lines.emplace_back(std::move(text), type);
     if (lines.size() > MAX_LINES) {
@@ -49,7 +55,7 @@ void console::handle_input() {
 
     if (was_key_just_pressed(DIK_RETURN)) {
         if (!input_buffer.empty()) {
-            add_line(input_buffer, LineType::Chat);
+            submit_input();
         }
         deactivate_input();
         return;
@@ -92,6 +98,44 @@ void console::handle_input() {
             input_buffer.insert(input_buffer.begin() + cursor_pos, c);
             cursor_pos++;
         }
+    }
+}
+
+void console::register_command(std::string_view name,
+                               std::function<void(std::string_view args)> callback) {
+    commands[std::string(name)] = {std::move(callback)};
+}
+
+void console::submit_input() {
+    if (input_buffer.empty()) {
+        return;
+    }
+
+    bool commands_need_prefix = mode == Mode::Chat;
+    if (input_buffer[0] == '!' || !commands_need_prefix) {
+        add_line(input_buffer, LineType::System);
+
+        std::string_view input(input_buffer);
+        if (input_buffer[0] == '!') {
+            input.remove_prefix(1);
+        }
+
+        // Split into command name and args
+        auto space = input.find(' ');
+        std::string cmd_name(input.substr(0, space));
+        std::string_view args;
+        if (space != std::string_view::npos) {
+            args = input.substr(space + 1);
+        }
+
+        auto it = commands.find(cmd_name);
+        if (it != commands.end()) {
+            it->second.callback(args);
+        } else {
+            add_line("Unknown command: !" + cmd_name, LineType::System);
+        }
+    } else {
+        add_line(input_buffer, LineType::Chat);
     }
 }
 

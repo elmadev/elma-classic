@@ -1,7 +1,9 @@
 #ifndef EOL_CONSOLE_H
 #define EOL_CONSOLE_H
 
+#include <functional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 class abc8;
@@ -14,6 +16,11 @@ class console {
         System,
     };
 
+    struct command {
+        std::function<void(std::string_view args)> callback;
+    };
+
+    void register_console_commands();
     void add_line(std::string text, LineType type);
     void render(pic8& screen, abc8& font);
 
@@ -21,6 +28,9 @@ class console {
     void toggle_active();
     void deactivate_input();
     void handle_input();
+
+    void register_command(std::string_view name,
+                          std::function<void(std::string_view args)> callback);
 
   private:
     static constexpr size_t MAX_LINES = 1000;
@@ -38,9 +48,11 @@ class console {
 
     void clear();
     void activate_input();
+    void submit_input();
 
     Mode mode = Mode::Chat;
     std::vector<console_line> lines;
+    std::unordered_map<std::string, command> commands;
     bool input_active = false;
     std::string input_buffer;
     int cursor_pos = 0;

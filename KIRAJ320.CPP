@@ -92,6 +92,7 @@ void init_renderer() {
     SmallFont->set_line_height(12);
 
     Console = new console();
+    Console->register_console_commands();
 }
 
 void beallitmereteket(int splitscreen) {

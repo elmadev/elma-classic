@@ -48,6 +48,19 @@ void console::toggle_active() {
     }
 }
 
+void console::paste_text(std::string_view text) {
+    if (!input_active) {
+        return;
+    }
+
+    for (char c : text) {
+        if (is_ascii_character(c) && input_buffer.size() < MAX_INPUT_LENGTH) {
+            input_buffer.insert(input_buffer.begin() + cursor_pos, c);
+            cursor_pos++;
+        }
+    }
+}
+
 void console::handle_input() {
     if (!input_active) {
         return;
@@ -63,6 +76,14 @@ void console::handle_input() {
 
     if (was_key_just_pressed(DIK_ESCAPE)) {
         deactivate_input();
+        return;
+    }
+
+    if (was_key_just_pressed(DIK_V) && is_shortcut_modifier_down()) {
+        std::string clipboard = get_clipboard_text();
+        if (!clipboard.empty()) {
+            paste_text(clipboard);
+        }
         return;
     }
 

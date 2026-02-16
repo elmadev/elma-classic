@@ -49,6 +49,7 @@ class console {
     void clear();
     void activate_input();
     void submit_input();
+    void paste_text(std::string_view text);
 
     Mode mode = Mode::Chat;
     std::vector<console_line> lines;

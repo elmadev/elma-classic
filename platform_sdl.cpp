@@ -460,6 +460,25 @@ DikScancode get_any_key_just_pressed() {
     return DIK_UNKNOWN;
 }
 
+std::string get_clipboard_text() {
+    char* text = SDL_GetClipboardText();
+    if (!text) {
+        return {};
+    }
+    std::string result(text);
+    SDL_free(text);
+    return result;
+}
+
+bool is_shortcut_modifier_down() {
+    SDL_Keymod mod = SDL_GetModState();
+#ifdef __APPLE__
+    return (mod & KMOD_GUI) != 0;
+#else
+    return (mod & KMOD_CTRL) != 0;
+#endif
+}
+
 bool was_key_down(DikScancode code) {
     SDL_Scancode sdl_code = windows_scancode_table[code];
     return keyboard::was_down(sdl_code);

@@ -1,6 +1,7 @@
 #ifndef PLATFORM_IMPL_H
 #define PLATFORM_IMPL_H
 
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -54,6 +55,9 @@ DikScancode get_any_key_just_pressed();
 bool was_key_down(DikScancode code);
 
 int get_mouse_wheel_delta();
+
+std::string get_clipboard_text();
+bool is_shortcut_modifier_down();
 
 bool is_fullscreen();
 long long get_milliseconds();

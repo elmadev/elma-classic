@@ -1,6 +1,5 @@
 #include "abc8.h"
 #include "eol_settings.h"
-#include "keys.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_intro.h"
@@ -10,6 +9,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <directinput/scancodes.h>
 #include <string>
 
 static double StopwatchStartTime = 0.0;
@@ -79,8 +79,8 @@ static void handle_error(const char* text1, const char* text2, const char* text3
     if (ErrorGraphicsLoaded) {
         render_error(text1, text2, text3, text4);
         while (true) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC || c == KEY_ENTER) {
+            handle_events();
+            if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
                 break;
             }
         }

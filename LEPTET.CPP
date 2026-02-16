@@ -9,10 +9,27 @@
 #include "recorder.h"
 #include <cmath>
 
-static void update_friction_volume(motorst* mot, vect2 wheel_displacement,
-                                   vect2 wheel_relative_velocity);
-
 static double MaxFrictionVolume = 0.0;
+
+// Calculate bike squeak sound. Save the loudest squeak sound (since we have up to 4 wheels)
+static void update_friction_volume(motorst* mot, vect2 wheel_displacement,
+                                   vect2 wheel_relative_velocity) {
+    // Calculate the wheel position based on the bike rotation
+    vect2 j1(cos(mot->bike.rotation - 0.5 * PI), sin(mot->bike.rotation - 0.5 * PI));
+    double upwards_displacement = j1 * wheel_displacement;
+    double upwards_velocity = j1 * wheel_relative_velocity;
+    // Only make sound if the wheel is displaced upwards and the wheel velocity is upwards
+    if (upwards_displacement <= 0.0 || upwards_velocity <= 0.0) {
+        return;
+    }
+
+    double friction_volume = upwards_displacement * upwards_velocity;
+    if (friction_volume > MaxFrictionVolume) {
+        MaxFrictionVolume = friction_volume;
+    }
+}
+
+double get_bike_friction_volume() { return MaxFrictionVolume; }
 
 // Modulo wheel to be between 0 and 2Pi (kind of), only when we aren't braking
 static void clamp_wheel_rotation(double* rotation) {
@@ -368,23 +385,3 @@ BikeState check_object_collision(motorst* mot) {
     }
     return BikeState::Normal;
 }
-
-// Calculate bike squeak sound. Save the loudest squeak sound (since we have up to 4 wheels)
-static void update_friction_volume(motorst* mot, vect2 wheel_displacement,
-                                   vect2 wheel_relative_velocity) {
-    // Calculate the wheel position based on the bike rotation
-    vect2 j1(cos(mot->bike.rotation - 0.5 * PI), sin(mot->bike.rotation - 0.5 * PI));
-    double upwards_displacement = j1 * wheel_displacement;
-    double upwards_velocity = j1 * wheel_relative_velocity;
-    // Only make sound if the wheel is displaced upwards and the wheel velocity is upwards
-    if (upwards_displacement <= 0.0 || upwards_velocity <= 0.0) {
-        return;
-    }
-
-    double friction_volume = upwards_displacement * upwards_velocity;
-    if (friction_volume > MaxFrictionVolume) {
-        MaxFrictionVolume = friction_volume;
-    }
-}
-
-double get_bike_friction_volume() { return MaxFrictionVolume; }

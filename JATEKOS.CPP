@@ -6,9 +6,11 @@
 #include "menu_main.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
+#include "platform_impl.h"
 #include "platform_utils.h"
 #include "state.h"
 #include <cstring>
+#include <directinput/scancodes.h>
 
 static int Maxnevhossz = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-nal!
 
@@ -17,40 +19,38 @@ static int bevesznevet(char* nev, int visszater) {
     menu_pic szovlist(false);
 
     int i = 0;
-    empty_keypress_buffer();
     int valtozott = 1;
     nev[0] = 0;
     while (1) {
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                if (visszater) {
-                    return 0;
-                }
-                menu_exit();
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            if (visszater) {
+                return 0;
             }
-            if (c == KEY_ENTER) {
-                // ENTER
-                if (i > 0) {
-                    return 1;
-                }
+            menu_exit();
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            if (i > 0) {
+                return 1;
             }
+        }
+        if (was_key_down(DIK_BACK)) {
+            if (i > 0) {
+                i--;
+                nev[i] = 0;
+                valtozott = 1;
+            }
+        }
+        while (has_text_input()) {
+            char c = pop_text_input();
             if (MenuFont->has_char(c) && is_char_valid_for_filename(c)) {
                 if (i >= Maxnevhossz) {
                     continue;
                 }
-                nev[i] = (char)c;
+                nev[i] = c;
                 nev[i + 1] = 0;
                 i++;
                 valtozott = 1;
-            }
-            if (c == KEY_BACKSPACE) {
-                // <- (torles):
-                if (i > 0) {
-                    i--;
-                    nev[i] = 0;
-                    valtozott = 1;
-                }
             }
         }
         if (valtozott) {
@@ -64,7 +64,6 @@ static int bevesznevet(char* nev, int visszater) {
             nev[i] = 0;
 
             szovlist.add_line_centered("Please enter your name:", 320, 180);
-            // szovlist.add_line_centered( "Press ESC to exit", 320, 300 );
         }
         szovlist.render();
     }

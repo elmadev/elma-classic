@@ -179,14 +179,26 @@ int menu_nav_old::navigate(text_line* extra_lines, int extra_lines_length, bool 
     while (true) {
         while (!render_only && has_keypress()) {
             Keycode c = get_keypress();
-            if (search_handler(c)) {
+            if (search_handler_text((char)c)) {
                 view_index = selected_index - max_visible_entries / 2;
                 rerender = true;
                 break;
             }
-            if (c == KEY_ESC && enable_esc) {
-                CtrlAltPressed = false;
-                return -1;
+            if (c == KEY_BACKSPACE && search_handler_backspace()) {
+                view_index = selected_index - max_visible_entries / 2;
+                rerender = true;
+                break;
+            }
+            if (c == KEY_ESC) {
+                if (search_pattern != SearchPattern::None && !search_input.empty()) {
+                    search_input.clear();
+                    rerender = true;
+                    break;
+                }
+                if (enable_esc) {
+                    CtrlAltPressed = false;
+                    return -1;
+                }
             }
             if (c == KEY_ENTER) {
                 CtrlAltPressed = is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
@@ -305,31 +317,35 @@ static size_t common_prefix_len(const char* a, const char* b) {
     }
 }
 
-bool menu_nav_old::search_handler(int code) {
+bool menu_nav_old::search_handler_text(char c) {
     if (search_pattern == SearchPattern::None) {
         return false;
     }
-
-    if (code == KEY_BACKSPACE) {
-        if (!search_input.empty()) {
-            search_input.pop_back();
-        }
-    } else if (code == KEY_ESC) {
-        if (!search_input.empty()) {
-            search_input.clear();
-        } else {
-            return false;
-        }
-    } else if (accept_search_input() && MenuFont->has_char(code)) {
-        if (search_input.size() < MAX_FILENAME_LEN) {
-            search_input.push_back(code);
-        }
-    } else {
+    if (!accept_search_input() || !MenuFont->has_char(c)) {
         return false;
     }
+    if (search_input.size() < MAX_FILENAME_LEN) {
+        search_input.push_back(c);
+    }
+    update_search();
+    return true;
+}
 
+bool menu_nav_old::search_handler_backspace() {
+    if (search_pattern == SearchPattern::None) {
+        return false;
+    }
     if (search_input.empty()) {
-        return true;
+        return false;
+    }
+    search_input.pop_back();
+    update_search();
+    return true;
+}
+
+void menu_nav_old::update_search() {
+    if (search_input.empty()) {
+        return;
     }
 
     nav_entry* begin = entries_left;
@@ -390,11 +406,9 @@ bool menu_nav_old::search_handler(int code) {
         break;
     }
     case SearchPattern::None:
-        internal_error("search_handler() SearchPattern::None reached!");
+        internal_error("update_search() SearchPattern::None reached!");
         break;
     }
-
-    return true;
 }
 
 menu_nav::menu_nav(std::string title)

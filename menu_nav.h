@@ -56,7 +56,9 @@ class menu_nav_old {
 
   private:
     int calculate_visible_entries(int extra_lines_length);
-    bool search_handler(int code);
+    bool search_handler_text(char c);
+    bool search_handler_backspace();
+    void update_search();
 };
 
 extern bool CtrlAltPressed;

@@ -10,6 +10,7 @@
 #include "platform_utils.h"
 #include <cctype>
 #include <cstring>
+#include <directinput/scancodes.h>
 
 bool InEditor = false;
 
@@ -164,19 +165,18 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
 
     // Await input
     int choice = 0;
-    left_mouse_clicked();
-    right_mouse_clicked();
     // Immediate exit if DIALOG_RETURN
     while (!immediately_return) {
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            // ESC/ENTER only valid if 1 button exists
-            if (button_length == 1) {
-                if (c == KEY_ESC || c == KEY_ENTER) {
-                    goto exit;
-                }
+        handle_events();
+        // ESC/ENTER only valid if 1 button exists
+        if (button_length == 1) {
+            if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
+                break;
             }
-            // Allow the first letter of each button as a shortcut (undocumented)
+        }
+        // Allow the first letter of each button as a shortcut
+        while (has_text_input()) {
+            char c = pop_text_input();
             for (int i = 0; i < button_length; i++) {
                 if (c == tolower(*(button_array[i]))) {
                     choice = i;
@@ -185,13 +185,13 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             }
         }
         // Right mouse click only valid if 1 button exists
-        if (right_mouse_clicked()) {
+        if (was_right_mouse_just_clicked()) {
             if (button_length == 1) {
-                goto exit;
+                break;
             }
         }
         // Left mouse click a button
-        if (left_mouse_clicked()) {
+        if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             for (int i = 0; i < button_length; i++) {
                 if (Moux >= button_array_x1[i] && Moux <= button_array_x2[i] && Mouy >= button_y1 &&

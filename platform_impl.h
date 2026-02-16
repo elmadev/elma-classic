@@ -48,6 +48,8 @@ DikScancode get_any_key_just_pressed();
 // Used for OS-level key repeat functionality (text input)
 bool was_key_down(DikScancode code);
 
+int get_mouse_wheel_delta();
+
 bool is_fullscreen();
 long long get_milliseconds();
 

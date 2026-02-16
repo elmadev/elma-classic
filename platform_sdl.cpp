@@ -21,6 +21,8 @@ static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
+static int MouseWheelDelta = 0;
+
 void message_box(const char* text) {
     // As per docs, can be called even before SDL_Init
     // SDLWindow will either be a handle to the window, or nullptr if no parent
@@ -203,6 +205,7 @@ void palette::set() {
 
 void handle_events() {
     keyboard::begin_frame();
+    MouseWheelDelta = 0;
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -261,6 +264,7 @@ void handle_events() {
             add_text_to_buffer(event.text.text);
             break;
         case SDL_MOUSEWHEEL:
+            MouseWheelDelta = event.wheel.y > 0 ? 1 : -1;
             if (event.wheel.y > 0) {
                 add_key_to_buffer(KEY_UP);
             } else if (event.wheel.y < 0) {
@@ -339,6 +343,8 @@ bool was_key_down(DikScancode code) {
     SDL_Scancode sdl_code = windows_scancode_table[code];
     return keyboard::was_down(sdl_code);
 }
+
+int get_mouse_wheel_delta() { return MouseWheelDelta; }
 
 bool is_fullscreen() {
     Uint32 flags = SDL_GetWindowFlags(SDLWindow);

@@ -2,7 +2,6 @@
 #include "eol_settings.h"
 #include "fs_utils.h"
 #include "JATEKOS.H"
-#include "keys.h"
 #include "level_load.h"
 #include "menu_controls.h"
 #include "menu_nav.h"
@@ -48,16 +47,7 @@ void menu_help() {
     menu.add_line_centered("After you have eaten all the fruits,", 320, y0 + dy * 9);
     menu.add_line_centered("touch the flower!", 320, y0 + dy * 10);
 
-    empty_keypress_buffer();
-    while (true) {
-        if (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC || c == KEY_ENTER) {
-                return;
-            }
-        }
-        menu.render();
-    }
+    menu.loop();
 }
 
 static void menu_lgr() {

@@ -5,7 +5,7 @@
 #include "fs_utils.h"
 #include "sound_engine.h"
 #include "KIRAJZOL.H"
-#include "LEPTET.H"
+#include "physics_forces.h"
 #include "level.h"
 #include "lgr.h"
 #include "main.h"

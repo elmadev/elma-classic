@@ -41,7 +41,7 @@ elma_sources = files(
     'grass.cpp',
     'platform_utils.cpp',
     'LEJATSZO.CPP',
-    'LEPTET.CPP',
+    'physics_forces.cpp',
     'lgr.cpp',
     'level_load.cpp',
     'main.cpp',

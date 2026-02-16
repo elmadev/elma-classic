@@ -67,6 +67,24 @@ void console::handle_input() {
         }
     }
 
+    if (was_key_down(DIK_DELETE)) {
+        if (cursor_pos < (int)input_buffer.size()) {
+            input_buffer.erase(cursor_pos, 1);
+        }
+    }
+
+    if (was_key_down(DIK_LEFT)) {
+        if (cursor_pos > 0) {
+            cursor_pos--;
+        }
+    }
+
+    if (was_key_down(DIK_RIGHT)) {
+        if (cursor_pos < (int)input_buffer.size()) {
+            cursor_pos++;
+        }
+    }
+
     // Drain text input buffer for printable characters
     char c;
     while ((c = pop_text_input()) != 0) {

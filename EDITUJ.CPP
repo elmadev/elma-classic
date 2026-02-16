@@ -630,8 +630,6 @@ static void editor_play(bool view_map) {
     Rec2->erase(State->editor_filename);
     lejatszo(State->editor_filename, view_map ? CameraMode::MapViewer : CameraMode::Normal);
 
-    empty_keypress_buffer();
-
     Pal_editor->set();
 }
 

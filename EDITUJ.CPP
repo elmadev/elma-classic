@@ -707,34 +707,33 @@ void editor(void) {
     zoom_fill();
     ujrarajzol(1);
 
-    left_mouse_clicked();
-    right_mouse_clicked();
     while (1) {
-        while (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC) {
-                if (Tool == T_MOVE) {
-                    t_move_esc();
-                }
-                if (Tool == T_ZOOMIN) {
-                    t_zoomin_esc();
-                }
-                if (Tool == T_CREATE_VERT) {
-                    t_create_vert_esc();
-                }
+        handle_events();
+        // Control keys
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            if (Tool == T_MOVE) {
+                t_move_esc();
             }
-            if (c == ' ') {
-                if (Tool == T_CREATE_VERT) {
-                    t_create_vert_space();
-                }
-                // if( Tool == T_MOVE ) Kurzor negyzette valik merethez
-                //	t_move_space();
+            if (Tool == T_ZOOMIN) {
+                t_zoomin_esc();
             }
-            if (c == KEY_ENTER) {
-                if (Tool == T_CREATE_VERT) {
-                    t_create_vert_enter();
-                }
+            if (Tool == T_CREATE_VERT) {
+                t_create_vert_esc();
             }
+        }
+        if (was_key_just_pressed(DIK_SPACE)) {
+            if (Tool == T_CREATE_VERT) {
+                t_create_vert_space();
+            }
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            if (Tool == T_CREATE_VERT) {
+                t_create_vert_enter();
+            }
+        }
+        // Character shortcuts from text buffer
+        while (has_text_input()) {
+            char c = pop_text_input();
             if (!(Pgy || Pker || Psp || Zoomfogva || Egypont)) {
                 if (c == 'p') {
                     editor_play(is_key_down(DIK_F1));
@@ -788,8 +787,8 @@ void editor(void) {
             } */
         }
         // Megnezzuk eger gombok lemenetelet:
-        bool balnyomva = left_mouse_clicked();
-        bool jobbnyomva = right_mouse_clicked();
+        bool balnyomva = was_left_mouse_just_clicked();
+        bool jobbnyomva = was_right_mouse_just_clicked();
         if (balnyomva || jobbnyomva) {
 
             /*lockfrontbuffer_pic();

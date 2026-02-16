@@ -161,10 +161,11 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // LEPTET!!!!!!!:
     // 0-meghalt, 1-megnyerte, 2-semmi kulonos
-    leptet(pmot, eddig, dt, is_key_down(popciok->gas),
-           is_key_down(popciok->brake) || is_key_down(popciok->brake_alias), ugrik1, ugrik2);
+    simulate_bike_physics(pmot, eddig, dt, is_key_down(popciok->gas),
+                          is_key_down(popciok->brake) || is_key_down(popciok->brake_alias), ugrik1,
+                          ugrik2);
 
-    int eredmeny = vizsgalat(pmot);
+    int eredmeny = check_object_collision(pmot);
     if (eredmeny == 0) {
         // Beteszunk egy 0 hangot:
         pvalt->inf.friction_volume = 0;
@@ -202,7 +203,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // eddig += dt; // Ezt meg kell ismetelni eggyel feljebb is
     //  Berreges es nyikorgas:
-    pvalt->inf.friction_volume = kiszamolsurlodast();
+    pvalt->inf.friction_volume = get_bike_friction_volume();
 
     if (pmot->flipped_bike) {
         pvalt->inf.motor_frequency = fabs(pmot->left_wheel.angular_velocity) * 0.025;
@@ -315,7 +316,7 @@ static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     if (!meghalt) {
         if (!pvalt->hatranyomva && is_key_down(popciok->turn)) {
             pmot->flipped_bike = !pmot->flipped_bike;
-            szamitfejr(pmot);
+            set_head_position(pmot);
         }
         pvalt->hatranyomva = is_key_down(popciok->turn);
     }
@@ -421,8 +422,8 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
     int meghalt2 = 0;
     long megvanido1 = 0;
     long megvanido2 = 0;
-    resetleptet(Motor1);
-    resetleptet(Motor2);
+    reset_motor_forces(Motor1);
+    reset_motor_forces(Motor2);
 
     camera current_camera;
     current_camera.mode = cameramode;
@@ -707,7 +708,7 @@ static bool replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // recall koordokat es Hatra-t is beallitja:
     bool visszaad = prec->recall_frame(pmot, eddig, &pvalt->inf);
-    szamitfejr(pmot); // mivel nincs leptet ami kiszamolna
+    set_head_position(pmot); // mivel nincs leptet ami kiszamolna
     // HANG ELINTEZES:
     WavEvent wavindex;
     double hangero;
@@ -793,8 +794,8 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         valt2.showkep = 1;
     }
 
-    resetleptet(Motor1);
-    resetleptet(Motor2);
+    reset_motor_forces(Motor1);
+    reset_motor_forces(Motor2);
 
     camera current_camera;
     current_camera.mode = CameraMode::Normal;

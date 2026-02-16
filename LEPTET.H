@@ -3,15 +3,16 @@
 
 struct motorst;
 
-void resetleptet(motorst* pmot);
-void leptet(motorst* pmot, double most, double dt, int gaz, int fek, int ugrik1, int ugrik2);
+void reset_motor_forces(motorst* mot);
+void simulate_bike_physics(motorst* mot, double time, double dt, int gas, int brake, int right_volt,
+                           int left_volt);
 
 // csak replay eseten kell meghivni, mivel leptet elvegzi:
-void szamitfejr(motorst* pmot);
+void set_head_position(motorst* mot);
 
 // 0-meghalt, 2-semmi kulonos:
-int vizsgalat(motorst* pmot);
+int check_object_collision(motorst* mot);
 
-double kiszamolsurlodast(void);
+double get_bike_friction_volume(void);
 
 #endif

@@ -1,6 +1,5 @@
 #include "abc8.h"
 #include "best_times.h"
-#include "keys.h"
 #include "level.h"
 #include "main.h"
 #include "menu_nav.h"
@@ -105,16 +104,7 @@ static void render_topten(topten* tten, const char* header, int single) {
         men.add_line(time_text, time_x, 110 + i * ROW_HEIGHT);
     }
 
-    empty_keypress_buffer();
-    while (true) {
-        if (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == KEY_ESC || c == KEY_ENTER) {
-                return;
-            }
-        }
-        men.render();
-    }
+    men.loop();
 }
 
 // Render the internal best times list

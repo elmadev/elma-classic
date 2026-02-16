@@ -15,8 +15,6 @@ static SDL_Window* SDLWindow = nullptr;
 static SDL_Surface* SDLSurfaceMain = nullptr;
 static SDL_Surface* SDLSurfacePaletted = nullptr;
 
-static bool LeftMouseDownPrev = false;
-static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
@@ -336,20 +334,6 @@ void show_cursor() { SDL_ShowCursor(SDL_ENABLE); }
 
 void get_mouse_position(int* x, int* y) { SDL_GetMouseState(x, y); }
 void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }
-
-bool left_mouse_clicked() {
-    handle_events();
-    bool click = !LeftMouseDownPrev && LeftMouseDown;
-    LeftMouseDownPrev = LeftMouseDown;
-    return click;
-}
-
-bool right_mouse_clicked() {
-    handle_events();
-    bool click = !RightMouseDownPrev && RightMouseDown;
-    RightMouseDownPrev = RightMouseDown;
-    return click;
-}
 
 bool was_left_mouse_just_clicked() { return LeftMouseDown && !LeftMouseDownPrevFrame; }
 

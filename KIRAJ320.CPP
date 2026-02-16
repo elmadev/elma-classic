@@ -6,6 +6,7 @@
 #include "best_times.h"
 #include "ECSET.H"
 #include "EDITUJ.H"
+#include "eol/console.h"
 #include "eol_settings.h"
 #include "flagtag.h"
 #include "LEJATSZO.H"
@@ -88,6 +89,8 @@ void init_renderer() {
 
     SmallFont = new abc8("small.abc");
     SmallFont->set_spacing(1);
+
+    Console = new console();
 }
 
 void beallitmereteket(int splitscreen) {
@@ -893,6 +896,10 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
             kirakegyjatekost(false, &Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
                              current_camera);
         }
+    }
+
+    if (Console) {
+        Console->render(npic, SmallFont);
     }
 
     // Mentes lemezre:

@@ -60,12 +60,12 @@ struct motorst {
     int apple_count;
     int last_apple_time;
 
-    int prev_brake;
+    bool prev_brake;
     double left_wheel_brake_rotation;
     double right_wheel_brake_rotation;
 
-    int volting_right;
-    int volting_left;
+    bool volting_right;
+    bool volting_left;
     double right_volt_time;
     double left_volt_time;
     double angular_velocity_pre_right_volt;

@@ -12,7 +12,7 @@
 static void update_friction_volume(motorst* mot, vect2 wheel_displacement,
                                    vect2 wheel_relative_velocity);
 
-static double MaxFrictionVolume = 0;
+static double MaxFrictionVolume = 0.0;
 
 // Modulo wheel to be between 0 and 2Pi (kind of), only when we aren't braking
 static void clamp_wheel_rotation(double* rotation) {
@@ -35,8 +35,8 @@ static void calculate_wheel_forces(motorst* mot, rigidbody* rb, vect2 i1, vect2 
     // Get the wheel relative displacement
     vect2 wheel_displacement = wheel_neutral_position_absolute - rb->r;
     // Calculate the wheel spring tension force
-    double tension_force_wheel_parallel = 0;
-    double tension_force_wheel_orthogonal = 0;
+    double tension_force_wheel_parallel = 0.0;
+    double tension_force_wheel_orthogonal = 0.0;
     if (wheel_displacement.x < -0.0001 || wheel_displacement.x > 0.0001 ||
         wheel_displacement.y < -0.0001 || wheel_displacement.y > 0.0001) {
         // Get unit vectors representing neutral bike->wheel spring
@@ -63,7 +63,7 @@ static void calculate_wheel_forces(motorst* mot, rigidbody* rb, vect2 i1, vect2 
         // No signficant wheel tension
         *force_wheel = vect2();
         *force_bike = vect2();
-        *torque_bike = 0;
+        *torque_bike = 0.0;
     }
 
     // (2) Spring Damping Force
@@ -113,15 +113,16 @@ static void calculate_wheel_forces(motorst* mot, rigidbody* rb, vect2 i1, vect2 
     update_friction_volume(mot, wheel_displacement, relative_velocity);
 }
 
-static double VOLT_ANGULAR_VELOCITY = 12.0;
-static double COUNTERVOLT_ANGULAR_VELOCITY = 3.0;
-
 void reset_motor_forces(motorst* mot) {
-    mot->prev_brake = 0;
-    mot->left_wheel_brake_rotation = mot->right_wheel_brake_rotation = 0;
-    mot->volting_right = mot->volting_left = 0;
-    mot->right_volt_time = mot->left_volt_time = -1.0;
-    mot->angular_velocity_pre_right_volt = mot->angular_velocity_pre_left_volt = -1.0;
+    mot->prev_brake = false;
+    mot->left_wheel_brake_rotation = 0.0;
+    mot->right_wheel_brake_rotation = 0.0;
+    mot->volting_right = false;
+    mot->volting_left = false;
+    mot->right_volt_time = -1.0;
+    mot->left_volt_time = -1.0;
+    mot->angular_velocity_pre_right_volt = -1.0;
+    mot->angular_velocity_pre_left_volt = -1.0;
 }
 
 void set_head_position(motorst* mot) {
@@ -136,8 +137,8 @@ void set_head_position(motorst* mot) {
     }
 }
 
-void simulate_bike_physics(motorst* mot, double time, double dt, int gas, int brake, int right_volt,
-                           int left_volt) {
+void simulate_bike_physics(motorst* mot, double time, double dt, bool gas, bool brake,
+                           bool right_volt, bool left_volt) {
     // Initialize bike friction volume (squeak sound)
     MaxFrictionVolume = 0;
 
@@ -219,6 +220,9 @@ void simulate_bike_physics(motorst* mot, double time, double dt, int gas, int br
         prevolt_angular_velocity = mot->bike.angular_velocity;
     }
 
+    constexpr double VOLT_ANGULAR_VELOCITY = 12.0;
+    constexpr double COUNTERVOLT_ANGULAR_VELOCITY = 3.0;
+
     // End a Right Volt if we are right-volting and 25% of the volt delay has passed
     // (or if somehow we managed to send a new volt request by dying and respawning in flagtag)
     if (mot->volting_right &&
@@ -247,7 +251,7 @@ void simulate_bike_physics(motorst* mot, double time, double dt, int gas, int br
             }
         }
         // Reset vars
-        mot->volting_right = 0;
+        mot->volting_right = false;
         mot->angular_velocity_pre_right_volt = -1.0;
         mot->right_volt_time = -1.0;
     }
@@ -270,7 +274,7 @@ void simulate_bike_physics(motorst* mot, double time, double dt, int gas, int br
                 mot->bike.angular_velocity = 0.0;
             }
         }
-        mot->volting_left = 0;
+        mot->volting_left = false;
         mot->angular_velocity_pre_left_volt = -1.0;
         mot->left_volt_time = -1.0;
     }
@@ -279,7 +283,7 @@ void simulate_bike_physics(motorst* mot, double time, double dt, int gas, int br
     if (right_volt) {
         // Temporarily give free angular velocity
         // (we will take it all back at the end of the volt, see above)
-        mot->volting_right = 1;
+        mot->volting_right = true;
         mot->angular_velocity_pre_right_volt = mot->bike.angular_velocity;
         mot->right_volt_time = time;
         mot->bike.angular_velocity -= VOLT_ANGULAR_VELOCITY;
@@ -287,7 +291,7 @@ void simulate_bike_physics(motorst* mot, double time, double dt, int gas, int br
     // Start a new Left Volt (same thing as right volt)
     if (left_volt) {
         // In an alovolt, right and left volt cancel each other out
-        mot->volting_left = 1;
+        mot->volting_left = true;
         mot->angular_velocity_pre_left_volt = mot->bike.angular_velocity;
         mot->left_volt_time = time;
         mot->bike.angular_velocity += VOLT_ANGULAR_VELOCITY;
@@ -365,15 +369,16 @@ void simulate_bike_physics(motorst* mot, double time, double dt, int gas, int br
 
 int check_object_collision(motorst* mot) {
     // If the head touches any line, we are dead
-    vect2 point1, point2;
+    vect2 point1;
+    vect2 point2;
     if (get_two_anchor_points(mot->head_r, HeadRadius, &point1, &point2)) {
         return 0;
     }
 
     // Collect all the object event interactions (but don't parse the interactions just yet)
-    int again = 1;
+    bool again = true;
     while (again) {
-        again = 0;
+        again = false;
         int object_indices[3];
         object_indices[0] = get_touching_object(mot->left_wheel.r, mot->left_wheel.radius);
         object_indices[1] = get_touching_object(mot->right_wheel.r, mot->right_wheel.radius);
@@ -384,15 +389,13 @@ int check_object_collision(motorst* mot) {
                 object* obj = Ptop->get_object(object_indices[i]);
                 if (obj->type == object::Type::Food) {
                     obj->active = false;
-                    again = 1;
+                    again = true;
                 }
             }
         }
     }
     return 2;
 }
-
-static double FRICTION_VOLUME_COEFFICIENT = 1.0 / 1.0;
 
 // Calculate bike squeak sound. Save the loudest squeak sound (since we have up to 4 wheels)
 static void update_friction_volume(motorst* mot, vect2 wheel_displacement,
@@ -402,13 +405,15 @@ static void update_friction_volume(motorst* mot, vect2 wheel_displacement,
     double upwards_displacement = j1 * wheel_displacement;
     double upwards_velocity = j1 * wheel_relative_velocity;
     // Only make sound if the wheel is displaced upwards and the wheel velocity is upwards
-    if (upwards_displacement <= 0 || upwards_velocity <= 0) {
+    if (upwards_displacement <= 0.0 || upwards_velocity <= 0.0) {
         return;
     }
+
+    constexpr double FRICTION_VOLUME_COEFFICIENT = 1.0 / 1.0;
     double friction_volume = upwards_displacement * upwards_velocity * FRICTION_VOLUME_COEFFICIENT;
     if (friction_volume > MaxFrictionVolume) {
         MaxFrictionVolume = friction_volume;
     }
 }
 
-double get_bike_friction_volume(void) { return MaxFrictionVolume; }
+double get_bike_friction_volume() { return MaxFrictionVolume; }

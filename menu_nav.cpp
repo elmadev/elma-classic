@@ -158,6 +158,11 @@ int menu_nav_old::navigate(text_line* extra_lines, int extra_lines_length, bool 
 
     search_input.clear();
 
+    // Clear any stale text input (e.g., typed during replay watching)
+    while (has_text_input()) {
+        pop_text_input();
+    }
+
     // Bound current selection
     if (selected_index > length - 1) {
         selected_index = length - 1;
@@ -174,48 +179,50 @@ int menu_nav_old::navigate(text_line* extra_lines, int extra_lines_length, bool 
     }
     menu = new menu_pic(false);
 
-    empty_keypress_buffer();
     bool rerender = true;
     while (true) {
-        while (!render_only && has_keypress()) {
-            Keycode c = get_keypress();
-            if (search_handler_text((char)c)) {
+        handle_events();
+        if (!render_only) {
+            while (has_text_input()) {
+                char c = pop_text_input();
+                if (search_handler_text(c)) {
+                    view_index = selected_index - max_visible_entries / 2;
+                    rerender = true;
+                }
+            }
+            if (was_key_pressed_or_repeated(DIK_BACK) && search_handler_backspace()) {
                 view_index = selected_index - max_visible_entries / 2;
                 rerender = true;
-                break;
             }
-            if (c == KEY_BACKSPACE && search_handler_backspace()) {
-                view_index = selected_index - max_visible_entries / 2;
-                rerender = true;
-                break;
-            }
-            if (c == KEY_ESC) {
+            if (was_key_just_pressed(DIK_ESCAPE)) {
                 if (search_pattern != SearchPattern::None && !search_input.empty()) {
                     search_input.clear();
                     rerender = true;
-                    break;
-                }
-                if (enable_esc) {
+                } else if (enable_esc) {
                     CtrlAltPressed = false;
                     return -1;
                 }
             }
-            if (c == KEY_ENTER) {
+            if (was_key_just_pressed(DIK_RETURN)) {
                 CtrlAltPressed = is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
                 F1Pressed = is_key_down(DIK_F1);
                 return selected_index;
             }
-            if (c == KEY_UP) {
+            if (was_key_pressed_or_repeated(DIK_UP)) {
                 selected_index--;
             }
-            if (c == KEY_PGUP) {
-                selected_index -= max_visible_entries;
-            }
-            if (c == KEY_DOWN) {
+            if (was_key_pressed_or_repeated(DIK_DOWN)) {
                 selected_index++;
             }
-            if (c == KEY_PGDOWN) {
+            if (was_key_pressed_or_repeated(DIK_PRIOR)) {
+                selected_index -= max_visible_entries;
+            }
+            if (was_key_pressed_or_repeated(DIK_NEXT)) {
                 selected_index += max_visible_entries;
+            }
+            int wheel = get_mouse_wheel_delta();
+            if (wheel != 0) {
+                selected_index -= wheel;
             }
         }
 

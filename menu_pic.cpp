@@ -8,6 +8,7 @@
 #include "main.h"
 #include "pic8.h"
 #include "platform_impl.h"
+#include <directinput/scancodes.h>
 #include "state.h"
 #include <cmath>
 #include <cstring>
@@ -53,6 +54,27 @@ void init_menu_pictures() {
     balls_init();
 
     get_pcx_pal("intro.pcx", &MenuPalette);
+}
+
+void menu_pic::loop() {
+    while (true) {
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
+            break;
+        }
+        render();
+    }
+}
+
+DikScancode menu_pic::loop_until_any_key() {
+    while (true) {
+        handle_events();
+        DikScancode code = get_any_key_just_pressed();
+        if (code != DIK_UNKNOWN) {
+            return code;
+        }
+        render();
+    }
 }
 
 menu_pic::menu_pic(bool center_vert) {

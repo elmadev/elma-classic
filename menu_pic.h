@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <platform_impl.h>
 
 constexpr unsigned char BLACK_PALETTE_ID = 254;
 constexpr unsigned char GREEN_PALETTE_ID = 248;
@@ -36,6 +37,8 @@ class menu_pic {
     void add_line_centered(const std::string& text, int x, int y);
     void set_helmet(int x, int y);
     void clear();
+    void loop();
+    DikScancode loop_until_any_key();
     void render(bool skip_balls_helmet = false);
     bool render_intro_anim(double time);
 };

@@ -238,32 +238,18 @@ void handle_events() {
         case SDL_KEYDOWN: {
             SDL_Scancode scancode = event.key.keysym.scancode;
             keyboard::record_key_down(scancode);
-            Keycode keycode = keyboard::keycode_for(scancode);
 
             // SDL doesn't generate text input events when Ctrl is held
-            // Resolve layout-specific keycodes for unmapped keys to support LCtrl search
-            if (EolSettings->lctrl_search() && keycode == SDL_SCANCODE_UNKNOWN) {
+            // Resolve layout-specific keycodes to support LCtrl search
+            if (EolSettings->lctrl_search()) {
                 bool is_lctrl_pressed = event.key.keysym.mod & KMOD_LCTRL;
                 if (is_lctrl_pressed) {
-                    SDL_Keycode sym = SDL_GetKeyFromScancode(scancode);
+                    SDL_Keycode sym = SDL_GetKeyFromScancode(event.key.keysym.scancode);
                     if (sym > 0 && sym < 128) {
-                        keycode = (Keycode)sym;
+                        add_key_to_buffer((Keycode)sym);
                     }
                 }
             }
-
-            if (keycode == SDL_SCANCODE_UNKNOWN) {
-                break; // Not a control mapping - delivered through text input events.
-            }
-
-            if (event.key.repeat) {
-                bool allow_repeat = (keycode != KEY_ESC && keycode != KEY_ENTER);
-                if (!allow_repeat) {
-                    break;
-                }
-            }
-
-            add_key_to_buffer(keycode);
             break;
         }
         case SDL_TEXTINPUT:
@@ -271,11 +257,6 @@ void handle_events() {
             break;
         case SDL_MOUSEWHEEL:
             MouseWheelDelta = event.wheel.y > 0 ? 1 : -1;
-            if (event.wheel.y > 0) {
-                add_key_to_buffer(KEY_UP);
-            } else if (event.wheel.y < 0) {
-                add_key_to_buffer(KEY_DOWN);
-            }
             break;
         case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {

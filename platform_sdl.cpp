@@ -20,6 +20,10 @@ static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
+// Per-frame mouse state for was_left/right_mouse_just_clicked()
+static bool LeftMouseDownPrevFrame = false;
+static bool RightMouseDownPrevFrame = false;
+
 // SDL keyboard state
 static const Uint8* SDLKeyState = nullptr;
 static Uint8 KeyState[SDL_NUM_SCANCODES];
@@ -261,6 +265,8 @@ void palette::set() {
 
 void handle_events() {
     memcpy(KeyStatePrev, KeyState, sizeof(KeyStatePrev));
+    LeftMouseDownPrevFrame = LeftMouseDown;
+    RightMouseDownPrevFrame = RightMouseDown;
     MouseWheelDelta = 0;
     memset(KeyDown, 0, sizeof(KeyDown));
 
@@ -400,6 +406,10 @@ bool right_mouse_clicked() {
     RightMouseDownPrev = RightMouseDown;
     return click;
 }
+
+bool was_left_mouse_just_clicked() { return LeftMouseDown && !LeftMouseDownPrevFrame; }
+
+bool was_right_mouse_just_clicked() { return RightMouseDown && !RightMouseDownPrevFrame; }
 
 bool is_key_down(DikScancode code) {
     if (code < 0 || code >= MaxKeycode) {

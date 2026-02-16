@@ -2,6 +2,7 @@
 #include "abc8.h"
 #include "eol_settings.h"
 #include "fs_utils.h"
+#include "keys.h"
 #include "main.h"
 #include "M_PIC.H"
 #include "platform_impl.h"
@@ -451,6 +452,11 @@ int menu_nav::prompt_choice(bool render_only) {
 
     search_input.clear();
 
+    // Clear any stale text input (e.g., typed during replay watching)
+    while (has_text_input()) {
+        pop_text_input();
+    }
+
     // Bound current selection
     selected_index = std::min(selected_index, (int)row_count() - 1);
 
@@ -460,45 +466,47 @@ int menu_nav::prompt_choice(bool render_only) {
     int view_index = selected_index - max_visible_entries / 2;
     int view_max = row_count() - max_visible_entries;
 
-    empty_keypress_buffer();
     bool rerender = true;
     while (true) {
-        while (!render_only && has_keypress()) {
-            Keycode c = get_keypress();
-            if (search_handler_text((char)c)) {
+        handle_events();
+        if (!render_only) {
+            while (has_text_input()) {
+                char c = pop_text_input();
+                if (search_handler_text(c)) {
+                    view_index = selected_index - max_visible_entries / 2;
+                    rerender = true;
+                }
+            }
+            if (was_key_pressed_or_repeated(DIK_BACK) && search_handler_backspace()) {
                 view_index = selected_index - max_visible_entries / 2;
                 rerender = true;
-                break;
             }
-            if (c == KEY_BACKSPACE && search_handler_backspace()) {
-                view_index = selected_index - max_visible_entries / 2;
-                rerender = true;
-                break;
-            }
-            if (c == KEY_ESC) {
+            if (was_key_just_pressed(DIK_ESCAPE)) {
                 if (search_pattern != SearchPattern::None && !search_input.empty()) {
                     search_input.clear();
                     rerender = true;
-                    break;
-                }
-                if (enable_esc) {
+                } else if (enable_esc) {
                     return -1;
                 }
             }
-            if (c == KEY_ENTER) {
+            if (was_key_just_pressed(DIK_RETURN)) {
                 return selected_index;
             }
-            if (c == KEY_UP) {
+            if (was_key_pressed_or_repeated(DIK_UP)) {
                 selected_index--;
             }
-            if (c == KEY_PGUP) {
-                selected_index -= max_visible_entries;
-            }
-            if (c == KEY_DOWN) {
+            if (was_key_pressed_or_repeated(DIK_DOWN)) {
                 selected_index++;
             }
-            if (c == KEY_PGDOWN) {
+            if (was_key_pressed_or_repeated(DIK_PRIOR)) {
+                selected_index -= max_visible_entries;
+            }
+            if (was_key_pressed_or_repeated(DIK_NEXT)) {
                 selected_index += max_visible_entries;
+            }
+            int wheel = get_mouse_wheel_delta();
+            if (wheel != 0) {
+                selected_index -= wheel;
             }
         }
 

@@ -465,13 +465,25 @@ int menu_nav::prompt_choice(bool render_only) {
     while (true) {
         while (!render_only && has_keypress()) {
             Keycode c = get_keypress();
-            if (search_handler(c)) {
+            if (search_handler_text((char)c)) {
                 view_index = selected_index - max_visible_entries / 2;
                 rerender = true;
                 break;
             }
-            if (c == KEY_ESC && enable_esc) {
-                return -1;
+            if (c == KEY_BACKSPACE && search_handler_backspace()) {
+                view_index = selected_index - max_visible_entries / 2;
+                rerender = true;
+                break;
+            }
+            if (c == KEY_ESC) {
+                if (search_pattern != SearchPattern::None && !search_input.empty()) {
+                    search_input.clear();
+                    rerender = true;
+                    break;
+                }
+                if (enable_esc) {
+                    return -1;
+                }
             }
             if (c == KEY_ENTER) {
                 return selected_index;
@@ -570,32 +582,36 @@ int menu_nav::navigate(bool render_only) {
 
 void menu_nav::render() { menu->render(); }
 
-bool menu_nav::search_handler(Keycode code) {
+bool menu_nav::search_handler_text(char c) {
     if (search_pattern == SearchPattern::None) {
         return false;
     }
-
-    if (code == KEY_BACKSPACE) {
-        if (!search_input.empty()) {
-            search_input.pop_back();
-        }
-    } else if (code == KEY_ESC) {
-        if (!search_input.empty()) {
-            search_input.clear();
-        } else {
-            return false;
-        }
-    } else if (accept_search_input() && MenuFont->has_char(code)) {
-        const size_t max_len = search_pattern == SearchPattern::Internals ? 20 : MAX_FILENAME_LEN;
-        if (search_input.size() < max_len) {
-            search_input.push_back(code);
-        }
-    } else {
+    if (!accept_search_input() || !MenuFont->has_char(c)) {
         return false;
     }
+    const size_t max_len = search_pattern == SearchPattern::Internals ? 20 : MAX_FILENAME_LEN;
+    if (search_input.size() < max_len) {
+        search_input.push_back(c);
+    }
+    update_search();
+    return true;
+}
 
+bool menu_nav::search_handler_backspace() {
+    if (search_pattern == SearchPattern::None) {
+        return false;
+    }
     if (search_input.empty()) {
-        return true;
+        return false;
+    }
+    search_input.pop_back();
+    update_search();
+    return true;
+}
+
+void menu_nav::update_search() {
+    if (search_input.empty()) {
+        return;
     }
 
     using iter = std::vector<nav_row>::iterator;
@@ -657,9 +673,7 @@ bool menu_nav::search_handler(Keycode code) {
         break;
     }
     case SearchPattern::None:
-        internal_error("search_handler() SearchPattern::None reached!");
+        internal_error("update_search() SearchPattern::None reached!");
         break;
     }
-
-    return true;
 }

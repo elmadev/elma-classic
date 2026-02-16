@@ -23,4 +23,7 @@ Keycode get_keypress();
 void empty_keypress_buffer();
 bool has_keypress();
 
+bool has_text_input();
+char pop_text_input();
+
 #endif

@@ -21,6 +21,10 @@ static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
+// Per-frame mouse state for was_left/right_mouse_just_clicked()
+static bool LeftMouseDownPrevFrame = false;
+static bool RightMouseDownPrevFrame = false;
+
 static int MouseWheelDelta = 0;
 
 void message_box(const char* text) {
@@ -206,6 +210,8 @@ void palette::set() {
 void handle_events() {
     keyboard::begin_frame();
     MouseWheelDelta = 0;
+    LeftMouseDownPrevFrame = LeftMouseDown;
+    RightMouseDownPrevFrame = RightMouseDown;
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -312,6 +318,10 @@ bool right_mouse_clicked() {
     RightMouseDownPrev = RightMouseDown;
     return click;
 }
+
+bool was_left_mouse_just_clicked() { return LeftMouseDown && !LeftMouseDownPrevFrame; }
+
+bool was_right_mouse_just_clicked() { return RightMouseDown && !RightMouseDownPrevFrame; }
 
 bool is_key_down(DikScancode code) {
     if (code < 0 || code >= MaxKeycode) {

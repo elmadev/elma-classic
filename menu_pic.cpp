@@ -2,7 +2,6 @@
 #include "abc8.h"
 #include "anim.h"
 #include "ball.h"
-#include "keys.h"
 #include "KIRAJZOL.H"
 #include "M_PIC.H"
 #include "main.h"
@@ -12,6 +11,7 @@
 #include "state.h"
 #include <cmath>
 #include <cstring>
+#include <directinput/scancodes.h>
 
 // Drawing of the screen when there is no ball. Also used as generic buffer by editor.
 pic8* BufferMain = nullptr;
@@ -237,13 +237,10 @@ void menu_pic::render(bool skip_balls_helmet) {
     if (IntroAnimation) {
         MenuPalette->set();
         IntroAnimation = false;
-        empty_keypress_buffer();
         while (true) {
-            if (has_keypress()) {
-                Keycode c = get_keypress();
-                if (c == KEY_ESC || c == KEY_ENTER) {
-                    break;
-                }
+            handle_events();
+            if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
+                break;
             }
             if (!render_intro_anim(time)) {
                 break;

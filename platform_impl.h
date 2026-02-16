@@ -52,6 +52,9 @@ bool was_key_down(DikScancode code);
 
 int get_mouse_wheel_delta();
 
+void set_input_suppressed(bool suppressed);
+bool is_input_suppressed();
+
 bool is_fullscreen();
 long long get_milliseconds();
 

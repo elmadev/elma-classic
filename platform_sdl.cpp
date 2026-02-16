@@ -28,7 +28,6 @@ static bool RightMouseDownPrevFrame = false;
 static const Uint8* SDLKeyState = nullptr;
 static Uint8 KeyState[SDL_NUM_SCANCODES];
 static Uint8 KeyStatePrev[SDL_NUM_SCANCODES];
-static Keycode SDLToKeycode[SDL_NUM_SCANCODES];
 static bool KeyDown[SDL_NUM_SCANCODES];
 
 static int MouseWheelDelta = 0;
@@ -95,43 +94,9 @@ static void create_palette_surface() {
     }
 }
 
-static void initialize_keyboard_mappings() {
-    // Initialize keyboard state and mappings
+static void initialize_keyboard_state() {
     SDLKeyState = SDL_GetKeyboardState(nullptr);
-
     memset(KeyStatePrev, 0, sizeof(KeyStatePrev));
-
-    // Map SDL scancodes to Keycodes
-    for (int i = 0; i < SDL_NUM_SCANCODES; i++) {
-        SDLToKeycode[i] = SDL_SCANCODE_UNKNOWN;
-    }
-
-    SDLToKeycode[SDL_SCANCODE_ESCAPE] = KEY_ESC;
-    SDLToKeycode[SDL_SCANCODE_RETURN] = KEY_ENTER;
-    SDLToKeycode[SDL_SCANCODE_KP_ENTER] = KEY_ENTER; // KP = Keypad
-
-    SDLToKeycode[SDL_SCANCODE_UP] = KEY_UP;
-    SDLToKeycode[SDL_SCANCODE_KP_8] = KEY_UP;
-    SDLToKeycode[SDL_SCANCODE_DOWN] = KEY_DOWN;
-    SDLToKeycode[SDL_SCANCODE_KP_2] = KEY_DOWN;
-    SDLToKeycode[SDL_SCANCODE_LEFT] = KEY_LEFT;
-    SDLToKeycode[SDL_SCANCODE_KP_4] = KEY_LEFT;
-    SDLToKeycode[SDL_SCANCODE_RIGHT] = KEY_RIGHT;
-    SDLToKeycode[SDL_SCANCODE_KP_6] = KEY_RIGHT;
-
-    SDLToKeycode[SDL_SCANCODE_PAGEUP] = KEY_PGUP;
-    SDLToKeycode[SDL_SCANCODE_KP_9] = KEY_PGUP;
-    SDLToKeycode[SDL_SCANCODE_PAGEDOWN] = KEY_PGDOWN;
-    SDLToKeycode[SDL_SCANCODE_KP_3] = KEY_PGDOWN;
-
-    SDLToKeycode[SDL_SCANCODE_DELETE] = KEY_DEL;
-    SDLToKeycode[SDL_SCANCODE_KP_PERIOD] = KEY_DEL;
-    SDLToKeycode[SDL_SCANCODE_BACKSPACE] = KEY_BACKSPACE;
-
-    SDLToKeycode[SDL_SCANCODE_MINUS] = KEY_LEFT;
-    SDLToKeycode[SDL_SCANCODE_KP_MINUS] = KEY_LEFT;
-    SDLToKeycode[SDL_SCANCODE_EQUALS] = KEY_RIGHT;
-    SDLToKeycode[SDL_SCANCODE_KP_PLUS] = KEY_RIGHT;
 }
 
 void platform_init() {
@@ -148,7 +113,7 @@ void platform_init() {
     create_window(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
     initialize_renderer();
     create_palette_surface();
-    initialize_keyboard_mappings();
+    initialize_keyboard_state();
 }
 
 void platform_recreate_window() {
@@ -294,33 +259,17 @@ void handle_events() {
             break;
         case SDL_KEYDOWN: {
             KeyDown[event.key.keysym.scancode] = true;
-            SDL_Scancode scancode = event.key.keysym.scancode;
-            Keycode keycode = SDLToKeycode[scancode];
-
             // SDL doesn't generate text input events when Ctrl is held
-            // Resolve layout-specific keycodes for unmapped keys to support LCtrl search
-            if (EolSettings->lctrl_search() && keycode == SDL_SCANCODE_UNKNOWN) {
+            // Resolve layout-specific keycodes to support LCtrl search
+            if (EolSettings->lctrl_search()) {
                 bool is_lctrl_pressed = event.key.keysym.mod & KMOD_LCTRL;
                 if (is_lctrl_pressed) {
-                    SDL_Keycode sym = SDL_GetKeyFromScancode(scancode);
+                    SDL_Keycode sym = SDL_GetKeyFromScancode(event.key.keysym.scancode);
                     if (sym > 0 && sym < 128) {
-                        keycode = (Keycode)sym;
+                        add_key_to_buffer((Keycode)sym);
                     }
                 }
             }
-
-            if (keycode == SDL_SCANCODE_UNKNOWN) {
-                break; // Not a control mapping - delivered through text input events.
-            }
-
-            if (event.key.repeat) {
-                bool allow_repeat = (keycode != KEY_ESC && keycode != KEY_ENTER);
-                if (!allow_repeat) {
-                    break;
-                }
-            }
-
-            add_key_to_buffer(keycode);
             break;
         }
         case SDL_TEXTINPUT:
@@ -328,11 +277,6 @@ void handle_events() {
             break;
         case SDL_MOUSEWHEEL:
             MouseWheelDelta = event.wheel.y > 0 ? 1 : -1;
-            if (event.wheel.y > 0) {
-                add_key_to_buffer(KEY_UP);
-            } else if (event.wheel.y < 0) {
-                add_key_to_buffer(KEY_DOWN);
-            }
             break;
         case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {

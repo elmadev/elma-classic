@@ -5,7 +5,6 @@
 #include "eol_settings.h"
 #include "JATEKOS.H"
 #include "KIRAJZOL.H"
-#include "keys.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_nav.h"
@@ -94,14 +93,6 @@ void menu_exit() {
     menu->add_line_centered("Thank you for registering the game!", 320, 220);
     menu->add_line_centered("Please do not distribute!", 320, 300);
 
-    empty_keypress_buffer();
-    while (true) {
-        menu->render();
-        if (has_keypress()) {
-            Keycode c = get_keypress();
-            if (c == ' ' || c == KEY_ENTER || c == KEY_ESC) {
-                quit();
-            }
-        }
-    }
+    menu->loop();
+    quit();
 }

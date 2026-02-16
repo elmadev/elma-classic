@@ -1,5 +1,4 @@
 #include "skip.h"
-#include "keys.h"
 #include "main.h"
 #include "menu_pic.h"
 #include "platform_utils.h"
@@ -58,12 +57,6 @@ bool is_skippable(int index) {
         menu.add_line_centered("Press a key to continue!", x0, y0 + 6 * dy);
     }
 
-    empty_keypress_buffer();
-    while (true) {
-        if (has_keypress()) {
-            get_keypress();
-            return is_skippable;
-        }
-        menu.render();
-    }
+    menu.loop_until_any_key();
+    return is_skippable;
 }

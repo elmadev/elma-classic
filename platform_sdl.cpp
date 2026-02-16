@@ -27,6 +27,8 @@ static Uint8 KeyStatePrev[SDL_NUM_SCANCODES];
 static Keycode SDLToKeycode[SDL_NUM_SCANCODES];
 static bool KeyDown[SDL_NUM_SCANCODES];
 
+static int MouseWheelDelta = 0;
+
 // Map numpad keys to navigation equivalents when NumLock is off
 static constexpr struct {
     SDL_Scancode numpad;
@@ -259,6 +261,7 @@ void palette::set() {
 
 void handle_events() {
     memcpy(KeyStatePrev, KeyState, sizeof(KeyStatePrev));
+    MouseWheelDelta = 0;
     memset(KeyDown, 0, sizeof(KeyDown));
 
     SDL_Event event;
@@ -318,6 +321,7 @@ void handle_events() {
             add_text_to_buffer(event.text.text);
             break;
         case SDL_MOUSEWHEEL:
+            MouseWheelDelta = event.wheel.y > 0 ? 1 : -1;
             if (event.wheel.y > 0) {
                 add_key_to_buffer(KEY_UP);
             } else if (event.wheel.y < 0) {
@@ -427,6 +431,8 @@ bool was_key_pressed_or_repeated(DikScancode code) {
     SDL_Scancode sdl_code = windows_scancode_table[code];
     return KeyDown[sdl_code];
 }
+
+int get_mouse_wheel_delta() { return MouseWheelDelta; }
 
 bool is_fullscreen() {
     Uint32 flags = SDL_GetWindowFlags(SDLWindow);

@@ -36,6 +36,7 @@ bool is_key_down(DikScancode code);
 bool was_key_just_pressed(DikScancode code);
 DikScancode get_any_key_just_pressed();
 bool was_key_pressed_or_repeated(DikScancode code);
+int get_mouse_wheel_delta();
 
 bool is_fullscreen();
 long long get_milliseconds();

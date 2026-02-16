@@ -20,11 +20,23 @@ static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
 
-// SDL keyboard state and mappings
+// SDL keyboard state
 static const Uint8* SDLKeyState = nullptr;
-static Uint8 SDLKeyStatePrev[SDL_NUM_SCANCODES];
+static Uint8 KeyState[SDL_NUM_SCANCODES];
+static Uint8 KeyStatePrev[SDL_NUM_SCANCODES];
 static Keycode SDLToKeycode[SDL_NUM_SCANCODES];
-static bool SDLKeyDown[SDL_NUM_SCANCODES];
+static bool KeyDown[SDL_NUM_SCANCODES];
+
+// Map numpad keys to navigation equivalents when NumLock is off
+static constexpr struct {
+    SDL_Scancode numpad;
+    SDL_Scancode nav;
+} NumpadNavMap[] = {
+    {SDL_SCANCODE_KP_ENTER, SDL_SCANCODE_RETURN}, {SDL_SCANCODE_KP_8, SDL_SCANCODE_UP},
+    {SDL_SCANCODE_KP_2, SDL_SCANCODE_DOWN},       {SDL_SCANCODE_KP_4, SDL_SCANCODE_LEFT},
+    {SDL_SCANCODE_KP_6, SDL_SCANCODE_RIGHT},      {SDL_SCANCODE_KP_9, SDL_SCANCODE_PAGEUP},
+    {SDL_SCANCODE_KP_3, SDL_SCANCODE_PAGEDOWN},   {SDL_SCANCODE_KP_PERIOD, SDL_SCANCODE_DELETE},
+};
 
 void message_box(const char* text) {
     // As per docs, can be called even before SDL_Init
@@ -81,7 +93,7 @@ static void initialize_keyboard_mappings() {
     // Initialize keyboard state and mappings
     SDLKeyState = SDL_GetKeyboardState(nullptr);
 
-    memset(SDLKeyStatePrev, 0, sizeof(Uint8) * SDL_NUM_SCANCODES);
+    memset(KeyStatePrev, 0, sizeof(KeyStatePrev));
 
     // Map SDL scancodes to Keycodes
     for (int i = 0; i < SDL_NUM_SCANCODES; i++) {
@@ -246,8 +258,8 @@ void palette::set() {
 }
 
 void handle_events() {
-    memcpy(SDLKeyStatePrev, SDLKeyState, sizeof(Uint8) * SDL_NUM_SCANCODES);
-    memset(SDLKeyDown, 0, sizeof(SDLKeyDown));
+    memcpy(KeyStatePrev, KeyState, sizeof(KeyStatePrev));
+    memset(KeyDown, 0, sizeof(KeyDown));
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -272,7 +284,7 @@ void handle_events() {
             }
             break;
         case SDL_KEYDOWN: {
-            SDLKeyDown[event.key.keysym.scancode] = true;
+            KeyDown[event.key.keysym.scancode] = true;
             SDL_Scancode scancode = event.key.keysym.scancode;
             Keycode keycode = SDLToKeycode[scancode];
 
@@ -330,6 +342,39 @@ void handle_events() {
             break;
         }
     }
+
+    // Build mapped key state from SDL's current state
+    memcpy(KeyState, SDLKeyState, sizeof(Uint8) * SDL_NUM_SCANCODES);
+
+    // Map numpad keys to navigation equivalents when in navigation mode.
+    // On macOS, KMOD_NUM is unreliable (SDL never initializes it from OS state),
+    // so we always map numpad keys to text input — macOS has no NumLock key anyway.
+#ifdef __APPLE__
+    bool numpad_nav = false;
+#else
+    bool numpad_nav = !(SDL_GetModState() & KMOD_NUM);
+#endif
+    for (auto& [numpad, nav] : NumpadNavMap) {
+        if (numpad == SDL_SCANCODE_KP_ENTER) {
+            continue; // Enter is handled below — always maps
+        }
+        if (numpad_nav) {
+            if (KeyState[numpad]) {
+                KeyState[nav] = 1;
+            }
+            if (KeyDown[numpad]) {
+                KeyDown[nav] = true;
+            }
+        }
+    }
+
+    // NumPad Enter always maps to Return regardless of NumLock
+    if (KeyState[SDL_SCANCODE_KP_ENTER]) {
+        KeyState[SDL_SCANCODE_RETURN] = 1;
+    }
+    if (KeyDown[SDL_SCANCODE_KP_ENTER]) {
+        KeyDown[SDL_SCANCODE_RETURN] = true;
+    }
 }
 
 void hide_cursor() { SDL_ShowCursor(SDL_DISABLE); }
@@ -360,12 +405,12 @@ bool is_key_down(DikScancode code) {
 
     SDL_Scancode sdl_code = windows_scancode_table[code];
 
-    return SDLKeyState[sdl_code] != 0;
+    return KeyState[sdl_code] != 0;
 }
 
 bool was_key_just_pressed(DikScancode code) {
     SDL_Scancode sdl_code = windows_scancode_table[code];
-    return SDLKeyState[sdl_code] != 0 && SDLKeyStatePrev[sdl_code] == 0;
+    return KeyState[sdl_code] != 0 && KeyStatePrev[sdl_code] == 0;
 }
 
 DikScancode get_any_key_just_pressed() {
@@ -380,7 +425,7 @@ DikScancode get_any_key_just_pressed() {
 
 bool was_key_pressed_or_repeated(DikScancode code) {
     SDL_Scancode sdl_code = windows_scancode_table[code];
-    return SDLKeyDown[sdl_code];
+    return KeyDown[sdl_code];
 }
 
 bool is_fullscreen() {

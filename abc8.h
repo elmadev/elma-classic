@@ -19,6 +19,8 @@ class abc8 {
     int len(const char* text);
     void set_spacing(int new_spacing);
     bool has_char(unsigned char c) const;
+    void delete_char(int index);
+    void add_char(int index, pic8* pic, int offset);
 };
 
 #endif

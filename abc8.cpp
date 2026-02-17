@@ -4,6 +4,7 @@
 #include "pic8.h"
 #include "qopen.h"
 #include <cstring>
+#include <format>
 #include <string>
 
 static void close_file(FILE* h, bool res_file) {
@@ -12,6 +13,22 @@ static void close_file(FILE* h, bool res_file) {
     } else {
         fclose(h);
     }
+}
+
+void abc8::delete_char(int index) {
+    delete ppsprite[index];
+    ppsprite[index] = nullptr;
+    y_offset[index] = 0;
+}
+
+void abc8::add_char(int index, pic8* pic, int offset) {
+    if (ppsprite[index]) {
+        std::string msg = std::format("abc8 Duplicate codepoint {} (0x{:02X}):", index, index);
+        internal_error(msg.c_str());
+        return;
+    }
+    ppsprite[index] = pic;
+    y_offset[index] = offset;
 }
 
 abc8::abc8(const char* filename) {
@@ -86,16 +103,13 @@ abc8::abc8(const char* filename) {
             close_file(h, res_file);
             return;
         }
-        if (fread(&y_offset[c], 2, 1, h) != 1) {
+        short offset;
+        if (fread(&offset, 2, 1, h) != 1) {
             internal_error("Could not read abc8 file: ", filename);
             close_file(h, res_file);
             return;
         }
-        if (ppsprite[c]) {
-            internal_error("Duplicate codepoint in abc8 file: ", filename);
-            return;
-        }
-        ppsprite[c] = new pic8(".spr", h);
+        add_char(c, new pic8(".spr", h), offset);
     }
 
     close_file(h, res_file);
@@ -104,10 +118,7 @@ abc8::abc8(const char* filename) {
 abc8::~abc8() {
     if (ppsprite) {
         for (int i = 0; i < 256; i++) {
-            if (ppsprite[i]) {
-                delete ppsprite[i];
-                ppsprite[i] = nullptr;
-            }
+            delete_char(i);
         }
         delete ppsprite;
         ppsprite = nullptr;

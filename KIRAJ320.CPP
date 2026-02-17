@@ -691,11 +691,11 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
             switch (pker->type) {
             case object::Type::Food:
                 pobjpic = Lgr->food[pker->animation % Lgr->food_count]->get_frame_by_time(t);
-                dy = (int)(5.0 * sin(t * 15.5 + pker->floating_phase));
+                dy = (int)(5.0 * EolSettings->zoom() * sin(t * 15.5 + pker->floating_phase));
                 break;
             case object::Type::Exit:
                 pobjpic = Lgr->exit->get_frame_by_time(t);
-                dy = (int)(5.0 * sin(t * 15.5 + pker->floating_phase));
+                dy = (int)(5.0 * EolSettings->zoom() * sin(t * 15.5 + pker->floating_phase));
                 break;
             case object::Type::Killer:
                 pobjpic = Lgr->killer->get_frame_by_time(t);

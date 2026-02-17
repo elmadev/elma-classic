@@ -10,6 +10,12 @@ class state;
 enum class MapAlignment { None, Left, Middle, Right };
 enum class RendererType { Software, OpenGL };
 
+struct RGB {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+};
+
 template <typename T> struct Default {
     T value;
     T def;
@@ -78,6 +84,10 @@ class eol_settings {
     Default<std::string> default_lgr_name_{"default"};
     Default<bool> show_last_apple_time_{true};
     Clamp<int> recording_fps_{30, 30, 120};
+    Default<bool> gravity_arrows_{true};
+    Default<RGB> gravity_arrow_color_{RGB{244, 228, 16}};
+    Clamp<int> gravity_arrow_index_{0, 0, 2};
+    Clamp<double> gravity_arrow_thickness_{0.0, 2.0, 10.0};
 
   public:
     static void read_settings();
@@ -110,6 +120,10 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(default_lgr_name);
     DECLARE_FIELD_FUNCS(show_last_apple_time);
     DECLARE_FIELD_FUNCS(recording_fps);
+    DECLARE_FIELD_FUNCS(gravity_arrows);
+    DECLARE_FIELD_FUNCS(gravity_arrow_color);
+    DECLARE_FIELD_FUNCS(gravity_arrow_index);
+    DECLARE_FIELD_FUNCS(gravity_arrow_thickness);
 };
 
 #undef DECLARE_FIELD_FUNCS

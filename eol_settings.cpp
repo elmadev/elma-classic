@@ -42,6 +42,7 @@ template struct Default<MapAlignment>;
 template struct Default<RendererType>;
 template struct Default<DikScancode>;
 template struct Default<std::string>;
+template struct Default<RGB>;
 template struct Clamp<int>;
 template struct Clamp<double>;
 
@@ -124,6 +125,16 @@ void eol_settings::set_show_last_apple_time(bool show) { show_last_apple_time_ =
 
 void eol_settings::set_recording_fps(int fps) { recording_fps_ = fps; }
 
+void eol_settings::set_gravity_arrows(bool arrows) { gravity_arrows_ = arrows; }
+
+void eol_settings::set_gravity_arrow_color(RGB color) { gravity_arrow_color_ = std::move(color); }
+
+void eol_settings::set_gravity_arrow_index(int index) { gravity_arrow_index_ = index; }
+
+void eol_settings::set_gravity_arrow_thickness(double thickness) {
+    gravity_arrow_thickness_ = thickness;
+}
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -189,6 +200,14 @@ void from_json(const json& j, RendererType& r) {
     }
 }
 
+void to_json(json& j, const RGB& rgb) { j = rgb.r << 16 | rgb.g << 8 | rgb.b << 0; }
+
+void from_json(const json& j, RGB& rgb) {
+    rgb.r = ((int)(j) & 0xFF0000) >> 16;
+    rgb.g = ((int)(j) & 0x00FF00) >> 8;
+    rgb.b = ((int)(j) & 0x0000FF) >> 0;
+}
+
 #define FIELD_LIST                                                                                 \
     JSON_FIELD(screen_width)                                                                       \
     JSON_FIELD(screen_height)                                                                      \
@@ -214,7 +233,11 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(replay_pause_key)                                                                   \
     JSON_FIELD(default_lgr_name)                                                                   \
     JSON_FIELD(show_last_apple_time)                                                               \
-    JSON_FIELD(recording_fps)
+    JSON_FIELD(recording_fps)                                                                      \
+    JSON_FIELD(gravity_arrows)                                                                     \
+    JSON_FIELD(gravity_arrow_color)                                                                \
+    JSON_FIELD(gravity_arrow_index)                                                                \
+    JSON_FIELD(gravity_arrow_thickness)
 
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

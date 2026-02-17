@@ -5,8 +5,6 @@
 #include <cstring>
 
 // Display the menu with the provided text, then return the key pressed by the user.
-// Unused feature:
-// If text1 == MENU_DIALOG_ONLY_ESC ("ESC"), then only ESC can quit this menu
 int menu_dialog(const char* text1, const char* text2, const char* text3, const char* text4,
                 const char* text5, const char* text6) {
     // Count the number of entries
@@ -21,16 +19,6 @@ int menu_dialog(const char* text1, const char* text2, const char* text3, const c
         internal_error("menu_dialog text_count <= 0!");
     }
 
-    // Check "ESC" as first string
-    bool esc_only = false;
-    if (strcmp(text_array[0], MENU_DIALOG_ONLY_ESC) == 0) {
-        esc_only = true;
-        for (int i = 0; i < text_count; i++) {
-            text_array[i] = text_array[i + 1];
-        }
-        text_count--;
-    }
-
     // Render and prompt for key input
     menu_pic menu;
     int dy = 40;
@@ -42,13 +30,7 @@ int menu_dialog(const char* text1, const char* text2, const char* text3, const c
     while (true) {
         if (has_keypress()) {
             Keycode c = get_keypress();
-            if (esc_only) {
-                if (c == KEY_ESC) {
-                    return c;
-                }
-            } else {
-                return c;
-            }
+            return c;
         }
         menu.render();
     }

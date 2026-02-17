@@ -272,6 +272,36 @@ void menu_options() {
                 EolSettings->set_recording_fps(new_fps);
             });
 
+        nav.add_row(
+            "Gravity Arrows:", EolSettings->gravity_arrows() ? "Yes" : "No",
+            NAV_FUNC() { EolSettings->set_gravity_arrows(!EolSettings->gravity_arrows()); });
+
+        nav.add_row(
+            "Arrow Design:", std::to_string(EolSettings->gravity_arrow_index()), NAV_FUNC() {
+                int index = EolSettings->gravity_arrow_index() + 1;
+                if (index >= 3) {
+                    index = 0;
+                }
+                EolSettings->set_gravity_arrow_index(index);
+            });
+
+        nav.add_row(
+            "Arrow Color:",
+            [] {
+                RGB rgb = EolSettings->gravity_arrow_color();
+                return std::format("#{:02x}{:02x}{:02x}", rgb.r, rgb.g, rgb.b);
+            }(),
+            NAV_FUNC() { return; });
+
+        nav.add_row(
+            "Arrow Thickness:", std::to_string(EolSettings->gravity_arrow_thickness()), NAV_FUNC() {
+                double thickness = EolSettings->gravity_arrow_thickness() * 2.0;
+                if (thickness >= 10.0) {
+                    thickness = 1.0;
+                }
+                EolSettings->set_gravity_arrow_thickness(thickness);
+            });
+
         choice = nav.navigate();
 
         if (choice < 0) {

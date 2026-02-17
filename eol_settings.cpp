@@ -127,12 +127,25 @@ void eol_settings::set_recording_fps(int fps) { recording_fps_ = fps; }
 
 void eol_settings::set_gravity_arrows(bool arrows) { gravity_arrows_ = arrows; }
 
-void eol_settings::set_gravity_arrow_color(RGB color) { gravity_arrow_color_ = std::move(color); }
+void eol_settings::set_gravity_arrow_color(RGB color) {
+    gravity_arrow_color_ = std::move(color);
+    if (Lgr) {
+        Lgr->setup_gravity_arrows();
+    }
+}
 
-void eol_settings::set_gravity_arrow_index(int index) { gravity_arrow_index_ = index; }
+void eol_settings::set_gravity_arrow_index(int index) {
+    gravity_arrow_index_ = index;
+    if (Lgr) {
+        Lgr->setup_gravity_arrows();
+    }
+}
 
 void eol_settings::set_gravity_arrow_thickness(double thickness) {
     gravity_arrow_thickness_ = thickness;
+    if (Lgr) {
+        Lgr->setup_gravity_arrows();
+    }
 }
 
 /*

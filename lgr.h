@@ -72,12 +72,15 @@ class lgrfile {
     void add_texture(pic8* pic, piclist* list, int index);
     void add_mask(pic8* pic, piclist* list, int index);
 
+    void delete_gravity_arrows();
+
     static bool try_load_lgr(const char* lgr_name, const char* desc);
     lgrfile(const char* lgrname);
     ~lgrfile();
 
   public:
     static void load_lgr_file(const char* lgr_name);
+    void setup_gravity_arrows();
 
     int picture_count;
     picture pictures[MAX_PICTURES];
@@ -103,6 +106,7 @@ class lgrfile {
     affine_pic* flag;
 
     anim* killer;
+    pic8* arrows[5];
     anim* exit;
     int food_count;
     anim* food[MAX_QFOOD];

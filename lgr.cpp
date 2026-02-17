@@ -13,6 +13,7 @@
 #include "M_PIC.H"
 #include "main.h"
 #include "menu_pic.h"
+#include "object.h"
 #include "pic8.h"
 #include "piclist.h"
 #include "platform_impl.h"
@@ -523,6 +524,7 @@ lgrfile::lgrfile(const char* lgrname) {
     background_name[0] = 0;
     food_count = 0;
     memset(food, 0, sizeof(food));
+    memset(arrows, 0, sizeof(arrows));
     grass_pics = new grass;
 
     double zoom = EolSettings->zoom();
@@ -889,6 +891,8 @@ lgrfile::lgrfile(const char* lgrname) {
     // Check grass
     has_grass = get_texture_index("qgrass") >= 0 && grass_pics->length >= 2;
 
+    setup_gravity_arrows();
+
     END_TIME(lgr_timer, std::format("{}.lgr (zoom={:.2f})", lgrname, zoom));
 }
 
@@ -993,6 +997,8 @@ lgrfile::~lgrfile() {
         delete foreground;
         foreground = nullptr;
     }
+
+    delete_gravity_arrows();
 }
 
 void lgrfile::reload_default_textures() {
@@ -1065,4 +1071,72 @@ int lgrfile::get_texture_index(const char* name) {
         }
     }
     return -1;
+}
+
+struct arrow_line {
+    vect2 r;
+    vect2 v;
+};
+
+std::vector<std::vector<arrow_line>> arrow_designs{{
+                                                       {{0.5, 0.75}, {0.0, -0.5}},
+                                                       {{0.5, 0.75}, {-0.25, -0.25}},
+                                                       {{0.5, 0.75}, {0.25, -0.25}},
+                                                   },
+                                                   {
+                                                       {{0.5, 0.6}, {-0.2, -0.2}},
+                                                       {{0.5, 0.6}, {0.2, -0.2}},
+                                                   },
+                                                   {
+                                                       {{0.5, 0.525}, {-0.05, -0.05}},
+                                                       {{0.5, 0.525}, {0.05, -0.05}},
+                                                   }};
+
+void lgrfile::delete_gravity_arrows() {
+    for (int i = 0; i < sizeof(arrows) / sizeof(arrows[0]); i++) {
+        delete arrows[i];
+    }
+    memset(arrows, 0, sizeof(arrows));
+}
+
+void lgrfile::setup_gravity_arrows() {
+    delete_gravity_arrows();
+
+    int size = (int)(ANIM_WIDTH * EolSettings->zoom());
+    pic8* up = arrows[static_cast<int>(object::Property::GravityUp)] = new pic8(size, size);
+    pic8* down = arrows[static_cast<int>(object::Property::GravityDown)] = new pic8(size, size);
+    pic8* left = arrows[static_cast<int>(object::Property::GravityLeft)] = new pic8(size, size);
+    pic8* right = arrows[static_cast<int>(object::Property::GravityRight)] = new pic8(size, size);
+
+    RGB rgb = EolSettings->gravity_arrow_color();
+    unsigned char color = get_nearest_color(palette_data, rgb.r, rgb.g, rgb.b);
+    unsigned char transparency = color == 0;
+
+    std::vector<arrow_line> design = arrow_designs[EolSettings->gravity_arrow_index()];
+    double thickness = EolSettings->gravity_arrow_thickness() / 80.0;
+
+    // Draw the gravity apples using the above parameters
+    vect2 pos;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            pos.y = (i + 0.5) / size;
+            pos.x = (j + 0.5) / size;
+            unsigned char id = transparency;
+            for (arrow_line line : design) {
+                if (point_segment_distance(pos, line.r, line.v) < thickness) {
+                    id = color;
+                    break;
+                }
+            }
+            left->ppixel(size - i - 1, size - j - 1, id);
+            right->ppixel(i, j, id);
+            up->ppixel(j, i, id);
+            down->ppixel(size - j - 1, size - i - 1, id);
+        }
+    }
+
+    left->add_transparency(transparency);
+    right->add_transparency(transparency);
+    up->add_transparency(transparency);
+    down->add_transparency(transparency);
 }

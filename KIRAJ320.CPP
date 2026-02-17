@@ -721,6 +721,12 @@ static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, 
         }
 
         blit8(ppic, pobjpic, pker->canvas_x - balalsox, pker->canvas_y - balalsoy + dy);
+        if (EolSettings->gravity_arrows()) {
+            if (pker->type == object::Type::Food && pker->property != object::Property::None) {
+                blit8(ppic, Lgr->arrows[static_cast<int>(pker->property)],
+                      pker->canvas_x - balalsox, pker->canvas_y - balalsoy);
+            }
+        }
     }
 
     // Motorosok kirajzolasa:

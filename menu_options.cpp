@@ -312,6 +312,8 @@ void menu_options() {
 
         BOOL_OPTION("Show Apple Time:", show_last_apple_time);
 
+        BOOL_OPTION("Gravity Arrows:", show_gravity_arrows);
+
         nav.add_row(
             "Record Replay FPS:", std::to_string(EolSettings->recording_fps()), NAV_FUNC() {
                 int old_fps = EolSettings->recording_fps();

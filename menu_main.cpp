@@ -4,7 +4,6 @@
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "fs_utils.h"
-#include "keys.h"
 #include "LEJATSZO.H"
 #include "level.h"
 #include "level_load.h"
@@ -108,19 +107,19 @@ static void menu_replay() {
 
                 int level_id = recorder::load_rec_file(replay_names[index].c_str(), false);
                 if (access_level_file(Rec1->level_filename) != 0) {
-                    int c = menu_dialog("Cannot find the lev file that corresponds",
-                                        "to the record file!", replay_names[index].c_str(),
-                                        Rec1->level_filename);
-                    if (c == KEY_ESC) {
+                    DikScancode c = menu_dialog("Cannot find the lev file that corresponds",
+                                                "to the record file!", replay_names[index].c_str(),
+                                                Rec1->level_filename);
+                    if (c == DIK_ESCAPE) {
                         return;
                     }
                 } else {
                     load_level_play(Rec1->level_filename);
                     if (Ptop->level_id != level_id) {
-                        int c = menu_dialog("The level file has changed since the",
-                                            "saving of the record file!",
-                                            replay_names[index].c_str(), Rec1->level_filename);
-                        if (c == KEY_ESC) {
+                        DikScancode c = menu_dialog(
+                            "The level file has changed since the", "saving of the record file!",
+                            replay_names[index].c_str(), Rec1->level_filename);
+                        if (c == DIK_ESCAPE) {
                             return;
                         }
                     } else {
@@ -142,9 +141,9 @@ static void menu_replay() {
                 char msg[128];
                 snprintf(msg, sizeof(msg), "Recording at %d FPS to renders/%s",
                          EolSettings->recording_fps(), NavEntriesLeft[choice]);
-                int c = menu_dialog("Render replay to video frames?", msg,
-                                    "Press Enter to continue, ESC to cancel");
-                if (c == KEY_ENTER) {
+                DikScancode c = menu_dialog("Render replay to video frames?", msg,
+                                            "Press Enter to continue, ESC to cancel");
+                if (c == DIK_RETURN) {
                     if (access_level_file(Rec1->level_filename) != 0) {
                         menu_dialog("Cannot find the lev file that corresponds",
                                     "to the record file!", replay_name, Rec1->level_filename);

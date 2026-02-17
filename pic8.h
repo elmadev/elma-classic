@@ -9,6 +9,7 @@ class pic8 {
   private:
     friend void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2);
     friend void blit8(pic8* dest, pic8* source, int x, int y);
+    friend void blit8_recolor(pic8* dest, pic8* source, int x, int y, unsigned char color);
 
     void allocate(int w, int h);
     void spr_open(const char* filename, FILE* h);
@@ -57,6 +58,7 @@ class pic8 {
 
 void blit8(pic8* dest, pic8* source, int x = 0, int y = 0);
 void blit8_dither(pic8* dest, pic8* source, int x, int y, int opacity);
+void blit8_recolor(pic8* dest, pic8* source, int x, int y, unsigned char color);
 
 bool get_pcx_pal(const char* filename, unsigned char* pal);
 bool get_pcx_pal(const char* filename, palette** pal);

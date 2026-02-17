@@ -836,6 +836,49 @@ void blit8_dither(pic8* dest, pic8* source, int x, int y, int opacity) {
     }
 }
 
+// Blit source onto dest, replacing all non-transparent pixels with `color`.
+// Source must have transparency data.
+void blit8_recolor(pic8* dest, pic8* source, int x, int y, unsigned char color) {
+    int sw = source->get_width();
+    int sh = source->get_height();
+
+    unsigned int buf = 0;
+    unsigned char* buffer = source->transparency_data;
+    for (int sy = 0; sy < sh; sy++) {
+        int dy = y + sy;
+        bool y_in_range = dy >= 0 && dy < dest->get_height();
+        int sx = 0;
+        while (sx < sw) {
+            switch (buffer[buf++]) {
+            case 'K': {
+                int len = buffer[buf++];
+                if (y_in_range) {
+                    int left = x + sx;
+                    int right = x + sx + len - 1;
+                    left = std::max(left, 0);
+
+                    if (right >= dest->get_width()) {
+                        right = dest->get_width() - 1;
+                    }
+
+                    if (left <= right) {
+                        memset(&dest->get_row(dy)[left], color, right - left + 1);
+                    }
+                }
+                sx += len;
+                break;
+            }
+            case 'N':
+                sx += buffer[buf++];
+                break;
+            default:
+                internal_error("blit8_recolor unknown transparency data block!");
+                return;
+            }
+        }
+    }
+}
+
 bool get_pcx_pal(const char* filename, unsigned char* pal) {
     FILE* h = qopen(filename, "rb");
     if (!h) {

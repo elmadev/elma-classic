@@ -69,6 +69,7 @@ elma_sources = files(
     'keys.cpp',
     'fs_utils.cpp',
     'object.cpp',
+    'src/renderer/object_overlay.cpp',
     'sprite.cpp',
     'gl_renderer.cpp',
     'src/debug/profiler.cpp',

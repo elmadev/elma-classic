@@ -3,6 +3,7 @@
 #include "lgr.h"
 #include "main.h"
 #include "menu_pic.h"
+#include "renderer/object_overlay.h"
 #include "state.h"
 #include "physics_init.h"
 #include "platform_impl.h"
@@ -74,6 +75,7 @@ void eol_settings::set_zoom(double z) {
         zoom_ = z;
         set_zoom_factor();
         invalidate_lgr_cache();
+        init_gravity_arrows();
     }
 }
 

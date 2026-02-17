@@ -17,6 +17,7 @@
 #include "pic8.h"
 #include "platform_utils.h"
 #include "physics_init.h"
+#include "renderer/object_overlay.h"
 #include "timer.h"
 #include <algorithm>
 #include <cmath>
@@ -83,6 +84,7 @@ static void init_shirt() {
 
 void init_renderer() {
     init_shirt();
+    init_gravity_arrows();
 
     SmallFont = new abc8("small.abc");
     SmallFont->set_spacing(1);
@@ -734,6 +736,12 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
         }
 
         blit8(ppic, pobjpic, pker->canvas_x - balalsox, pker->canvas_y - balalsoy + dy);
+
+        if (EolSettings->show_gravity_arrows() && pker->type == object::Type::Food &&
+            pker->property != object::Property::None) {
+            draw_gravity_arrow(ppic, pker->canvas_x - balalsox, pker->canvas_y - balalsoy + dy,
+                               pker->property);
+        }
     }
 
     // Motorosok kirajzolasa:

@@ -1,12 +1,16 @@
 #include "menu_options.h"
+#include "abc8.h"
+#include "anim.h"
 #include "eol_settings.h"
 #include "fs_utils.h"
 #include "JATEKOS.H"
 #include "keys.h"
 #include "level_load.h"
+#include "lgr.h"
 #include "menu_controls.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
+#include "pic8.h"
 #include "platform_utils.h"
 #include "state.h"
 #include <algorithm>
@@ -271,6 +275,28 @@ void menu_options() {
                 }
                 EolSettings->set_recording_fps(new_fps);
             });
+
+        nav.add_row(
+            "Preview:",
+            [] {
+                constexpr int PREVIEW_CHAR = 1;
+                MenuFont->delete_char(PREVIEW_CHAR);
+
+                int size = ANIM_WIDTH;
+                pic8* preview = new pic8(size, size);
+
+                unsigned char sky_color = get_nearest_color(MenuPaletteData, 56, 120, 188);
+                preview->fill_box(sky_color);
+
+                if (EolSettings->gravity_arrows()) {
+                    gravity_arrow_preview(*preview);
+                }
+
+                MenuFont->add_char(PREVIEW_CHAR, preview, (25 - size) / 2);
+
+                return std::string(1, PREVIEW_CHAR);
+            }(),
+            nullptr);
 
         nav.add_row(
             "Gravity Arrows:", EolSettings->gravity_arrows() ? "Yes" : "No",

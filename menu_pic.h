@@ -15,6 +15,7 @@ extern pic8* BufferMain;
 extern pic8* BufferBall;
 extern abc8* MenuFont;
 extern palette* MenuPalette;
+extern unsigned char MenuPaletteData[768];
 extern pic8* Intro;
 
 struct text_line {

@@ -1099,6 +1099,30 @@ void lgrfile::delete_gravity_arrows() {
     memset(arrows, 0, sizeof(arrows));
 }
 
+void gravity_arrow_preview(pic8& sprite) {
+    int size = ANIM_WIDTH;
+
+    unsigned char color = get_nearest_color(MenuPaletteData, 244, 228, 16);
+
+    std::vector<arrow_line> design = arrow_designs[EolSettings->gravity_arrow_index()];
+    double thickness = EolSettings->gravity_arrow_thickness() / 80.0;
+
+    // Draw the gravity apples using the above parameters
+    vect2 pos;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            pos.y = (i + 0.5) / size;
+            pos.x = (j + 0.5) / size;
+            for (arrow_line line : design) {
+                if (point_segment_distance(pos, line.r, line.v) < thickness) {
+                    sprite.ppixel(size - i - 1, size - j - 1, color);
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void lgrfile::setup_gravity_arrows() {
     delete_gravity_arrows();
 

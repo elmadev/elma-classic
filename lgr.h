@@ -140,6 +140,8 @@ class lgrfile {
 extern lgrfile* Lgr;
 void invalidate_lgr_cache();
 
+void gravity_arrow_preview(pic8& sprite);
+
 struct bike_box {
     int x1;
     int y1;

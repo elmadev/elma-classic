@@ -29,6 +29,7 @@ abc8* MenuFont = nullptr;
 static anim* Helmet = nullptr;
 
 palette* MenuPalette = nullptr;
+unsigned char MenuPaletteData[768];
 
 void init_menu_pictures() {
     if (BufferMain) {
@@ -53,6 +54,7 @@ void init_menu_pictures() {
     balls_init();
 
     get_pcx_pal("intro.pcx", &MenuPalette);
+    get_pcx_pal("intro.pcx", MenuPaletteData);
 }
 
 menu_pic::menu_pic(bool center_vert) {

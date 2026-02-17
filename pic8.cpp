@@ -5,6 +5,7 @@
 #include "platform_utils.h"
 #include "qopen.h"
 #include <algorithm>
+#include <climits>
 #include <cstring>
 
 void pic8::allocate(int w, int h) {
@@ -935,3 +936,27 @@ void pic8::add_transparency(int transparency) {
 }
 
 void pic8::add_transparency() { add_transparency(gpixel(0, 0)); }
+
+unsigned char get_nearest_color(unsigned char* pal, unsigned char r, unsigned char g,
+                                unsigned char b) {
+    int closest_index = 0;
+    int min_distance = INT_MAX;
+
+    for (int index = 0; index < 256; index++) {
+        unsigned char r2 = pal[index * 3];
+        unsigned char g2 = pal[index * 3 + 1];
+        unsigned char b2 = pal[index * 3 + 2];
+
+        int dr = r - r2;
+        int dg = g - g2;
+        int db = b - b2;
+
+        int distance = dr * dr + dg * dg + db * db;
+
+        if (distance < min_distance) {
+            min_distance = distance;
+            closest_index = index;
+        }
+    }
+    return (unsigned char)closest_index;
+}

@@ -61,4 +61,7 @@ bool get_pcx_pal(const char* filename, palette** pal);
 void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2);
 void blit_scale8(pic8* dest, pic8* source);
 
+unsigned char get_nearest_color(unsigned char* pal, unsigned char r, unsigned char g,
+                                unsigned char b);
+
 #endif

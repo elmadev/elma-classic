@@ -4,6 +4,7 @@
 #include "EDITUJ.H"
 #include "sound_engine.h"
 #include "keys.h"
+#include "platform_sdl_keyboard.h"
 #include "gl_renderer.h"
 #include "main.h"
 #include "M_PIC.H"
@@ -19,12 +20,6 @@ static bool LeftMouseDownPrev = false;
 static bool RightMouseDownPrev = false;
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
-
-// SDL keyboard state and mappings
-static const Uint8* SDLKeyState = nullptr;
-static Uint8 SDLKeyStatePrev[SDL_NUM_SCANCODES];
-static Keycode SDLToKeycode[SDL_NUM_SCANCODES];
-static bool SDLKeyDown[SDL_NUM_SCANCODES];
 
 void message_box(const char* text) {
     // As per docs, can be called even before SDL_Init
@@ -77,45 +72,6 @@ static void create_palette_surface() {
     }
 }
 
-static void initialize_keyboard_mappings() {
-    // Initialize keyboard state and mappings
-    SDLKeyState = SDL_GetKeyboardState(nullptr);
-
-    memset(SDLKeyStatePrev, 0, sizeof(Uint8) * SDL_NUM_SCANCODES);
-
-    // Map SDL scancodes to Keycodes
-    for (int i = 0; i < SDL_NUM_SCANCODES; i++) {
-        SDLToKeycode[i] = SDL_SCANCODE_UNKNOWN;
-    }
-
-    SDLToKeycode[SDL_SCANCODE_ESCAPE] = KEY_ESC;
-    SDLToKeycode[SDL_SCANCODE_RETURN] = KEY_ENTER;
-    SDLToKeycode[SDL_SCANCODE_KP_ENTER] = KEY_ENTER; // KP = Keypad
-
-    SDLToKeycode[SDL_SCANCODE_UP] = KEY_UP;
-    SDLToKeycode[SDL_SCANCODE_KP_8] = KEY_UP;
-    SDLToKeycode[SDL_SCANCODE_DOWN] = KEY_DOWN;
-    SDLToKeycode[SDL_SCANCODE_KP_2] = KEY_DOWN;
-    SDLToKeycode[SDL_SCANCODE_LEFT] = KEY_LEFT;
-    SDLToKeycode[SDL_SCANCODE_KP_4] = KEY_LEFT;
-    SDLToKeycode[SDL_SCANCODE_RIGHT] = KEY_RIGHT;
-    SDLToKeycode[SDL_SCANCODE_KP_6] = KEY_RIGHT;
-
-    SDLToKeycode[SDL_SCANCODE_PAGEUP] = KEY_PGUP;
-    SDLToKeycode[SDL_SCANCODE_KP_9] = KEY_PGUP;
-    SDLToKeycode[SDL_SCANCODE_PAGEDOWN] = KEY_PGDOWN;
-    SDLToKeycode[SDL_SCANCODE_KP_3] = KEY_PGDOWN;
-
-    SDLToKeycode[SDL_SCANCODE_DELETE] = KEY_DEL;
-    SDLToKeycode[SDL_SCANCODE_KP_PERIOD] = KEY_DEL;
-    SDLToKeycode[SDL_SCANCODE_BACKSPACE] = KEY_BACKSPACE;
-
-    SDLToKeycode[SDL_SCANCODE_MINUS] = KEY_LEFT;
-    SDLToKeycode[SDL_SCANCODE_KP_MINUS] = KEY_LEFT;
-    SDLToKeycode[SDL_SCANCODE_EQUALS] = KEY_RIGHT;
-    SDLToKeycode[SDL_SCANCODE_KP_PLUS] = KEY_RIGHT;
-}
-
 void platform_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         internal_error(SDL_GetError());
@@ -130,7 +86,7 @@ void platform_init() {
     create_window(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
     initialize_renderer();
     create_palette_surface();
-    initialize_keyboard_mappings();
+    keyboard::init();
 }
 
 void platform_recreate_window() {
@@ -246,8 +202,7 @@ void palette::set() {
 }
 
 void handle_events() {
-    memcpy(SDLKeyStatePrev, SDLKeyState, sizeof(Uint8) * SDL_NUM_SCANCODES);
-    memset(SDLKeyDown, 0, sizeof(SDLKeyDown));
+    keyboard::begin_frame();
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -272,9 +227,9 @@ void handle_events() {
             }
             break;
         case SDL_KEYDOWN: {
-            SDLKeyDown[event.key.keysym.scancode] = true;
             SDL_Scancode scancode = event.key.keysym.scancode;
-            Keycode keycode = SDLToKeycode[scancode];
+            keyboard::record_key_down(scancode);
+            Keycode keycode = keyboard::keycode_for(scancode);
 
             // SDL doesn't generate text input events when Ctrl is held
             // Resolve layout-specific keycodes for unmapped keys to support LCtrl search
@@ -360,12 +315,12 @@ bool is_key_down(DikScancode code) {
 
     SDL_Scancode sdl_code = windows_scancode_table[code];
 
-    return SDLKeyState[sdl_code] != 0;
+    return keyboard::is_down(sdl_code);
 }
 
 bool was_key_just_pressed(DikScancode code) {
     SDL_Scancode sdl_code = windows_scancode_table[code];
-    return SDLKeyState[sdl_code] != 0 && SDLKeyStatePrev[sdl_code] == 0;
+    return keyboard::was_just_pressed(sdl_code);
 }
 
 DikScancode get_any_key_just_pressed() {
@@ -380,7 +335,7 @@ DikScancode get_any_key_just_pressed() {
 
 bool was_key_down(DikScancode code) {
     SDL_Scancode sdl_code = windows_scancode_table[code];
-    return SDLKeyDown[sdl_code];
+    return keyboard::was_down(sdl_code);
 }
 
 bool is_fullscreen() {

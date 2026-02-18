@@ -55,6 +55,7 @@ elma_sources = files(
     'qopen.cpp',
     'recorder.cpp',
     'platform_sdl.cpp',
+    'platform_sdl_keyboard.cpp',
     'skip.cpp',
     'state.cpp',
     'segments.cpp',

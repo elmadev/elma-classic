@@ -24,6 +24,7 @@ static bool RightMouseDown = false;
 static const Uint8* SDLKeyState = nullptr;
 static Uint8 SDLKeyStatePrev[SDL_NUM_SCANCODES];
 static Keycode SDLToKeycode[SDL_NUM_SCANCODES];
+static bool SDLKeyDown[SDL_NUM_SCANCODES];
 
 void message_box(const char* text) {
     // As per docs, can be called even before SDL_Init
@@ -246,6 +247,7 @@ void palette::set() {
 
 void handle_events() {
     memcpy(SDLKeyStatePrev, SDLKeyState, sizeof(Uint8) * SDL_NUM_SCANCODES);
+    memset(SDLKeyDown, 0, sizeof(SDLKeyDown));
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -270,6 +272,7 @@ void handle_events() {
             }
             break;
         case SDL_KEYDOWN: {
+            SDLKeyDown[event.key.keysym.scancode] = true;
             SDL_Scancode scancode = event.key.keysym.scancode;
             Keycode keycode = SDLToKeycode[scancode];
 
@@ -373,6 +376,11 @@ DikScancode get_any_key_just_pressed() {
     }
 
     return DIK_UNKNOWN;
+}
+
+bool was_key_down(DikScancode code) {
+    SDL_Scancode sdl_code = windows_scancode_table[code];
+    return SDLKeyDown[sdl_code];
 }
 
 bool is_fullscreen() {

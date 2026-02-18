@@ -36,6 +36,10 @@ bool is_key_down(DikScancode code);
 bool was_key_just_pressed(DikScancode code);
 DikScancode get_any_key_just_pressed();
 
+// Returns true if the key is held at OS-level key repeat intervals.
+// Used for OS-level key repeat functionality (text input)
+bool was_key_down(DikScancode code);
+
 bool is_fullscreen();
 long long get_milliseconds();
 

@@ -7,10 +7,12 @@ on:
     paths-ignore:
       - "**.md"
       - "**/docs/**"
+      - "**.txt"
   pull_request:
     paths-ignore:
       - "**.md"
       - "**/docs/**"
+      - "**.txt"
 
 jobs:
   clang-format:

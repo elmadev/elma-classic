@@ -27,6 +27,8 @@
 * You can now type more non-letter symbols in game menus, like saving a replay or level named `!cov!`
 * Save play is enabled for internal 55, More Levels
 * Key repeat now works in menu so you can hold arrow down to go down or a to save many a.rec
+* Numpad NumLock state is now respected: navigation when NumLock is off, digit input when on
+* Bike controls configured to numpad keys now work regardless of NumLock state
 * You can now use mouse scroll wheel to navigate the menu
 * Elma now saves State.dat when you change options
 * You can now f1-p in editor (same as f1-enter but in editor)

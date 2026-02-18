@@ -285,6 +285,8 @@ void handle_events() {
             break;
         }
     }
+
+    keyboard::end_frame();
 }
 
 void hide_cursor() { SDL_ShowCursor(SDL_DISABLE); }

@@ -54,6 +54,7 @@ Keycode get_keypress() {
 void empty_keypress_buffer() {
     handle_events();
     KeyBufferCount = 0;
+    TextInputBuffer.clear();
 }
 
 bool has_keypress() {

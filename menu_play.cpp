@@ -25,6 +25,7 @@
 static bool menu_prompt_replay_name(char* filename) {
     menu_pic menu;
     int i = 0;
+    empty_keypress_buffer();
     bool rerender = true;
     filename[0] = 0;
     while (true) {

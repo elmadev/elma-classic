@@ -955,14 +955,14 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
     // Add 20 pixels of height to grass
     int grass_height_padding = QGRASS_EXTRA_HEIGHT * EolSettings->zoom();
     if (felso) {
-        for (int y = 0; y < grass_height_padding; y++) {
+        for (int i = 0; i < grass_height_padding; i++) {
             draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
-                        y + height + y, clipping);
+                        y + height + i, clipping);
         }
     } else {
-        for (int y = 0; y < grass_height_padding; y++) {
+        for (int i = 0; i < grass_height_padding; i++) {
             draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
-                        y - 1 - y, clipping);
+                        y - 1 - i, clipping);
         }
     }
 }

@@ -19,6 +19,7 @@ static int bevesznevet(char* nev, int visszater) {
     menu_pic szovlist(false);
 
     int i = 0;
+    empty_keypress_buffer();
     int valtozott = 1;
     nev[0] = 0;
     while (1) {

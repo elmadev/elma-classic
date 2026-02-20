@@ -1,6 +1,8 @@
 #ifndef PLATFORM_IMPL_H
 #define PLATFORM_IMPL_H
 
+class pic8;
+
 // DIK_ Windows scancode
 typedef int DikScancode;
 
@@ -20,9 +22,9 @@ void handle_events();
 void platform_init();
 void init_sound();
 
-unsigned char** lock_backbuffer(bool flipped);
+void lock_backbuffer(pic8& view, bool flipped);
 void unlock_backbuffer();
-unsigned char** lock_frontbuffer(bool flipped);
+void lock_frontbuffer(pic8& view, bool flipped);
 void unlock_frontbuffer();
 
 void get_mouse_position(int* x, int* y);

@@ -9,9 +9,6 @@ class pic8 {
   private:
     friend void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y2);
     friend void blit8(pic8* dest, pic8* source, int x, int y);
-    friend pic8* lockbackbuffer_pic(bool flipped);
-    friend void lockfrontbuffer_pic(bool flipped);
-    friend void unlockbackbuffer_pic();
 
     void allocate(int w, int h);
     void spr_open(const char* filename, FILE* h);

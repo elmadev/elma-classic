@@ -9,7 +9,7 @@ extern int SCREEN_HEIGHT;
 pic8* lockbackbuffer_pic(bool flipped = true);
 void unlockbackbuffer_pic(void);
 
-void lockfrontbuffer_pic(bool flipped = false);
+pic8* lockfrontbuffer_pic(bool flipped = false);
 void unlockfrontbuffer_pic(void);
 void ppixelfront(int x, int y, unsigned char szin);
 

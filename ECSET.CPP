@@ -1524,7 +1524,7 @@ void canvas::create_front_grass() {
 
 void canvas::create_canvases() {
     START_TIME(canvas_timer);
-    Lgr->reload_default_textures();
+    Lgr->reload_default_textures(false);
 
     delete CanvasBack;
     CanvasBack = nullptr;

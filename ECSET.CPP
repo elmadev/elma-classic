@@ -14,7 +14,6 @@
 #include "pic8.h"
 #include "segments.h"
 #include "debug/profiler.h"
-#include <cstdint>
 #include <climits>
 #include <cmath>
 #include <cstring>

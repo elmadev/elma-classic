@@ -1,8 +1,11 @@
 #ifndef ECSET_H
 #define ECSET_H
 
+#include "lgr.h"
+#include "main.h"
 #include "sprite.h"
 #include "vect2.h"
+#include <cstdint>
 
 class canvas;
 class grass;
@@ -27,6 +30,82 @@ class node_finder {
 #define PixelsDefaultBackground (0)
 #define PixelsDefaultForeground (1)
 #define PixelsTransparent (2)
+
+class canvas_pixels {
+  public:
+    canvas_pixels()
+        : value(0) {}
+
+    static constexpr canvas_pixels default_background() { return canvas_pixels(0); }
+    static constexpr canvas_pixels default_foreground() { return canvas_pixels(1); }
+    static constexpr canvas_pixels transparent() { return canvas_pixels(2); }
+
+    static canvas_pixels texture(int texture_index) {
+        canvas_pixels texture(TEXTURE_START + texture_index);
+#ifdef DEBUG
+        if (!texture.is_texture()) {
+            internal_error("canvas_pixels invalid texture constructor");
+        }
+#endif
+        return texture;
+    }
+
+    static canvas_pixels pointer(unsigned char* ptr) {
+        canvas_pixels pointer(reinterpret_cast<uintptr_t>(ptr));
+#ifdef DEBUG
+        if (!pointer.is_pointer()) {
+            internal_error("canvas_pixels invalid pointer constructor");
+        }
+#endif
+        return pointer;
+    }
+
+    bool is_pointer() const { return value >= POINTER_START; }
+    bool is_enum() const { return value < ENUM_END; }
+    bool is_texture() const { return value >= TEXTURE_START && value < TEXTURE_END; }
+
+    int to_texture() const {
+#ifdef DEBUG
+        if (!is_texture()) {
+            internal_error("to_texture() called on invalid value");
+        }
+#endif
+        return static_cast<int>(value - TEXTURE_START);
+    }
+
+    unsigned char* to_pointer() const {
+#ifdef DEBUG
+        if (!is_pointer()) {
+            internal_error("to_pointer() called on invalid value");
+        }
+#endif
+        return reinterpret_cast<unsigned char*>(value);
+    }
+
+    constexpr friend bool operator==(canvas_pixels, canvas_pixels) = default;
+
+    canvas_pixels& operator+=(int offset) {
+#ifdef DEBUG
+        if (!is_pointer()) {
+            internal_error("operator+=() called on invalid value");
+        }
+#endif
+        value += static_cast<uintptr_t>(offset);
+        return *this;
+    }
+
+  private:
+    constexpr explicit canvas_pixels(uintptr_t v) noexcept
+        : value(v) {}
+
+    static constexpr uintptr_t ENUM_END = 10;
+    static constexpr uintptr_t TEXTURE_START = ENUM_END;
+    static constexpr uintptr_t TEXTURE_END = TEXTURE_START + MAX_TEXTURES;
+    static constexpr uintptr_t POINTER_START = 0x800;
+    static_assert(TEXTURE_END < POINTER_START);
+
+    uintptr_t value;
+};
 
 // Horizontal segment of pixels sharing the same source of pixel data, chained
 // together to make one row of the rendered level.

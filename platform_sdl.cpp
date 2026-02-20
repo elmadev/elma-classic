@@ -104,6 +104,7 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
     }
 
     int window_flags = EolSettings->renderer() == RendererType::OpenGL ? SDL_WINDOW_OPENGL : 0;
+    window_flags |= SDL_WINDOW_RESIZABLE;
 
     SDLWindow =
         SDL_CreateWindow("Elasto Mania", window_pos_x, window_pos_y, width, height, window_flags);
@@ -127,6 +128,21 @@ static void window_resized(int width, int height) {
 bool is_fullscreen() {
     Uint32 flags = SDL_GetWindowFlags(SDLWindow);
     return flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
+}
+
+// This only procs at the very end of a resize because the program freezes during a resize event
+// There's not really any fix to this unless the entire control flow of the program is changed
+// https://wiki.libsdl.org/SDL3/AppFreezeDuringDrag
+void window_resize_event() {
+    SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
+
+    // We purposely don't save the new size to EolSettings
+    SCREEN_WIDTH = SDLSurfaceMain->w;
+    SCREEN_HEIGHT = SDLSurfaceMain->h;
+
+    window_resized(SDLSurfaceMain->w, SDLSurfaceMain->h);
+
+    on_resolution_change();
 }
 
 void platform_apply_fullscreen_mode() {
@@ -387,6 +403,9 @@ void handle_events() {
                 break;
             case SDL_WINDOWEVENT_FOCUS_LOST:
                 invalidateegesz();
+                break;
+            case SDL_WINDOWEVENT_RESIZED:
+                window_resize_event();
                 break;
             }
             break;

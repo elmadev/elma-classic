@@ -16,6 +16,7 @@
 static SDL_Window* SDLWindow = nullptr;
 static SDL_Surface* SDLSurfaceMain = nullptr;
 static SDL_Surface* SDLSurfacePaletted = nullptr;
+static palette* CurrentPalette = nullptr;
 
 static bool LeftMouseDown = false;
 static bool RightMouseDown = false;
@@ -72,6 +73,10 @@ static void create_palette_surface() {
     if (!SDLSurfacePaletted) {
         internal_error(SDL_GetError());
         return;
+    }
+
+    if (CurrentPalette) {
+        CurrentPalette->set();
     }
 }
 
@@ -183,6 +188,7 @@ palette::palette(unsigned char* palette_data) {
 palette::~palette() { delete[] (SDL_Color*)data; }
 
 void palette::set() {
+    CurrentPalette = this;
     if (EolSettings->renderer() == RendererType::OpenGL) {
         gl_update_palette(data);
     } else {

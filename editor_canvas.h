@@ -12,6 +12,8 @@ double pixel_to_meter_y(int y);
 int meter_to_pixel_x(double x);
 int meter_to_pixel_y(double y);
 
+void editor_canvas_update_resolution();
+
 void zoom(vect2 center, double width);
 void zoom_out();
 void zoom_in(int x1, int y1, int x2, int y2);

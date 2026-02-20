@@ -1,4 +1,5 @@
 #include "abc8.h"
+#include "editor_canvas.h"
 #include "eol_settings.h"
 #include "M_PIC.H"
 #include "main.h"
@@ -36,6 +37,7 @@ int main() {
 
     SCREEN_WIDTH = EolSettings->screen_width();
     SCREEN_HEIGHT = EolSettings->screen_height();
+    editor_canvas_update_resolution();
 
     platform_init();
 

@@ -1769,7 +1769,7 @@ void canvas::create_front_grass() {
     finder = nullptr;
 }
 
-void create_canvases() {
+void canvas::create_canvases() {
     Lgr->reload_default_textures();
 
     delete CanvasBack;

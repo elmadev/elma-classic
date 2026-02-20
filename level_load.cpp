@@ -74,7 +74,7 @@ bool load_level_play(const char* levelname) {
         }
         END_TIME(segments_timer, std::format("{} Segments", levelname))
 
-        create_canvases();
+        canvas::create_canvases();
     }
     return true;
 }

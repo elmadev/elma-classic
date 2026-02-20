@@ -52,12 +52,8 @@ struct canvas_chunk {
     unsigned char* pixels;
 };
 
-// Generate all 3 canvasses required to render a level
-void create_canvases();
-
 // Contains an image of the static level front, back or minimap
 class canvas {
-    friend void create_canvases();
     friend canvas_chunk_node* node_finder::get_chunk(int x, int y);
 
     // Memory structure for canvas_chunk_node
@@ -138,6 +134,8 @@ class canvas {
     void meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y);
     void render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2);
     void render_minimap(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2);
+    // Generate all 3 canvasses required to render a level
+    static void create_canvases();
 };
 
 extern canvas* CanvasBack;

@@ -962,24 +962,15 @@ void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y) {
 
     // Draw the QGRASS image on top of the QUP/QDOWN
     if (width > 640 || height > 480) {
-#ifdef DEBUG
-        internal_error("7yfg4");
-#endif
         return;
     }
     draw_qgrass_texture(gr, qupdown_index, x, y);
 }
 
 void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0) {
-#ifdef DEBUG
     if (heightmap_length < 1) {
-        internal_error("dd387d3e");
+        internal_error("draw_grass_polygon should always have a length of at least 1!");
     }
-#else
-    if (heightmap_length < 1) {
-        return;
-    }
-#endif
     int x = x0;
     int y = heightmap[0];
     while (true) {

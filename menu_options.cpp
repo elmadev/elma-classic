@@ -3,6 +3,7 @@
 #include "fs_utils.h"
 #include "JATEKOS.H"
 #include "level_load.h"
+#include "M_PIC.H"
 #include "menu_controls.h"
 #include "menu_nav.h"
 #include "menu_pic.h"
@@ -69,6 +70,36 @@ static void menu_lgr() {
 
     nav.sort_rows();
     nav.select_row(EolSettings->default_lgr_name());
+
+    nav.navigate();
+}
+
+struct resolution {
+    int width;
+    int height;
+};
+
+static constexpr resolution RESOLUTIONS[] = {
+    {640, 480},   {800, 600},   {1024, 768},  {1280, 720},  {1280, 960},
+    {1280, 1024}, {1366, 768},  {1440, 900},  {1600, 900},  {1600, 1200},
+    {1920, 1080}, {1920, 1200}, {2560, 1440}, {3840, 1660}, {3840, 2160},
+};
+
+static void menu_resolution() {
+    menu_nav nav("Pick a resolution!");
+
+    for (const auto& res : RESOLUTIONS) {
+        std::string label = std::format("{}x{}", res.width, res.height);
+        nav.add_row(
+            label, NAV_FUNC(&res) {
+                EolSettings->set_screen_width(res.width);
+                EolSettings->set_screen_height(res.height);
+            });
+    }
+
+    std::string current =
+        std::format("{}x{}", EolSettings->screen_width(), EolSettings->screen_height());
+    nav.select_row(current);
 
     nav.navigate();
 }
@@ -201,18 +232,7 @@ void menu_options() {
         nav.add_row(
             "Resolution:",
             std::format("{}x{}", EolSettings->screen_width(), EolSettings->screen_height()),
-            NAV_FUNC() {
-                switch (EolSettings->screen_width()) {
-                case 640:
-                    EolSettings->set_screen_width(1024);
-                    EolSettings->set_screen_height(768);
-                    return;
-                case 1024:
-                    EolSettings->set_screen_width(640);
-                    EolSettings->set_screen_height(480);
-                    return;
-                }
-            });
+            NAV_FUNC() { menu_resolution(); });
 
         nav.add_row(
             "Zoom:", std::format("{:.2f}", EolSettings->zoom()), NAV_FUNC() {

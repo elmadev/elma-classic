@@ -25,8 +25,10 @@ class pic8 {
     unsigned char* pixels;
     unsigned char* transparency_data;
     unsigned short transparency_data_length;
+    bool is_subview;
 
   public:
+    pic8(); // subview
     pic8(int w, int h);
     pic8(const char* filename, FILE* h = nullptr);
     static pic8* from_bmp(const char* filename);

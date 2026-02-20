@@ -47,8 +47,20 @@ pic8::~pic8() {
     }
 }
 
+// Initialize a subview picture that doesn't manage its own memory
+pic8::pic8() {
+    is_subview = true;
+    rows = nullptr;
+    pixels = nullptr;
+    transparency_data = nullptr;
+    transparency_data_length = 0;
+    width = 0;
+    height = 0;
+}
+
 // Initialize a blank picture
 pic8::pic8(int w, int h) {
+    is_subview = false;
     rows = nullptr;
     pixels = nullptr;
     transparency_data = nullptr;
@@ -58,6 +70,7 @@ pic8::pic8(int w, int h) {
 
 // Initialize a picture from filename or file
 pic8::pic8(const char* filename, FILE* h) {
+    is_subview = false;
     rows = nullptr;
     pixels = nullptr;
     transparency_data = nullptr;
@@ -830,6 +843,7 @@ void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
 void pic8::subview(int x1, int y1, int x2, int y2, pic8* source) {
     width = x2 - x1 + 1;
     height = y2 - y1 + 1;
+    rows = (unsigned char**)realloc(rows, sizeof(*rows) * height);
 #ifdef DEBUG
     if (x1 < 0 || x2 >= SCREEN_WIDTH || y1 < 0 || y2 >= SCREEN_HEIGHT) {
         internal_error("pic8::subview!");

@@ -1327,10 +1327,13 @@ static inline void draw_default_background(unsigned char* dest, size_t offset, s
     }
 }
 
-void canvas::render_row1(unsigned char* dest, int y) {
+void canvas::render_row(bool player1, unsigned char* dest, int y) {
+    canvas_chunk** rows_position = player1 ? &rows_position1[y] : &rows_position2[y];
+    int* rows_x = player1 ? &rows_x1[y] : &rows_x2[y];
+
     // Find chunk corresponding to the left of the screen
-    canvas_chunk* cur_chunk = rows_position1[y];
-    int xpos = rows_x1[y];
+    canvas_chunk* cur_chunk = *rows_position;
+    int xpos = *rows_x;
     // Search leftwards using left border of chunk
     while (xpos > ViewLeftBorder) {
         cur_chunk--;
@@ -1342,8 +1345,8 @@ void canvas::render_row1(unsigned char* dest, int y) {
         cur_chunk++;
     }
     // Remember our current position
-    rows_position1[y] = cur_chunk;
-    rows_x1[y] = xpos;
+    *rows_position = cur_chunk;
+    *rows_x = xpos;
 
     // If the entire row is a single chunk, paste it
     int offset = ViewLeftBorder - xpos;
@@ -1444,115 +1447,6 @@ void canvas::render_row1(unsigned char* dest, int y) {
     }
 }
 
-// Identical to render_row1 except using rows_position2/rows_x2
-void canvas::render_row2(unsigned char* dest, int y) {
-    canvas_chunk* cur_chunk = rows_position2[y];
-    int xpos = rows_x2[y];
-    while (xpos > ViewLeftBorder) {
-        cur_chunk--;
-        xpos -= cur_chunk->width;
-    }
-    while (xpos + cur_chunk->width <= ViewLeftBorder) {
-        xpos += cur_chunk->width;
-        cur_chunk++;
-    }
-    rows_position2[y] = cur_chunk;
-    rows_x2[y] = xpos;
-
-    int offset = ViewLeftBorder - xpos;
-    if (xpos + cur_chunk->width > ViewRightBorder) {
-        int width = ViewRightBorder - xpos + 1;
-        if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-            memcpy(dest, &cur_chunk->pixels[ViewLeftBorder - xpos], width - offset);
-        } else {
-            if (!cur_chunk->pixels) {
-                draw_default_background(dest, 0, width - offset, is_minimap);
-                return;
-            }
-            if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
-                draw_default_foreground(dest, 0, width - offset, is_minimap);
-            } else {
-#ifdef DEBUG
-                if ((pixelek_t)cur_chunk->pixels != PixelsTransparent) {
-                    internal_error("cur_chunk->pixels unknown or texture type!");
-                }
-#endif
-            }
-        }
-        return;
-    }
-
-    int size = cur_chunk->width - offset;
-    if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-        memcpy(dest, &cur_chunk->pixels[ViewLeftBorder - xpos], size);
-    } else {
-        if (!cur_chunk->pixels) {
-            draw_default_background(dest, 0, size, is_minimap);
-        } else {
-            if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
-                draw_default_foreground(dest, 0, size, is_minimap);
-            } else {
-#ifdef DEBUG
-                if ((pixelek_t)cur_chunk->pixels != PixelsTransparent) {
-                    internal_error("cur_chunk->pixels unknown or texture type!");
-                }
-#endif
-            }
-        }
-    }
-
-    xpos += cur_chunk->width;
-    cur_chunk++;
-    dest += size;
-
-    while (xpos <= ViewRightBorder) {
-        if (xpos + cur_chunk->width > ViewRightBorder) {
-            if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-                memcpy(dest, cur_chunk->pixels, ViewRightBorder - xpos + 1);
-                return;
-            }
-            if (!cur_chunk->pixels) {
-                draw_default_background(dest, xpos - ViewLeftBorder, ViewRightBorder - xpos + 1,
-                                        is_minimap);
-                return;
-            }
-            if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
-                draw_default_foreground(dest, xpos - ViewLeftBorder, ViewRightBorder - xpos + 1,
-                                        is_minimap);
-                return;
-            }
-#ifdef DEBUG
-            if ((pixelek_t)cur_chunk->pixels != PixelsTransparent) {
-                internal_error("cur_chunk->pixels unknown or texture type!");
-            }
-#endif
-        }
-
-        if ((pixelek_t)cur_chunk->pixels & PIXELMASZK) {
-            memcpy(dest, cur_chunk->pixels, cur_chunk->width);
-        } else {
-            if (!cur_chunk->pixels) {
-                draw_default_background(dest, xpos - ViewLeftBorder, cur_chunk->width, is_minimap);
-            } else {
-                if ((pixelek_t)cur_chunk->pixels == PixelsDefaultForeground) {
-                    draw_default_foreground(dest, xpos - ViewLeftBorder, cur_chunk->width,
-                                            is_minimap);
-                } else {
-#ifdef DEBUG
-                    if ((pixelek_t)cur_chunk->pixels != PixelsTransparent) {
-                        internal_error("cur_chunk->pixels unknown or texture type!");
-                    }
-#endif
-                }
-            }
-        }
-
-        xpos += cur_chunk->width;
-        dest += cur_chunk->width;
-        cur_chunk++;
-    }
-}
-
 void canvas::meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y) {
     vect2 dr = meters - origin;
     if (is_minimap) {
@@ -1592,26 +1486,12 @@ void canvas::render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x
 
     // Draw each row
     int canvas_y1 = view_top_border - y1;
-    if (player1) {
-        for (int i = y1; i <= y2; i++) {
-            int canvas_y = i + canvas_y1;
-            // Calculate the texture graphic y-offset for the current row
-            DefaultForeground =
-                Lgr->foreground->get_row(canvas_y % foreground_height) + foreground_x;
-            DefaultBackground =
-                Lgr->background->get_row((i - y1) % background_height) + background_x;
-            render_row1(pic->get_row(i) + x1, canvas_y);
-        }
-    } else {
-        for (int i = y1; i <= y2; i++) {
-            int canvas_y = i + canvas_y1;
-            // Calculate the texture graphic y-offset for the current row
-            DefaultForeground =
-                Lgr->foreground->get_row(canvas_y % foreground_height) + foreground_x;
-            DefaultBackground =
-                Lgr->background->get_row((i - y1) % background_height) + background_x;
-            render_row2(pic->get_row(i) + x1, canvas_y);
-        }
+    for (int i = y1; i <= y2; i++) {
+        int canvas_y = i + canvas_y1;
+        // Calculate the texture graphic y-offset for the current row
+        DefaultForeground = Lgr->foreground->get_row(canvas_y % foreground_height) + foreground_x;
+        DefaultBackground = Lgr->background->get_row((i - y1) % background_height) + background_x;
+        render_row(player1, pic->get_row(i) + x1, canvas_y);
     }
     DefaultForeground = nullptr;
     DefaultBackground = nullptr;
@@ -1638,16 +1518,9 @@ void canvas::render_minimap(bool player1, pic8* pic, vect2 corner, int x1, int y
 
     // Draw each row
     int canvas_y1 = view_top_border - y1;
-    if (player1) {
-        for (int y = y1; y <= y2; y++) {
-            int canvas_y = y + canvas_y1;
-            render_row1(pic->get_row(y) + x1, canvas_y);
-        }
-    } else {
-        for (int y = y1; y <= y2; y++) {
-            int canvas_y = y + canvas_y1;
-            render_row2(pic->get_row(y) + x1, canvas_y);
-        }
+    for (int y = y1; y <= y2; y++) {
+        int canvas_y = y + canvas_y1;
+        render_row(player1, pic->get_row(y) + x1, canvas_y);
     }
 }
 

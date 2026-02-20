@@ -124,8 +124,7 @@ class canvas {
     void draw_grass_polygons(int clipping);
 
     // Render
-    void render_row1(unsigned char* dest, int y);
-    void render_row2(unsigned char* dest, int y);
+    void render_row(bool player1, unsigned char* dest, int y);
 
     void create_front_grass();
 

@@ -52,10 +52,16 @@ void menu_nav::select_row(const std::string& left) {
     }
 }
 
-int menu_nav::calculate_visible_entries() {
-    int max_visible_entries = (SCREEN_HEIGHT - y_entries) / dy;
+void menu_nav::calculate_visible_entries(int& max_visible_entries, int& view_max, bool& rerender) {
+    int prev_max = max_visible_entries;
+    max_visible_entries = (SCREEN_HEIGHT - y_entries) / dy;
     max_visible_entries = std::max(max_visible_entries, 2);
-    return max_visible_entries;
+
+    if (prev_max != max_visible_entries) {
+        rerender = true;
+    }
+
+    view_max = (int)filter_indices.size() - max_visible_entries;
 }
 
 // Render menu and return selected index (or -1 if Esc)
@@ -79,14 +85,15 @@ int menu_nav::prompt_choice(bool render_only) {
     // Bound current selection
     selected_index = std::min(selected_index, (int)filter_indices.size() - 1);
 
-    int max_visible_entries = calculate_visible_entries();
+    int max_visible_entries;
+    int view_max;
+    bool rerender = true;
+    calculate_visible_entries(max_visible_entries, view_max, rerender);
 
     // Center current selection on the screen
     int view_index = selected_index - max_visible_entries / 2;
-    int view_max = (int)filter_indices.size() - max_visible_entries;
 
     empty_keypress_buffer();
-    bool rerender = true;
     while (true) {
         handle_events();
         if (!render_only) {
@@ -134,15 +141,12 @@ int menu_nav::prompt_choice(bool render_only) {
             }
         }
 
-        // Recalculate view_max (filter may have changed the count)
-        view_max = (int)filter_indices.size() - max_visible_entries;
-
-        // Limit selected index to valid values
+        // Update view_index and limit to valid values
+        calculate_visible_entries(max_visible_entries, view_max, rerender);
         if (!filter_indices.empty()) {
             selected_index = std::max(selected_index, 0);
             selected_index = std::min(selected_index, (int)filter_indices.size() - 1);
         }
-        // Update view_index and limit to valid values
         if (selected_index < view_index) {
             view_index = selected_index;
             rerender = true;

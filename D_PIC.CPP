@@ -2,6 +2,7 @@
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "editor/canvas.h"
+#include "KIRAJZOL.H"
 #include "lgr.h"
 #include "main.h"
 #include "menu/pic.h"
@@ -21,6 +22,8 @@ static void on_resolution_change() {
     if (Ptop && Lgr) {
         Lgr->reload_default_textures(true);
     }
+    invalidateegesz();
+    GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
 }
 
 void update_resolution(int w, int h) {

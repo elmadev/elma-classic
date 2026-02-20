@@ -1,5 +1,10 @@
 #include "M_PIC.H"
+#include "EDITUJ.H"
+#include "eol_settings.h"
+#include "editor_canvas.h"
+#include "lgr.h"
 #include "main.h"
+#include "menu_pic.h"
 #include "pic8.h"
 #include "platform_impl.h"
 
@@ -9,6 +14,21 @@ int SCREEN_HEIGHT = 480;
 static pic8 Lockbuff = pic8();
 
 static int Backpiclocked = 0, Frontpiclocked = 0;
+
+void on_resolution_change() {
+    editor_canvas_update_resolution();
+    reinit_menu_pictures();
+    if (Ptop && Lgr) {
+        Lgr->reload_default_textures(true);
+    }
+}
+
+void update_resolution(int w, int h) {
+    EolSettings->set_screen_width(w);
+    EolSettings->set_screen_height(h);
+    platform_resize_window(w, h);
+    on_resolution_change();
+}
 
 pic8* lockbackbuffer_pic(bool flipped) {
     if (Backpiclocked || Frontpiclocked) {

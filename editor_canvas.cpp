@@ -12,9 +12,13 @@ bool RedrawingEditor = false;
 
 constexpr double ZOOM_IN_LIMIT = 0.017;
 constexpr double ZOOM_OUT_LIMIT = 170.0;
-static double AspectRatio =
-    double((SCREEN_WIDTH - EDITOR_MENU_X - 1)) / (SCREEN_HEIGHT - EDITOR_MENU_Y - 1);
-static double ZOOM_OUT_LIMIT_HEIGHT = ZOOM_OUT_LIMIT / AspectRatio;
+static double AspectRatio = 1.0;
+static double ZOOM_OUT_LIMIT_HEIGHT = ZOOM_OUT_LIMIT;
+
+void editor_canvas_update_resolution() {
+    AspectRatio = double(SCREEN_WIDTH - EDITOR_MENU_X - 1) / (SCREEN_HEIGHT - EDITOR_MENU_Y - 1);
+    ZOOM_OUT_LIMIT_HEIGHT = ZOOM_OUT_LIMIT / AspectRatio;
+}
 
 static vect2 CanvasTopLeft(-10.0, -10.0);
 static vect2 CanvasBottomRight(-10.0 + 20.0 * AspectRatio, 10.0);

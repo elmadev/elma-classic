@@ -62,7 +62,7 @@ class recorder {
     // Load replay of one bike
     int load(const char* filename, FILE* h, bool is_first_replay);
     // Save replay of one bike
-    void save(const char* filename, FILE* h, int level_id, int flagtag);
+    void save(const char* filename, FILE* h, int level_id);
 
   public:
     char level_filename[16];
@@ -73,7 +73,7 @@ class recorder {
     // Load a singleplayer or multiplayer replay
     static int load_rec_file(const char* filename, bool demo);
     // Save a singleplayer or multiplayer replay
-    static void save_rec_file(const char* filename, int level_id, int flagtag);
+    static void save_rec_file(const char* filename, int level_id);
 
     bool is_empty() const { return frame_count_ == 0; }
     int frame_count() const { return frame_count_; }

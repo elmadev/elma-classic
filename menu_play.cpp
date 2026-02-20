@@ -78,7 +78,7 @@ static void menu_save_play(int level_id) {
         return;
     }
     strcat(tmp, ".rec");
-    recorder::save_rec_file(tmp, level_id, State->flag_tag);
+    recorder::save_rec_file(tmp, level_id);
 }
 
 void update_top_ten(int time, char* time_message, int internal_index,

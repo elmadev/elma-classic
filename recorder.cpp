@@ -440,9 +440,7 @@ static void save_error(const char* filename) {
     internal_error("Failed to write rec file: ", filename);
 }
 
-void recorder::save(const char* filename, FILE* h, int level_id, int flagtag) {
-    flagtag_ = flagtag;
-
+void recorder::save(const char* filename, FILE* h, int level_id) {
     bool keep_file = false;
     if (h) {
         keep_file = true;
@@ -554,7 +552,7 @@ int recorder::load_rec_file(const char* filename, bool demo) {
     return level_id;
 }
 
-void recorder::save_rec_file(const char* filename, int level_id, int flagtag) {
+void recorder::save_rec_file(const char* filename, int level_id) {
     if (MultiplayerRec) {
         char path[40];
         sprintf(path, "rec/%s", filename);
@@ -562,11 +560,11 @@ void recorder::save_rec_file(const char* filename, int level_id, int flagtag) {
         if (!h) {
             external_error("Failed to open rec file for writing!: ", path);
         }
-        Rec1->save(filename, h, level_id, flagtag);
-        Rec2->save(filename, h, level_id, flagtag);
+        Rec1->save(filename, h, level_id);
+        Rec2->save(filename, h, level_id);
         fclose(h);
     } else {
-        Rec1->save(filename, nullptr, level_id, flagtag);
+        Rec1->save(filename, nullptr, level_id);
     }
 }
 

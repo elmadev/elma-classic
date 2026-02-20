@@ -30,6 +30,7 @@
 * Numpad NumLock state is now respected: navigation when NumLock is off, digit input when on
 * Bike controls configured to numpad keys now work regardless of NumLock state
 * You can now use mouse scroll wheel to navigate the menu
+* Mouse scroll now works in the editor for selecting level, lgr and pictures
 * Elma now saves State.dat when you change options
 * You can now f1-p in editor (same as f1-enter but in editor)
 * You can now change what LGR to use as the default from inside the options menu

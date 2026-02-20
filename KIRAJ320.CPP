@@ -321,16 +321,16 @@ static void kiview(bool ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, 
     // Most kirajzoljuk masik (hatso) motorost:
     if (pmot2) {
         vect2 sarokrel = pmot2->bike.r - sarok;
-        int mx = (int)(sarokrel.x * MetersToPixels / MinimapScaleFactor + vx1);
-        int my = (int)(sarokrel.y * MetersToPixels / MinimapScaleFactor + vy1);
+        int mx = (int)(sarokrel.x * MetersToMinimapPixels + vx1);
+        int my = (int)(sarokrel.y * MetersToMinimapPixels + vy1);
         if (mx >= vx1 && mx <= vx2 && my >= vy1 && my <= vy2) {
             kigyuru(ppic, mx, my, viewindex2);
         }
     }
 
     // Most kirajzoljuk elso motorost:
-    int mx = (int)(sarokbolkozepre.x * MetersToPixels / MinimapScaleFactor);
-    int my = (int)(sarokbolkozepre.y * MetersToPixels / MinimapScaleFactor);
+    int mx = (int)(sarokbolkozepre.x * MetersToMinimapPixels);
+    int my = (int)(sarokbolkozepre.y * MetersToMinimapPixels);
     kigyuru(ppic, vx1 + mx, vy1 + my, viewindex1);
 
     // Kirajzoljuk keretet:

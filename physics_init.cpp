@@ -39,6 +39,7 @@ double MetersToPixels;
 double PixelsToMeters;
 
 int MinimapScaleFactor = 10;
+double MetersToMinimapPixels;
 
 void init_motor(motorst* motor) {
     motor->flipped_bike = 0;
@@ -82,6 +83,7 @@ void set_zoom_factor() {
     PixelsToMeters = 1.0 / MetersToPixels;
 
     MinimapScaleFactor = (int)(0.42 * MetersToPixels * 0.5);
+    MetersToMinimapPixels = MetersToPixels / MinimapScaleFactor;
 }
 
 void init_physics_data(void) {

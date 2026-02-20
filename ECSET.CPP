@@ -457,10 +457,8 @@ void canvas::calculate_object_positions() {
             continue;
         }
         if (is_minimap) {
-            obj->minimap_canvas_x =
-                (int)((obj->r.x - origin.x) * MetersToPixels / MinimapScaleFactor);
-            obj->minimap_canvas_y =
-                (int)((-obj->r.y - origin.y) * MetersToPixels / MinimapScaleFactor);
+            obj->minimap_canvas_x = (int)((obj->r.x - origin.x) * MetersToMinimapPixels);
+            obj->minimap_canvas_y = (int)((-obj->r.y - origin.y) * MetersToMinimapPixels);
         } else {
             obj->canvas_x = (int)((obj->r.x - origin.x) * MetersToPixels - offset);
             obj->canvas_y = (int)((-obj->r.y - origin.y) * MetersToPixels - offset);
@@ -1063,8 +1061,8 @@ void canvas::draw_killers() {
             // Draw a 3x3 square
             unsigned char* source = Lgr->minimap_killer_palette_id;
             int distance = 499;
-            int x = (int)((obj->r.x - origin.x) * (MetersToPixels / MinimapScaleFactor));
-            int y = (int)((-obj->r.y - origin.y) * (MetersToPixels / MinimapScaleFactor));
+            int x = (int)((obj->r.x - origin.x) * MetersToMinimapPixels);
+            int y = (int)((-obj->r.y - origin.y) * MetersToMinimapPixels);
             draw_pixels(source, distance, x - 1, x + 1, y - 1, Clipping::Unclipped);
             draw_pixels(source, distance, x - 1, x - 1, y, Clipping::Unclipped);
             draw_pixels(source, distance, x + 1, x + 1, y, Clipping::Unclipped);
@@ -1122,8 +1120,8 @@ canvas::canvas(bool minimap) {
     // Set canvas dimensions
     set_origin_and_dimensions();
     if (is_minimap) {
-        pixel_width = (int)(width * (MetersToPixels / MinimapScaleFactor));
-        pixel_height = (int)(height * (MetersToPixels / MinimapScaleFactor));
+        pixel_width = (int)(width * MetersToMinimapPixels);
+        pixel_height = (int)(height * MetersToMinimapPixels);
     } else {
         pixel_width = (int)(width * MetersToPixels);
         pixel_height = (int)(height * MetersToPixels);
@@ -1394,8 +1392,8 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
 void canvas::meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y) {
     vect2 dr = meters - origin;
     if (is_minimap) {
-        *pixel_x = (int)(dr.x * (MetersToPixels / MinimapScaleFactor));
-        *pixel_y = (int)(dr.y * (MetersToPixels / MinimapScaleFactor));
+        *pixel_x = (int)(dr.x * MetersToMinimapPixels);
+        *pixel_y = (int)(dr.y * MetersToMinimapPixels);
     } else {
         *pixel_x = (int)(dr.x * MetersToPixels);
         *pixel_y = (int)(dr.y * MetersToPixels);

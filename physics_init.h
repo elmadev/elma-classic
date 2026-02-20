@@ -27,6 +27,7 @@ extern double MetersToPixels, PixelsToMeters;
 extern double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY, BodyDY;
 
 extern int MinimapScaleFactor;
+extern double MetersToMinimapPixels;
 
 enum class MotorGravity {
     Up = 0,

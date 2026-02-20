@@ -270,6 +270,7 @@ void tolt_open(void) {
     int ly1 = y1 + 37;
     int lx2 = lx1 + 100;
     int ly2 = ly1 + helyszam * dy;
+    box boxlist = {lx1, ly1, lx2, ly2};
 
     box boxfel = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
     box boxle = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
@@ -302,7 +303,7 @@ void tolt_open(void) {
             kur += helyszam - 1;
         }
         int wheel = get_mouse_wheel_delta();
-        if (wheel != 0) {
+        if (wheel != 0 && is_in_box(Moux, Mouy, boxlist)) {
             kur -= wheel;
         }
         // Eger lenyomas:
@@ -439,6 +440,7 @@ void kivalasztkezdetit(void) {
     int ly1 = y1 + 37;
     int lx2 = lx1 + 100;
     int ly2 = ly1 + helyszam * dy;
+    box boxlist = {lx1, ly1, lx2, ly2};
 
     box boxfel = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
     box boxle = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
@@ -478,7 +480,7 @@ void kivalasztkezdetit(void) {
             kur += helyszam - 1;
         }
         int wheel = get_mouse_wheel_delta();
-        if (wheel != 0) {
+        if (wheel != 0 && is_in_box(Moux, Mouy, boxlist)) {
             kur -= wheel;
         }
         // Eger lenyomas:
@@ -910,6 +912,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     int ly1 = y1 + 37;
     int lx2 = lx1 + 100;
     int ly2 = ly1 + helyszam * dy;
+    box boxlist = {lx1, ly1, lx2, ly2};
 
     box boxfel = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
     box boxle = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
@@ -962,7 +965,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
             kur += helyszam - 1;
         }
         int wheel = get_mouse_wheel_delta();
-        if (wheel != 0) {
+        if (wheel != 0 && is_in_box(Moux, Mouy, boxlist)) {
             kur -= wheel;
         }
         // Eger lenyomas:
@@ -1336,6 +1339,7 @@ int tolt_picklgrfile(char* lgrnev) {
     int ly1 = y1 + 37;
     int lx2 = lx1 + 100;
     int ly2 = ly1 + helyszam * dy;
+    box boxlist = {lx1, ly1, lx2, ly2};
 
     box boxfel = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
     box boxle = {x1 + 10, y2 - 30 - dyorigszov, x1 + 110, y2 - 10 - dyorigszov};
@@ -1368,7 +1372,7 @@ int tolt_picklgrfile(char* lgrnev) {
             kur += helyszam - 1;
         }
         int wheel = get_mouse_wheel_delta();
-        if (wheel != 0) {
+        if (wheel != 0 && is_in_box(Moux, Mouy, boxlist)) {
             kur -= wheel;
         }
 

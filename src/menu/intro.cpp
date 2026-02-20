@@ -18,6 +18,14 @@
 #include "qopen.h"
 #include <directinput/scancodes.h>
 
+static void show_intro_screen() {
+    pic8* intro_screen = lockbackbuffer_pic(false);
+    intro_screen->fill_box(BLACK_PALETTE_ID);
+    blit8(intro_screen, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,
+          SCREEN_HEIGHT / 2 - Intro->get_height() / 2);
+    unlockbackbuffer_pic();
+}
+
 void menu_intro() {
     init_qopen();
 
@@ -41,14 +49,10 @@ void menu_intro() {
     Intro = new pic8("intro.pcx");
     Intro->fill_box(0, 410, Intro->get_width(), 450, Intro->gpixel(0, 409));
     Intro->add_transparency();
-    pic8* static_intro_screen = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
-    static_intro_screen->fill_box(BLACK_PALETTE_ID);
-    blit8(static_intro_screen, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,
-          SCREEN_HEIGHT / 2 - Intro->get_height() / 2);
 
     // Display intro.pcx
     MenuPalette->set();
-    bltfront(static_intro_screen);
+    show_intro_screen();
 
     init_sound();
 
@@ -74,10 +78,8 @@ void menu_intro() {
         if (get_any_key_just_pressed()) {
             break;
         }
-        bltfront(static_intro_screen);
+        show_intro_screen();
     }
-    delete static_intro_screen;
-    static_intro_screen = nullptr;
 
     if (State->player_count == 0) {
         if (!menu_player_create(true)) {

@@ -66,7 +66,6 @@ void eol_settings::set_renderer(RendererType r) {
     renderer_ = r;
     if (has_window()) {
         platform_recreate_window();
-        MenuPalette->set();
     }
 }
 

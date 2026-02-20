@@ -14,6 +14,7 @@
 #include "pic8.h"
 #include "segments.h"
 #include "sprite.h"
+#include "debug/profiler.h"
 #include <cstdint>
 #include <cmath>
 #include <cstring>
@@ -1763,6 +1764,7 @@ void canvas::create_front_grass() {
 }
 
 void canvas::create_canvases() {
+    START_TIME(canvas_timer);
     Lgr->reload_default_textures();
 
     delete CanvasBack;
@@ -1838,6 +1840,8 @@ void canvas::create_canvases() {
     // Calculate the rendering position of objects
     CanvasBack->calculate_object_positions();
     CanvasMinimap->calculate_object_positions();
+
+    END_TIME(canvas_timer, std::format("Canvases"));
 }
 
 node_finder::node_finder(canvas* src) {

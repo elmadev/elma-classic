@@ -16,7 +16,7 @@ static pic8 Lockbuff = pic8();
 
 static int Backpiclocked = 0, Frontpiclocked = 0;
 
-static void on_resolution_change() {
+void on_resolution_change() {
     editor_canvas_update_resolution();
     reinit_menu_pictures();
     if (Ptop && Lgr) {

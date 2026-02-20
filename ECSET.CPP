@@ -1127,56 +1127,7 @@ void canvas::draw_killers(void) {
             draw_pixels(source, distance, x - 1, x - 1, y, CanvasClipping_Unclipped);
             draw_pixels(source, distance, x + 1, x + 1, y, CanvasClipping_Unclipped);
             draw_pixels(source, distance, x - 1, x + 1, y + 1, CanvasClipping_Unclipped);
-
-            continue;
         }
-
-        /* Ez a resz csak nagy objektumokhoz kellene, de most csak view-val
-           foglalkozunk:
-        int x1 = (pk->r.x-origin.x)*MetersToPixels;
-        int y1 = (-pk->r.y-origin.y)*MetersToPixels;
-        x1 -= ANIM_WIDTH/2;
-        y1 += ANIM_WIDTH/2;
-
-        pic8* ppic = Lgr->pexit;
-        int ujtavolsag = 498;
-        if( pk->type == object::Type::Killer ) {
-            ppic = Lgr->pkiller;
-            ujtavolsag = 499;
-        }
-
-        int xsize = ppic->get_width();
-        int ysize = ppic->get_height();
-
-        if( x1 < 120 || x1+xsize >= maxx-50 )
-            return;
-
-        // Van atlatszosag:
-        unsigned char atlatszo = ppic->gpixel( 0, 0 );
-        for( int y = 0; y < ysize; y++ ) {
-            // Kep egy soranak elintezese:
-            unsigned char* sor = ppic->get_row( ysize - 1 - y );
-            if( ((int)sor & PIXELMASZK) == 0 )
-                external_error( "Memory address is less than 2048 (654)!" );
-
-            // Atugorja elso ures pixeleket:
-            int x = uresszam( 0, xsize, sor, atlatszo );
-            while( x <= xsize-1 ) {
-                // Keresi kis szakaszokat:
-                int size = teliszam( x, xsize, sor, atlatszo );
-                if( size <= 0 )
-                    internal_error( "canvas::draw_sprites teliszam utan size <= 0!" );
-
-                // Negativ iranyban haladunk y-on (y1-y):
-                if( y1-y >= 0 && y1-y < pixel_height )
-                    draw_pixels( &sor[x], ujtavolsag, x1+x, x1+x+size-1,
-                                                    y1-y, CanvasClipping_Unclipped );
-                x += size;
-
-                // Atugorja ures pixeleket:
-                x += uresszam( x, xsize, sor, atlatszo );
-            }
-        }*/
     }
 }
 

@@ -388,7 +388,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
 
     // Jatekmod eldontese:
     Single = State->single;
-    Tag = State->flag_tag;
+    Tag = !Single && State->flag_tag;
     Rec1->set_flagtag(Tag);
     Rec2->set_flagtag(Tag);
 

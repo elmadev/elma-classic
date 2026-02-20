@@ -838,11 +838,10 @@ static int consecutive_transparent_pixels(unsigned char* pic_row, int x, int wid
                                           unsigned char transparency) {
     int count = 0;
     for (int i = x; i < width; i++) {
-        if (pic_row[i] == transparency) {
-            count++;
-        } else {
+        if (pic_row[i] != transparency) {
             return count;
         }
+        count++;
     }
     return count;
 }
@@ -851,11 +850,10 @@ static int consecutive_solid_pixels(unsigned char* pic_row, int x, int width,
                                     unsigned char transparency) {
     int count = 0;
     for (int i = x; i < width; i++) {
-        if (pic_row[i] != transparency) {
-            count++;
-        } else {
+        if (pic_row[i] == transparency) {
             return count;
         }
+        count++;
     }
     return count;
 }
@@ -893,11 +891,10 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) 
     // Calculate qupdown mask
     for (int j = 0; j < width; j++) {
         for (int i = 0; i < height; i++) {
-            if (pic->gpixel(j, i) == transparency) {
-                BufferMain->ppixel(j, i, 1);
-            } else {
+            if (pic->gpixel(j, i) != transparency) {
                 break;
             }
+            BufferMain->ppixel(j, i, 1);
         }
     }
 

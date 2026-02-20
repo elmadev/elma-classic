@@ -388,7 +388,7 @@ static void menu_customize_player(key_pointers keys, player_keys* player_control
         if (choice < 0) {
             return;
         }
-        if (choice >= 0 && choice < PLAYER_KEYS_END) {
+        if (choice >= PLAYER_KEYS_START && choice < PLAYER_KEYS_END) {
             prompt_control(PLAYER_KEYS_END, keys, choice);
         }
     }
@@ -414,7 +414,7 @@ static void menu_customize_replay(key_pointers keys) {
         if (choice < 0) {
             return;
         }
-        if (choice >= 0 && choice < REPLAY_KEYS_END) {
+        if (choice >= REPLAY_KEYS_START && choice < REPLAY_KEYS_END) {
             prompt_control(REPLAY_KEYS_END, keys, choice);
         }
     }

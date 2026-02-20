@@ -8,6 +8,7 @@
 #include "gl_renderer.h"
 #include "main.h"
 #include "M_PIC.H"
+#include "pic8.h"
 #include <directinput/scancodes.h>
 #include <SDL.h>
 #include <sdl/scancodes_windows.h>
@@ -30,8 +31,6 @@ void message_box(const char* text) {
     // SDLWindow will either be a handle to the window, or nullptr if no parent
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Message", text, SDLWindow);
 }
-
-static unsigned char** SurfaceBuffer;
 
 static void create_window(int window_pos_x, int window_pos_y, int width, int height) {
     if (EolSettings->renderer() == RendererType::OpenGL) {
@@ -85,8 +84,6 @@ void platform_init() {
     SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
     SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
 
-    SurfaceBuffer = new unsigned char*[SCREEN_HEIGHT];
-
     create_window(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
     initialize_renderer();
     create_palette_surface();
@@ -128,28 +125,17 @@ bool has_window() { return SDLWindow != nullptr; }
 
 static bool SurfaceLocked = false;
 
-unsigned char** lock_backbuffer(bool flipped) {
+void lock_backbuffer(pic8& view, bool flipped) {
     if (SurfaceLocked) {
         internal_error("lock_backbuffer SurfaceLocked!");
     }
     SurfaceLocked = true;
 
-    unsigned char* row = (unsigned char*)SDLSurfacePaletted->pixels;
-    if (flipped) {
-        // Set the row buffer bottom-down
-        for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            SurfaceBuffer[SCREEN_HEIGHT - 1 - y] = row;
-            row += SDLSurfacePaletted->w;
-        }
-    } else {
-        // Set the row buffer top-down
-        for (int y = 0; y < SCREEN_HEIGHT; y++) {
-            SurfaceBuffer[y] = row;
-            row += SDLSurfacePaletted->w;
-        }
-    }
-
-    return SurfaceBuffer;
+    int pitch = SDLSurfacePaletted->pitch;
+    int width = SDLSurfacePaletted->w;
+    int height = SDLSurfacePaletted->h;
+    unsigned char* pixels = (unsigned char*)SDLSurfacePaletted->pixels;
+    view.subview(width, height, pixels, pitch, flipped);
 }
 
 void unlock_backbuffer() {
@@ -168,12 +154,11 @@ void unlock_backbuffer() {
     }
 }
 
-unsigned char** lock_frontbuffer(bool flipped) {
+void lock_frontbuffer(pic8& view, bool flipped) {
     if (SurfaceLocked) {
         internal_error("lock_frontbuffer SurfaceLocked!");
     }
-
-    return lock_backbuffer(flipped);
+    lock_backbuffer(view, flipped);
 }
 
 void unlock_frontbuffer() {

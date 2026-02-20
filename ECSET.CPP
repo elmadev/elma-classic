@@ -1445,7 +1445,7 @@ void canvas::render_minimap(bool player1, pic8* pic, vect2 corner, int x1, int y
     }
 }
 
-static canvas_chunk_node* QgrassTextureId = nullptr;
+static canvas_pixels* QgrassTextureId = nullptr;
 
 // Returns true if the pixel above (x, y) renders in front of the bike
 static bool above_is_front(int x, int y, node_finder* finder) {
@@ -1456,7 +1456,7 @@ static bool above_is_front(int x, int y, node_finder* finder) {
     if (chunk->pixels.is_enum()) {
         return false;
     }
-    if (chunk->pixels == QgrassTextureId->pixels) {
+    if (chunk->pixels == *QgrassTextureId) {
         return false;
     }
     // Bug: It should actually check if the distance >= 500 to prevent floating
@@ -1513,7 +1513,7 @@ void canvas::create_front_grass() {
         while (cur_node) {
             int node_width = cur_node->width;
             canvas_chunk_node* next_node = cur_node->next;
-            QgrassTextureId = cur_node;
+            QgrassTextureId = &cur_node->pixels;
 
             // Only parse back grass
             if (cur_node->pixels.is_texture()) {

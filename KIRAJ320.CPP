@@ -7,6 +7,7 @@
 #include "ECSET.H"
 #include "EDITUJ.H"
 #include "eol/console.h"
+#include "eol/status_messages.h"
 #include "eol_settings.h"
 #include "flagtag.h"
 #include "LEJATSZO.H"
@@ -93,6 +94,8 @@ void init_renderer() {
 
     Console = new console();
     Console->register_console_commands();
+
+    StatusMessages = new status_messages();
 }
 
 void beallitmereteket(int splitscreen) {
@@ -901,6 +904,7 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
     }
 
     Console->render(*npic, *SmallFont);
+    StatusMessages->render(*npic, *SmallFont);
 
     // Mentes lemezre:
     menteshakell(npic);

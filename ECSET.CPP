@@ -891,7 +891,6 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
     }
 
     // Grab the QGRASS texture
-    int felso = 1;
     int distance = 600;
     char texturanev[20];
     strcpy(texturanev, "qgrass");
@@ -914,21 +913,11 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
     }
     // Calculate qupdown mask
     for (int j = 0; j < width; j++) {
-        if (felso) {
-            for (int i = 0; i < height; i++) {
-                if (pic->gpixel(j, i) == transparency) {
-                    BufferMain->ppixel(j, i, 1);
-                } else {
-                    break;
-                }
-            }
-        } else {
-            for (int i = height - 1; i >= 0; i--) {
-                if (pic->gpixel(j, i) == transparency) {
-                    BufferMain->ppixel(j, i, 1);
-                } else {
-                    break;
-                }
+        for (int i = 0; i < height; i++) {
+            if (pic->gpixel(j, i) == transparency) {
+                BufferMain->ppixel(j, i, 1);
+            } else {
+                break;
             }
         }
     }
@@ -954,16 +943,9 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
 
     // Add 20 pixels of height to grass
     int grass_height_padding = QGRASS_EXTRA_HEIGHT * EolSettings->zoom();
-    if (felso) {
-        for (int i = 0; i < grass_height_padding; i++) {
-            draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
-                        y + height + i, clipping);
-        }
-    } else {
-        for (int i = 0; i < grass_height_padding; i++) {
-            draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
-                        y - 1 - i, clipping);
-        }
+    for (int i = 0; i < grass_height_padding; i++) {
+        draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
+                    y + height + i, clipping);
     }
 }
 
@@ -1035,7 +1017,8 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
         int best_index = -1;
         int best_slope = 0;
         for (int i = 0; i < gr->length; i++) {
-            // Check each image and choose the one with the smallest y-offset from desired height
+            // Check each image and choose the one with the smallest y-offset from desired
+            // height
             int slope = gr->pics[i]->get_height();
             if (slope < 2 * GRASS_MARGIN + 1) {
                 char tmp[60];

@@ -277,6 +277,9 @@ static void load_control(menu_nav* nav, key_pointers keys, int offset, std::stri
     if (!nav) {
         return;
     }
+    if (offset != nav->row_count()) {
+        internal_error("load_control key_pointers array desynced from menu_nav!", label.c_str());
+    }
     nav->add_row(std::move(label), dik_to_string(*key));
 }
 
@@ -326,6 +329,9 @@ static void load_universal_controls(menu_nav* nav) {
     load_control(nav, UniversalKeys, i++, "Dec. Screen Size", &State->key_decrease_screen_size);
     load_control(nav, UniversalKeys, i++, "Make a Screenshot", &State->key_screenshot);
     load_control(nav, UniversalKeys, i++, "Escape Alias", &State->key_escape_alias);
+    if (i != UNIVERSAL_KEYS_END) {
+        internal_error("UNIVERSAL_KEYS_END is misaligned!");
+    }
 }
 
 // Setup the menu to display the replay controls
@@ -337,6 +343,9 @@ static void load_replay_controls(menu_nav* nav, key_pointers keys) {
     load_control(nav, keys, i++, "Slow motion 2x", &State->key_replay_slow_2x);
     load_control(nav, keys, i++, "Slow motion 4x", &State->key_replay_slow_4x);
     load_control(nav, keys, i++, "Pause", &State->key_replay_pause);
+    if (i != REPLAY_KEYS_END) {
+        internal_error("REPLAY_KEYS_END is misaligned!");
+    }
 }
 
 // Setup the menu to display one player's controls
@@ -352,6 +361,9 @@ static void load_player_controls(menu_nav* nav, key_pointers keys, player_keys* 
     load_control(nav, keys, i++, "Toggle Navigator", &player_controls->toggle_minimap);
     load_control(nav, keys, i++, "Toggle Time", &player_controls->toggle_timer);
     load_control(nav, keys, i++, "Toggle Show/Hide", &player_controls->toggle_visibility);
+    if (i != PLAYER_KEYS_END) {
+        internal_error("PLAYER_KEYS_END is misaligned!");
+    }
 }
 
 // Menu to change controls for one player

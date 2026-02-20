@@ -49,17 +49,10 @@ canvas_chunk_node* canvas::new_node() {
         // Point to the new memory struct
         node_array_last = node_array_last->next;
         node_array_last->next = nullptr;
-
-        // Return the next unused node
-        node_array_index++;
-        canvas_chunk_node* new_node = &node_array_last->nodes[node_array_index - 1];
-        new_node->distance = 0;
-        return new_node;
     }
 
     // Return the next unused node
-    node_array_index++;
-    canvas_chunk_node* new_node = &node_array_last->nodes[node_array_index - 1];
+    canvas_chunk_node* new_node = &node_array_last->nodes[node_array_index++];
     new_node->distance = 0;
     return new_node;
 }

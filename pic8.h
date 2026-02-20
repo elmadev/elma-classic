@@ -27,6 +27,7 @@ class pic8 {
     unsigned short transparency_data_length;
 
   public:
+    pic8(); // subview
     pic8(int w, int h);
     pic8(const char* filename, FILE* h = nullptr);
     static pic8* from_bmp(const char* filename);

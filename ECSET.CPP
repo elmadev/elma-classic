@@ -24,6 +24,11 @@ canvas* CanvasBack = nullptr;
 canvas* CanvasFront = nullptr;
 canvas* CanvasMinimap = nullptr;
 
+constexpr int RIGHTMOST_CHUNK_WIDTH = 1000000;
+
+constexpr int DISTANCE_DEFAULT = 1000000;
+constexpr int DISTANCE_SKY_CLIPPING_CORRECTION = 10000;
+
 #define PIXELMASZK (~((uintptr_t)0x7FF))
 
 static void memory_error() {
@@ -215,7 +220,7 @@ static int xpos_to_width(canvas_chunk_node* row_nodes) {
             cur_node->width = cur_node->next->width - cur_node->width;
         } else {
             // Very last chunk has a infinite-ish width
-            cur_node->width = 1000000;
+            cur_node->width = RIGHTMOST_CHUNK_WIDTH;
         }
 
         cur_node = cur_node->next;
@@ -496,7 +501,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
     bool skip = false;
     if (clipping == CanvasClipping_Ground) {
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground) {
-            dest_dist = 1000000;
+            dest_dist = DISTANCE_DEFAULT;
         }
         if ((pixelek_t)dest->pixels == PixelsDefaultBackground) {
             skip = true;
@@ -505,18 +510,18 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
     if (clipping == CanvasClipping_Sky) {
         // Background distance needs to be temporarily modified as Sky clipping should never draw on
         // top of Ground clipping
-        source_dist += 10000;
+        source_dist += DISTANCE_SKY_CLIPPING_CORRECTION;
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground) {
             skip = true;
         }
         if ((pixelek_t)dest->pixels == PixelsDefaultBackground) {
-            dest_dist = 1000000;
+            dest_dist = DISTANCE_DEFAULT;
         }
     }
     if (clipping == CanvasClipping_Unclipped) {
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground ||
             (pixelek_t)dest->pixels == PixelsDefaultBackground) {
-            dest_dist = 1000000;
+            dest_dist = DISTANCE_DEFAULT;
         }
     }
 
@@ -528,7 +533,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
                            "dest is non-transparent but clipping is transparent!");
         }
         if ((pixelek_t)dest->pixels == PixelsTransparent) {
-            dest_dist = 1000000;
+            dest_dist = DISTANCE_DEFAULT;
         }
     }
 
@@ -881,6 +886,7 @@ constexpr int MAX_HEIGHTMAP_LENGTH = 10000;
 static int GrassHeightmap[MAX_HEIGHTMAP_LENGTH + 10];
 
 constexpr int GRASS_MARGIN = 20;
+constexpr int GRASS_DISTANCE = 600;
 
 void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, int clipping) {
     if (!BufferMain) {
@@ -888,7 +894,7 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
     }
 
     // Grab the QGRASS texture
-    int distance = 600;
+    int distance = GRASS_DISTANCE;
     int texture_index = Lgr->get_texture_index("qgrass");
     if (texture_index < 0) {
         internal_error("draw_qgrass_texture texture_index < 0");
@@ -945,7 +951,7 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
 }
 
 void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y, int clipping) {
-    int distance = 600;
+    int distance = GRASS_DISTANCE;
 
     // Grab the QUP/QDOWN image
     pic8* pic = gr->pics[qupdown_index];
@@ -1133,8 +1139,8 @@ void canvas::adjust_background_distance() {
         while (cur_node) {
             // In draw_one_chunk(), we temporarily added distance to properly layer assets
             // Remove that distance
-            if (cur_node->distance >= 10000) {
-                cur_node->distance -= 10000;
+            if (cur_node->distance >= DISTANCE_SKY_CLIPPING_CORRECTION) {
+                cur_node->distance -= DISTANCE_SKY_CLIPPING_CORRECTION;
             }
             cur_node = cur_node->next;
         }
@@ -1270,7 +1276,7 @@ canvas::canvas(canvas* reference) {
 
         rows_linked[i] = new_node();
         rows_linked[i]->next = nullptr;
-        rows_linked[i]->width = 1000000;
+        rows_linked[i]->width = RIGHTMOST_CHUNK_WIDTH;
         rows_linked[i]->distance = 0;
         rows_linked[i]->pixels = (unsigned char*)PixelsTransparent;
     }

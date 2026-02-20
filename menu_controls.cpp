@@ -6,8 +6,9 @@
 #include "platform_impl.h"
 #include "state.h"
 #include <cstring>
+#include <format>
 
-const char* dik_to_string(DikScancode keycode) {
+std::string dik_to_string(DikScancode keycode) {
     switch (keycode) {
     case DIK_UNKNOWN:
         return "NONE";
@@ -250,7 +251,7 @@ const char* dik_to_string(DikScancode keycode) {
     case DIK_APPS:
         return "APPLICATION";
     }
-    return NULL;
+    return std::format("Key code: {}", keycode);
 }
 
 // A list of pointers to where the keys are stored (somewhere in a state class object)
@@ -271,13 +272,7 @@ constexpr int REPLAY_KEYS_END = REPLAY_KEYS_START + 6;
 // Setup the menu to display one control key
 static void load_control(key_pointers keys, int offset, const char* label, int* key) {
     strcpy(NavEntriesLeft[offset], label);
-    const char* key_text = dik_to_string(*key);
-    char tmp[20] = "";
-    if (!key_text) {
-        sprintf(tmp, "Key code: %d", *key);
-        key_text = tmp;
-    }
-    strcpy(NavEntriesRight[offset], key_text);
+    strcpy(NavEntriesRight[offset], dik_to_string(*key).c_str());
     keys[offset] = key;
 }
 

@@ -16,6 +16,7 @@
 #include "sprite.h"
 #include "debug/profiler.h"
 #include <cstdint>
+#include <climits>
 #include <cmath>
 #include <cstring>
 
@@ -1006,7 +1007,7 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
         }
 
         // Let's pick the best matching QUP/QDOWN
-        int best_score = 10000;
+        int best_score = INT_MAX;
         int best_index = -1;
         int best_slope = 0;
         for (int i = 0; i < gr->length; i++) {

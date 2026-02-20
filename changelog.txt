@@ -58,6 +58,7 @@
 * Some minor grammatical or spelling mistakes are fixed
 * Apples and flowers now maintain correct bobbing animation when the view zoom level changes.
 * Pictures extremely out of bounds to the far left or right will no longer prevent other pictures and textures from being rendered
+* Extremely vertical grass polygon lines could crash, especially at high zoom
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

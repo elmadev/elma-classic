@@ -1021,13 +1021,13 @@ lgrfile::~lgrfile() {
     }
 }
 
-void lgrfile::reload_default_textures() {
+void lgrfile::reload_default_textures(bool force) {
     if (!Ptop->foreground_name[0] || !Ptop->background_name[0]) {
         internal_error("!Ptop->foreground_name[0] || !Ptop->background_name[0]");
     }
 
     // Recreate background texture
-    if (strcmpi(background_name, Ptop->background_name) != 0) {
+    if (force || strcmpi(background_name, Ptop->background_name) != 0) {
         strcpy(background_name, Ptop->background_name);
         delete background;
         background = nullptr;
@@ -1042,7 +1042,7 @@ void lgrfile::reload_default_textures() {
     }
 
     // Recreate foreground texture
-    if (strcmpi(foreground_name, Ptop->foreground_name) != 0) {
+    if (force || strcmpi(foreground_name, Ptop->foreground_name) != 0) {
         strcpy(foreground_name, Ptop->foreground_name);
         delete foreground;
         foreground = nullptr;

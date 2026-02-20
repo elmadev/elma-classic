@@ -185,7 +185,7 @@ void canvas::draw_segment(segment* seg) {
         // Create a new node
         canvas_chunk_node* node = new_node();
         node->next = nullptr;
-        node->width = x;
+        node->xpos = x;
         if (line_direction_negative) {
             node->pixels = (unsigned char*)PixelsDefaultForeground;
         } else {
@@ -207,11 +207,11 @@ void canvas::draw_segment(segment* seg) {
 // Initially, the chunk keeps track of x position instead of chunk width
 // Convert x position values to chunk width values
 static int xpos_to_width(canvas_chunk_node* row_nodes) {
-    int xpos = row_nodes->width;
+    int xpos = row_nodes->xpos;
     canvas_chunk_node* cur_node = row_nodes;
     while (cur_node) {
         if (cur_node->next) {
-            cur_node->width = cur_node->next->width - cur_node->width;
+            cur_node->width = cur_node->next->xpos - cur_node->xpos;
         } else {
             // Very last chunk has a infinite-ish width
             cur_node->width = RIGHTMOST_CHUNK_WIDTH;
@@ -249,10 +249,10 @@ static void sort_xpos_and_merge(canvas_chunk_node* row_nodes) {
         cur_node = cur_node->next;
         while (cur_node->next) {
             canvas_chunk_node* next_node = cur_node->next;
-            if (cur_node->width > next_node->width) {
-                int tmp_xpos = cur_node->width;
-                cur_node->width = next_node->width;
-                next_node->width = tmp_xpos;
+            if (cur_node->xpos > next_node->xpos) {
+                int tmp_xpos = cur_node->xpos;
+                cur_node->xpos = next_node->xpos;
+                next_node->xpos = tmp_xpos;
 
                 unsigned char* tmp_pixels = cur_node->pixels;
                 cur_node->pixels = next_node->pixels;
@@ -268,7 +268,7 @@ static void sort_xpos_and_merge(canvas_chunk_node* row_nodes) {
     while (cur_node->next) {
         canvas_chunk_node* next_node = cur_node->next;
         // Check if two nodes with the same x position
-        if (cur_node->width == next_node->width) {
+        if (cur_node->xpos == next_node->xpos) {
             if (cur_node->pixels == next_node->pixels) {
                 // Identical, delete next_node
                 cur_node->next = next_node->next;

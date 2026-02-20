@@ -31,7 +31,12 @@ class node_finder {
 // together to make one row of the rendered level.
 struct canvas_chunk_node {
     canvas_chunk_node* next;
-    int width;
+    union {
+        // Initially, when drawing from segments class.
+        int xpos;
+        // Later converted to width.
+        int width;
+    };
     int distance;
     unsigned char* pixels;
 };

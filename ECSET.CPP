@@ -13,7 +13,6 @@
 #include "physics_init.h"
 #include "pic8.h"
 #include "segments.h"
-#include "sprite.h"
 #include "debug/profiler.h"
 #include <cstdint>
 #include <climits>
@@ -469,36 +468,29 @@ void canvas::calculate_object_positions() {
     }
 }
 
-enum {
-    CanvasClipping_Ground,
-    CanvasClipping_Sky,
-    CanvasClipping_Unclipped,
-    CanvasClipping_Transparent
-};
-
 // source must be aligned to a single chunk.
 canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char* source,
                                           int dest_x, int source_x_left, int source_x_right,
                                           int source_dist, canvas_chunk_node* dest_prev,
-                                          bool* prev_can_merge, int clipping) {
+                                          bool* prev_can_merge, Clipping clipping) {
 
     if ((pixelek_t)source == PixelsTransparent) {
         internal_error("canvas::draw_one_chunk source is transparent!");
     }
     // Transparent pixels are only specifically used for the front canvas, so enforce this usage
-    if ((pixelek_t)dest->pixels == PixelsTransparent && clipping != CanvasClipping_Transparent) {
+    if ((pixelek_t)dest->pixels == PixelsTransparent && clipping != Clipping::Transparent) {
         internal_error("canvas::draw_one_chunk",
                        "dest is transparent but clipping is not transparent!");
     }
 
     // Validate whether we want to draw based on clipping
-    if (clipping == CanvasClipping_Ground) {
+    if (clipping == Clipping::Ground) {
         if ((pixelek_t)dest->pixels == PixelsDefaultBackground) {
             *prev_can_merge = false;
             return dest;
         }
     }
-    if (clipping == CanvasClipping_Sky) {
+    if (clipping == Clipping::Sky) {
         // Background distance needs to be temporarily modified as Sky clipping should never draw on
         // top of Ground clipping
         source_dist += DISTANCE_SKY_CLIPPING_CORRECTION;
@@ -507,7 +499,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
             return dest;
         }
     }
-    if (clipping == CanvasClipping_Transparent) {
+    if (clipping == Clipping::Transparent) {
         // Transparent pixels are only specifically used for the front canvas, so enforce this usage
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground ||
             (pixelek_t)dest->pixels == PixelsDefaultBackground) {
@@ -663,7 +655,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
 }
 
 void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int x_right, int y,
-                         int clipping) {
+                         Clipping clipping) {
     // Make sure canvas is unused so far
     canvas_chunk_node* cur_node = rows_linked[y];
     int xpos = rows_x1[y];
@@ -718,7 +710,7 @@ void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int
     }
 }
 
-void canvas::draw_texture(sprite* spr, int texture_index, int mask_index, int clipping) {
+void canvas::draw_texture(sprite* spr, int texture_index, int mask_index, Clipping clipping) {
     // Calculate pixel position
     int x = (int)((spr->r.x - origin.x) * MetersToPixels);
     int y = (int)((-spr->r.y - origin.y) * MetersToPixels);
@@ -749,20 +741,14 @@ void canvas::draw_texture(sprite* spr, int texture_index, int mask_index, int cl
     }
 }
 
-void canvas::draw_sprites(int clipping) {
+void canvas::draw_sprites(Clipping clipping) {
     for (int sprite_index = 0; sprite_index < MAX_SPRITES; sprite_index++) {
         sprite* spr = Ptop->sprites[sprite_index];
         if (!spr) {
             return;
         }
         // Only draw the selected clipping
-        if (clipping == CanvasClipping_Ground && spr->clipping != Clipping::Ground) {
-            continue;
-        }
-        if (clipping == CanvasClipping_Sky && spr->clipping != Clipping::Sky) {
-            continue;
-        }
-        if (clipping == CanvasClipping_Unclipped && spr->clipping != Clipping::Unclipped) {
+        if (clipping != spr->clipping) {
             continue;
         }
 
@@ -912,7 +898,7 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) 
                 internal_error("draw_qgrass_texture count <= 0");
             }
             draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x + j,
-                        x + j + count - 1, y + i, CanvasClipping_Ground);
+                        x + j + count - 1, y + i, Clipping::Ground);
             j += count;
         }
     }
@@ -921,7 +907,7 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) 
     int grass_height_padding = QGRASS_EXTRA_HEIGHT * EolSettings->zoom();
     for (int i = 0; i < grass_height_padding; i++) {
         draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
-                    y + height + i, CanvasClipping_Ground);
+                    y + height + i, Clipping::Ground);
     }
 }
 
@@ -955,7 +941,7 @@ void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y) {
             if (count <= 0) {
                 internal_error("draw_qupdown count <= 0");
             }
-            draw_pixels(&sor[j], distance, x + j, x + j + count - 1, y + i, CanvasClipping_Ground);
+            draw_pixels(&sor[j], distance, x + j, x + j + count - 1, y + i, Clipping::Ground);
             j += count;
         }
     }
@@ -1079,10 +1065,10 @@ void canvas::draw_killers() {
             int distance = 499;
             int x = (int)((obj->r.x - origin.x) * (MetersToPixels / MinimapScaleFactor));
             int y = (int)((-obj->r.y - origin.y) * (MetersToPixels / MinimapScaleFactor));
-            draw_pixels(source, distance, x - 1, x + 1, y - 1, CanvasClipping_Unclipped);
-            draw_pixels(source, distance, x - 1, x - 1, y, CanvasClipping_Unclipped);
-            draw_pixels(source, distance, x + 1, x + 1, y, CanvasClipping_Unclipped);
-            draw_pixels(source, distance, x - 1, x + 1, y + 1, CanvasClipping_Unclipped);
+            draw_pixels(source, distance, x - 1, x + 1, y - 1, Clipping::Unclipped);
+            draw_pixels(source, distance, x - 1, x - 1, y, Clipping::Unclipped);
+            draw_pixels(source, distance, x + 1, x + 1, y, Clipping::Unclipped);
+            draw_pixels(source, distance, x - 1, x + 1, y + 1, Clipping::Unclipped);
         }
     }
 }
@@ -1172,11 +1158,11 @@ canvas::canvas(bool minimap) {
 
     // Handle high quality graphics
     if (!is_minimap && State->high_quality) {
-        draw_sprites(CanvasClipping_Ground);
+        draw_sprites(Clipping::Ground);
         draw_grass_polygons();
-        draw_sprites(CanvasClipping_Sky);
+        draw_sprites(Clipping::Sky);
         adjust_background_distance();
-        draw_sprites(CanvasClipping_Unclipped);
+        draw_sprites(Clipping::Unclipped);
     }
 
     // Draw killers into the minimap
@@ -1576,10 +1562,10 @@ void canvas::create_front_grass() {
                             alternate_distance = !alternate_distance;
                             if (alternate_distance) {
                                 draw_pixels(cur_node->pixels, 223, x1, x1 + count - 1, i,
-                                            CanvasClipping_Unclipped);
+                                            Clipping::Unclipped);
                             } else {
                                 draw_pixels(cur_node->pixels, 224, x1, x1 + count - 1, i,
-                                            CanvasClipping_Unclipped);
+                                            Clipping::Unclipped);
                             }
                         }
                         x1 += count;
@@ -1637,7 +1623,7 @@ void canvas::create_canvases() {
                     if ((pixelek_t)cur_node->pixels >= 10) {
                         CanvasFront->draw_pixels(cur_node->pixels, cur_node->distance, xpos,
                                                  xpos + cur_node->width - 1, i,
-                                                 CanvasClipping_Transparent);
+                                                 Clipping::Transparent);
                         // Delete from back canvas
                         cur_node->pixels = (unsigned char*)PixelsTransparent;
                     }

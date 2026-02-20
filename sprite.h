@@ -11,6 +11,8 @@ enum class Clipping {
     Unclipped = 0,
     Ground = 1,
     Sky = 2,
+    // only used by canvas
+    Transparent = 3,
 };
 
 class sprite {

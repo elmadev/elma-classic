@@ -1,6 +1,7 @@
 #ifndef ECSET_H
 #define ECSET_H
 
+#include "sprite.h"
 #include "vect2.h"
 
 class canvas;
@@ -110,11 +111,11 @@ class canvas {
     canvas_chunk_node* draw_one_chunk(canvas_chunk_node* dest, unsigned char* source, int dest_x,
                                       int source_x_left, int source_x_right, int source_dist,
                                       canvas_chunk_node* dest_prev, bool* prev_can_merge,
-                                      int clipping);
+                                      Clipping clipping);
     void draw_pixels(unsigned char* source, int source_dist, int x_left, int x_right, int y,
-                     int clipping);
-    void draw_texture(sprite* spr, int texture_index, int mask_index, int clipping);
-    void draw_sprites(int clipping);
+                     Clipping clipping);
+    void draw_texture(sprite* spr, int texture_index, int mask_index, Clipping clipping);
+    void draw_sprites(Clipping clipping);
     void draw_killers();
 
     // Draw grass

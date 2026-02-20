@@ -882,7 +882,7 @@ static int GrassHeightmap[MAX_HEIGHTMAP_LENGTH + 10];
 constexpr int GRASS_MARGIN = 20;
 constexpr int GRASS_DISTANCE = 600;
 
-void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, int clipping) {
+void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) {
     if (!BufferMain) {
         internal_error("draw_qgrass_texture !BufferMain");
     }
@@ -931,7 +931,7 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
                 internal_error("draw_qgrass_texture count <= 0");
             }
             draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x + j,
-                        x + j + count - 1, y + i, clipping);
+                        x + j + count - 1, y + i, CanvasClipping_Ground);
             j += count;
         }
     }
@@ -940,11 +940,11 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
     int grass_height_padding = QGRASS_EXTRA_HEIGHT * EolSettings->zoom();
     for (int i = 0; i < grass_height_padding; i++) {
         draw_pixels((unsigned char*)(pixelek_t)(texture_index + 10), distance, x, x + width - 1,
-                    y + height + i, clipping);
+                    y + height + i, CanvasClipping_Ground);
     }
 }
 
-void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y, int clipping) {
+void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y) {
     int distance = GRASS_DISTANCE;
 
     // Grab the QUP/QDOWN image
@@ -974,7 +974,7 @@ void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y, int clippi
             if (count <= 0) {
                 internal_error("draw_qupdown count <= 0");
             }
-            draw_pixels(&sor[j], distance, x + j, x + j + count - 1, y + i, clipping);
+            draw_pixels(&sor[j], distance, x + j, x + j + count - 1, y + i, CanvasClipping_Ground);
             j += count;
         }
     }
@@ -986,11 +986,10 @@ void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y, int clippi
 #endif
         return;
     }
-    draw_qgrass_texture(gr, qupdown_index, x, y, clipping);
+    draw_qgrass_texture(gr, qupdown_index, x, y);
 }
 
-void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0,
-                                int clipping) {
+void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0) {
 #ifdef DEBUG
     if (heightmap_length < 1) {
         internal_error("dd387d3e");
@@ -1046,13 +1045,13 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
             internal_error("draw_grass_polygon best_index < 0");
         }
 
-        draw_qupdown(gr, best_index, x, y, clipping);
+        draw_qupdown(gr, best_index, x, y);
         x += gr->pics[best_index]->get_width();
         y += best_slope;
     }
 }
 
-void canvas::draw_grass_polygons(int clipping) {
+void canvas::draw_grass_polygons() {
     // Only if the lgr has the right assets
     if (!Lgr->has_grass) {
         return;
@@ -1065,17 +1064,6 @@ void canvas::draw_grass_polygons(int clipping) {
             return;
         }
         if (!poly->is_grass) {
-            continue;
-        }
-
-        Clipping valid_clipping = Clipping::Ground;
-        if (clipping == CanvasClipping_Ground && valid_clipping != Clipping::Ground) {
-            continue;
-        }
-        if (clipping == CanvasClipping_Sky && valid_clipping != Clipping::Sky) {
-            continue;
-        }
-        if (clipping == CanvasClipping_Unclipped && valid_clipping != Clipping::Unclipped) {
             continue;
         }
 
@@ -1093,7 +1081,7 @@ void canvas::draw_grass_polygons(int clipping) {
         }
 
         // Draw the grass polygon
-        draw_grass_polygon(gr, GrassHeightmap, heightmap_length, x0, clipping);
+        draw_grass_polygon(gr, GrassHeightmap, heightmap_length, x0);
     }
 }
 
@@ -1213,12 +1201,10 @@ canvas::canvas(bool minimap) {
     // Handle high quality graphics
     if (!is_minimap && State->high_quality) {
         draw_sprites(CanvasClipping_Ground);
-        draw_grass_polygons(CanvasClipping_Ground);
+        draw_grass_polygons();
         draw_sprites(CanvasClipping_Sky);
-        draw_grass_polygons(CanvasClipping_Sky);
         adjust_background_distance();
         draw_sprites(CanvasClipping_Unclipped);
-        draw_grass_polygons(CanvasClipping_Unclipped);
     }
 
     // Draw killers into the minimap

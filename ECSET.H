@@ -118,10 +118,10 @@ class canvas {
     void draw_killers();
 
     // Draw grass
-    void draw_qgrass_texture(grass* gr, int qupdown_index, int x, int y, int clipping);
-    void draw_qupdown(grass* gr, int qupdown_index, int x, int y, int clipping);
-    void draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0, int clipping);
-    void draw_grass_polygons(int clipping);
+    void draw_qgrass_texture(grass* gr, int qupdown_index, int x, int y);
+    void draw_qupdown(grass* gr, int qupdown_index, int x, int y);
+    void draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0);
+    void draw_grass_polygons();
 
     // Render
     void render_row(bool player1, unsigned char* dest, int y);

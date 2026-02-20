@@ -816,8 +816,7 @@ void canvas::draw_sprites(int clipping) {
 
         // Check out of range pictures (x position only)
         if (x < 120 || x + width >= pixel_width - 50) {
-            // Should continue instead of return here
-            return;
+            continue;
         }
 
         unsigned char* pixeldata = pict->data;

@@ -56,8 +56,7 @@ void create_canvases(void);
 
 // Contains an image of the static level front, back or minimap
 class canvas {
-    friend void create_canvases(void);
-    friend void segedfv(void);
+    friend void create_canvases();
     friend canvas_chunk_node* node_finder::get_chunk(int x, int y);
 
     // Memory structure for canvas_chunk_node
@@ -122,7 +121,6 @@ class canvas {
     // Render
     void render_row1(unsigned char* dest, int y);
     void render_row2(unsigned char* dest, int y);
-    void kiegysor_FF(unsigned char* pc, int ye);
 
     void create_front_grass(void);
 

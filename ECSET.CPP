@@ -1909,11 +1909,6 @@ void create_canvases(void) {
     CanvasMinimap->calculate_object_positions();
 }
 
-void segedfv(void) {
-    canvas* pe = NULL;
-    pe->render_row1(NULL, 0);
-}
-
 node_finder::node_finder(canvas* src) {
     current_x = -1;
     current_y = -1;

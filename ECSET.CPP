@@ -20,18 +20,18 @@
 
 typedef uintptr_t pixelek_t;
 
-canvas* CanvasBack = NULL;
-canvas* CanvasFront = NULL;
-canvas* CanvasMinimap = NULL;
+canvas* CanvasBack = nullptr;
+canvas* CanvasFront = nullptr;
+canvas* CanvasMinimap = nullptr;
 
 #define PIXELMASZK (~((uintptr_t)0x7FF))
 
-static void memory_error(void) {
+static void memory_error() {
     external_error("You do not have enough memory to load this level!",
                    "Try to set the graphic detail to low at the options.");
 }
 
-canvas_chunk_node* canvas::new_node(void) {
+canvas_chunk_node* canvas::new_node() {
     // Check to see if we used up all the unused nodes in our memory struct
     if (node_array_index >= CHUNK_NODE_BLOCK_LENGTH) {
         // Create a new memory struct and reset the index to 0
@@ -43,7 +43,7 @@ canvas_chunk_node* canvas::new_node(void) {
 
         // Point to the new memory struct
         node_array_last = node_array_last->next;
-        node_array_last->next = NULL;
+        node_array_last->next = nullptr;
 
         // Return the next unused node
         node_array_index++;
@@ -65,7 +65,7 @@ static void quantize(double* meters) {
     *meters = (pixels + 0.5) / MetersToPixels;
 }
 
-void canvas::set_origin_and_dimensions(void) {
+void canvas::set_origin_and_dimensions() {
     // Iterate through all the segments and grab the min/max x/y values
     Segments->iterate_all_segments();
     segment* seg = Segments->next_segment();
@@ -125,10 +125,10 @@ void canvas::set_origin_and_dimensions(void) {
 
 void canvas::draw_segment(segment* seg) {
     // Get the line position relative to the origin, converted to pixels
-    vect2 r, v;
-    r = seg->r - origin;
+    vect2 r = seg->r - origin;
     r.x *= MetersToPixels;
     r.y *= MetersToPixels;
+    vect2 v;
     v.x = seg->v.x * MetersToPixels;
     v.y = seg->v.y * MetersToPixels;
     if (is_minimap) {
@@ -145,7 +145,7 @@ void canvas::draw_segment(segment* seg) {
     r.y -= 0.5;
 
     // Determine whether the line will generate background or foreground
-    int line_direction_negative = v.y < 0;
+    bool line_direction_negative = v.y < 0;
 
     // If the vector is going in a negative y direction, swap it to go in the positive y direction
     if (v.y < 0) {
@@ -185,7 +185,7 @@ void canvas::draw_segment(segment* seg) {
 
         // Create a new node
         canvas_chunk_node* node = new_node();
-        node->next = NULL;
+        node->next = nullptr;
         node->width = x;
         if (line_direction_negative) {
             node->pixels = (unsigned char*)PixelsDefaultForeground;
@@ -304,7 +304,7 @@ static void sort_xpos_and_merge(canvas_chunk_node* row_nodes) {
     }
 }
 
-void canvas::default_foreground_to_pointers(void) {
+void canvas::default_foreground_to_pointers() {
     for (int i = 0; i < pixel_height; i++) {
         canvas_chunk_node* cur_node = rows_linked[i];
         // Make sure canvas is unused so far
@@ -326,11 +326,11 @@ void canvas::default_foreground_to_pointers(void) {
     }
 }
 
-void canvas::merge_redundant_chunks(void) {
+void canvas::merge_redundant_chunks() {
     for (int i = 0; i < pixel_height; i++) {
-        int again = 1;
+        bool again = true;
         while (again) {
-            again = 0;
+            again = false;
             canvas_chunk_node* cur_node = rows_linked[i];
             while (cur_node && cur_node->next) {
                 canvas_chunk_node* next_node = cur_node->next;
@@ -339,7 +339,7 @@ void canvas::merge_redundant_chunks(void) {
                     cur_node->pixels == next_node->pixels) {
                     cur_node->next = next_node->next;
                     cur_node->width += next_node->width;
-                    again = 1;
+                    again = true;
                 }
                 cur_node = cur_node->next;
             }
@@ -347,7 +347,7 @@ void canvas::merge_redundant_chunks(void) {
     }
 }
 
-void canvas::textures_to_pointers(void) {
+void canvas::textures_to_pointers() {
     for (int y = 0; y < pixel_height; y++) {
         canvas_chunk_node* cur_node = rows_linked[y];
         // Make sure canvas is unused so far
@@ -375,7 +375,7 @@ void canvas::textures_to_pointers(void) {
                 pic8* pic = text->pic;
                 int remaining_width = cur_node->width;
                 int texture_x_offset = xpos;
-                int first = 1;
+                bool first = true;
                 while (remaining_width > 0) {
                     if (!first) {
                         canvas_chunk_node* node = new_node();
@@ -383,7 +383,7 @@ void canvas::textures_to_pointers(void) {
                         cur_node->next = node;
                         cur_node = node;
                     }
-                    first = 0;
+                    first = false;
 
                     texture_x_offset %= text->original_width;
                     int node_width = remaining_width;
@@ -420,7 +420,7 @@ static int list_length(canvas_chunk_node* row_nodes) {
     return count;
 }
 
-void canvas::linked_list_to_array(void) {
+void canvas::linked_list_to_array() {
     // Total number of still-used chunks
     int count = 0;
     for (int i = 0; i < pixel_height; i++) {
@@ -449,7 +449,7 @@ void canvas::linked_list_to_array(void) {
     }
 }
 
-void canvas::calculate_object_positions(void) {
+void canvas::calculate_object_positions() {
     const double offset = ANIM_WIDTH / 2.0 * EolSettings->zoom();
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Ptop->objects[i];
@@ -479,7 +479,7 @@ enum {
 canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char* source,
                                           int dest_x, int source_x_left, int source_x_right,
                                           int source_dist, canvas_chunk_node* dest_prev,
-                                          int* prev_can_merge, int clipping) {
+                                          bool* prev_can_merge, int clipping) {
 
     if ((pixelek_t)source == PixelsTransparent) {
         internal_error("canvas::draw_one_chunk source is transparent!");
@@ -493,13 +493,13 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
     // Validate whether we want to draw based on clipping and distance
     // Default foreground/background and empty has the lowest-priority distance
     int dest_dist = dest->distance;
-    int skip = 0;
+    bool skip = false;
     if (clipping == CanvasClipping_Ground) {
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground) {
             dest_dist = 1000000;
         }
         if ((pixelek_t)dest->pixels == PixelsDefaultBackground) {
-            skip = 1;
+            skip = true;
         }
     }
     if (clipping == CanvasClipping_Sky) {
@@ -507,7 +507,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         // top of Ground clipping
         source_dist += 10000;
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground) {
-            skip = 1;
+            skip = true;
         }
         if ((pixelek_t)dest->pixels == PixelsDefaultBackground) {
             dest_dist = 1000000;
@@ -534,7 +534,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
 
     // Check to see if we actually want to draw it
     if (skip || source_dist >= dest_dist) {
-        *prev_can_merge = 0;
+        *prev_can_merge = false;
         return dest;
     }
 
@@ -566,7 +566,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         dest->width -= node->width;
         dest->next = node;
 
-        *prev_can_merge = 1;
+        *prev_can_merge = true;
         return node;
     }
 
@@ -581,7 +581,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         // Check if prev chunk is a matching texture, in which case we merge with prev chunk
         if (!(*prev_can_merge) && dest_prev->distance == source_dist &&
             !((pixelek_t)dest_prev->pixels & PIXELMASZK) && dest_prev->pixels == source) {
-            *prev_can_merge = 1;
+            *prev_can_merge = true;
         }
         if (*prev_can_merge) {
             // Merge with previous chunk (which was right-aligned or matching texture)
@@ -592,7 +592,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
                 dest->pixels += insertion_width;
             }
 
-            *prev_can_merge = 0;
+            *prev_can_merge = false;
             return dest;
         } else {
             // Split the chunk in two
@@ -609,7 +609,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
                 dest->pixels += node->width;
             }
 
-            *prev_can_merge = 0;
+            *prev_can_merge = false;
             return dest;
         }
     }
@@ -625,21 +625,21 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         // Check if prev chunk is a matching texture, in which case we merge with prev chunk
         if (!(*prev_can_merge) && dest_prev->distance == source_dist &&
             !((pixelek_t)dest_prev->pixels & PIXELMASZK) && dest_prev->pixels == source) {
-            *prev_can_merge = 1;
+            *prev_can_merge = true;
         }
         if (*prev_can_merge) {
             // Merge with previous chunk (which was right-aligned or matching texture)
             dest_prev->width += dest->width;
             dest_prev->next = dest->next;
 
-            *prev_can_merge = 1;
+            *prev_can_merge = true;
             return dest_prev;
         } else {
             // Overwrite chunk with new data
             dest->pixels = source;
             dest->distance = source_dist;
 
-            *prev_can_merge = 1;
+            *prev_can_merge = true;
             return dest;
         }
     }
@@ -670,12 +670,12 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         dest->width -= node_middle->width + node_right->width;
         dest->next = node_middle;
 
-        *prev_can_merge = 0;
+        *prev_can_merge = false;
         return node_right;
     }
 
     internal_error("canvas::draw_one_chunk unknown case!");
-    return NULL;
+    return nullptr;
 }
 
 void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int x_right, int y,
@@ -687,7 +687,7 @@ void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int
         internal_error("canvas::draw_pixels xpos > 10!");
     }
     // Find the first chunk onto which we will draw
-    canvas_chunk_node* prev_node = NULL;
+    canvas_chunk_node* prev_node = nullptr;
     while (xpos + cur_node->width - 1 < x_left) {
         xpos += cur_node->width;
         prev_node = cur_node;
@@ -697,8 +697,9 @@ void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int
         }
     }
     // Draw one chunk at a time
-    int prev_can_merge = 0;
-    while (1) {
+    bool prev_can_merge = false;
+    bool done = false;
+    while (!done) {
         if (!cur_node) {
             internal_error("canvas::draw_pixels !cur_node!");
         }
@@ -707,9 +708,8 @@ void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int
         if (x_right < xpos_left) {
             internal_error("canvas::draw_pixels x_right < xpos_left!");
         }
-        int done = 0;
         if (xpos_right + 1 > x_right) {
-            done = 1;
+            done = true;
         }
 
         // Offset the source data if it is a pointer to pixel data
@@ -728,9 +728,6 @@ void canvas::draw_pixels(unsigned char* source, int source_dist, int x_left, int
         prev_node = draw_one_chunk(cur_node, source, xpos, x_left, x_right, source_dist, prev_node,
                                    &prev_can_merge, clipping);
 
-        if (done) {
-            return;
-        }
         source = source_next;
         xpos = xpos_next;
         cur_node = next_node;
@@ -833,7 +830,7 @@ void canvas::draw_sprites(int clipping) {
         int offset = 0;
         for (int i = 0; i < height; i++) {
             int j = 0;
-            while (1) {
+            while (true) {
                 int skip = pixeldata[offset] * 256 + pixeldata[offset + 1];
                 offset += 2;
                 if (skip > 60000) {
@@ -880,7 +877,7 @@ static int consecutive_solid_pixels(unsigned char* pic_row, int x, int width,
     return count;
 }
 
-#define MAX_HEIGHTMAP_LENGTH (10000)
+constexpr int MAX_HEIGHTMAP_LENGTH = 10000;
 static int GrassHeightmap[MAX_HEIGHTMAP_LENGTH + 10];
 
 constexpr int GRASS_MARGIN = 20;
@@ -892,9 +889,7 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y, 
 
     // Grab the QGRASS texture
     int distance = 600;
-    char texturanev[20];
-    strcpy(texturanev, "qgrass");
-    int texture_index = Lgr->get_texture_index(texturanev);
+    int texture_index = Lgr->get_texture_index("qgrass");
     if (texture_index < 0) {
         internal_error("draw_qgrass_texture texture_index < 0");
     }
@@ -1007,7 +1002,7 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
 #endif
     int x = x0;
     int y = heightmap[0];
-    while (1) {
+    while (true) {
         if (x >= x0 + heightmap_length) {
             return;
         }
@@ -1087,7 +1082,8 @@ void canvas::draw_grass_polygons(int clipping) {
         grass* gr = Lgr->grass_pics;
 
         // Calculate the grass heightmap
-        int heightmap_length = 0, x0 = 0;
+        int heightmap_length = 0;
+        int x0 = 0;
         if (!create_grass_polygon_heightmap(poly, GrassHeightmap, &heightmap_length, &x0,
                                             MAX_HEIGHTMAP_LENGTH, &origin)) {
             continue;
@@ -1101,7 +1097,7 @@ void canvas::draw_grass_polygons(int clipping) {
     }
 }
 
-void canvas::draw_killers(void) {
+void canvas::draw_killers() {
     if (!is_minimap) {
         return;
     }
@@ -1131,7 +1127,7 @@ void canvas::draw_killers(void) {
     }
 }
 
-void canvas::adjust_background_distance(void) {
+void canvas::adjust_background_distance() {
     for (int i = 0; i < pixel_height; i++) {
         canvas_chunk_node* cur_node = rows_linked[i];
         while (cur_node) {
@@ -1145,22 +1141,25 @@ void canvas::adjust_background_distance(void) {
     }
 };
 
-canvas::canvas(int minimap) {
+canvas::canvas(bool minimap) {
     is_minimap = minimap;
 
     for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
-        rows_linked[i] = NULL;
-        rows[i] = NULL;
+        rows_linked[i] = nullptr;
+        rows[i] = nullptr;
         rows_x1[i] = 0;
         rows_x2[i] = 0;
-        rows_position1[i] = NULL;
-        rows_position2[i] = NULL;
+        rows_position1[i] = nullptr;
+        rows_position2[i] = nullptr;
     }
-    node_array = node_array_last = NULL;
+    node_array = nullptr;
+    node_array_last = nullptr;
     node_array_index = 0;
-    chunk_array = NULL;
-    width = height = 0.0;
-    pixel_width = pixel_height = 0;
+    chunk_array = nullptr;
+    width = 0.0;
+    height = 0.0;
+    pixel_width = 0;
+    pixel_height = 0;
 
     if (!Ptop || !Segments) {
         internal_error("canvas::canvas !Ptop || !Segments!");
@@ -1171,7 +1170,7 @@ canvas::canvas(int minimap) {
     if (!node_array) {
         internal_error("canvas::canvas out of memory!");
     }
-    node_array->next = NULL;
+    node_array->next = nullptr;
     node_array_last = node_array;
 
     // Set canvas dimensions
@@ -1191,7 +1190,7 @@ canvas::canvas(int minimap) {
     // Initialize the canvas with a single chunk for every row
     for (int i = 0; i < pixel_height; i++) {
         rows_linked[i] = new_node();
-        rows_linked[i]->next = NULL;
+        rows_linked[i]->next = nullptr;
         rows_linked[i]->width = 1;
         rows_linked[i]->distance = 0;
         rows_linked[i]->pixels = (unsigned char*)PixelsDefaultForeground;
@@ -1228,19 +1227,22 @@ canvas::canvas(int minimap) {
 
 canvas::canvas(canvas* reference) {
     for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
-        rows_linked[i] = NULL;
-        rows[i] = NULL;
+        rows_linked[i] = nullptr;
+        rows[i] = nullptr;
         rows_x1[i] = 0;
         rows_x2[i] = 0;
-        rows_position1[i] = NULL;
-        rows_position2[i] = NULL;
+        rows_position1[i] = nullptr;
+        rows_position2[i] = nullptr;
     }
-    node_array = node_array_last = NULL;
+    node_array = nullptr;
+    node_array_last = nullptr;
     node_array_index = 0;
-    chunk_array = NULL;
-    is_minimap = 0;
-    width = height = 0.0;
-    pixel_width = pixel_height = 0;
+    chunk_array = nullptr;
+    is_minimap = false;
+    width = 0.0;
+    height = 0.0;
+    pixel_width = 0;
+    pixel_height = 0;
 
     if (!Ptop || !Segments) {
         internal_error("canvas::canvas !Ptop || !Segments!");
@@ -1251,7 +1253,7 @@ canvas::canvas(canvas* reference) {
     if (!node_array) {
         internal_error("canvas::canvas out of memory!");
     }
-    node_array->next = NULL;
+    node_array->next = nullptr;
     node_array_last = node_array;
 
     // Copy canvas dimensions from reference canvas
@@ -1267,14 +1269,14 @@ canvas::canvas(canvas* reference) {
         rows_x2[i] = 1;
 
         rows_linked[i] = new_node();
-        rows_linked[i]->next = NULL;
+        rows_linked[i]->next = nullptr;
         rows_linked[i]->width = 1000000;
         rows_linked[i]->distance = 0;
         rows_linked[i]->pixels = (unsigned char*)PixelsTransparent;
     }
 }
 
-canvas::~canvas(void) {
+canvas::~canvas() {
     if (node_array) {
         internal_error("canvas::~canvas node_array");
     }
@@ -1282,10 +1284,10 @@ canvas::~canvas(void) {
         internal_error("canvas::~canvas !chunk_array!");
     }
     delete chunk_array;
-    chunk_array = NULL;
+    chunk_array = nullptr;
 }
 
-void canvas::delete_all_nodes(void) {
+void canvas::delete_all_nodes() {
     if (!node_array) {
         internal_error("canvas::delete_all_nodes !node_array!");
     }
@@ -1295,15 +1297,17 @@ void canvas::delete_all_nodes(void) {
         delete cur_array;
         cur_array = next_array;
     }
-    node_array = NULL;
+    node_array = nullptr;
     for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
-        rows_linked[i] = NULL;
+        rows_linked[i] = nullptr;
     }
 }
 
-static int ViewLeftBorder, ViewRightBorder;
+static int ViewLeftBorder;
+static int ViewRightBorder;
 
-unsigned char *DefaultForeground = NULL, *DefaultBackground = NULL;
+unsigned char* DefaultForeground = nullptr;
+unsigned char* DefaultBackground = nullptr;
 
 static inline void draw_default_foreground(unsigned char* dest, size_t offset, size_t width,
                                            bool minimap) {
@@ -1560,7 +1564,7 @@ void canvas::meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y) {
     }
 }
 
-void canvas::render(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2) {
+void canvas::render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2) {
     if (x1 >= x2 || y1 >= y2) {
         internal_error("canvas::render x1 >= x2 || y1 >= y2!");
     }
@@ -1583,8 +1587,8 @@ void canvas::render(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2
     int foreground_height = Lgr->foreground->get_height();
     int background_height = Lgr->background->get_height();
     int foreground_x = ViewLeftBorder % Lgr->foreground_original_width;
-    int parallax = 2;
-    int background_x = (ViewLeftBorder / parallax) % Lgr->background_original_width;
+    constexpr int PARALLAX = 2;
+    int background_x = (ViewLeftBorder / PARALLAX) % Lgr->background_original_width;
 
     // Draw each row
     int canvas_y1 = view_top_border - y1;
@@ -1613,7 +1617,7 @@ void canvas::render(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2
     DefaultBackground = nullptr;
 }
 
-void canvas::render_minimap(int player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2) {
+void canvas::render_minimap(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2) {
     if (x1 >= x2 || y1 >= y2) {
         internal_error("canvas::render x1 >= x2 || y1 >= y2!");
     }
@@ -1647,27 +1651,27 @@ void canvas::render_minimap(int player1, pic8* pic, vect2 corner, int x1, int y1
     }
 }
 
-static canvas_chunk_node* QgrassTextureId = NULL;
+static canvas_chunk_node* QgrassTextureId = nullptr;
 
 // Returns true if the pixel above (x, y) renders in front of the bike
-static int above_is_front(int x, int y, node_finder* finder) {
+static bool above_is_front(int x, int y, node_finder* finder) {
     if (!QgrassTextureId) {
         internal_error("above_is_front no reference");
     }
     canvas_chunk_node* chunk = finder->get_chunk(x, y + 1);
     pixelek_t kepindex = (pixelek_t)chunk->pixels;
     if (kepindex < 10) {
-        return 0;
+        return false;
     }
     if (chunk->pixels == QgrassTextureId->pixels) {
-        return 0;
+        return false;
     }
     // Bug: It should actually check if the distance >= 500 to prevent floating
     // foreground grass
     if (chunk->distance > 500) {
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 // Count the number of consecutive pixels located at (x1, y + 1) up to (x2, y + 1)
@@ -1696,12 +1700,12 @@ static int consecutive_front(int x1, int x2, int y, node_finder* finder) {
     return count;
 }
 
-void canvas::create_front_grass(void) {
+void canvas::create_front_grass() {
     node_finder* finder = new node_finder(this);
 
     // A crutch that we use to avoid keeping proper track of our linked lists,
     // by making sure our chunks don't get merged together.
-    int alternate_distance = 0;
+    bool alternate_distance = false;
 
     // For each row
     for (int i = 10; i < pixel_height - 10; i++) {
@@ -1756,27 +1760,21 @@ void canvas::create_front_grass(void) {
         }
     }
     delete finder;
-    finder = NULL;
+    finder = nullptr;
 }
 
-void create_canvases(void) {
+void create_canvases() {
     Lgr->reload_default_textures();
 
-    if (CanvasBack) {
-        delete CanvasBack;
-    }
-    CanvasBack = NULL;
-    if (CanvasFront) {
-        delete CanvasFront;
-    }
-    CanvasFront = NULL;
-    if (CanvasMinimap) {
-        delete CanvasMinimap;
-    }
-    CanvasMinimap = NULL;
+    delete CanvasBack;
+    CanvasBack = nullptr;
+    delete CanvasFront;
+    CanvasFront = nullptr;
+    delete CanvasMinimap;
+    CanvasMinimap = nullptr;
 
     // Base back canvas
-    CanvasBack = new canvas(0);
+    CanvasBack = new canvas(false);
     if (!CanvasBack) {
         internal_error("create_canvasses out of memory!");
     }
@@ -1831,7 +1829,7 @@ void create_canvases(void) {
     CanvasFront->delete_all_nodes();
 
     // Minimap canvas
-    CanvasMinimap = new canvas(1);
+    CanvasMinimap = new canvas(true);
     if (!CanvasMinimap) {
         internal_error("create_canvasses out of memory!");
     }
@@ -1846,7 +1844,7 @@ void create_canvases(void) {
 node_finder::node_finder(canvas* src) {
     current_x = -1;
     current_y = -1;
-    current_node = NULL;
+    current_node = nullptr;
     source = src;
 }
 

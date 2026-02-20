@@ -242,7 +242,7 @@ static void felhokfel( int x, int y, pic8* ppicbuffer, pic8* pfelho,
     }
 } */
 
-static void kiview(int ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, motorst* pmot2) {
+static void kiview(bool ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, motorst* pmot2) {
 
     double Viewxsize_d = Viewxsize * MinimapScaleFactor * PixelsToMeters;
     double Viewysize_d = Viewysize * MinimapScaleFactor * PixelsToMeters;
@@ -646,7 +646,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     }
 }
 
-static void kirakegyjatekost(int ajatekos, pic8* ppic, double t, motorst* pmot, valtozok* pvalt,
+static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot, valtozok* pvalt,
                              int viewki, int timeki, motorst* pmot2, valtozok* pvalt2,
                              camera& current_camera) {
 
@@ -859,21 +859,21 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
         // 1. Jatekos:
         Bpic->subview(Cx1, Cy1, Cx2, Cy2, npic);
 
-        kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
+        kirakegyjatekost(true, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
                          current_camera);
 
         // 2. Jatekos:
         Bpic->subview(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
 
-        kirakegyjatekost(0, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
+        kirakegyjatekost(false, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
                          current_camera);
     } else {
         Bpic->subview(Cx1, Cy1, Cx2, Cy2, npic);
         if (fulljatekosA) {
-            kirakegyjatekost(1, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
+            kirakegyjatekost(true, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
                              current_camera);
         } else {
-            kirakegyjatekost(0, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
+            kirakegyjatekost(false, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
                              current_camera);
         }
     }

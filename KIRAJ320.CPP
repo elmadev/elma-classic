@@ -795,7 +795,7 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
     }
 }
 
-static pic8* Bpic = NULL;
+static pic8 Bpic = pic8();
 
 extern int Ucsosurlodas;
 
@@ -828,10 +828,6 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
 
     pic8* npic = lockbackbuffer_pic();
 
-    if (!Bpic) {
-        Bpic = new pic8(10, SCREEN_HEIGHT);
-    }
-
     // internal_error( "Itt van 11!" ); idejott
 
     if (Kitoltestmegrak > 0) {
@@ -847,23 +843,23 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
 
     if (splitscreen) {
         // 1. Jatekos:
-        Bpic->subview(Cx1, Cy1, Cx2, Cy2, npic);
+        Bpic.subview(Cx1, Cy1, Cx2, Cy2, npic);
 
-        kirakegyjatekost(true, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
+        kirakegyjatekost(true, &Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
                          current_camera);
 
         // 2. Jatekos:
-        Bpic->subview(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
+        Bpic.subview(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
 
-        kirakegyjatekost(false, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
+        kirakegyjatekost(false, &Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
                          current_camera);
     } else {
-        Bpic->subview(Cx1, Cy1, Cx2, Cy2, npic);
+        Bpic.subview(Cx1, Cy1, Cx2, Cy2, npic);
         if (fulljatekosA) {
-            kirakegyjatekost(true, Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
+            kirakegyjatekost(true, &Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
                              current_camera);
         } else {
-            kirakegyjatekost(false, Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
+            kirakegyjatekost(false, &Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
                              current_camera);
         }
     }

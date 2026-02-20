@@ -304,28 +304,6 @@ static void sort_xpos_and_merge(canvas_chunk_node* row_nodes) {
     }
 }
 
-void canvas::default_foreground_to_pointers() {
-    for (int i = 0; i < pixel_height; i++) {
-        canvas_chunk_node* cur_node = rows_linked[i];
-        // Make sure canvas is unused so far
-        int xpos = rows_x1[i];
-        if (xpos > 100) {
-            internal_error("canvas::default_foreground_to_pointers xpos > 100!");
-        }
-        while (cur_node) {
-            // Make sure width doesn't exceed the width in generate_default_texture()
-            if (cur_node->pixels == canvas_pixels::default_foreground() &&
-                cur_node->width < SCREEN_WIDTH) {
-                int x = xpos % Lgr->foreground_original_width;
-                int y = i % Lgr->foreground->get_height();
-                cur_node->pixels = canvas_pixels::pointer(Lgr->foreground->get_row(y) + x);
-            }
-            xpos += cur_node->width;
-            cur_node = cur_node->next;
-        }
-    }
-}
-
 void canvas::merge_redundant_chunks() {
     for (int i = 0; i < pixel_height; i++) {
         bool again = true;
@@ -1585,7 +1563,6 @@ void canvas::create_canvases() {
     }
 
     // Increase efficiency of canvas for faster rendering
-    CanvasBack->default_foreground_to_pointers();
     CanvasBack->merge_redundant_chunks();
     CanvasBack->textures_to_pointers();
     CanvasBack->linked_list_to_array();

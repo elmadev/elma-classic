@@ -175,7 +175,6 @@ class canvas {
     void draw_segment(segment* seg);
 
     // Process data
-    void default_foreground_to_pointers();
     void merge_redundant_chunks();
     void textures_to_pointers();
     void linked_list_to_array();

@@ -48,7 +48,8 @@ class pic8 {
     void fill_box(int x1, int y1, int x2, int y2, unsigned char index);
     void fill_box(unsigned char index);
     void line(int x1, int y1, int x2, int y2, unsigned char index);
-    void subview(int x1, int y1, int x2, int y2, pic8* source);
+    void subview(int w, int h, unsigned char* source, int pitch, bool inverted); // from pixelarray
+    void subview(int x1, int y1, int x2, int y2, pic8* source);                  // from box
 
     // Generate transparency data with a specified transparency palette index.
     void add_transparency(int transparency);

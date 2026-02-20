@@ -327,6 +327,10 @@ static double IntroAnimStartTime = 0.0;
 // intro.pcx starts at offset 0 and moves down to SCREEN_HEIGHT
 // The background tiles start at offset SCREEN_HEIGHT and move up to 0
 bool menu_pic::render_intro_anim(double time) {
+    if (!ScreenBuffer) {
+        // Surface lost, skip intro animation
+        return false;
+    }
     if (IntroAnimFirstFrame) {
         balls_simulate(0.000000001);
         IntroAnimFirstFrame = false;

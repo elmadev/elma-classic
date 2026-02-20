@@ -219,6 +219,24 @@ void gl_update_palette(const void* palette) {
 
 void gl_present() { glDrawArrays(GL_TRIANGLES, 0, 6); }
 
+int gl_resize(int width, int height) {
+    FrameWidth = width;
+    FrameHeight = height;
+    glViewport(0, 0, width, height);
+
+    // Resize index texture
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, IndexTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
+
+    // Resize PBO
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
+    glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height, nullptr, GL_STREAM_DRAW);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+
+    return 0;
+}
+
 void gl_cleanup() {
     if (VBO) {
         glDeleteBuffers(1, &VBO);

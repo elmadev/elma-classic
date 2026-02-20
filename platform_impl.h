@@ -55,6 +55,7 @@ int get_mouse_wheel_delta();
 bool is_fullscreen();
 long long get_milliseconds();
 
+void platform_resize_window(int width, int height);
 void platform_recreate_window();
 bool has_window();
 

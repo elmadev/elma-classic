@@ -95,6 +95,44 @@ void platform_init() {
     keyboard::init();
 }
 
+void platform_resize_window(int width, int height) {
+    if (!SDLWindow) {
+        internal_error("platform_resize_window no window!");
+    }
+
+    if (!is_fullscreen()) {
+        // Keep window centered
+        int x;
+        int y;
+        SDL_GetWindowPosition(SDLWindow, &x, &y);
+        int dx = SCREEN_WIDTH - width;
+        int dy = SCREEN_HEIGHT - height;
+        SDL_SetWindowPosition(SDLWindow, x + dx / 2, y + dy / 2);
+    }
+
+    SCREEN_WIDTH = width;
+    SCREEN_HEIGHT = height;
+    SDL_SetWindowSize(SDLWindow, width, height);
+
+    if (EolSettings->renderer() == RendererType::OpenGL) {
+        if (gl_resize(width, height) != 0) {
+            internal_error("Failed to resize OpenGL renderer");
+            return;
+        }
+        SDLSurfaceMain = nullptr; // Not used in GL mode
+    } else {
+        SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
+        if (!SDLSurfaceMain) {
+            internal_error(SDL_GetError());
+            return;
+        }
+    }
+
+    SDL_FreeSurface(SDLSurfacePaletted);
+    SDLSurfacePaletted = nullptr;
+    create_palette_surface();
+}
+
 void platform_recreate_window() {
     int x;
     int y;

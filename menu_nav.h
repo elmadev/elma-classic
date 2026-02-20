@@ -74,7 +74,7 @@ class menu_nav {
 
   private:
     int prompt_choice(bool render_only);
-    int calculate_visible_entries();
+    void calculate_visible_entries(int& max_visible_entries, int& view_max, bool& rerender);
     bool search_handler_text(char c);
     bool search_handler_backspace();
     void update_search();

@@ -240,10 +240,16 @@ void menu_main() {
 
         nav.add_row("Play", NAV_FUNC() { menu_play(); });
         nav.add_row("Replay", NAV_FUNC() { menu_replay(); });
-        nav.add_row("Demo", NAV_FUNC() { menu_demo(); });
+        if (EolSettings->show_demo_menu()) {
+            nav.add_row("Demo", NAV_FUNC() { menu_demo(); });
+        }
         nav.add_row("Options", NAV_FUNC() { menu_options(); });
-        nav.add_row("Help", NAV_FUNC() { menu_help(); });
-        nav.add_row("Best Times", NAV_FUNC() { menu_best_times(); });
+        if (EolSettings->show_help_menu()) {
+            nav.add_row("Help", NAV_FUNC() { menu_help(); });
+        }
+        if (EolSettings->show_best_times_menu()) {
+            nav.add_row("Best Times", NAV_FUNC() { menu_best_times(); });
+        }
         nav.add_row(
             "Editor", NAV_FUNC() {
                 InEditor = true;

@@ -122,7 +122,9 @@ static int SpaceWidth = 5;
 static int SpaceWidthMenu = 10;
 
 void abc8::write(pic8* dest, int x, int y, const char* text) {
+#ifdef DEBUG
     const char* error_text = text;
+#endif
     while (*text) {
         int index = (unsigned char)*text;
         // Space character is hardcoded
@@ -151,7 +153,9 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
 }
 
 int abc8::len(const char* text) {
+#ifdef DEBUG
     const char* error_text = text;
+#endif
     int width = 0;
     while (*text) {
         int index = (unsigned char)*text;

@@ -257,7 +257,7 @@ std::string dik_to_string(DikScancode keycode) {
 
 // A list of pointers to where the keys are stored (somewhere in a state class object)
 constexpr size_t KEY_POINTERS_MAX = 20;
-typedef DikScancode* key_pointers[KEY_POINTERS_MAX];
+using key_pointers = DikScancode* [KEY_POINTERS_MAX];
 
 static key_pointers UniversalKeys; // +/- and Screenshot
 static key_pointers Player1Keys;

@@ -4,8 +4,14 @@
 #include "sound_engine.h"
 #include "vect2.h"
 #include <cstdio>
+#include <optional>
 #include <string>
 #include <vector>
+
+struct rec_header {
+    int level_id;
+    char level_filename[16];
+};
 
 struct motorst;
 
@@ -84,6 +90,8 @@ class recorder {
     static void save_rec_file(const char* filename, int level_id);
     // Load two replay files and merge them into a multiplayer replay
     static merge_result load_merge(const std::string& filename1, const std::string& filename2);
+    // Read only the header (level_id + level_filename) from a .rec file
+    static std::optional<rec_header> read_header(const std::string& filename);
 
     bool is_empty() const { return frame_count_ == 0; }
     int frame_count() const { return frame_count_; }

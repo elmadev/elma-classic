@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <memory>
 
 recorder* Rec1 = nullptr;
 recorder* Rec2 = nullptr;
@@ -620,6 +621,29 @@ recorder::merge_result recorder::load_merge(const std::string& filename1,
     Rec2->set_flagtag(false);
 
     return {level_id1, was_multi, was_multi2, level_id1 != level_id2};
+}
+
+std::optional<rec_header> recorder::read_header(const std::string& filename) {
+    std::string path = "rec/" + filename;
+    std::unique_ptr<FILE, decltype(&fclose)> h(fopen(path.c_str(), "rb"), fclose);
+    if (!h) {
+        return std::nullopt;
+    }
+
+    // Skip frame_count(4) + version(4) + multiplayer(4) + flagtag(4) = 16 bytes
+    if (fseek(h.get(), 16, SEEK_SET) != 0) {
+        return std::nullopt;
+    }
+
+    rec_header header{};
+    if (fread(&header.level_id, 1, sizeof(header.level_id), h.get()) != 4) {
+        return std::nullopt;
+    }
+    if (fread(header.level_filename, 1, sizeof(header.level_filename), h.get()) != 16) {
+        return std::nullopt;
+    }
+
+    return header;
 }
 
 void recorder::save_rec_file(const char* filename, int level_id) {

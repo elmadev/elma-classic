@@ -116,6 +116,10 @@ void menu_options() {
             NAV_FUNC() { State->animated_objects = !State->animated_objects; });
 
         nav.add_row(
+            "Still Objects:", EolSettings->still_objects() ? "Yes" : "No",
+            NAV_FUNC() { EolSettings->set_still_objects(!EolSettings->still_objects()); });
+
+        nav.add_row(
             "Swap Bikes:", State->player1_bike1 ? "No" : "Yes",
             NAV_FUNC() { State->player1_bike1 = !State->player1_bike1; });
 

@@ -64,7 +64,7 @@ static LoadReplayResult load_replay(const std::string& filename) {
         DikScancode key =
             menu_dialog("Cannot find the lev file that corresponds", "to the record file!",
                         filename.c_str(), Rec1->level_filename);
-        return key == KEY_ESC ? LoadReplayResult::Abort : LoadReplayResult::Fail;
+        return key == DIK_ESCAPE ? LoadReplayResult::Abort : LoadReplayResult::Fail;
     }
     load_level_play(Rec1->level_filename);
 
@@ -72,7 +72,7 @@ static LoadReplayResult load_replay(const std::string& filename) {
         DikScancode key =
             menu_dialog("The level file has changed since the", "saving of the record file!",
                         filename.c_str(), Rec1->level_filename);
-        return key == KEY_ESC ? LoadReplayResult::Abort : LoadReplayResult::Fail;
+        return key == DIK_ESCAPE ? LoadReplayResult::Abort : LoadReplayResult::Fail;
     }
 
     return LoadReplayResult::Success;

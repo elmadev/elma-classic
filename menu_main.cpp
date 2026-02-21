@@ -231,31 +231,36 @@ static void menu_prompt_exit() {
 void menu_main() {
     MenuPalette->set();
 
-    menu_nav nav("Main Menu");
-    nav.x_left = 200;
-    nav.y_entries = 100;
-    nav.dy = 50;
-
-    nav.add_row("Play", NAV_FUNC() { menu_play(); });
-    nav.add_row("Replay", NAV_FUNC() { menu_replay(); });
-    nav.add_row("Demo", NAV_FUNC() { menu_demo(); });
-    nav.add_row("Options", NAV_FUNC() { menu_options(); });
-    nav.add_row("Help", NAV_FUNC() { menu_help(); });
-    nav.add_row("Best Times", NAV_FUNC() { menu_best_times(); });
-    nav.add_row(
-        "Editor", NAV_FUNC() {
-            InEditor = true;
-            hide_cursor();
-            editor();
-            show_cursor();
-            InEditor = false;
-            MenuPalette->set();
-        });
-
+    std::string prev_choice = "Play";
     while (true) {
+        menu_nav nav("Main Menu");
+        nav.x_left = 200;
+        nav.y_entries = 100;
+        nav.dy = 50;
+
+        nav.add_row("Play", NAV_FUNC() { menu_play(); });
+        nav.add_row("Replay", NAV_FUNC() { menu_replay(); });
+        nav.add_row("Demo", NAV_FUNC() { menu_demo(); });
+        nav.add_row("Options", NAV_FUNC() { menu_options(); });
+        nav.add_row("Help", NAV_FUNC() { menu_help(); });
+        nav.add_row("Best Times", NAV_FUNC() { menu_best_times(); });
+        nav.add_row(
+            "Editor", NAV_FUNC() {
+                InEditor = true;
+                hide_cursor();
+                editor();
+                show_cursor();
+                InEditor = false;
+                MenuPalette->set();
+            });
+
+        nav.select_row(prev_choice);
+
         int choice = nav.navigate();
         if (choice == -1) {
             menu_prompt_exit();
+        } else {
+            prev_choice = nav.entry_left(choice);
         }
     }
 }

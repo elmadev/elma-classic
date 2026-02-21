@@ -2,7 +2,6 @@
 
 #include "debug/profiler.h"
 #include <iostream>
-#include <print>
 
 debug_timer::debug_timer() { start = std::chrono::high_resolution_clock::now(); }
 

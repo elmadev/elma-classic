@@ -94,7 +94,7 @@ static void replay_render(const std::string& filename) {
         if (load_replay(filename) == LoadReplayResult::Success) {
             Rec1->rewind();
             Rec2->rewind();
-            render_replay(Rec1->level_filename, filename.c_str());
+            render_replay(Rec1->level_filename);
         }
     }
 }

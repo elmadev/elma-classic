@@ -976,7 +976,7 @@ void setup_render_directory(const std::string& replay_filename) {
     VideoOutputDirectory = out_dir.string();
 }
 
-void render_replay(const char* level_filename, const char* replay_filename) {
+void render_replay(const char* level_filename) {
     Single = !MultiplayerRec;
     Tag = Rec1->flagtag();
     setup_gameloop(level_filename);

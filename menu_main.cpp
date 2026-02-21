@@ -15,7 +15,6 @@
 #include "menu_pic.h"
 #include "menu_play.h"
 #include "platform_impl.h"
-#include "platform_utils.h"
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>

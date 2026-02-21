@@ -703,6 +703,10 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
             default:
                 internal_error("HIBA6751353");
             }
+
+            if (EolSettings->still_objects()) {
+                dy = 0;
+            }
         } else {
             // Elso frame-et adja vissza mindig:
             switch (pker->type) {

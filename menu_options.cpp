@@ -262,6 +262,19 @@ void menu_options() {
                 EolSettings->set_recording_fps(new_fps);
             });
 
+        nav.add_row(
+            "Demo menu:", EolSettings->show_demo_menu() ? "Yes" : "No",
+            NAV_FUNC() { EolSettings->set_show_demo_menu(!EolSettings->show_demo_menu()); });
+
+        nav.add_row(
+            "Help menu:", EolSettings->show_help_menu() ? "Yes" : "No",
+            NAV_FUNC() { EolSettings->set_show_help_menu(!EolSettings->show_help_menu()); });
+
+        nav.add_row(
+            "Best times menu:", EolSettings->show_best_times_menu() ? "Yes" : "No", NAV_FUNC() {
+                EolSettings->set_show_best_times_menu(!EolSettings->show_best_times_menu());
+            });
+
         choice = nav.navigate();
 
         if (choice < 0) {

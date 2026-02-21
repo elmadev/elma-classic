@@ -81,6 +81,7 @@ class eol_settings {
     Default<bool> show_demo_menu_{true};
     Default<bool> show_help_menu_{true};
     Default<bool> show_best_times_menu_{true};
+    Default<bool> still_objects_{false};
 
   public:
     static void read_settings();
@@ -116,6 +117,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(show_demo_menu);
     DECLARE_FIELD_FUNCS(show_help_menu);
     DECLARE_FIELD_FUNCS(show_best_times_menu);
+    DECLARE_FIELD_FUNCS(still_objects);
 };
 
 #undef DECLARE_FIELD_FUNCS

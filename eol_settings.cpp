@@ -128,6 +128,8 @@ void eol_settings::set_show_demo_menu(bool show) { show_demo_menu_ = show; }
 void eol_settings::set_show_help_menu(bool show) { show_help_menu_ = show; }
 void eol_settings::set_show_best_times_menu(bool show) { show_best_times_menu_ = show; }
 
+void eol_settings::set_still_objects(bool still) { still_objects_ = still; }
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -221,7 +223,8 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(recording_fps)                                                                      \
     JSON_FIELD(show_demo_menu)                                                                     \
     JSON_FIELD(show_help_menu)                                                                     \
-    JSON_FIELD(show_best_times_menu)
+    JSON_FIELD(show_best_times_menu)                                                               \
+    JSON_FIELD(still_objects)
 
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

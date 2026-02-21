@@ -78,6 +78,9 @@ class eol_settings {
     Default<std::string> default_lgr_name_{"default"};
     Default<bool> show_last_apple_time_{true};
     Clamp<int> recording_fps_{30, 30, 120};
+    Default<bool> show_demo_menu_{true};
+    Default<bool> show_help_menu_{true};
+    Default<bool> show_best_times_menu_{true};
 
   public:
     static void read_settings();
@@ -110,6 +113,9 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(default_lgr_name);
     DECLARE_FIELD_FUNCS(show_last_apple_time);
     DECLARE_FIELD_FUNCS(recording_fps);
+    DECLARE_FIELD_FUNCS(show_demo_menu);
+    DECLARE_FIELD_FUNCS(show_help_menu);
+    DECLARE_FIELD_FUNCS(show_best_times_menu);
 };
 
 #undef DECLARE_FIELD_FUNCS

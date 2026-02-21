@@ -374,10 +374,10 @@ static void load_player_controls(menu_nav* nav, key_pointers keys, player_keys* 
 
 // Menu to change controls for one player
 static void menu_customize_player(key_pointers keys, player_keys* player_controls,
-                                  std::string player_letter) {
+                                  char player_letter) {
     int choice = 0;
     while (true) {
-        menu_nav nav("Customize Player " + player_letter);
+        menu_nav nav(std::format("Customize Player {}", player_letter));
         nav.select_row(choice);
         nav.x_left = 60;
         nav.x_right = 400;
@@ -438,11 +438,11 @@ void menu_customize_controls() {
 
         nav.add_row(
             "Customize Player A",
-            NAV_FUNC() { menu_customize_player(Player1Keys, &State->keys1, "A"); });
+            NAV_FUNC() { menu_customize_player(Player1Keys, &State->keys1, 'A'); });
 
         nav.add_row(
             "Customize Player B",
-            NAV_FUNC() { menu_customize_player(Player2Keys, &State->keys2, "B"); });
+            NAV_FUNC() { menu_customize_player(Player2Keys, &State->keys2, 'B'); });
 
         nav.add_row("Customize Replay VCR", NAV_FUNC() { menu_customize_replay(ReplayKeys); });
 

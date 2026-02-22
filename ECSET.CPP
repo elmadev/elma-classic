@@ -492,10 +492,10 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
     }
 
     // Validate whether we want to draw based on clipping
-    bool skip = false;
     if (clipping == CanvasClipping_Ground) {
         if ((pixelek_t)dest->pixels == PixelsDefaultBackground) {
-            skip = true;
+            *prev_can_merge = false;
+            return dest;
         }
     }
     if (clipping == CanvasClipping_Sky) {
@@ -503,7 +503,8 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         // top of Ground clipping
         source_dist += DISTANCE_SKY_CLIPPING_CORRECTION;
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground) {
-            skip = true;
+            *prev_can_merge = false;
+            return dest;
         }
     }
     if (clipping == CanvasClipping_Transparent) {
@@ -516,7 +517,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
     }
 
     // Only draw if closer distance
-    if (skip || source_dist >= dest->distance) {
+    if (source_dist >= dest->distance) {
         *prev_can_merge = false;
         return dest;
     }

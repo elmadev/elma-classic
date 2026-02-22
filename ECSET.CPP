@@ -187,6 +187,7 @@ void canvas::draw_segment(segment* seg) {
         canvas_chunk_node* node = new_node();
         node->next = nullptr;
         node->xpos = x;
+        node->distance = DISTANCE_DEFAULT;
         if (line_direction_negative) {
             node->pixels = (unsigned char*)PixelsDefaultForeground;
         } else {
@@ -490,14 +491,9 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
                        "dest is transparent but clipping is not transparent!");
     }
 
-    // Validate whether we want to draw based on clipping and distance
-    // Default foreground/background and empty has the lowest-priority distance
-    int dest_dist = dest->distance;
+    // Validate whether we want to draw based on clipping
     bool skip = false;
     if (clipping == CanvasClipping_Ground) {
-        if ((pixelek_t)dest->pixels == PixelsDefaultForeground) {
-            dest_dist = DISTANCE_DEFAULT;
-        }
         if ((pixelek_t)dest->pixels == PixelsDefaultBackground) {
             skip = true;
         }
@@ -509,17 +505,7 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground) {
             skip = true;
         }
-        if ((pixelek_t)dest->pixels == PixelsDefaultBackground) {
-            dest_dist = DISTANCE_DEFAULT;
-        }
     }
-    if (clipping == CanvasClipping_Unclipped) {
-        if ((pixelek_t)dest->pixels == PixelsDefaultForeground ||
-            (pixelek_t)dest->pixels == PixelsDefaultBackground) {
-            dest_dist = DISTANCE_DEFAULT;
-        }
-    }
-
     if (clipping == CanvasClipping_Transparent) {
         // Transparent pixels are only specifically used for the front canvas, so enforce this usage
         if ((pixelek_t)dest->pixels == PixelsDefaultForeground ||
@@ -527,13 +513,10 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, unsigned char
             internal_error("canvas::draw_one_chunk",
                            "dest is non-transparent but clipping is transparent!");
         }
-        if ((pixelek_t)dest->pixels == PixelsTransparent) {
-            dest_dist = DISTANCE_DEFAULT;
-        }
     }
 
-    // Check to see if we actually want to draw it
-    if (skip || source_dist >= dest_dist) {
+    // Only draw if closer distance
+    if (skip || source_dist >= dest->distance) {
         *prev_can_merge = false;
         return dest;
     }
@@ -1180,7 +1163,7 @@ canvas::canvas(bool minimap) {
         rows_linked[i] = new_node();
         rows_linked[i]->next = nullptr;
         rows_linked[i]->width = 1;
-        rows_linked[i]->distance = 0;
+        rows_linked[i]->distance = DISTANCE_DEFAULT;
         rows_linked[i]->pixels = (unsigned char*)PixelsDefaultForeground;
     }
 
@@ -1257,7 +1240,7 @@ canvas::canvas(canvas* reference) {
         rows_linked[i] = new_node();
         rows_linked[i]->next = nullptr;
         rows_linked[i]->width = RIGHTMOST_CHUNK_WIDTH;
-        rows_linked[i]->distance = 0;
+        rows_linked[i]->distance = DISTANCE_DEFAULT;
         rows_linked[i]->pixels = (unsigned char*)PixelsTransparent;
     }
 }

@@ -364,7 +364,7 @@ static void load_player_controls(menu_nav* nav, key_pointers keys, player_keys* 
     load_control(nav, keys, i++, "Rotate right", &player_controls->right_volt);
     load_control(nav, keys, i++, "Alovolt", &player_controls->alovolt);
     load_control(nav, keys, i++, "Change direction", &player_controls->turn);
-    load_control(nav, keys, i++, "Toggle Navigator", &player_controls->toggle_minimap);
+    load_control(nav, keys, i++, "Toggle Minimap", &player_controls->toggle_minimap);
     load_control(nav, keys, i++, "Toggle Time", &player_controls->toggle_timer);
     load_control(nav, keys, i++, "Toggle Show/Hide", &player_controls->toggle_visibility);
     if (i != PLAYER_KEYS_END) {

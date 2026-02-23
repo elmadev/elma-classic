@@ -1117,14 +1117,19 @@ canvas::canvas(bool minimap) {
     if (is_minimap) {
         pixel_width = (int)(width * MetersToMinimapPixels);
         pixel_height = (int)(height * MetersToMinimapPixels);
+
+        constexpr double MAX_HEIGHT = LEVEL_MAX_SIZE + MARGIN_Y_MINIMAP * 2;
+        if (height > MAX_HEIGHT) {
+            internal_error("canvas::canvas is too tall!");
+        }
     } else {
         pixel_width = (int)(width * MetersToPixels);
         pixel_height = (int)(height * MetersToPixels);
-    }
 
-    constexpr int CANVAS_MAX_HEIGHT = 12000;
-    if (pixel_height - 10 > CANVAS_MAX_HEIGHT) {
-        internal_error("canvas::canvas pixel_height-10 > CANVAS_MAX_HEIGHT!");
+        constexpr double MAX_HEIGHT = LEVEL_MAX_SIZE + MARGIN_Y * 2;
+        if (height > MAX_HEIGHT) {
+            internal_error("canvas::canvas is too tall!");
+        }
     }
 
     // Initialize the canvas with a single chunk for every row

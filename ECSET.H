@@ -6,6 +6,7 @@
 #include "sprite.h"
 #include "vect2.h"
 #include <cstdint>
+#include <vector>
 
 class canvas;
 class grass;
@@ -125,8 +126,6 @@ struct canvas_chunk_node_array {
     canvas_chunk_node_array* next;
 };
 
-constexpr int CANVAS_MAX_HEIGHT = 12000;
-
 // A stripped-down version of canvas_chunk_node in array form.
 struct canvas_chunk {
     int width;
@@ -159,17 +158,17 @@ class canvas {
     int pixel_width;
     int pixel_height;
     // Temporary, (deleted during init())
-    canvas_chunk_node* rows_linked[CANVAS_MAX_HEIGHT];
+    std::vector<canvas_chunk_node*> rows_linked;
     // Pointer to start of each row in canvas
-    canvas_chunk* rows[CANVAS_MAX_HEIGHT];
+    std::vector<canvas_chunk*> rows;
     // Position of current offset (player 1)
-    int rows_x1[CANVAS_MAX_HEIGHT];
+    std::vector<int> rows_x1;
     // Pointer to current offset (player 1)
-    canvas_chunk* rows_position1[CANVAS_MAX_HEIGHT];
+    std::vector<canvas_chunk*> rows_position1;
     // Position of current offset (player 2)
-    int rows_x2[CANVAS_MAX_HEIGHT];
+    std::vector<int> rows_x2;
     // Pointer to current offset (player 2)
-    canvas_chunk* rows_position2[CANVAS_MAX_HEIGHT];
+    std::vector<canvas_chunk*> rows_position2;
 
     void set_origin_and_dimensions();
     void draw_segment(segment* seg);

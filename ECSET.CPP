@@ -428,6 +428,9 @@ void canvas::linked_list_to_array() {
     }
 
     // Copy data
+    rows.resize(pixel_height);
+    rows_position1.resize(pixel_height);
+    rows_position2.resize(pixel_height);
     int offset = 0;
     for (int i = 0; i < pixel_height; i++) {
         canvas_chunk_node* cur_node = rows_linked[i];
@@ -1083,14 +1086,6 @@ void canvas::adjust_background_distance() {
 canvas::canvas(bool minimap) {
     is_minimap = minimap;
 
-    for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
-        rows_linked[i] = nullptr;
-        rows[i] = nullptr;
-        rows_x1[i] = 0;
-        rows_x2[i] = 0;
-        rows_position1[i] = nullptr;
-        rows_position2[i] = nullptr;
-    }
     node_array = nullptr;
     node_array_last = nullptr;
     node_array_index = 0;
@@ -1122,11 +1117,13 @@ canvas::canvas(bool minimap) {
         pixel_height = (int)(height * MetersToPixels);
     }
 
+    constexpr int CANVAS_MAX_HEIGHT = 12000;
     if (pixel_height - 10 > CANVAS_MAX_HEIGHT) {
         internal_error("canvas::canvas pixel_height-10 > CANVAS_MAX_HEIGHT!");
     }
 
     // Initialize the canvas with a single chunk for every row
+    rows_linked.resize(pixel_height);
     for (int i = 0; i < pixel_height; i++) {
         rows_linked[i] = new_node();
         rows_linked[i]->next = nullptr;
@@ -1144,6 +1141,8 @@ canvas::canvas(bool minimap) {
     }
 
     // Convert the polygon data into widths instead of x position
+    rows_x1.resize(pixel_height);
+    rows_x2.resize(pixel_height);
     for (int i = 0; i < pixel_height; i++) {
         sort_xpos_and_merge(rows_linked[i]);
         rows_x1[i] = rows_x2[i] = xpos_to_width(rows_linked[i]);
@@ -1163,14 +1162,6 @@ canvas::canvas(bool minimap) {
 }
 
 canvas::canvas(canvas* reference) {
-    for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
-        rows_linked[i] = nullptr;
-        rows[i] = nullptr;
-        rows_x1[i] = 0;
-        rows_x2[i] = 0;
-        rows_position1[i] = nullptr;
-        rows_position2[i] = nullptr;
-    }
     node_array = nullptr;
     node_array_last = nullptr;
     node_array_index = 0;
@@ -1201,6 +1192,9 @@ canvas::canvas(canvas* reference) {
     pixel_height = reference->pixel_height;
 
     // Initialize the canvas with a single chunk for every row (already as width)
+    rows_linked.resize(pixel_height);
+    rows_x1.resize(pixel_height);
+    rows_x2.resize(pixel_height);
     for (int i = 0; i < pixel_height; i++) {
         rows_x1[i] = 1;
         rows_x2[i] = 1;
@@ -1235,9 +1229,8 @@ void canvas::delete_all_nodes() {
         cur_array = next_array;
     }
     node_array = nullptr;
-    for (int i = 0; i < CANVAS_MAX_HEIGHT; i++) {
-        rows_linked[i] = nullptr;
-    }
+    rows_linked.resize(0);
+    rows_linked.shrink_to_fit();
 }
 
 static int ViewLeftBorder;

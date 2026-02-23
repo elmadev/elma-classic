@@ -73,6 +73,11 @@ static void menu_lgr() {
     nav.navigate();
 }
 
+#define BOOL_OPTION(text, setting)                                                                 \
+    nav.add_row(                                                                                   \
+        text, EolSettings->setting() ? "Yes" : "No",                                               \
+        NAV_FUNC() { EolSettings->set_##setting(!EolSettings->setting()); });
+
 void menu_options() {
     int choice = 0;
     while (true) {
@@ -115,9 +120,7 @@ void menu_options() {
             "Animated Objects:", State->animated_objects ? "Yes" : "No",
             NAV_FUNC() { State->animated_objects = !State->animated_objects; });
 
-        nav.add_row(
-            "Still Objects:", EolSettings->still_objects() ? "Yes" : "No",
-            NAV_FUNC() { EolSettings->set_still_objects(!EolSettings->still_objects()); });
+        BOOL_OPTION("Still Objects:", still_objects);
 
         nav.add_row(
             "Swap Bikes:", State->player1_bike1 ? "No" : "Yes",
@@ -132,13 +135,8 @@ void menu_options() {
                 invalidate_level();
             });
 
-        nav.add_row(
-            "Centered Camera:", EolSettings->center_camera() ? "Yes" : "No",
-            NAV_FUNC() { EolSettings->set_center_camera(!EolSettings->center_camera()); });
-
-        nav.add_row(
-            "Centered Minimap:", EolSettings->center_map() ? "Yes" : "No",
-            NAV_FUNC() { EolSettings->set_center_map(!EolSettings->center_map()); });
+        BOOL_OPTION("Centered Camera:", center_camera);
+        BOOL_OPTION("Centered Minimap:", center_map);
 
         nav.add_row(
             "Minimap Alignment:",
@@ -197,9 +195,7 @@ void menu_options() {
                 }
             });
 
-        nav.add_row(
-            "Zoom Textures:", EolSettings->zoom_textures() ? "Yes" : "No",
-            NAV_FUNC() { EolSettings->set_zoom_textures(!EolSettings->zoom_textures()); });
+        BOOL_OPTION("Zoom Textures:", zoom_textures);
 
         nav.add_row(
             "Renderer:",
@@ -241,16 +237,11 @@ void menu_options() {
                 }
             });
 
-        nav.add_row(
-            "LCtrl search:", EolSettings->lctrl_search() ? "Yes" : "No",
-            NAV_FUNC() { EolSettings->set_lctrl_search(!EolSettings->lctrl_search()); });
+        BOOL_OPTION("LCtrl search:", lctrl_search);
 
         nav.add_row("Default LGR:", EolSettings->default_lgr_name(), NAV_FUNC() { menu_lgr(); });
 
-        nav.add_row(
-            "Show Apple Time:", EolSettings->show_last_apple_time() ? "Yes" : "No", NAV_FUNC() {
-                EolSettings->set_show_last_apple_time(!EolSettings->show_last_apple_time());
-            });
+        BOOL_OPTION("Show Apple Time:", show_last_apple_time);
 
         nav.add_row(
             "Record Replay FPS:", std::to_string(EolSettings->recording_fps()), NAV_FUNC() {
@@ -266,18 +257,9 @@ void menu_options() {
                 EolSettings->set_recording_fps(new_fps);
             });
 
-        nav.add_row(
-            "Demo menu:", EolSettings->show_demo_menu() ? "Yes" : "No",
-            NAV_FUNC() { EolSettings->set_show_demo_menu(!EolSettings->show_demo_menu()); });
-
-        nav.add_row(
-            "Help menu:", EolSettings->show_help_menu() ? "Yes" : "No",
-            NAV_FUNC() { EolSettings->set_show_help_menu(!EolSettings->show_help_menu()); });
-
-        nav.add_row(
-            "Best times menu:", EolSettings->show_best_times_menu() ? "Yes" : "No", NAV_FUNC() {
-                EolSettings->set_show_best_times_menu(!EolSettings->show_best_times_menu());
-            });
+        BOOL_OPTION("Demo menu:", show_demo_menu);
+        BOOL_OPTION("Help menu:", show_help_menu);
+        BOOL_OPTION("Best Times menu:", show_best_times_menu);
 
         choice = nav.navigate();
 
@@ -288,3 +270,5 @@ void menu_options() {
         }
     }
 }
+
+#undef BOOL_OPTION

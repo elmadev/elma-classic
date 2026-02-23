@@ -96,7 +96,28 @@ pic8* pic8::resize(pic8* src, int target_height) {
     int target_width = std::max((int)(source_width * scale), 1);
 
     pic8* scaled = new pic8(target_width, target_height);
-    blit_scale8(scaled, src);
+    int prev_i1 = -1;
+    for (int i2 = 0; i2 < target_height; i2++) {
+        int i1 = (int)(i2 / scale);
+        if (i1 >= source_height) {
+            i1 = source_height - 1;
+        }
+        if (prev_i1 == i1) {
+            // Copy identical rows in order to scale faster
+            memcpy(scaled->rows[i2], scaled->rows[i2 - 1], target_width);
+            continue;
+        }
+        prev_i1 = i1;
+        for (int j2 = 0; j2 < target_width; j2++) {
+            int j1 = (int)(j2 / scale);
+            // We don't use ppixel() to be more efficient, but we need to check
+            // that we don't accidentally overflow through bad rounding
+            if (j1 >= source_width) {
+                j1 = source_width - 1;
+            }
+            scaled->rows[i2][j2] = src->rows[i1][j1];
+        }
+    }
     delete src;
     return scaled;
 }

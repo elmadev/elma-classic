@@ -339,7 +339,7 @@ void lgrfile::add_texture(pic8* pic, piclist* list, int index) {
         external_error("Too many textures in lgr file!");
     }
 
-    forditkepet(pic);
+    vertical_flip(pic);
 
     texture* new_text = &textures[texture_count];
     if (list) {

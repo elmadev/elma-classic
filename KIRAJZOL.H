@@ -25,6 +25,6 @@ void csokkentkepmeret(void);
 void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
                  int viewki2, int timeki2, camera& current_camera);
 
-void forditkepet(pic8* ppic);
+void vertical_flip(pic8* ppic);
 
 #endif

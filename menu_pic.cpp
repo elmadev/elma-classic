@@ -45,7 +45,7 @@ void init_menu_pictures() {
     ErrorGraphicsLoaded = true;
 
     pic8* helmet_tmp = new pic8("sisak.pcx"); // "helmet"
-    forditkepet(helmet_tmp);
+    vertical_flip(helmet_tmp);
     Helmet = new anim(helmet_tmp, "sisak.pcx");
     delete helmet_tmp;
     helmet_tmp = nullptr;

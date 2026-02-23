@@ -134,7 +134,7 @@ void beallitmereteket(int splitscreen) {
     Viewxtolas = Cxsize - 2 * Viewxorig - Viewxsize;
 }
 
-void forditkepet(pic8* ppic) {
+void vertical_flip(pic8* ppic) {
     for (int y1 = 0; y1 < ppic->get_height() / 2; y1++) {
         int y2 = ppic->get_height() - 1 - y1;
         unsigned char* sora = ppic->get_row(y1);
@@ -353,9 +353,9 @@ static void menteshakell(pic8* ppic) {
     if (VideoRecordingMode) {
         std::string filenameStr = std::format("snp{:05}.pcx", VideoFrameIndex);
         std::filesystem::path filename = std::filesystem::path(VideoOutputDirectory) / filenameStr;
-        forditkepet(ppic);
+        vertical_flip(ppic);
         ppic->save(filename.string().c_str(), Lgr->palette_data);
-        forditkepet(ppic);
+        vertical_flip(ppic);
         return;
     }
 
@@ -365,9 +365,9 @@ static void menteshakell(pic8* ppic) {
         while (1) {
             std::string filenev = std::format("snp{:05}.pcx", i);
             if (!std::filesystem::exists(filenev)) {
-                forditkepet(ppic);
+                vertical_flip(ppic);
                 ppic->save(filenev.c_str(), Lgr->palette_data);
-                forditkepet(ppic);
+                vertical_flip(ppic);
                 break;
             }
             i++;

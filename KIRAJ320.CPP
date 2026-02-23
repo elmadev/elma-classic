@@ -134,20 +134,6 @@ void beallitmereteket(int splitscreen) {
     Viewxtolas = Cxsize - 2 * Viewxorig - Viewxsize;
 }
 
-void vertical_flip(pic8* ppic) {
-    for (int y1 = 0; y1 < ppic->get_height() / 2; y1++) {
-        int y2 = ppic->get_height() - 1 - y1;
-        unsigned char* sora = ppic->get_row(y1);
-        unsigned char* sorb = ppic->get_row(y2);
-        int xsize = ppic->get_width();
-        for (int x = 0; x < xsize; x++) {
-            unsigned char tmp = sora[x];
-            sora[x] = sorb[x];
-            sorb[x] = tmp;
-        }
-    }
-}
-
 // v1 iranyabol v2 fele interpolal:
 /*static vect2 interpolal( vect2 v1, vect2 v2, double x ) {
     vect2 vissza = v1+(v2-v1)*x;
@@ -353,9 +339,9 @@ static void menteshakell(pic8* ppic) {
     if (VideoRecordingMode) {
         std::string filenameStr = std::format("snp{:05}.pcx", VideoFrameIndex);
         std::filesystem::path filename = std::filesystem::path(VideoOutputDirectory) / filenameStr;
-        vertical_flip(ppic);
+        ppic->vertical_flip();
         ppic->save(filename.string().c_str(), Lgr->palette_data);
-        vertical_flip(ppic);
+        ppic->vertical_flip();
         return;
     }
 
@@ -365,9 +351,9 @@ static void menteshakell(pic8* ppic) {
         while (1) {
             std::string filenev = std::format("snp{:05}.pcx", i);
             if (!std::filesystem::exists(filenev)) {
-                vertical_flip(ppic);
+                ppic->vertical_flip();
                 ppic->save(filenev.c_str(), Lgr->palette_data);
-                vertical_flip(ppic);
+                ppic->vertical_flip();
                 break;
             }
             i++;

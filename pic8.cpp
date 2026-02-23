@@ -81,6 +81,20 @@ pic8::pic8(const char* filename, FILE* h) {
     internal_error("pic8 could not find file extension: ", filename);
 }
 
+void pic8::vertical_flip() {
+    for (int y1 = 0; y1 < get_height() / 2; y1++) {
+        int y2 = get_height() - 1 - y1;
+        unsigned char* sora = get_row(y1);
+        unsigned char* sorb = get_row(y2);
+        int xsize = get_width();
+        for (int x = 0; x < xsize; x++) {
+            unsigned char tmp = sora[x];
+            sora[x] = sorb[x];
+            sorb[x] = tmp;
+        }
+    }
+}
+
 pic8* pic8::resize(pic8* src, int target_height) {
     int source_height = src->get_height();
     int source_width = src->get_width();

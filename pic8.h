@@ -32,6 +32,7 @@ class pic8 {
     static pic8* from_bmp(const char* filename);
     static pic8* resize(pic8* src, int height);
     ~pic8();
+    void vertical_flip();
     bool save(const char* filename, unsigned char* pal = nullptr, FILE* h = nullptr);
     void ppixel(int x, int y, unsigned char index);
     unsigned char gpixel(int x, int y);

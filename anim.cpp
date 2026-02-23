@@ -37,7 +37,7 @@ anim::anim(pic8* source_sheet, const char* error_filename, int target_height, do
         frames[i] = new pic8(source_height, source_height);
         blit8(frames[i], source_sheet, -source_height * i, 0);
         frames[i] = pic8::resize(frames[i], (int)(target_height * zoom));
-        vertical_flip(frames[i]);
+        frames[i]->vertical_flip();
         frames[i]->add_transparency(transparency);
     }
 }

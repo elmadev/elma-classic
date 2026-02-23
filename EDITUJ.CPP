@@ -766,9 +766,9 @@ void editor(void) {
                         }
                         if (access(filenev, 0) != 0) {
                             // Ez a nev nem foglalt:
-                            // vertical_flip( ppic );
+                            // ppic->vertical_flip();
                             BufferMain->save(filenev, Pal_editor_byteok);
-                            // vertical_flip( ppic );
+                            // ppic->vertical_flip();
                             break;
                         }
                         i++;

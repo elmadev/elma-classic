@@ -264,6 +264,8 @@ void menu_options() {
 
         BOOL_OPTION("Zoom Textures:", zoom_textures);
 
+        BOOL_OPTION("Zoom Grass:", zoom_grass);
+
         nav.add_row(
             "Renderer:",
             [] {

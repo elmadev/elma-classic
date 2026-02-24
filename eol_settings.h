@@ -63,6 +63,7 @@ class eol_settings {
     Clamp<double> zoom_{0.25, 1.0, 3.0};
     Clamp<double> minimap_zoom_{0.25, 1.0, 3.0};
     Default<bool> zoom_textures_{true};
+    Default<bool> zoom_grass_{true};
     Clamp<double> turn_time_{0.0, 0.35, 0.35};
     Default<bool> lctrl_search_{false};
     Default<DikScancode> alovolt_key_player_a_{DIK_UNKNOWN};
@@ -105,6 +106,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(zoom);
     DECLARE_FIELD_FUNCS(minimap_zoom);
     DECLARE_FIELD_FUNCS(zoom_textures);
+    DECLARE_FIELD_FUNCS(zoom_grass);
     DECLARE_FIELD_FUNCS(turn_time);
     DECLARE_FIELD_FUNCS(lctrl_search);
     DECLARE_FIELD_FUNCS(alovolt_key_player_a);

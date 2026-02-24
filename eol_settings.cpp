@@ -91,6 +91,12 @@ void eol_settings::set_zoom_textures(bool zoom_textures) {
     invalidate_lgr_cache();
 }
 
+void eol_settings::set_zoom_grass(bool zoom_grass) {
+    zoom_grass_ = zoom_grass;
+
+    invalidate_lgr_cache();
+}
+
 void eol_settings::set_turn_time(double t) { turn_time_ = t; }
 
 void eol_settings::set_lctrl_search(bool lctrl_search) { lctrl_search_ = lctrl_search; }
@@ -223,6 +229,7 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(zoom)                                                                               \
     JSON_FIELD(minimap_zoom)                                                                       \
     JSON_FIELD(zoom_textures)                                                                      \
+    JSON_FIELD(zoom_grass)                                                                         \
     JSON_FIELD(renderer)                                                                           \
     JSON_FIELD(turn_time)                                                                          \
     JSON_FIELD(lctrl_search)                                                                       \

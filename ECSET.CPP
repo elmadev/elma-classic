@@ -849,10 +849,6 @@ static int GrassHeightmap[MAX_HEIGHTMAP_LENGTH + 10];
 constexpr int GRASS_DISTANCE = 600;
 
 void canvas::draw_qgrass_texture(updown& qupdown, int x, int y) {
-    if (!BufferMain) {
-        internal_error("draw_qgrass_texture !BufferMain");
-    }
-
     // Grab the QGRASS texture
     int distance = GRASS_DISTANCE;
     int texture_index = Lgr->get_texture_index("qgrass");
@@ -860,44 +856,35 @@ void canvas::draw_qgrass_texture(updown& qupdown, int x, int y) {
         internal_error("draw_qgrass_texture texture_index < 0");
     }
 
-    // Grab the QUP/QDOWN image
+    if (qupdown.msk.data == nullptr) {
+        return;
+    }
+
     int width = qupdown.pic->get_width();
     int height = qupdown.pic->get_height();
-    unsigned char transparency = qupdown.pic->gpixel(0, 0);
 
-    // Initialize picture buffer
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            BufferMain->ppixel(j, i, 0);
-        }
-    }
-    // Calculate qupdown mask
-    for (int j = 0; j < width; j++) {
-        for (int i = 0; i < height; i++) {
-            if (qupdown.pic->gpixel(j, i) != transparency) {
-                break;
-            }
-            BufferMain->ppixel(j, i, 1);
-        }
-    }
-
-    // Draw qupdown mask with qgrass texture
-    for (int i = 0; i < height; i++) {
+    // Render mask
+    mask_element* data = qupdown.msk.data;
+    int mask_height = qupdown.msk.height;
+    int mask_y = y + height - 1;
+    for (int i = 0; i < mask_height; i++) {
         int j = 0;
-        unsigned char* row = BufferMain->get_row(height - 1 - i);
-        while (j < width) {
-            j += consecutive_transparent_pixels(row, j, width, 0);
-            if (j >= width) {
+        while (true) {
+            if (data->type == MaskEncoding::EndOfLine) {
+                data++;
                 break;
             }
-            int count = consecutive_solid_pixels(row, j, width, 0);
-            if (count <= 0) {
-                internal_error("draw_qgrass_texture count <= 0");
+
+            if (data->type == MaskEncoding::Solid) {
+                draw_pixels(canvas_pixels::texture(texture_index), distance, x + j,
+                            x + j + data->length - 1, mask_y, Clipping::Ground);
             }
-            draw_pixels(canvas_pixels::texture(texture_index), distance, x + j, x + j + count - 1,
-                        y + i, Clipping::Ground);
-            j += count;
+
+            j += data->length;
+            data++;
         }
+
+        mask_y--;
     }
 
     // Add 20 pixels of height to grass
@@ -944,9 +931,6 @@ void canvas::draw_qupdown(updown& qupdown, int x, int y) {
     }
 
     // Draw the QGRASS image on top of the QUP/QDOWN
-    if (width > 640 || height > 480) {
-        return;
-    }
     draw_qgrass_texture(qupdown, x, y);
 }
 

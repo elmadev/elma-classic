@@ -36,6 +36,7 @@
 * You can now change what LGR to use as the default from inside the options menu
 * Replays recorded with f1-enter are now saved into renders/rec_filename folder instead of the root
 * Internal editor allows Start object to be inside the ground
+* Improved lgr and level loading speeds
 * New setting to enable access to all internal levels without requiring them to be finished
 
 ## Minor Bug Fixes

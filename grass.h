@@ -1,6 +1,7 @@
 #ifndef GRASS_H
 #define GRASS_H
 
+#include "lgr.h"
 #include <memory>
 #include <vector>
 
@@ -16,13 +17,15 @@ struct updown {
     std::unique_ptr<pic8> pic;
     bool is_up;
     int slope;
+    mask msk;
 };
 
 class grass {
   public:
     std::vector<updown> elements;
     grass() = default;
-    void add(pic8* pic, bool up);
+    ~grass();
+    void add(pic8* pic, bool up, int target_height);
 };
 
 bool create_grass_polygon_heightmap(polygon* poly, int* heightmap, int* heightmap_length, int* x0,

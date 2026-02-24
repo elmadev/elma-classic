@@ -3,16 +3,60 @@
 #include "polygon.h"
 #include "physics_init.h"
 #include "pic8.h"
+#include <algorithm>
 #include <cmath>
 #include <format>
 
-void grass::add(pic8* pic, bool up) {
+grass::~grass() {
+    for (updown& qupdown : elements) {
+        delete[] qupdown.msk.data;
+    }
+}
+
+static void generate_grass_mask(mask& msk, pic8* pic, int target_height) {
+    // Source pic dimensions
+    int src_width = pic->get_width();
+    int src_height = pic->get_height();
+
+    msk.name[0] = 0;
+    msk.width = 0;
+    msk.height = 0;
+    msk.data = nullptr;
+
+    // No mask data if qupdown image is too large
+    int mask_height = std::max((int)(target_height), 1);
+    double scale = (double)(mask_height) / (double)(src_height);
+    int mask_width = std::max((int)(src_width * scale), 1);
+    if (mask_height > 640.0 || mask_width > 480.0) {
+        return;
+    }
+
+    // Generate heightmap
+    unsigned char transparency = pic->gpixel(0, 0);
+    int* heightmap = new int[mask_width];
+    for (int j = 0; j < mask_width; j++) {
+        heightmap[j] = mask_height; // for transparent columns
+        for (int i = 0; i < src_height; i++) {
+            if (pic->gpixel(j, i) != transparency) {
+                heightmap[j] = (int)(i * scale);
+                break;
+            }
+        }
+    }
+
+    // Create mask
+    msk.width = mask_width;
+    msk.height = *std::max_element(heightmap, heightmap + mask_width);
+    create_grass_mask(msk, heightmap);
+}
+
+void grass::add(pic8* pic, bool up, int target_height) {
     if (elements.size() >= MAX_GRASS_PICS) {
         external_error("Too many grass pictures in lgr file!");
     }
 
     constexpr int SLOPE_PADDING = 2 * GRASS_MARGIN + 1;
-    int slope = pic->get_height() - SLOPE_PADDING;
+    int slope = target_height - SLOPE_PADDING;
     if (slope < 0) {
         external_error(
             std::format("QUP/QDOWN picture's height is less than {}!", SLOPE_PADDING).c_str());
@@ -21,7 +65,10 @@ void grass::add(pic8* pic, bool up) {
         slope *= -1;
     }
 
-    elements.emplace_back(std::unique_ptr<pic8>(pic), up, slope);
+    mask msk;
+    generate_grass_mask(msk, pic, target_height);
+
+    elements.emplace_back(std::unique_ptr<pic8>(pic), up, slope, msk);
 }
 
 // Calculate the heightmap for the line segment of `poly`,

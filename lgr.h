@@ -136,6 +136,8 @@ class lgrfile {
 extern lgrfile* Lgr;
 void invalidate_lgr_cache();
 
+void create_grass_mask(mask& msk, int* heightmap);
+
 struct bike_box {
     int x1;
     int y1;

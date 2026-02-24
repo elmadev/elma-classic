@@ -422,6 +422,55 @@ static void create_mask(mask* dest, pic8* pic, int transparency) {
     delete pic;
 }
 
+void create_grass_mask(mask& msk, int* heightmap) {
+    int width = msk.width;
+    int height = msk.height;
+
+    // Special compression format type
+    MaskBuffer.resize(0);
+    for (int i = 0; i < height; i++) {
+        int j = 0;
+        while (j < width) {
+            // Transparent data
+            int skip = 0;
+            while (j < width && i >= heightmap[j]) {
+                skip++;
+                j++;
+            }
+            if (skip > 0) {
+                mask_element element;
+                element.type = MaskEncoding::Transparent;
+                element.length = skip;
+                MaskBuffer.push_back(element);
+            }
+
+            // Solid data
+            int count = 0;
+            while (j < width && i < heightmap[j]) {
+                count++;
+                j++;
+            }
+            if (count > 0) {
+                mask_element element;
+                element.type = MaskEncoding::Solid;
+                element.length = count;
+                MaskBuffer.push_back(element);
+            }
+        }
+        // End of row
+        mask_element element;
+        element.type = MaskEncoding::EndOfLine;
+        element.length = 0;
+        MaskBuffer.push_back(element);
+    }
+
+    msk.data = new mask_element[MaskBuffer.size()];
+    if (!msk.data) {
+        internal_error("Memory!");
+    }
+    std::copy(MaskBuffer.begin(), MaskBuffer.end(), msk.data);
+}
+
 void lgrfile::add_mask(pic8* pic, piclist* list, int index) {
     if (mask_count >= MAX_MASKS) {
         external_error("Too many masks in lgr file!");
@@ -677,12 +726,12 @@ lgrfile::lgrfile(const char* lgrname) {
         // QUP/QDOWN
         if (strnicmp(asset_filename, "qup_", 4) == 0) {
             asset_pic = pic8::resize(asset_pic, target_height);
-            grass_pics->add(asset_pic, true);
+            grass_pics->add(asset_pic, true, target_height);
             continue;
         }
         if (strnicmp(asset_filename, "qdown_", 6) == 0) {
             asset_pic = pic8::resize(asset_pic, target_height);
-            grass_pics->add(asset_pic, false);
+            grass_pics->add(asset_pic, false, target_height);
             continue;
         }
 

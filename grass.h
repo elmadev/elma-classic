@@ -25,7 +25,7 @@ class grass {
     std::vector<updown> elements;
     grass() = default;
     ~grass();
-    void add(pic8* pic, bool up, int target_height, double zoom);
+    void add(pic8* pic, bool up, int target_height, double qupdown_zoom, double zoom);
 };
 
 bool create_grass_polygon_heightmap(polygon* poly, int* heightmap, int* heightmap_length, int* x0,

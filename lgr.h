@@ -140,7 +140,7 @@ class lgrfile {
 extern lgrfile* Lgr;
 void invalidate_lgr_cache();
 
-void create_grass_mask(mask& msk, int* heightmap);
+void create_grass_mask(mask& msk, int* heightmap, int skip_rows);
 
 int read_varint(const unsigned char* buffer, int& offset);
 

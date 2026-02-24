@@ -424,13 +424,20 @@ static void create_mask(mask* dest, pic8* pic, int transparency) {
     delete pic;
 }
 
-void create_grass_mask(mask& msk, int* heightmap) {
+void create_grass_mask(mask& msk, int* heightmap, int skip_rows) {
     int width = msk.width;
     int height = msk.height;
 
     // Special compression format type
     MaskBuffer.resize(0);
-    for (int i = 0; i < height; i++) {
+    for (int i = 0; i < skip_rows; i++) {
+        mask_element element;
+        element.type = MaskEncoding::EndOfLine;
+        element.length = 0;
+        MaskBuffer.push_back(element);
+    }
+
+    for (int i = skip_rows; i < height; i++) {
         int j = 0;
         while (j < width) {
             // Transparent data
@@ -731,12 +738,12 @@ lgrfile::lgrfile(const char* lgrname) {
         // QUP/QDOWN
         if (strnicmp(asset_filename, "qup_", 4) == 0) {
             asset_pic = pic8::resize(asset_pic, target_height);
-            grass_pics->add(asset_pic, true, target_height, qupdown_zoom);
+            grass_pics->add(asset_pic, true, target_height, qupdown_zoom, zoom);
             continue;
         }
         if (strnicmp(asset_filename, "qdown_", 6) == 0) {
             asset_pic = pic8::resize(asset_pic, target_height);
-            grass_pics->add(asset_pic, false, target_height, qupdown_zoom);
+            grass_pics->add(asset_pic, false, target_height, qupdown_zoom, zoom);
             continue;
         }
 

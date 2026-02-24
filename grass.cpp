@@ -110,7 +110,7 @@ static int grass_line_heightmap(polygon* poly, int v1, int v2, int* x0, int cur,
     int x2 = (int)((r2.x - origin->x) * MetersToPixels);
     double y2 = (-r2.y - origin->y) * MetersToPixels;
 
-    if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0) {
+    if (x1 < 0 || x2 < 0) {
         internal_error("grass_line_heightmap coordinate out of bounds!");
     }
 

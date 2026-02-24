@@ -32,6 +32,12 @@ constexpr double MARGIN_X = 209.0;
 constexpr double MARGIN_Y_MINIMAP = 84.0;
 constexpr double MARGIN_Y = 21.0;
 
+// No-draw margin of the edge of canvas for sprites and grass images
+constexpr int CANVAS_SAFETY_LEFT = 120;
+constexpr int CANVAS_SAFETY_RIGHT = 50;
+constexpr int CANVAS_SAFETY_TOP = 20;
+constexpr int CANVAS_SAFETY_BOTTOM = CANVAS_SAFETY_TOP;
+
 static void memory_error() {
     external_error("You do not have enough memory to load this level!\n"
                    "Try to set the graphic detail to low at the options.");
@@ -698,7 +704,7 @@ void canvas::draw_texture(sprite* spr, int texture_index, int mask_index, Clippi
     int height = msk->height;
 
     // Check out of range textures (x position only)
-    if (x < 120 || x + width >= pixel_width - 50) {
+    if (x < CANVAS_SAFETY_LEFT || x + width >= pixel_width - CANVAS_SAFETY_RIGHT) {
         return;
     }
 
@@ -763,7 +769,7 @@ void canvas::draw_sprites(Clipping clipping) {
         int height = pict->height;
 
         // Check out of range pictures (x position only)
-        if (x < 120 || x + width >= pixel_width - 50) {
+        if (x < CANVAS_SAFETY_LEFT || x + width >= pixel_width - CANVAS_SAFETY_RIGHT) {
             continue;
         }
 
@@ -879,6 +885,14 @@ void canvas::draw_qupdown(updown& qupdown, int x, int y, int qupdown_margin, int
     if (!qupdown.is_up) {
         // Slide image down again by the slope
         y += qupdown.slope;
+    }
+
+    // Check out of bounds
+    int y2 = y + height + qgrass_margin;
+    int x2 = x + width;
+    if (x < CANVAS_SAFETY_LEFT || x2 >= pixel_width - CANVAS_SAFETY_RIGHT ||
+        y < CANVAS_SAFETY_TOP || y2 >= pixel_height - CANVAS_SAFETY_BOTTOM) {
+        return;
     }
 
     // Draw upside down

@@ -555,6 +555,7 @@ lgrfile::lgrfile(const char* lgrname) {
 
     double zoom = EolSettings->zoom();
     double texture_zoom = EolSettings->zoom_textures() ? zoom : 1.0;
+    double qgrass_zoom = EolSettings->zoom_grass() ? texture_zoom : 1.0;
 
     // Load file
     char path[30];
@@ -726,6 +727,7 @@ lgrfile::lgrfile(const char* lgrname) {
 
         // QGRASS
         if (strcmpi(asset_filename, "qgrass") == 0) {
+            asset_pic = pic8::resize(asset_pic, (int)(qgrass_zoom * target_height));
             add_texture(asset_pic, nullptr, 0);
             continue;
         }

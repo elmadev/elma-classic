@@ -5,9 +5,8 @@ class pic8;
 class polygon;
 class vect2;
 
-#define MAX_GRASS_PICS (100)
-
-#define QGRASS_EXTRA_HEIGHT (20)
+constexpr int MAX_GRASS_PICS = 100;
+constexpr int QGRASS_EXTRA_HEIGHT = 20;
 
 class grass {
   public:

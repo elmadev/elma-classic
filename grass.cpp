@@ -134,7 +134,7 @@ bool create_grass_polygon_heightmap(polygon* poly, int* heightmap, int* heightma
         }
     }
     if (max_vertex_length < 0.0001) {
-        return 0;
+        return false;
     }
 
     bool polygon_is_counterclockwise = true;

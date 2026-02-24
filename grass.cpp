@@ -4,13 +4,24 @@
 #include "physics_init.h"
 #include "pic8.h"
 #include <cmath>
+#include <format>
 
 void grass::add(pic8* pic, bool up) {
     if (elements.size() >= MAX_GRASS_PICS) {
         external_error("Too many grass pictures in lgr file!");
     }
 
-    elements.emplace_back(std::unique_ptr<pic8>(pic), up);
+    constexpr int SLOPE_PADDING = 2 * GRASS_MARGIN + 1;
+    int slope = pic->get_height() - SLOPE_PADDING;
+    if (slope < 0) {
+        external_error(
+            std::format("QUP/QDOWN picture's height is less than {}!", SLOPE_PADDING).c_str());
+    }
+    if (!up) {
+        slope *= -1;
+    }
+
+    elements.emplace_back(std::unique_ptr<pic8>(pic), up, slope);
 }
 
 // Calculate the heightmap for the line segment of `poly`,

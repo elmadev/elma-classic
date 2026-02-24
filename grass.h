@@ -10,10 +10,12 @@ class vect2;
 
 constexpr int MAX_GRASS_PICS = 100;
 constexpr int QGRASS_EXTRA_HEIGHT = 20;
+constexpr int GRASS_MARGIN = 20;
 
 struct updown {
     std::unique_ptr<pic8> pic;
     bool is_up;
+    int slope;
 };
 
 class grass {

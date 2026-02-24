@@ -846,7 +846,6 @@ static int consecutive_solid_pixels(unsigned char* pic_row, int x, int width,
 constexpr int MAX_HEIGHTMAP_LENGTH = 10000;
 static int GrassHeightmap[MAX_HEIGHTMAP_LENGTH + 10];
 
-constexpr int GRASS_MARGIN = 20;
 constexpr int GRASS_DISTANCE = 600;
 
 void canvas::draw_qgrass_texture(updown& qupdown, int x, int y) {
@@ -918,12 +917,11 @@ void canvas::draw_qupdown(updown& qupdown, int x, int y) {
     int height = qupdown.pic->get_height();
     unsigned char transparency = qupdown.pic->gpixel(0, 0);
 
-    if (qupdown.is_up) {
-        // Slide image down by 20
-        y -= GRASS_MARGIN;
-    } else {
-        // Slide image down by 20, then down again by the slope
-        y -= height - 1 - GRASS_MARGIN;
+    // Slide image down by top of image buffer
+    y -= GRASS_MARGIN;
+    if (!qupdown.is_up) {
+        // Slide image down again by the slope
+        y += qupdown.slope;
     }
 
     // Draw upside down
@@ -970,17 +968,6 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
         for (updown& qupdown : gr->elements) {
             // Check each image and choose the one with the smallest y-offset from desired
             // height
-            int slope = qupdown.pic->get_height();
-            if (slope < 2 * GRASS_MARGIN + 1) {
-                char tmp[60];
-                sprintf(tmp, "QUP/QDOWN picture's height is less than %d!", 2 * GRASS_MARGIN + 1);
-                external_error(tmp);
-            }
-            slope -= 2 * GRASS_MARGIN + 1;
-            if (!qupdown.is_up) {
-                slope = -slope;
-            }
-
             int target_x = x + qupdown.pic->get_width();
             int target_y;
             if (target_x >= x0 + heightmap_length) {
@@ -989,11 +976,11 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
                 target_y = heightmap[target_x - x0];
             }
 
-            int score = abs(y + slope - target_y);
+            int score = abs(y + qupdown.slope - target_y);
             if (score < best_score) {
                 best_score = score;
                 best_qupdown = &qupdown;
-                best_slope = slope;
+                best_slope = qupdown.slope;
             }
         }
 

@@ -843,9 +843,6 @@ static int consecutive_solid_pixels(unsigned char* pic_row, int x, int width,
     return count;
 }
 
-constexpr int MAX_HEIGHTMAP_LENGTH = 10000;
-static int GrassHeightmap[MAX_HEIGHTMAP_LENGTH + 10];
-
 constexpr int GRASS_DISTANCE = 600;
 
 void canvas::draw_qgrass_texture(updown& qupdown, int x, int y) {
@@ -985,6 +982,9 @@ void canvas::draw_grass_polygons() {
         return;
     }
 
+    constexpr int HEIGHTMAP_LENGTH = 10000;
+    int max_heightmap_length = EolSettings->zoom() * HEIGHTMAP_LENGTH;
+    int* heightmap = new int[max_heightmap_length];
     for (int i = 0; i < MAX_POLYGONS; i++) {
         // Make sure we are drawing a grass polygon onto the ground
         polygon* poly = Ptop->polygons[i];
@@ -1000,17 +1000,19 @@ void canvas::draw_grass_polygons() {
         // Calculate the grass heightmap
         int heightmap_length = 0;
         int x0 = 0;
-        if (!create_grass_polygon_heightmap(poly, GrassHeightmap, &heightmap_length, &x0,
-                                            MAX_HEIGHTMAP_LENGTH, &origin)) {
+        if (!create_grass_polygon_heightmap(poly, heightmap, &heightmap_length, &x0,
+                                            max_heightmap_length, &origin)) {
             continue;
         }
-        if (heightmap_length > MAX_HEIGHTMAP_LENGTH) {
-            internal_error("draw_grass_polygons heightmap_length > MAX_HEIGHTMAP_LENGTH");
+        if (heightmap_length > max_heightmap_length) {
+            internal_error("draw_grass_polygons heightmap_length > max_heightmap_length");
         }
 
         // Draw the grass polygon
-        draw_grass_polygon(gr, GrassHeightmap, heightmap_length, x0);
+        draw_grass_polygon(gr, heightmap, heightmap_length, x0);
     }
+
+    delete[] heightmap;
 }
 
 void canvas::draw_killers() {

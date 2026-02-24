@@ -903,7 +903,8 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) 
     }
 
     // Add 20 pixels of height to grass
-    int grass_height_padding = QGRASS_EXTRA_HEIGHT * EolSettings->zoom();
+    int grass_height_padding =
+        (QGRASS_EXTRA_HEIGHT + GRASS_MARGIN) * EolSettings->zoom() - GRASS_MARGIN;
     for (int i = 0; i < grass_height_padding; i++) {
         draw_pixels(canvas_pixels::texture(texture_index), distance, x, x + width - 1,
                     y + height + i, Clipping::Ground);

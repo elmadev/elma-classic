@@ -887,7 +887,7 @@ lgrfile::lgrfile(const char* lgrname) {
     }
 
     // Check grass
-    has_grass = get_texture_index("qgrass") >= 0 && grass_pics->length >= 2;
+    has_grass = get_texture_index("qgrass") >= 0 && grass_pics->elements.size() >= 2;
 
     END_TIME(lgr_timer, std::format("{}.lgr (zoom={:.2f})", lgrname, zoom));
 }

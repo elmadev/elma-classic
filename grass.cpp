@@ -5,31 +5,12 @@
 #include "pic8.h"
 #include <cmath>
 
-grass::grass() {
-    length = 0;
-    for (int i = 0; i < MAX_GRASS_PICS; i++) {
-        pics[i] = NULL;
-        is_up[i] = false;
-    }
-}
-
 void grass::add(pic8* pic, bool up) {
-    if (length >= MAX_GRASS_PICS) {
+    if (elements.size() >= MAX_GRASS_PICS) {
         external_error("Too many grass pictures in lgr file!");
     }
-    pics[length] = pic;
-    is_up[length] = up;
 
-    length++;
-}
-
-grass::~grass() {
-    for (int i = 0; i < MAX_GRASS_PICS; i++) {
-        if (pics[i]) {
-            delete pics[i];
-            pics[i] = NULL;
-        }
-    }
+    elements.emplace_back(std::unique_ptr<pic8>(pic), up);
 }
 
 // Calculate the heightmap for the line segment of `poly`,

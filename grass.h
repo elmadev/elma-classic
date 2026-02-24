@@ -1,6 +1,9 @@
 #ifndef GRASS_H
 #define GRASS_H
 
+#include <memory>
+#include <vector>
+
 class pic8;
 class polygon;
 class vect2;
@@ -8,13 +11,15 @@ class vect2;
 constexpr int MAX_GRASS_PICS = 100;
 constexpr int QGRASS_EXTRA_HEIGHT = 20;
 
+struct updown {
+    std::unique_ptr<pic8> pic;
+    bool is_up;
+};
+
 class grass {
   public:
-    int length;
-    pic8* pics[MAX_GRASS_PICS];
-    bool is_up[MAX_GRASS_PICS];
-    grass();
-    ~grass();
+    std::vector<updown> elements;
+    grass() = default;
     void add(pic8* pic, bool up);
 };
 

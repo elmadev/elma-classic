@@ -1,6 +1,7 @@
 #ifndef ECSET_H
 #define ECSET_H
 
+#include "grass.h"
 #include "lgr.h"
 #include "main.h"
 #include "sprite.h"
@@ -193,8 +194,8 @@ class canvas {
     void draw_killers();
 
     // Draw grass
-    void draw_qgrass_texture(grass* gr, int qupdown_index, int x, int y);
-    void draw_qupdown(grass* gr, int qupdown_index, int x, int y);
+    void draw_qgrass_texture(updown& qupdown, int x, int y);
+    void draw_qupdown(updown& qupdown, int x, int y);
     void draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0);
     void draw_grass_polygons();
 

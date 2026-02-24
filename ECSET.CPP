@@ -849,7 +849,7 @@ static int GrassHeightmap[MAX_HEIGHTMAP_LENGTH + 10];
 constexpr int GRASS_MARGIN = 20;
 constexpr int GRASS_DISTANCE = 600;
 
-void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) {
+void canvas::draw_qgrass_texture(updown& qupdown, int x, int y) {
     if (!BufferMain) {
         internal_error("draw_qgrass_texture !BufferMain");
     }
@@ -862,10 +862,9 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) 
     }
 
     // Grab the QUP/QDOWN image
-    pic8* pic = grass->pics[qupdown_index];
-    int width = pic->get_width();
-    int height = pic->get_height();
-    unsigned char transparency = pic->gpixel(0, 0);
+    int width = qupdown.pic->get_width();
+    int height = qupdown.pic->get_height();
+    unsigned char transparency = qupdown.pic->gpixel(0, 0);
 
     // Initialize picture buffer
     for (int i = 0; i < height; i++) {
@@ -876,7 +875,7 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) 
     // Calculate qupdown mask
     for (int j = 0; j < width; j++) {
         for (int i = 0; i < height; i++) {
-            if (pic->gpixel(j, i) != transparency) {
+            if (qupdown.pic->gpixel(j, i) != transparency) {
                 break;
             }
             BufferMain->ppixel(j, i, 1);
@@ -911,16 +910,15 @@ void canvas::draw_qgrass_texture(grass* grass, int qupdown_index, int x, int y) 
     }
 }
 
-void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y) {
+void canvas::draw_qupdown(updown& qupdown, int x, int y) {
     int distance = GRASS_DISTANCE;
 
     // Grab the QUP/QDOWN image
-    pic8* pic = gr->pics[qupdown_index];
-    int width = pic->get_width();
-    int height = pic->get_height();
-    unsigned char transparency = pic->gpixel(0, 0);
+    int width = qupdown.pic->get_width();
+    int height = qupdown.pic->get_height();
+    unsigned char transparency = qupdown.pic->gpixel(0, 0);
 
-    if (gr->is_up[qupdown_index]) {
+    if (qupdown.is_up) {
         // Slide image down by 20
         y -= GRASS_MARGIN;
     } else {
@@ -931,7 +929,7 @@ void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y) {
     // Draw upside down
     for (int i = 0; i < height; i++) {
         int j = 0;
-        unsigned char* sor = pic->get_row(height - 1 - i);
+        unsigned char* sor = qupdown.pic->get_row(height - 1 - i);
         while (j < width) {
             j += consecutive_transparent_pixels(sor, j, width, transparency);
             if (j >= width) {
@@ -951,7 +949,7 @@ void canvas::draw_qupdown(grass* gr, int qupdown_index, int x, int y) {
     if (width > 640 || height > 480) {
         return;
     }
-    draw_qgrass_texture(gr, qupdown_index, x, y);
+    draw_qgrass_texture(qupdown, x, y);
 }
 
 void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0) {
@@ -967,23 +965,23 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
 
         // Let's pick the best matching QUP/QDOWN
         int best_score = INT_MAX;
-        int best_index = -1;
+        updown* best_qupdown = nullptr;
         int best_slope = 0;
-        for (int i = 0; i < gr->length; i++) {
+        for (updown& qupdown : gr->elements) {
             // Check each image and choose the one with the smallest y-offset from desired
             // height
-            int slope = gr->pics[i]->get_height();
+            int slope = qupdown.pic->get_height();
             if (slope < 2 * GRASS_MARGIN + 1) {
                 char tmp[60];
                 sprintf(tmp, "QUP/QDOWN picture's height is less than %d!", 2 * GRASS_MARGIN + 1);
                 external_error(tmp);
             }
             slope -= 2 * GRASS_MARGIN + 1;
-            if (!gr->is_up[i]) {
+            if (!qupdown.is_up) {
                 slope = -slope;
             }
 
-            int target_x = x + gr->pics[i]->get_width();
+            int target_x = x + qupdown.pic->get_width();
             int target_y;
             if (target_x >= x0 + heightmap_length) {
                 target_y = heightmap[heightmap_length - 1];
@@ -994,18 +992,18 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
             int score = abs(y + slope - target_y);
             if (score < best_score) {
                 best_score = score;
-                best_index = i;
+                best_qupdown = &qupdown;
                 best_slope = slope;
             }
         }
 
         // Draw the best matching QUP/QDOWN
-        if (best_index < 0) {
-            internal_error("draw_grass_polygon best_index < 0");
+        if (!best_qupdown) {
+            internal_error("draw_grass_polygon no qupdown identified!");
         }
 
-        draw_qupdown(gr, best_index, x, y);
-        x += gr->pics[best_index]->get_width();
+        draw_qupdown(*best_qupdown, x, y);
+        x += best_qupdown->pic->get_width();
         y += best_slope;
     }
 }

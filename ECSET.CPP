@@ -823,7 +823,7 @@ static int consecutive_solid_pixels(unsigned char* pic_row, int x, int width,
 
 constexpr int GRASS_DISTANCE = 600;
 
-void canvas::draw_qgrass_texture(updown& qupdown, int x, int y) {
+void canvas::draw_qgrass_texture(updown& qupdown, int x, int y, int qgrass_margin) {
     // Grab the QGRASS texture
     int distance = GRASS_DISTANCE;
     int texture_index = Lgr->get_texture_index("qgrass");
@@ -862,16 +862,13 @@ void canvas::draw_qgrass_texture(updown& qupdown, int x, int y) {
         mask_y--;
     }
 
-    // Add 20 pixels of height to grass
-    int grass_height_padding =
-        (QGRASS_EXTRA_HEIGHT + GRASS_MARGIN) * EolSettings->zoom() - GRASS_MARGIN;
-    for (int i = 0; i < grass_height_padding; i++) {
+    for (int i = 0; i < qgrass_margin; i++) {
         draw_pixels(canvas_pixels::texture(texture_index), distance, x, x + width - 1,
                     y + height + i, Clipping::Ground);
     }
 }
 
-void canvas::draw_qupdown(updown& qupdown, int x, int y) {
+void canvas::draw_qupdown(updown& qupdown, int x, int y, int qupdown_margin, int qgrass_margin) {
     int distance = GRASS_DISTANCE;
 
     // Grab the QUP/QDOWN image
@@ -880,7 +877,7 @@ void canvas::draw_qupdown(updown& qupdown, int x, int y) {
     unsigned char transparency = qupdown.pic->gpixel(0, 0);
 
     // Slide image down by top of image buffer
-    y -= GRASS_MARGIN;
+    y -= qupdown_margin;
     if (!qupdown.is_up) {
         // Slide image down again by the slope
         y += qupdown.slope;
@@ -906,10 +903,11 @@ void canvas::draw_qupdown(updown& qupdown, int x, int y) {
     }
 
     // Draw the QGRASS image on top of the QUP/QDOWN
-    draw_qgrass_texture(qupdown, x, y);
+    draw_qgrass_texture(qupdown, x, y, qgrass_margin);
 }
 
-void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0) {
+void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length, int x0,
+                                int qupdown_margin, int qgrass_margin) {
     if (heightmap_length < 1) {
         internal_error("draw_grass_polygon should always have a length of at least 1!");
     }
@@ -948,7 +946,7 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
             internal_error("draw_grass_polygon no qupdown identified!");
         }
 
-        draw_qupdown(*best_qupdown, x, y);
+        draw_qupdown(*best_qupdown, x, y, qupdown_margin, qgrass_margin);
         x += best_qupdown->pic->get_width();
         y += best_slope;
     }
@@ -960,9 +958,15 @@ void canvas::draw_grass_polygons() {
         return;
     }
 
+    // Calculate zoom-adjusted grass margin
+    double zoom = EolSettings->zoom();
+    int qupdown_margin = (int)(QUPDOWN_MARGIN * (EolSettings->zoom_grass() ? zoom : 1.0));
+    int qgrass_margin = (int)(QGRASS_MARGIN * zoom) - qupdown_margin;
+
     constexpr int HEIGHTMAP_LENGTH = 10000;
-    int max_heightmap_length = EolSettings->zoom() * HEIGHTMAP_LENGTH;
+    int max_heightmap_length = zoom * HEIGHTMAP_LENGTH;
     int* heightmap = new int[max_heightmap_length];
+
     for (int i = 0; i < MAX_POLYGONS; i++) {
         // Make sure we are drawing a grass polygon onto the ground
         polygon* poly = Ptop->polygons[i];
@@ -987,7 +991,7 @@ void canvas::draw_grass_polygons() {
         }
 
         // Draw the grass polygon
-        draw_grass_polygon(gr, heightmap, heightmap_length, x0);
+        draw_grass_polygon(gr, heightmap, heightmap_length, x0, qupdown_margin, qgrass_margin);
     }
 
     delete[] heightmap;

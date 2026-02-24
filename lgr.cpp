@@ -556,6 +556,7 @@ lgrfile::lgrfile(const char* lgrname) {
     double zoom = EolSettings->zoom();
     double texture_zoom = EolSettings->zoom_textures() ? zoom : 1.0;
     double qgrass_zoom = EolSettings->zoom_grass() ? texture_zoom : 1.0;
+    double qupdown_zoom = EolSettings->zoom_grass() ? zoom : 1.0;
 
     // Load file
     char path[30];
@@ -707,12 +708,12 @@ lgrfile::lgrfile(const char* lgrname) {
         // QUP/QDOWN
         if (strnicmp(asset_filename, "qup_", 4) == 0) {
             asset_pic = pic8::resize(asset_pic, target_height);
-            grass_pics->add(asset_pic, true, target_height);
+            grass_pics->add(asset_pic, true, target_height, qupdown_zoom);
             continue;
         }
         if (strnicmp(asset_filename, "qdown_", 6) == 0) {
             asset_pic = pic8::resize(asset_pic, target_height);
-            grass_pics->add(asset_pic, false, target_height);
+            grass_pics->add(asset_pic, false, target_height, qupdown_zoom);
             continue;
         }
 

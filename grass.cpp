@@ -13,7 +13,7 @@ grass::~grass() {
     }
 }
 
-static void generate_grass_mask(mask& msk, pic8* pic, int target_height) {
+static void generate_grass_mask(mask& msk, pic8* pic, int target_height, double zoom) {
     // Source pic dimensions
     int src_width = pic->get_width();
     int src_height = pic->get_height();
@@ -24,10 +24,10 @@ static void generate_grass_mask(mask& msk, pic8* pic, int target_height) {
     msk.data = nullptr;
 
     // No mask data if qupdown image is too large
-    int mask_height = std::max((int)(target_height), 1);
+    int mask_height = std::max((int)(target_height * zoom), 1);
     double scale = (double)(mask_height) / (double)(src_height);
     int mask_width = std::max((int)(src_width * scale), 1);
-    if (mask_height > 640.0 || mask_width > 480.0) {
+    if (mask_height > 640.0 * zoom || mask_width > 480.0 * zoom) {
         return;
     }
 
@@ -36,9 +36,10 @@ static void generate_grass_mask(mask& msk, pic8* pic, int target_height) {
     int* heightmap = new int[mask_width];
     for (int j = 0; j < mask_width; j++) {
         heightmap[j] = mask_height; // for transparent columns
+        int src_j = (int)(j / scale);
         for (int i = 0; i < src_height; i++) {
-            if (pic->gpixel(j, i) != transparency) {
-                heightmap[j] = (int)(i * scale);
+            if (pic->gpixel(src_j, i) != transparency) {
+                heightmap[j] = (int)std::ceil(i * scale);
                 break;
             }
         }
@@ -50,12 +51,12 @@ static void generate_grass_mask(mask& msk, pic8* pic, int target_height) {
     create_grass_mask(msk, heightmap);
 }
 
-void grass::add(pic8* pic, bool up, int target_height) {
+void grass::add(pic8* pic, bool up, int target_height, double zoom) {
     if (elements.size() >= MAX_GRASS_PICS) {
         external_error("Too many grass pictures in lgr file!");
     }
 
-    constexpr int SLOPE_PADDING = 2 * GRASS_MARGIN + 1;
+    constexpr int SLOPE_PADDING = 2 * QUPDOWN_MARGIN + 1;
     int slope = target_height - SLOPE_PADDING;
     if (slope < 0) {
         external_error(
@@ -64,9 +65,12 @@ void grass::add(pic8* pic, bool up, int target_height) {
     if (!up) {
         slope *= -1;
     }
+    slope = (int)(slope * zoom);
 
     mask msk;
-    generate_grass_mask(msk, pic, target_height);
+    generate_grass_mask(msk, pic, target_height, zoom);
+
+    pic = pic8::resize(pic, (int)(zoom * target_height));
 
     elements.emplace_back(std::unique_ptr<pic8>(pic), up, slope, msk);
 }

@@ -10,8 +10,8 @@ class polygon;
 class vect2;
 
 constexpr int MAX_GRASS_PICS = 100;
-constexpr int QGRASS_EXTRA_HEIGHT = 20;
-constexpr int GRASS_MARGIN = 20;
+constexpr int QUPDOWN_MARGIN = 20;
+constexpr int QGRASS_MARGIN = QUPDOWN_MARGIN + 20;
 
 struct updown {
     std::unique_ptr<pic8> pic;
@@ -25,7 +25,7 @@ class grass {
     std::vector<updown> elements;
     grass() = default;
     ~grass();
-    void add(pic8* pic, bool up, int target_height);
+    void add(pic8* pic, bool up, int target_height, double zoom);
 };
 
 bool create_grass_polygon_heightmap(polygon* poly, int* heightmap, int* heightmap_length, int* x0,

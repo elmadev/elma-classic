@@ -13,8 +13,8 @@ void pic8::allocate(int w, int h) {
         internal_error("pic8 already allocated!");
         return;
     }
-    width = short(w);
-    height = short(h);
+    width = w;
+    height = h;
     if (w % 4) {
         w += 4 - w % 4;
     }

@@ -234,6 +234,44 @@ static int consecutive_solid_pixels(int x, int pic_width, unsigned char* pic_row
 
 static std::vector<unsigned char> PictureBuffer;
 
+// Encodes integers >= -1 by storing (value + 1) as unsigned varint.
+constexpr int VARINT_MINIMUM = -1;
+constexpr int VARINT_SHIFT = 7;
+constexpr int VARINT_TAG = 1 << VARINT_SHIFT;
+constexpr int VARINT_MASK = VARINT_TAG - 1;
+constexpr int VARINT_MAX_BYTES = 5;
+
+static void write_varint(std::vector<unsigned char>& buffer, int value) {
+    if (value < VARINT_MINIMUM) {
+        internal_error("write_varint() value below VARINT_MINIMUM!");
+    }
+
+    value -= VARINT_MINIMUM;
+    while (value > VARINT_MASK) {
+        buffer.push_back(VARINT_TAG | (value & VARINT_MASK));
+        value >>= VARINT_SHIFT;
+    }
+    buffer.push_back(value & VARINT_MASK);
+}
+
+int read_varint(const unsigned char* buffer, int& offset) {
+    int value = 0;
+    int shift = 0;
+    for (int i = 0; i < VARINT_MAX_BYTES; ++i) {
+        unsigned char c = buffer[offset++];
+        value |= (c & VARINT_MASK) << shift;
+
+        if ((c & VARINT_TAG) == 0) {
+            return value + VARINT_MINIMUM;
+        }
+
+        shift += VARINT_SHIFT;
+    }
+
+    internal_error("read_varint() value too large!");
+    return -1;
+}
+
 // Store a picture into the lgr.
 // Compression format:
 //  {

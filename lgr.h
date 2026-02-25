@@ -138,6 +138,8 @@ void invalidate_lgr_cache();
 
 void create_grass_mask(mask& msk, int* heightmap);
 
+int read_varint(const unsigned char* buffer, int& offset);
+
 struct bike_box {
     int x1;
     int y1;

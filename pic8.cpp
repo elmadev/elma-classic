@@ -425,7 +425,7 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
         return false;
     }
     // Header
-    pcxdescriptor desc;
+    pcxdescriptor desc{};
     desc.ManufactId = 10;
     desc.VersionNum = 5;
     desc.EncodingTech = 1;

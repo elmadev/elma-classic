@@ -81,7 +81,7 @@ vect2 intersection(const vect2& r1, vect2 v1, vect2 r2, vect2 v2) {
 double point_segment_distance(const vect2& point_r, const vect2& segment_r,
                               const vect2& segment_v) {
     vect2 rr = point_r - segment_r;
-    double scalar = segment_r * rr;
+    double scalar = segment_v * rr;
     if (scalar <= 0) {
         // Distance to the first point.
         return rr.length();

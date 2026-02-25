@@ -81,7 +81,7 @@ pic8::pic8(const char* filename, FILE* h) {
     internal_error("pic8 could not find file extension: ", filename);
 }
 
-void pic8::vertical_flip() { std::reverse(rows, rows + get_height() - 1); }
+void pic8::vertical_flip() { std::reverse(rows, rows + get_height()); }
 
 pic8* pic8::resize(pic8* src, int target_height) {
     int source_height = src->get_height();

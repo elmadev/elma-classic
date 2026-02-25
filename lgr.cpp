@@ -232,9 +232,7 @@ static int consecutive_solid_pixels(int x, int pic_width, unsigned char* pic_row
     return count;
 }
 
-constexpr size_t PICTURE_MAX_MEMORY = 600000;
-
-static unsigned char* PictureBuffer = nullptr;
+static std::vector<unsigned char> PictureBuffer;
 
 // Store a picture into the lgr.
 // Compression format:
@@ -266,19 +264,9 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
         external_error("Picture must be transparent in lgr file!", new_pic->name);
     }
 
-    if (!PictureBuffer) {
-        PictureBuffer = new unsigned char[PICTURE_MAX_MEMORY + 10];
-    }
-    if (!PictureBuffer) {
-        internal_error("Not enough memory!");
-    }
-
-    int buffer_offset = 0;
+    PictureBuffer.resize(0);
     for (int i = 0; i < new_pic->height; i++) {
         unsigned char* row = pic->get_row(i);
-        if (buffer_offset > PICTURE_MAX_MEMORY) {
-            external_error("Picture is too big in lgr file! Picture name:", new_pic->name);
-        }
 
         int x = 0;
         while (true) {
@@ -288,19 +276,18 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
             if (skip > 60000) {
                 internal_error("add_picture skip width too long!");
             }
-
-            PictureBuffer[buffer_offset] = (unsigned char)(skip / 256);
-            PictureBuffer[buffer_offset + 1] = (unsigned char)(skip % 256);
             x += skip;
+
             if (x >= new_pic->width) {
                 // End of line
-                PictureBuffer[buffer_offset] = 255;
-                PictureBuffer[buffer_offset + 1] = 255;
-                buffer_offset += 2;
+                PictureBuffer.push_back(255);
+                PictureBuffer.push_back(255);
                 break;
             }
 
-            buffer_offset += 2;
+            PictureBuffer.push_back((unsigned char)(skip / 256));
+            PictureBuffer.push_back((unsigned char)(skip % 256));
+
             // Solid pixels
             int count =
                 consecutive_solid_pixels(x, new_pic->width, row, (unsigned char)transparency);
@@ -310,26 +297,18 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
             if (count > 60000) {
                 internal_error("add_picture count width too long!");
             }
-
-            PictureBuffer[buffer_offset] = (unsigned char)(count / 256);
-            PictureBuffer[buffer_offset + 1] = (unsigned char)(count % 256);
-
-            buffer_offset += 2;
-            if (buffer_offset + count > PICTURE_MAX_MEMORY) {
-                external_error("Picture is too big in lgr file! Picture name:", new_pic->name);
-            }
-
-            memcpy(&PictureBuffer[buffer_offset], &row[x], count);
+            PictureBuffer.push_back((unsigned char)(count / 256));
+            PictureBuffer.push_back((unsigned char)(count % 256));
+            PictureBuffer.insert(PictureBuffer.end(), row + x, row + x + count);
             x += count;
-            buffer_offset += count;
         }
     }
 
-    new_pic->data = new unsigned char[buffer_offset + 10];
+    new_pic->data = new unsigned char[PictureBuffer.size()];
     if (!new_pic->data) {
         internal_error("Not enough memory!");
     }
-    memcpy(new_pic->data, PictureBuffer, buffer_offset);
+    std::copy(PictureBuffer.begin(), PictureBuffer.end(), new_pic->data);
 
     picture_count++;
 }
@@ -558,6 +537,7 @@ lgrfile::lgrfile(const char* lgrname) {
     pic8* q2bike = nullptr;
     pic8* qcolors = nullptr;
     MaskBuffer.reserve(20000);
+    PictureBuffer.reserve(40000);
     for (int i = 0; i < pcx_length; i++) {
         char asset_filename[30];
         if (fread(asset_filename, 1, 20, h) != 20) {
@@ -865,11 +845,8 @@ lgrfile::lgrfile(const char* lgrname) {
     delete list;
     list = nullptr;
 
-    if (PictureBuffer) {
-        delete PictureBuffer;
-        PictureBuffer = nullptr;
-    }
-
+    PictureBuffer.resize(0);
+    PictureBuffer.shrink_to_fit();
     MaskBuffer.resize(0);
     MaskBuffer.shrink_to_fit();
 

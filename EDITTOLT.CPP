@@ -769,34 +769,29 @@ static void vegyesblt(pic8* dest, picture* pkep, int x0, int y0) {
         int x = 0;
         while (1) {
             // Ures elintezes:
-            int uresszam = tomb[i] * 256 + tomb[i + 1];
-            i += 2;
-
-            if (uresszam > 60000) {
+            int skip = read_varint(tomb, i);
+            if (skip == -1) {
                 break;
             }
-
-            x += uresszam;
+            x += skip;
 
             // Teli elintezes:
-            int teliszam = tomb[i] * 256 + tomb[i + 1];
-            i += 2;
-
+            int count = read_varint(tomb, i);
             // Johet konverzio:
             if (xtullog) {
-                for (int dx = 0; dx < teliszam; dx++) {
+                for (int dx = 0; dx < count; dx++) {
                     if (x + dx < xsize) {
                         dsor[x + dx] = Szinkonvtomb[tomb[i + dx]];
                     }
                 }
             } else {
-                for (int dx = 0; dx < teliszam; dx++) {
+                for (int dx = 0; dx < count; dx++) {
                     dsor[x + dx] = Szinkonvtomb[tomb[i + dx]];
                 }
             }
 
-            x += teliszam;
-            i += teliszam;
+            x += count;
+            i += count;
         }
     }
 }

@@ -275,8 +275,8 @@ int read_varint(const unsigned char* buffer, int& offset) {
 // Store a picture into the lgr.
 // Compression format:
 //  {
-//   Big-endian unsigned short: transparent length or 0xFFFF if end of row,
-//   Big-endian unsigned short: non-transparent length, (skipped if end of row)
+//   Varint: transparent length or -1 if end of row,
+//   Varint: non-transparent length, (skipped if end of row)
 //   Raw pixel data, (skipped if end of row)
 //  }
 void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
@@ -292,11 +292,6 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
     new_pic->width = pic->get_width();
     new_pic->height = pic->get_height();
 
-    // Compress picture data
-    if (new_pic->width > 60000) {
-        external_error(std::string("Picture width is too big! ") + new_pic->name);
-    }
-
     int transparency = get_transparency_palette_id(list->transparency[index], pic);
     if (transparency < 0) {
         external_error(std::string("Picture must be transparent in lgr file! ") + new_pic->name);
@@ -311,20 +306,14 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
             // Skip pixels
             int skip =
                 consecutive_transparent_pixels(x, new_pic->width, row, (unsigned char)transparency);
-            if (skip > 60000) {
-                internal_error("add_picture skip width too long!");
-            }
             x += skip;
-
             if (x >= new_pic->width) {
                 // End of line
-                PictureBuffer.push_back(255);
-                PictureBuffer.push_back(255);
+                write_varint(PictureBuffer, -1);
                 break;
             }
 
-            PictureBuffer.push_back((unsigned char)(skip / 256));
-            PictureBuffer.push_back((unsigned char)(skip % 256));
+            write_varint(PictureBuffer, skip);
 
             // Solid pixels
             int count =
@@ -332,11 +321,7 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
             if (count <= 0) {
                 internal_error("add_picture count width negative!");
             }
-            if (count > 60000) {
-                internal_error("add_picture count width too long!");
-            }
-            PictureBuffer.push_back((unsigned char)(count / 256));
-            PictureBuffer.push_back((unsigned char)(count % 256));
+            write_varint(PictureBuffer, count);
             PictureBuffer.insert(PictureBuffer.end(), row + x, row + x + count);
             x += count;
         }

@@ -30,8 +30,12 @@ struct picture {
     Clipping default_clipping;
     int width;
     int height;
-    // Encoded as array of {unsigned BE short skip, unsigned BE short length, char[length] pixels}
-    // Jump to next row when skip length is 2^16 (and skip length/pixels)
+    // Compression format:
+    //  {
+    //   Varint: transparent length or -1 if end of row,
+    //   Varint: non-transparent length, (skipped if end of row)
+    //   Raw pixel data, (skipped if end of row)
+    //  }
     unsigned char* data;
 };
 

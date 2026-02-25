@@ -777,15 +777,13 @@ void canvas::draw_sprites(Clipping clipping) {
         for (int i = 0; i < height; i++) {
             int j = 0;
             while (true) {
-                int skip = pixeldata[offset] * 256 + pixeldata[offset + 1];
-                offset += 2;
-                if (skip > 60000) {
+                int skip = read_varint(pixeldata, offset);
+                if (skip == -1) {
                     break;
                 }
                 j += skip;
 
-                int count = pixeldata[offset] * 256 + pixeldata[offset + 1];
-                offset += 2;
+                int count = read_varint(pixeldata, offset);
                 if (y - i >= 0 && y - i < pixel_height) {
                     draw_pixels(canvas_pixels::pointer(&pixeldata[offset]), distance, x + j,
                                 x + j + count - 1, y - i, clipping);

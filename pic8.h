@@ -29,6 +29,8 @@ class pic8 {
     pic8(const char* filename, FILE* h = nullptr);
     static pic8* from_bmp(const char* filename);
     static pic8* resize(pic8* src, int height);
+    static pic8* transpose(pic8* src);
+    pic8* clone();
     ~pic8();
     void vertical_flip();
     bool save(const char* filename, unsigned char* pal = nullptr, FILE* h = nullptr);

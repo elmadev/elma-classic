@@ -132,6 +132,26 @@ pic8* pic8::resize(pic8* src, int target_height) {
     return scaled;
 }
 
+pic8* pic8::transpose(pic8* src) {
+    int w = src->get_width();
+    int h = src->get_height();
+    pic8* dst = new pic8(h, w);
+    for (int j = 0; j < h; j++) {
+        for (int i = 0; i < w; i++) {
+            dst->ppixel(j, i, src->gpixel(i, j));
+        }
+    }
+    return dst;
+}
+
+pic8* pic8::clone() {
+    pic8* copy = new pic8(width, height);
+    for (int y = 0; y < height; y++) {
+        memcpy(copy->rows[y], rows[y], width);
+    }
+    return copy;
+}
+
 bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
     int i = 0;
     while (filename[i]) {

@@ -59,7 +59,4 @@ void blit8(pic8* dest, pic8* source, int x = 0, int y = 0);
 bool get_pcx_pal(const char* filename, unsigned char* pal);
 bool get_pcx_pal(const char* filename, palette** pal);
 
-void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2);
-void blit_scale8(pic8* dest, pic8* source);
-
 #endif

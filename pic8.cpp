@@ -799,49 +799,6 @@ bool get_pcx_pal(const char* filename, palette** pal) {
     return true;
 }
 
-// Copy entire source into the (x1, y1, x2, y2) coordinates of dest
-void blit_scale8(pic8* dest, pic8* source, int x1, int y1, int x2, int y2) {
-#ifdef DEBUG
-    if (!dest || !source) {
-        internal_error("blit_scale8 !dest || !source!");
-    }
-#endif
-    if (x1 > x2) {
-        int tmp = x1;
-        x1 = x2;
-        x2 = tmp;
-    }
-    if (y1 > y2) {
-        int tmp = y1;
-        y1 = y2;
-        y2 = tmp;
-    }
-#ifdef DEBUG
-    if (x1 < 0 || y1 < 0 || x2 >= dest->get_width() || y2 >= dest->get_height()) {
-        internal_error("pic8::blit_scale x1 < 0 || y1 < 0 || x2 >= width || y2 >= height!");
-    }
-#endif
-    int xsd = x2 - x1 + 1;
-    int ysd = y2 - y1 + 1;
-    int xss = source->get_width();
-    int yss = source->get_height();
-    double s_per_d_y = (double)yss / ysd;
-    double s_per_d_x = (double)xss / xsd;
-    for (int y = 0; y < ysd; y++) {
-        double sy = (y + 0.5) * s_per_d_y;
-        for (int x = 0; x < xsd; x++) {
-            double sx = (x + 0.5) * s_per_d_x;
-            unsigned char c = source->gpixel((int)(sx), (int)(sy));
-            dest->ppixel(x1 + x, y1 + y, c);
-        }
-    }
-}
-
-// Copy entire source and resize and paste into entire dest
-void blit_scale8(pic8* dest, pic8* source) {
-    blit_scale8(dest, source, 0, 0, dest->get_width() - 1, dest->get_height() - 1);
-}
-
 // Only horizontal and vertical lines can be drawn
 void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
     if (x2 < x1) {

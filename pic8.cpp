@@ -6,6 +6,7 @@
 #include "qopen.h"
 #include <algorithm>
 #include <cstring>
+#include <climits>
 
 void pic8::allocate(int w, int h) {
     if (rows || pixels) {
@@ -348,6 +349,11 @@ void pic8::spr_open(const char* filename, FILE* h) {
 }
 
 bool pic8::spr_save(const char* filename, FILE* h) {
+    if (width > SHRT_MAX || height > SHRT_MAX) {
+        external_error(std::string("Image is too large to be saved as .spr format!") + filename);
+        return false;
+    }
+
     bool h_provided = true;
     if (!h) {
         h_provided = false;
@@ -470,6 +476,11 @@ static int pcx_count_repeats(pic8* ppic, int x, int y, int width) {
 // Strictly respects pcx convention: Only compresses palette IDs 0-63 instead of 0-191
 // Does not enforce the width to be an even number however
 bool pic8::pcx_save(const char* filename, unsigned char* pal) {
+    if (width > SHRT_MAX || height > SHRT_MAX) {
+        external_error(std::string("Image is too large to be saved as .pcx format!") + filename);
+        return false;
+    }
+
     FILE* h = fopen(filename, "wb");
     if (!h) {
         internal_error(std::string("pcx_save failed to open file: ") + filename);
@@ -481,7 +492,8 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     desc.VersionNum = 5;
     desc.EncodingTech = 1;
     desc.BitsPerPlane = 8;
-    desc.Xmin = desc.Ymin = 0;
+    desc.Xmin = 0;
+    desc.Ymin = 0;
     desc.Xmax = (short)(width - 1);
     desc.Ymax = (short)(height - 1);
     desc.HorRes = 10;

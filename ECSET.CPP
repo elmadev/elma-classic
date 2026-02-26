@@ -27,6 +27,11 @@ constexpr int RIGHTMOST_CHUNK_WIDTH = 1000000;
 constexpr int DISTANCE_DEFAULT = 1000000;
 constexpr int DISTANCE_SKY_CLIPPING_CORRECTION = 10000;
 
+// Canvas margins in meters
+constexpr double MARGIN_X = 209.0;
+constexpr double MARGIN_Y_MINIMAP = 84.0;
+constexpr double MARGIN_Y = 21.0;
+
 static void memory_error() {
     external_error("You do not have enough memory to load this level!",
                    "Try to set the graphic detail to low at the options.");
@@ -100,9 +105,6 @@ void canvas::set_origin_and_dimensions() {
         seg = Segments->next_segment();
     }
 
-    const double MARGIN_X = 10000 / MetersToPixels;
-    const double MARGIN_Y_MINIMAP = 4000 / MetersToPixels;
-    const double MARGIN_Y = 1000 / MetersToPixels;
     if (is_minimap) {
         // Minimap, we don't need to quantize
         // Add a small buffer around the level to avoid crashing from out of bounds

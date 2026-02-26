@@ -100,20 +100,23 @@ void canvas::set_origin_and_dimensions() {
         seg = Segments->next_segment();
     }
 
+    const double MARGIN_X = 10000 / MetersToPixels;
+    const double MARGIN_Y_MINIMAP = 4000 / MetersToPixels;
+    const double MARGIN_Y = 1000 / MetersToPixels;
     if (is_minimap) {
         // Minimap, we don't need to quantize
         // Add a small buffer around the level to avoid crashing from out of bounds
-        origin = vect2(minx - 10000 / MetersToPixels, miny - 4000 / MetersToPixels);
-        width = (maxx + 10000 / MetersToPixels) - origin.x;
-        height = (maxy + 4000 / MetersToPixels) - origin.y;
+        origin = vect2(minx - MARGIN_X, miny - MARGIN_Y_MINIMAP);
+        width = (maxx + MARGIN_X) - origin.x;
+        height = (maxy + MARGIN_Y_MINIMAP) - origin.y;
     } else {
         // Main view, we need to quantize
         // Add a small buffer around the level to avoid crashing from out of bounds
-        origin = vect2(minx - 10000 / MetersToPixels, miny - 1000 / MetersToPixels);
+        origin = vect2(minx - MARGIN_X, miny - MARGIN_Y);
         quantize(&origin.x);
         quantize(&origin.y);
-        width = (maxx + 10000 / MetersToPixels) - origin.x;
-        height = (maxy + 1000 / MetersToPixels) - origin.y;
+        width = (maxx + MARGIN_X) - origin.x;
+        height = (maxy + MARGIN_Y) - origin.y;
     }
 }
 

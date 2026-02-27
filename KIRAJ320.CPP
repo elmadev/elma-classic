@@ -123,7 +123,7 @@ void beallitmereteket(int splitscreen) {
     if (EolSettings->center_camera()) {
         Mo_bal = (Cxsize / MetersToPixels) * 0.50;
     } else {
-        Mo_bal = (SCREEN_WIDTH / MetersToPixels) * 0.15;
+        Mo_bal = (SCREEN_WIDTH / MetersToPixels) * 0.15 * EolSettings->zoom();
     }
     Mo_dx = Cxsize / MetersToPixels - 2.0 * Mo_bal;
     Mo_y = Cysize / MetersToPixels / 2.0;

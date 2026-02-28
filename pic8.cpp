@@ -838,6 +838,9 @@ void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
 
 // Make this picture point by reference of a subview of the source picture
 void pic8::subview(int x1, int y1, int x2, int y2, pic8* source) {
+    if (pixels) {
+        internal_error("pic8 is not a subview!");
+    }
     width = x2 - x1 + 1;
     height = y2 - y1 + 1;
     rows = (unsigned char**)realloc(rows, sizeof(*rows) * height);

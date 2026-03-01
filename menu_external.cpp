@@ -36,6 +36,7 @@ static void play_external(const std::string& filename, bool map_viewer) {
             Rec2->erase(filename_str);
             return;
         }
+        map_viewer = is_key_down(DIK_F1);
     }
 }
 

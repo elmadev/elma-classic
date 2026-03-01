@@ -86,7 +86,7 @@ void set_zoom_factor() {
 }
 
 void set_minimap_zoom_factor() {
-    MinimapScaleFactor = (int)(0.42 * MetersToPixels * 0.5);
+    MinimapScaleFactor = (int)(0.42 * MetersToPixels * 0.5 / EolSettings->minimap_zoom());
     MetersToMinimapPixels = MetersToPixels / MinimapScaleFactor;
 }
 

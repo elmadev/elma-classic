@@ -82,6 +82,10 @@ void set_zoom_factor() {
     MetersToPixels = 100.0 * zoom_factor;
     PixelsToMeters = 1.0 / MetersToPixels;
 
+    set_minimap_zoom_factor();
+}
+
+void set_minimap_zoom_factor() {
     MinimapScaleFactor = (int)(0.42 * MetersToPixels * 0.5);
     MetersToMinimapPixels = MetersToPixels / MinimapScaleFactor;
 }

@@ -439,9 +439,11 @@ static void play_internal(int internal_index, bool map_viewer) {
             return;
         }
         if (choice == MenuLevel::PlayAgain) {
+            map_viewer = is_key_down(DIK_F1);
             continue;
         }
         if (choice == MenuLevel::PlayNext) {
+            map_viewer = is_key_down(DIK_F1);
             internal_index++;
             cur_player->selected_level = internal_index;
         }

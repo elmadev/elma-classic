@@ -223,6 +223,15 @@ void menu_options() {
                 }
             });
 
+        nav.add_row(
+            "Minimap Zoom:", std::format("{:.2f}", EolSettings->minimap_zoom()), NAV_FUNC() {
+                double old_zoom = EolSettings->minimap_zoom();
+                EolSettings->set_minimap_zoom(old_zoom + 0.25);
+                if (old_zoom == EolSettings->minimap_zoom()) {
+                    EolSettings->set_minimap_zoom(0.25);
+                }
+            });
+
         BOOL_OPTION("Zoom Textures:", zoom_textures);
 
         nav.add_row(

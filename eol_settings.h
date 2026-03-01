@@ -61,6 +61,7 @@ class eol_settings {
     Default<MapAlignment> map_alignment_{MapAlignment::None};
     Default<RendererType> renderer_{RendererType::Software};
     Clamp<double> zoom_{0.25, 1.0, 3.0};
+    Clamp<double> minimap_zoom_{0.25, 1.0, 3.0};
     Default<bool> zoom_textures_{false};
     Clamp<double> turn_time_{0.0, 0.35, 0.35};
     Default<bool> lctrl_search_{false};
@@ -101,6 +102,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(map_alignment);
     DECLARE_FIELD_FUNCS(renderer);
     DECLARE_FIELD_FUNCS(zoom);
+    DECLARE_FIELD_FUNCS(minimap_zoom);
     DECLARE_FIELD_FUNCS(zoom_textures);
     DECLARE_FIELD_FUNCS(turn_time);
     DECLARE_FIELD_FUNCS(lctrl_search);

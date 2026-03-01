@@ -1,4 +1,5 @@
 #include "eol_settings.h"
+#include "level_load.h"
 #include "lgr.h"
 #include "main.h"
 #include "menu_pic.h"
@@ -74,6 +75,14 @@ void eol_settings::set_zoom(double z) {
         zoom_ = z;
         set_zoom_factor();
         invalidate_lgr_cache();
+    }
+}
+
+void eol_settings::set_minimap_zoom(double z) {
+    if (z != minimap_zoom_) {
+        minimap_zoom_ = z;
+        set_minimap_zoom_factor();
+        invalidate_level();
     }
 }
 
@@ -211,6 +220,7 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(center_map)                                                                         \
     JSON_FIELD(map_alignment)                                                                      \
     JSON_FIELD(zoom)                                                                               \
+    JSON_FIELD(minimap_zoom)                                                                       \
     JSON_FIELD(zoom_textures)                                                                      \
     JSON_FIELD(renderer)                                                                           \
     JSON_FIELD(turn_time)                                                                          \

@@ -22,6 +22,7 @@ class eol {
     void process(const new_kuski&);
     void process(const kuski_logout&);
     void process(const kuski_set_level&);
+    void process(const chat_message&);
 
     void enter_level(const char* level_name, const level* lev);
     void exit_level(const char* level_name, double time, int apple_count, int level_apple_count,

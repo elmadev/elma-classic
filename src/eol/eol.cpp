@@ -1,6 +1,10 @@
 #include "eol/eol.h"
 #include "eol/status_messages.h"
+#include "eol/console.h"
+#include "eol_settings.h"
 #include <cstring>
+#include <chrono>
+#include <format>
 
 static kuski* get_kuski(std::vector<kuski>& kuskis, unsigned int id) {
     for (kuski& k : kuskis) {
@@ -55,6 +59,25 @@ void eol::sync_players_online_table() {
     for (const kuski& k : kuskis) {
         players_online_table.add_row({k.nick, k.level});
     }
+}
+
+void eol::process(const chat_message& msg) {
+    std::string nick;
+    if (msg.kuski_id == id) {
+        nick = EolSettings->nick();
+    } else {
+        kuski* k = get_kuski(kuskis, msg.kuski_id);
+        if (!k) {
+            return;
+        }
+
+        nick = k->nick;
+    }
+
+    auto timestamp = std::chrono::floor<std::chrono::seconds>(
+        std::chrono::system_clock::from_time_t(static_cast<std::time_t>(msg.unix_timestamp)));
+    std::string line = std::format("{:%H:%M:%S} <{}> {}", timestamp, nick, msg.message);
+    Console->add_line(line, console::LineType::Chat);
 }
 
 void eol::enter_level(const char* level_name, const level* lev) {

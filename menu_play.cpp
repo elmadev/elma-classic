@@ -1,4 +1,5 @@
 #include "menu_play.h"
+#include "M_PIC.H"
 #include "abc8.h"
 #include "best_times.h"
 #include "EDITUJ.H"
@@ -482,6 +483,22 @@ void menu_play() {
         menu_nav nav("Select Level!");
         nav.search_pattern = SearchPattern::Internals;
         nav.select_row(player1->selected_level + 1);
+
+        if (EolSettings->show_total_time()) {
+            int finished = State->player_finished_level_count(player1->name, State->single);
+            int level_count = INTERNAL_LEVEL_COUNT - 1;
+            std::string total_text;
+            if (finished == level_count) {
+                char total_time_text[40];
+                centiseconds_to_string(State->player_total_time(player1->name, State->single),
+                                       total_time_text, true);
+                total_text = std::format("Total: {}", total_time_text);
+            } else {
+                total_text = std::format("Finished: {}/{}", finished, level_count);
+            }
+            int text_x = SCREEN_WIDTH / 2 + 320 - 10 - MenuFont->len(total_text.c_str());
+            nav.add_overlay(total_text, text_x, 30);
+        }
 
         nav.add_row(
             "External File", NAV_FUNC(&player1) {

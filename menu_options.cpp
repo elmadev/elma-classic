@@ -324,6 +324,7 @@ void menu_options() {
                 EolSettings->set_recording_fps(new_fps);
             });
 
+        BOOL_OPTION("Show Total Time:", show_total_time);
         BOOL_OPTION("Demo menu:", show_demo_menu);
         BOOL_OPTION("Help menu:", show_help_menu);
         BOOL_OPTION("Best Times menu:", show_best_times_menu);

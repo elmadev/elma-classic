@@ -74,7 +74,9 @@ static void create_palette_surface() {
         internal_error(SDL_GetError());
         return;
     }
+}
 
+static void apply_current_palette() {
     if (CurrentPalette) {
         CurrentPalette->set();
     }
@@ -92,6 +94,7 @@ void platform_init() {
     create_window(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
     initialize_renderer();
     create_palette_surface();
+    apply_current_palette();
     keyboard::init();
 }
 
@@ -131,6 +134,7 @@ void platform_resize_window(int width, int height) {
     SDL_FreeSurface(SDLSurfacePaletted);
     SDLSurfacePaletted = nullptr;
     create_palette_surface();
+    apply_current_palette();
 }
 
 void platform_recreate_window() {
@@ -160,6 +164,7 @@ void platform_recreate_window() {
     create_window(x, y, width, height);
     initialize_renderer();
     create_palette_surface();
+    apply_current_palette();
 }
 
 long long get_milliseconds() { return SDL_GetTicks64(); }

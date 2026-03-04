@@ -90,6 +90,7 @@ class state {
     void reset_keys();
     player* get_player(const char* player_name);
     int player_total_time(const char* player_name, bool single);
+    int player_finished_level_count(const char* player_name, bool single);
 
   private:
     void write_stats_player_total_time(FILE* h, const char* player_name, bool single);

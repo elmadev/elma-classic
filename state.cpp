@@ -232,6 +232,21 @@ int state::player_total_time(const char* player_name, bool single) {
     return total_time;
 }
 
+int state::player_finished_level_count(const char* player_name, bool single) {
+    int count = 0;
+    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
+        topten* tten = single ? &toptens[i].single : &toptens[i].multi;
+        for (int j = 0; j < tten->times_count; j++) {
+            if (strcmp(player_name, tten->names1[j]) == 0 ||
+                (!single && strcmp(player_name, tten->names2[j]) == 0)) {
+                count++;
+                break;
+            }
+        }
+    }
+    return count;
+}
+
 // Print total time of all players combined
 void state::write_stats_anonymous_total_time(FILE* h, bool single, const char* text1,
                                              const char* text2, const char* text3) {

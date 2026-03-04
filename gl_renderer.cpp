@@ -121,10 +121,10 @@ static void setup_render_state() {
     glBindTexture(GL_TEXTURE_1D, PaletteTexture);
 }
 
-static void setup_PBO(int width, int height) {
+static void setup_PBO(int pitch, int height) {
     glGenBuffers(1, &PBO);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
-    glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height, nullptr, GL_STREAM_DRAW);
+    glBufferData(GL_PIXEL_UNPACK_BUFFER, pitch * height, nullptr, GL_STREAM_DRAW);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
@@ -152,7 +152,7 @@ static void setup_vertex_data() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-int gl_init(SDL_Window* sdl_window, int width, int height) {
+int gl_init(SDL_Window* sdl_window, int width, int height, int pitch) {
     FrameWidth = width;
     FrameHeight = height;
 
@@ -186,29 +186,32 @@ int gl_init(SDL_Window* sdl_window, int width, int height) {
     }
 
     setup_textures(width, height);
-    setup_PBO(width, height);
+    setup_PBO(pitch, height);
 
     setup_render_state();
 
     return 0;
 }
 
-void gl_upload_frame(const unsigned char* indices) {
+void gl_upload_frame(const unsigned char* indices, int pitch) {
+    unsigned long buffer_size = pitch * FrameHeight;
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
-    void* ptr = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, FrameWidth * FrameHeight,
+    void* ptr = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, buffer_size,
                                  GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
     if (!ptr) {
         internal_error("Could not map PBO!");
     }
 
-    memcpy(ptr, indices, FrameWidth * FrameHeight);
+    memcpy(ptr, indices, buffer_size);
     glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 
     glActiveTexture(GL_TEXTURE0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, FrameWidth, FrameHeight, GL_RED, GL_UNSIGNED_BYTE,
                     nullptr);
 
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 }
 
 void gl_update_palette(const void* palette) {
@@ -219,7 +222,7 @@ void gl_update_palette(const void* palette) {
 
 void gl_present() { glDrawArrays(GL_TRIANGLES, 0, 6); }
 
-int gl_resize(int width, int height) {
+int gl_resize(int width, int height, int pitch) {
     FrameWidth = width;
     FrameHeight = height;
     glViewport(0, 0, width, height);
@@ -231,7 +234,7 @@ int gl_resize(int width, int height) {
 
     // Resize PBO
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
-    glBufferData(GL_PIXEL_UNPACK_BUFFER, width * height, nullptr, GL_STREAM_DRAW);
+    glBufferData(GL_PIXEL_UNPACK_BUFFER, pitch * height, nullptr, GL_STREAM_DRAW);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     return 0;

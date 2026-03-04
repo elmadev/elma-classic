@@ -52,7 +52,7 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
 
 static void initialize_renderer() {
     if (EolSettings->renderer() == RendererType::OpenGL) {
-        if (gl_init(SDLWindow, SCREEN_WIDTH, SCREEN_HEIGHT) != 0) {
+        if (gl_init(SDLWindow, SCREEN_WIDTH, SCREEN_HEIGHT, SDLSurfacePaletted->pitch) != 0) {
             internal_error("Failed to initialize OpenGL renderer");
             return;
         }
@@ -122,7 +122,7 @@ void platform_resize_window(int width, int height) {
     create_palette_surface();
 
     if (EolSettings->renderer() == RendererType::OpenGL) {
-        if (gl_resize(width, height) != 0) {
+        if (gl_resize(width, height, SDLSurfacePaletted->pitch) != 0) {
             internal_error("Failed to resize OpenGL renderer");
             return;
         }
@@ -194,7 +194,7 @@ void unlock_backbuffer() {
     SurfaceLocked = false;
 
     if (EolSettings->renderer() == RendererType::OpenGL) {
-        gl_upload_frame((unsigned char*)SDLSurfacePaletted->pixels);
+        gl_upload_frame((unsigned char*)SDLSurfacePaletted->pixels, SDLSurfacePaletted->pitch);
         gl_present();
         SDL_GL_SwapWindow(SDLWindow);
     } else {

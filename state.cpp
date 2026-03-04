@@ -211,6 +211,27 @@ static void write_stats_topten(FILE* h, topten* tten, bool single) {
 // Default time if uncompleted level: 10 minutes
 constexpr int STATS_MAX_TIME = 100 * 60 * 10;
 
+int state::player_total_time(const char* player_name, bool single) {
+    int total_time = 0;
+    for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {
+        int best_time = 100000000;
+        topten* tten = single ? &toptens[i].single : &toptens[i].multi;
+        for (int j = 0; j < tten->times_count; j++) {
+            if (strcmp(player_name, tten->names1[j]) == 0 ||
+                (!single && strcmp(player_name, tten->names2[j]) == 0)) {
+                best_time = tten->times[j];
+                break;
+            }
+        }
+        if (best_time >= STATS_MAX_TIME) {
+            total_time += STATS_MAX_TIME;
+        } else {
+            total_time += best_time;
+        }
+    }
+    return total_time;
+}
+
 // Print total time of all players combined
 void state::write_stats_anonymous_total_time(FILE* h, bool single, const char* text1,
                                              const char* text2, const char* text3) {

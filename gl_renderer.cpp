@@ -194,7 +194,7 @@ int gl_init(SDL_Window* sdl_window, int width, int height, int pitch) {
 }
 
 void gl_upload_frame(const unsigned char* indices, int pitch) {
-    unsigned long buffer_size = pitch * FrameHeight;
+    const unsigned long long buffer_size = pitch * FrameHeight;
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
     void* ptr = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, buffer_size,
                                  GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);

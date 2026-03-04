@@ -53,8 +53,8 @@ template <typename T> struct Clamp {
     decltype(eol_settings::name##_.value) name##_default() const { return name##_.def; }
 
 class eol_settings {
-    Clamp<int> screen_width_{640, 640, 10000};
-    Clamp<int> screen_height_{480, 480, 10000};
+    Clamp<int> screen_width_{640, 800, 10000};
+    Clamp<int> screen_height_{480, 600, 10000};
     Default<bool> pictures_in_background_{false};
     Default<bool> center_camera_{false};
     Default<bool> center_map_{false};

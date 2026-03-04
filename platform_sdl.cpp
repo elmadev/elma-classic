@@ -92,8 +92,8 @@ void platform_init() {
     SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
 
     create_window(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
-    initialize_renderer();
     create_palette_surface();
+    initialize_renderer();
     apply_current_palette();
     keyboard::init();
 }
@@ -117,6 +117,10 @@ void platform_resize_window(int width, int height) {
     SCREEN_HEIGHT = height;
     SDL_SetWindowSize(SDLWindow, width, height);
 
+    SDL_FreeSurface(SDLSurfacePaletted);
+    SDLSurfacePaletted = nullptr;
+    create_palette_surface();
+
     if (EolSettings->renderer() == RendererType::OpenGL) {
         if (gl_resize(width, height) != 0) {
             internal_error("Failed to resize OpenGL renderer");
@@ -131,9 +135,6 @@ void platform_resize_window(int width, int height) {
         }
     }
 
-    SDL_FreeSurface(SDLSurfacePaletted);
-    SDLSurfacePaletted = nullptr;
-    create_palette_surface();
     apply_current_palette();
 }
 
@@ -162,8 +163,8 @@ void platform_recreate_window() {
     SDLWindow = nullptr;
 
     create_window(x, y, width, height);
-    initialize_renderer();
     create_palette_surface();
+    initialize_renderer();
     apply_current_palette();
 }
 

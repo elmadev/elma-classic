@@ -24,6 +24,7 @@ menu_nav::menu_nav(std::string title)
     y_title = 30;
     search_pattern = SearchPattern::None;
     search_skip = 0;
+    max_search_len = MAX_FILENAME_LEN;
 }
 
 void menu_nav::add_row(std::string left, std::string right, nav_func handler) {
@@ -227,8 +228,7 @@ bool menu_nav::search_handler_text(char c) {
     if (!accept_search_input() || !MenuFont->has_char(c)) {
         return false;
     }
-    const size_t max_len = search_pattern == SearchPattern::Internals ? 20 : MAX_FILENAME_LEN;
-    if (search_input.size() < max_len) {
+    if (search_input.size() < max_search_len) {
         search_input.push_back(c);
     }
     update_search();

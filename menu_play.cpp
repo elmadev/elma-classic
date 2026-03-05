@@ -482,6 +482,7 @@ void menu_play() {
 
         menu_nav nav("Select Level!");
         nav.search_pattern = SearchPattern::Internals;
+        nav.max_search_len = 20;
         nav.select_row(player1->selected_level + 1);
 
         if (EolSettings->show_total_time()) {

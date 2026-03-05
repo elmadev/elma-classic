@@ -50,6 +50,7 @@ class menu_nav {
     SearchPattern search_pattern;
     bool search_skip_one;
     int search_skip;
+    size_t max_search_len;
 
     menu_nav(std::string title);
 

@@ -62,7 +62,7 @@ class eol_settings {
     Default<RendererType> renderer_{RendererType::Software};
     Clamp<double> zoom_{0.25, 1.0, 3.0};
     Clamp<double> minimap_zoom_{0.25, 1.0, 3.0};
-    Default<bool> zoom_textures_{false};
+    Default<bool> zoom_textures_{true};
     Clamp<double> turn_time_{0.0, 0.35, 0.35};
     Default<bool> lctrl_search_{false};
     Default<DikScancode> alovolt_key_player_a_{DIK_UNKNOWN};

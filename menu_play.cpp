@@ -18,6 +18,7 @@
 #include "skip.h"
 #include "timer.h"
 #include "eol_settings.h"
+#include "fs_utils.h"
 #include "directinput/scancodes.h"
 #include <cstdlib>
 #include <cstring>
@@ -52,7 +53,7 @@ static bool menu_prompt_replay_name(char* filename) {
         while (has_text_input()) {
             char c = pop_text_input();
             if (MenuFont->has_char(c) && is_char_valid_for_filename(c)) {
-                if (i >= 8) {
+                if (i >= MAX_REPLAY_NAME_LEN) {
                     continue;
                 }
                 filename[i] = c;
@@ -77,7 +78,7 @@ static bool menu_prompt_replay_name(char* filename) {
 }
 
 static void menu_save_play(int level_id) {
-    char tmp[20] = "";
+    char tmp[MAX_REPLAY_NAME_LEN + 5] = "";
     if (!menu_prompt_replay_name(tmp)) {
         return;
     }

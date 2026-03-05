@@ -129,8 +129,8 @@ static void replay_randomizer(std::vector<std::string>& filenames) {
 
 static std::vector<std::string> find_replay_files() {
     std::vector<std::string> filenames;
-    finame filename;
-    bool done = find_first("rec/*.rec", filename);
+    char filename[MAX_REPLAY_NAME_LEN + 5];
+    bool done = find_first("rec/*.rec", filename, MAX_REPLAY_NAME_LEN);
     while (!done) {
         filenames.emplace_back(filename);
         done = find_next(filename);
@@ -162,6 +162,7 @@ static void menu_replay() {
 
     nav.search_pattern = SearchPattern::Sorted;
     nav.search_skip = 1;
+    nav.max_search_len = MAX_REPLAY_NAME_LEN;
     nav.sort_rows();
 
     if (nav.row_count() <= 1) {
@@ -216,6 +217,7 @@ static void menu_merge_replays() {
     }
 
     nav.search_pattern = SearchPattern::Sorted;
+    nav.max_search_len = MAX_REPLAY_NAME_LEN;
     nav.sort_rows();
 
     if (nav.row_count() == 0) {

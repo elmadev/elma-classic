@@ -493,7 +493,7 @@ void recorder::save(const char* filename, FILE* h, int level_id) {
     }
 
     if (!h) {
-        char path[40];
+        char path[MAX_REPLAY_NAME_LEN + 10];
         sprintf(path, "rec/%s", filename);
         h = fopen(path, "wb");
         if (!h) {
@@ -572,7 +572,7 @@ int recorder::load_rec_file(const char* filename, bool demo) {
             external_error("Failed to open demo file: ", filename);
         }
     } else {
-        char path[40];
+        char path[MAX_REPLAY_NAME_LEN + 10];
         sprintf(path, "rec/%s", filename);
         h = fopen(path, "rb");
         if (!h) {
@@ -623,7 +623,7 @@ recorder::merge_result recorder::load_merge(const std::string& filename1,
 
 void recorder::save_rec_file(const char* filename, int level_id) {
     if (MultiplayerRec) {
-        char path[40];
+        char path[MAX_REPLAY_NAME_LEN + 10];
         sprintf(path, "rec/%s", filename);
         FILE* h = fopen(path, "wb");
         if (!h) {

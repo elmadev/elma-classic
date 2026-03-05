@@ -89,7 +89,7 @@ static void abcberendez(int nevszam) {
             if (case_insensitive_lexicographical_compare(nev2, nev1)) {
                 // if( strcmp( nev1, nev2 ) > 0 ) {
                 //  Csere:
-                char tmp[20];
+                finame tmp;
                 strcpy(tmp, nev1);
                 strcpy(nev1, nev2);
                 strcpy(nev2, tmp);
@@ -599,7 +599,7 @@ int tolt_save_as() {
     pop();
 
     empty_keypress_buffer();
-    char nev[20] = "";
+    finame nev = "";
     int i = 0;
     char eddignev[10] = "$%...%^&";
     while (1) {
@@ -1996,7 +1996,7 @@ void change_level_properties(void) {
     strcpy(bgnev, Ptop->background_name);
     strcpy(levelname, Ptop->level_name);
 
-    char lgrnev[20] = "";
+    finame lgrnev = "";
     strcpy(lgrnev, Ptop->lgr_name);
 
     int x1 = 130, y1 = 100;
@@ -2098,7 +2098,7 @@ void change_level_properties(void) {
                 invalid = 1;
             }
             if (is_in_box(Moux, Mouy, boxlgrfile)) {
-                char belgrnev[20] = "";
+                finame belgrnev = "";
                 strcpy(belgrnev, lgrnev);
                 if (!tolt_picklgrfile(lgrnev)) {
                     strcpy(lgrnev, belgrnev);

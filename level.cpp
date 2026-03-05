@@ -1,5 +1,6 @@
 #include "level.h"
 #include "best_times.h"
+#include "fs_utils.h"
 #include "editor_topology.h"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
@@ -431,7 +432,7 @@ int access_level_file(const char* filename) {
         return 0;
     }
     // For externals, normal access function call
-    char tmp[30];
+    filepath tmp;
     sprintf(tmp, "lev/%s", filename);
     return access(tmp, 0);
 }
@@ -542,7 +543,7 @@ level::level(const char* filename) {
     if (internal_index > 0) {
         from_file(InternalFilePaths[internal_index], true);
         // Override lgr name from lgrlist.txt
-        char lgrpath[40];
+        filepath lgrpath;
         const char* lgrname = InternalLevelLgrs[internal_index];
         sprintf(lgrpath, "lgr/%s.lgr", lgrname);
         if (access(lgrpath, 0) == 0) {
@@ -616,7 +617,7 @@ void level::from_file(const char* filename, bool internal) {
     if (internal) {
         h = qopen(filename, "rb");
     } else {
-        char path[40];
+        filepath path;
         sprintf(path, "lev/%s", filename);
         h = fopen(path, "rb");
     }
@@ -867,7 +868,7 @@ void level::save(const char* filename, bool skip_topology) {
         topology_errors = check_topology(false);
     }
 
-    char path[40];
+    filepath path;
     sprintf(path, "lev/%s", filename);
     if (SAVE_INTERNAL) {
         // Rename from .lev to .leb
@@ -1006,7 +1007,7 @@ void level::save_topten(const char* filename) {
         internal_error("save_topten cannot be used with internal levels!");
     }
 
-    char path[40];
+    filepath path;
     sprintf(path, "lev/%s", filename);
 
     FILE* h = fopen(path, "r+b");

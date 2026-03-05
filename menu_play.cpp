@@ -78,7 +78,7 @@ static bool menu_prompt_replay_name(char* filename) {
 }
 
 static void menu_save_play(int level_id) {
-    char tmp[MAX_REPLAY_NAME_LEN + 5] = "";
+    recname tmp = "";
     if (!menu_prompt_replay_name(tmp)) {
         return;
     }
@@ -399,7 +399,7 @@ void loading_screen() {
 static void play_internal(int internal_index, bool map_viewer) {
     player* cur_player = State->get_player(State->player1);
     while (true) {
-        char filename[20];
+        finame filename;
         sprintf(filename, "QWQUU%03d.LEV", internal_index + 1);
 
         loading_screen();

@@ -40,7 +40,7 @@ void invalidate_lgr_cache() {
 }
 
 static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
-    char path[30];
+    filepath path;
     sprintf(path, "lgr/%s.lgr", lgr_name);
     if (std::filesystem::exists(path)) {
         return true;
@@ -56,7 +56,7 @@ static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
     }
 
     // Display warning
-    char filename[20];
+    finame filename;
     strcpy(filename, lgr_name);
     strcat(filename, ".lgr");
     blit8(BufferBall, BufferMain);
@@ -559,7 +559,7 @@ lgrfile::lgrfile(const char* lgrname) {
     double qupdown_zoom = EolSettings->zoom_grass() ? zoom : 1.0;
 
     // Load file
-    char path[30];
+    filepath path;
     sprintf(path, "lgr/%s.lgr", lgrname);
     FILE* h = fopen(path, "rb");
     if (!h) {

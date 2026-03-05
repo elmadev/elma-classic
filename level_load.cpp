@@ -14,7 +14,7 @@
 #include <cstring>
 
 static bool ReloadLevel = false;
-static char CurrentLevelName[20] = "";
+static finame CurrentLevelName = "";
 
 void invalidate_level() { ReloadLevel = true; }
 

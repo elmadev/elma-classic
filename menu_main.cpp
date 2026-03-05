@@ -129,7 +129,7 @@ static void replay_randomizer(std::vector<std::string>& filenames) {
 
 static std::vector<std::string> find_replay_files() {
     std::vector<std::string> filenames;
-    char filename[MAX_REPLAY_NAME_LEN + 5];
+    recname filename;
     bool done = find_first("rec/*.rec", filename, MAX_REPLAY_NAME_LEN);
     while (!done) {
         filenames.emplace_back(filename);
@@ -244,8 +244,7 @@ static void menu_merge_replays() {
 
 static void menu_demo() {
     constexpr int DEMO_REPLAY_COUNT = 3;
-    char demo_names[DEMO_REPLAY_COUNT][MAX_FILENAME_LEN + 4] = {"demor1.rec", "demor2.rec",
-                                                                "demor3.rec"};
+    constexpr recname DEMO_NAMES[DEMO_REPLAY_COUNT] = {"demor1.rec", "demor2.rec", "demor3.rec"};
 
     int previous_demo = -1;
 
@@ -257,7 +256,7 @@ static void menu_demo() {
         previous_demo = demo;
 
         loading_screen();
-        int level_id = recorder::load_rec_file(demo_names[demo], true);
+        int level_id = recorder::load_rec_file(DEMO_NAMES[demo], true);
         if (access_level_file(Rec1->level_filename) != 0) {
             internal_error("menu_demo: cannot find level file for demo replay: ",
                            Rec1->level_filename);

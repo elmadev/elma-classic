@@ -115,6 +115,7 @@ class recorder {
     // Check that the framecount matches with the MSB of the flags
     bool frame_count_integrity();
 };
+static_assert(sizeof(recorder::level_filename) == 16);
 
 extern recorder* Rec1;
 extern recorder* Rec2;

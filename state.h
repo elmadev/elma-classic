@@ -16,6 +16,7 @@ struct player {
     int levels_completed;
     int selected_level; // -1 if selected external files
 };
+static_assert(sizeof(player) == 116);
 
 typedef char player_name[MAX_PLAYERNAME_LENGTH + 1];
 
@@ -25,11 +26,13 @@ struct topten {
     player_name names1[MAX_TIMES];
     player_name names2[MAX_TIMES];
 };
+static_assert(sizeof(topten) == 344);
 
 struct topten_set {
     topten single;
     topten multi;
 };
+static_assert(sizeof(topten_set) == 688);
 
 struct player_state_keys {
     DikScancode gas;

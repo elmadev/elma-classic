@@ -2,8 +2,8 @@
 #define FS_UTILS_H
 
 constexpr int MAX_FILENAME_LEN = 8;
-constexpr int MAX_FILENAME_EXT_LEN = MAX_FILENAME_LEN + 4;  // "FILENAME.EXT" = 12
-constexpr int MAX_FILE_PATH_LEN = 4 + MAX_FILENAME_EXT_LEN; // "dir/FILENAME.EXT" = 16
+constexpr int MAX_FILENAME_EXT_LEN = 15; // binary formats allow up to 15 chars
+constexpr int MAX_FILE_PATH_LEN = 4 + MAX_FILENAME_EXT_LEN + 4; // "lgr/" + name + ".lgr" = 23
 
 constexpr int MAX_REPLAY_NAME_LEN = 15;
 constexpr int MAX_REPLAY_EXT_LEN = MAX_REPLAY_NAME_LEN + 4; // "replayname.rec" = 19

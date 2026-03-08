@@ -721,7 +721,7 @@ void level::from_file(const char* filename, bool internal) {
         fread(foreground_name, 1, 10, h);
         foreground_name[9] = 0;
         fread(background_name, 1, 10, h);
-        foreground_name[9] = 0;
+        background_name[9] = 0;
     } else {
         strcpy(foreground_name, "ground");
         strcpy(background_name, "sky");

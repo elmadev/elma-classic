@@ -262,11 +262,11 @@ static void kiview(bool ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, 
 
     int opacity = EolSettings->minimap_opacity();
 
-    // Save game scene pixels under the minimap area (including 1px border margin)
-    int save_x1 = vx1 - 1;
-    int save_y1 = vy1 - 1;
-    int save_x2 = vx2 + 1;
-    int save_y2 = vy2 + 1;
+    // Save game scene pixels under the minimap area
+    int save_x1 = vx1;
+    int save_y1 = vy1;
+    int save_x2 = vx2;
+    int save_y2 = vy2;
     int save_w = save_x2 - save_x1 + 1;
     int save_h = save_y2 - save_y1 + 1;
     static pic8* save_pic = nullptr;
@@ -344,14 +344,23 @@ static void kiview(bool ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, 
     vy1--;
     vx2++;
     vy2++;
-    for (int y = vy1; y <= vy2; y++) {
+    int step = opacity < 100 ? 2 : 1;
+    for (int y = vy1; y <= vy2; y += step) {
         ppic->ppixel(vx1, y, Lgr->minimap_border_palette_id);
         ppic->ppixel(vx2, y, Lgr->minimap_border_palette_id);
     }
-    unsigned char* sor = ppic->get_row(vy1) + vx1 + 1;
-    memset(sor, Lgr->minimap_border_palette_id, Viewxsize);
-    sor = ppic->get_row(vy2) + vx1 + 1;
-    memset(sor, Lgr->minimap_border_palette_id, Viewxsize);
+
+    unsigned char* bottom_border = ppic->get_row(vy1) + vx1 + 1;
+    unsigned char* top_border = ppic->get_row(vy2) + vx1 + 1;
+    if (opacity == 100) {
+        memset(bottom_border, Lgr->minimap_border_palette_id, Viewxsize);
+        memset(top_border, Lgr->minimap_border_palette_id, Viewxsize);
+    } else {
+        for (int x = 0; x < Viewxsize; x += 2) {
+            bottom_border[x] = Lgr->minimap_border_palette_id;
+            top_border[x] = Lgr->minimap_border_palette_id;
+        }
+    }
 
     // bring back pixels from the saved game scene based on opacity
     if (opacity < 100) {

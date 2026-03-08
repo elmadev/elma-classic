@@ -427,6 +427,7 @@ int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
     if (fread(level_filename, 1, sizeof(level_filename), h) != 16) {
         read_error(filename);
     }
+    level_filename[sizeof(level_filename) - 1] = '\0';
 
 #define READ_FIELD(field)                                                                          \
     {                                                                                              \

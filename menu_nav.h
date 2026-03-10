@@ -37,6 +37,7 @@ class menu_nav {
     std::vector<nav_overlay> overlays;
     std::unique_ptr<menu_pic> menu;
     std::string search_input;
+    std::vector<int> filter_indices;
     int selected_index;
 
   public:

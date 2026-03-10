@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstring>
 #include <directinput/scancodes.h>
+#include <numeric>
 
 menu_nav::menu_nav(std::string title)
     : menu(std::make_unique<menu_pic>(false)),
@@ -67,14 +68,18 @@ int menu_nav::prompt_choice(bool render_only) {
 
     search_input.clear();
 
+    // Initialize filter_indices to identity mapping
+    filter_indices.resize(entries.size());
+    std::iota(filter_indices.begin(), filter_indices.end(), 0);
+
     // Bound current selection
-    selected_index = std::min(selected_index, (int)row_count() - 1);
+    selected_index = std::min(selected_index, (int)filter_indices.size() - 1);
 
     int max_visible_entries = calculate_visible_entries();
 
     // Center current selection on the screen
     int view_index = selected_index - max_visible_entries / 2;
-    int view_max = row_count() - max_visible_entries;
+    int view_max = (int)filter_indices.size() - max_visible_entries;
 
     empty_keypress_buffer();
     bool rerender = true;
@@ -101,29 +106,31 @@ int menu_nav::prompt_choice(bool render_only) {
                 }
             }
             if (was_key_just_pressed(DIK_RETURN)) {
-                return selected_index;
+                return filter_indices[selected_index];
             }
-            if (was_key_down(DIK_UP)) {
-                selected_index--;
-            }
-            if (was_key_down(DIK_DOWN)) {
-                selected_index++;
-            }
-            if (was_key_down(DIK_PRIOR)) {
-                selected_index -= max_visible_entries;
-            }
-            if (was_key_down(DIK_NEXT)) {
-                selected_index += max_visible_entries;
-            }
-            int wheel = get_mouse_wheel_delta();
-            if (wheel != 0) {
-                selected_index -= wheel;
+            if (!filter_indices.empty()) {
+                if (was_key_down(DIK_UP)) {
+                    selected_index--;
+                }
+                if (was_key_down(DIK_DOWN)) {
+                    selected_index++;
+                }
+                if (was_key_down(DIK_PRIOR)) {
+                    selected_index -= max_visible_entries;
+                }
+                if (was_key_down(DIK_NEXT)) {
+                    selected_index += max_visible_entries;
+                }
+                int wheel = get_mouse_wheel_delta();
+                if (wheel != 0) {
+                    selected_index -= wheel;
+                }
             }
         }
 
         // Limit selected index to valid values
         selected_index = std::max(selected_index, 0);
-        selected_index = std::min(selected_index, (int)row_count() - 1);
+        selected_index = std::min(selected_index, (int)filter_indices.size() - 1);
         // Update view_index and limit to valid values
         if (selected_index < view_index) {
             view_index = selected_index;
@@ -168,14 +175,19 @@ int menu_nav::prompt_choice(bool render_only) {
             }
 
             // Only the visible menu entries
-            for (int i = 0; i < max_visible_entries && i < row_count() - view_index; i++) {
-                menu->add_line(entries[view_index + i].text_left, x_left, y_entries + i * dy);
-            }
-            for (int i = 0; i < max_visible_entries && i < row_count() - view_index; i++) {
-                menu->add_line(entries[view_index + i].text_right, x_right, y_entries + i * dy);
+            int visible = (int)filter_indices.size() - view_index;
+            for (int i = 0; i < max_visible_entries && i < visible; i++) {
+                menu->add_line(entries[filter_indices[view_index + i]].text_left, x_left,
+                               y_entries + i * dy);
+                menu->add_line(entries[filter_indices[view_index + i]].text_right, x_right,
+                               y_entries + i * dy);
             }
         }
-        menu->set_helmet(x_left - 30, y_entries + (selected_index - view_index) * dy);
+        if (filter_indices.empty()) {
+            menu->set_helmet(x_left - 30, -100);
+        } else {
+            menu->set_helmet(x_left - 30, y_entries + (selected_index - view_index) * dy);
+        }
         menu->render();
         if (render_only) {
             return -1;

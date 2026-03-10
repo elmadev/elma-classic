@@ -89,9 +89,21 @@ static constexpr resolution RESOLUTIONS[] = {
 static void menu_resolution() {
     menu_nav nav("Pick a resolution!");
 
-    for (const auto& res : RESOLUTIONS) {
-        std::string label = std::format("{}x{}", res.width, res.height);
-        nav.add_row(label, NAV_FUNC(&res) { update_resolution(res.width, res.height); });
+    if (EolSettings->fullscreen() == FullscreenMode::Fullscreen) {
+        auto display_modes = platform_get_display_modes();
+        for (const auto& [w, h] : display_modes) {
+            std::string label = std::format("{}x{}", w, h);
+            nav.add_row(label, NAV_FUNC(w, h) { update_resolution(w, h); });
+        }
+    } else {
+        auto [desktop_w, desktop_h] = platform_get_desktop_resolution();
+        for (const auto& res : RESOLUTIONS) {
+            if (res.width > desktop_w || res.height > desktop_h) {
+                continue;
+            }
+            std::string label = std::format("{}x{}", res.width, res.height);
+            nav.add_row(label, NAV_FUNC(&res) { update_resolution(res.width, res.height); });
+        }
     }
 
     std::string current =

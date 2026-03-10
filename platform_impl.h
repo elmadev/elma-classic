@@ -1,6 +1,9 @@
 #ifndef PLATFORM_IMPL_H
 #define PLATFORM_IMPL_H
 
+#include <utility>
+#include <vector>
+
 class pic8;
 
 // DIK_ Windows scancode
@@ -56,6 +59,8 @@ bool is_fullscreen();
 long long get_milliseconds();
 
 void platform_apply_fullscreen_mode();
+std::vector<std::pair<int, int>> platform_get_display_modes();
+std::pair<int, int> platform_get_desktop_resolution();
 
 void platform_resize_window(int width, int height);
 void platform_recreate_window();

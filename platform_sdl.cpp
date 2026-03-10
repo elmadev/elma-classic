@@ -443,6 +443,30 @@ bool is_fullscreen() {
     return flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
+std::vector<std::pair<int, int>> platform_get_display_modes() {
+    std::vector<std::pair<int, int>> modes;
+    int count = SDL_GetNumDisplayModes(0);
+    for (int i = 0; i < count; i++) {
+        SDL_DisplayMode mode;
+        if (SDL_GetDisplayMode(0, i, &mode) == 0) {
+            std::pair<int, int> res = {mode.w, mode.h};
+            if (std::find(modes.begin(), modes.end(), res) == modes.end()) {
+                modes.push_back(res);
+            }
+        }
+    }
+    std::sort(modes.begin(), modes.end());
+    return modes;
+}
+
+std::pair<int, int> platform_get_desktop_resolution() {
+    SDL_DisplayMode mode;
+    if (SDL_GetDesktopDisplayMode(0, &mode) == 0) {
+        return {mode.w, mode.h};
+    }
+    return {SCREEN_WIDTH, SCREEN_HEIGHT};
+}
+
 static SDL_AudioDeviceID SDLAudioDevice;
 static bool SDLSoundInitialized = false;
 

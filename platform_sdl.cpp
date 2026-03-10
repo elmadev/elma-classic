@@ -354,6 +354,22 @@ void handle_events() {
             SDL_Scancode scancode = event.key.keysym.scancode;
             keyboard::record_key_down(scancode);
 
+#ifdef __APPLE__
+            // macOS exclusive fullscreen captures the display and blocks
+            // Cmd+Tab/M/H. Intercept them and minimize the window.
+            if (EolSettings->fullscreen() == FullscreenMode::Fullscreen) {
+                bool is_cmd = event.key.keysym.mod & KMOD_GUI;
+                if (is_cmd && (scancode == SDL_SCANCODE_TAB || scancode == SDL_SCANCODE_M)) {
+                    SDL_MinimizeWindow(SDLWindow);
+                    break;
+                }
+                if (is_cmd && scancode == SDL_SCANCODE_H) {
+                    SDL_HideWindow(SDLWindow);
+                    break;
+                }
+            }
+#endif
+
             // SDL doesn't generate text input events when Ctrl is held
             // Resolve layout-specific keycodes to support LCtrl search
             if (EolSettings->lctrl_search()) {

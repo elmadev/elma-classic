@@ -10,6 +10,7 @@
 #include "M_PIC.H"
 #include "pic8.h"
 #include <directinput/scancodes.h>
+#include <algorithm>
 #include <SDL.h>
 #include <sdl/scancodes_windows.h>
 
@@ -86,6 +87,50 @@ void platform_apply_fullscreen_mode() {
     if (!SDLWindow) {
         return;
     }
+
+    switch (EolSettings->fullscreen()) {
+    case FullscreenMode::Windowed:
+        SDL_SetWindowFullscreen(SDLWindow, 0);
+        SDL_SetWindowSize(SDLWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
+        SDL_SetWindowPosition(SDLWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+        break;
+    case FullscreenMode::Fullscreen: {
+        SDL_DisplayMode desired = {};
+        desired.w = SCREEN_WIDTH;
+        desired.h = SCREEN_HEIGHT;
+        SDL_DisplayMode closest;
+        if (!SDL_GetClosestDisplayMode(0, &desired, &closest)) {
+            internal_error("No matching display mode found");
+            break;
+        }
+        SDL_SetWindowDisplayMode(SDLWindow, &closest);
+        // Snap to the closest supported display mode if the current resolution
+        // doesn't match (e.g. stale settings from a different monitor, or an
+        // arbitrary windowed resolution). This recurses through update_resolution
+        // → platform_resize_window, but terminates because the second call finds
+        // closest == SCREEN_WIDTH/HEIGHT.
+        if (closest.w != SCREEN_WIDTH || closest.h != SCREEN_HEIGHT) {
+            update_resolution(closest.w, closest.h);
+        }
+        SDL_SetWindowFullscreen(SDLWindow, SDL_WINDOW_FULLSCREEN);
+        break;
+    }
+    case FullscreenMode::FullscreenDesktop: {
+        SDL_SetWindowFullscreen(SDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        int w;
+        int h;
+        SDL_GetWindowSize(SDLWindow, &w, &h);
+        if (w != SCREEN_WIDTH || h != SCREEN_HEIGHT) {
+            update_resolution(w, h);
+        }
+
+        break;
+    }
+    }
+
+    if (EolSettings->renderer() == RendererType::Software) {
+        SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
+    }
 }
 
 void platform_init() {
@@ -102,6 +147,7 @@ void platform_init() {
     initialize_renderer();
     apply_current_palette();
     keyboard::init();
+    platform_apply_fullscreen_mode();
 }
 
 void platform_resize_window(int width, int height) {
@@ -121,7 +167,40 @@ void platform_resize_window(int width, int height) {
 
     SCREEN_WIDTH = width;
     SCREEN_HEIGHT = height;
-    SDL_SetWindowSize(SDLWindow, width, height);
+
+    if (EolSettings->fullscreen() == FullscreenMode::Fullscreen) {
+        SDL_DisplayMode desired = {};
+        desired.w = width;
+        desired.h = height;
+        SDL_DisplayMode closest;
+        if (!SDL_GetClosestDisplayMode(0, &desired, &closest)) {
+            internal_error("No matching display mode found");
+            return;
+        }
+        if (closest.w != width || closest.h != height) {
+            width = closest.w;
+            height = closest.h;
+            SCREEN_WIDTH = width;
+            SCREEN_HEIGHT = height;
+            EolSettings->set_screen_width(width);
+            EolSettings->set_screen_height(height);
+        }
+
+        if (EolSettings->renderer() == RendererType::Software) {
+            // Recreate the window in fullscreen software mode to avoid issues
+            // with window surfaces not resizing after a display mode change.
+            platform_recreate_window();
+            return;
+        }
+
+        // Cycle fullscreen off and back on to force SDL2 to apply the new
+        // display mode (SDL_SetWindowFullscreen is a no-op when already fullscreen).
+        SDL_SetWindowFullscreen(SDLWindow, 0);
+        SDL_SetWindowDisplayMode(SDLWindow, &closest);
+        SDL_SetWindowFullscreen(SDLWindow, SDL_WINDOW_FULLSCREEN);
+    } else {
+        SDL_SetWindowSize(SDLWindow, width, height);
+    }
 
     SDL_FreeSurface(SDLSurfacePaletted);
     SDLSurfacePaletted = nullptr;
@@ -149,10 +228,6 @@ void platform_recreate_window() {
     int y;
     SDL_GetWindowPosition(SDLWindow, &x, &y);
 
-    int width;
-    int height;
-    SDL_GetWindowSize(SDLWindow, &width, &height);
-
     gl_cleanup();
 
     if (SDLSurfacePaletted) {
@@ -168,10 +243,11 @@ void platform_recreate_window() {
     SDL_DestroyWindow(SDLWindow);
     SDLWindow = nullptr;
 
-    create_window(x, y, width, height);
+    create_window(x, y, SCREEN_WIDTH, SCREEN_HEIGHT);
     create_palette_surface();
     initialize_renderer();
     apply_current_palette();
+    platform_apply_fullscreen_mode();
 }
 
 long long get_milliseconds() { return SDL_GetTicks64(); }
@@ -364,7 +440,7 @@ int get_mouse_wheel_delta() { return MouseWheelDelta; }
 
 bool is_fullscreen() {
     Uint32 flags = SDL_GetWindowFlags(SDLWindow);
-    return flags & SDL_WINDOW_FULLSCREEN;
+    return flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
 static SDL_AudioDeviceID SDLAudioDevice;

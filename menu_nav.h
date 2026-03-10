@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-enum class SearchPattern { None, Sorted, Internals };
+enum class SearchPattern { None, Sorted, Internals, Filter };
 
 #define NAV_FUNC(...)                                                                              \
     [__VA_ARGS__]([[maybe_unused]] int choice, [[maybe_unused]] const std::string& left,           \
@@ -62,6 +62,7 @@ class menu_nav {
     void add_overlay(std::string text, int x, int y,
                      OverlayAlignment alignment = OverlayAlignment::Left);
     void sort_rows();
+    void clear_entries() { entries.clear(); }
     void select_row(int index) { selected_index = index; }
     void select_row(const std::string& left);
 
@@ -77,6 +78,7 @@ class menu_nav {
     bool search_handler_text(char c);
     bool search_handler_backspace();
     void update_search();
+    void update_filter();
 };
 
 #endif

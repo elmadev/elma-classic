@@ -66,11 +66,17 @@ int menu_nav::prompt_choice(bool render_only) {
         internal_error("menu_nav::prompt_choice no rows!");
     }
 
-    search_input.clear();
+    if (search_pattern != SearchPattern::Filter) {
+        search_input.clear();
+    }
 
     // Initialize filter_indices to identity mapping
     filter_indices.resize(entries.size());
     std::iota(filter_indices.begin(), filter_indices.end(), 0);
+
+    if (!search_input.empty()) {
+        update_filter();
+    }
 
     // Bound current selection
     selected_index = std::min(selected_index, (int)filter_indices.size() - 1);
@@ -100,12 +106,14 @@ int menu_nav::prompt_choice(bool render_only) {
             if (was_key_just_pressed(DIK_ESCAPE)) {
                 if (search_pattern != SearchPattern::None && !search_input.empty()) {
                     search_input.clear();
+                    update_search();
+                    view_index = selected_index - max_visible_entries / 2;
                     rerender = true;
                 } else if (enable_esc) {
                     return -1;
                 }
             }
-            if (was_key_just_pressed(DIK_RETURN)) {
+            if (was_key_just_pressed(DIK_RETURN) && !filter_indices.empty()) {
                 return filter_indices[selected_index];
             }
             if (!filter_indices.empty()) {
@@ -128,9 +136,14 @@ int menu_nav::prompt_choice(bool render_only) {
             }
         }
 
+        // Recalculate view_max (filter may have changed the count)
+        view_max = (int)filter_indices.size() - max_visible_entries;
+
         // Limit selected index to valid values
-        selected_index = std::max(selected_index, 0);
-        selected_index = std::min(selected_index, (int)filter_indices.size() - 1);
+        if (!filter_indices.empty()) {
+            selected_index = std::max(selected_index, 0);
+            selected_index = std::min(selected_index, (int)filter_indices.size() - 1);
+        }
         // Update view_index and limit to valid values
         if (selected_index < view_index) {
             view_index = selected_index;
@@ -221,6 +234,13 @@ static bool accept_search_input() {
     return true;
 }
 
+static bool contains_ci(const std::string& haystack, const std::string& needle) {
+    return std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(),
+                       [](char a, char b) {
+                           return std::tolower((unsigned char)a) == std::tolower((unsigned char)b);
+                       }) != haystack.end();
+}
+
 static size_t common_prefix_len(const char* a, const char* b) {
     size_t n = 0;
     for (;; ++a, ++b, ++n) {
@@ -237,7 +257,10 @@ bool menu_nav::search_handler_text(char c) {
     if (search_pattern == SearchPattern::None) {
         return false;
     }
-    if (!accept_search_input() || !MenuFont->has_char(c)) {
+    if (search_pattern != SearchPattern::Filter && !accept_search_input()) {
+        return false;
+    }
+    if (!MenuFont->has_char(c)) {
         return false;
     }
     if (search_input.size() < max_search_len) {
@@ -260,6 +283,10 @@ bool menu_nav::search_handler_backspace() {
 }
 
 void menu_nav::update_search() {
+    if (search_pattern == SearchPattern::Filter) {
+        update_filter();
+        return;
+    }
     if (search_input.empty()) {
         return;
     }
@@ -322,8 +349,40 @@ void menu_nav::update_search() {
         }
         break;
     }
+    case SearchPattern::Filter:
     case SearchPattern::None:
         internal_error("update_search() SearchPattern::None reached!");
         break;
     }
+}
+
+void menu_nav::update_filter() {
+    // Remember which real entry was selected so we can restore position
+    int prev_real = -1;
+    if (selected_index >= 0 && selected_index < (int)filter_indices.size()) {
+        prev_real = filter_indices[selected_index];
+    }
+
+    filter_indices.clear();
+    if (search_input.empty()) {
+        filter_indices.resize(entries.size());
+        std::iota(filter_indices.begin(), filter_indices.end(), 0);
+    } else {
+        for (int i = 0; i < (int)entries.size(); ++i) {
+            if (contains_ci(entries[i].text_left, search_input) ||
+                contains_ci(entries[i].text_right, search_input)) {
+                filter_indices.push_back(i);
+            }
+        }
+    }
+
+    // Restore selection to the same entry, or clamp if it's no longer visible
+    if (prev_real >= 0) {
+        auto it = std::find(filter_indices.begin(), filter_indices.end(), prev_real);
+        if (it != filter_indices.end()) {
+            selected_index = (int)(it - filter_indices.begin());
+            return;
+        }
+    }
+    selected_index = std::min(selected_index, std::max(0, (int)filter_indices.size() - 1));
 }

@@ -42,6 +42,7 @@
 * New setting to enable access to all internal levels without requiring them to be finished
 * Minimap opacity now can be configured from the options menu
 * Total time is now shown in the internal level list
+* You can now filter the options menu to find options
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems

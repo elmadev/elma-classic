@@ -150,14 +150,17 @@ static void menu_fullscreen() {
         NAV_FUNC() { EolSettings->set_##setting(!EolSettings->setting()); });
 
 void menu_options() {
+    menu_nav nav("Options");
+    nav.x_left = 0;
+    nav.x_right = 390;
+    nav.y_entries = 77;
+    nav.dy = 36;
+    nav.search_pattern = SearchPattern::Filter;
+
     int choice = 0;
     while (true) {
-        menu_nav nav("Options");
+        nav.clear_entries();
         nav.select_row(choice);
-        nav.x_left = 0;
-        nav.x_right = 390;
-        nav.y_entries = 77;
-        nav.dy = 36;
 
         nav.add_row(
             "Play mode:", State->single ? "Single Player" : "Multiplayer",

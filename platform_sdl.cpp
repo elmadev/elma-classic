@@ -82,6 +82,12 @@ static void apply_current_palette() {
     }
 }
 
+void platform_apply_fullscreen_mode() {
+    if (!SDLWindow) {
+        return;
+    }
+}
+
 void platform_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         internal_error(SDL_GetError());

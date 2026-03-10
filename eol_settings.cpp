@@ -42,6 +42,7 @@ template <typename T> void Clamp<T>::reset() { value = def; }
 template struct Default<bool>;
 template struct Default<MapAlignment>;
 template struct Default<RendererType>;
+template struct Default<FullscreenMode>;
 template struct Default<DikScancode>;
 template struct Default<std::string>;
 template struct Clamp<int>;
@@ -67,6 +68,17 @@ void eol_settings::set_renderer(RendererType r) {
     renderer_ = r;
     if (has_window()) {
         platform_recreate_window();
+    }
+}
+
+void eol_settings::set_fullscreen(FullscreenMode f) {
+    if (fullscreen_ == f) {
+        return;
+    }
+
+    fullscreen_ = f;
+    if (has_window()) {
+        platform_apply_fullscreen_mode();
     }
 }
 
@@ -233,6 +245,32 @@ void from_json(const json& j, RendererType& r) {
     }
 }
 
+void to_json(json& j, const FullscreenMode& f) {
+    switch (f) {
+    case FullscreenMode::Windowed:
+        j = "windowed";
+        break;
+    case FullscreenMode::Fullscreen:
+        j = "fullscreen";
+        break;
+    case FullscreenMode::FullscreenDesktop:
+        j = "fullscreen_desktop";
+        break;
+    }
+}
+
+void from_json(const json& j, FullscreenMode& f) {
+    if (j == "windowed") {
+        f = FullscreenMode::Windowed;
+    } else if (j == "fullscreen") {
+        f = FullscreenMode::Fullscreen;
+    } else if (j == "fullscreen_desktop") {
+        f = FullscreenMode::FullscreenDesktop;
+    } else {
+        throw("[json.exception.type_error.302] (/fullscreen) invalid value");
+    }
+}
+
 #define FIELD_LIST                                                                                 \
     JSON_FIELD(screen_width)                                                                       \
     JSON_FIELD(screen_height)                                                                      \
@@ -245,6 +283,7 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(zoom_textures)                                                                      \
     JSON_FIELD(zoom_grass)                                                                         \
     JSON_FIELD(renderer)                                                                           \
+    JSON_FIELD(fullscreen)                                                                         \
     JSON_FIELD(turn_time)                                                                          \
     JSON_FIELD(lctrl_search)                                                                       \
     JSON_FIELD(alovolt_key_player_a)                                                               \

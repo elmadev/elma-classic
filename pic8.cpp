@@ -153,8 +153,8 @@ pic8* pic8::clone() {
 }
 
 bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
-    int i = 0;
-    while (filename[i]) {
+    int i = strlen(filename) - 1;
+    while (i >= 0) {
         if (filename[i] == '.') {
             if (strcmpi(filename + i, ".spr") == 0) {
                 return spr_save(filename, h);
@@ -165,7 +165,7 @@ bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
             internal_error("pic8::save unknown file extension: ", filename);
             return false;
         }
-        i++;
+        i--;
     }
     internal_error("pic8::save could not find file extension: ", filename);
     return false;

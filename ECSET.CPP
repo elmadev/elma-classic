@@ -159,7 +159,7 @@ void canvas::draw_segment(segment* seg) {
 
     // Draw over the target rows
     int ymin = (int)(r.y + 1.0); // std::ceil(r.y)
-    int ymax = (int)(r.y + v.y); // std::floor((r + v).y)
+    int ymax = (int)std::ceil(r.y + v.y) - 1;
 
     // Calculate the slope of the line x = ym + b
     double m = v.x / v.y;

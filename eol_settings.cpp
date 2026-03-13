@@ -1,6 +1,10 @@
 #include "eol_settings.h"
 #include "level_load.h"
 #include "lgr.h"
+#include "level.h"
+#include "ECSET.H"
+#include "EDITUJ.H"
+#include "KIRAJZOL.H"
 #include "main.h"
 #include "menu_pic.h"
 #include "renderer/object_overlay.h"
@@ -75,7 +79,13 @@ void eol_settings::set_zoom(double z) {
         zoom_ = z;
         set_zoom_factor();
         invalidate_lgr_cache();
+        if (Ptop) {
+            lgrfile::load_lgr_file(Ptop->lgr_name);
+            Ptop->unflip_objects();
+        }
         init_gravity_arrows();
+        canvas::create_canvases();
+        Kitoltestmegrak = Kitoltestmegrakkezd;
     }
 }
 

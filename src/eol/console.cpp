@@ -1,16 +1,43 @@
 #include "eol/console.h"
 #include "abc8.h"
+#include "eol_settings.h"
 #include "keys.h"
 #include "main.h"
 #include "platform_impl.h"
 #include <algorithm>
 #include <directinput/scancodes.h>
+#include <charconv>
+#include <format>
 #include <string>
 
 console* Console = nullptr;
 
+#define REGISTER_SETTINGS_STR(cmd, desc, field)                                                    \
+    register_command(cmd, desc,                                                                    \
+                     [](std::string_view text) { EolSettings->set_##field(std::string(text)); });
+
+static double parse_double(std::string_view s) {
+    double v;
+    auto r = std::from_chars(s.data(), s.data() + s.size(), v);
+    if (r.ec != std::errc()) {
+        throw std::runtime_error("bad number");
+    }
+    return v;
+}
+
+#define REGISTER_SETTINGS_DBL(cmd, desc, field)                                                    \
+    register_command(cmd, desc, [this](std::string_view text) {                                    \
+        if (text.empty()) {                                                                        \
+            add_line(std::format("{}: {:.2f}", #field, EolSettings->field()));                     \
+        } else {                                                                                   \
+            EolSettings->set_##field(parse_double(text));                                          \
+        }                                                                                          \
+    });
+
 console::console() {
     register_command("clear", "Clear chat history", [this](std::string_view) { clear(); });
+    REGISTER_SETTINGS_STR("lgr", "Change default LGR", default_lgr_name);
+    REGISTER_SETTINGS_DBL("zoom", "Change default LGR", zoom);
 }
 
 void console::add_line(std::string text) {
@@ -111,7 +138,7 @@ void console::handle_input() {
 }
 
 void console::register_command(std::string_view name, std::string_view description,
-                            std::function<void(std::string_view args)> callback) {
+                               std::function<void(std::string_view args)> callback) {
     commands_[std::string(name)] = {std::string(description), std::move(callback)};
 }
 

@@ -1513,6 +1513,9 @@ void canvas::create_front_grass() {
 }
 
 void canvas::create_canvases() {
+    if (!Lgr) {
+        return;
+    }
     START_TIME(canvas_timer);
     Lgr->reload_default_textures();
 

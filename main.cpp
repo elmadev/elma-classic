@@ -78,8 +78,19 @@ static void handle_error(const char* text1, const char* text2, const char* text3
     }
     InError = true;
 
+    std::string text = text1;
+    if (text2) {
+        text = text + " " + text2;
+    }
+    if (text3) {
+        text = text + " " + text3;
+    }
+    if (text4) {
+        text = text + " " + text4;
+    }
+
     if (ErrorGraphicsLoaded) {
-        render_error(text1, text2, text3, text4);
+        render_error(text);
         while (true) {
             handle_events();
             if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
@@ -87,16 +98,6 @@ static void handle_error(const char* text1, const char* text2, const char* text3
             }
         }
     } else {
-        std::string text = text1;
-        if (text2) {
-            text = text + "\n" + text2;
-        }
-        if (text3) {
-            text = text + "\n" + text3;
-        }
-        if (text4) {
-            text = text + "\n" + text4;
-        }
         message_box(text.c_str());
     }
 

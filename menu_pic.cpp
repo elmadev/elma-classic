@@ -426,11 +426,43 @@ bool menu_pic::render_intro_anim(double time) {
     return true;
 }
 
-constexpr int ERROR_MAX_ROW_LENGTH = 34;
-constexpr int ERROR_MAX_ROWS = 10;
-static char ErrorLines[ERROR_MAX_ROWS][ERROR_MAX_ROW_LENGTH + 4];
+constexpr size_t ERROR_MAX_ROW_LENGTH = 34;
+constexpr size_t ERROR_MAX_ROWS = 10;
 
-void render_error(const char* text1, const char* text2, const char* text3, const char* text4) {
+// Word-wrap text into lines. Breaks on spaces and \n. Hard-breaks words longer than max_length.
+static std::vector<std::string> word_wrap(const std::string& text, size_t max_length,
+                                          size_t max_lines) {
+    std::vector<std::string> lines;
+    size_t pos = 0;
+    while (pos < text.size() && lines.size() < max_lines) {
+        // Find the next newline
+        size_t newline = text.find('\n', pos);
+        size_t segment_end = (newline != std::string::npos) ? newline : text.size();
+
+        // If the segment until the next newline (or end) fits, take it whole
+        if (segment_end - pos <= max_length) {
+            lines.push_back(text.substr(pos, segment_end - pos));
+            pos = (newline != std::string::npos) ? newline + 1 : text.size();
+            continue;
+        }
+
+        // Segment is too long - find the last space within [pos, pos + max_length]
+        std::string_view window(text.data() + pos, max_length);
+        size_t break_at = window.find_last_of(' ');
+        if (break_at != std::string_view::npos) {
+            break_at += pos;
+            lines.push_back(text.substr(pos, break_at - pos));
+            pos = break_at + 1;
+        } else {
+            // No space found, hard-break
+            lines.push_back(text.substr(pos, max_length));
+            pos += max_length;
+        }
+    }
+    return lines;
+}
+
+void render_error(const std::string& text) {
     // Tile the background vertically
     int y = 0;
     int odd_row = 0;
@@ -451,67 +483,12 @@ void render_error(const char* text1, const char* text2, const char* text3, const
         y += BackgroundTileMain->get_height();
     }
 
-    // Process the text by making sure each line is at most ERROR_MAX_ROW_LENGTH characters long
-    // We break up each text1/text2/text3 into multiple components, each of max length
-    // ERROR_ROW_MAX_LENGTH We break it up on the last ' ' character, or if none exists, then we
-    // just break the word We can have a total of ERROR_MAX_ROWS segments
-    int line_count = 0;
-    for (int i = 0; i < 4; i++) {
-        const char* text = text1;
-        if (i == 1) {
-            text = text2;
-        }
-        if (i == 2) {
-            text = text3;
-        }
-        if (i == 3) {
-            text = text4;
-        }
-        if (!text) {
-            break;
-        }
+    std::vector<std::string> lines = word_wrap(text, ERROR_MAX_ROW_LENGTH, ERROR_MAX_ROWS);
 
-        while (true) {
-            if (line_count >= ERROR_MAX_ROWS) {
-                break;
-            }
-            // Text is not too long, just copy it
-            if (strlen(text) <= ERROR_MAX_ROW_LENGTH) {
-                strcpy(ErrorLines[line_count], text);
-                line_count++;
-                break;
-            }
-            // The text is too long, break it up
-            // Find the last ' ' character
-            int j = ERROR_MAX_ROW_LENGTH;
-            while (j > 0) {
-                if (text[j] == ' ') {
-                    break;
-                }
-                j--;
-            }
-            if (j <= 0) {
-                // No ' ' found, just cut at the maximum length and copy to the buffer
-                strncpy(ErrorLines[line_count], text, ERROR_MAX_ROW_LENGTH);
-                line_count++;
-                text += ERROR_MAX_ROW_LENGTH;
-            } else {
-                // Cut at the ' ' and copy to the buffer
-                strncpy(ErrorLines[line_count], text, j);
-                line_count++;
-                text += j;
-                while (text[0] == ' ') {
-                    text++;
-                }
-            }
-        }
+    for (int i = 0; i < (int)lines.size(); i++) {
+        int y = SCREEN_HEIGHT / 2 - 20 - (int)lines.size() * (40 / 2) + i * 40;
+        MenuFont->write_centered(BufferMain, SCREEN_WIDTH / 2, y, lines[i].c_str());
     }
-    // Write all the text to the screen
-    for (int i = 0; i < line_count; i++) {
-        int y = SCREEN_HEIGHT / 2 - 20 - line_count * (40 / 2) + i * 40;
-        MenuFont->write_centered(BufferMain, SCREEN_WIDTH / 2, y, ErrorLines[i]);
-    }
-    // Display the error message
     if (MenuPalette) {
         MenuPalette->set();
     }

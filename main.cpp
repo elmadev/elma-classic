@@ -109,10 +109,22 @@ void internal_error(const char* text1, const char* text2, const char* text3) {
     handle_error("Sorry, internal error.", text1, text2, text3);
 }
 
+void internal_error(const std::string& message) {
+    handle_error("Sorry, internal error.", message.c_str(), nullptr, nullptr);
+}
+
 void external_error(const char* text1, const char* text2, const char* text3) {
     if (strstr(text1, "memory")) {
         handle_error("Sorry, out of memory!", text1, text2, text3);
     } else {
         handle_error("External error encountered:", text1, text2, text3);
+    }
+}
+
+void external_error(const std::string& message) {
+    if (message.find("memory") != std::string::npos) {
+        handle_error("Sorry, out of memory!", message.c_str(), nullptr, nullptr);
+    } else {
+        handle_error("External error encountered:", message.c_str(), nullptr, nullptr);
     }
 }

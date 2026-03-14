@@ -50,8 +50,7 @@ int random_range(int maximum) { return rand() % maximum; }
 
 bool ErrorGraphicsLoaded = false;
 
-static void handle_error(const char* text1, const char* text2, const char* text3,
-                         const char* text4) {
+static void handle_error(const std::string& prefix, const std::string& message) {
     static bool InError = false;
     static FILE* ErrorHandle;
     if (!InError) {
@@ -61,16 +60,7 @@ static void handle_error(const char* text1, const char* text2, const char* text3
         if (InError) {
             fprintf(ErrorHandle, "\nTwo errors while processing!\n");
         }
-        fprintf(ErrorHandle, "%s\n", text1);
-        if (text2) {
-            fprintf(ErrorHandle, "%s\n", text2);
-        }
-        if (text3) {
-            fprintf(ErrorHandle, "%s\n", text3);
-        }
-        if (text4) {
-            fprintf(ErrorHandle, "%s\n", text4);
-        }
+        fprintf(ErrorHandle, "%s\n%s\n", prefix.c_str(), message.c_str());
     }
 
     if (InError) {
@@ -78,16 +68,7 @@ static void handle_error(const char* text1, const char* text2, const char* text3
     }
     InError = true;
 
-    std::string text = text1;
-    if (text2) {
-        text = text + " " + text2;
-    }
-    if (text3) {
-        text = text + " " + text3;
-    }
-    if (text4) {
-        text = text + " " + text4;
-    }
+    std::string text = prefix + "\n" + message;
 
     if (ErrorGraphicsLoaded) {
         render_error(text);
@@ -105,26 +86,12 @@ static void handle_error(const char* text1, const char* text2, const char* text3
     quit();
 }
 
-void internal_error(const char* text1, const char* text2, const char* text3) {
-    handle_error("Sorry, internal error.", text1, text2, text3);
-}
-
-void internal_error(const std::string& message) {
-    handle_error("Sorry, internal error.", message.c_str(), nullptr, nullptr);
-}
-
-void external_error(const char* text1, const char* text2, const char* text3) {
-    if (strstr(text1, "memory")) {
-        handle_error("Sorry, out of memory!", text1, text2, text3);
-    } else {
-        handle_error("External error encountered:", text1, text2, text3);
-    }
-}
+void internal_error(const std::string& message) { handle_error("Sorry, internal error.", message); }
 
 void external_error(const std::string& message) {
     if (message.find("memory") != std::string::npos) {
-        handle_error("Sorry, out of memory!", message.c_str(), nullptr, nullptr);
+        handle_error("Sorry, out of memory!", message);
     } else {
-        handle_error("External error encountered:", message.c_str(), nullptr, nullptr);
+        handle_error("External error encountered:", message);
     }
 }

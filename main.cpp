@@ -111,6 +111,7 @@ void internal_error(const char* text1, const char* text2, const char* text3) {
 void external_error(const char* text1, const char* text2, const char* text3) {
     if (strstr(text1, "memory")) {
         handle_error("Sorry, out of memory!", text1, text2, text3);
+    } else {
+        handle_error("External error encountered:", text1, text2, text3);
     }
-    handle_error("External error encountered:", text1, text2, text3);
 }

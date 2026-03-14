@@ -492,5 +492,4 @@ void render_error(const std::string& text) {
     if (MenuPalette) {
         MenuPalette->set();
     }
-    bltfront(BufferMain);
 }

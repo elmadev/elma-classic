@@ -304,6 +304,19 @@ void unlock_frontbuffer() {
     unlock_backbuffer();
 }
 
+bool platform_render_error(pic8* buffer) {
+    if (!SDLWindow || !SDLSurfacePaletted || !buffer) {
+        return false;
+    }
+
+    SurfaceLocked = false;
+    pic8 view;
+    lock_backbuffer(view, false);
+    blit8(&view, buffer);
+    unlock_backbuffer();
+    return true;
+}
+
 palette::palette(unsigned char* palette_data) {
     SDL_Color* pal = new SDL_Color[256];
     for (int i = 0; i < 256; i++) {

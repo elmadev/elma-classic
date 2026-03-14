@@ -70,11 +70,16 @@ static void handle_error(const std::string& prefix, const std::string& message) 
 
     std::string text = prefix + "\n" + message;
 
+    bool rendered = false;
     if (ErrorGraphicsLoaded) {
         render_error(text);
+        rendered = platform_render_error(BufferMain);
+    }
+    if (rendered) {
         while (true) {
             handle_events();
-            if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
+            if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN) ||
+                was_key_just_pressed(DIK_SPACE)) {
                 break;
             }
         }

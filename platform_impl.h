@@ -20,6 +20,7 @@ class palette {
 };
 
 void message_box(const char* text);
+bool platform_render_error(pic8* buffer);
 
 void handle_events();
 

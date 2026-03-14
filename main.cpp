@@ -50,7 +50,7 @@ int random_range(int maximum) { return rand() % maximum; }
 
 bool ErrorGraphicsLoaded = false;
 
-static void handle_error(const std::string& prefix, const std::string& message) {
+[[noreturn]] static void handle_error(const std::string& prefix, const std::string& message) {
     static bool InError = false;
     static FILE* ErrorHandle;
     if (!InError) {
@@ -64,7 +64,11 @@ static void handle_error(const std::string& prefix, const std::string& message) 
     }
 
     if (InError) {
-        return;
+        if (ErrorHandle) {
+            fclose(ErrorHandle);
+        }
+        message_box("A fatal error occurred. Details written to error.txt.");
+        quit();
     }
     InError = true;
 

@@ -6,14 +6,14 @@
 constexpr double STOPWATCH_MULTIPLIER = 0.182;
 extern bool ErrorGraphicsLoaded;
 
-void quit();
+[[noreturn]] void quit();
 
 double stopwatch();
 void stopwatch_reset();
 void delay(int milliseconds);
 
-void internal_error(const std::string& message);
-void external_error(const std::string& message);
+[[noreturn]] void internal_error(const std::string& message);
+[[noreturn]] void external_error(const std::string& message);
 
 int random_range(int maximum);
 

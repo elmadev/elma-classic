@@ -383,7 +383,7 @@ bool recorder::recall_event_reverse(double time, WavEvent* event_id, double* vol
     return false;
 }
 
-static void read_error(const char* filename) {
+[[noreturn]] static void read_error(const char* filename) {
     internal_error(std::string("Failed to read rec file: ") + filename);
 }
 
@@ -479,7 +479,7 @@ int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
     return level_id;
 }
 
-static void save_error(const char* filename) {
+[[noreturn]] static void save_error(const char* filename) {
     internal_error(std::string("Failed to write rec file: ") + filename);
 }
 

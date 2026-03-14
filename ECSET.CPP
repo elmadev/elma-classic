@@ -33,7 +33,7 @@ constexpr double MARGIN_Y_MINIMAP = 84.0;
 constexpr double MARGIN_Y = 21.0;
 
 static void memory_error() {
-    external_error("You do not have enough memory to load this level!",
+    external_error("You do not have enough memory to load this level!\n"
                    "Try to set the graphic detail to low at the options.");
 }
 
@@ -457,8 +457,8 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, canvas_pixels
     }
     // Transparent pixels are only specifically used for the front canvas, so enforce this usage
     if (dest->pixels == canvas_pixels::transparent() && clipping != Clipping::Transparent) {
-        internal_error("canvas::draw_one_chunk",
-                       "dest is transparent but clipping is not transparent!");
+        internal_error(
+            "canvas::draw_one_chunk: dest is transparent but clipping is not transparent!");
     }
 
     // Validate whether we want to draw based on clipping
@@ -481,8 +481,8 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, canvas_pixels
         // Transparent pixels are only specifically used for the front canvas, so enforce this usage
         if (dest->pixels == canvas_pixels::default_foreground() ||
             dest->pixels == canvas_pixels::default_background()) {
-            internal_error("canvas::draw_one_chunk",
-                           "dest is non-transparent but clipping is transparent!");
+            internal_error(
+                "canvas::draw_one_chunk: dest is non-transparent but clipping is transparent!");
         }
     }
 

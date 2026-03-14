@@ -221,7 +221,7 @@ void tolt_open(void) {
         int i = 0;
         while (nev[i] != '.') {
             if (!nev[i]) {
-                internal_error("Nincs pont nevben! (yewruyrewuy): ", nev);
+                internal_error(std::string("Nincs pont nevben! (yewruyrewuy): ") + nev);
             }
             i++;
         }
@@ -391,7 +391,7 @@ void kivalasztkezdetit(void) {
         int i = 0;
         while (nev[i] != '.') {
             if (!nev[i]) {
-                internal_error("Nincs pont nevben! (yewruyrewuy): ", nev);
+                internal_error(std::string("Nincs pont nevben! (yewruyrewuy): ") + nev);
             }
             i++;
         }
@@ -1294,7 +1294,7 @@ int tolt_picklgrfile(char* lgrnev) {
         int i = 0;
         while (nev[i] != '.') {
             if (!nev[i]) {
-                internal_error("Nincs pont nevben! (454534): ", nev);
+                internal_error(std::string("Nincs pont nevben! (454534): ") + nev);
             }
             i++;
         }

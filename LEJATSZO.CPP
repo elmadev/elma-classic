@@ -1003,7 +1003,7 @@ void setup_render_directory(const std::string& replay_filename) {
     std::error_code ec;
     std::filesystem::create_directories(out_dir, ec);
     if (ec) {
-        internal_error("Failed to create output directory for replay render", ec.message().c_str());
+        internal_error("Failed to create output directory for replay render:\n" + ec.message());
     }
 
     VideoOutputDirectory = out_dir.string();

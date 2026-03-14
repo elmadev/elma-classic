@@ -123,8 +123,8 @@ void t_move_nyomva(int mx, int my) {
         }
         // Kis ellenorzes:
         if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-            internal_error("t_move_nyomva-ban legtav utan:",
-                           "(Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+            internal_error(
+                "t_move_nyomva-ban legtav utan: (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
         }
         // Talaltunk egy pontot:
         if (Pgy) {
@@ -273,7 +273,7 @@ void t_move_mmove(int mx, int my) {
         internal_error("t_move_mmove-ban !Pgy && !Pker!");
     }
     if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-        internal_error("t_move_mmove-ban:", "(Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+        internal_error("t_move_mmove-ban: (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
     }
 
     push();

@@ -383,12 +383,12 @@ void init_sound() {
     desired_spec.format = AUDIO_S16LSB;
 
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
-        internal_error("Failed to initialize audio subsystem", SDL_GetError());
+        internal_error(std::string("Failed to initialize audio subsystem:\n") + SDL_GetError());
     }
     SDL_AudioSpec obtained_spec;
     SDLAudioDevice = SDL_OpenAudioDevice(NULL, 0, &desired_spec, &obtained_spec, 0);
     if (SDLAudioDevice == 0) {
-        internal_error("Failed to open audio device", SDL_GetError());
+        internal_error(std::string("Failed to open audio device:\n") + SDL_GetError());
     }
     if (obtained_spec.format != desired_spec.format) {
         internal_error("Failed to get correct audio format");

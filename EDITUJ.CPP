@@ -231,7 +231,7 @@ static char Toolhelpszoveg[110] = "";
 void toolhelp(const char* text) {
     if (text) {
         if (strlen(text) > 100) {
-            internal_error("toolhelp-ben strlen( text ) > 100!", text);
+            internal_error(std::string("toolhelp-ben strlen( text ) > 100!\n") + text);
         }
         strcpy(Toolhelpszoveg, text);
     }

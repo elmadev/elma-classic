@@ -284,7 +284,7 @@ static void load_control(menu_nav* nav, key_pointers keys, int offset, std::stri
         return;
     }
     if (offset != nav->row_count()) {
-        internal_error("load_control key_pointers array desynced from menu_nav!", label.c_str());
+        internal_error("load_control key_pointers array desynced from menu_nav! " + label);
     }
     nav->add_row(std::move(label), dik_to_string(*key));
 }

@@ -25,7 +25,7 @@ static bool load_level(const char* levelname) {
     }
     size_t len = strlen(levelname);
     if (len > MAX_FILENAME_EXT_LEN || len <= 0) {
-        internal_error("load_level_play levelname length invalid!", levelname);
+        internal_error(std::string("load_level_play levelname length invalid! ") + levelname);
     }
 
     if (!ReloadLevel && Ptop && strcmpi(levelname, CurrentLevelName) == 0) {

@@ -11,24 +11,24 @@ anim::anim(pic8* source_sheet, const char* error_filename, int target_height, do
 
     // LGR13 format: target object height must always be ANIM_WIDTH
     if (target_height != ANIM_WIDTH) {
-        external_error(std::format("Object picture height must be {}", ANIM_WIDTH).c_str(),
-                       error_filename);
+        external_error(
+            std::format("Object picture height must be {}: {}", ANIM_WIDTH, error_filename));
     }
 
     // Get total number of animation frames
     int source_height = source_sheet->get_height();
     int source_width = source_sheet->get_width();
     if (source_width % source_height) {
-        external_error("Object picture width must be a multiple of its height", error_filename);
+        external_error(std::string("Object picture width must be a multiple of its height: ") +
+                       error_filename);
     }
     frame_count = source_width / source_height;
     if (frame_count < 0) {
         internal_error("anim::anim frame_count < 0");
     }
     if (frame_count > ANIM_MAX_FRAMES) {
-        external_error(
-            std::format("Too many frames in picture! Max frame is {}!", ANIM_MAX_FRAMES).c_str(),
-            error_filename);
+        external_error(std::format("Too many frames in picture! Max frame is {}!: {}",
+                                   ANIM_MAX_FRAMES, error_filename));
     }
 
     // Split the source picture into individual frames

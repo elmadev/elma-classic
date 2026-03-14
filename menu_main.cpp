@@ -258,13 +258,14 @@ static void menu_demo() {
         loading_screen();
         int level_id = recorder::load_rec_file(DEMO_NAMES[demo], true);
         if (access_level_file(Rec1->level_filename) != 0) {
-            internal_error("menu_demo: cannot find level file for demo replay: ",
+            internal_error(std::string("menu_demo: cannot find level file for demo replay: ") +
                            Rec1->level_filename);
         }
         load_level_play(Rec1->level_filename);
         if (Ptop->level_id != level_id) {
-            internal_error("menu_demo: level file changed since demo replay was made: ",
-                           Rec1->level_filename);
+            internal_error(
+                std::string("menu_demo: level file changed since demo replay was made: ") +
+                Rec1->level_filename);
         }
         Rec1->rewind();
         Rec2->rewind();

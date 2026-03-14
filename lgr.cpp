@@ -256,12 +256,12 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
 
     // Compress picture data
     if (new_pic->width > 60000) {
-        external_error("Picture width is too big!", new_pic->name);
+        external_error(std::string("Picture width is too big! ") + new_pic->name);
     }
 
     int transparency = get_transparency_palette_id(list->transparency[index], pic);
     if (transparency < 0) {
-        external_error("Picture must be transparent in lgr file!", new_pic->name);
+        external_error(std::string("Picture must be transparent in lgr file! ") + new_pic->name);
     }
 
     PictureBuffer.resize(0);
@@ -506,7 +506,7 @@ static unsigned char* create_timer_palette_map(unsigned char* pal) {
     return map;
 }
 
-#define ERROR_CORRUPT() external_error("Corrupt LGR file!:", path)
+#define ERROR_CORRUPT() external_error(std::string("Corrupt LGR file!: ") + path)
 
 // Read "LGR12" or "LGR13"
 static int read_version(FILE* h, const char* path) {
@@ -515,14 +515,14 @@ static int read_version(FILE* h, const char* path) {
         ERROR_CORRUPT();
     }
     if (strncmp(LGRXX, "LGR", 3) != 0) {
-        external_error("This is not an LGR file!:", path);
+        external_error(std::string("This is not an LGR file!: ") + path);
     }
     if (LGRXX[3] < '0' || LGRXX[3] > '9' || LGRXX[4] < '0' || LGRXX[4] > '9') {
-        external_error("LGR file's version is too new!:", path, nullptr);
+        external_error(std::string("LGR file's version is too new!: ") + path);
     }
     int version = (LGRXX[3] - '0') * 10 + (LGRXX[4] - '0');
     if (version != 12 && version != 13) {
-        external_error("LGR file's version is too new!:", path, nullptr);
+        external_error(std::string("LGR file's version is too new!: ") + path);
     }
     return version;
 }
@@ -563,7 +563,7 @@ lgrfile::lgrfile(const char* lgrname) {
     sprintf(path, "lgr/%s.lgr", lgrname);
     FILE* h = fopen(path, "rb");
     if (!h) {
-        external_error("Cannot find file:", path);
+        external_error(std::string("Cannot find file: ") + path);
     }
 
     int version = read_version(h, path);
@@ -719,11 +719,12 @@ lgrfile::lgrfile(const char* lgrname) {
 
         // Truncate file extension
         if (!strchr(asset_filename, '.')) {
-            external_error("Cannot find dot in name:", asset_filename);
+            external_error(std::string("Cannot find dot in name: ") + asset_filename);
         }
         *strchr(asset_filename, '.') = 0;
         if (strlen(asset_filename) > MAX_FILENAME_LEN) {
-            external_error("Filename is too long in LGR file!:", asset_filename, path);
+            external_error(std::string("Filename is too long in LGR file!: ") + asset_filename +
+                           " " + path);
         }
 
         // QGRASS
@@ -736,8 +737,9 @@ lgrfile::lgrfile(const char* lgrname) {
         // Generic asset
         int index = list->get_index(asset_filename);
         if (index < 0) {
-            external_error("There is no line in PICTURES.LST corresponding to picture:",
-                           asset_filename);
+            external_error(
+                std::string("There is no line in PICTURES.LST corresponding to picture: ") +
+                asset_filename);
         }
         if (list->type[index] == piclist::Type::Picture) {
             asset_pic = pic8::resize(asset_pic, (int)(zoom * target_height));
@@ -778,12 +780,12 @@ lgrfile::lgrfile(const char* lgrname) {
 
     // Check that the LGR is complete
     if (texture_count < 2) {
-        external_error("There must be at least two textures in LGR file!", lgrname);
+        external_error(std::string("There must be at least two textures in LGR file! ") + lgrname);
     }
 
 #define ASSERT_EXISTS(var, name)                                                                   \
     if (!var) {                                                                                    \
-        external_error("Picture not found in LGR file!: ", name, path);                            \
+        external_error(std::string("Picture not found in LGR file!: ") + name + " " + path);       \
     }
 
     ASSERT_EXISTS(bike1.body, "q1body.pcx");
@@ -877,19 +879,21 @@ lgrfile::lgrfile(const char* lgrname) {
     // Check for duplicate names in pictures, masks and textures
     for (int i = 0; i < picture_count - 1; i++) {
         if (strcmpi(pictures[i].name, pictures[i + 1].name) == 0) {
-            external_error("Picture name is duplicated in LGR file!: ", pictures[i].name);
+            external_error(std::string("Picture name is duplicated in LGR file!: ") +
+                           pictures[i].name);
         }
     }
 
     for (int i = 0; i < mask_count - 1; i++) {
         if (strcmpi(masks[i].name, masks[i + 1].name) == 0) {
-            external_error("Mask name is duplicated in LGR file!: ", masks[i].name);
+            external_error(std::string("Mask name is duplicated in LGR file!: ") + masks[i].name);
         }
     }
 
     for (int i = 0; i < texture_count - 1; i++) {
         if (strcmpi(textures[i].name, textures[i + 1].name) == 0) {
-            external_error("Texture name is duplicated in LGR file!: ", textures[i].name);
+            external_error(std::string("Texture name is duplicated in LGR file!: ") +
+                           textures[i].name);
         }
     }
 
@@ -912,7 +916,7 @@ lgrfile::lgrfile(const char* lgrname) {
         food_count++;
     }
     if (food_count < 1) {
-        external_error("Picture is missing from LGR file:", "qfood1.pcx", path);
+        external_error(std::string("Picture is missing from LGR file: qfood1.pcx ") + path);
     }
 
     // Check grass

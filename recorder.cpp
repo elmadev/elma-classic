@@ -384,7 +384,7 @@ bool recorder::recall_event_reverse(double time, WavEvent* event_id, double* vol
 }
 
 static void read_error(const char* filename) {
-    internal_error("Failed to read rec file: ", filename);
+    internal_error(std::string("Failed to read rec file: ") + filename);
 }
 
 int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
@@ -393,7 +393,7 @@ int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
         read_error(filename);
     }
     if (frame_count_ <= 0) {
-        internal_error("recorder frame_count_ <= 0: ", filename);
+        internal_error(std::string("recorder frame_count_ <= 0: ") + filename);
     }
 
     frames.resize(frame_count_);
@@ -403,10 +403,10 @@ int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
         read_error(filename);
     }
     if (version < 131) {
-        external_error("Rec file version is too old!", filename);
+        external_error(std::string("Rec file version is too old!") + filename);
     }
     if (version > 131) {
-        external_error("Rec file version is too new!", filename);
+        external_error(std::string("Rec file version is too new!") + filename);
     }
 
     int multiplayer_rec = 0;
@@ -480,7 +480,7 @@ int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
 }
 
 static void save_error(const char* filename) {
-    internal_error("Failed to write rec file: ", filename);
+    internal_error(std::string("Failed to write rec file: ") + filename);
 }
 
 void recorder::save(const char* filename, FILE* h, int level_id) {
@@ -498,7 +498,7 @@ void recorder::save(const char* filename, FILE* h, int level_id) {
         sprintf(path, "rec/%s", filename);
         h = fopen(path, "wb");
         if (!h) {
-            internal_error("Failed to open rec file for writing!: ", path);
+            internal_error(std::string("Failed to open rec file for writing!: ") + path);
         }
     }
 
@@ -570,14 +570,14 @@ int recorder::load_rec_file(const char* filename, bool demo) {
     if (demo) {
         h = qopen(filename, "rb");
         if (!h) {
-            external_error("Failed to open demo file: ", filename);
+            external_error(std::string("Failed to open demo file: ") + filename);
         }
     } else {
         recpath path;
         sprintf(path, "rec/%s", filename);
         h = fopen(path, "rb");
         if (!h) {
-            external_error("Failed to open rec file: ", path);
+            external_error(std::string("Failed to open rec file: ") + path);
         }
     }
 
@@ -600,7 +600,7 @@ recorder::merge_result recorder::load_merge(const std::string& filename1,
     std::string path = "rec/" + filename1;
     FILE* h1 = fopen(path.c_str(), "rb");
     if (!h1) {
-        external_error("Failed to open rec file: ", path.c_str());
+        external_error("Failed to open rec file: " + path);
     }
     int level_id1 = Rec1->load(filename1.c_str(), h1, true);
     bool was_multi = MultiplayerRec != 0;
@@ -609,7 +609,7 @@ recorder::merge_result recorder::load_merge(const std::string& filename1,
     path = "rec/" + filename2;
     FILE* h2 = fopen(path.c_str(), "rb");
     if (!h2) {
-        external_error("Failed to open rec file: ", path.c_str());
+        external_error("Failed to open rec file: " + path);
     }
     int level_id2 = Rec2->load(filename2.c_str(), h2, true);
     bool was_multi2 = MultiplayerRec != 0;
@@ -628,7 +628,7 @@ void recorder::save_rec_file(const char* filename, int level_id) {
         sprintf(path, "rec/%s", filename);
         FILE* h = fopen(path, "wb");
         if (!h) {
-            external_error("Failed to open rec file for writing!: ", path);
+            external_error(std::string("Failed to open rec file for writing!: ") + path);
         }
         Rec1->save(filename, h, level_id);
         Rec2->save(filename, h, level_id);

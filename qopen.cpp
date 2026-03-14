@@ -65,7 +65,7 @@ void init_qopen() {
 
     FILE* h = fopen(RES_FILENAME, "rb");
     if (!h) {
-        external_error("Missing file!: ", RES_FILENAME);
+        external_error(std::string("Missing file!: ") + RES_FILENAME);
     }
 
     // There are two different .res formats, with no explicit versioning.
@@ -114,7 +114,8 @@ FILE* qopen(const char* filename, const char* mode) {
         internal_error("NumHandles == MAX_HANDLES!");
     }
     if (strcmp(mode, "rb") != 0 && strcmp(mode, "r") != 0) {
-        internal_error("qopen() mode is not \"rb\" or \"r\"!: ", filename, mode);
+        internal_error(std::string("qopen() mode is not \"rb\" or \"r\"!: ") + filename + " " +
+                       mode);
     }
 
     if (USE_RES_FILE) {
@@ -123,7 +124,7 @@ FILE* qopen(const char* filename, const char* mode) {
                 Handles[NumHandles] = fopen(RES_FILENAME, mode);
                 HandleOffset[NumHandles] = i;
                 if (!Handles[NumHandles]) {
-                    internal_error("qopen() failed to open: ", RES_FILENAME);
+                    internal_error(std::string("qopen() failed to open: ") + RES_FILENAME);
                 }
                 if (fseek(Handles[NumHandles], ResFiles[i].offset, SEEK_SET) != 0) {
                     internal_error("qopen() failed to fseek!");
@@ -133,13 +134,13 @@ FILE* qopen(const char* filename, const char* mode) {
                 return Handles[NumHandles - 1];
             }
         }
-        internal_error("qopen() failed to find file: ", filename);
+        internal_error(std::string("qopen() failed to find file: ") + filename);
         return nullptr;
     } else {
         NumHandles++;
         char tmp[30] = "files/";
         if (strlen(filename) > 12 || filename[0] == '.') {
-            internal_error("qopen() malformed filename!: ", filename);
+            internal_error(std::string("qopen() malformed filename!: ") + filename);
         }
         strcat(tmp, filename);
         return fopen(tmp, mode);

@@ -56,7 +56,7 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
     assert_filename_is_wav(filename);
     FILE* h = qopen(filename, "rb");
     if (!h) {
-        internal_error("Failed to open wav file: ", filename);
+        internal_error(std::string("Failed to open wav file: ") + filename);
     }
 
     wav_header header;
@@ -64,19 +64,19 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
         internal_error("Failed to read wav file header!");
     }
     if (header.format != 1) {
-        internal_error("Wav file is not PCM!: ", filename);
+        internal_error(std::string("Wav file is not PCM!: ") + filename);
     }
     if (header.channels != 1) {
-        internal_error("Wav file is not mono!: ", filename);
+        internal_error(std::string("Wav file is not mono!: ") + filename);
     }
     if (header.fmt_size != 16) {
-        internal_error("Wav file fmt chunk size must be 16!: ", filename);
+        internal_error(std::string("Wav file fmt chunk size must be 16!: ") + filename);
     }
     if (header.block_align != 2) {
-        internal_error("Wav file block align is invalid!: ", filename);
+        internal_error(std::string("Wav file block align is invalid!: ") + filename);
     }
     if (header.bits_per_sample != 16) {
-        internal_error("Wav file must be 16-bit!: ", filename);
+        internal_error(std::string("Wav file must be 16-bit!: ") + filename);
     }
 
     int source_size = header.data_size;
@@ -96,7 +96,7 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
     allocate();
     qseek(h, start * 2, SEEK_CUR);
     if (fread(samples, 1, size * 2, h) != size * 2) {
-        internal_error("Failed to read wav file: ", filename);
+        internal_error(std::string("Failed to read wav file: ") + filename);
     }
 
     qclose(h);

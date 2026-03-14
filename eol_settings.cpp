@@ -276,9 +276,9 @@ void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
             name = j.value(#name, s.name());                                                       \
             s.set_##name(name);                                                                    \
         } catch (json::exception & e) {                                                            \
-            external_error("Invalid parameter in " SETTINGS_JSON "!", e.what());                   \
+            external_error(std::string("Invalid parameter in " SETTINGS_JSON "!\n") + e.what());   \
         } catch (const char* e) {                                                                  \
-            external_error("Invalid parameter in " SETTINGS_JSON "!", e);                          \
+            external_error(std::string("Invalid parameter in " SETTINGS_JSON "!\n") + e);          \
         }                                                                                          \
     }
 void from_json(const json& j, eol_settings& s) { FIELD_LIST }
@@ -293,7 +293,7 @@ void eol_settings::read_settings() {
     if (!j.is_discarded()) {
         *EolSettings = j;
     } else {
-        external_error(SETTINGS_JSON " is corrupt!", "Please fix this or delete the file!");
+        external_error(SETTINGS_JSON " is corrupt! Please fix this or delete the file!");
     }
 }
 

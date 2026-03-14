@@ -623,12 +623,12 @@ void level::from_file(const char* filename, bool internal) {
     }
 
     if (!h) {
-        external_error("Failed to open level file: ", filename);
+        external_error(std::string("Failed to open level file: ") + filename);
     }
 
     char tmp[10] = "AAAAA";
     if (fread(tmp, 1, 5, h) != 5) {
-        external_error("Error reading level file!", filename);
+        external_error(std::string("Error reading level file! ") + filename);
     }
 
     int version;
@@ -640,42 +640,42 @@ void level::from_file(const char* filename, bool internal) {
         version = 14;
     } else {
         if (strncmp(tmp, "POT", 3) != 0) {
-            external_error("Corrupt .LEV file!", filename);
+            external_error(std::string("Corrupt .LEV file! ") + filename);
         }
 
         version = tmp[4] - '0' + 10 * (tmp[3] - '0');
         if (version > 14) {
-            external_error("Level file's version is too new!: ", filename);
+            external_error(std::string("Level file's version is too new!: ") + filename);
         }
 
         if (version != 6 && version != 14) {
-            external_error("Corrupt .LEV file!", filename);
+            external_error(std::string("Corrupt .LEV file! ") + filename);
         }
     }
 
     int level_id_checksum;
     if (version == 14) {
         if (fread(&level_id_checksum, 1, 2, h) != 2) {
-            external_error("Error reading level file!", filename);
+            external_error(std::string("Error reading level file! ") + filename);
         }
     }
 
     if (fread(&level_id, 1, sizeof(level_id), h) != 4) {
-        external_error("Error reading level file!", filename);
+        external_error(std::string("Error reading level file! ") + filename);
     }
 
     double integrity_checksum = 0.0;
     if (fread(&integrity_checksum, 1, sizeof(integrity_checksum), h) != 8) {
-        external_error("Corrupt .LEV file!", filename);
+        external_error(std::string("Corrupt .LEV file! ") + filename);
     }
 
     double integrity_shareware;
     if (fread(&integrity_shareware, 1, sizeof(integrity_shareware), h) != 8) {
-        external_error("Error reading level file!", filename);
+        external_error(std::string("Error reading level file! ") + filename);
     }
     if (integrity_shareware + integrity_checksum < 9786.0 ||
         integrity_shareware + integrity_checksum > 36546.0) {
-        external_error("Corrupt .LEV file!", filename);
+        external_error(std::string("Corrupt .LEV file! ") + filename);
     }
 
     // Levels that can only be played in Registered would meet the condition:
@@ -683,11 +683,11 @@ void level::from_file(const char* filename, bool internal) {
 
     double integrity_topology_errors;
     if (fread(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h) != 8) {
-        external_error("Error reading level file!", filename);
+        external_error(std::string("Error reading level file! ") + filename);
     }
     if (integrity_topology_errors + integrity_checksum < 9786.0 ||
         integrity_topology_errors + integrity_checksum > 36546.0) {
-        external_error("Corrupt .LEV file!", filename);
+        external_error(std::string("Corrupt .LEV file! ") + filename);
     }
     if (integrity_topology_errors + integrity_checksum > 20000.0) {
         topology_errors = true;
@@ -696,11 +696,11 @@ void level::from_file(const char* filename, bool internal) {
     // Ignore locked parameter, but keep the integrity check
     double integrity_locked;
     if (fread(&integrity_locked, 1, sizeof(integrity_locked), h) != 8) {
-        external_error("Error reading level file!", filename);
+        external_error(std::string("Error reading level file! ") + filename);
     }
     if (integrity_locked + integrity_checksum < 9875.0 ||
         integrity_locked + integrity_checksum > 32345.0) {
-        external_error("Corrupt .LEV file!", filename);
+        external_error(std::string("Corrupt .LEV file! ") + filename);
     }
 
     int level_name_length = LEVEL_NAME_LENGTH;
@@ -739,23 +739,23 @@ void level::from_file(const char* filename, bool internal) {
     double encrypted_polygon_count = 0.0;
     double encrypted_object_count = 0.0;
     if (fread(&encrypted_polygon_count, 1, sizeof(encrypted_polygon_count), h) != 8) {
-        external_error("Error reading level file!", filename);
+        external_error(std::string("Error reading level file! ") + filename);
     }
 
     if (internal) {
         // object_count is moved out of order in .leb files.
         if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) != 8) {
-            external_error("Error reading level file!", filename);
+            external_error(std::string("Error reading level file! ") + filename);
         }
     }
 
     int polygon_count = (int)(encrypted_polygon_count);
     if (polygon_count > MAX_POLYGONS) {
-        external_error("Too many polygons in level file!", filename);
+        external_error(std::string("Too many polygons in level file! ") + filename);
     }
 
     if (polygon_count <= 0) {
-        external_error("Corrupt .LEV file!", filename);
+        external_error(std::string("Corrupt .LEV file! ") + filename);
     }
 
     for (int i = 0; i < polygon_count; i++) {
@@ -764,16 +764,16 @@ void level::from_file(const char* filename, bool internal) {
 
     if (!internal) {
         if (fread(&encrypted_object_count, 1, sizeof(encrypted_object_count), h) != 8) {
-            external_error("Error reading level file!", filename);
+            external_error(std::string("Error reading level file! ") + filename);
         }
     }
 
     int object_count = (int)(encrypted_object_count);
     if (object_count > MAX_OBJECTS) {
-        external_error("Too many objects in level file!", filename);
+        external_error(std::string("Too many objects in level file! ") + filename);
     }
     if (object_count <= 0) {
-        external_error("Corrupt .LEV file!", filename);
+        external_error(std::string("Corrupt .LEV file! ") + filename);
     }
     for (int i = 0; i < object_count; i++) {
         objects[i] = new object(h, version);
@@ -782,14 +782,14 @@ void level::from_file(const char* filename, bool internal) {
     if (version == 14) {
         double encrypted_sprite_count = 0.0;
         if (fread(&encrypted_sprite_count, 1, sizeof(encrypted_sprite_count), h) != 8) {
-            external_error("Error reading level file!", filename);
+            external_error(std::string("Error reading level file! ") + filename);
         }
         int sprite_count = (int)(encrypted_sprite_count);
         if (sprite_count > MAX_SPRITES) {
-            external_error("Too many pictures in level file!", filename);
+            external_error(std::string("Too many pictures in level file! ") + filename);
         }
         if (sprite_count < 0) {
-            external_error("Corrupt .LEV file!", filename);
+            external_error(std::string("Corrupt .LEV file! ") + filename);
         }
         for (int i = 0; i < sprite_count; i++) {
             sprites[i] = new sprite(h);
@@ -799,7 +799,7 @@ void level::from_file(const char* filename, bool internal) {
     // Verify checksum
     double calculated_checksum = checksum();
     if (fabs(calculated_checksum - integrity_checksum) > 0.01) {
-        external_error("Corrupt .LEV file!", filename);
+        external_error(std::string("Corrupt .LEV file! ") + filename);
     }
 
     if (internal) {
@@ -884,7 +884,7 @@ void level::save(const char* filename, bool skip_topology) {
     }
     FILE* h = fopen(path, "wb");
     if (!h) {
-        external_error("Failed to open file for writing: ", path);
+        external_error(std::string("Failed to open file for writing: ") + path);
     }
 
     if (SAVE_INTERNAL) {
@@ -992,7 +992,7 @@ void level::save(const char* filename, bool skip_topology) {
 
     if (topology_errors) {
         if (SAVE_INTERNAL) {
-            internal_error("Internal levels cannot have topology errors!", filename);
+            internal_error(std::string("Internal levels cannot have topology errors! ") + filename);
         }
         dialog("Though the level file was successfully saved, there are some errors in the "
                "design.",
@@ -1012,25 +1012,25 @@ void level::save_topten(const char* filename) {
 
     FILE* h = fopen(path, "r+b");
     if (!h) {
-        external_error("Could not open file!", path);
+        external_error(std::string("Could not open file! ") + path);
     }
 
     if (fseek(h, topten_file_offset, SEEK_SET) != 0) {
-        external_error("Could not write to file:", path);
+        external_error(std::string("Could not write to file: ") + path);
     }
 
     int magic_number = TOP_TEN_HEADER;
     if (fwrite(&magic_number, 1, 4, h) != 4) {
-        external_error("Could not write to file:", path);
+        external_error(std::string("Could not write to file: ") + path);
     }
 
     if (!write_encrypted(&toptens, sizeof(toptens), h)) {
-        external_error("Could not write to file:", path);
+        external_error(std::string("Could not write to file: ") + path);
     }
 
     magic_number = TOP_TEN_FOOTER;
     if (fwrite(&magic_number, 1, 4, h) != 4) {
-        external_error("Could not write to file:", path);
+        external_error(std::string("Could not write to file: ") + path);
     }
 
     fclose(h);

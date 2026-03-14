@@ -19,7 +19,7 @@ state* State = nullptr;
 
 static void read_encrypted(void* buffer, int length, FILE* h, const char* filename) {
     if (fread(buffer, 1, length, h) != length) {
-        external_error("Corrupt file, please delete it!", filename);
+        external_error(std::string("Corrupt file, please delete it! ") + filename);
     }
     unsigned char* pc = (unsigned char*)buffer;
     short a = 23;
@@ -91,13 +91,13 @@ state::state(const char* filename) {
 
     FILE* h = fopen(filename, "rb");
     if (!h) {
-        internal_error("Cannot open state file!: ", filename);
+        internal_error(std::string("Cannot open state file!: ") + filename);
     }
 
     int version = 0;
     read_encrypted(&version, sizeof(version), h, filename);
     if (version != STATE_VERSION) {
-        external_error("File version is incorrect!", "Please rename it!", filename);
+        external_error(std::string("File version is incorrect! Please rename it! ") + filename);
     }
     read_encrypted(toptens, sizeof(toptens), h, filename);
     read_encrypted(players, sizeof(players), h, filename);
@@ -122,11 +122,11 @@ state::state(const char* filename) {
 
     int magic_number = 0;
     if (fread(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
-        external_error("Corrupt file, please rename it!", filename);
+        external_error(std::string("Corrupt file, please rename it! ") + filename);
     }
     if (magic_number != STATE_MAGICNUMBER_SHAREWARE &&
         magic_number != STATE_MAGICNUMBER_REGISTERED) {
-        external_error("Corrupt file, please rename it!", filename);
+        external_error(std::string("Corrupt file, please rename it! ") + filename);
     }
     fclose(h);
 }
@@ -144,7 +144,7 @@ void state::reload_toptens() {
     int version = 0;
     read_encrypted(&version, 4, h, filename);
     if (version != STATE_VERSION) {
-        external_error("File version is incorrect!", "Please rename it!", filename);
+        external_error(std::string("File version is incorrect! Please rename it! ") + filename);
     }
 
     read_encrypted(toptens, sizeof(toptens), h, filename);
@@ -155,7 +155,7 @@ void state::reload_toptens() {
 void state::save() {
     FILE* h = fopen(STATE_FILENAME, "wb");
     if (!h) {
-        external_error("Could not open for write file!: ", STATE_FILENAME);
+        external_error(std::string("Could not open for write file!: ") + STATE_FILENAME);
     }
 
     int version = STATE_VERSION;
@@ -183,7 +183,7 @@ void state::save() {
 
     int magic_number = STATE_MAGICNUMBER_REGISTERED;
     if (fwrite(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
-        internal_error("Cannot write to state file: ", STATE_FILENAME);
+        internal_error(std::string("Cannot write to state file: ") + STATE_FILENAME);
     }
 
     fclose(h);

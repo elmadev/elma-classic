@@ -54,7 +54,7 @@ static GLuint compile_shader(GLenum type, const char* source) {
     if (!success) {
         char infoLog[512];
         glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        internal_error("Shader compilation failed:", infoLog);
+        internal_error(std::string("Shader compilation failed:\n") + infoLog);
         return 0;
     }
     return shader;
@@ -77,7 +77,7 @@ static int init_shaders() {
     if (!success) {
         char infoLog[512];
         glGetProgramInfoLog(ShaderProgram, 512, nullptr, infoLog);
-        internal_error("Shader linking failed:", infoLog);
+        internal_error(std::string("Shader linking failed:\n") + infoLog);
         return -1;
     }
 
@@ -158,7 +158,7 @@ int gl_init(SDL_Window* sdl_window, int width, int height, int pitch) {
 
     GLContext = SDL_GL_CreateContext(sdl_window);
     if (!GLContext) {
-        internal_error("Failed to create OpenGL context:", SDL_GetError());
+        internal_error(std::string("Failed to create OpenGL context:\n") + SDL_GetError());
         return -1;
     }
 

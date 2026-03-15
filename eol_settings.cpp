@@ -115,6 +115,14 @@ void eol_settings::set_brake_alias_key_player_b(DikScancode key) {
     brake_alias_key_player_b_ = key;
 }
 
+void eol_settings::set_one_frame_brake_key_player_a(DikScancode key) {
+    one_frame_brake_key_player_a_ = key;
+}
+
+void eol_settings::set_one_frame_brake_key_player_b(DikScancode key) {
+    one_frame_brake_key_player_b_ = key;
+}
+
 void eol_settings::set_escape_alias_key(DikScancode key) { escape_alias_key_ = key; }
 
 void eol_settings::set_replay_fast_2x_key(DikScancode key) { replay_fast_2x_key_ = key; }
@@ -243,6 +251,8 @@ void from_json(const json& j, RendererType& r) {
     JSON_FIELD(alovolt_key_player_b)                                                               \
     JSON_FIELD(brake_alias_key_player_a)                                                           \
     JSON_FIELD(brake_alias_key_player_b)                                                           \
+    JSON_FIELD(one_frame_brake_key_player_a)                                                       \
+    JSON_FIELD(one_frame_brake_key_player_b)                                                       \
     JSON_FIELD(escape_alias_key)                                                                   \
     JSON_FIELD(replay_fast_2x_key)                                                                 \
     JSON_FIELD(replay_fast_4x_key)                                                                 \
@@ -312,6 +322,8 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->keys2.alovolt = EolSettings->alovolt_key_player_b();
     s->keys1.brake_alias = EolSettings->brake_alias_key_player_a();
     s->keys2.brake_alias = EolSettings->brake_alias_key_player_b();
+    s->keys1.one_frame_brake = EolSettings->one_frame_brake_key_player_a();
+    s->keys2.one_frame_brake = EolSettings->one_frame_brake_key_player_b();
     s->key_escape_alias = EolSettings->escape_alias_key();
     s->key_replay_fast_2x = EolSettings->replay_fast_2x_key();
     s->key_replay_fast_4x = EolSettings->replay_fast_4x_key();
@@ -331,6 +343,8 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->set_alovolt_key_player_b(s->keys2.alovolt);
     EolSettings->set_brake_alias_key_player_a(s->keys1.brake_alias);
     EolSettings->set_brake_alias_key_player_b(s->keys2.brake_alias);
+    EolSettings->set_one_frame_brake_key_player_a(s->keys1.one_frame_brake);
+    EolSettings->set_one_frame_brake_key_player_b(s->keys2.one_frame_brake);
     EolSettings->set_escape_alias_key(s->key_escape_alias);
     EolSettings->set_replay_fast_2x_key(s->key_replay_fast_2x);
     EolSettings->set_replay_fast_4x_key(s->key_replay_fast_4x);

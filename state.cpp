@@ -404,6 +404,7 @@ void state::reset_keys() {
     keys1.toggle_visibility = DIK_1;
     keys1.alovolt = EolSettings->alovolt_key_player_a_default();
     keys1.brake_alias = EolSettings->brake_alias_key_player_a_default();
+    keys1.one_frame_brake = EolSettings->one_frame_brake_key_player_a_default();
 
     keys2.gas = DIK_NUMPAD5;
     keys2.brake = DIK_NUMPAD2;
@@ -415,11 +416,13 @@ void state::reset_keys() {
     keys2.toggle_visibility = DIK_2;
     keys2.alovolt = EolSettings->alovolt_key_player_b_default();
     keys2.brake_alias = EolSettings->brake_alias_key_player_b_default();
+    keys2.one_frame_brake = EolSettings->one_frame_brake_key_player_b_default();
 
     key_increase_screen_size = DIK_EQUALS;
     key_decrease_screen_size = DIK_MINUS;
     key_screenshot = DIK_I;
     key_escape_alias = EolSettings->escape_alias_key_default();
+
     key_replay_fast_2x = EolSettings->replay_fast_2x_key_default();
     key_replay_fast_4x = EolSettings->replay_fast_4x_key_default();
     key_replay_fast_8x = EolSettings->replay_fast_8x_key_default();

@@ -148,6 +148,7 @@ void console::submit_input() {
     }
 
     if (input_buffer_[0] == '!') {
+        add_line(input_buffer_);
         std::string_view input(input_buffer_);
         input.remove_prefix(1);
 

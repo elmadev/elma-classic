@@ -269,7 +269,7 @@ constexpr int UNIVERSAL_KEYS_END = UNIVERSAL_KEYS_START + 4;
 static_assert(KEY_POINTERS_MAX > UNIVERSAL_KEYS_END);
 
 constexpr int PLAYER_KEYS_START = 0;
-constexpr int PLAYER_KEYS_END = PLAYER_KEYS_START + 10;
+constexpr int PLAYER_KEYS_END = PLAYER_KEYS_START + 11;
 static_assert(KEY_POINTERS_MAX > PLAYER_KEYS_END);
 
 constexpr int REPLAY_KEYS_START = 0;
@@ -361,6 +361,7 @@ static void load_player_controls(menu_nav* nav, key_pointers keys, player_keys* 
     load_control(nav, keys, i++, "Throttle", &player_controls->gas);
     load_control(nav, keys, i++, "Brake", &player_controls->brake);
     load_control(nav, keys, i++, "Brake Alias", &player_controls->brake_alias);
+    load_control(nav, keys, i++, "One Frame Brake", &player_controls->one_frame_brake);
     load_control(nav, keys, i++, "Rotate left", &player_controls->left_volt);
     load_control(nav, keys, i++, "Rotate right", &player_controls->right_volt);
     load_control(nav, keys, i++, "Alovolt", &player_controls->alovolt);

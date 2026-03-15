@@ -157,8 +157,9 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // LEPTET!!!!!!!:
     // 0-meghalt, 1-megnyerte, 2-semmi kulonos
-    simulate_bike_physics(pmot, eddig, dt, is_key_down(popciok->gas),
-                          is_key_down(popciok->brake) || is_key_down(popciok->brake_alias), ugrik1,
+    bool is_brake_down = is_key_down(popciok->brake) || is_key_down(popciok->brake_alias) ||
+                         was_key_just_pressed(popciok->one_frame_brake);
+    simulate_bike_physics(pmot, eddig, dt, is_key_down(popciok->gas), is_brake_down, ugrik1,
                           ugrik2);
 
     BikeState eredmeny = check_object_collision(pmot);

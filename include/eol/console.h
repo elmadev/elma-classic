@@ -48,6 +48,7 @@ class console {
     bool input_active_ = false;
     std::string input_buffer_;
     int cursor_pos_ = 0;
+    bool commands_need_prefix = false;
 };
 
 extern console* Console;

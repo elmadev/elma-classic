@@ -147,10 +147,12 @@ void console::submit_input() {
         return;
     }
 
-    if (input_buffer_[0] == '!') {
+    if (input_buffer_[0] == '!' || !commands_need_prefix) {
         add_line(input_buffer_);
         std::string_view input(input_buffer_);
-        input.remove_prefix(1);
+        if (input_buffer_[0] == '!') {
+            input.remove_prefix(1);
+        }
 
         // Split into command name and args
         auto space = input.find(' ');

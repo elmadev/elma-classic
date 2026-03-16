@@ -100,7 +100,7 @@ if cpp.get_id() == 'msvc'
         link_args += ['/ENTRY:mainCRTStartup']
     endif
 else
-    cpp_args += ['-Wno-deprecated-declarations']
+    cpp_args += ['-Wno-deprecated-declarations', '-Wunreachable-code']
 endif
 
 sdl2_dep = dependency('sdl2',

@@ -11,7 +11,6 @@
 void pic8::allocate(int w, int h) {
     if (rows || pixels) {
         internal_error("pic8 already allocated!");
-        return;
     }
     width = w;
     height = h;
@@ -20,14 +19,12 @@ void pic8::allocate(int w, int h) {
     }
     if (w <= 0 || h <= 0) {
         internal_error("pic8 invalid width/height!");
-        return;
     }
     // Allocate pixels and rows
     pixels = new unsigned char[w * h];
     rows = new unsigned char*[(unsigned int)(h)];
     if (!rows || !pixels) {
         external_error("pic8::alloc memory!");
-        return;
     }
     memset(pixels, 0, sizeof(unsigned char) * w * h);
     // Map the pixel array to the array of rows
@@ -85,7 +82,6 @@ pic8::pic8(const char* filename, FILE* h) {
                 return;
             }
             internal_error(std::string("pic8 unknown file extension: ") + filename);
-            return;
         }
         i--;
     }
@@ -164,12 +160,10 @@ bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
                 return pcx_save(filename, pal);
             }
             internal_error(std::string("pic8::save unknown file extension: ") + filename);
-            return false;
         }
         i--;
     }
     internal_error(std::string("pic8::save could not find file extension: ") + filename);
-    return false;
 }
 
 void pic8::ppixel(int x, int y, unsigned char index) {
@@ -191,7 +185,6 @@ unsigned char pic8::gpixel(int x, int y) {
 unsigned char* pic8::get_row(int y) {
     if (y < 0 || y >= height) {
         internal_error("pic8::get_row y out of bounds!");
-        return 0;
     }
     return rows[y];
 }
@@ -248,100 +241,55 @@ void pic8::spr_open(const char* filename, FILE* h) {
         h = qopen(filename, "rb");
         if (!h) {
             internal_error(std::string("Failed to open sprite file!: ") + filename);
-            return;
         }
     }
     // Header
     unsigned char c = 0;
     if (fread(&c, 1, 1, h) != 1) {
         internal_error(std::string("Error reading sprite file: ") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     if (c != 0x2d) {
         internal_error(std::string("Sprite file header invalid:") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     // Pixel data
     unsigned short sprite_width = -1;
     unsigned short sprite_height = -1;
     if (fread(&sprite_width, 2, 1, h) != 1 || fread(&sprite_height, 2, 1, h) != 1) {
         internal_error(std::string("Error reading sprite file: ") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     width = sprite_width;
     height = sprite_height;
     if (width < 1 || height < 1) {
         internal_error(std::string("Sprite file width/height invalid: ") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     allocate(width, height);
     for (int y = 0; y < height; y++) {
         if (fread(rows[y], width, 1, h) != 1) {
             internal_error(std::string("Error reading sprite file: ") + filename);
-            if (!h_provided) {
-                qclose(h);
-            }
-            return;
         }
     }
     // Transparency data header
     char tmp[10] = "";
     if (fread(tmp, 7, 1, h) != 1) {
         internal_error(std::string("Error reading sprite file: ") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     if (strcmp(tmp, "SPRITE") != 0) {
         internal_error(std::string("Sprite file data header invalid: ") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     // Transparency data
     transparency_data_length = -1;
     if (fread(&transparency_data_length, 2, 1, h) != 1) {
         internal_error(std::string("Error reading sprite file: ") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     if (transparency_data_length < 1) {
         internal_error(std::string("Sprite file transparency data length invalid: ") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     transparency_data = new unsigned char[transparency_data_length];
     if (!transparency_data) {
         internal_error(std::string("Could not allocate memory for sprite file: ") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     if (fread(transparency_data, transparency_data_length, 1, h) != 1) {
         internal_error(std::string("Error reading sprite file transparency data: ") + filename);
-        if (!h_provided) {
-            qclose(h);
-        }
-        return;
     }
     if (!h_provided) {
         qclose(h);
@@ -360,33 +308,20 @@ bool pic8::spr_save(const char* filename, FILE* h) {
         h = fopen(filename, "wb");
         if (!h) {
             internal_error(std::string("pic8::spr_save failed to open file: ") + filename);
-            return false;
         }
     }
     unsigned char c = 0x2d;
     if (fwrite(&c, 1, 1, h) != 1 || fwrite(&width, 2, 1, h) != 1 || fwrite(&height, 2, 1, h) != 1) {
         internal_error(std::string("pic8::spr_save failed to write to file: ") + filename);
-        if (!h_provided) {
-            fclose(h);
-        }
-        return false;
     }
     for (int y = 0; y < height; y++) {
         if (fwrite(rows[y], width, 1, h) != 1) {
             internal_error(std::string("pic8::spr_save failed to write to file: ") + filename);
-            if (!h_provided) {
-                fclose(h);
-            }
-            return false;
         }
     }
     if (fwrite("SPRITE", 7, 1, h) != 1 || fwrite(&transparency_data_length, 2, 1, h) != 1 ||
         fwrite(transparency_data, transparency_data_length, 1, h) != 1) {
         internal_error(std::string("pic8::spr_save failed to write to file: ") + filename);
-        if (!h_provided) {
-            fclose(h);
-        }
-        return false;
     }
     if (!h_provided) {
         fclose(h);
@@ -484,7 +419,6 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     FILE* h = fopen(filename, "wb");
     if (!h) {
         internal_error(std::string("pcx_save failed to open file: ") + filename);
-        return false;
     }
     // Header
     pcxdescriptor desc{};
@@ -504,8 +438,6 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     desc.PaletteInf = 1;
     if (fwrite(&desc, sizeof(desc), 1, h) != 1) {
         internal_error(std::string("pcx_save failed to write header to file: ") + filename);
-        fclose(h);
-        return false;
     }
     // Pixel data
     for (int y = 0; y < height; y++) {
@@ -519,14 +451,10 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
                 unsigned char controll = (unsigned char)(i + 192);
                 if (fwrite(&controll, 1, 1, h) != 1) {
                     internal_error(std::string("pcx_save failed to write to file: ") + filename);
-                    fclose(h);
-                    return false;
                 }
                 unsigned char index = gpixel(x, y);
                 if (fwrite(&index, 1, 1, h) != 1) {
                     internal_error(std::string("pcx_save failed to write to file: ") + filename);
-                    fclose(h);
-                    return false;
                 }
                 x += i;
             } else {
@@ -535,23 +463,17 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
                     if (fwrite(&index, 1, 1, h) != 1) {
                         internal_error(std::string("pcx_save failed to write to file: ") +
                                        filename);
-                        fclose(h);
-                        return false;
                     }
                 } else {
                     unsigned char controll = 193;
                     if (fwrite(&controll, 1, 1, h) != 1) {
                         internal_error(std::string("pcx_save failed to write to file: ") +
                                        filename);
-                        fclose(h);
-                        return false;
                     }
                     index = gpixel(x, y);
                     if (fwrite(&index, 1, 1, h) != 1) {
                         internal_error(std::string("pcx_save failed to write to file: ") +
                                        filename);
-                        fclose(h);
-                        return false;
                     }
                 }
                 x++;
@@ -562,15 +484,11 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
     unsigned char palette_header = 0x0c;
     if (fwrite(&palette_header, 1, 1, h) != 1) {
         internal_error(std::string("pcx_save failed to write to file: ") + filename);
-        fclose(h);
-        return false;
     }
     if (pal) {
         for (int i = 0; i < 768; i++) {
             if (fwrite(&pal[i], 1, 1, h) != 1) {
                 internal_error(std::string("pcx_save failed to write to file: ") + filename);
-                fclose(h);
-                return false;
             }
         }
     } else {
@@ -580,8 +498,6 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
             for (int j = 0; j < 3; j++) {
                 if (fwrite(&c, 1, 1, h) != 1) {
                     internal_error(std::string("pcx_save failed to write to file: ") + filename);
-                    fclose(h);
-                    return false;
                 }
             }
         }
@@ -675,12 +591,10 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
 #ifdef DEBUG
     if (!dest || !source) {
         internal_error("blit8 missing dest or source!");
-        return;
     }
 #endif
     if (dest->transparency_data) {
         internal_error("blit8 destination has transparency_data!");
-        return;
     }
     if (x2 < x1) {
         int tmp = x1;
@@ -773,7 +687,6 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
                     break;
                 default:
                     internal_error("Sprite blit8 unknown data block!");
-                    return;
                 }
             }
             desty++;
@@ -794,7 +707,6 @@ void blit8(pic8* dest, pic8* source, int x, int y) {
 #ifdef DEBUG
     if (!dest || !source) {
         internal_error("blit8 missing dest or source!");
-        return;
     }
 #endif
     int x1 = 0;
@@ -888,7 +800,6 @@ void blit8_recolor(pic8* dest, pic8* source, int x, int y, unsigned char color) 
                 break;
             default:
                 internal_error("blit8_recolor unknown transparency data block!");
-                return;
             }
         }
     }
@@ -898,30 +809,21 @@ bool get_pcx_pal(const char* filename, unsigned char* pal) {
     FILE* h = qopen(filename, "rb");
     if (!h) {
         internal_error(std::string("get_pcx_pal failed to open file: ") + filename);
-        return false;
     }
     int l = -769;
     if (qseek(h, l, SEEK_END) != 0) {
         internal_error(std::string("get_pcx_pal failed to seek to palette data: ") + filename);
-        qclose(h);
-        return false;
     }
     char palette_header;
     l = fread(&palette_header, 1, 1, h);
     if (l != 1) {
         internal_error(std::string("get_pcx_pal failed to read file: ") + filename);
-        qclose(h);
-        return false;
     }
     if (palette_header != 0x0c) {
         internal_error(std::string("get_pcx_pal invalid palette data header:") + filename);
-        qclose(h);
-        return false;
     }
     if (fread(pal, 768, 1, h) != 1) {
         internal_error(std::string("get_pcx_pal failed to read file: ") + filename);
-        qclose(h);
-        return false;
     }
     qclose(h);
     return true;
@@ -1031,7 +933,6 @@ void pic8::add_transparency(int transparency) {
     buffer = new unsigned char[SPRITE_MAX_BUFFER];
     if (!buffer) {
         external_error("add_transparency memory!");
-        return;
     }
 
     // Transparency data format:
@@ -1056,8 +957,6 @@ void pic8::add_transparency(int transparency) {
             }
             if (buffer_length >= SPRITE_MAX_BUFFER) {
                 internal_error("add_transparency buffer too small!");
-                delete[] buffer;
-                return;
             }
         }
     }
@@ -1066,8 +965,6 @@ void pic8::add_transparency(int transparency) {
     transparency_data = new unsigned char[buffer_length];
     if (!transparency_data) {
         external_error("add_transparency memory!");
-        delete[] buffer;
-        return;
     }
     memcpy(transparency_data, buffer, buffer_length);
     transparency_data_length = buffer_length;

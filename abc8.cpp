@@ -21,7 +21,6 @@ abc8::abc8(const char* filename) {
     ppsprite = new ptrpic8[256];
     if (!ppsprite) {
         external_error("memory");
-        return;
     }
     for (int i = 0; i < 256; i++) {
         ppsprite[i] = nullptr;
@@ -29,7 +28,6 @@ abc8::abc8(const char* filename) {
     y_offset = new short[256];
     if (!y_offset) {
         external_error("memory");
-        return;
     }
     for (int i = 0; i < 256; i++) {
         y_offset[i] = 0;
@@ -47,24 +45,17 @@ abc8::abc8(const char* filename) {
     }
     if (!h) {
         internal_error(std::string("Could not open abc8 file:: ") + filename);
-        return;
     }
     char tmp[20];
     if (fread(tmp, 4, 1, h) != 1) {
         internal_error(std::string("Could not read abc8 file: ") + filename);
-        close_file(h, res_file);
-        return;
     }
     if (strcmp(tmp, "RA1") != 0) {
         internal_error(std::string("Invalid abc8 file header: ") + filename);
-        close_file(h, res_file);
-        return;
     }
     short sprite_count = 0;
     if (fread(&sprite_count, 2, 1, h) != 1) {
         internal_error(std::string("Could not read abc8 file: ") + filename);
-        close_file(h, res_file);
-        return;
     }
     if (sprite_count <= 0 || sprite_count > 256) {
         internal_error(std::string("Invalid codepoint count for abc8 file: ") + filename);
@@ -72,28 +63,19 @@ abc8::abc8(const char* filename) {
     for (int i = 0; i < sprite_count; i++) {
         if (fread(tmp, 7, 1, h) != 1) {
             internal_error(std::string("Could not read abc8 file: ") + filename);
-            close_file(h, res_file);
-            return;
         }
         if (strcmp(tmp, "EGYMIX") != 0) {
             internal_error(std::string("Invalid sprite header in abc8 file: ") + filename);
-            close_file(h, res_file);
-            return;
         }
         unsigned char c = -1;
         if (fread(&c, 1, 1, h) != 1) {
             internal_error(std::string("Could not read abc8 file: ") + filename);
-            close_file(h, res_file);
-            return;
         }
         if (fread(&y_offset[c], 2, 1, h) != 1) {
             internal_error(std::string("Could not read abc8 file: ") + filename);
-            close_file(h, res_file);
-            return;
         }
         if (ppsprite[c]) {
             internal_error(std::string("Duplicate codepoint in abc8 file: ") + filename);
-            return;
         }
         ppsprite[c] = new pic8(".spr", h);
     }

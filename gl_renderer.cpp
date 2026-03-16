@@ -55,7 +55,6 @@ static GLuint compile_shader(GLenum type, const char* source) {
         char infoLog[512];
         glGetShaderInfoLog(shader, 512, nullptr, infoLog);
         internal_error(std::string("Shader compilation failed:\n") + infoLog);
-        return 0;
     }
     return shader;
 }
@@ -78,7 +77,6 @@ static int init_shaders() {
         char infoLog[512];
         glGetProgramInfoLog(ShaderProgram, 512, nullptr, infoLog);
         internal_error(std::string("Shader linking failed:\n") + infoLog);
-        return -1;
     }
 
     glDeleteShader(vertexShader);
@@ -159,12 +157,10 @@ int gl_init(SDL_Window* sdl_window, int width, int height, int pitch) {
     GLContext = SDL_GL_CreateContext(sdl_window);
     if (!GLContext) {
         internal_error(std::string("Failed to create OpenGL context:\n") + SDL_GetError());
-        return -1;
     }
 
     if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
         internal_error("Failed to initialize GLAD");
-        return -1;
     }
 
     // Disable unnecessary GL features
@@ -182,7 +178,6 @@ int gl_init(SDL_Window* sdl_window, int width, int height, int pitch) {
 
     if (init_shaders() != 0) {
         internal_error("Failed to initialize shaders");
-        return -1;
     }
 
     setup_textures(width, height);

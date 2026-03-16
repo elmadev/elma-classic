@@ -209,7 +209,6 @@ static int get_transparency_palette_id(piclist::Transparency type, pic8* pic) {
         return pic->gpixel(pic->get_width() - 1, pic->get_height() - 1);
     }
     internal_error("get_transparency_palette_id unknown type");
-    return -1;
 }
 
 static int consecutive_transparent_pixels(int x, int pic_width, unsigned char* pic_row,

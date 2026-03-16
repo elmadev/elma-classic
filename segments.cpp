@@ -25,7 +25,6 @@ segments::segments(level* lev) {
     seg_list = new segment[MAX_SEGMENTS];
     if (!seg_list) {
         external_error("segments::segments out of memory!");
-        return;
     }
     memset(seg_list, 0, sizeof(segment) * MAX_SEGMENTS);
     seg_list_allocated_length = MAX_SEGMENTS;

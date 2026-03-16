@@ -90,7 +90,6 @@ static void draw_digit_segment(DigitSegment segment, int x, int y) {
         break;
     default:
         internal_error("draw_digit_segment segment out of range!");
-        break;
     }
 }
 

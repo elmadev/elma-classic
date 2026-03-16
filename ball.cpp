@@ -115,7 +115,6 @@ void balls_simulate(double dt) {
     }
     if (!BallsInitialized) {
         internal_error("balls_simulate - balls not initialized!");
-        return;
     }
 
     // If no collision occurs during dt, then just update position

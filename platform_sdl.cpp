@@ -50,7 +50,6 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
         SDL_CreateWindow("Elasto Mania", window_pos_x, window_pos_y, width, height, window_flags);
     if (!SDLWindow) {
         internal_error(SDL_GetError());
-        return;
     }
 }
 
@@ -58,7 +57,6 @@ static void initialize_renderer() {
     if (EolSettings->renderer() == RendererType::OpenGL) {
         if (gl_init(SDLWindow, SCREEN_WIDTH, SCREEN_HEIGHT, SDLSurfacePaletted->pitch) != 0) {
             internal_error("Failed to initialize OpenGL renderer");
-            return;
         }
 
         SDLSurfaceMain = nullptr; // Not used in GL mode
@@ -66,7 +64,6 @@ static void initialize_renderer() {
         SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
         if (!SDLSurfaceMain) {
             internal_error(SDL_GetError());
-            return;
         }
     }
 }
@@ -76,7 +73,6 @@ static void create_palette_surface() {
         SDL_CreateRGBSurfaceWithFormat(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, SDL_PIXELFORMAT_INDEX8);
     if (!SDLSurfacePaletted) {
         internal_error(SDL_GetError());
-        return;
     }
 }
 
@@ -139,7 +135,6 @@ void platform_apply_fullscreen_mode() {
 void platform_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         internal_error(SDL_GetError());
-        return;
     }
 
     SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
@@ -213,14 +208,12 @@ void platform_resize_window(int width, int height) {
     if (EolSettings->renderer() == RendererType::OpenGL) {
         if (gl_resize(width, height, SDLSurfacePaletted->pitch) != 0) {
             internal_error("Failed to resize OpenGL renderer");
-            return;
         }
         SDLSurfaceMain = nullptr; // Not used in GL mode
     } else {
         SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
         if (!SDLSurfaceMain) {
             internal_error(SDL_GetError());
-            return;
         }
     }
 
@@ -453,7 +446,6 @@ bool was_right_mouse_just_clicked() { return RightMouseDown && !RightMouseDownPr
 bool is_key_down(DikScancode code) {
     if (code < 0 || code >= MaxKeycode) {
         internal_error("code out of range in is_key_down()!");
-        return false;
     }
 
     SDL_Scancode sdl_code = windows_scancode_table[code];

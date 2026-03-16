@@ -440,7 +440,6 @@ player* state::get_player(const char* player_name) {
         }
     }
     internal_error("get_player cannot find name!");
-    return nullptr;
 }
 
 void test_player() {

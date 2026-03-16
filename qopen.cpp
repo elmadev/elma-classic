@@ -135,7 +135,6 @@ FILE* qopen(const char* filename, const char* mode) {
             }
         }
         internal_error(std::string("qopen() failed to find file: ") + filename);
-        return nullptr;
     } else {
         NumHandles++;
         char tmp[30] = "files/";
@@ -193,7 +192,6 @@ int qseek(FILE* h, int offset, int whence) {
             }
         }
         internal_error("qseek() can't find handle!");
-        return 0;
     } else {
         return fseek(h, offset, whence);
     }

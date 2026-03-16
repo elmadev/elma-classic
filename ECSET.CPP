@@ -634,7 +634,6 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, canvas_pixels
     }
 
     internal_error("canvas::draw_one_chunk unknown case!");
-    return nullptr;
 }
 
 void canvas::draw_pixels(canvas_pixels source, int source_dist, int x_left, int x_right, int y,

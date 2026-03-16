@@ -352,7 +352,6 @@ void menu_nav::update_search() {
     case SearchPattern::Filter:
     case SearchPattern::None:
         internal_error("update_search() SearchPattern::None reached!");
-        break;
     }
 }
 

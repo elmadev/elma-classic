@@ -45,6 +45,10 @@ static std::optional<bool> parse_bool(std::string_view text) {
     return {};
 }
 
+#define REGISTER_SETTINGS_STR(field)                                                               \
+    register_command(#field,                                                                       \
+                     [](std::string_view text) { EolSettings->set_##field(std::string(text)); });
+
 #define REGISTER_SETTINGS_BOOL(field)                                                              \
     register_command(#field, [this](std::string_view text) {                                       \
         if (text.empty()) {                                                                        \
@@ -62,6 +66,7 @@ void console::register_console_commands() {
     register_command("clear", [this](std::string_view) { clear(); });
     register_command("dev", [this](std::string_view) { mode = Mode::Console; });
     register_command("chat", [this](std::string_view) { mode = Mode::Chat; });
+    REGISTER_SETTINGS_STR(default_lgr_name);
     REGISTER_SETTINGS_BOOL(show_last_apple_time);
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
 }

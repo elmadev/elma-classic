@@ -5,15 +5,65 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include <directinput/scancodes.h>
+#include <format>
+#include <optional>
 #include <string>
 #include <ranges>
 
 console* Console = nullptr;
 
+static std::optional<bool> parse_bool(std::string_view text) {
+    if (text.empty()) {
+        return {};
+    }
+
+    if (strcmpi(text.data(), "yes") == 0 || strcmpi(text.data(), "true") == 0) {
+        return true;
+    }
+
+    if (strcmpi(text.data(), "no") == 0 || strcmpi(text.data(), "false") == 0) {
+        return false;
+    }
+
+    if (text.size() != 1) {
+        return {};
+    }
+
+    switch (text[0]) {
+    case 'y':
+    case 'Y':
+    case '1':
+        return true;
+    case 'n':
+    case 'N':
+    case '0':
+        return false;
+    default:
+        break;
+    }
+
+    return {};
+}
+
+#define REGISTER_SETTINGS_BOOL(field)                                                              \
+    register_command(#field, [this](std::string_view text) {                                       \
+        if (text.empty()) {                                                                        \
+            EolSettings->set_##field(!EolSettings->field());                                       \
+        } else {                                                                                   \
+            if (auto val = parse_bool(text)) {                                                     \
+                EolSettings->set_##field(*val);                                                    \
+            } else {                                                                               \
+                add_line(std::format("invalid value: {}", text), LineType::System);                \
+            }                                                                                      \
+        }                                                                                          \
+    });
+
 void console::register_console_commands() {
     register_command("clear", [this](std::string_view) { clear(); });
     register_command("dev", [this](std::string_view) { mode = Mode::Console; });
     register_command("chat", [this](std::string_view) { mode = Mode::Chat; });
+    REGISTER_SETTINGS_BOOL(show_last_apple_time);
+    REGISTER_SETTINGS_BOOL(show_gravity_arrows);
 }
 
 void console::add_line(std::string text, LineType type) {

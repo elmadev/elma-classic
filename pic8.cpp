@@ -1044,7 +1044,7 @@ void pic8::add_transparency(int transparency) {
             }
             if (buffer_length >= SPRITE_MAX_BUFFER) {
                 internal_error("add_transparency buffer too small!");
-                delete buffer;
+                delete[] buffer;
                 return;
             }
         }
@@ -1054,12 +1054,12 @@ void pic8::add_transparency(int transparency) {
     transparency_data = new unsigned char[buffer_length];
     if (!transparency_data) {
         external_error("add_transparency memory!");
-        delete buffer;
+        delete[] buffer;
         return;
     }
     memcpy(transparency_data, buffer, buffer_length);
     transparency_data_length = buffer_length;
-    delete buffer;
+    delete[] buffer;
 }
 
 void pic8::add_transparency() { add_transparency(gpixel(0, 0)); }

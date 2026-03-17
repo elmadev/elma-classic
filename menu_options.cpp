@@ -149,6 +149,24 @@ static void menu_fullscreen() {
         text, EolSettings->setting() ? "Yes" : "No",                                               \
         NAV_FUNC() { EolSettings->set_##setting(!EolSettings->setting()); });
 
+static void menu_cripples() {
+    int choice = 0;
+    while (true) {
+        menu_nav nav("Cripples");
+        nav.select_row(choice);
+        nav.x_left = 0;
+        nav.x_right = 390;
+
+        BOOL_OPTION("No Brake:", cripple_no_brake);
+
+        choice = nav.navigate();
+
+        if (choice < 0) {
+            return;
+        }
+    }
+}
+
 void menu_options() {
     int choice = 0;
     while (true) {
@@ -200,6 +218,8 @@ void menu_options() {
             NAV_FUNC() { State->player1_bike1 = !State->player1_bike1; });
 
         nav.add_row("Customize Controls ...", NAV_FUNC() { menu_customize_controls(); });
+
+        nav.add_row("Cripples ...", NAV_FUNC() { menu_cripples(); });
 
         nav.add_row(
             "Pics In Background:", EolSettings->pictures_in_background() ? "Yes" : "No",

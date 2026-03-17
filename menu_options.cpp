@@ -160,6 +160,7 @@ static void menu_cripples() {
         BOOL_OPTION("No Brake:", cripple_no_brake);
         BOOL_OPTION("No Throttle:", cripple_no_throttle);
         BOOL_OPTION("Always Throttle:", cripple_always_throttle);
+        BOOL_OPTION("No Turn:", cripple_no_turn);
 
         choice = nav.navigate();
 

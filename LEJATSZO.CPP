@@ -342,11 +342,15 @@ static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // Hatra fordulas elintezes:
     if (!meghalt) {
-        if (!pvalt->hatranyomva && is_game_key_down(popciok->turn)) {
+        bool is_turn_down = is_game_key_down(popciok->turn);
+        if (EolSettings->cripple_no_turn()) {
+            is_turn_down = false;
+        }
+        if (!pvalt->hatranyomva && is_turn_down) {
             pmot->flipped_bike = !pmot->flipped_bike;
             set_head_position(pmot);
         }
-        pvalt->hatranyomva = is_game_key_down(popciok->turn);
+        pvalt->hatranyomva = is_turn_down;
     }
     baljobbelintez(&pvalt->baljobbv_f, prec, eddig, pmot->flipped_bike);
 

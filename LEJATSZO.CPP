@@ -193,6 +193,10 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     if (EolSettings->cripple_no_throttle()) {
         is_gas_down = false;
     }
+    if (EolSettings->cripple_always_throttle()) {
+        is_gas_down = true;
+        is_brake_down = false;
+    }
     simulate_bike_physics(pmot, eddig, dt, is_gas_down, is_brake_down, ugrik1, ugrik2);
 
     BikeState eredmeny = check_object_collision(pmot);

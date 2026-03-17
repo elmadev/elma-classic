@@ -183,14 +183,17 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // LEPTET!!!!!!!:
     // 0-meghalt, 1-megnyerte, 2-semmi kulonos
+    bool is_gas_down = is_game_key_down(popciok->gas);
     bool is_brake_down = is_game_key_down(popciok->brake) ||
                          is_game_key_down(popciok->brake_alias) ||
                          was_game_key_just_pressed(popciok->one_frame_brake);
     if (EolSettings->cripple_no_brake()) {
         is_brake_down = false;
     }
-    simulate_bike_physics(pmot, eddig, dt, is_game_key_down(popciok->gas), is_brake_down, ugrik1,
-                          ugrik2);
+    if (EolSettings->cripple_no_throttle()) {
+        is_gas_down = false;
+    }
+    simulate_bike_physics(pmot, eddig, dt, is_gas_down, is_brake_down, ugrik1, ugrik2);
 
     BikeState eredmeny = check_object_collision(pmot);
     if (eredmeny == BikeState::Dead) {
@@ -243,7 +246,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     }
     pvalt->inf.motor_frequency = 2.0 - exp(-pvalt->inf.motor_frequency);
 
-    pvalt->inf.gas = (char)is_game_key_down(popciok->gas);
+    pvalt->inf.gas = (char)is_gas_down;
     prec->store_frames(pmot, eddig, &pvalt->inf);
 
     // Egyedi hangok:

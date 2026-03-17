@@ -52,6 +52,7 @@ struct valtozok {
     int showkep;
 
     int hatranyomva;
+    bool one_turn_used;
 
     double ugrasnagysag;
 

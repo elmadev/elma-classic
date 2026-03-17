@@ -162,6 +162,8 @@ class eol_settings {
     Default<bool> cripple_no_volt_{false};
     Default<bool> cripple_one_turn_{false};
     Default<bool> cripple_drunk_{false};
+    Default<bool> cripple_one_wheel_{false};
+    Default<bool> show_one_wheel_status_{false};
     Default<std::string> hostname_{"eol.elma.online"};
     Default<int> tcp_port_{DEFAULT_TCP_PORT};
     Default<std::string> nick_{""};
@@ -263,6 +265,8 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(cripple_no_volt);
     DECLARE_FIELD_FUNCS(cripple_one_turn);
     DECLARE_FIELD_FUNCS(cripple_drunk);
+    DECLARE_FIELD_FUNCS(cripple_one_wheel);
+    DECLARE_FIELD_FUNCS(show_one_wheel_status);
     DECLARE_FIELD_FUNCS(hostname);
     DECLARE_FIELD_FUNCS(tcp_port);
     DECLARE_FIELD_FUNCS(nick);

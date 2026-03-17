@@ -166,7 +166,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
                       long* pmegvanido, int* pmeghalt, double eddig, double dt) {
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
-    if (eddig > pvalt->utolsougras + VoltDelay) {
+    if (eddig > pvalt->utolsougras + VoltDelay && !EolSettings->cripple_no_volt()) {
         if (is_game_key_down(popciok->right_volt) || is_game_key_down(popciok->alovolt)) {
             ugrik1 = 1;
             pvalt->utolsougras = eddig;

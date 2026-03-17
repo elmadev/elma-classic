@@ -229,6 +229,10 @@ void eol_settings::set_cripple_one_turn(bool b) {
     }
 }
 
+void eol_settings::set_cripple_one_wheel(bool b) { cripple_one_wheel_ = b; }
+
+void eol_settings::set_show_one_wheel_status(bool b) { show_one_wheel_status_ = b; }
+
 void eol_settings::set_hostname(std::string hostname) { hostname_ = std::move(hostname); }
 
 void eol_settings::set_tcp_port(int p) { tcp_port_ = p; }
@@ -382,6 +386,8 @@ void from_json(const json& j, FullscreenMode& f) {
     JSON_FIELD(cripple_no_volt)                                                                    \
     JSON_FIELD(cripple_one_turn)                                                                   \
     JSON_FIELD(cripple_drunk)                                                                      \
+    JSON_FIELD(cripple_one_wheel)                                                                  \
+    JSON_FIELD(show_one_wheel_status)                                                              \
     JSON_FIELD(hostname)                                                                           \
     JSON_FIELD(tcp_port)                                                                           \
     JSON_FIELD(nick)                                                                               \

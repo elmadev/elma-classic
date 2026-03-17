@@ -161,6 +161,8 @@ static void menu_cripples() {
         BOOL_OPTION("One Turn:", cripple_one_turn);
         BOOL_OPTION("No Volt:", cripple_no_volt);
         BOOL_OPTION("Drunk:", cripple_drunk);
+        BOOL_OPTION("One Wheel:", cripple_one_wheel);
+        BOOL_OPTION("Show One Wheel Status:", show_one_wheel_status);
 
         choice = nav.navigate();
 

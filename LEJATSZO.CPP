@@ -286,6 +286,11 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
         }
         prec->store_event(eddig, wavazonosito, hangero, objszam);
     }
+
+    if (EolSettings->cripple_one_wheel() && pmot->one_wheel_failed) {
+        *pmeghalt = 1;
+        return;
+    }
 }
 
 static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int* ptimekin,

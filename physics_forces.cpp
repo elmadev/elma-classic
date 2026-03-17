@@ -8,9 +8,12 @@
 #include "physics_init.h"
 #include "physics_move.h"
 #include "recorder.h"
+#include "timer.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cmath>
+
+constexpr double ONE_WHEEL_GRACE = 10.0 / TimeToCentiseconds;
 
 static double MaxFrictionVolume = 0.0;
 
@@ -317,6 +320,10 @@ void simulate_bike_physics(motorst* mot, double time, double dt, bool gas, bool 
             mot->bike.angular_velocity - prevolt_angular_velocity;
         vect2 body_spring_perp = rotate_90deg(mot->body_r - mot->bike.r);
         mot->body_v = mot->body_v + body_spring_perp * bike_relative_angular_velocity;
+    }
+
+    if (mot->left_wheel.touching_edge && mot->right_wheel.touching_edge && time > ONE_WHEEL_GRACE) {
+        mot->one_wheel_failed = true;
     }
 
     // Update the body position and bike/wheel positions based on gravity

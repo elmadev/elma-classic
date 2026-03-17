@@ -46,6 +46,7 @@ void init_motor(motorst* motor) {
     motor->flipped_camera = 0;
     motor->gravity_direction = MotorGravity::Down;
     motor->prev_brake = false;
+    motor->one_wheel_failed = false;
 
     motor->bike.rotation = 0.0;
     motor->bike.angular_velocity = 0.0;
@@ -64,6 +65,7 @@ void init_motor(motorst* motor) {
     motor->left_wheel.inertia = 0.32;
     motor->left_wheel.r = vect2(1.9, 3.0);
     motor->left_wheel.v = vect2(0, 0);
+    motor->left_wheel.touching_edge = false;
 
     motor->right_wheel.rotation = 0.0;
     motor->right_wheel.angular_velocity = 0.0;
@@ -72,6 +74,7 @@ void init_motor(motorst* motor) {
     motor->right_wheel.inertia = 0.32;
     motor->right_wheel.r = vect2(3.6, 3.0);
     motor->right_wheel.v = vect2(0, 0);
+    motor->right_wheel.touching_edge = false;
 
     motor->body_r = vect2(2.75, 4.04);
     motor->body_v = vect2(0.0, 0.0);

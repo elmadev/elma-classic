@@ -186,6 +186,9 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     bool is_brake_down = is_game_key_down(popciok->brake) ||
                          is_game_key_down(popciok->brake_alias) ||
                          was_game_key_just_pressed(popciok->one_frame_brake);
+    if (EolSettings->cripple_no_brake()) {
+        is_brake_down = false;
+    }
     simulate_bike_physics(pmot, eddig, dt, is_game_key_down(popciok->gas), is_brake_down, ugrik1,
                           ugrik2);
 

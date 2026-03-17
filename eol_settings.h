@@ -97,6 +97,7 @@ class eol_settings {
     Clamp<int> minimap_opacity_{25, 100, 100};
     Clamp<int> chat_lines_{1, 10, 50};
     Default<bool> cripple_no_brake_{false};
+    Default<bool> cripple_no_throttle_{false};
 
   public:
     static void read_settings();
@@ -147,6 +148,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(minimap_opacity);
     DECLARE_FIELD_FUNCS(chat_lines);
     DECLARE_FIELD_FUNCS(cripple_no_brake);
+    DECLARE_FIELD_FUNCS(cripple_no_throttle);
 };
 
 #undef DECLARE_FIELD_FUNCS

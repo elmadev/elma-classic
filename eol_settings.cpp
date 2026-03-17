@@ -200,6 +200,8 @@ void eol_settings::set_cripple_always_throttle(bool b) {
 
 void eol_settings::set_cripple_no_turn(bool b) { cripple_no_turn_ = b; }
 
+void eol_settings::set_cripple_no_volt(bool b) { cripple_no_volt_ = b; }
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -337,7 +339,8 @@ void from_json(const json& j, FullscreenMode& f) {
     JSON_FIELD(cripple_no_brake)                                                                   \
     JSON_FIELD(cripple_no_throttle)                                                                \
     JSON_FIELD(cripple_always_throttle)                                                            \
-    JSON_FIELD(cripple_no_turn)
+    JSON_FIELD(cripple_no_turn)                                                                    \
+    JSON_FIELD(cripple_no_volt)
 
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

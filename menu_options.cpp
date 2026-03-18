@@ -387,6 +387,15 @@ void menu_options() {
         BOOL_OPTION("Help menu:", show_help_menu);
         BOOL_OPTION("Best Times menu:", show_best_times_menu);
 
+        nav.add_row(
+            "Num Chat Lines:", std::format("{}", EolSettings->chat_lines()), NAV_FUNC() {
+                int old_chat_lines = EolSettings->chat_lines();
+                EolSettings->set_chat_lines(old_chat_lines + 1);
+                if (old_chat_lines == EolSettings->chat_lines()) {
+                    EolSettings->set_chat_lines(1);
+                }
+            });
+
         choice = nav.navigate();
 
         if (choice < 0) {

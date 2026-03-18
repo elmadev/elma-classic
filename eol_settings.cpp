@@ -180,6 +180,8 @@ void eol_settings::set_minimap_height(int h) { minimap_height_ = h; }
 
 void eol_settings::set_minimap_opacity(int opacity) { minimap_opacity_ = opacity; }
 
+void eol_settings::set_chat_lines(int lines) { chat_lines_ = lines; }
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -312,7 +314,8 @@ void from_json(const json& j, FullscreenMode& f) {
     JSON_FIELD(show_total_time)                                                                    \
     JSON_FIELD(minimap_width)                                                                      \
     JSON_FIELD(minimap_height)                                                                     \
-    JSON_FIELD(minimap_opacity)
+    JSON_FIELD(minimap_opacity)                                                                    \
+    JSON_FIELD(chat_lines)
 
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

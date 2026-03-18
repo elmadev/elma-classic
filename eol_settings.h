@@ -95,6 +95,7 @@ class eol_settings {
     Clamp<int> minimap_width_{140, 140, 420};
     Clamp<int> minimap_height_{70, 70, 210};
     Clamp<int> minimap_opacity_{25, 100, 100};
+    Clamp<int> chat_lines_{1, 10, 50};
 
   public:
     static void read_settings();
@@ -143,6 +144,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(minimap_width);
     DECLARE_FIELD_FUNCS(minimap_height);
     DECLARE_FIELD_FUNCS(minimap_opacity);
+    DECLARE_FIELD_FUNCS(chat_lines);
 };
 
 #undef DECLARE_FIELD_FUNCS

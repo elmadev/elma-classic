@@ -1,6 +1,8 @@
 #include "LEJATSZO.H"
 #include "EDITUJ.H"
+#include "eol/console.h"
 #include "eol_settings.h"
+#include "keys.h"
 #include "flagtag.h"
 #include "fs_utils.h"
 #include "sound_engine.h"
@@ -33,9 +35,29 @@ std::string VideoOutputDirectory;
 
 static int Kajakell;
 
-static bool is_game_key_down(DikScancode code) { return is_key_down(code); }
+static bool handle_console_input() {
+    bool was_active = Console->is_input_active();
+    if (was_key_just_pressed(DIK_F9)) {
+        Console->toggle_active();
+    } else if (Console->is_input_active()) {
+        Console->handle_input();
+    }
+    return was_active;
+}
 
-static bool was_game_key_just_pressed(DikScancode code) { return was_key_just_pressed(code); }
+static bool is_game_key_down(DikScancode code) {
+    if (Console->is_input_active()) {
+        return false;
+    }
+    return is_key_down(code);
+}
+
+static bool was_game_key_just_pressed(DikScancode code) {
+    if (Console->is_input_active()) {
+        return false;
+    }
+    return was_key_just_pressed(code);
+}
 
 static void update_freecam(double dt, camera& current_camera) {
     double speed = 30.0;
@@ -464,6 +486,9 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         */
 
         handle_events(); // Billentyut itt olvassuk be
+
+        bool console_was_active = handle_console_input();
+
         while (eddig <= cel - 0.000001) {
             // char tmp[10];
             // sprintf( tmp, "Gaz kodja: %d", (int)State->keys1.gas );
@@ -544,6 +569,8 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
                 }
                 delay((int)(LevelEndDelay * 1000.0));
 
+                Console->deactivate_input();
+
                 stop_motor_sound(true);
                 stop_motor_sound(false);
 
@@ -603,7 +630,8 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         }
 
         // Vizsgalat kilepesre:
-        if (is_key_down(DIK_ESCAPE) || is_key_down(State->key_escape_alias)) {
+        if (!console_was_active &&
+            (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {
             MeghalteloszorAB = 0;
             double eltelido = stopwatch();
             // Motor hangjat kikapcsolja:
@@ -844,6 +872,8 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     while (1) {
         handle_events(); // Billentyut itt olvassuk be
 
+        bool console_was_active = handle_console_input();
+
         double now = stopwatch();
         double dt = (now - last_stopwatch) * 0.0024;
         last_stopwatch = now;
@@ -966,7 +996,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         }
 
         // Vizsgalat kilepesre:
-        if (is_key_down(DIK_ESCAPE)) {
+        if (!console_was_active && was_key_just_pressed(DIK_ESCAPE)) {
             double eltelido = stopwatch();
             // Kiirja framerate-et:
             double tpl = double(l) / eltelido;

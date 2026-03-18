@@ -33,22 +33,26 @@ std::string VideoOutputDirectory;
 
 static int Kajakell;
 
+static bool is_game_key_down(DikScancode code) { return is_key_down(code); }
+
+static bool was_game_key_just_pressed(DikScancode code) { return was_key_just_pressed(code); }
+
 static void update_freecam(double dt, camera& current_camera) {
     double speed = 30.0;
-    if (is_key_down(DIK_LSHIFT) || is_key_down(DIK_RSHIFT)) {
+    if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
         speed *= 4.0;
     }
     double move = speed * dt;
-    if (is_key_down(DIK_UP)) {
+    if (is_game_key_down(DIK_UP)) {
         current_camera.y += move;
     }
-    if (is_key_down(DIK_DOWN)) {
+    if (is_game_key_down(DIK_DOWN)) {
         current_camera.y -= move;
     }
-    if (is_key_down(DIK_LEFT)) {
+    if (is_game_key_down(DIK_LEFT)) {
         current_camera.x -= move;
     }
-    if (is_key_down(DIK_RIGHT)) {
+    if (is_game_key_down(DIK_RIGHT)) {
         current_camera.x += move;
     }
 
@@ -141,13 +145,13 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
     if (eddig > pvalt->utolsougras + VoltDelay) {
-        if (is_key_down(popciok->right_volt) || is_key_down(popciok->alovolt)) {
+        if (is_game_key_down(popciok->right_volt) || is_game_key_down(popciok->alovolt)) {
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
             add_event_buffer(WavEvent::RightVolt, 0.99, -1);
         }
-        if (is_key_down(popciok->left_volt) || is_key_down(popciok->alovolt)) {
+        if (is_game_key_down(popciok->left_volt) || is_game_key_down(popciok->alovolt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;
@@ -157,9 +161,10 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // LEPTET!!!!!!!:
     // 0-meghalt, 1-megnyerte, 2-semmi kulonos
-    bool is_brake_down = is_key_down(popciok->brake) || is_key_down(popciok->brake_alias) ||
-                         was_key_just_pressed(popciok->one_frame_brake);
-    simulate_bike_physics(pmot, eddig, dt, is_key_down(popciok->gas), is_brake_down, ugrik1,
+    bool is_brake_down = is_game_key_down(popciok->brake) ||
+                         is_game_key_down(popciok->brake_alias) ||
+                         was_game_key_just_pressed(popciok->one_frame_brake);
+    simulate_bike_physics(pmot, eddig, dt, is_game_key_down(popciok->gas), is_brake_down, ugrik1,
                           ugrik2);
 
     BikeState eredmeny = check_object_collision(pmot);
@@ -213,7 +218,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     }
     pvalt->inf.motor_frequency = 2.0 - exp(-pvalt->inf.motor_frequency);
 
-    pvalt->inf.gas = (char)is_key_down(popciok->gas);
+    pvalt->inf.gas = (char)is_game_key_down(popciok->gas);
     prec->store_frames(pmot, eddig, &pvalt->inf);
 
     // Egyedi hangok:
@@ -245,7 +250,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int* ptimekin,
                        int* pmasikshow) {
     // Showkep:
-    if (was_key_just_pressed(popciok->toggle_visibility)) {
+    if (was_game_key_just_pressed(popciok->toggle_visibility)) {
         Kitoltestmegrak = Kitoltestmegrakkezd;
         if (!*pmasikshow) {
             // Ha masik jatekos ablaka nem latszott, mindegyik fog latszani:
@@ -256,12 +261,12 @@ static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int
         }
     }
     // View ablak:
-    if (was_key_just_pressed(popciok->toggle_minimap)) {
+    if (was_game_key_just_pressed(popciok->toggle_minimap)) {
         *pviewkin = !*pviewkin;
     }
 
     // Ido kint legyen vagy ne:
-    if (was_key_just_pressed(popciok->toggle_timer)) {
+    if (was_game_key_just_pressed(popciok->toggle_timer)) {
         *ptimekin = !*ptimekin;
     }
 }
@@ -305,11 +310,11 @@ static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // Hatra fordulas elintezes:
     if (!meghalt) {
-        if (!pvalt->hatranyomva && is_key_down(popciok->turn)) {
+        if (!pvalt->hatranyomva && is_game_key_down(popciok->turn)) {
             pmot->flipped_bike = !pmot->flipped_bike;
             set_head_position(pmot);
         }
-        pvalt->hatranyomva = is_key_down(popciok->turn);
+        pvalt->hatranyomva = is_game_key_down(popciok->turn);
     }
     baljobbelintez(&pvalt->baljobbv_f, prec, eddig, pmot->flipped_bike);
 
@@ -585,15 +590,15 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
 
         // Egy par kozos toggle:
         // Plusz elintezes:
-        if (was_key_just_pressed(State->key_increase_screen_size)) {
+        if (was_game_key_just_pressed(State->key_increase_screen_size)) {
             novelkepmeret();
         }
         // Minusz elintezes:
-        if (was_key_just_pressed(State->key_decrease_screen_size)) {
+        if (was_game_key_just_pressed(State->key_decrease_screen_size)) {
             csokkentkepmeret();
         }
         // Snap nyomas elintezese:
-        if (was_key_just_pressed(State->key_screenshot)) {
+        if (was_game_key_just_pressed(State->key_screenshot)) {
             Legkozment = 1;
         }
 
@@ -845,26 +850,26 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         double speed = 1.0;
 
-        if (is_key_down(State->key_replay_fast_2x)) {
+        if (is_game_key_down(State->key_replay_fast_2x)) {
             speed *= 2.0;
         }
-        if (is_key_down(State->key_replay_fast_4x)) {
+        if (is_game_key_down(State->key_replay_fast_4x)) {
             speed *= 4.0;
         }
-        if (is_key_down(State->key_replay_fast_8x)) {
+        if (is_game_key_down(State->key_replay_fast_8x)) {
             speed *= 8.0;
         }
 
-        if (is_key_down(State->key_replay_slow_2x)) {
+        if (is_game_key_down(State->key_replay_slow_2x)) {
             speed *= 0.5;
         }
-        if (is_key_down(State->key_replay_slow_4x)) {
+        if (is_game_key_down(State->key_replay_slow_4x)) {
             speed *= 0.25;
         }
 
-        bool rewinding = is_key_down(State->key_replay_rewind);
+        bool rewinding = is_game_key_down(State->key_replay_rewind);
 
-        bool paused = is_key_down(State->key_replay_pause);
+        bool paused = is_game_key_down(State->key_replay_pause);
 
         if (!paused) {
             if (rewinding) {
@@ -945,18 +950,18 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         // Egy par kozos toggle:
         // Plusz elintezes:
-        if (was_key_just_pressed(State->key_increase_screen_size)) {
+        if (was_game_key_just_pressed(State->key_increase_screen_size)) {
             novelkepmeret();
 
             // extern int Mostirdki;
             // Mostirdki = 1;
         }
         // Minusz elintezes:
-        if (was_key_just_pressed(State->key_decrease_screen_size)) {
+        if (was_game_key_just_pressed(State->key_decrease_screen_size)) {
             csokkentkepmeret();
         }
         // Snap nyomas elintezese:
-        if (was_key_just_pressed(State->key_screenshot)) {
+        if (was_game_key_just_pressed(State->key_screenshot)) {
             Legkozment = 1;
         }
 
@@ -1036,7 +1041,7 @@ void render_replay(const char* level_filename) {
 
     while (true) {
         handle_events();
-        if (is_key_down(DIK_ESCAPE)) {
+        if (is_game_key_down(DIK_ESCAPE)) {
             break;
         }
 

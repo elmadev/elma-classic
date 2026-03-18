@@ -6,6 +6,7 @@
 #include "best_times.h"
 #include "ECSET.H"
 #include "EDITUJ.H"
+#include "eol/console.h"
 #include "eol_settings.h"
 #include "flagtag.h"
 #include "LEJATSZO.H"
@@ -89,6 +90,8 @@ void init_renderer() {
     SmallFont = new abc8("small.abc");
     SmallFont->set_spacing(1);
     SmallFont->set_line_height(12);
+
+    Console = new console();
 }
 
 void beallitmereteket(int splitscreen) {
@@ -895,6 +898,8 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
                              current_camera);
         }
     }
+
+    Console->render(*npic, *SmallFont);
 
     // Mentes lemezre:
     menteshakell(npic);

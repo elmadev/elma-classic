@@ -69,7 +69,7 @@
 * Pictures extremely out of bounds to the far left or right will no longer prevent other pictures and textures from being rendered
 * Extremely vertical grass polygon lines could crash, especially at high zoom
 * Replay animations now rewind correctly and apples get restored
-* Out-of-bounds grass no longer causes a hard crash
+* Out-of-bounds grass and masks no longer cause a hard crash
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

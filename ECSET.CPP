@@ -714,8 +714,11 @@ void canvas::draw_texture(sprite* spr, int texture_index, int mask_index, Clippi
         int j = 0;
         while (msk->data[offset].type != MaskEncoding::EndOfLine) {
             if (msk->data[offset].type == MaskEncoding::Solid) {
-                draw_pixels(canvas_pixels::texture(texture_index), distance, x + j,
-                            x + j + msk->data[offset].length - 1, y - i, clipping);
+                // Check out of range textures (y position)
+                if (y - i >= 0 && y - i < pixel_height) {
+                    draw_pixels(canvas_pixels::texture(texture_index), distance, x + j,
+                                x + j + msk->data[offset].length - 1, y - i, clipping);
+                }
             }
             j += msk->data[offset].length;
             offset++;
@@ -790,6 +793,7 @@ void canvas::draw_sprites(Clipping clipping) {
                 j += skip;
 
                 int count = read_varint(pixeldata, offset);
+                // Check out of range pictures (y position)
                 if (y - i >= 0 && y - i < pixel_height) {
                     draw_pixels(canvas_pixels::pointer(&pixeldata[offset]), distance, x + j,
                                 x + j + count - 1, y - i, clipping);

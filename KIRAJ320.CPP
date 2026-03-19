@@ -88,6 +88,7 @@ void init_renderer() {
 
     SmallFont = new abc8("small.abc");
     SmallFont->set_spacing(1);
+    SmallFont->set_line_height(12);
 }
 
 void beallitmereteket(int splitscreen) {

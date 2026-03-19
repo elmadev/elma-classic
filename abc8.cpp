@@ -203,3 +203,12 @@ void abc8::write_right_align(pic8* dest, int x, int y, const char* text) {
     int width = len(text);
     write(dest, x - width, y, text);
 }
+
+#ifdef DEBUG
+int abc8::line_height() const {
+    if (line_height_ == 0) {
+        internal_error("line height not set!");
+    }
+    return line_height_;
+}
+#endif

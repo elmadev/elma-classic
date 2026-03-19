@@ -28,6 +28,8 @@ static bool RightMouseDownPrevFrame = false;
 
 static int MouseWheelDelta = 0;
 static bool CursorRequested = true;
+static long long LastMouseMotionTime = 0;
+static constexpr long long CURSOR_HIDE_DELAY_MS = 1000;
 
 void message_box(const char* text) {
     // As per docs, can be called even before SDL_Init
@@ -94,7 +96,6 @@ void platform_apply_fullscreen_mode() {
         SDL_SetWindowFullscreen(SDLWindow, 0);
         SDL_SetWindowSize(SDLWindow, SCREEN_WIDTH, SCREEN_HEIGHT);
         SDL_SetWindowPosition(SDLWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-        SDL_ShowCursor(CursorRequested ? SDL_ENABLE : SDL_DISABLE);
         break;
     case FullscreenMode::Fullscreen: {
         SDL_DisplayMode desired = {};
@@ -115,7 +116,6 @@ void platform_apply_fullscreen_mode() {
             update_resolution(closest.w, closest.h);
         }
         SDL_SetWindowFullscreen(SDLWindow, SDL_WINDOW_FULLSCREEN);
-        SDL_ShowCursor(SDL_DISABLE);
         break;
     }
     case FullscreenMode::FullscreenDesktop: {
@@ -127,7 +127,6 @@ void platform_apply_fullscreen_mode() {
             update_resolution(w, h);
         }
 
-        SDL_ShowCursor(SDL_DISABLE);
         break;
     }
     }
@@ -152,6 +151,7 @@ void platform_init() {
     apply_current_palette();
     keyboard::init();
     platform_apply_fullscreen_mode();
+    LastMouseMotionTime = get_milliseconds();
 }
 
 void platform_resize_window(int width, int height) {
@@ -409,7 +409,15 @@ void handle_events() {
                 RightMouseDown = false;
             }
             break;
+        case SDL_MOUSEMOTION:
+            LastMouseMotionTime = get_milliseconds();
+            break;
         }
+    }
+
+    if (CursorRequested) {
+        bool should_show = (get_milliseconds() - LastMouseMotionTime) < CURSOR_HIDE_DELAY_MS;
+        SDL_ShowCursor(should_show ? SDL_ENABLE : SDL_DISABLE);
     }
 
     keyboard::end_frame();
@@ -420,12 +428,7 @@ void hide_cursor() {
     SDL_ShowCursor(SDL_DISABLE);
 }
 
-void show_cursor() {
-    CursorRequested = true;
-    if (!is_fullscreen()) {
-        SDL_ShowCursor(SDL_ENABLE);
-    }
-}
+void show_cursor() { CursorRequested = true; }
 
 void get_mouse_position(int* x, int* y) { SDL_GetMouseState(x, y); }
 void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }

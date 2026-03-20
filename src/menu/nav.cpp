@@ -33,8 +33,9 @@ void menu_nav::add_row(std::string left, std::string right, nav_func handler) {
     entries.emplace_back(std::move(left), std::move(right), std::move(handler));
 }
 
-void menu_nav::add_overlay(std::string text, int x, int y, OverlayAlignment alignment) {
-    overlays.emplace_back(std::move(text), x, y, alignment);
+void menu_nav::add_overlay(std::string text, int x, int y, OverlayAlignment alignment,
+                           ScreenAnchor anchor) {
+    overlays.emplace_back(std::move(text), x, y, alignment, anchor);
 }
 
 void menu_nav::sort_rows() {
@@ -174,13 +175,13 @@ int menu_nav::prompt_choice(bool render_only) {
             for (nav_overlay overlay : overlays) {
                 switch (overlay.alignment) {
                 case OverlayAlignment::Centered:
-                    menu->add_line_centered(overlay.text, overlay.x, overlay.y);
+                    menu->add_line_centered(overlay.text, overlay.x, overlay.y, overlay.anchor);
                     break;
                 case OverlayAlignment::Left:
-                    menu->add_line(overlay.text, overlay.x, overlay.y);
+                    menu->add_line(overlay.text, overlay.x, overlay.y, overlay.anchor);
                     break;
                 case OverlayAlignment::Right:
-                    menu->add_line_right(overlay.text, overlay.x, overlay.y);
+                    menu->add_line_right(overlay.text, overlay.x, overlay.y, overlay.anchor);
                     break;
                 }
             }

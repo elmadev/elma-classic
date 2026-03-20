@@ -86,17 +86,17 @@ menu_pic::menu_pic(bool center_vert) {
     lines.reserve(8);
 }
 
-void menu_pic::add_line(std::string text, int x, int y) {
-    lines.emplace_back(std::move(text), x, y);
+void menu_pic::add_line(std::string text, int x, int y, ScreenAnchor anchor) {
+    lines.emplace_back(std::move(text), anchor, x, y);
     image_valid = false;
 }
 
-void menu_pic::add_line_centered(const std::string& text, int x, int y) {
-    add_line(text, x - MenuFont->len(text.c_str()) / 2, y);
+void menu_pic::add_line_centered(const std::string& text, int x, int y, ScreenAnchor anchor) {
+    add_line(text, x - MenuFont->len(text.c_str()) / 2, y, anchor);
 }
 
-void menu_pic::add_line_right(const std::string& text, int x, int y) {
-    add_line(text, x - MenuFont->len(text.c_str()), y);
+void menu_pic::add_line_right(const std::string& text, int x, int y, ScreenAnchor anchor) {
+    add_line(text, x - MenuFont->len(text.c_str()), y, anchor);
 }
 
 // Set red helmet pixel position
@@ -198,6 +198,18 @@ static double BallsPrevTime = 0.0;
 static double BallsStartTime = 0.0;
 static bool IntroAnimation = true;
 
+static int anchored_x_position(int x, ScreenAnchor anchor) {
+    switch (anchor) {
+    case ScreenAnchor::Center:
+        return x + SCREEN_WIDTH / 2 - 320;
+    case ScreenAnchor::LeftEdge:
+        return x;
+    case ScreenAnchor::RightEdge:
+        return x + SCREEN_WIDTH - 640;
+    }
+    internal_error("anchored_x_position invalid enum value!");
+}
+
 // Draw the menu. Optionally don't draw the background balls or helmet.
 void menu_pic::render(bool skip_balls_helmet) {
     if (!ScreenBuffer) {
@@ -234,7 +246,7 @@ void menu_pic::render(bool skip_balls_helmet) {
         }
 
         for (text_line line : lines) {
-            int x = line.x + SCREEN_WIDTH / 2 - 320;
+            int x = anchored_x_position(line.x, line.position);
             int y = line.y;
             if (center_vertically) {
                 y += SCREEN_HEIGHT / 2 - 240;
@@ -398,7 +410,7 @@ bool menu_pic::render_intro_anim(double time) {
 
     // The text moves down from -SCREEN_HEIGHT to 0
     for (text_line line : lines) {
-        int x = line.x + SCREEN_WIDTH / 2 - 320;
+        int x = anchored_x_position(line.x, line.position);
         if (center_vertically) {
             internal_error("menu_pic::render_intro_anim should not center vertically!");
         }

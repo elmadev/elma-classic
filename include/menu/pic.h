@@ -19,8 +19,15 @@ extern abc8* MenuFont;
 extern palette* MenuPalette;
 extern pic8* Intro;
 
+enum class ScreenAnchor {
+    LeftEdge,
+    Center,
+    RightEdge,
+};
+
 struct text_line {
     std::string text;
+    ScreenAnchor position;
     int x;
     int y;
 };
@@ -34,9 +41,11 @@ class menu_pic {
 
   public:
     menu_pic(bool center_vert = true);
-    void add_line(std::string text, int x, int y);
-    void add_line_centered(const std::string& text, int x, int y);
-    void add_line_right(const std::string& text, int x, int y);
+    void add_line(std::string text, int x, int y, ScreenAnchor anchor = ScreenAnchor::Center);
+    void add_line_centered(const std::string& text, int x, int y,
+                           ScreenAnchor anchor = ScreenAnchor::Center);
+    void add_line_right(const std::string& text, int x, int y,
+                        ScreenAnchor anchor = ScreenAnchor::RightEdge);
     void set_helmet(int x, int y);
     void clear();
     void loop();

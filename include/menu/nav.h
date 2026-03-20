@@ -31,6 +31,7 @@ struct nav_overlay {
     int x;
     int y;
     OverlayAlignment alignment;
+    ScreenAnchor anchor;
 };
 
 class menu_nav {
@@ -61,7 +62,8 @@ class menu_nav {
         add_row(left, "", handler);
     }
     void add_overlay(std::string text, int x, int y,
-                     OverlayAlignment alignment = OverlayAlignment::Left);
+                     OverlayAlignment alignment = OverlayAlignment::Left,
+                     ScreenAnchor anchor = ScreenAnchor::Center);
     void sort_rows();
     void clear_entries() { entries.clear(); }
     void select_row(int index) { selected_index = index; }

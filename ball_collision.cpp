@@ -186,7 +186,9 @@ double ball_wall_collision_time(ball* ball, WallId wall) {
             return NO_COLLISION_TIME;
         }
         if (ball->keyframe_r.y <= wall_top() + ball->radius) {
-            return NO_COLLISION_TIME;
+            // A ball might end up out of bounds if you resize the screen and two balls get stacked
+            // on top of each other near a wall. In this case, reflect the ball towards in-bounds
+            return ball->keyframe_time;
         }
         return ball->keyframe_time - ((ball->keyframe_r.y - wall_top() - ball->radius) / ball->v.y);
     case WallId::Bottom:
@@ -194,7 +196,7 @@ double ball_wall_collision_time(ball* ball, WallId wall) {
             return NO_COLLISION_TIME;
         }
         if (ball->keyframe_r.y >= wall_bottom() - ball->radius) {
-            return NO_COLLISION_TIME;
+            return ball->keyframe_time;
         }
         return ball->keyframe_time +
                ((wall_bottom() - ball->radius - ball->keyframe_r.y) / ball->v.y);
@@ -203,7 +205,7 @@ double ball_wall_collision_time(ball* ball, WallId wall) {
             return NO_COLLISION_TIME;
         }
         if (ball->keyframe_r.x >= wall_right() - ball->radius) {
-            return NO_COLLISION_TIME;
+            return ball->keyframe_time;
         }
         return ball->keyframe_time +
                ((wall_right() - ball->radius - ball->keyframe_r.x) / ball->v.x);
@@ -212,7 +214,7 @@ double ball_wall_collision_time(ball* ball, WallId wall) {
             return NO_COLLISION_TIME;
         }
         if (ball->keyframe_r.x <= wall_left() + ball->radius) {
-            return NO_COLLISION_TIME;
+            return ball->keyframe_time;
         }
         return ball->keyframe_time -
                ((ball->keyframe_r.x - wall_left() - ball->radius) / ball->v.x);
@@ -236,4 +238,11 @@ void simulate_ball_wall_collision(ball* ball, WallId wall, double time) {
         ball->v.x = -ball->v.x;
         break;
     }
+}
+
+void clamp_ball_position(ball& ball, double time) {
+    ball.keyframe_r.y = std::max(ball.keyframe_r.y, wall_top() + ball.radius + 0.5);
+    ball.keyframe_r.y = std::min(ball.keyframe_r.y, wall_bottom() - ball.radius - 0.5);
+    ball.keyframe_r.x = std::max(ball.keyframe_r.x, wall_left() + ball.radius + 0.5);
+    ball.keyframe_r.x = std::min(ball.keyframe_r.x, wall_right() - ball.radius - 0.5);
 }

@@ -19,6 +19,7 @@ struct ball {
 
 void balls_init();
 void balls_simulate(double dt);
+void balls_resolution_change();
 
 extern int BallCount;
 extern ball* Balls;

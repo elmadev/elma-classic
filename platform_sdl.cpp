@@ -84,6 +84,11 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
         internal_error(SDL_GetError());
         return;
     }
+
+    create_palette_surface();
+    initialize_renderer();
+    apply_current_palette();
+    platform_apply_fullscreen_mode();
 }
 
 bool is_fullscreen() {
@@ -150,11 +155,8 @@ void platform_init() {
     SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
 
     create_window(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
-    create_palette_surface();
-    initialize_renderer();
-    apply_current_palette();
+
     keyboard::init();
-    platform_apply_fullscreen_mode();
     LastMouseMotionTime = get_milliseconds();
 }
 
@@ -267,10 +269,6 @@ void platform_recreate_window() {
     SDLWindow = nullptr;
 
     create_window(x, y, SCREEN_WIDTH, SCREEN_HEIGHT);
-    create_palette_surface();
-    initialize_renderer();
-    apply_current_palette();
-    platform_apply_fullscreen_mode();
 }
 
 bool has_window() { return SDLWindow != nullptr; }

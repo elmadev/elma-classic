@@ -70,6 +70,19 @@ static void apply_current_palette() {
 }
 
 static void create_window(int window_pos_x, int window_pos_y, int width, int height) {
+    // Delete existing window if it exists
+    gl_cleanup();
+
+    if (SDLSurfaceMain) {
+        SDL_DestroyWindowSurface(SDLWindow);
+        SDLSurfaceMain = nullptr;
+    }
+    if (SDLWindow) {
+        SDL_DestroyWindow(SDLWindow);
+        SDLWindow = nullptr;
+    }
+
+    // Create window
     if (EolSettings->renderer() == RendererType::OpenGL) {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
@@ -257,17 +270,6 @@ void platform_recreate_window() {
     int x;
     int y;
     SDL_GetWindowPosition(SDLWindow, &x, &y);
-
-    gl_cleanup();
-
-    if (SDLSurfaceMain) {
-        SDL_DestroyWindowSurface(SDLWindow);
-        SDLSurfaceMain = nullptr;
-    }
-
-    SDL_DestroyWindow(SDLWindow);
-    SDLWindow = nullptr;
-
     create_window(x, y, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 

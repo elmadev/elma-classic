@@ -18,8 +18,15 @@ extern abc8* MenuFont;
 extern palette* MenuPalette;
 extern pic8* Intro;
 
+enum class ScreenPosition {
+    Left,
+    Centered,
+    Right,
+};
+
 struct text_line {
     std::string text;
+    ScreenPosition position;
     int x;
     int y;
 };
@@ -33,9 +40,12 @@ class menu_pic {
 
   public:
     menu_pic(bool center_vert = true);
-    void add_line(std::string text, int x, int y);
-    void add_line_centered(const std::string& text, int x, int y);
-    void add_line_right(const std::string& text, int x, int y);
+    void add_line(std::string text, int x, int y,
+                  ScreenPosition alignment = ScreenPosition::Centered);
+    void add_line_centered(const std::string& text, int x, int y,
+                           ScreenPosition alignment = ScreenPosition::Centered);
+    void add_line_right(const std::string& text, int x, int y,
+                        ScreenPosition alignment = ScreenPosition::Centered);
     void set_helmet(int x, int y);
     void clear();
     void loop();

@@ -524,7 +524,7 @@ void menu_play() {
             } else {
                 total_text = std::format("Finished: {}/{}", finished, level_count);
             }
-            nav.add_overlay(total_text, SCREEN_WIDTH / 2 + 320 - 10, 30, OverlayAlignment::Right);
+            nav.add_overlay(total_text, 630, 30, OverlayAlignment::Right, ScreenPosition::Right);
         }
 
         nav.add_row(

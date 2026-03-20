@@ -54,6 +54,20 @@ static void initialize_renderer() {
     }
 }
 
+static void resize_renderer(int width, int height) {
+    if (EolSettings->renderer() == RendererType::OpenGL) {
+        if (gl_resize(width, height, SDLSurfacePaletted->pitch) != 0) {
+            internal_error("Failed to resize OpenGL renderer");
+        }
+        SDLSurfaceMain = nullptr; // Not used in GL mode
+    } else {
+        SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
+        if (!SDLSurfaceMain) {
+            internal_error(SDL_GetError());
+        }
+    }
+}
+
 static void create_palette_surface() {
     SDL_FreeSurface(SDLSurfacePaletted);
     SDLSurfacePaletted =
@@ -102,6 +116,12 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
     initialize_renderer();
     apply_current_palette();
     platform_apply_fullscreen_mode();
+}
+
+static void window_resized(int width, int height) {
+    create_palette_surface();
+    resize_renderer(width, height);
+    apply_current_palette();
 }
 
 bool is_fullscreen() {
@@ -225,21 +245,7 @@ void platform_resize_window(int width, int height) {
         SDL_SetWindowSize(SDLWindow, width, height);
     }
 
-    create_palette_surface();
-
-    if (EolSettings->renderer() == RendererType::OpenGL) {
-        if (gl_resize(width, height, SDLSurfacePaletted->pitch) != 0) {
-            internal_error("Failed to resize OpenGL renderer");
-        }
-        SDLSurfaceMain = nullptr; // Not used in GL mode
-    } else {
-        SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
-        if (!SDLSurfaceMain) {
-            internal_error(SDL_GetError());
-        }
-    }
-
-    apply_current_palette();
+    window_resized(width, height);
 }
 
 std::vector<std::pair<int, int>> platform_get_display_modes() {

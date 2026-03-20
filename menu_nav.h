@@ -23,6 +23,7 @@ struct nav_row {
 enum class OverlayAlignment {
     Left,
     Centered,
+    Right,
 };
 
 struct nav_overlay {

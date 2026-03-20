@@ -179,6 +179,9 @@ int menu_nav::prompt_choice(bool render_only) {
                 case OverlayAlignment::Left:
                     menu->add_line(overlay.text, overlay.x, overlay.y);
                     break;
+                case OverlayAlignment::Right:
+                    menu->add_line_right(overlay.text, overlay.x, overlay.y);
+                    break;
                 }
             }
 

@@ -95,6 +95,10 @@ void menu_pic::add_line_centered(const std::string& text, int x, int y) {
     add_line(text, x - MenuFont->len(text.c_str()) / 2, y);
 }
 
+void menu_pic::add_line_right(const std::string& text, int x, int y) {
+    add_line(text, x - MenuFont->len(text.c_str()), y);
+}
+
 // Set red helmet pixel position
 void menu_pic::set_helmet(int x, int y) {
     helmet_x = x;

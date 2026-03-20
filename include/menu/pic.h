@@ -36,6 +36,7 @@ class menu_pic {
     menu_pic(bool center_vert = true);
     void add_line(std::string text, int x, int y);
     void add_line_centered(const std::string& text, int x, int y);
+    void add_line_right(const std::string& text, int x, int y);
     void set_helmet(int x, int y);
     void clear();
     void loop();

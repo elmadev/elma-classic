@@ -55,6 +55,7 @@ static void initialize_renderer() {
 }
 
 static void create_palette_surface() {
+    SDL_FreeSurface(SDLSurfacePaletted);
     SDLSurfacePaletted =
         SDL_CreateRGBSurfaceWithFormat(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, SDL_PIXELFORMAT_INDEX8);
     if (!SDLSurfacePaletted) {
@@ -209,8 +210,6 @@ void platform_resize_window(int width, int height) {
         SDL_SetWindowSize(SDLWindow, width, height);
     }
 
-    SDL_FreeSurface(SDLSurfacePaletted);
-    SDLSurfacePaletted = nullptr;
     create_palette_surface();
 
     if (EolSettings->renderer() == RendererType::OpenGL) {
@@ -258,11 +257,6 @@ void platform_recreate_window() {
     SDL_GetWindowPosition(SDLWindow, &x, &y);
 
     gl_cleanup();
-
-    if (SDLSurfacePaletted) {
-        SDL_FreeSurface(SDLSurfacePaletted);
-        SDLSurfacePaletted = nullptr;
-    }
 
     if (SDLSurfaceMain) {
         SDL_DestroyWindowSurface(SDLWindow);

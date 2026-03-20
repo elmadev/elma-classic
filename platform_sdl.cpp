@@ -37,21 +37,7 @@ void message_box(const char* text) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Message", text, SDLWindow);
 }
 
-static void create_window(int window_pos_x, int window_pos_y, int width, int height) {
-    if (EolSettings->renderer() == RendererType::OpenGL) {
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-    }
-
-    int window_flags = EolSettings->renderer() == RendererType::OpenGL ? SDL_WINDOW_OPENGL : 0;
-
-    SDLWindow =
-        SDL_CreateWindow("Elasto Mania", window_pos_x, window_pos_y, width, height, window_flags);
-    if (!SDLWindow) {
-        internal_error(SDL_GetError());
-    }
-}
+long long get_milliseconds() { return SDL_GetTicks64(); }
 
 static void initialize_renderer() {
     if (EolSettings->renderer() == RendererType::OpenGL) {
@@ -80,6 +66,28 @@ static void apply_current_palette() {
     if (CurrentPalette) {
         CurrentPalette->set();
     }
+}
+
+static void create_window(int window_pos_x, int window_pos_y, int width, int height) {
+    if (EolSettings->renderer() == RendererType::OpenGL) {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    }
+
+    int window_flags = EolSettings->renderer() == RendererType::OpenGL ? SDL_WINDOW_OPENGL : 0;
+
+    SDLWindow =
+        SDL_CreateWindow("Elasto Mania", window_pos_x, window_pos_y, width, height, window_flags);
+    if (!SDLWindow) {
+        internal_error(SDL_GetError());
+        return;
+    }
+}
+
+bool is_fullscreen() {
+    Uint32 flags = SDL_GetWindowFlags(SDLWindow);
+    return flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
 void platform_apply_fullscreen_mode() {
@@ -220,6 +228,30 @@ void platform_resize_window(int width, int height) {
     apply_current_palette();
 }
 
+std::vector<std::pair<int, int>> platform_get_display_modes() {
+    std::vector<std::pair<int, int>> modes;
+    int count = SDL_GetNumDisplayModes(0);
+    for (int i = 0; i < count; i++) {
+        SDL_DisplayMode mode;
+        if (SDL_GetDisplayMode(0, i, &mode) == 0) {
+            std::pair<int, int> res = {mode.w, mode.h};
+            if (std::find(modes.begin(), modes.end(), res) == modes.end()) {
+                modes.push_back(res);
+            }
+        }
+    }
+    std::sort(modes.begin(), modes.end());
+    return modes;
+}
+
+std::pair<int, int> platform_get_desktop_resolution() {
+    SDL_DisplayMode mode;
+    if (SDL_GetDesktopDisplayMode(0, &mode) == 0) {
+        return {mode.w, mode.h};
+    }
+    return {SCREEN_WIDTH, SCREEN_HEIGHT};
+}
+
 void platform_recreate_window() {
     int x;
     int y;
@@ -246,8 +278,6 @@ void platform_recreate_window() {
     apply_current_palette();
     platform_apply_fullscreen_mode();
 }
-
-long long get_milliseconds() { return SDL_GetTicks64(); }
 
 bool has_window() { return SDLWindow != nullptr; }
 
@@ -493,35 +523,6 @@ bool was_key_down(DikScancode code) {
 }
 
 int get_mouse_wheel_delta() { return MouseWheelDelta; }
-
-bool is_fullscreen() {
-    Uint32 flags = SDL_GetWindowFlags(SDLWindow);
-    return flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP);
-}
-
-std::vector<std::pair<int, int>> platform_get_display_modes() {
-    std::vector<std::pair<int, int>> modes;
-    int count = SDL_GetNumDisplayModes(0);
-    for (int i = 0; i < count; i++) {
-        SDL_DisplayMode mode;
-        if (SDL_GetDisplayMode(0, i, &mode) == 0) {
-            std::pair<int, int> res = {mode.w, mode.h};
-            if (std::find(modes.begin(), modes.end(), res) == modes.end()) {
-                modes.push_back(res);
-            }
-        }
-    }
-    std::sort(modes.begin(), modes.end());
-    return modes;
-}
-
-std::pair<int, int> platform_get_desktop_resolution() {
-    SDL_DisplayMode mode;
-    if (SDL_GetDesktopDisplayMode(0, &mode) == 0) {
-        return {mode.w, mode.h};
-    }
-    return {SCREEN_WIDTH, SCREEN_HEIGHT};
-}
 
 static SDL_AudioDeviceID SDLAudioDevice;
 static bool SDLSoundInitialized = false;

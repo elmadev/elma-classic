@@ -1,4 +1,5 @@
 #include "menu/ball.h"
+#include "menu/ball_collision.h"
 #include "menu/ball_handler.h"
 #include "main.h"
 #include "M_PIC.H"
@@ -102,6 +103,20 @@ void balls_init() {
 
 static double FirstTimeDelay = 0.0;
 
+static void reset_keyframe_time(double current_time) {
+    // Update keyframe position time of all the balls to the current time
+    for (int i = 0; i < BallCount; i++) {
+        Balls[i].keyframe_r =
+            Balls[i].keyframe_r + ((current_time - Balls[i].keyframe_time) * Balls[i].v);
+        Balls[i].current_r = Balls[i].keyframe_r;
+        Balls[i].keyframe_rotation =
+            Balls[i].keyframe_rotation +
+            ((current_time - Balls[i].keyframe_time) * Balls[i].angular_velocity);
+        Balls[i].current_rotation = Balls[i].keyframe_rotation;
+        Balls[i].keyframe_time = 0.0;
+    }
+}
+
 // Update ball positions
 void balls_simulate(double dt) {
     // A minimal time delay before we actually start the ball animation.
@@ -141,16 +156,7 @@ void balls_simulate(double dt) {
         simulate_collision(collider1, collider2);
     }
     // Update keyframe position time of all the balls to the current time
-    for (int i = 0; i < BallCount; i++) {
-        Balls[i].keyframe_r =
-            Balls[i].keyframe_r + ((current_time - Balls[i].keyframe_time) * Balls[i].v);
-        Balls[i].current_r = Balls[i].keyframe_r;
-        Balls[i].keyframe_rotation =
-            Balls[i].keyframe_rotation +
-            ((current_time - Balls[i].keyframe_time) * Balls[i].angular_velocity);
-        Balls[i].current_rotation = Balls[i].keyframe_rotation;
-        Balls[i].keyframe_time = 0;
-    }
+    reset_keyframe_time(current_time);
     // Update collision time to be relative to current time, skipping unused parts of the grid
     for (int i = 0; i < BallCount; i++) {
         for (int j = i + 1; j < BallCount + 4; j++) {
@@ -161,4 +167,24 @@ void balls_simulate(double dt) {
     // Reset keyframe time to current time
     ElapsedTimeSinceKeyframe = 0.0;
     NextCollisionTime -= current_time;
+}
+
+void balls_resolution_change() {
+    // Synchronize time of all the balls
+    reset_keyframe_time(ElapsedTimeSinceKeyframe);
+    ElapsedTimeSinceKeyframe = 0.0;
+
+    // Teleport balls out of the walls
+    for (int i = 0; i < BallCount; i++) {
+        clamp_ball_position(Balls[i], ElapsedTimeSinceKeyframe);
+    }
+
+    // Reset the predicted collision time for all balls
+    for (int i = 0; i < BallCount + 4; i++) {
+        for (int j = 0; j < BallCount + 4; j++) {
+            CollisionTimeGrid[i][j] = UNKNOWN_COLLISION_TIME;
+        }
+    }
+    int unused;
+    NextCollisionTime = next_collision_time(&unused, &unused);
 }

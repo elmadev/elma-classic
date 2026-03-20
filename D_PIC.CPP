@@ -1,4 +1,5 @@
 #include "M_PIC.H"
+#include "menu/ball.h"
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "editor/canvas.h"
@@ -24,6 +25,7 @@ void on_resolution_change() {
     }
     invalidateegesz();
     GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
+    balls_resolution_change();
 }
 
 void update_resolution(int w, int h) {

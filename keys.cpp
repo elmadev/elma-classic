@@ -1,12 +1,12 @@
 #include "keys.h"
-#include "platform_utils.h"
+#include "util/util.h"
 #include <deque>
 
 static constexpr size_t TEXT_INPUT_BUFFER_MAX_SIZE = 64;
 static std::deque<char> TextInputBuffer;
 
 void add_char_to_buffer(char text) {
-    if (!is_ascii_character(text)) {
+    if (!util::text::is_ascii_char(text)) {
         return;
     }
     if (TextInputBuffer.size() >= TEXT_INPUT_BUFFER_MAX_SIZE) {
@@ -19,7 +19,7 @@ void add_text_to_buffer(const char* text) {
     while (*text && TextInputBuffer.size() < TEXT_INPUT_BUFFER_MAX_SIZE) {
         unsigned char c = *text;
 
-        if (!is_ascii_character(c)) {
+        if (!util::text::is_ascii_char(c)) {
             text++;
             continue;
         }

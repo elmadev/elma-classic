@@ -15,6 +15,7 @@
 #include "platform_impl.h"
 #include "platform_utils.h"
 #include "polygon.h"
+#include "util/util.h"
 #include "sprite.h"
 #include <cstring>
 #include <directinput/scancodes.h>
@@ -680,7 +681,7 @@ int tolt_save_as() {
         }
         while (has_text_input()) {
             char c = pop_text_input();
-            if (Pabc2->has_char(c) && is_char_valid_for_filename(c)) {
+            if (Pabc2->has_char(c) && util::text::is_filename_char(c)) {
                 if (strlen(nev) < 8) {
                     // c-t beillesztjuk i. helyre:
                     int hossz = strlen(nev);
@@ -1963,7 +1964,7 @@ static void change_level_name(char* nev) {
         }
         while (has_text_input()) {
             char c = pop_text_input();
-            if (Pabc2->has_char(c) && is_char_valid_for_filename(c)) {
+            if (Pabc2->has_char(c) && util::text::is_filename_char(c)) {
                 char tmpfejlec[LEVEL_NAME_LENGTH + 10];
                 sprintf(tmpfejlec, "Ext: %s", nev);
 

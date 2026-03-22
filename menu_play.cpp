@@ -13,8 +13,8 @@
 #include "menu_nav.h"
 #include "menu_pic.h"
 #include "platform_impl.h"
-#include "platform_utils.h"
 #include "physics_init.h"
+#include "util/util.h"
 #include "skip.h"
 #include "timer.h"
 #include "eol_settings.h"
@@ -52,7 +52,7 @@ static bool menu_prompt_replay_name(char* filename) {
         }
         while (has_text_input()) {
             char c = pop_text_input();
-            if (MenuFont->has_char(c) && is_char_valid_for_filename(c)) {
+            if (MenuFont->has_char(c) && util::text::is_filename_char(c)) {
                 if (i >= MAX_REPLAY_NAME_LEN) {
                     continue;
                 }

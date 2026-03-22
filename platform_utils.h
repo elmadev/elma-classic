@@ -18,9 +18,6 @@ constexpr double PI = 3.141592;
 #define strupr _strupr
 #endif
 
-bool is_ascii_character(unsigned char c);
-bool is_char_valid_for_filename(unsigned char c);
-
 #ifndef _WIN32
 
 void itoa(int value, char* str, int base);

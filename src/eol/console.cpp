@@ -4,6 +4,7 @@
 #include "keys.h"
 #include "platform_impl.h"
 #include "platform_utils.h"
+#include "util/util.h"
 #include <directinput/scancodes.h>
 #include <format>
 #include <optional>
@@ -109,7 +110,7 @@ void console::paste_text(std::string_view text) {
     }
 
     for (char c : text) {
-        if (is_ascii_character(c) && input_buffer.size() < MAX_INPUT_LENGTH) {
+        if (util::text::is_ascii_char(c) && input_buffer.size() < MAX_INPUT_LENGTH) {
             input_buffer.insert(input_buffer.begin() + cursor_pos, c);
             cursor_pos++;
         }
@@ -170,7 +171,7 @@ void console::handle_input() {
     // Drain text input buffer for printable characters
     char c;
     while ((c = pop_text_input()) != 0) {
-        if (is_ascii_character(c) && input_buffer.size() < MAX_INPUT_LENGTH) {
+        if (util::text::is_ascii_char(c) && input_buffer.size() < MAX_INPUT_LENGTH) {
             input_buffer.insert(input_buffer.begin() + cursor_pos, c);
             cursor_pos++;
         }

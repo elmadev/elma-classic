@@ -17,3 +17,18 @@ unsigned int uint32() {
 }
 
 } // namespace util::random
+
+namespace util::text {
+
+bool is_ascii_char(unsigned char c) { return (c >= 32 && c < 127); }
+
+bool is_filename_char(unsigned char c) {
+    if (c == '\\' || c == '/' || c == ':' || c == '*' || c == '?' || c == '\"' || c == '<' ||
+        c == '>' || c == '|') {
+        return false;
+    }
+
+    return is_ascii_char(c);
+}
+
+} // namespace util::text

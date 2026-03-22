@@ -166,14 +166,27 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
                       long* pmegvanido, int* pmeghalt, double eddig, double dt) {
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
+
+    bool is_gas_down = is_game_key_down(popciok->gas);
+    bool is_brake_down = is_game_key_down(popciok->brake) ||
+                         is_game_key_down(popciok->brake_alias) ||
+                         was_game_key_just_pressed(popciok->one_frame_brake);
+    bool is_right_volt_down = is_game_key_down(popciok->right_volt);
+    bool is_left_volt_down = is_game_key_down(popciok->left_volt);
+
+    if (EolSettings->cripple_drunk() && (pmot->apple_count & 1)) {
+        std::swap(is_gas_down, is_brake_down);
+        std::swap(is_right_volt_down, is_left_volt_down);
+    }
+
     if (eddig > pvalt->utolsougras + VoltDelay && !EolSettings->cripple_no_volt()) {
-        if (is_game_key_down(popciok->right_volt) || is_game_key_down(popciok->alovolt)) {
+        if (is_right_volt_down || is_game_key_down(popciok->alovolt)) {
             ugrik1 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 1;
             add_event_buffer(WavEvent::RightVolt, 0.99, -1);
         }
-        if (is_game_key_down(popciok->left_volt) || is_game_key_down(popciok->alovolt)) {
+        if (is_left_volt_down || is_game_key_down(popciok->alovolt)) {
             ugrik2 = 1;
             pvalt->utolsougras = eddig;
             pvalt->ugras1volt = 0;
@@ -183,10 +196,6 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // LEPTET!!!!!!!:
     // 0-meghalt, 1-megnyerte, 2-semmi kulonos
-    bool is_gas_down = is_game_key_down(popciok->gas);
-    bool is_brake_down = is_game_key_down(popciok->brake) ||
-                         is_game_key_down(popciok->brake_alias) ||
-                         was_game_key_just_pressed(popciok->one_frame_brake);
     if (EolSettings->cripple_no_brake()) {
         is_brake_down = false;
     }

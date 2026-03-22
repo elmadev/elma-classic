@@ -1,5 +1,4 @@
 #include "level.h"
-#include "best_times.h"
 #include "fs_utils.h"
 #include "editor_topology.h"
 #include "editor_canvas.h"
@@ -467,7 +466,7 @@ void load_best_time(const char* filename, int single) {
 
     // Write the best time or null string if no best time
     if (tten->times_count > 0) {
-        centiseconds_to_string(tten->times[0], BestTime);
+        util::text::centiseconds_to_string(tten->times[0], BestTime);
     } else {
         BestTime[0] = 0;
     }

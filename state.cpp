@@ -1,9 +1,9 @@
 #include "state.h"
-#include "best_times.h"
 #include "eol_settings.h"
 #include "level.h"
 #include "main.h"
 #include "menu_dialog.h"
+#include "util/util.h"
 #include <cstring>
 #include <directinput/scancodes.h>
 #include <filesystem>
@@ -192,7 +192,7 @@ void state::save() {
 static void write_stats_topten(FILE* h, topten* tten, bool single) {
     for (int i = 0; i < tten->times_count; i++) {
         char time_text[40];
-        centiseconds_to_string(tten->times[i], time_text, true);
+        util::text::centiseconds_to_string(tten->times[i], time_text, true);
         fprintf(h, "    ");
         fprintf(h, "%s", time_text);
 
@@ -275,7 +275,7 @@ void state::write_stats_anonymous_total_time(FILE* h, bool single, const char* t
     fprintf(h, "%s\n%s\n%s\n", text1, text2, text3);
 
     char time_text[40];
-    centiseconds_to_string(total_time, time_text, true);
+    util::text::centiseconds_to_string(total_time, time_text, true);
     fprintf(h, "%s", time_text);
     fprintf(h, "\n\n");
 }
@@ -316,7 +316,7 @@ void state::write_stats_player_total_time(FILE* h, const char* player_name, bool
         }
     }
     char time_text[40];
-    centiseconds_to_string(total_time, time_text, true);
+    util::text::centiseconds_to_string(total_time, time_text, true);
     fprintf(h, "%s", time_text);
     for (int alignment = 0; alignment < (12 - strlen(time_text)); alignment++) {
         fprintf(h, " ");

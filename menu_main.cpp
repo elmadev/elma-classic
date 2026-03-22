@@ -39,7 +39,7 @@ static void replay_time(const std::string& filename) {
     time = std::max(time, 1);
 
     char time_str[25];
-    centiseconds_to_string(time, time_str);
+    util::text::centiseconds_to_string(time, time_str);
     strcat(time_str, "    +- 0.01 sec");
     menu_dialog(filename.c_str(), "The time of this replay file is:", time_str);
 }

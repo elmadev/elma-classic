@@ -3,7 +3,6 @@
 #include "affine_pic.h"
 #include "anim.h"
 #include "affine_pic_render.h"
-#include "best_times.h"
 #include "ECSET.H"
 #include "EDITUJ.H"
 #include "eol/console.h"
@@ -20,6 +19,7 @@
 #include "physics_init.h"
 #include "renderer/object_overlay.h"
 #include "timer.h"
+#include "util/util.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -821,7 +821,7 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
     if (pmot->apple_count && EolSettings->show_last_apple_time()) {
         char tmp[100];
         sprintf(tmp, "last apple (%d)        ", pmot->apple_count);
-        centiseconds_to_string(pmot->last_apple_time, tmp + strlen(tmp), true, true);
+        util::text::centiseconds_to_string(pmot->last_apple_time, tmp + strlen(tmp), true, true);
 
         constexpr int RIGHT_MARGIN = 5;
         constexpr int BOTTOM_MARGIN = 5;

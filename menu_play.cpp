@@ -111,7 +111,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
 
     // Display finish time
     char tmp[10];
-    centiseconds_to_string(time, tmp);
+    util::text::centiseconds_to_string(time, tmp);
     if (Single) {
         sprintf(time_message, "%s", tmp);
     } else {
@@ -329,11 +329,11 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
             if (is_flagtag) {
                 int time1 = FlagTimeA * TimeToCentiseconds;
                 char time_text1[20];
-                centiseconds_to_string(time1, time_text1);
+                util::text::centiseconds_to_string(time1, time_text1);
                 nav.add_overlay(std::string(time_text1), 440 + dx, y1);
                 int time2 = FlagTimeB * TimeToCentiseconds;
                 char time_text2[20];
-                centiseconds_to_string(time2, time_text2);
+                util::text::centiseconds_to_string(time2, time_text2);
                 nav.add_overlay(std::string(time_text2), 440 + dx, y2);
             }
         }
@@ -492,8 +492,8 @@ void menu_play() {
             std::string total_text;
             if (finished == level_count) {
                 char total_time_text[40];
-                centiseconds_to_string(State->player_total_time(player1->name, State->single),
-                                       total_time_text, true);
+                util::text::centiseconds_to_string(
+                    State->player_total_time(player1->name, State->single), total_time_text, true);
                 total_text = std::format("Total: {}", total_time_text);
             } else {
                 total_text = std::format("Finished: {}/{}", finished, level_count);

@@ -1,6 +1,8 @@
 #ifndef UTIL_UTIL_H
 #define UTIL_UTIL_H
 
+constexpr double PI = 3.141592;
+
 namespace util::random {
 
 void seed();

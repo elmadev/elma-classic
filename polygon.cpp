@@ -3,7 +3,6 @@
 #include "editor_dialog.h"
 #include "level.h"
 #include "main.h"
-#include "platform_utils.h"
 #include "util/util.h"
 #include <cmath>
 

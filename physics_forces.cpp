@@ -5,8 +5,8 @@
 #include "physics_collision.h"
 #include "physics_init.h"
 #include "physics_move.h"
-#include "platform_utils.h"
 #include "recorder.h"
+#include "util/util.h"
 #include <cmath>
 
 static double MaxFrictionVolume = 0.0;

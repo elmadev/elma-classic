@@ -15,7 +15,6 @@
 #include "main.h"
 #include "object.h"
 #include "pic8.h"
-#include "platform_utils.h"
 #include "physics_init.h"
 #include "renderer/object_overlay.h"
 #include "timer.h"

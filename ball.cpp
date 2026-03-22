@@ -2,7 +2,6 @@
 #include "ball_handler.h"
 #include "main.h"
 #include "M_PIC.H"
-#include "platform_utils.h"
 #include "util/util.h"
 #include <cmath>
 

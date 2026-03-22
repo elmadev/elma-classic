@@ -1,7 +1,7 @@
 #include "object.h"
 #include "editor_canvas.h"
 #include "main.h"
-#include "platform_utils.h"
+#include "util/util.h"
 #include <cmath>
 
 object::object(double x, double y, Type typ) {

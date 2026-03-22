@@ -850,6 +850,9 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         return -2;
     }
 
+    int saved_single = Single;
+    int saved_tag = Tag;
+
     Single = !MultiplayerRec;
     Tag = Rec1->flagtag();
     setup_gameloop(filenev);
@@ -973,6 +976,8 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
             Elozoshowkep1 = valt1.showkep;
             Elozoshowkep2 = valt2.showkep;
+            Single = saved_single;
+            Tag = saved_tag;
             return 0;
         }
 
@@ -1052,6 +1057,8 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
             Elozoshowkep1 = valt1.showkep;
             Elozoshowkep2 = valt2.showkep;
+            Single = saved_single;
+            Tag = saved_tag;
             return -1;
         }
         l++;

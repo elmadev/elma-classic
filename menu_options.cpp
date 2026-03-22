@@ -163,6 +163,7 @@ static void menu_cripples() {
         BOOL_OPTION("No Turn:", cripple_no_turn);
         BOOL_OPTION("One Turn:", cripple_one_turn);
         BOOL_OPTION("No Volt:", cripple_no_volt);
+        BOOL_OPTION("Drunk:", cripple_drunk);
 
         choice = nav.navigate();
 

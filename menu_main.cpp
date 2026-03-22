@@ -16,20 +16,12 @@
 #include "menu_play.h"
 #include "recorder.h"
 #include "platform_impl.h"
+#include "util/util.h"
 #include <algorithm>
-#include <cstdlib>
 #include <cstring>
 #include <format>
 #include <string>
 #include <vector>
-
-static unsigned int gen_rand_int() {
-    unsigned int result = 0;
-    for (int i = 0; i < 4; i++) {
-        result = (result << 8) | (rand() & 0xFF);
-    }
-    return result;
-}
 
 static void replay_time(const std::string& filename) {
     MenuPalette->set();
@@ -107,9 +99,9 @@ static void replay_randomizer(std::vector<std::string>& filenames) {
     int last_played = -1;
     int second_last_played = -1;
     while (true) {
-        int index = gen_rand_int() % count;
+        int index = util::random::uint32() % count;
         while ((index == last_played && count > 1) || (index == second_last_played && count > 2)) {
-            index = gen_rand_int() % count;
+            index = util::random::uint32() % count;
         }
         second_last_played = last_played;
         last_played = index;
@@ -249,9 +241,9 @@ static void menu_demo() {
     int previous_demo = -1;
 
     while (true) {
-        int demo = gen_rand_int() % DEMO_REPLAY_COUNT;
+        int demo = util::random::uint32() % DEMO_REPLAY_COUNT;
         while (demo == previous_demo) {
-            demo = gen_rand_int() % DEMO_REPLAY_COUNT;
+            demo = util::random::uint32() % DEMO_REPLAY_COUNT;
         }
         previous_demo = demo;
 

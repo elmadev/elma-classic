@@ -14,6 +14,7 @@
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "sprite.h"
+#include "util/util.h"
 #include "qopen.h"
 #include <algorithm>
 #include <cmath>
@@ -838,12 +839,12 @@ void level::from_file(const char* filename, bool internal) {
 // Lower 16 bits are a hashed checksum.
 static int generate_level_id(double checksum) {
     srand(clock());
-    unsigned int random = random_range(6542);
-    random *= random_range(7042);
-    random += random_range(4542);
-    random *= random_range(3042);
-    random *= random_range(3742);
-    random += random_range(9187);
+    unsigned int random = util::random::range(6542);
+    random *= util::random::range(7042);
+    random += util::random::range(4542);
+    random *= util::random::range(3042);
+    random *= util::random::range(3742);
+    random += util::random::range(9187);
 
     checksum = sin(checksum);
     checksum *= (checksum + 1.0001) * 40000;
@@ -900,22 +901,22 @@ void level::save(const char* filename, bool skip_topology) {
     fwrite(&level_id, 1, 4, h);
     fwrite(&integrity_checksum, 1, sizeof(integrity_checksum), h);
 
-    double integrity_shareware = 11877.0 + random_range(5871) - integrity_checksum;
+    double integrity_shareware = 11877.0 + util::random::range(5871) - integrity_checksum;
     if (SAVE_INTERNAL) {
         // Internals are marked as Shareware-compatible
-        integrity_shareware = 20961.0 + random_range(4982) - integrity_checksum;
+        integrity_shareware = 20961.0 + util::random::range(4982) - integrity_checksum;
     }
 
     fwrite(&integrity_shareware, 1, sizeof(integrity_shareware), h);
 
-    double integrity_topology_errors = 11877.0 + random_range(5871) - integrity_checksum;
+    double integrity_topology_errors = 11877.0 + util::random::range(5871) - integrity_checksum;
     if (topology_errors) {
-        integrity_topology_errors = 20961.0 + random_range(4982) - integrity_checksum;
+        integrity_topology_errors = 20961.0 + util::random::range(4982) - integrity_checksum;
     }
     fwrite(&integrity_topology_errors, 1, sizeof(integrity_topology_errors), h);
 
     // Always set integrity as unlocked
-    double integrity_locked = 12112.0 + random_range(6102) - integrity_checksum;
+    double integrity_locked = 12112.0 + util::random::range(6102) - integrity_checksum;
     fwrite(&integrity_locked, 1, sizeof(integrity_topology_errors), h);
 
     if (SAVE_INTERNAL) {
@@ -1114,7 +1115,7 @@ int level::initialize_objects(motorst* mot) {
         object* obj = objects[i];
         if (obj) {
             // Set a random phase to every object
-            obj->floating_phase = random_range(1000) * 2.0 * PI / 1000.0;
+            obj->floating_phase = util::random::range(1000) * 2.0 * PI / 1000.0;
             obj->active = true;
             if (obj->type == object::Type::Food) {
                 apple_count++;

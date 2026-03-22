@@ -4,6 +4,7 @@
 #include "level.h"
 #include "main.h"
 #include "platform_utils.h"
+#include "util/util.h"
 #include <cmath>
 
 polygon::polygon() {
@@ -356,8 +357,8 @@ static double get_and_fix_angle(vect2* a, vect2 b, vect2 c) {
 static void separate_two_stacked_vertices(vect2* a, vect2* b) {
     constexpr double displacement = 0.0002;
     if (fabs(a->x - b->x) < 0.0000002 && fabs(a->y - b->y) < 0.0000002) {
-        a->x += displacement + displacement * random_range(1000) / 1200.0;
-        a->y += displacement + displacement * random_range(1000) / 1200.0;
+        a->x += displacement + displacement * util::random::range(1000) / 1200.0;
+        a->y += displacement + displacement * util::random::range(1000) / 1200.0;
     }
 }
 

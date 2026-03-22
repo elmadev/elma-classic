@@ -15,6 +15,4 @@ void delay(int milliseconds);
 void internal_error(const std::string& message);
 void external_error(const std::string& message);
 
-int random_range(int maximum);
-
 #endif

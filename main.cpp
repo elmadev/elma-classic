@@ -46,8 +46,6 @@ int main() {
 
 void quit() { exit(0); }
 
-int random_range(int maximum) { return rand() % maximum; }
-
 bool ErrorGraphicsLoaded = false;
 
 static void handle_error(const std::string& prefix, const std::string& message) {

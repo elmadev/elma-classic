@@ -18,8 +18,6 @@
 #include "qopen.h"
 #include <algorithm>
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
 #include <cstring>
 
 constexpr int TOP_TEN_HEADER = 6754362;
@@ -838,7 +836,6 @@ void level::from_file(const char* filename, bool internal) {
 // Upper 16 bits are random.
 // Lower 16 bits are a hashed checksum.
 static int generate_level_id(double checksum) {
-    srand(clock());
     unsigned int random = util::random::range(6542);
     random *= util::random::range(7042);
     random += util::random::range(4542);

@@ -6,10 +6,10 @@
 #include "menu_intro.h"
 #include "menu_pic.h"
 #include "platform_impl.h"
+#include "util/util.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <ctime>
 #include <directinput/scancodes.h>
 #include <string>
 
@@ -30,7 +30,7 @@ void delay(int milliseconds) {
 eol_settings* EolSettings = nullptr;
 
 int main() {
-    srand((unsigned)clock());
+    util::random::seed();
 
     EolSettings = new eol_settings();
     eol_settings::read_settings();

@@ -5,8 +5,6 @@
 #include "platform_utils.h"
 #include "util/util.h"
 #include <cmath>
-#include <cstdlib>
-#include <ctime>
 
 int BallCount = 0;
 ball* Balls = nullptr;
@@ -45,7 +43,6 @@ static void create_balls() {
         }
     }
     // Choose a random starting angle for the top-left ball
-    srand((unsigned int)time(nullptr));
     double angle = util::random::range(1000);
     angle *= 0.5 * PI / 1000.0;
     angle *= 0.999;

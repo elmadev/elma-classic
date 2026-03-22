@@ -184,6 +184,8 @@ void eol_settings::set_chat_lines(int lines) { chat_lines_ = lines; }
 
 void eol_settings::set_cripple_no_brake(bool b) { cripple_no_brake_ = b; }
 
+void eol_settings::set_cripple_drunk(bool b) { cripple_drunk_ = b; }
+
 void eol_settings::set_cripple_no_throttle(bool b) {
     cripple_no_throttle_ = b;
     if (b) {
@@ -353,7 +355,8 @@ void from_json(const json& j, FullscreenMode& f) {
     JSON_FIELD(cripple_always_throttle)                                                            \
     JSON_FIELD(cripple_no_turn)                                                                    \
     JSON_FIELD(cripple_no_volt)                                                                    \
-    JSON_FIELD(cripple_one_turn)
+    JSON_FIELD(cripple_one_turn)                                                                   \
+    JSON_FIELD(cripple_drunk)
 
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

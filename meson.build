@@ -57,6 +57,7 @@ elma_sources = files(
     'platform_sdl.cpp',
     'platform_sdl_keyboard.cpp',
     'skip.cpp',
+    'src/eol/status_messages.cpp',
     'state.cpp',
     'segments.cpp',
     'menu_intro.cpp',

@@ -31,6 +31,7 @@ class console {
 
     void register_command(std::string_view name,
                           std::function<void(std::string_view args)> callback);
+    void register_alias(std::string_view alias, const std::string& cmd);
 
   private:
     static constexpr size_t MAX_LINES = 1000;

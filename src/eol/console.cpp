@@ -182,6 +182,17 @@ void console::register_command(std::string_view name,
     commands[std::string(name)] = {std::move(callback)};
 }
 
+void console::register_alias(std::string_view alias, const std::string& cmd) {
+    register_command(alias, [this, cmd](std::string_view text) {
+        auto it = commands.find(cmd);
+        if (it != commands.end()) {
+            it->second.callback(text);
+        } else {
+            add_line(std::format("Unknown command: !{}", cmd), LineType::System);
+        }
+    });
+}
+
 void console::submit_input() {
     if (input_buffer.empty()) {
         return;

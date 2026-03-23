@@ -1,5 +1,6 @@
 #include "eol/console.h"
 #include "abc8.h"
+#include "eol/status_messages.h"
 #include "eol_settings.h"
 #include "keys.h"
 #include "platform_impl.h"
@@ -53,9 +54,12 @@ static std::optional<bool> parse_bool(std::string_view text) {
     register_command(#field, [this](std::string_view text) {                                       \
         if (text.empty()) {                                                                        \
             EolSettings->set_##field(!EolSettings->field());                                       \
+            StatusMessages->add(                                                                   \
+                std::format("{}: {}", #field, EolSettings->field() ? "on" : "off"));               \
         } else {                                                                                   \
             if (auto val = parse_bool(text)) {                                                     \
                 EolSettings->set_##field(*val);                                                    \
+                StatusMessages->add(std::format("{}: {}", #field, *val ? "on" : "off"));           \
             } else {                                                                               \
                 add_line(std::format("invalid value: {}", text), LineType::System);                \
             }                                                                                      \

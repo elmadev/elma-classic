@@ -407,6 +407,7 @@ static void setup_gameloop(const char* filenev) {
     flagtag_reset();
 
     Motor1->apple_count = Motor2->apple_count = 0;
+    Motor1->apple_bug_count = Motor2->apple_bug_count = 0;
 
     Lgr->pal->set();
 }

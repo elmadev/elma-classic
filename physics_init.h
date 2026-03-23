@@ -60,6 +60,7 @@ struct motorst {
 
     int apple_count;
     int last_apple_time;
+    int apple_bug_count;
 
     bool prev_brake;
     double left_wheel_brake_rotation;

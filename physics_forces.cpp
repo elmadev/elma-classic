@@ -367,8 +367,14 @@ BikeState check_object_collision(motorst* mot) {
         object_indices[2] = get_touching_object(mot->head_r, HeadRadius);
         for (int i = 0; i < 3; i++) {
             if (object_indices[i] >= 0) {
-                add_event_buffer(WavEvent::None, 0.0, object_indices[i]);
                 object* obj = Ptop->get_object(object_indices[i]);
+
+                // Count number of apple bug apples taken
+                if (obj->type == object::Type::Food && !obj->active) {
+                    mot->apple_bug_count++;
+                }
+
+                add_event_buffer(WavEvent::None, 0.0, object_indices[i]);
                 if (obj->type == object::Type::Food) {
                     obj->active = false;
                     again = true;

@@ -822,7 +822,7 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
 
     if (pmot->apple_count && EolSettings->show_last_apple_time()) {
         char tmp[100];
-        sprintf(tmp, "last apple (%d)        ", pmot->apple_count);
+        sprintf(tmp, "last apple (%d)        ", pmot->apple_count - pmot->apple_bug_count);
         util::text::centiseconds_to_string(pmot->last_apple_time, tmp + strlen(tmp), true, true);
 
         constexpr int RIGHT_MARGIN = 5;

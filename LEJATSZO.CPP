@@ -174,7 +174,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     bool is_right_volt_down = is_game_key_down(popciok->right_volt);
     bool is_left_volt_down = is_game_key_down(popciok->left_volt);
 
-    if (EolSettings->cripple_drunk() && (pmot->apple_count & 1)) {
+    if (EolSettings->cripple_drunk() && ((pmot->apple_count - pmot->apple_bug_count) & 1)) {
         std::swap(is_gas_down, is_brake_down);
         std::swap(is_right_volt_down, is_left_volt_down);
     }

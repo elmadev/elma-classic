@@ -69,6 +69,32 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_STR(default_lgr_name);
     REGISTER_SETTINGS_BOOL(show_last_apple_time);
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
+    REGISTER_SETTINGS_BOOL(cripple_no_brake);
+    register_alias("nobrake", "cripple_no_brake");
+    register_alias("nb", "cripple_no_brake");
+    REGISTER_SETTINGS_BOOL(cripple_no_throttle);
+    register_alias("nothrottle", "cripple_no_throttle");
+    register_alias("ng", "cripple_no_throttle");
+    register_alias("nth", "cripple_no_throttle");
+    register_alias("nogas", "cripple_no_throttle");
+    REGISTER_SETTINGS_BOOL(cripple_always_throttle);
+    register_alias("alwaysthrottle", "cripple_always_throttle");
+    register_alias("at", "cripple_always_throttle");
+    register_alias("ag", "cripple_always_throttle");
+    register_alias("ath", "cripple_always_throttle");
+    register_alias("alwaysgas", "cripple_always_throttle");
+    REGISTER_SETTINGS_BOOL(cripple_no_turn);
+    register_alias("noturn", "cripple_no_turn");
+    register_alias("nt", "cripple_no_turn");
+    REGISTER_SETTINGS_BOOL(cripple_no_volt);
+    register_alias("novolt", "cripple_no_volt");
+    register_alias("nv", "cripple_no_volt");
+    REGISTER_SETTINGS_BOOL(cripple_one_turn);
+    register_alias("oneturn", "cripple_one_turn");
+    register_alias("ot", "cripple_one_turn");
+    REGISTER_SETTINGS_BOOL(cripple_drunk);
+    register_alias("drunk", "cripple_drunk");
+    register_alias("dr", "cripple_drunk");
 }
 
 void console::add_line(std::string text, LineType type) {

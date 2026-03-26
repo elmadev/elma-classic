@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install clang-format 19
         run: |
@@ -27,7 +27,7 @@ jobs:
           sudo apt-get install -y clang-format-19 libgl1-mesa-dev
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install clang-tidy 19
         run: |
@@ -52,7 +52,7 @@ jobs:
           sudo apt-get install -y clang-tidy-19 libgl1-mesa-dev
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -86,7 +86,7 @@ jobs:
 
       - name: Upload clang-tidy results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: clang-tidy-results
           path: clang-tidy-output.txt
@@ -106,22 +106,22 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Cache Meson subprojects
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: subprojects/packagecache
           key: ${{ runner.os }}-${{ matrix.arch || 'default' }}-meson-${{ hashFiles('subprojects/*.wrap') }}
 
       - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
+        uses: hendrikmuhs/ccache-action@v1.2.22
         with:
           variant: sccache
           key: ${{ runner.os }}-${{ matrix.arch || 'default' }}
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -136,7 +136,7 @@ jobs:
 
       - name: Visual Studio 17
         if: runner.os == 'windows'
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
         with:
           vs-version: "[17.1,18.0)"
 
@@ -152,7 +152,7 @@ jobs:
         run: meson compile -C build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: elma-${{ runner.os }}-${{ matrix.arch || 'default' }}
           path: |

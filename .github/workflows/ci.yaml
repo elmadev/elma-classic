@@ -146,7 +146,7 @@ jobs:
 
       - name: Configure
         if: runner.os != 'windows'
-        run: meson setup build -Dbuildtype=release
+        run: meson setup build -Dbuildtype=release -Dstatic_sdl=true
 
       - name: Build
         run: meson compile -C build

@@ -1212,9 +1212,6 @@ void canvas::delete_all_nodes() {
     rows_linked.shrink_to_fit();
 }
 
-static int ViewLeftBorder;
-static int ViewRightBorder;
-
 unsigned char* DefaultForeground = nullptr;
 unsigned char* DefaultBackground = nullptr;
 
@@ -1236,7 +1233,7 @@ static inline void draw_default_background(unsigned char* dest, size_t offset, s
     }
 }
 
-void canvas::render_row(bool player1, unsigned char* dest, int y) {
+void canvas::render_row(bool player1, int view_left, int view_right, unsigned char* dest, int y) {
     canvas_chunk** rows_position = player1 ? &rows_position1[y] : &rows_position2[y];
     int* rows_x = player1 ? &rows_x1[y] : &rows_x2[y];
 
@@ -1244,12 +1241,12 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
     canvas_chunk* cur_chunk = *rows_position;
     int xpos = *rows_x;
     // Search leftwards using left border of chunk
-    while (xpos > ViewLeftBorder) {
+    while (xpos > view_left) {
         cur_chunk--;
         xpos -= cur_chunk->width;
     }
     // Search rightwards using right border of chunk
-    while (xpos + cur_chunk->width <= ViewLeftBorder) {
+    while (xpos + cur_chunk->width <= view_left) {
         xpos += cur_chunk->width;
         cur_chunk++;
     }
@@ -1258,11 +1255,11 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
     *rows_x = xpos;
 
     // If the entire row is a single chunk, paste it
-    int offset = ViewLeftBorder - xpos;
-    if (xpos + cur_chunk->width > ViewRightBorder) {
-        int width = ViewRightBorder - xpos + 1;
+    int offset = view_left - xpos;
+    if (xpos + cur_chunk->width > view_right) {
+        int width = view_right - xpos + 1;
         if (cur_chunk->pixels.is_pointer()) {
-            memcpy(dest, &cur_chunk->pixels.to_pointer()[ViewLeftBorder - xpos], width - offset);
+            memcpy(dest, &cur_chunk->pixels.to_pointer()[view_left - xpos], width - offset);
         } else if (cur_chunk->pixels == canvas_pixels::default_background()) {
             draw_default_background(dest, 0, width - offset, is_minimap);
         } else if (cur_chunk->pixels == canvas_pixels::default_foreground()) {
@@ -1282,7 +1279,7 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
     // First chunk (not left-aligned):
     int size = cur_chunk->width - offset;
     if (cur_chunk->pixels.is_pointer()) {
-        memcpy(dest, &cur_chunk->pixels.to_pointer()[ViewLeftBorder - xpos], size);
+        memcpy(dest, &cur_chunk->pixels.to_pointer()[view_left - xpos], size);
     } else if (cur_chunk->pixels == canvas_pixels::default_background()) {
         draw_default_background(dest, 0, size, is_minimap);
     } else if (cur_chunk->pixels == canvas_pixels::default_foreground()) {
@@ -1299,17 +1296,15 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
     dest += size;
 
     // Remaining chunks (left-aligned)
-    while (xpos <= ViewRightBorder) {
+    while (xpos <= view_right) {
         // Last chunk (not right-aligned)
-        if (xpos + cur_chunk->width > ViewRightBorder) {
+        if (xpos + cur_chunk->width > view_right) {
             if (cur_chunk->pixels.is_pointer()) {
-                memcpy(dest, cur_chunk->pixels.to_pointer(), ViewRightBorder - xpos + 1);
+                memcpy(dest, cur_chunk->pixels.to_pointer(), view_right - xpos + 1);
             } else if (cur_chunk->pixels == canvas_pixels::default_background()) {
-                draw_default_background(dest, xpos - ViewLeftBorder, ViewRightBorder - xpos + 1,
-                                        is_minimap);
+                draw_default_background(dest, xpos - view_left, view_right - xpos + 1, is_minimap);
             } else if (cur_chunk->pixels == canvas_pixels::default_foreground()) {
-                draw_default_foreground(dest, xpos - ViewLeftBorder, ViewRightBorder - xpos + 1,
-                                        is_minimap);
+                draw_default_foreground(dest, xpos - view_left, view_right - xpos + 1, is_minimap);
             } else {
 #ifdef DEBUG
                 if (cur_chunk->pixels != canvas_pixels::transparent()) {
@@ -1324,9 +1319,9 @@ void canvas::render_row(bool player1, unsigned char* dest, int y) {
         if (cur_chunk->pixels.is_pointer()) {
             memcpy(dest, cur_chunk->pixels.to_pointer(), cur_chunk->width);
         } else if (cur_chunk->pixels == canvas_pixels::default_background()) {
-            draw_default_background(dest, xpos - ViewLeftBorder, cur_chunk->width, is_minimap);
+            draw_default_background(dest, xpos - view_left, cur_chunk->width, is_minimap);
         } else if (cur_chunk->pixels == canvas_pixels::default_foreground()) {
-            draw_default_foreground(dest, xpos - ViewLeftBorder, cur_chunk->width, is_minimap);
+            draw_default_foreground(dest, xpos - view_left, cur_chunk->width, is_minimap);
         } else {
 #ifdef DEBUG
             if (cur_chunk->pixels != canvas_pixels::transparent()) {
@@ -1357,34 +1352,34 @@ void canvas::render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x
     }
 
     // Convert corner frame of reference from meters to pixels
-    int view_top_border = 0;
-    meters_to_pixels(corner, &ViewLeftBorder, &view_top_border);
-    ViewRightBorder = ViewLeftBorder + x2 - x1;
-    int view_bottom_border = view_top_border + y2 - y1;
+    int view_top = 0;
+    int view_left = 0;
+    meters_to_pixels(corner, &view_left, &view_top);
+    int view_right = view_left + x2 - x1;
+    int view_bottom = view_top + y2 - y1;
 
-    if (ViewLeftBorder < 20 || ViewRightBorder > pixel_width - 20 || view_top_border < 20 ||
-        view_bottom_border > pixel_height - 20) {
-        internal_error(
-            "canvas::render ScreenLeftBorder < 20 || ViewRightBorder > pixel_width-20 || "
-            "view_top_border < 20 || view_bottom_border > "
-            "pixel_height-20!");
+    if (view_left < 20 || view_right > pixel_width - 20 || view_top < 20 ||
+        view_bottom > pixel_height - 20) {
+        internal_error("canvas::render view_left < 20 || view_right > pixel_width-20 || "
+                       "view_top < 20 || view_bottom > "
+                       "pixel_height-20!");
     }
 
     // Calculate the texture graphic offset for the left edge of the screen
     int foreground_height = Lgr->foreground->get_height();
     int background_height = Lgr->background->get_height();
-    int foreground_x = ViewLeftBorder % Lgr->foreground_original_width;
+    int foreground_x = view_left % Lgr->foreground_original_width;
     constexpr int PARALLAX = 2;
-    int background_x = (ViewLeftBorder / PARALLAX) % Lgr->background_original_width;
+    int background_x = (view_left / PARALLAX) % Lgr->background_original_width;
 
     // Draw each row
-    int canvas_y1 = view_top_border - y1;
+    int canvas_y1 = view_top - y1;
     for (int i = y1; i <= y2; i++) {
         int canvas_y = i + canvas_y1;
         // Calculate the texture graphic y-offset for the current row
         DefaultForeground = Lgr->foreground->get_row(canvas_y % foreground_height) + foreground_x;
         DefaultBackground = Lgr->background->get_row((i - y1) % background_height) + background_x;
-        render_row(player1, pic->get_row(i) + x1, canvas_y);
+        render_row(player1, view_left, view_right, pic->get_row(i) + x1, canvas_y);
     }
     DefaultForeground = nullptr;
     DefaultBackground = nullptr;
@@ -1396,24 +1391,24 @@ void canvas::render_minimap(bool player1, pic8* pic, vect2 corner, int x1, int y
     }
 
     // Convert corner frame of reference from meters to pixels
-    int view_top_border = 0;
-    meters_to_pixels(corner, &ViewLeftBorder, &view_top_border);
-    ViewRightBorder = ViewLeftBorder + x2 - x1 + 1;         // Difference from render() -> +1
-    int view_bottom_border = view_top_border + y2 - y1 + 1; // Difference from render() -> +1
+    int view_top = 0;
+    int view_left = 0;
+    meters_to_pixels(corner, &view_left, &view_top);
+    int view_right = view_left + x2 - x1 + 1; // Difference from render() -> +1
+    int view_bottom = view_top + y2 - y1 + 1; // Difference from render() -> +1
 
-    if (ViewLeftBorder < 20 || ViewRightBorder > pixel_width - 20 || view_top_border < 20 ||
-        view_bottom_border > pixel_height - 20) {
-        internal_error(
-            "canvas::render ScreenLeftBorder < 20 || ViewRightBorder > pixel_width-20 || "
-            "view_top_border < 20 || view_bottom_border > "
-            "pixel_height-20!");
+    if (view_left < 20 || view_right > pixel_width - 20 || view_top < 20 ||
+        view_bottom > pixel_height - 20) {
+        internal_error("canvas::render view_left < 20 || view_right > pixel_width-20 || "
+                       "view_top < 20 || view_bottom > "
+                       "pixel_height-20!");
     }
 
     // Draw each row
-    int canvas_y1 = view_top_border - y1;
+    int canvas_y1 = view_top - y1;
     for (int y = y1; y <= y2; y++) {
         int canvas_y = y + canvas_y1;
-        render_row(player1, pic->get_row(y) + x1, canvas_y);
+        render_row(player1, view_left, view_right, pic->get_row(y) + x1, canvas_y);
     }
 }
 

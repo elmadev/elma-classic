@@ -1257,7 +1257,7 @@ void canvas::render_row(bool player1, int view_left, int view_right, unsigned ch
     // First chunk (not left-aligned):
     int offset = view_left - xpos;
     xpos = view_left;
-    int size = std::min(cur_chunk->width - offset, view_right - xpos + 1);
+    int size = std::min(cur_chunk->width - offset, view_right - xpos);
 
     if (cur_chunk->pixels.is_pointer()) {
         memcpy(dest, &cur_chunk->pixels.to_pointer()[offset], size);
@@ -1277,8 +1277,8 @@ void canvas::render_row(bool player1, int view_left, int view_right, unsigned ch
     cur_chunk++;
 
     // Remaining chunks (left-aligned)
-    while (xpos <= view_right) {
-        size = std::min(cur_chunk->width, view_right - xpos + 1);
+    while (xpos < view_right) {
+        size = std::min(cur_chunk->width, view_right - xpos);
 
         if (cur_chunk->pixels.is_pointer()) {
             memcpy(dest, cur_chunk->pixels.to_pointer(), size);
@@ -1319,8 +1319,8 @@ void canvas::render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x
     int view_top = 0;
     int view_left = 0;
     meters_to_pixels(corner, &view_left, &view_top);
-    int view_right = view_left + x2 - x1;
-    int view_bottom = view_top + y2 - y1;
+    int view_right = view_left + x2 - x1 + 1;
+    int view_bottom = view_top + y2 - y1 + 1;
 
     if (view_left < 20 || view_right > pixel_width - 20 || view_top < 20 ||
         view_bottom > pixel_height - 20) {
@@ -1358,8 +1358,8 @@ void canvas::render_minimap(bool player1, pic8* pic, vect2 corner, int x1, int y
     int view_top = 0;
     int view_left = 0;
     meters_to_pixels(corner, &view_left, &view_top);
-    int view_right = view_left + x2 - x1 + 1; // Difference from render() -> +1
-    int view_bottom = view_top + y2 - y1 + 1; // Difference from render() -> +1
+    int view_right = view_left + x2 - x1 + 1;
+    int view_bottom = view_top + y2 - y1 + 1;
 
     if (view_left < 20 || view_right > pixel_width - 20 || view_top < 20 ||
         view_bottom > pixel_height - 20) {

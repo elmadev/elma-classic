@@ -1291,6 +1291,9 @@ void canvas::meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y) {
     }
 }
 
+// modulo that always returns a positive value
+constexpr int positive_modulo(int i, int n) { return (i % n + n) % n; }
+
 void canvas::render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2) {
     if (x1 >= x2 || y1 >= y2) {
         internal_error("canvas::render x1 >= x2 || y1 >= y2!");
@@ -1313,17 +1316,19 @@ void canvas::render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x
     // Calculate the texture graphic offset for the left edge of the screen
     int foreground_height = Lgr->foreground->get_height();
     int background_height = Lgr->background->get_height();
-    int foreground_x = view_left % Lgr->foreground_original_width;
+    int foreground_x = positive_modulo(view_left, Lgr->foreground_original_width);
     constexpr int PARALLAX = 2;
-    int background_x = (view_left / PARALLAX) % Lgr->background_original_width;
+    int background_x = positive_modulo(view_left / PARALLAX, Lgr->background_original_width);
 
     // Draw each row
     int canvas_y1 = view_top - y1;
     for (int i = y1; i <= y2; i++) {
         int canvas_y = i + canvas_y1;
         // Calculate the texture graphic y-offset for the current row
-        DefaultForeground = Lgr->foreground->get_row(canvas_y % foreground_height) + foreground_x;
-        DefaultBackground = Lgr->background->get_row((i - y1) % background_height) + background_x;
+        DefaultForeground =
+            Lgr->foreground->get_row(positive_modulo(canvas_y, foreground_height)) + foreground_x;
+        DefaultBackground =
+            Lgr->background->get_row(positive_modulo(i - y1, background_height)) + background_x;
         render_row(player1, view_left, view_right, pic->get_row(i) + x1, canvas_y);
     }
     DefaultForeground = nullptr;

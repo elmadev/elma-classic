@@ -355,7 +355,7 @@ double recorder::find_last_turn_frame_time(double time) const {
 }
 
 double recorder::find_last_volt_time(double time, bool* is_right_volt) const {
-    for (int i = current_event_index; i >= 0; i--) {
+    for (int i = current_event_index - 1; i >= 0; i--) {
         if (events[i].time > time) {
             continue;
         }

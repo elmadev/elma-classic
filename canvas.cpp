@@ -29,9 +29,10 @@ constexpr int DISTANCE_DEFAULT = 1000000;
 constexpr int DISTANCE_SKY_CLIPPING_CORRECTION = 10000;
 
 // Canvas margins in meters
-constexpr double MARGIN_X = 209.0;
-constexpr double MARGIN_Y_MINIMAP = 84.0;
-constexpr double MARGIN_Y = 21.0;
+constexpr double ZOOM1_METERS_TO_PIXELS = (100.0 * 0.48);
+constexpr double MARGIN_X = 10000 / ZOOM1_METERS_TO_PIXELS;
+constexpr double MARGIN_Y_MINIMAP = 4000 / ZOOM1_METERS_TO_PIXELS;
+constexpr double MARGIN_Y = 1000 / ZOOM1_METERS_TO_PIXELS;
 
 // No-render margin of the canvas in all directions
 constexpr int CANVAS_SAFETY_RENDER = 20;

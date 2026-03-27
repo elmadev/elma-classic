@@ -42,7 +42,7 @@ recorder::recorder() {
     events.reserve(INITIAL_EVENTS);
 }
 
-recorder::~recorder() { internal_error("recorder::~recorder not implemented!"); }
+recorder::~recorder() = default;
 
 void recorder::erase(const char* lev_filename) {
     if (strlen(lev_filename) > MAX_FILENAME_LEN + 4) {

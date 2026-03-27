@@ -1254,32 +1254,13 @@ void canvas::render_row(bool player1, int view_left, int view_right, unsigned ch
     *rows_position = cur_chunk;
     *rows_x = xpos;
 
-    // If the entire row is a single chunk, paste it
-    int offset = view_left - xpos;
-    if (xpos + cur_chunk->width > view_right) {
-        int width = view_right - xpos + 1;
-        if (cur_chunk->pixels.is_pointer()) {
-            memcpy(dest, &cur_chunk->pixels.to_pointer()[view_left - xpos], width - offset);
-        } else if (cur_chunk->pixels == canvas_pixels::default_background()) {
-            draw_default_background(dest, 0, width - offset, is_minimap);
-        } else if (cur_chunk->pixels == canvas_pixels::default_foreground()) {
-            draw_default_foreground(dest, 0, width - offset, is_minimap);
-        } else {
-#ifdef DEBUG
-            if (cur_chunk->pixels != canvas_pixels::transparent()) {
-                internal_error("cur_chunk->pixels unknown or texture type!");
-            }
-#endif
-        }
-        return;
-    }
-
-    // Otherwise we need to split the situation into the first chunk (not left-aligned),
-    // and the remaining chunks (all left-aligned)
     // First chunk (not left-aligned):
-    int size = cur_chunk->width - offset;
+    int offset = view_left - xpos;
+    xpos = view_left;
+    int size = std::min(cur_chunk->width - offset, view_right - xpos + 1);
+
     if (cur_chunk->pixels.is_pointer()) {
-        memcpy(dest, &cur_chunk->pixels.to_pointer()[view_left - xpos], size);
+        memcpy(dest, &cur_chunk->pixels.to_pointer()[offset], size);
     } else if (cur_chunk->pixels == canvas_pixels::default_background()) {
         draw_default_background(dest, 0, size, is_minimap);
     } else if (cur_chunk->pixels == canvas_pixels::default_foreground()) {
@@ -1291,37 +1272,20 @@ void canvas::render_row(bool player1, int view_left, int view_right, unsigned ch
         }
 #endif
     }
-    xpos += cur_chunk->width;
-    cur_chunk++;
+    xpos += size;
     dest += size;
+    cur_chunk++;
 
     // Remaining chunks (left-aligned)
     while (xpos <= view_right) {
-        // Last chunk (not right-aligned)
-        if (xpos + cur_chunk->width > view_right) {
-            if (cur_chunk->pixels.is_pointer()) {
-                memcpy(dest, cur_chunk->pixels.to_pointer(), view_right - xpos + 1);
-            } else if (cur_chunk->pixels == canvas_pixels::default_background()) {
-                draw_default_background(dest, xpos - view_left, view_right - xpos + 1, is_minimap);
-            } else if (cur_chunk->pixels == canvas_pixels::default_foreground()) {
-                draw_default_foreground(dest, xpos - view_left, view_right - xpos + 1, is_minimap);
-            } else {
-#ifdef DEBUG
-                if (cur_chunk->pixels != canvas_pixels::transparent()) {
-                    internal_error("cur_chunk->pixels unknown or texture type!");
-                }
-#endif
-            }
-            return;
-        }
+        size = std::min(cur_chunk->width, view_right - xpos + 1);
 
-        // Middle chunk (left- and right-aligned)
         if (cur_chunk->pixels.is_pointer()) {
-            memcpy(dest, cur_chunk->pixels.to_pointer(), cur_chunk->width);
+            memcpy(dest, cur_chunk->pixels.to_pointer(), size);
         } else if (cur_chunk->pixels == canvas_pixels::default_background()) {
-            draw_default_background(dest, xpos - view_left, cur_chunk->width, is_minimap);
+            draw_default_background(dest, xpos - view_left, size, is_minimap);
         } else if (cur_chunk->pixels == canvas_pixels::default_foreground()) {
-            draw_default_foreground(dest, xpos - view_left, cur_chunk->width, is_minimap);
+            draw_default_foreground(dest, xpos - view_left, size, is_minimap);
         } else {
 #ifdef DEBUG
             if (cur_chunk->pixels != canvas_pixels::transparent()) {
@@ -1329,8 +1293,8 @@ void canvas::render_row(bool player1, int view_left, int view_right, unsigned ch
             }
 #endif
         }
-        xpos += cur_chunk->width;
-        dest += cur_chunk->width;
+        xpos += size;
+        dest += size;
         cur_chunk++;
     }
 }

@@ -95,6 +95,11 @@ void update_top_ten(int time, char* time_message, int internal_index,
 
     time_message[0] = 0;
 
+    if (OutOfBounds) {
+        strcpy(time_message, "You Went Out of Bounds!");
+        return;
+    }
+
     // Dead
     if (time <= 0) {
         strcpy(time_message, "You Failed to Finish!");

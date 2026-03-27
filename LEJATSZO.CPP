@@ -28,6 +28,7 @@ int Single = 1;
 // Van-e fogocska:
 int Tag = 0;
 // int Multi = 0;
+bool OutOfBounds = false;
 
 int Legkozment = 0;
 bool VideoRecordingMode = false;
@@ -409,6 +410,8 @@ static void setup_gameloop(const char* filenev) {
 
     Motor1->apple_count = Motor2->apple_count = 0;
     Motor1->apple_bug_count = Motor2->apple_bug_count = 0;
+
+    OutOfBounds = false;
 
     Lgr->pal->set();
 }

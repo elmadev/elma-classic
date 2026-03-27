@@ -1,4 +1,5 @@
 #include "segments.h"
+#include "LEJATSZO.H"
 #include "level.h"
 #include "main.h"
 #include "polygon.h"
@@ -317,9 +318,8 @@ void segments::iterate_collision_grid_cell_segments(vect2 r) {
         internal_error("segments::iterate_collision_grid_cell_segments !collision_grid!");
     }
     // Convert from elmameters to grid position
-    // This function is responsible for crashing when you go out of bounds in the up/right direction
-    // down/left position is handled without a crash
     r = (r - collision_grid_origin) * (1 / collision_grid_cell_size);
+    // Allow negative out of bounds
     int cell_x = 0;
     if (r.x > 0) {
         cell_x = (int)(r.x);
@@ -328,18 +328,17 @@ void segments::iterate_collision_grid_cell_segments(vect2 r) {
     if (r.y > 0) {
         cell_y = (int)(r.y);
     }
+    // Disallow positive out of bounds by more than 1 cell
     if (cell_x > collision_grid_width) {
-        internal_error(
-            "segments::iterate_collision_grid_cell_segments cell_x > collision_grid_width!");
-    }
-    if (cell_x == collision_grid_width) {
-        cell_x = collision_grid_width - 1;
+        OutOfBounds = true;
     }
     if (cell_y > collision_grid_height) {
-        internal_error(
-            "segments::iterate_collision_grid_cell_segments cell_y > collision_grid_height!");
+        OutOfBounds = true;
     }
-    if (cell_y == collision_grid_height) {
+    if (cell_x >= collision_grid_width) {
+        cell_x = collision_grid_width - 1;
+    }
+    if (cell_y >= collision_grid_height) {
         cell_y = collision_grid_height - 1;
     }
     // We are now ready to iterate

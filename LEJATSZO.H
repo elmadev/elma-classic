@@ -7,6 +7,7 @@
 // Jatek modja ket fele lehet:
 extern int Single;
 extern int Tag; // Van-e fogocska
+extern bool OutOfBounds;
 // extern int Coop;
 
 extern int Legkozment; // kiraj320 ebbol tudja, hogy snapshot-ot keszitsen

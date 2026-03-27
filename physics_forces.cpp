@@ -1,5 +1,7 @@
 #include "physics_forces.h"
+#include "canvas.h"
 #include "EDITUJ.H"
+#include "LEJATSZO.H"
 #include "level.h"
 #include "object.h"
 #include "physics_collision.h"
@@ -354,6 +356,10 @@ BikeState check_object_collision(motorst* mot) {
     vect2 point1;
     vect2 point2;
     if (get_two_anchor_points(mot->head_r, HeadRadius, &point1, &point2)) {
+        return BikeState::Dead;
+    }
+
+    if (OutOfBounds) {
         return BikeState::Dead;
     }
 

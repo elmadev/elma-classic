@@ -33,11 +33,14 @@ constexpr double MARGIN_X = 209.0;
 constexpr double MARGIN_Y_MINIMAP = 84.0;
 constexpr double MARGIN_Y = 21.0;
 
+// No-render margin of the canvas in all directions
+constexpr int CANVAS_SAFETY_RENDER = 20;
+
 // No-draw margin of the edge of canvas for sprites and grass images
 constexpr int CANVAS_SAFETY_LEFT = 120;
 constexpr int CANVAS_SAFETY_RIGHT = 50;
-constexpr int CANVAS_SAFETY_TOP = 20;
-constexpr int CANVAS_SAFETY_BOTTOM = CANVAS_SAFETY_TOP;
+constexpr int CANVAS_SAFETY_TOP = CANVAS_SAFETY_RENDER;
+constexpr int CANVAS_SAFETY_BOTTOM = CANVAS_SAFETY_RENDER;
 
 static void memory_error() {
     external_error("You do not have enough memory to load this level!\n"
@@ -1215,6 +1218,49 @@ static inline void draw_default_background(unsigned char* dest, size_t offset, s
 }
 
 void canvas::render_row(bool player1, int view_left, int view_right, unsigned char* dest, int y) {
+    // Vertically out-of-bounds
+    int view_width = view_right - view_left;
+    if (y < CANVAS_SAFETY_RENDER || y > pixel_height - CANVAS_SAFETY_RENDER) {
+        if (this != CanvasFront) {
+            draw_default_foreground(dest, 0, view_width, is_minimap);
+        }
+        return;
+    }
+
+    // Left out-of-bounds
+    int render_left = view_left;
+    int oob_left = CANVAS_SAFETY_RENDER - view_left;
+    if (oob_left > 0) {
+        oob_left = std::min(oob_left, view_width);
+        if (this != CanvasFront) {
+            draw_default_foreground(dest, 0, oob_left, is_minimap);
+        }
+        if (oob_left == view_width) {
+            return; // We rendered entire screen
+        }
+        dest += oob_left;
+        render_left = CANVAS_SAFETY_RENDER;
+    }
+
+    // Right out-of-bounds
+    int render_right = view_right;
+    int oob_right = view_right - (pixel_width - CANVAS_SAFETY_RENDER);
+    if (oob_right > 0) {
+        // Take into account if we were also left-out-of-bounds
+        int render_width = view_width - std::max(0, oob_left);
+
+        oob_right = std::min(oob_right, render_width);
+        int offset = render_width - oob_right;
+        if (this != CanvasFront) {
+            draw_default_foreground(dest, offset, oob_right, is_minimap);
+        }
+        if (oob_right == render_width) {
+            return; // We rendered entire screen
+        }
+        render_right = pixel_width - CANVAS_SAFETY_RENDER;
+    }
+
+    // Render inbounds
     canvas_chunk** rows_position = player1 ? &rows_position1[y] : &rows_position2[y];
     int* rows_x = player1 ? &rows_x1[y] : &rows_x2[y];
 
@@ -1222,12 +1268,12 @@ void canvas::render_row(bool player1, int view_left, int view_right, unsigned ch
     canvas_chunk* cur_chunk = *rows_position;
     int xpos = *rows_x;
     // Search leftwards using left border of chunk
-    while (xpos > view_left) {
+    while (xpos > render_left) {
         cur_chunk--;
         xpos -= cur_chunk->width;
     }
     // Search rightwards using right border of chunk
-    while (xpos + cur_chunk->width <= view_left) {
+    while (xpos + cur_chunk->width <= render_left) {
         xpos += cur_chunk->width;
         cur_chunk++;
     }
@@ -1236,16 +1282,16 @@ void canvas::render_row(bool player1, int view_left, int view_right, unsigned ch
     *rows_x = xpos;
 
     // First chunk (not left-aligned):
-    int offset = view_left - xpos;
-    xpos = view_left;
-    int size = std::min(cur_chunk->width - offset, view_right - xpos);
+    int offset = render_left - xpos;
+    xpos = render_left;
+    int size = std::min(cur_chunk->width - offset, render_right - xpos);
 
     if (cur_chunk->pixels.is_pointer()) {
         memcpy(dest, &cur_chunk->pixels.to_pointer()[offset], size);
     } else if (cur_chunk->pixels == canvas_pixels::default_background()) {
-        draw_default_background(dest, 0, size, is_minimap);
+        draw_default_background(dest, xpos - view_left, size, is_minimap);
     } else if (cur_chunk->pixels == canvas_pixels::default_foreground()) {
-        draw_default_foreground(dest, 0, size, is_minimap);
+        draw_default_foreground(dest, xpos - view_left, size, is_minimap);
     } else {
 #ifdef DEBUG
         if (cur_chunk->pixels != canvas_pixels::transparent()) {
@@ -1258,8 +1304,8 @@ void canvas::render_row(bool player1, int view_left, int view_right, unsigned ch
     cur_chunk++;
 
     // Remaining chunks (left-aligned)
-    while (xpos < view_right) {
-        size = std::min(cur_chunk->width, view_right - xpos);
+    while (xpos < render_right) {
+        size = std::min(cur_chunk->width, render_right - xpos);
 
         if (cur_chunk->pixels.is_pointer()) {
             memcpy(dest, cur_chunk->pixels.to_pointer(), size);
@@ -1304,14 +1350,6 @@ void canvas::render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x
     int view_left = 0;
     meters_to_pixels(corner, &view_left, &view_top);
     int view_right = view_left + x2 - x1 + 1;
-    int view_bottom = view_top + y2 - y1 + 1;
-
-    if (view_left < 20 || view_right > pixel_width - 20 || view_top < 20 ||
-        view_bottom > pixel_height - 20) {
-        internal_error("canvas::render view_left < 20 || view_right > pixel_width-20 || "
-                       "view_top < 20 || view_bottom > "
-                       "pixel_height-20!");
-    }
 
     // Calculate the texture graphic offset for the left edge of the screen
     int foreground_height = Lgr->foreground->get_height();
@@ -1345,14 +1383,6 @@ void canvas::render_minimap(bool player1, pic8* pic, vect2 corner, int x1, int y
     int view_left = 0;
     meters_to_pixels(corner, &view_left, &view_top);
     int view_right = view_left + x2 - x1 + 1;
-    int view_bottom = view_top + y2 - y1 + 1;
-
-    if (view_left < 20 || view_right > pixel_width - 20 || view_top < 20 ||
-        view_bottom > pixel_height - 20) {
-        internal_error("canvas::render view_left < 20 || view_right > pixel_width-20 || "
-                       "view_top < 20 || view_bottom > "
-                       "pixel_height-20!");
-    }
 
     // Draw each row
     int canvas_y1 = view_top - y1;

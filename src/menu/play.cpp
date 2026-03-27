@@ -298,7 +298,7 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
 
         // Show either the time_message from update_top_ten or FlagTag info
         std::string overlay_text;
-        if (!Single && Tag) {
+        if (!Single && Tag && !OutOfBounds) {
             std::string letter = FlagTagAStarts ? "A" : "B";
             overlay_text = letter + " start with the flag next.";
         } else {

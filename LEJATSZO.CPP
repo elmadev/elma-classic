@@ -217,7 +217,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
         pvalt->inf.motor_frequency = -1;
         pvalt->inf.gas = 0;
         prec->store_frames(pmot, eddig, &pvalt->inf);
-        if (!Single && Tag) {
+        if (!Single && Tag && !OutOfBounds) {
             // Flag Tag modban nem allnak meg, hanem visszamennek starthelyre:
             init_motor(pmot);
             // Kezdetihelydiff-et setallaktiv allitja be:

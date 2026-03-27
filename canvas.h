@@ -214,6 +214,9 @@ class canvas {
     void meters_to_pixels(vect2 meters, int* pixel_x, int* pixel_y);
     void render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2);
     void render_minimap(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x2, int y2);
+    // Return true if bike is out-of-bounds in the negative direction. This would have caused an
+    // internal error in Elma 1.11a.
+    bool bike_out_of_bounds(vect2 pos);
     // Generate all 3 canvasses required to render a level
     static void create_canvases();
 };

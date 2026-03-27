@@ -43,6 +43,11 @@ constexpr int CANVAS_SAFETY_RIGHT = 50;
 constexpr int CANVAS_SAFETY_TOP = CANVAS_SAFETY_RENDER;
 constexpr int CANVAS_SAFETY_BOTTOM = CANVAS_SAFETY_RENDER;
 
+// Position at which renderer would crash in Elma 1.11a
+constexpr double OUT_OF_BOUNDS_LEFT = (CANVAS_SAFETY_RENDER + 640.0 / 2.0) / ZOOM1_METERS_TO_PIXELS;
+constexpr double OUT_OF_BOUNDS_BOTTOM =
+    (CANVAS_SAFETY_RENDER + 480.0 / 2.0) / ZOOM1_METERS_TO_PIXELS;
+
 static void memory_error() {
     external_error("You do not have enough memory to load this level!\n"
                    "Try to set the graphic detail to low at the options.");
@@ -1617,4 +1622,9 @@ canvas_chunk_node* node_finder::get_chunk(int x, int y) {
         }
     }
     return current_node;
+}
+
+bool canvas::bike_out_of_bounds(vect2 pos) {
+    vect2 relative_pos = pos - origin;
+    return relative_pos.x < OUT_OF_BOUNDS_LEFT || relative_pos.y < OUT_OF_BOUNDS_BOTTOM;
 }

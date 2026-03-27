@@ -359,6 +359,10 @@ BikeState check_object_collision(motorst* mot) {
         return BikeState::Dead;
     }
 
+    if (CanvasBack->bike_out_of_bounds(mot->bike.r)) {
+        OutOfBounds = true;
+    }
+
     if (OutOfBounds) {
         return BikeState::Dead;
     }

@@ -16,6 +16,7 @@
 * Wheel turning the wrong way in replays is fixed (glitch starts at 455 speed instead of 124 speed, where max gas speed is approximately 220)
 * Fix crash related to "too complicated" (too large) mask and too large picture in lgr
 * Fix Uphill Battle bug where very wide grass polygons are not rendered properly at high zoom
+* Going out of bounds will kill the player instead of crashing
 
 ## Minor Features
 * Improve picture loading speed by allocating all needed memory at once instead of allocating in blocks of 64 KB (DOS-era restriction)

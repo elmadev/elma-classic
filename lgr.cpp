@@ -3,7 +3,7 @@
 #include "EDITUJ.H"
 #include "affine_pic.h"
 #include "anim.h"
-#include "ECSET.H"
+#include "canvas.h"
 #include "eol_settings.h"
 #include "fs_utils.h"
 #include "grass.h"

@@ -1,5 +1,5 @@
 #include "level_load.h"
-#include "ECSET.H"
+#include "canvas.h"
 #include "editor_dialog.h"
 #include "EDITUJ.H"
 #include "fs_utils.h"

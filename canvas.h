@@ -1,5 +1,5 @@
-#ifndef ECSET_H
-#define ECSET_H
+#ifndef CANVAS_H
+#define CANVAS_H
 
 #include "grass.h"
 #include "lgr.h"

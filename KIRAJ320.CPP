@@ -3,7 +3,7 @@
 #include "affine_pic.h"
 #include "anim.h"
 #include "affine_pic_render.h"
-#include "ECSET.H"
+#include "canvas.h"
 #include "EDITUJ.H"
 #include "eol/console.h"
 #include "eol/status_messages.h"

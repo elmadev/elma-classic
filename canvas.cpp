@@ -1,4 +1,4 @@
-#include "ECSET.H"
+#include "canvas.h"
 #include "anim.h"
 #include "EDITUJ.H"
 #include "eol_settings.h"

@@ -1,7 +1,7 @@
 #include "menu/rec_list.h"
+#include "debug/profiler.h"
 #include "fs_utils.h"
 #include "menu/replay_cache.h"
-#include "recorder.h"
 
 namespace {
 replay_cache Cache;
@@ -24,13 +24,10 @@ std::vector<std::string> rec_list::get_replays() {
 }
 
 std::vector<std::string> rec_list::replays_for_level(int level_id) {
-    std::vector<std::string> result;
-    for (const auto& filename : get_replays()) {
-        auto header = recorder::read_header(filename);
-        if (header && header->level_id == level_id) {
-            result.push_back(filename);
-        }
-    }
+    START_TIME(timer);
+    Cache.sync(get_replays());
+    auto result = Cache.filenames_for_level(level_id);
+    END_TIME(timer, "rec_list::replays_for_level")
     return result;
 }
 

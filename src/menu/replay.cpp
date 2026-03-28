@@ -4,6 +4,7 @@
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "fs_utils.h"
+#include "menu/rec_list.h"
 #include "LEJATSZO.H"
 #include "level.h"
 #include "level_load.h"
@@ -143,18 +144,6 @@ static void replay_randomizer(std::vector<std::string>& filenames) {
     }
 }
 
-static std::vector<std::string> find_replay_files() {
-    std::vector<std::string> filenames;
-    recname filename;
-    bool done = find_first("rec/*.rec", filename, MAX_REPLAY_NAME_LEN);
-    while (!done) {
-        filenames.emplace_back(filename);
-        done = find_next(filename);
-    }
-    find_close();
-    return filenames;
-}
-
 static void replay_row_handler(const std::string& filename) {
     if (is_key_down(DIK_F1)) {
         replay_render(filename);
@@ -166,7 +155,7 @@ static void replay_row_handler(const std::string& filename) {
 }
 
 void menu_replay_all() {
-    std::vector<std::string> replay_names = find_replay_files();
+    std::vector<std::string> replay_names = rec_list::get_replays();
 
     menu_nav nav("Select replay file!");
     nav.add_row("Randomizer", NAV_FUNC(&replay_names) { replay_randomizer(replay_names); });
@@ -197,7 +186,7 @@ void menu_replay_all() {
 
 void menu_merge_replays() {
     std::string picked_file;
-    std::vector<std::string> replay_names = find_replay_files();
+    std::vector<std::string> replay_names = rec_list::get_replays();
 
     menu_nav nav("Select first replay");
 

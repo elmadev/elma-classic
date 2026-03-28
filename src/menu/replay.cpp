@@ -224,6 +224,7 @@ void menu_merge_replays() {
 
 void menu_replay_level(int level_id) {
     std::vector<std::string> replay_names = rec_list::replays_for_level(level_id);
+    std::erase(replay_names, std::string(LAST_REC_FILENAME));
 
     if (replay_names.empty()) {
         return;

@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+constexpr const char LAST_REC_FILENAME[] = "!last.rec";
+
 struct rec_header {
     int level_id;
     char level_filename[16];

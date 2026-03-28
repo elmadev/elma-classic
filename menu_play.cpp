@@ -242,6 +242,10 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
                      const char* external_filename) {
     bool external_level = external_filename != nullptr;
 
+    if (!Rec1->is_empty()) {
+        recorder::save_rec_file(LAST_REC_FILENAME, Ptop->level_id);
+    }
+
     player* player1 = State->get_player(State->player1);
     player* player2 = State->get_player(State->player2);
 

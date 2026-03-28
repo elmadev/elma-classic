@@ -1,6 +1,15 @@
 #include "menu/rec_list.h"
 #include "fs_utils.h"
+#include "menu/replay_cache.h"
 #include "recorder.h"
+
+namespace {
+replay_cache Cache;
+} // namespace
+
+void rec_list::build_cache() { Cache.start(); }
+
+bool rec_list::is_cache_ready() { return Cache.is_ready(); }
 
 std::vector<std::string> rec_list::get_replays() {
     std::vector<std::string> filenames;
@@ -23,4 +32,8 @@ std::vector<std::string> rec_list::replays_for_level(int level_id) {
         }
     }
     return result;
+}
+
+void rec_list::add_new_replay(const std::string& filename, int level_id) {
+    Cache.upsert(filename, level_id);
 }

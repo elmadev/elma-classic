@@ -3,6 +3,7 @@
 #include "fs_utils.h"
 #include "level.h"
 #include "main.h"
+#include "menu/rec_list.h"
 #include "physics_init.h"
 #include "qopen.h"
 #include "util/util.h"
@@ -660,6 +661,7 @@ void recorder::save_rec_file(const char* filename, int level_id) {
     } else {
         Rec1->save(filename, nullptr, level_id);
     }
+    rec_list::add_new_replay(filename, level_id);
 }
 
 // Max events in one frame: Triple apple bug x MAX_OBJECTS, turn, volt, bump x 2

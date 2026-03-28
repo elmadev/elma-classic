@@ -12,6 +12,7 @@
 #include "physics_init.h"
 #include "pic8.h"
 #include "platform_impl.h"
+#include "menu/rec_list.h"
 #include "recorder.h"
 #include "state.h"
 #include "qopen.h"
@@ -32,6 +33,8 @@ void menu_intro() {
     eol_settings::sync_controls_to_state(State);
 
     init_physics_data();
+
+    rec_list::build_cache();
 
     // test_player();
 

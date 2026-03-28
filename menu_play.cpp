@@ -299,7 +299,7 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
         } else {
             overlay_text = std::string(time_message);
         }
-        nav.add_overlay(overlay_text, 320, Single ? 412 : 356, OverlayAlignment::Centered);
+        nav.add_overlay(overlay_text, 320, Single ? 454 : 398, OverlayAlignment::Centered);
 
         if (!Single) {
             // Show extra multiplayer information
@@ -310,8 +310,8 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
                 dx = 100;
             }
 
-            int y1 = 422;
-            int y2 = 457;
+            int y1 = 464;
+            int y2 = 499;
 
             // Adjust horizontal spacing if player names are too long
             bool long_name =
@@ -379,6 +379,18 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
                 recorder saved_rec2 = *Rec2;
                 int saved_multi = MultiplayerRec;
                 menu_replay_level(Ptop->level_id);
+                *Rec1 = saved_rec1;
+                *Rec2 = saved_rec2;
+                MultiplayerRec = saved_multi;
+                MenuPalette->set();
+            });
+
+        nav.add_row(
+            "Merge with", NAV_FUNC() {
+                recorder saved_rec1 = *Rec1;
+                recorder saved_rec2 = *Rec2;
+                int saved_multi = MultiplayerRec;
+                menu_merge_level(Ptop->level_id, LAST_REC_FILENAME);
                 *Rec1 = saved_rec1;
                 *Rec2 = saved_rec2;
                 MultiplayerRec = saved_multi;

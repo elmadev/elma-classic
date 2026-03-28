@@ -9,6 +9,7 @@
 * Add support for LGR13
 * Add setting to properly scale grass with zoom
 * There is now navigation to "Level replays" after playing a level to view replays in that level
+* There is now navigation to "Merge with" after playing a level to merge last run with replays in that level
 
 ## Major Bug Fixes
 * It is possible to properly collect more than 200 apples in a single frame

@@ -8,6 +8,7 @@
 * Replays: maximum duration increased from 1 hour to about 828 days.
 * Add support for LGR13
 * Add setting to properly scale grass with zoom
+* There is now navigation to "Level replays" after playing a level to view replays in that level
 
 ## Major Bug Fixes
 * It is possible to properly collect more than 200 apples in a single frame

@@ -14,6 +14,8 @@
 #include "menu_pic.h"
 #include "platform_impl.h"
 #include "physics_init.h"
+#include "menu/replay.h"
+#include "recorder.h"
 #include "util/util.h"
 #include "skip.h"
 #include "timer.h"
@@ -293,7 +295,7 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
         } else {
             overlay_text = std::string(time_message);
         }
-        nav.add_overlay(overlay_text, 320, Single ? 370 : 314, OverlayAlignment::Centered);
+        nav.add_overlay(overlay_text, 320, Single ? 412 : 356, OverlayAlignment::Centered);
 
         if (!Single) {
             // Show extra multiplayer information
@@ -304,8 +306,8 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
                 dx = 100;
             }
 
-            int y1 = 380;
-            int y2 = 415;
+            int y1 = 422;
+            int y2 = 457;
 
             // Adjust horizontal spacing if player names are too long
             bool long_name =
@@ -366,6 +368,18 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
             });
 
         nav.add_row("Save play", NAV_FUNC() { menu_save_play(Ptop->level_id); });
+
+        nav.add_row(
+            "Level replays", NAV_FUNC() {
+                recorder saved_rec1 = *Rec1;
+                recorder saved_rec2 = *Rec2;
+                int saved_multi = MultiplayerRec;
+                menu_replay_level(Ptop->level_id);
+                *Rec1 = saved_rec1;
+                *Rec2 = saved_rec2;
+                MultiplayerRec = saved_multi;
+                MenuPalette->set();
+            });
 
         nav.add_row(
             "Best times", NAV_FUNC(&external_level, &internal_index) {

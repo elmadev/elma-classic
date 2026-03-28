@@ -250,3 +250,32 @@ void menu_replay_level(int level_id) {
         }
     }
 }
+
+void menu_merge_level(int level_id, const std::string& merge_file) {
+    std::vector<std::string> replay_names = rec_list::replays_for_level(level_id);
+    std::erase(replay_names, std::string(LAST_REC_FILENAME));
+
+    if (replay_names.empty()) {
+        return;
+    }
+
+    menu_nav nav("Merge with");
+
+    for (const std::string& filename : replay_names) {
+        constexpr int EXT_LEN = 4;
+        std::string short_name = filename.substr(0, filename.size() - EXT_LEN);
+        nav.add_row(
+            short_name, NAV_FUNC(&merge_file, filename) { merge_play(merge_file, filename); });
+    }
+
+    nav.search_pattern = SearchPattern::Sorted;
+    nav.max_search_len = MAX_REPLAY_NAME_LEN;
+    nav.sort_rows();
+
+    while (true) {
+        MenuPalette->set();
+        if (nav.navigate() < 0) {
+            return;
+        }
+    }
+}

@@ -3,5 +3,6 @@
 
 void menu_replay_all();
 void menu_merge_replays();
+void menu_replay_level(int level_id);
 
 #endif

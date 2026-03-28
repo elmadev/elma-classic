@@ -221,3 +221,31 @@ void menu_merge_replays() {
         merge_play(file1, picked_file);
     }
 }
+
+void menu_replay_level(int level_id) {
+    std::vector<std::string> replay_names = rec_list::replays_for_level(level_id);
+
+    if (replay_names.empty()) {
+        return;
+    }
+
+    menu_nav nav("Level Replays");
+
+    for (const std::string& filename : replay_names) {
+        constexpr int EXT_LEN = 4;
+        std::string short_name = filename.substr(0, filename.size() - EXT_LEN);
+        nav.add_row(short_name, NAV_FUNC(filename) { replay_row_handler(filename); });
+    }
+
+    nav.search_pattern = SearchPattern::Sorted;
+    nav.max_search_len = MAX_REPLAY_NAME_LEN;
+    nav.sort_rows();
+
+    while (true) {
+        MenuPalette->set();
+        int choice = nav.navigate();
+        if (choice < 0) {
+            return;
+        }
+    }
+}

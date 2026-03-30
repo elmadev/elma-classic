@@ -51,8 +51,8 @@ struct motorst {
     rigidbody left_wheel;
     rigidbody right_wheel;
     vect2 head_r;
-    int flipped_bike;
-    int flipped_camera;
+    bool flipped_bike;
+    bool flipped_camera;
     MotorGravity gravity_direction;
 
     vect2 body_r;

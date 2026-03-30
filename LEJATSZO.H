@@ -34,11 +34,16 @@ long lejatszo_r(const char* filenev, int showkepmarad);
 void setup_render_directory(const std::string& replay_filename);
 void render_replay(const char* level_filename);
 
-struct baljobbvaltozok {
-    int eddighatra;
+struct turning_camera_pan_animation {
+    // `flipped_bike` is true when the bike is facing right.
+    bool flipped_bike;
     double ucsoforgas;
     double ucsoford;
-    double baljobb; // kulsoresz szamolja tobbibol
+    // 0.0 is the leftmost position, for when the bike is facing right, and 1.0 is the rightmost
+    // position.
+    // The camera position is animated from left to right after turning at the rate defined by
+    // `EolSettings->turn_time`.
+    double camera_position;
     double forgas;
 };
 
@@ -56,7 +61,7 @@ struct valtozok {
 
     double ugrasnagysag;
 
-    baljobbvaltozok baljobbv_f, baljobbv_h;
+    turning_camera_pan_animation baljobbv_f, baljobbv_h;
 };
 
 // lejatszo ezt beallitja: 0 -> nem kell kiirni, 1 -> A eloszor, 2 -> B

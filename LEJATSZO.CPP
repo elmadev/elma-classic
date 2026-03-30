@@ -99,24 +99,24 @@ static void initsoundlejatszoban(void) {
 static viewtimest Viewtime1 = {1, 0, 1, 0};
 static viewtimest Viewtime2 = {1, 0, 1, 0};
 
-static BikeState spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
-    if (sorszam < 0 || sorszam >= MAX_OBJECTS) {
+static BikeState on_collect_object(int object_idx, int* papple_count, motorst* pmot) {
+    if (object_idx < 0 || object_idx >= MAX_OBJECTS) {
         internal_error("spritefeldolgoz-ban sorszam < 0 || sorszam >= MAXKEREK!");
     }
-    if (!Ptop->objects[sorszam]) {
+    if (!Ptop->objects[object_idx]) {
         internal_error("spritefeldolgoz-ban !Ptop->objects[sorszam]!");
     }
 
-    object::Type tipus = Ptop->objects[sorszam]->type;
+    object::Type tipus = Ptop->objects[object_idx]->type;
 
     if (tipus == object::Type::Killer) {
         return BikeState::Dead;
     }
     if (tipus == object::Type::Food) {
-        Ptop->objects[sorszam]->active = false;
-        (*pkajaszam)++;
+        Ptop->objects[object_idx]->active = false;
+        (*papple_count)++;
         add_event_buffer(WavEvent::Food, 0.99, -1);
-        switch (Ptop->objects[sorszam]->property) {
+        switch (Ptop->objects[object_idx]->property) {
         case object::Property::None:
             break;
         case object::Property::GravityUp:
@@ -142,11 +142,16 @@ static BikeState spritefeldolgoz(int sorszam, int* pkajaszam, motorst* pmot) {
     return BikeState::Normal;
 }
 
-static double baljobbszamol(double eltelt, int hatra) {
+// Get the camera position.
+// 0.0 is the leftmost position, for when the bike is facing right, and 1.0 is the rightmost
+// position.
+//
+// `flipped_bike`: true if the bike is facing right
+static double camera_position(double eltelt, bool flipped_bike) {
     eltelt = std::max<double>(eltelt, 0);
 
     double camera_flip_time = EolSettings->turn_time() + 0.15;
-    if (hatra) {
+    if (flipped_bike) {
         if (eltelt > camera_flip_time) {
             return 0.0;
         }
@@ -269,7 +274,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     while (get_event_buffer(&wavazonosito, &hangero, &objszam)) {
         if (objszam >= 0) {
             int prev_apple_count = pmot->apple_count;
-            BikeState eredmeny = spritefeldolgoz(objszam, &pmot->apple_count, pmot);
+            BikeState eredmeny = on_collect_object(objszam, &pmot->apple_count, pmot);
             if (eredmeny == BikeState::Dead || eredmeny == BikeState::Finish) {
                 if (eredmeny == BikeState::Dead) {
                     *pmeghalt = 1;
@@ -312,8 +317,9 @@ static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int
     }
 }
 
-static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig, int hatra) {
-    if (pvalt->eddighatra != hatra) {
+static void baljobbelintez(turning_camera_pan_animation* pvalt, recorder* prec, double eddig,
+                           bool flipped_bike) {
+    if (pvalt->flipped_bike != flipped_bike) {
         pvalt->ucsoforgas = eddig;
         double eltelt = eddig - pvalt->ucsoford;
         double camera_flip_time = EolSettings->turn_time() + 0.15;
@@ -322,7 +328,7 @@ static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig,
         } else {
             pvalt->ucsoford = eddig;
         }
-        pvalt->eddighatra = hatra;
+        pvalt->flipped_bike = flipped_bike;
         // Hang adas:
         if (prec) {
             // Most kihagyjuk wavgyujtot:
@@ -342,7 +348,7 @@ static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig,
         pvalt->forgas = std::clamp(pvalt->forgas, 0.0, 1.0);
     }
 
-    pvalt->baljobb = baljobbszamol(eddig - pvalt->ucsoford, hatra);
+    pvalt->camera_position = camera_position(eddig - pvalt->ucsoford, flipped_bike);
 }
 
 static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, recorder* prec,
@@ -452,7 +458,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
     stopwatch_reset();
 
     // Valtozok inicializalasa:
-    valtozok valt1; // Inicializalni kell !!!!!!!!!!!!
+    valtozok valt1; // must be initiailized
     memset(&valt1, 0, sizeof(valt1));
     valtozok valt2;
     memset(&valt2, 0, sizeof(valt2));
@@ -495,7 +501,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
 
     long l = 0;
     int mindjar = 1;
-    while (1) {
+    while (true) {
         // Kiszamolja mennyit kell leptetni:
         double cel = stopwatch() * 0.0024;
         if (cel < 0.000001) {
@@ -769,16 +775,16 @@ static void rewind_override_animations(valtozok* pvalt, motorst* pmot, recorder*
                                        double eddig) {
     double turn_time = prec->find_last_turn_frame_time(eddig);
 
-    pvalt->baljobbv_f.eddighatra = pmot->flipped_bike;
+    pvalt->baljobbv_f.flipped_bike = pmot->flipped_bike;
     pvalt->baljobbv_f.ucsoforgas = turn_time;
     pvalt->baljobbv_f.ucsoford = turn_time;
     baljobbelintez(&pvalt->baljobbv_f, nullptr, eddig, pmot->flipped_bike);
 
-    pvalt->baljobbv_h.eddighatra = pmot->flipped_camera;
+    pvalt->baljobbv_h.flipped_bike = pmot->flipped_camera;
     pvalt->baljobbv_h.ucsoforgas = eddig - 1000.0;
     pvalt->baljobbv_h.ucsoford = eddig - 1000.0;
     pvalt->baljobbv_h.forgas = 1.0;
-    pvalt->baljobbv_h.baljobb = pmot->flipped_camera ? 0.0 : 1.0;
+    pvalt->baljobbv_h.camera_position = pmot->flipped_camera ? 0.0 : 1.0;
 
     bool is_right_volt = true;
     double volt_time = prec->find_last_volt_time(eddig, &is_right_volt);
@@ -804,7 +810,7 @@ static bool replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     while (prec->recall_event(eddig, &wavindex, &hangero, &objszam)) {
         if (objszam >= 0) {
             int prev_apple_count = pmot->apple_count;
-            spritefeldolgoz(objszam, &pmot->apple_count, pmot);
+            on_collect_object(objszam, &pmot->apple_count, pmot);
             if (prev_apple_count < pmot->apple_count) {
                 pmot->last_apple_time = eddig * TimeToCentiseconds;
             }

@@ -152,13 +152,13 @@ void beallitmereteket(int splitscreen) {
 
 // Meg nem affin koordok:
 static void kidoboz(vect2 a, vect2 b, pic8* ppic8, double szelesseg, affine_pic* pk, double tulloga,
-                    double tullogb, int tukor = 0) {
+                    double tullogb, bool flipped_bike) {
     vect2 vegys = unit_vector(b - a);
     b = b + vegys * tullogb;
     a = a - vegys * tulloga;
     vect2 v = b - a;
     vect2 v2fel;
-    if (tukor) {
+    if (flipped_bike) {
         v2fel = rotate_90deg(vegys) * szelesseg;
     } else {
         v2fel = rotate_minus90deg(vegys) * szelesseg;
@@ -177,12 +177,12 @@ static void kidoboz(vect2 a, vect2 b, pic8* ppic8, double szelesseg, affine_pic*
 // radius meg nincs megszorozva:
 // Meg nem affin koordok:
 static void kidobozkerek(vect2 r, double radius, double rotation, pic8* ppicbuffer, affine_pic* pk,
-                         int tukor = 0) {
+                         bool flipped_bike) {
     vect2 vfel(cos(rotation) * radius, sin(rotation) * radius);
-    if (tukor) {
-        kidoboz(r + vfel, r - vfel, ppicbuffer, radius, pk, 0.0, 0.0, tukor);
+    if (flipped_bike) {
+        kidoboz(r + vfel, r - vfel, ppicbuffer, radius, pk, 0.0, 0.0, flipped_bike);
     } else {
-        kidoboz(r - vfel, r + vfel, ppicbuffer, radius, pk, 0.0, 0.0, tukor);
+        kidoboz(r - vfel, r + vfel, ppicbuffer, radius, pk, 0.0, 0.0, flipped_bike);
     }
 }
 
@@ -238,20 +238,22 @@ static void felhokfel( int x, int y, pic8* ppicbuffer, pic8* pfelho,
     }
 } */
 
-static void kiview(bool ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, motorst* pmot2) {
+static void kiview(bool ajatekos, pic8* ppic, double camera_position, vect2 motorkozep,
+                   motorst* pmot2) {
 
     double Viewxsize_d = Viewxsize * MinimapScaleFactor * PixelsToMeters;
     double Viewysize_d = Viewysize * MinimapScaleFactor * PixelsToMeters;
 
     double szeltoltav = EolSettings->center_map() ? 0.5 : 0.2;
     double atfuthossz = 1.0 - 2.0 * szeltoltav;
-    vect2 sarokbolkozepre(Viewxsize_d * (szeltoltav + baljobb * atfuthossz), Viewysize_d / 2);
+    vect2 sarokbolkozepre(Viewxsize_d * (szeltoltav + camera_position * atfuthossz),
+                          Viewysize_d / 2);
     vect2 sarok = motorkozep - sarokbolkozepre;
 
     double align;
     switch (EolSettings->map_alignment()) {
     case MapAlignment::None:
-        align = baljobb;
+        align = camera_position;
         break;
     case MapAlignment::Left:
         align = 0.0;
@@ -457,12 +459,12 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 
     // Kerekek:
     if (elsokerekrogton) {
-        kidobozkerek(p_k1, WheelBackgroundRenderRadius, pmot->left_wheel.rotation, ppic,
-                     pmk->wheel);
+        kidobozkerek(p_k1, WheelBackgroundRenderRadius, pmot->left_wheel.rotation, ppic, pmk->wheel,
+                     false);
     }
     if (hatsokerekrogton) {
         kidobozkerek(p_k2, WheelBackgroundRenderRadius, pmot->right_wheel.rotation, ppic,
-                     pmk->wheel);
+                     pmk->wheel, false);
     }
 
     vect2 kozep = pmot->bike.r - sarok;
@@ -497,11 +499,11 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
 
     // Elso felfuggesztes:
     vect2 p_fogantyu = Mi * (365.0 - Mx) + Mj * (My - 292.0) + Mr; // Uj
-    kidoboz(p_k1, p_fogantyu, ppic, 0.06, pmk->susp1, 0.05, 0.03);
+    kidoboz(p_k1, p_fogantyu, ppic, 0.06, pmk->susp1, 0.05, 0.03, false);
 
     // Hatso felfuggesztes:
     vect2 p_darab2 = Mi * (370.0 - Mx) + Mj * (My - 520.0) + Mr;
-    kidoboz(p_darab2, p_k2, ppic, 0.06, pmk->susp2, 0.0, 0.1);
+    kidoboz(p_darab2, p_k2, ppic, 0.06, pmk->susp2, 0.0, 0.1, false);
 
     // Ha kell zaszlot rajzol:
     int flages = 0;
@@ -655,12 +657,12 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
             p_k2 = tmpv;
         }
         if (!elsokerekrogton) {
-            kidobozkerek(p_k1, pmot->left_wheel.radius, pmot->left_wheel.rotation, ppic,
-                         pmk->wheel);
+            kidobozkerek(p_k1, pmot->left_wheel.radius, pmot->left_wheel.rotation, ppic, pmk->wheel,
+                         false);
         }
         if (!hatsokerekrogton) {
             kidobozkerek(p_k2, pmot->right_wheel.radius, pmot->right_wheel.rotation, ppic,
-                         pmk->wheel);
+                         pmk->wheel, false);
         }
     }
 }
@@ -670,21 +672,22 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
                              camera& current_camera) {
 
     // Kiszamoljuk kepernyo bal also sarkat:
-    vect2 motorkozep = pmot->bike.r;
+    vect2 bike_center = pmot->bike.r;
     if (current_camera.mode == CameraMode::MapViewer) {
-        motorkozep = vect2(current_camera.x, current_camera.y);
+        bike_center = vect2(current_camera.x, current_camera.y);
     }
 
     vect2 world_camera_position(
-        bike_center.x - (Camera_offset_x + pvalt->baljobbv_h.baljobb * Camera_offset_x_mult),
+        bike_center.x -
+            (Camera_offset_x + pvalt->baljobbv_h.camera_position * Camera_offset_x_mult),
         bike_center.y - Camera_offset_y);
 
     // ppic->fill_box( 100 );
-    CanvasBack->render(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+    CanvasBack->render(ajatekos, ppic, world_camera_position, 0, 0, Cxsize - 1, Cysize - 1);
 
     // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
     int balalsox, balalsoy;
-    CanvasBack->meters_to_pixels(sarok, &balalsox, &balalsoy);
+    CanvasBack->meters_to_pixels(world_camera_position, &balalsox, &balalsoy);
     int objminx = balalsox - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
     int objminy = balalsoy - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
     int objmaxx = balalsox + SCREEN_WIDTH;
@@ -765,28 +768,28 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
     if (current_camera.mode == CameraMode::Normal) {
         if (!Single) {
             // Hatso motoros kirajzolasa:
-            vect2 kozep(sarok.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
-                        sarok.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
+            vect2 kozep(world_camera_position.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
+                        world_camera_position.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
             double tav = (pmot2->bike.r - kozep).length();
             if (tav < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters) {
-                kibike(!ajatekos, ppic, t, sarok, pmot2, pvalt2, pmkepek2, nullptr);
+                kibike(!ajatekos, ppic, t, world_camera_position, pmot2, pvalt2, pmkepek2, nullptr);
             }
         }
 
         // Motoros kirajzolasa:
-        kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1, shirt);
+        kibike(ajatekos, ppic, t, world_camera_position, pmot, pvalt, pmkepek1, shirt);
     }
 
     if (!EolSettings->pictures_in_background()) {
         // Felso canvas kitevese:
-        CanvasFront->render(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+        CanvasFront->render(ajatekos, ppic, world_camera_position, 0, 0, Cxsize - 1, Cysize - 1);
     }
 
     if (viewki) {
         if (Single) {
-            kiview(ajatekos, ppic, pvalt->baljobbv_h.baljobb, motorkozep, NULL);
+            kiview(ajatekos, ppic, pvalt->baljobbv_h.camera_position, bike_center, nullptr);
         } else {
-            kiview(ajatekos, ppic, pvalt->baljobbv_h.baljobb, motorkozep, pmot2);
+            kiview(ajatekos, ppic, pvalt->baljobbv_h.camera_position, bike_center, pmot2);
         }
     }
 

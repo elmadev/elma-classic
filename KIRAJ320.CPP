@@ -422,8 +422,8 @@ static void kitolthatteret(pic8* ppic) {
 int Voltkilogas = 0;
 #endif
 
-static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmot, valtozok* pvalt,
-                   bike_pics* pmk, affine_pic* shirt) {
+static void kibike(int ajatekos, pic8* ppic, double time, vect2 sarok, motorst* pmot,
+                   valtozok* pvalt, bike_pics* pmk, affine_pic* shirt) {
 
     // Mivel ezeket fv megvaltoztatja:
     double ugrasnagysag = pvalt->ugrasnagysag;
@@ -513,7 +513,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
         }
 
         if (!flages && FlagTagImmunity) {
-            int egeszido = (int)(t * 30.0);
+            int egeszido = (int)(time * 30.0);
             if (egeszido % 2) {
                 flages = 1;
             }
@@ -667,7 +667,7 @@ static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmo
     }
 }
 
-static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot, valtozok* pvalt,
+static void kirakegyjatekost(bool ajatekos, pic8* ppic, double time, motorst* pmot, valtozok* pvalt,
                              int viewki, int timeki, motorst* pmot2, valtozok* pvalt2,
                              camera& current_camera) {
 
@@ -714,15 +714,15 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
         if (State->animated_objects) {
             switch (pker->type) {
             case object::Type::Food:
-                pobjpic = Lgr->food[pker->animation % Lgr->food_count]->get_frame_by_time(t);
-                dy = (int)(5.0 * EolSettings->zoom() * sin(t * 15.5 + pker->floating_phase));
+                pobjpic = Lgr->food[pker->animation % Lgr->food_count]->get_frame_by_time(time);
+                dy = (int)(5.0 * EolSettings->zoom() * sin(time * 15.5 + pker->floating_phase));
                 break;
             case object::Type::Exit:
-                pobjpic = Lgr->exit->get_frame_by_time(t);
-                dy = (int)(5.0 * EolSettings->zoom() * sin(t * 15.5 + pker->floating_phase));
+                pobjpic = Lgr->exit->get_frame_by_time(time);
+                dy = (int)(5.0 * EolSettings->zoom() * sin(time * 15.5 + pker->floating_phase));
                 break;
             case object::Type::Killer:
-                pobjpic = Lgr->killer->get_frame_by_time(t);
+                pobjpic = Lgr->killer->get_frame_by_time(time);
                 break;
             default:
                 internal_error("HIBA6751353");
@@ -772,12 +772,13 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
                         world_camera_position.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
             double tav = (pmot2->bike.r - kozep).length();
             if (tav < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters) {
-                kibike(!ajatekos, ppic, t, world_camera_position, pmot2, pvalt2, pmkepek2, nullptr);
+                kibike(!ajatekos, ppic, time, world_camera_position, pmot2, pvalt2, pmkepek2,
+                       nullptr);
             }
         }
 
         // Motoros kirajzolasa:
-        kibike(ajatekos, ppic, t, world_camera_position, pmot, pvalt, pmkepek1, shirt);
+        kibike(ajatekos, ppic, time, world_camera_position, pmot, pvalt, pmkepek1, shirt);
     }
 
     if (!EolSettings->pictures_in_background()) {
@@ -820,9 +821,9 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
         }
         else*/
         if (Tag) {
-            draw_timers(BestTime, fogoido, t, ppic, Cxsize, Cysize);
+            draw_timers(BestTime, fogoido, time, ppic, Cxsize, Cysize);
         } else {
-            draw_timers(BestTime, -1.0, t, ppic, Cxsize, Cysize);
+            draw_timers(BestTime, -1.0, time, ppic, Cxsize, Cysize);
         }
     }
 
@@ -843,7 +844,7 @@ static pic8 Bpic = pic8();
 
 extern int Ucsosurlodas;
 
-void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
+void kirajzol320(double time, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
                  int viewki2, int timeki2, camera& current_camera) {
 
     int splitscreen = 0;
@@ -889,21 +890,21 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
         // 1. Jatekos:
         Bpic.subview(Cx1, Cy1, Cx2, Cy2, npic);
 
-        kirakegyjatekost(true, &Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
+        kirakegyjatekost(true, &Bpic, time, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
                          current_camera);
 
         // 2. Jatekos:
         Bpic.subview(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
 
-        kirakegyjatekost(false, &Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
+        kirakegyjatekost(false, &Bpic, time, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
                          current_camera);
     } else {
         Bpic.subview(Cx1, Cy1, Cx2, Cy2, npic);
         if (fulljatekosA) {
-            kirakegyjatekost(true, &Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
+            kirakegyjatekost(true, &Bpic, time, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
                              current_camera);
         } else {
-            kirakegyjatekost(false, &Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
+            kirakegyjatekost(false, &Bpic, time, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
                              current_camera);
         }
     }

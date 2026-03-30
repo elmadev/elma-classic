@@ -22,7 +22,7 @@ void init_renderer();
 void novelkepmeret(void);
 void csokkentkepmeret(void);
 
-void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
+void kirajzol320(double time, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
                  int viewki2, int timeki2, camera& current_camera);
 
 #endif

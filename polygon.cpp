@@ -28,9 +28,7 @@ polygon::polygon() {
 }
 
 polygon::~polygon() {
-    if (vertices) {
-        delete vertices;
-    }
+    delete vertices;
     vertices = nullptr;
 }
 

@@ -34,15 +34,9 @@ void pic8::allocate(int w, int h) {
 }
 
 pic8::~pic8() {
-    if (rows) {
-        delete rows;
-    }
-    if (pixels) {
-        delete pixels;
-    }
-    if (transparency_data) {
-        delete transparency_data;
-    }
+    delete rows;
+    delete pixels;
+    delete transparency_data;
 }
 
 // Initialize a subview picture that doesn't manage its own memory

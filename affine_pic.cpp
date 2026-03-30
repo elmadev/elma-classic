@@ -34,8 +34,4 @@ affine_pic::affine_pic(const char* filename, pic8* pic) {
     delete pic;
 }
 
-affine_pic::~affine_pic() {
-    if (pixels) {
-        delete pixels;
-    }
-}
+affine_pic::~affine_pic() { delete pixels; }

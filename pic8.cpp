@@ -659,7 +659,7 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
                 case 'K':
                     if (y_in_range) {
                         if (sx < x1 || sx + buffer[buf] - 1 > x2) {
-                            if (!(sx > x2 || sx + buffer[buf] - 1 < x1)) {
+                            if (sx <= x2 && sx + buffer[buf] - 1 >= x1) {
                                 int xstart = sx;
                                 int xend = sx + buffer[buf] - 1;
                                 if (xstart < x1) {

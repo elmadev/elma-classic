@@ -88,7 +88,7 @@ static void menu_save_play(int level_id) {
 void update_top_ten(int time, char* time_message, int internal_index,
                     const char* external_filename) {
     // Check if internal or external
-    bool external_level = external_filename ? true : false;
+    bool external_level = external_filename != nullptr;
 
     time_message[0] = 0;
 

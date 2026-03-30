@@ -1,5 +1,5 @@
-#ifndef JATEKOS_H
-#define JATEKOS_H
+#ifndef MENU_PLAYER_H
+#define MENU_PLAYER_H
 
 // return false if Esc out of the menu
 bool menu_player_create(bool change_player1);

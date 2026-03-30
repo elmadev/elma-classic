@@ -35,7 +35,7 @@ elma_sources = files(
     'ball_collision.cpp',
     'polygon.cpp',
     'wav.cpp',
-    'JATEKOS.CPP',
+    'src/menu/player.cpp',
     'KIRAJ320.CPP',
     'affine_pic.cpp',
     'grass.cpp',

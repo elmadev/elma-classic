@@ -1047,34 +1047,18 @@ void level::get_boundaries(double* x1, double* y1, double* x2, double* y2,
     if (check_objects_and_sprites) {
         for (int i = 0; i < MAX_OBJECTS; i++) {
             if (objects[i]) {
-                if (*x1 > objects[i]->r.x) {
-                    *x1 = objects[i]->r.x;
-                }
-                if (*x2 < objects[i]->r.x) {
-                    *x2 = objects[i]->r.x;
-                }
-                if (*y1 > objects[i]->r.y) {
-                    *y1 = objects[i]->r.y;
-                }
-                if (*y2 < objects[i]->r.y) {
-                    *y2 = objects[i]->r.y;
-                }
+                *x1 = std::min(*x1, objects[i]->r.x);
+                *x2 = std::max(*x2, objects[i]->r.x);
+                *y1 = std::min(*y1, objects[i]->r.y);
+                *y2 = std::max(*y2, objects[i]->r.y);
             }
         }
         for (int i = 0; i < MAX_SPRITES; i++) {
             if (sprites[i]) {
-                if (*x1 > sprites[i]->r.x) {
-                    *x1 = sprites[i]->r.x;
-                }
-                if (*x2 < sprites[i]->r.x) {
-                    *x2 = sprites[i]->r.x;
-                }
-                if (*y1 > sprites[i]->r.y) {
-                    *y1 = sprites[i]->r.y;
-                }
-                if (*y2 < sprites[i]->r.y) {
-                    *y2 = sprites[i]->r.y;
-                }
+                *x1 = std::min(*x1, sprites[i]->r.x);
+                *x2 = std::max(*x2, sprites[i]->r.x);
+                *y1 = std::min(*y1, sprites[i]->r.y);
+                *y2 = std::max(*y2, sprites[i]->r.y);
             }
         }
     }

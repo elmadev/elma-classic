@@ -9,6 +9,7 @@
 #include "platform_impl.h"
 #include <directinput/scancodes.h>
 #include "state.h"
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <directinput/scancodes.h>
@@ -160,18 +161,10 @@ static void render_ball(vect2 r, double radius, pic8* source_pic) {
         // Clip horizontally to the screen
         int x1 = (int)(x_center - dx);
         int x2 = (int)(x_center + dx);
-        if (x1 < 0) {
-            x1 = 0;
-        }
-        if (x1 > SCREEN_WIDTH - 1) {
-            x1 = SCREEN_WIDTH - 1;
-        }
-        if (x2 < 0) {
-            x2 = 0;
-        }
-        if (x2 > SCREEN_WIDTH - 1) {
-            x2 = SCREEN_WIDTH - 1;
-        }
+        x1 = std::max(x1, 0);
+        x1 = std::min(x1, SCREEN_WIDTH - 1);
+        x2 = std::max(x2, 0);
+        x2 = std::min(x2, SCREEN_WIDTH - 1);
         if (x1 >= x2) {
             y++;
             continue;
@@ -287,9 +280,7 @@ void menu_pic::render(bool skip_balls_helmet) {
         dt = 0.001;
     }
     dt *= 3.6;
-    if (dt > 100.0) {
-        dt = 100.0;
-    }
+    dt = std::min(dt, 100.0);
     balls_simulate(dt);
 
     // By default, the screen uses the "bright" version of the menu

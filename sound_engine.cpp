@@ -2,6 +2,7 @@
 #include "main.h"
 #include "state.h"
 #include "wav.h"
+#include <algorithm>
 #include <cstring>
 
 bool Mute = true;
@@ -122,9 +123,7 @@ void set_motor_frequency(bool is_motor1, double frequency, int gas) {
     }
     motor_sound* mot = is_motor1 ? &MotorSound1 : &MotorSound2;
     mot->gas = gas;
-    if (frequency > 2.0) {
-        frequency = 2.0;
-    }
+    frequency = std::min(frequency, 2.0);
     if (frequency < 1.0) {
         frequency = 0.0;
     }
@@ -137,12 +136,8 @@ static double FrictionVolumeNext = 0.0;
 
 // Set bike squeak sound (0.0 to 1.0)
 void set_friction_volume(double volume) {
-    if (volume > 1.0) {
-        volume = 1.0;
-    }
-    if (volume < 0) {
-        volume = 0;
-    }
+    volume = std::min(volume, 1.0);
+    volume = std::max(volume, 0.0);
     FrictionVolumeNext = volume;
 }
 

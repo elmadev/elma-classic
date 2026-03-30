@@ -20,6 +20,7 @@
 #include "eol_settings.h"
 #include "fs_utils.h"
 #include "directinput/scancodes.h"
+#include <algorithm>
 #include <cstring>
 #include <directinput/scancodes.h>
 #include <format>
@@ -469,16 +470,12 @@ void menu_play() {
         int levels_completed = player1->levels_completed + 1;
         if (!State->single) {
             player* player2 = State->get_player(State->player2);
-            if (levels_completed < player2->levels_completed + 1) {
-                levels_completed = player2->levels_completed + 1;
-            }
+            levels_completed = std::max(levels_completed, player2->levels_completed + 1);
         }
         if (EolSettings->all_internals_accessible()) {
             levels_completed = INTERNAL_LEVEL_COUNT;
         }
-        if (levels_completed > INTERNAL_LEVEL_COUNT) {
-            levels_completed = INTERNAL_LEVEL_COUNT;
-        }
+        levels_completed = std::min(levels_completed, INTERNAL_LEVEL_COUNT);
 
         menu_nav nav("Select Level!");
         nav.search_pattern = SearchPattern::Internals;

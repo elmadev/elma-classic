@@ -4,6 +4,7 @@
 #include "level.h"
 #include "main.h"
 #include "util/util.h"
+#include <algorithm>
 #include <cmath>
 
 polygon::polygon() {
@@ -411,18 +412,10 @@ void polygon::update_boundaries(double* x1, double* y1, double* x2, double* y2) 
     for (int i = 0; i < vertex_count; i++) {
         double x = vertices[i].x;
         double y = vertices[i].y;
-        if (*x1 > x) {
-            *x1 = x;
-        }
-        if (*y1 > y) {
-            *y1 = y;
-        }
-        if (*x2 < x) {
-            *x2 = x;
-        }
-        if (*y2 < y) {
-            *y2 = y;
-        }
+        *x1 = std::min(*x1, x);
+        *y1 = std::min(*y1, y);
+        *x2 = std::max(*x2, x);
+        *y2 = std::max(*y2, y);
     }
 }
 

@@ -2,6 +2,7 @@
 #include "main.h"
 #include "platform_utils.h"
 #include "qopen.h"
+#include <algorithm>
 #include <cstring>
 
 void wav::allocate() {
@@ -105,13 +106,9 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
     int max_amplitude = 1;
     for (int i = 0; i < size; i++) {
         if (samples[i] > 0) {
-            if (samples[i] > max_amplitude) {
-                max_amplitude = samples[i];
-            }
+            max_amplitude = std::max((int)samples[i], max_amplitude);
         } else {
-            if (-samples[i] > max_amplitude) {
-                max_amplitude = -samples[i];
-            }
+            max_amplitude = std::max(-samples[i], max_amplitude);
         }
     }
     // Scale based on the max amplitude and max volume

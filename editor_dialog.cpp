@@ -8,6 +8,7 @@
 #include "pic8.h"
 #include "platform_impl.h"
 #include "platform_utils.h"
+#include <algorithm>
 #include <cctype>
 #include <cstring>
 #include <directinput/scancodes.h>
@@ -110,9 +111,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     int width = 0;
     for (int i = 0; i < text_length; i++) {
         int text_width = Pabc2->len(text_array[i]) + 16;
-        if (width < text_width) {
-            width = text_width;
-        }
+        width = std::max(width, text_width);
     }
     // Draw dialog box
     int dy = 20;

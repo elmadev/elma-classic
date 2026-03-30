@@ -14,6 +14,7 @@
 #include "pic8.h"
 #include "segments.h"
 #include "debug/profiler.h"
+#include <algorithm>
 #include <climits>
 #include <cmath>
 #include <cstring>
@@ -79,34 +80,18 @@ void canvas::set_origin_and_dimensions() {
     double miny = seg->r.y;
     double maxy = seg->r.y;
     while (seg) {
-        if (seg->r.x < minx) {
-            minx = seg->r.x;
-        }
-        if (seg->r.x > maxx) {
-            maxx = seg->r.x;
-        }
-        if (seg->r.y < miny) {
-            miny = seg->r.y;
-        }
-        if (seg->r.y > maxy) {
-            maxy = seg->r.y;
-        }
+        minx = std::min(seg->r.x, minx);
+        maxx = std::max(seg->r.x, maxx);
+        miny = std::min(seg->r.y, miny);
+        maxy = std::max(seg->r.y, maxy);
 
         // This code is unnecessary:
         // We only need to check the end of the line for Verzio Across levels
         // since all polygons are closed loops in Elma.
-        if (seg->r.x + seg->v.x < minx) {
-            minx = seg->r.x + seg->v.x;
-        }
-        if (seg->r.x + seg->v.x > maxx) {
-            maxx = seg->r.x + seg->v.x;
-        }
-        if (seg->r.y + seg->v.y < miny) {
-            miny = seg->r.y + seg->v.y;
-        }
-        if (seg->r.y + seg->v.y > maxy) {
-            maxy = seg->r.y + seg->v.y;
-        }
+        minx = std::min(seg->r.x + seg->v.x, minx);
+        maxx = std::max(seg->r.x + seg->v.x, maxx);
+        miny = std::min(seg->r.y + seg->v.y, miny);
+        maxy = std::max(seg->r.y + seg->v.y, maxy);
 
         seg = Segments->next_segment();
     }
@@ -500,12 +485,8 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, canvas_pixels
 
     // Sanity checks, which should already be handled by draw_pixels()
     int dest_x_right = dest_x + dest->width - 1;
-    if (source_x_left < dest_x) {
-        source_x_left = dest_x;
-    }
-    if (source_x_right > dest_x_right) {
-        source_x_right = dest_x_right;
-    }
+    source_x_left = std::max(source_x_left, dest_x);
+    source_x_right = std::min(source_x_right, dest_x_right);
     if (source_x_right < dest_x || source_x_left > dest_x_right) {
         internal_error(
             "canvas::draw_one_chunk source_x_right < dest_x || source_x_left > dest_x_right!");

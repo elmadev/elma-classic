@@ -198,12 +198,8 @@ void pic8::fill_box(int x1, int y1, int x2, int y2, unsigned char index) {
         y1 = y2;
         y2 = tmp;
     }
-    if (x1 < 0) {
-        x1 = 0;
-    }
-    if (y1 < 0) {
-        y1 = 0;
-    }
+    x1 = std::max(x1, 0);
+    y1 = std::max(y1, 0);
     if (x2 >= width) {
         x2 = width - 1;
     }
@@ -440,9 +436,7 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
         while (x < width) {
             int i = pcx_count_repeats(this, x, y, width);
             if (i > 1) {
-                if (i > 63) {
-                    i = 63;
-                }
+                i = std::min(i, 63);
                 unsigned char controll = (unsigned char)(i + 192);
                 if (fwrite(&controll, 1, 1, h) != 1) {
                     internal_error(std::string("pcx_save failed to write to file: ") + filename);
@@ -661,12 +655,8 @@ void blit8(pic8* dest, pic8* source, int x, int y, int x1, int y1, int x2, int y
                             if (sx <= x2 && sx + buffer[buf] - 1 >= x1) {
                                 int xstart = sx;
                                 int xend = sx + buffer[buf] - 1;
-                                if (xstart < x1) {
-                                    xstart = x1;
-                                }
-                                if (xend > x2) {
-                                    xend = x2;
-                                }
+                                xstart = std::max(xstart, x1);
+                                xend = std::min(xend, x2);
                                 memcpy(&dest->rows[desty][x + xstart - x1],
                                        &source->rows[sy][xstart], xend - xstart + 1);
                             }

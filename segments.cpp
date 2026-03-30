@@ -2,6 +2,7 @@
 #include "level.h"
 #include "main.h"
 #include "polygon.h"
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 
@@ -250,32 +251,16 @@ void segments::setup_collision_grid(double max_radius) {
     double miny = seg->r.y;
     double maxy = seg->r.y;
     while (seg) {
-        if (seg->r.x < minx) {
-            minx = seg->r.x;
-        }
-        if (seg->r.x > maxx) {
-            maxx = seg->r.x;
-        }
-        if (seg->r.y < miny) {
-            miny = seg->r.y;
-        }
-        if (seg->r.y > maxy) {
-            maxy = seg->r.y;
-        }
+        minx = std::min(seg->r.x, minx);
+        maxx = std::max(seg->r.x, maxx);
+        miny = std::min(seg->r.y, miny);
+        maxy = std::max(seg->r.y, maxy);
         // We don't need to check all the endpoints because in Elma all polygons are closed loops.
         // This check used to be necessary for Across 1.0 Verzio levels
-        if (seg->r.x + seg->v.x < minx) {
-            minx = seg->r.x + seg->v.x;
-        }
-        if (seg->r.x + seg->v.x > maxx) {
-            maxx = seg->r.x + seg->v.x;
-        }
-        if (seg->r.y + seg->v.y < miny) {
-            miny = seg->r.y + seg->v.y;
-        }
-        if (seg->r.y + seg->v.y > maxy) {
-            maxy = seg->r.y + seg->v.y;
-        }
+        minx = std::min(seg->r.x + seg->v.x, minx);
+        maxx = std::max(seg->r.x + seg->v.x, maxx);
+        miny = std::min(seg->r.y + seg->v.y, miny);
+        maxy = std::max(seg->r.y + seg->v.y, maxy);
 
         seg = next_segment();
     }

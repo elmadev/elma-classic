@@ -4,6 +4,7 @@
 #include "main.h"
 #include "menu_dialog.h"
 #include "util/util.h"
+#include <algorithm>
 #include <cstring>
 #include <directinput/scancodes.h>
 #include <filesystem>
@@ -301,9 +302,7 @@ void state::write_stats_player_total_time(FILE* h, const char* player_name, bool
             for (int j = 0; j < tten_multi->times_count; j++) {
                 if (strcmp(player_name, tten_multi->names1[j]) == 0 ||
                     strcmp(player_name, tten_multi->names2[j]) == 0) {
-                    if (best_time > tten_multi->times[j]) {
-                        best_time = tten_multi->times[j];
-                    }
+                    best_time = std::min(best_time, tten_multi->times[j]);
                     break;
                 }
             }
@@ -577,9 +576,7 @@ static void merge_toptens(topten* src, topten* mrg, bool single) {
         }
     }
 
-    if (combined_count > MAX_TIMES) {
-        combined_count = MAX_TIMES;
-    }
+    combined_count = std::min(combined_count, MAX_TIMES);
     src->times_count = combined_count;
 
     // Clear the best times

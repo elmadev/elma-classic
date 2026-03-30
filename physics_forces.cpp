@@ -7,6 +7,7 @@
 #include "physics_move.h"
 #include "recorder.h"
 #include "util/util.h"
+#include <algorithm>
 #include <cmath>
 
 static double MaxFrictionVolume = 0.0;
@@ -24,9 +25,7 @@ static void update_friction_volume(motorst* mot, vect2 wheel_displacement,
     }
 
     double friction_volume = upwards_displacement * upwards_velocity;
-    if (friction_volume > MaxFrictionVolume) {
-        MaxFrictionVolume = friction_volume;
-    }
+    MaxFrictionVolume = std::max(friction_volume, MaxFrictionVolume);
 }
 
 double get_bike_friction_volume() { return MaxFrictionVolume; }
@@ -255,17 +254,14 @@ void simulate_bike_physics(motorst* mot, double time, double dt, bool gas, bool 
         // amount of free momentum here.
         // Alovolt bug: Since the bike didn't get its rotational velocity during the volt,
         // we generally generate VOLT_ANGULAR_VELOCITY worth of free momentum
-        if (mot->bike.angular_velocity > mot->angular_velocity_pre_right_volt) {
-            mot->bike.angular_velocity = mot->angular_velocity_pre_right_volt;
-        }
+        mot->bike.angular_velocity =
+            std::min(mot->bike.angular_velocity, mot->angular_velocity_pre_right_volt);
         // If we are volting against the current rotation of the bike, then give a small
         // bonus to the angular velocity in the form of free momentum, capped to an
         // amount that will neutralize the rotation
         if (mot->bike.angular_velocity > 0.0) {
             mot->bike.angular_velocity -= COUNTERVOLT_ANGULAR_VELOCITY;
-            if (mot->bike.angular_velocity < 0.0) {
-                mot->bike.angular_velocity = 0.0;
-            }
+            mot->bike.angular_velocity = std::max(mot->bike.angular_velocity, 0.0);
         }
         // Reset vars
         mot->volting_right = false;
@@ -279,17 +275,14 @@ void simulate_bike_physics(motorst* mot, double time, double dt, bool gas, bool 
         // Alovolt penalty: You can't speed up during the alovolt because the
         // extra momentum will be removed by this check
         // e.g. your left wheel is bumped upwards and you gain spin speed
-        if (mot->bike.angular_velocity < mot->angular_velocity_pre_left_volt) {
-            mot->bike.angular_velocity = mot->angular_velocity_pre_left_volt;
-        }
+        mot->bike.angular_velocity =
+            std::max(mot->bike.angular_velocity, mot->angular_velocity_pre_left_volt);
         // Alovolt penalty: lose COUNTERVOLT_ANGULAR_VELOCITY if the bike is already
         // spinning clockwise. That's why you should rotate slightly counterclockwise before doing
         // an alovolt at the start of Bumpy Journey.
         if (mot->bike.angular_velocity < 0.0) {
             mot->bike.angular_velocity += COUNTERVOLT_ANGULAR_VELOCITY;
-            if (mot->bike.angular_velocity > 0.0) {
-                mot->bike.angular_velocity = 0.0;
-            }
+            mot->bike.angular_velocity = std::min(mot->bike.angular_velocity, 0.0);
         }
         mot->volting_left = false;
         mot->angular_velocity_pre_left_volt = -1.0;

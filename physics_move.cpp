@@ -3,6 +3,7 @@
 #include "physics_init.h"
 #include "recorder.h"
 #include "sound_engine.h"
+#include <algorithm>
 #include <cmath>
 
 // Push the wheel out from the ground so it is standing on the anchor point
@@ -34,9 +35,7 @@ static bool simulate_anchor_point_collision(rigidbody* rb, vect2* point, vect2 f
     double bump_magnitude = deleted_velocity.length();
     if (bump_magnitude > BumpThreshold) {
         bump_magnitude = bump_magnitude / 0.8 * 0.1;
-        if (bump_magnitude >= 0.99) {
-            bump_magnitude = 0.99;
-        }
+        bump_magnitude = std::min(bump_magnitude, 0.99);
         add_event_buffer(WavEvent::Bump, bump_magnitude, -1);
     }
     return true;
@@ -215,18 +214,12 @@ static void body_boundaries(motorst* mot, vect2 i, vect2 j) {
 
     // Restrict top
     static const double ELLIPSE_HEIGHT = 0.48;
-    if (body_r.y > ELLIPSE_HEIGHT) {
-        body_r.y = ELLIPSE_HEIGHT;
-    }
+    body_r.y = std::min(body_r.y, ELLIPSE_HEIGHT);
     // Restrict front
-    if (body_r.x < -0.5) {
-        body_r.x = -0.5;
-    }
+    body_r.x = std::max(body_r.x, -0.5);
     // Restrict back (not very important, see next restriction)
     static const double ELLIPSE_WIDTH = 0.26;
-    if (body_r.x > ELLIPSE_WIDTH) {
-        body_r.x = ELLIPSE_WIDTH;
-    }
+    body_r.x = std::min(body_r.x, ELLIPSE_WIDTH);
 
     // Restrict back-top corner with a curved line (ellipse)
     // Ellipse equation
@@ -269,9 +262,7 @@ void body_movement(motorst* mot, vect2 gravity, vect2 i, vect2 j, double dt) {
     // Force = Stretch*Tension
     // where Tension is 5x the tension of the wheel spring
     double spring_length = delta_body_r.length();
-    if (spring_length < 0.0000001) {
-        spring_length = 0.0000001;
-    }
+    spring_length = std::max(spring_length, 0.0000001);
     vect2 force_spring_unit = delta_body_r * (1.0 / spring_length);
     double force_spring_scalar = spring_length * SpringTensionCoefficient * 5.0;
     vect2 force_spring = force_spring_unit * force_spring_scalar;

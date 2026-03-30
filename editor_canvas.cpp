@@ -5,6 +5,7 @@
 #include "main.h"
 #include "menu_pic.h"
 #include "pic8.h"
+#include <algorithm>
 #include <cmath>
 
 // If false, when drawing lines, immediately update the screen
@@ -57,12 +58,8 @@ static double CanvasDiagonalLength = 1.0;
 // Zoom to specified size
 void zoom(vect2 center, double width) {
     // Bound min/max zoom
-    if (width < ZOOM_IN_LIMIT) {
-        width = ZOOM_IN_LIMIT;
-    }
-    if (width > ZOOM_OUT_LIMIT) {
-        width = ZOOM_OUT_LIMIT;
-    }
+    width = std::max(width, ZOOM_IN_LIMIT);
+    width = std::min(width, ZOOM_OUT_LIMIT);
     // Calculate top-left and bottom-right screen corners
     CanvasTopLeft.x = center.x - width * 0.5;
     CanvasBottomRight.x = center.x + width * 0.5;

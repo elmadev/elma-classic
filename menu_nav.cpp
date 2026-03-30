@@ -54,9 +54,7 @@ void menu_nav::select_row(const std::string& left) {
 
 int menu_nav::calculate_visible_entries() {
     int max_visible_entries = (SCREEN_HEIGHT - y_entries) / dy;
-    if (max_visible_entries < 2) {
-        max_visible_entries = 2;
-    }
+    max_visible_entries = std::max(max_visible_entries, 2);
     return max_visible_entries;
 }
 

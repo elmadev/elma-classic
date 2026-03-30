@@ -165,7 +165,6 @@ void pic8::ppixel(int x, int y, unsigned char index) {
         return;
     }
     rows[y][x] = index;
-    return;
 }
 
 unsigned char pic8::gpixel(int x, int y) {

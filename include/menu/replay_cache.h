@@ -9,9 +9,14 @@
 #include <vector>
 
 class replay_cache {
+    // Contains a list of replay files associated with each level id
     std::unordered_map<int, std::vector<std::string>> level_id_to_filenames_;
     std::unordered_map<std::string, int> filename_to_level_id_;
+
+    // Replay file changes that haven't yet been applied to the unordered_maps
     std::vector<std::pair<std::string, int>> pending_upserts_;
+
+    // Thread-related variables
     mutable std::mutex mutex_;
     std::atomic<bool> ready_{false};
     std::atomic<bool> stop_requested_{false};
@@ -31,6 +36,7 @@ class replay_cache {
     bool is_ready() const;
 
     // Thread-safe accessors - return copies
+    // Get a list of all replay files that are associated with a specific level
     std::vector<std::string> filenames_for_level(int level_id) const;
 
     // Called after saving a replay - updates existing entry or inserts new one

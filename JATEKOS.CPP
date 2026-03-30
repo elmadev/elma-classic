@@ -92,17 +92,19 @@ bool menu_player_create(bool change_player1) {
     return false;
 }
 
-void menu_player_choose(bool change_player1, bool should_return) {
+bool menu_player_choose(bool change_player1, bool allow_delete) {
     menu_nav nav("Choose Player");
 
+    bool success = true;
     nav.add_row(
-        "Create New Player", NAV_FUNC(&change_player1) { menu_player_create(change_player1); });
+        "Create New Player",
+        NAV_FUNC(&change_player1, &success) { success = menu_player_create(change_player1); });
 
     for (int i = 0; i < State->player_count; i++) {
         nav.add_row(
-            State->players[i].name, NAV_FUNC(&change_player1, &should_return) {
+            State->players[i].name, NAV_FUNC(&change_player1, &allow_delete) {
                 bool delete_player =
-                    should_return && is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
+                    allow_delete && is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
                 if (!delete_player) {
                     // Normal behaviour - select player
                     if (change_player1) {
@@ -139,16 +141,5 @@ void menu_player_choose(bool change_player1, bool should_return) {
     nav.select_row(player_name);
 
     int choice = nav.navigate();
-
-    if (choice < 0) {
-        if (!should_return) {
-            menu_exit();
-        }
-    }
-
-    if (should_return) {
-        return;
-    }
-
-    menu_main();
+    return success && choice >= 0;
 }

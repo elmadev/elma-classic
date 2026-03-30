@@ -81,7 +81,9 @@ void menu_intro() {
             menu_exit();
         }
     } else {
-        menu_player_choose(true, false);
+        if (!menu_player_choose(true, false)) {
+            menu_exit();
+        }
     }
 
     menu_main();

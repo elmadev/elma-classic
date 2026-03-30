@@ -92,7 +92,7 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     //
     // For small angles, Angle = tan⁻¹(y/x) ≈ y/x, so we skip the trigonometric function for speed.
     bool needs_rotation = false;
-    bool positive_rotation_direction = 0;
+    bool positive_rotation_direction = false;
     constexpr double MINIMUM_ROTATION = 0.005; // radians
     if (u.x == 0.0) {
         // Perfectly upright

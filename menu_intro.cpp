@@ -76,9 +76,9 @@ void menu_intro() {
     static_intro_screen = nullptr;
 
     if (State->player_count == 0) {
-        newjatekos(1, 0);
+        menu_player_create(1, 0);
     } else {
-        jatekosvalasztas(1, 0);
+        menu_player_choose(1, 0);
     }
     internal_error("menu_intro!");
 }

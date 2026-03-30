@@ -71,14 +71,14 @@ static int bevesznevet(char* nev, int visszater) {
     }
 }
 
-void newjatekos(int A, int visszater) {
+void menu_player_create(int change_player1, int should_return) {
     // Ellenorzes:
     if (State->player_count >= MAX_PLAYERS - 1) {
         external_error("Sorry, no more players can get onto the list!");
     }
 
-    if (bevesznevet(State->players[int(State->player_count)].name, visszater)) {
-        if (A) {
+    if (bevesznevet(State->players[int(State->player_count)].name, should_return)) {
+        if (change_player1) {
             strcpy(State->player1, State->players[int(State->player_count)].name);
             State->player_count++;
             if (State->player_count == 1) {
@@ -92,41 +92,44 @@ void newjatekos(int A, int visszater) {
             }
         }
     } else {
-        visszater = 1; // Ha elescapelte, akkor visszamegyunk menube
+        should_return = 1; // Ha elescapelte, akkor visszamegyunk menube
     }
 
     if (State->player_count == 0) {
         menu_exit();
     }
 
-    if (visszater) {
+    if (should_return) {
         return;
     }
 
     menu_main();
 }
 
-void jatekosvalasztas(int A, int visszater) {
+void menu_player_choose(int change_player1, int should_return) {
     // Valasztas:
     menu_nav nav("Choose Player");
 
     char* eddigjatekos = nullptr;
-    if (A) {
+    if (change_player1) {
         eddigjatekos = State->player1;
     } else {
         eddigjatekos = State->player2;
     }
 
-    nav.add_row("Create New Player", NAV_FUNC(&A, &visszater) { newjatekos(A, visszater); });
+    nav.add_row(
+        "Create New Player", NAV_FUNC(&change_player1, &should_return) {
+            menu_player_create(change_player1, should_return);
+        });
 
     for (int i = 0; i < State->player_count; i++) {
         nav.add_row(
-            State->players[i].name, NAV_FUNC(&A, &visszater) {
+            State->players[i].name, NAV_FUNC(&change_player1, &should_return) {
                 bool delete_player =
-                    visszater && is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
+                    should_return && is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU);
                 if (!delete_player) {
                     // Normal behaviour - select player
-                    if (A) {
+                    if (change_player1) {
                         strcpy(State->player1, left.c_str());
                     } else {
                         strcpy(State->player2, left.c_str());
@@ -174,12 +177,12 @@ void jatekosvalasztas(int A, int visszater) {
     int eredmeny = nav.navigate();
 
     if (eredmeny < 0) {
-        if (!visszater) {
+        if (!should_return) {
             menu_exit();
         }
     }
 
-    if (visszater) {
+    if (should_return) {
         return;
     }
 

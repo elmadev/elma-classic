@@ -11,36 +11,36 @@
 #include "util/util.h"
 #include <directinput/scancodes.h>
 #include <cstring>
-#include <directinput/scancodes.h>
 
-static int MAX_PLAYERNAME_INPUT = 8;
+constexpr int MAX_PLAYERNAME_INPUT = 8;
+static_assert(MAX_PLAYERNAME_INPUT < MAX_PLAYERNAME_LENGTH);
 
 // Prompt for a new player name. Return true if name successfully selected
-static int prompt_new_name(char* player_name, int should_return) {
+static bool prompt_new_name(char* player_name, bool should_return) {
     menu_pic menu(false);
 
     int i = 0;
     empty_keypress_buffer();
-    int needs_update = 1;
+    bool needs_update = true;
     player_name[0] = 0;
-    while (1) {
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             if (should_return) {
-                return 0;
+                return false;
             }
             menu_exit();
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             if (i > 0) {
-                return 1;
+                return true;
             }
         }
         if (was_key_down(DIK_BACK)) {
             if (i > 0) {
                 i--;
                 player_name[i] = 0;
-                needs_update = 1;
+                needs_update = true;
             }
         }
         while (has_text_input()) {
@@ -52,11 +52,11 @@ static int prompt_new_name(char* player_name, int should_return) {
                 player_name[i] = c;
                 player_name[i + 1] = 0;
                 i++;
-                needs_update = 1;
+                needs_update = true;
             }
         }
         if (needs_update) {
-            needs_update = 0;
+            needs_update = false;
 
             menu.clear();
 
@@ -71,7 +71,7 @@ static int prompt_new_name(char* player_name, int should_return) {
     }
 }
 
-void menu_player_create(int change_player1, int should_return) {
+void menu_player_create(bool change_player1, bool should_return) {
     if (State->player_count >= MAX_PLAYERS - 1) {
         external_error("Sorry, no more players can get onto the list!");
     }
@@ -91,7 +91,7 @@ void menu_player_create(int change_player1, int should_return) {
             }
         }
     } else {
-        should_return = 1;
+        should_return = true;
     }
 
     if (State->player_count == 0) {
@@ -105,15 +105,8 @@ void menu_player_create(int change_player1, int should_return) {
     menu_main();
 }
 
-void menu_player_choose(int change_player1, int should_return) {
+void menu_player_choose(bool change_player1, bool should_return) {
     menu_nav nav("Choose Player");
-
-    char* player_name = nullptr;
-    if (change_player1) {
-        player_name = State->player1;
-    } else {
-        player_name = State->player2;
-    }
 
     nav.add_row(
         "Create New Player", NAV_FUNC(&change_player1, &should_return) {
@@ -141,33 +134,23 @@ void menu_player_choose(int change_player1, int should_return) {
                     // Use index in case we have two duplicate player names
                     // There should be a create player check to prevent this because it's buggy
                     // but at the moment there's no check
-                    int delete_index = choice - 1;
-
-                    // If deleted player is selected, wipe the name
-                    int match1 = 0;
-                    if (strcmp(State->player1, left.c_str()) == 0) {
-                        match1 = 1;
-                    }
-                    int match2 = 0;
-                    if (strcmp(State->player2, left.c_str()) == 0) {
-                        match2 = 1;
-                    }
-
-                    for (int i = delete_index; i < State->player_count - 1; i++) {
+                    for (int i = choice - 1; i < State->player_count - 1; i++) {
                         State->players[i] = State->players[i + 1];
                     }
                     State->player_count--;
 
-                    if (match1) {
+                    // If deleted player is selected, wipe the name
+                    if (strcmp(State->player1, left.c_str()) == 0) {
                         strcpy(State->player1, State->players[0].name);
                     }
-                    if (match2) {
+                    if (strcmp(State->player2, left.c_str()) == 0) {
                         strcpy(State->player2, State->players[0].name);
                     }
                 }
             });
     }
 
+    char* player_name = change_player1 ? State->player1 : State->player2;
     nav.select_row(player_name);
 
     int choice = nav.navigate();

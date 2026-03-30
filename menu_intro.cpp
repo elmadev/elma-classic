@@ -76,9 +76,9 @@ void menu_intro() {
     static_intro_screen = nullptr;
 
     if (State->player_count == 0) {
-        menu_player_create(1, 0);
+        menu_player_create(true, false);
     } else {
-        menu_player_choose(1, 0);
+        menu_player_choose(true, false);
     }
     internal_error("menu_intro!");
 }

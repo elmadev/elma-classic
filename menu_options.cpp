@@ -193,9 +193,9 @@ void menu_options() {
                 NAV_FUNC() { State->flag_tag = !State->flag_tag; });
         }
 
-        nav.add_row("Player A:", State->player1, NAV_FUNC() { menu_player_choose(1, 1); });
+        nav.add_row("Player A:", State->player1, NAV_FUNC() { menu_player_choose(true, true); });
 
-        nav.add_row("Player B:", State->player2, NAV_FUNC() { menu_player_choose(0, 1); });
+        nav.add_row("Player B:", State->player2, NAV_FUNC() { menu_player_choose(false, true); });
 
         nav.add_row(
             "Sound:", State->sound_on ? "Enabled" : "Disabled",

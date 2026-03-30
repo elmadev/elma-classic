@@ -33,6 +33,7 @@ int Kitoltestmegrak = 0;
 int Kitoltestmegrakkezd = 10;
 
 static abc8* SmallFont = nullptr;
+static abc8* MediumFont = nullptr;
 
 static double Kepmeret = 1.0;
 
@@ -90,6 +91,9 @@ void init_renderer() {
     SmallFont = new abc8("small.abc");
     SmallFont->set_spacing(1);
     SmallFont->set_line_height(12);
+
+    MediumFont = new abc8("medium.abc");
+    MediumFont->set_spacing(1);
 
     Console = new console();
     Console->register_console_commands();

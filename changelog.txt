@@ -72,6 +72,7 @@
 * Extremely vertical grass polygon lines could crash, especially at high zoom
 * Replay animations now rewind correctly and apples get restored
 * Out-of-bounds grass and masks no longer cause a hard crash
+* You can no longer create a player with a duplicate name
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

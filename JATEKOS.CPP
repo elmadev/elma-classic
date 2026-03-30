@@ -2,6 +2,7 @@
 #include "abc8.h"
 #include "keys.h"
 #include "main.h"
+#include "menu_dialog.h"
 #include "menu_intro.h"
 #include "menu_main.h"
 #include "menu_nav.h"
@@ -73,15 +74,24 @@ bool menu_player_create(bool change_player1) {
         external_error("Sorry, no more players can get onto the list!");
     }
 
-    if (prompt_new_name(State->players[int(State->player_count)].name)) {
+    char* player_name = State->players[int(State->player_count)].name;
+    if (prompt_new_name(player_name)) {
+        for (int i = 0; i < State->player_count; i++) {
+            if (strcmp(State->players[i].name, player_name) == 0) {
+                memset(player_name, 0, MAX_PLAYERNAME_LENGTH);
+                menu_dialog("This player name already exists!");
+                return false;
+            }
+        }
+
         if (change_player1) {
-            strcpy(State->player1, State->players[int(State->player_count)].name);
+            strcpy(State->player1, player_name);
             State->player_count++;
             if (State->player_count == 1) {
                 strcpy(State->player2, State->player1);
             }
         } else {
-            strcpy(State->player2, State->players[int(State->player_count)].name);
+            strcpy(State->player2, player_name);
             State->player_count++;
             if (State->player_count == 1) {
                 strcpy(State->player1, State->player2);
@@ -119,8 +129,6 @@ bool menu_player_choose(bool change_player1, bool allow_delete) {
                     }
 
                     // Use index in case we have two duplicate player names
-                    // There should be a create player check to prevent this because it's buggy
-                    // but at the moment there's no check
                     for (int i = choice - 1; i < State->player_count - 1; i++) {
                         State->players[i] = State->players[i + 1];
                     }

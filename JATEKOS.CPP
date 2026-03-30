@@ -71,7 +71,9 @@ static bool prompt_new_name(char* player_name) {
 
 bool menu_player_create(bool change_player1) {
     if (State->player_count >= MAX_PLAYERS - 1) {
-        external_error("Sorry, no more players can get onto the list!");
+        menu_dialog("Sorry, no more players can get onto the list!",
+                    "Delete a player to be able to create a new one!");
+        return false;
     }
 
     char* player_name = State->players[int(State->player_count)].name;

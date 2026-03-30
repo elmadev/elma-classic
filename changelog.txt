@@ -73,6 +73,7 @@
 * Replay animations now rewind correctly and apples get restored
 * Out-of-bounds grass and masks no longer cause a hard crash
 * You can no longer create a player with a duplicate name
+* Warning instead of crash if you reach max number of players in state.dat
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

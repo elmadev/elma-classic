@@ -23,17 +23,17 @@
 #include <cstring>
 #include <directinput/scancodes.h>
 
-level* Ptop = NULL;
+level* Ptop = nullptr;
 
-abc8 *Pabc1 = NULL, *Pabc2 = NULL;
+abc8 *Pabc1 = nullptr, *Pabc2 = nullptr;
 
-polygon* Pgy = NULL;
+polygon* Pgy = nullptr;
 int K = 0;
 bool Fel = false;
 
-object* Pker = NULL;
+object* Pker = nullptr;
 
-sprite* Psp = NULL;
+sprite* Psp = nullptr;
 
 int Valtozott = 0;
 
@@ -42,7 +42,7 @@ unsigned char Hatterindex = 3;
 unsigned char Feherszin = 9;
 // unsigned char Feketeindex = Hatterindex+128;
 
-palette* Pal_editor = NULL;
+palette* Pal_editor = nullptr;
 static unsigned char Pal_editor_byteok[768];
 
 void seteditorpal(void) {
@@ -328,7 +328,7 @@ static void editbe_balmenu(void) {
     BufferMain->line(x, y, x + 7, y, 247);
 }
 
-static pic8* Pspritenevbuffer = NULL;
+static pic8* Pspritenevbuffer = nullptr;
 // Ezekbe kikereknev() is neha beleir (gany):
 static char Kepnevkint[10] = "", Texturanevkint[10] = "", Maszknevkint[10] = "";
 
@@ -551,7 +551,7 @@ static void beallitkozelvane(int mx, int my) {
             Kozelvan = 1;
         }
     }
-    object* pker = NULL;
+    object* pker = nullptr;
     if (Tool == T_MOVE || Tool == T_DELETE_KEREK) {
         double ujtav;
         pker = Ptop->get_closest_object(x, y, &ujtav);
@@ -560,20 +560,20 @@ static void beallitkozelvane(int mx, int my) {
             if (ujtav < tav) {
                 tav = ujtav;
             } else {
-                pker = NULL;
+                pker = nullptr;
             }
         }
     }
-    sprite* ps = NULL;
+    sprite* ps = nullptr;
     if (Tool == T_MOVE || Tool == T_DELETE_SPRITE) {
         double ujtav;
         ps = Ptop->get_closest_sprite(x, y, &ujtav);
         if (ps) {
             Kozelvan = 1;
             if (ujtav < tav) {
-                pker = NULL;
+                pker = nullptr;
             } else {
-                ps = NULL;
+                ps = nullptr;
             }
         }
     }
@@ -694,12 +694,12 @@ void editor(void) {
     }
 
     // Alaphelyzetbe allitunk egy-ket valtozot:
-    Pgy = NULL;
+    Pgy = nullptr;
     K = 0;
     Fel = false;
 
-    Pker = NULL;
-    Psp = NULL;
+    Pker = nullptr;
+    Psp = nullptr;
 
     Tool = T_MOVE;
     alaphelp();

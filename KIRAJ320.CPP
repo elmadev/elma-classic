@@ -781,7 +781,7 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
 
     if (viewki) {
         if (Single) {
-            kiview(ajatekos, ppic, pvalt->baljobbv_h.baljobb, motorkozep, NULL);
+            kiview(ajatekos, ppic, pvalt->baljobbv_h.baljobb, motorkozep, nullptr);
         } else {
             kiview(ajatekos, ppic, pvalt->baljobbv_h.baljobb, motorkozep, pmot2);
         }

@@ -25,7 +25,7 @@ constexpr unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;
 static unsigned char Openlistaszin = 6, Openlistainvszin = 7;
 
 static int Maxnev = 1000; // Nem lehet nagyobb 3000-nel!
-static char* Soknev = NULL;
+static char* Soknev = nullptr;
 
 // Returns true if text1 is earlier in the alphabet than text2
 static int case_insensitive_lexicographical_compare(const char* text1, const char* text2) {
@@ -843,7 +843,7 @@ static void vegyesblt(pic8* dest, texture* pt, mask* pm, int x0, int y0) {
 
 // tipus 1-tol 4-ig (4. koveto file):
 static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, int cleares = 0) {
-    char* nev = NULL;
+    char* nev = nullptr;
     int nevszam = 0;
     if (tipus == 1) {
         nev = kepnev;

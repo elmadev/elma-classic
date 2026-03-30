@@ -277,7 +277,7 @@ void unlock_backbuffer() {
         gl_present();
         SDL_GL_SwapWindow(SDLWindow);
     } else {
-        SDL_BlitSurface(SDLSurfacePaletted, NULL, SDLSurfaceMain, NULL);
+        SDL_BlitSurface(SDLSurfacePaletted, nullptr, SDLSurfaceMain, nullptr);
         SDL_UpdateWindowSurface(SDLWindow);
     }
 }
@@ -437,7 +437,7 @@ void hide_cursor() {
 void show_cursor() { CursorRequested = true; }
 
 void get_mouse_position(int* x, int* y) { SDL_GetMouseState(x, y); }
-void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(NULL, x, y); }
+void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(nullptr, x, y); }
 
 bool was_left_mouse_just_clicked() { return LeftMouseDown && !LeftMouseDownPrevFrame; }
 
@@ -548,7 +548,7 @@ void init_sound() {
         internal_error(std::string("Failed to initialize audio subsystem:\n") + SDL_GetError());
     }
     SDL_AudioSpec obtained_spec;
-    SDLAudioDevice = SDL_OpenAudioDevice(NULL, 0, &desired_spec, &obtained_spec, 0);
+    SDLAudioDevice = SDL_OpenAudioDevice(nullptr, 0, &desired_spec, &obtained_spec, 0);
     if (SDLAudioDevice == 0) {
         internal_error(std::string("Failed to open audio device:\n") + SDL_GetError());
     }

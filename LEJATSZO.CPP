@@ -373,7 +373,7 @@ static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     } else {
         pmot->flipped_camera = pmot->flipped_bike;
     }
-    baljobbelintez(&pvalt->baljobbv_h, NULL, eddig, pmot->flipped_camera);
+    baljobbelintez(&pvalt->baljobbv_h, nullptr, eddig, pmot->flipped_camera);
 
     // Kirajzolashoz kell:
     pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / VoltDelay;
@@ -822,14 +822,14 @@ static bool replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     }
 
     // Hatra elintezes:
-    baljobbelintez(&pvalt->baljobbv_f, NULL, eddig, pmot->flipped_bike);
+    baljobbelintez(&pvalt->baljobbv_f, nullptr, eddig, pmot->flipped_bike);
 
     if (pmot->gravity_direction == MotorGravity::Up) {
         pmot->flipped_camera = !pmot->flipped_bike;
     } else {
         pmot->flipped_camera = pmot->flipped_bike;
     }
-    baljobbelintez(&pvalt->baljobbv_h, NULL, eddig, pmot->flipped_camera);
+    baljobbelintez(&pvalt->baljobbv_h, nullptr, eddig, pmot->flipped_camera);
 
     // Kirajzolashoz kellenek:
     pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / VoltDelay;

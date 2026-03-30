@@ -110,7 +110,7 @@ void jatekosvalasztas(int A, int visszater) {
     // Valasztas:
     menu_nav nav("Choose Player");
 
-    char* eddigjatekos = NULL;
+    char* eddigjatekos = nullptr;
     if (A) {
         eddigjatekos = State->player1;
     } else {

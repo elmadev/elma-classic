@@ -58,8 +58,9 @@ static int Cx1 = 0, Cy1 = 0, Cx2 = SCREEN_WIDTH - 1, Cy2 = SCREEN_HEIGHT - 1, Cy
            Cy2Bplayer = 0;
 int Cxsize = SCREEN_WIDTH, Cysize = SCREEN_HEIGHT;
 
-// Motoros kepernyo mely reszen helyezkedik el:
-static double Mo_y = 0.0, Mo_bal = 0.0, Mo_dx = 0.0;
+static double Camera_offset_y = 0.0;
+static double Camera_offset_x = 0.0;
+static double Camera_offset_x_mult = 0.0;
 
 double Hatarx1, Hatarx2, Hatary1, Hatary2;
 
@@ -130,12 +131,12 @@ void beallitmereteket(int splitscreen) {
 
     // Motoros kepernyo mely reszen helyezkedik el:
     if (EolSettings->center_camera()) {
-        Mo_bal = (Cxsize / MetersToPixels) * 0.50;
+        Camera_offset_x = (Cxsize / MetersToPixels) * 0.50;
     } else {
-        Mo_bal = (SCREEN_WIDTH / MetersToPixels) * 0.15 * EolSettings->zoom();
+        Camera_offset_x = (SCREEN_WIDTH / MetersToPixels) * 0.15 * EolSettings->zoom();
     }
-    Mo_dx = Cxsize / MetersToPixels - 2.0 * Mo_bal;
-    Mo_y = Cysize / MetersToPixels / 2.0;
+    Camera_offset_x_mult = Cxsize / MetersToPixels - 2.0 * Camera_offset_x;
+    Camera_offset_y = Cysize / MetersToPixels / 2.0;
 
     Viewxsize = (int)(EolSettings->minimap_width() * sqrt(double(Cysize) / double(SCREEN_HEIGHT)));
     Viewysize = (int)(EolSettings->minimap_height() * sqrt(double(Cysize) / double(SCREEN_HEIGHT)));
@@ -674,7 +675,9 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
         motorkozep = vect2(current_camera.x, current_camera.y);
     }
 
-    vect2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
+    vect2 world_camera_position(
+        bike_center.x - (Camera_offset_x + pvalt->baljobbv_h.baljobb * Camera_offset_x_mult),
+        bike_center.y - Camera_offset_y);
 
     // ppic->fill_box( 100 );
     CanvasBack->render(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);

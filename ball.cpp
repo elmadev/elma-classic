@@ -131,7 +131,8 @@ void balls_simulate(double dt) {
     // Handle all the collisions
     while (true) {
         // Update all the collision times and get the next collision time
-        int collider1, collider2;
+        int collider1;
+        int collider2;
         NextCollisionTime = next_collision_time(&collider1, &collider2);
         // Handle one collision
         if (NextCollisionTime > current_time) {

@@ -353,7 +353,9 @@ void pic8::pcx_open(const char* filename, FILE* h) {
     allocate(desc.Xmax - desc.Xmin + 1, desc.Ymax - desc.Ymin + 1);
     // Pixel data
     for (int y = 0; y < height; y++) {
-        short nnn = 0, ccc, iii;
+        short nnn = 0;
+        short ccc;
+        short iii;
 
         do {
             unsigned char index;

@@ -90,7 +90,10 @@ bool check_topology(bool show_dialog) {
     }
 
     // Make sure objects are not outside of level borders
-    double x1, y1, x2, y2;
+    double x1;
+    double y1;
+    double x2;
+    double y2;
     Ptop->get_boundaries(&x1, &y1, &x2, &y2, false);
     x1 -= 1.0;
     y1 -= 1.0;

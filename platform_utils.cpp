@@ -10,7 +10,8 @@ void itoa(int value, char* str, int base) {
 }
 
 int strcmpi(const char* a, const char* b) {
-    char ca, cb;
+    char ca;
+    char cb;
     int v;
     do {
         ca = *a++;
@@ -21,7 +22,8 @@ int strcmpi(const char* a, const char* b) {
 }
 
 int strnicmp(const char* a, const char* b, size_t len) {
-    char ca, cb;
+    char ca;
+    char cb;
     int v;
     do {
         ca = *a++;

@@ -192,7 +192,8 @@ void rigidbody_movement(rigidbody* rb, vect2 force, double torque, double dt, bo
 // See the image file body_boundaries.png in docs/
 static void body_boundaries(motorst* mot, vect2 i, vect2 j) {
     // Flip the body temporarily if the bike is turned
-    double body_x, body_y;
+    double body_x;
+    double body_y;
     if (mot->flipped_bike) {
         body_x = i * (mot->bike.r - mot->body_r);
         body_y = j * (mot->body_r - mot->bike.r);

@@ -13,9 +13,9 @@
 #include <cstring>
 #include <directinput/scancodes.h>
 
-static int MAX_PLAYERNAME_INPUT = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-nal!
+static int MAX_PLAYERNAME_INPUT = 8;
 
-// Siker eseten igazzal ter vissza:
+// Prompt for a new player name. Return true if name successfully selected
 static int prompt_new_name(char* player_name, int should_return) {
     menu_pic menu(false);
 
@@ -72,7 +72,6 @@ static int prompt_new_name(char* player_name, int should_return) {
 }
 
 void menu_player_create(int change_player1, int should_return) {
-    // Ellenorzes:
     if (State->player_count >= MAX_PLAYERS - 1) {
         external_error("Sorry, no more players can get onto the list!");
     }
@@ -92,7 +91,7 @@ void menu_player_create(int change_player1, int should_return) {
             }
         }
     } else {
-        should_return = 1; // Ha elescapelte, akkor visszamegyunk menube
+        should_return = 1;
     }
 
     if (State->player_count == 0) {
@@ -107,7 +106,6 @@ void menu_player_create(int change_player1, int should_return) {
 }
 
 void menu_player_choose(int change_player1, int should_return) {
-    // Valasztas:
     menu_nav nav("Choose Player");
 
     char* player_name = nullptr;
@@ -145,7 +143,7 @@ void menu_player_choose(int change_player1, int should_return) {
                     // but at the moment there's no check
                     int delete_index = choice - 1;
 
-                    // Megjegyezzuk hogy A vagy B nem torolt jatekos-e veletlenul:
+                    // If deleted player is selected, wipe the name
                     int match1 = 0;
                     if (strcmp(State->player1, left.c_str()) == 0) {
                         match1 = 1;
@@ -155,9 +153,7 @@ void menu_player_choose(int change_player1, int should_return) {
                         match2 = 1;
                     }
 
-                    // Toroljuk jatekost, tobbit elore hozzuk eggyel:
                     for (int i = delete_index; i < State->player_count - 1; i++) {
-                        // i-edik helyre elore hozzuk i+1-edik helyrol:
                         State->players[i] = State->players[i + 1];
                     }
                     State->player_count--;

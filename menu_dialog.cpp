@@ -2,7 +2,6 @@
 #include "main.h"
 #include "menu_pic.h"
 #include "platform_impl.h"
-#include <cstring>
 #include <directinput/scancodes.h>
 
 // Display the menu with the provided text, then return the key pressed by the user.

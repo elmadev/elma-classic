@@ -1,6 +1,5 @@
 #include "sound_engine.h"
 #include "main.h"
-#include "platform_impl.h"
 #include "state.h"
 #include "wav.h"
 #include <cstring>

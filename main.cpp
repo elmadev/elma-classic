@@ -1,4 +1,3 @@
-#include "abc8.h"
 #include "editor_canvas.h"
 #include "eol_settings.h"
 #include "M_PIC.H"
@@ -9,7 +8,6 @@
 #include "util/util.h"
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <directinput/scancodes.h>
 #include <string>
 

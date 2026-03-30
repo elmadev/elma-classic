@@ -2,7 +2,6 @@
 #include "main.h"
 #include "platform_utils.h"
 #include <cstdio>
-#include <cstring>
 
 constexpr int PICLIST_VERSION = 1002;
 

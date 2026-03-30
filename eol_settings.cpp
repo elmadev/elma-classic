@@ -2,7 +2,6 @@
 #include "level_load.h"
 #include "lgr.h"
 #include "main.h"
-#include "menu_pic.h"
 #include "renderer/object_overlay.h"
 #include "state.h"
 #include "physics_init.h"

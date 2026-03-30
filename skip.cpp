@@ -3,7 +3,6 @@
 #include "menu_pic.h"
 #include "platform_utils.h"
 #include "state.h"
-#include <cstdlib>
 #include <cstring>
 
 bool is_skippable(int index) {

@@ -7,7 +7,6 @@
 #include "platform_utils.h"
 #include "state.h"
 #include "util/util.h"
-#include <cstdlib>
 #include <cstring>
 #include <format>
 

@@ -7,7 +7,6 @@
 #include "KIRAJZOL.H"
 #include "M_PIC.H"
 #include "main.h"
-#include "menu_nav.h"
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "pic8.h"
@@ -15,7 +14,6 @@
 #include "recorder.h"
 #include "state.h"
 #include "qopen.h"
-#include <cstring>
 #include <directinput/scancodes.h>
 
 void menu_intro() {

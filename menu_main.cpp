@@ -8,7 +8,6 @@
 #include "level.h"
 #include "level_load.h"
 #include "main.h"
-#include "menu_dialog.h"
 #include "menu_intro.h"
 #include "menu_nav.h"
 #include "menu_options.h"

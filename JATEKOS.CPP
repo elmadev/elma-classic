@@ -13,20 +13,20 @@
 #include <cstring>
 #include <directinput/scancodes.h>
 
-static int Maxnevhossz = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-nal!
+static int MAX_PLAYERNAME_INPUT = 8; // Ez kisebb kell hogy legyen MAX_PLAYERNAME_LENGTH-nal!
 
 // Siker eseten igazzal ter vissza:
-static int bevesznevet(char* nev, int visszater) {
-    menu_pic szovlist(false);
+static int prompt_new_name(char* player_name, int should_return) {
+    menu_pic menu(false);
 
     int i = 0;
     empty_keypress_buffer();
-    int valtozott = 1;
-    nev[0] = 0;
+    int needs_update = 1;
+    player_name[0] = 0;
     while (1) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            if (visszater) {
+            if (should_return) {
                 return 0;
             }
             menu_exit();
@@ -39,35 +39,35 @@ static int bevesznevet(char* nev, int visszater) {
         if (was_key_down(DIK_BACK)) {
             if (i > 0) {
                 i--;
-                nev[i] = 0;
-                valtozott = 1;
+                player_name[i] = 0;
+                needs_update = 1;
             }
         }
         while (has_text_input()) {
             char c = pop_text_input();
             if (MenuFont->has_char(c) && util::text::is_filename_char(c)) {
-                if (i >= Maxnevhossz) {
+                if (i >= MAX_PLAYERNAME_INPUT) {
                     continue;
                 }
-                nev[i] = c;
-                nev[i + 1] = 0;
+                player_name[i] = c;
+                player_name[i + 1] = 0;
                 i++;
-                valtozott = 1;
+                needs_update = 1;
             }
         }
-        if (valtozott) {
-            valtozott = 0;
+        if (needs_update) {
+            needs_update = 0;
 
-            szovlist.clear();
+            menu.clear();
 
-            nev[i] = '_';
-            nev[i + 1] = 0;
-            szovlist.add_line_centered(nev, 320, 240);
-            nev[i] = 0;
+            player_name[i] = '_';
+            player_name[i + 1] = 0;
+            menu.add_line_centered(player_name, 320, 240);
+            player_name[i] = 0;
 
-            szovlist.add_line_centered("Please enter your name:", 320, 180);
+            menu.add_line_centered("Please enter your name:", 320, 180);
         }
-        szovlist.render();
+        menu.render();
     }
 }
 
@@ -77,7 +77,7 @@ void menu_player_create(int change_player1, int should_return) {
         external_error("Sorry, no more players can get onto the list!");
     }
 
-    if (bevesznevet(State->players[int(State->player_count)].name, should_return)) {
+    if (prompt_new_name(State->players[int(State->player_count)].name, should_return)) {
         if (change_player1) {
             strcpy(State->player1, State->players[int(State->player_count)].name);
             State->player_count++;
@@ -110,11 +110,11 @@ void menu_player_choose(int change_player1, int should_return) {
     // Valasztas:
     menu_nav nav("Choose Player");
 
-    char* eddigjatekos = nullptr;
+    char* player_name = nullptr;
     if (change_player1) {
-        eddigjatekos = State->player1;
+        player_name = State->player1;
     } else {
-        eddigjatekos = State->player2;
+        player_name = State->player2;
     }
 
     nav.add_row(
@@ -143,40 +143,40 @@ void menu_player_choose(int change_player1, int should_return) {
                     // Use index in case we have two duplicate player names
                     // There should be a create player check to prevent this because it's buggy
                     // but at the moment there's no check
-                    int torlendo = choice - 1;
+                    int delete_index = choice - 1;
 
                     // Megjegyezzuk hogy A vagy B nem torolt jatekos-e veletlenul:
-                    int atorlodott = 0;
+                    int match1 = 0;
                     if (strcmp(State->player1, left.c_str()) == 0) {
-                        atorlodott = 1;
+                        match1 = 1;
                     }
-                    int btorlodott = 0;
+                    int match2 = 0;
                     if (strcmp(State->player2, left.c_str()) == 0) {
-                        btorlodott = 1;
+                        match2 = 1;
                     }
 
                     // Toroljuk jatekost, tobbit elore hozzuk eggyel:
-                    for (int i = torlendo; i < State->player_count - 1; i++) {
+                    for (int i = delete_index; i < State->player_count - 1; i++) {
                         // i-edik helyre elore hozzuk i+1-edik helyrol:
                         State->players[i] = State->players[i + 1];
                     }
                     State->player_count--;
 
-                    if (atorlodott) {
+                    if (match1) {
                         strcpy(State->player1, State->players[0].name);
                     }
-                    if (btorlodott) {
+                    if (match2) {
                         strcpy(State->player2, State->players[0].name);
                     }
                 }
             });
     }
 
-    nav.select_row(eddigjatekos);
+    nav.select_row(player_name);
 
-    int eredmeny = nav.navigate();
+    int choice = nav.navigate();
 
-    if (eredmeny < 0) {
+    if (choice < 0) {
         if (!should_return) {
             menu_exit();
         }

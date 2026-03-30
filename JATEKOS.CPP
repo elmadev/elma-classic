@@ -16,7 +16,7 @@ constexpr int MAX_PLAYERNAME_INPUT = 8;
 static_assert(MAX_PLAYERNAME_INPUT < MAX_PLAYERNAME_LENGTH);
 
 // Prompt for a new player name. Return true if name successfully selected
-static bool prompt_new_name(char* player_name, bool should_return) {
+static bool prompt_new_name(char* player_name) {
     menu_pic menu(false);
 
     int i = 0;
@@ -26,10 +26,7 @@ static bool prompt_new_name(char* player_name, bool should_return) {
     while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            if (should_return) {
-                return false;
-            }
-            menu_exit();
+            return false;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             if (i > 0) {
@@ -71,12 +68,12 @@ static bool prompt_new_name(char* player_name, bool should_return) {
     }
 }
 
-void menu_player_create(bool change_player1, bool should_return) {
+bool menu_player_create(bool change_player1) {
     if (State->player_count >= MAX_PLAYERS - 1) {
         external_error("Sorry, no more players can get onto the list!");
     }
 
-    if (prompt_new_name(State->players[int(State->player_count)].name, should_return)) {
+    if (prompt_new_name(State->players[int(State->player_count)].name)) {
         if (change_player1) {
             strcpy(State->player1, State->players[int(State->player_count)].name);
             State->player_count++;
@@ -90,28 +87,16 @@ void menu_player_create(bool change_player1, bool should_return) {
                 strcpy(State->player1, State->player2);
             }
         }
-    } else {
-        should_return = true;
+        return true;
     }
-
-    if (State->player_count == 0) {
-        menu_exit();
-    }
-
-    if (should_return) {
-        return;
-    }
-
-    menu_main();
+    return false;
 }
 
 void menu_player_choose(bool change_player1, bool should_return) {
     menu_nav nav("Choose Player");
 
     nav.add_row(
-        "Create New Player", NAV_FUNC(&change_player1, &should_return) {
-            menu_player_create(change_player1, should_return);
-        });
+        "Create New Player", NAV_FUNC(&change_player1) { menu_player_create(change_player1); });
 
     for (int i = 0; i < State->player_count; i++) {
         nav.add_row(

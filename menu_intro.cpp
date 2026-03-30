@@ -7,6 +7,7 @@
 #include "KIRAJZOL.H"
 #include "M_PIC.H"
 #include "main.h"
+#include "menu_main.h"
 #include "menu_pic.h"
 #include "physics_init.h"
 #include "pic8.h"
@@ -76,10 +77,15 @@ void menu_intro() {
     static_intro_screen = nullptr;
 
     if (State->player_count == 0) {
-        menu_player_create(true, false);
+        if (!menu_player_create(true)) {
+            menu_exit();
+        }
     } else {
         menu_player_choose(true, false);
     }
+
+    menu_main();
+
     internal_error("menu_intro!");
 }
 

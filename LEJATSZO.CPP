@@ -87,7 +87,7 @@ struct viewtimest {
     int timekinplay, timekinreplay;
 };
 
-static void initsoundlejatszoban(void) {
+static void initsoundlejatszoban() {
     static int Hangmarmegy = 0;
     if (State->sound_on && !Hangmarmegy) {
         Hangmarmegy = 1;

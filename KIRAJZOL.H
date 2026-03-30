@@ -19,8 +19,8 @@ extern int Kitoltestmegrakkezd;
 
 void init_renderer();
 
-void novelkepmeret(void);
-void csokkentkepmeret(void);
+void novelkepmeret();
+void csokkentkepmeret();
 
 void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
                  int viewki2, int timeki2, camera& current_camera);

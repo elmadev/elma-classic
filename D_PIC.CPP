@@ -39,7 +39,7 @@ pic8* lockbackbuffer_pic(bool flipped) {
     return &Lockbuff;
 }
 
-void unlockbackbuffer_pic(void) {
+void unlockbackbuffer_pic() {
     if (!Backpiclocked || Frontpiclocked) {
         internal_error("ulbb_p lock!");
     }
@@ -55,7 +55,7 @@ void lockfrontbuffer_pic(bool flipped) {
     lock_frontbuffer(Lockbuff, flipped);
 }
 
-void unlockfrontbuffer_pic(void) {
+void unlockfrontbuffer_pic() {
     if (!Frontpiclocked || Backpiclocked) {
         internal_error("ulfb_pw lock!");
     }

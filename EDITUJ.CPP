@@ -45,7 +45,7 @@ unsigned char Feherszin = 9;
 palette* Pal_editor = nullptr;
 static unsigned char Pal_editor_byteok[768];
 
-void seteditorpal(void) {
+void seteditorpal() {
     unsigned char* pal = Pal_editor_byteok;
     // Paletta elso 64 szine menu szinek,
     // Masodik 64 szin truecolor tabla
@@ -124,7 +124,7 @@ void seteditorpal(void) {
     Pal_editor = new palette(pal);
 }
 
-static int hanypalyavanmeg(void) {
+static int hanypalyavanmeg() {
     player* pjatekos = State->get_player(State->player1);
     int skippelt = 0;
     for (int i = 0; i < pjatekos->levels_completed; i++) {
@@ -155,7 +155,7 @@ static void elintezegymousepixelt(int x, int y) {
     ppixelfront(x, y, szin);
 }
 
-static void egeretrajzolja(void) {
+static void egeretrajzolja() {
     /*if( Tool == T_MOVE && !Pgy && !Pker && !Psp && Kurzornegyzet ) {
         //internal_error( "Most itt van benn!" );
         vect2 r = pixel_to_meter( Moux, Mouy );
@@ -190,7 +190,7 @@ static void egeretrajzolja(void) {
 }
 
 // Egeret leveszi kepernyorol:
-void push(void) {
+void push() {
     if (!Egerkint) {
         internal_error("push-ban !Egerkint!");
     }
@@ -200,7 +200,7 @@ void push(void) {
 }
 
 // Egeret felteszi kepernyore:
-void pop(void) {
+void pop() {
     if (Egerkint) {
         internal_error("pop-ban Egerkint!");
     }
@@ -247,10 +247,10 @@ void toolhelp(const char* text) {
 // KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK
 
 static int Kellredraw = 0;
-void invalidate(void) { Kellredraw = 1; }
+void invalidate() { Kellredraw = 1; }
 
 static int Kellredrawegesz = 0;
-void invalidateegesz(void) { Kellredrawegesz = 1; }
+void invalidateegesz() { Kellredrawegesz = 1; }
 
 static int Elsotool = 13, Toolszam = 10;
 static int Menuszam = Elsotool + Toolszam, Menudy = 19;
@@ -282,7 +282,7 @@ static char Menuszovegek[23][15] = { // Masodik egy string hossza
 
 int Tool = T_MOVE;
 
-static void editbe_balmenu(void) {
+static void editbe_balmenu() {
     BufferMain->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menuszin);
     // Eloszor is egy nagy keret:
     BufferMain->line(0, 0, SCREEN_WIDTH - 1, 0, Menulineszin);
@@ -653,7 +653,7 @@ static void editor_zoom_out() {
     invalidate();
 }
 
-void editor(void) {
+void editor() {
     if (!BufferMain) {
         internal_error("editor-ban !BufferMain!");
     }

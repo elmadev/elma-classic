@@ -90,7 +90,7 @@ void set_minimap_zoom_factor() {
     MetersToMinimapPixels = MetersToPixels / MinimapScaleFactor;
 }
 
-void init_physics_data(void) {
+void init_physics_data() {
     init_motor(Motor1);
     init_motor(Motor2);
 

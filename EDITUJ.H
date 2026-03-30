@@ -17,7 +17,7 @@ extern level* Ptop;
 // extern pic8* Editbuffer2;  Ezentul ez BufferBall
 
 extern palette* Pal_editor;
-void seteditorpal(void); // Pal_editor-t hozza letre es allitja be
+void seteditorpal(); // Pal_editor-t hozza letre es allitja be
 
 extern abc8 *Pabc1, *Pabc2;
 
@@ -54,14 +54,14 @@ extern unsigned char Feherszin;
 extern unsigned char Hatterindex;
 
 extern int Moux, Mouy;
-void push(void); // levesz
-void pop(void);  // feltesz
+void push(); // levesz
+void pop();  // feltesz
 void update_and_draw_cursor();
 
-void invalidate(void);
-void invalidateegesz(void);
+void invalidate();
+void invalidateegesz();
 
-void editor(void);
+void editor();
 
 void toolhelp(const char* text = nullptr);
 

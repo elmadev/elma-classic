@@ -8,7 +8,7 @@ vect2 operator*(double x, const vect2& a) { return vect2(a.x * x, a.y * x); }
 
 vect2 operator*(const vect2& a, double x) { return vect2(a.x * x, a.y * x); }
 
-vect2::vect2(void) { x = y = 0; }
+vect2::vect2() { x = y = 0; }
 
 vect2::vect2(double xp, double yp) {
     x = xp;

@@ -37,7 +37,7 @@ static abc8* SmallFont = nullptr;
 static double Kepmeret = 1.0;
 
 static double Szorzo = 1.1;
-void novelkepmeret(void) {
+void novelkepmeret() {
     Kepmeret *= Szorzo;
     if (Kepmeret >= 0.999) {
         Kepmeret = 1.0;
@@ -45,7 +45,7 @@ void novelkepmeret(void) {
     Kitoltestmegrak = Kitoltestmegrakkezd;
 }
 
-void csokkentkepmeret(void) {
+void csokkentkepmeret() {
     Kepmeret /= Szorzo;
     if (Kepmeret < 0.7) {
         Kepmeret = 0.7;

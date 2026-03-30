@@ -191,7 +191,7 @@ static void boxbarajz(pic8* ppic, box abox, unsigned char szin, int fel) {
     }
 }
 
-void tolt_open(void) {
+void tolt_open() {
     invalidateegesz();
     if (Valtozott) {
         if (dialog("There are unsaved changes in the level file.",
@@ -367,7 +367,7 @@ void tolt_open(void) {
 }
 
 // Editfilenev alapjan megprobal josolni, majd oda teszi eredmenyt:
-void kivalasztkezdetit(void) {
+void kivalasztkezdetit() {
     invalidateegesz();
     if (!Soknev) {
         Soknev = new char[Maxnev * 10 + 100];
@@ -554,7 +554,7 @@ void kivalasztkezdetit(void) {
     }
 }
 
-void tolt_new(void) {
+void tolt_new() {
     invalidateegesz();
     if (Valtozott) {
         if (dialog("There are unsaved changes in the level file.", "Do you still want to continue?",
@@ -1133,7 +1133,7 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     }
 }
 
-void tolt_pickasprite(void) {
+void tolt_pickasprite() {
     if (!Lgr) {
         internal_error("tolt_pickasprite-ban !Lgr!");
     }
@@ -1982,7 +1982,7 @@ static void change_level_name(char* nev) {
     }
 }
 
-void change_level_properties(void) {
+void change_level_properties() {
     invalidateegesz();
 
     char fgnev[10];
@@ -2158,7 +2158,7 @@ int Rajzolpoligon = 1;
 int Rajzolkoveto = 1;
 int Rajzolkepek = 1;
 
-void setviewoptions(void) {
+void setviewoptions() {
     invalidateegesz();
 
     int x1 = 200, y1 = 100;

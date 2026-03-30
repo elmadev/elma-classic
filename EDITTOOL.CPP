@@ -15,7 +15,7 @@
 
 // int Kurzornegyzet = 0;
 
-void alaphelp(void) {
+void alaphelp() {
     switch (Tool) {
     case T_MOVE:
         toolhelp("Move the cursor near a vertex or an object center you want to move, and click "
@@ -241,7 +241,7 @@ void t_move_nyomva_jobb(int mx, int my) {
     }
 }
 
-void t_move_esc(void) {
+void t_move_esc() {
     if (Pgy) {
         Pgy->vertices[K].x = Moveorigx;
         Pgy->vertices[K].y = Moveorigy;
@@ -410,7 +410,7 @@ void t_create_vert_nyomva(int mx, int my) {
 // Jobb gomb nyomva:
 // Ha nem fogtunk pontot, akkor uj poligonnak veszi fel elso pontjat,
 // Ha fogtuk pontot, akkor torli es elengedi:
-void t_create_vert_esc(void) {
+void t_create_vert_esc() {
     if (!Pgy && !Egypont) {
         return; // Nincsen semmi dolgunk
     }
@@ -463,14 +463,14 @@ void t_create_vert_esc(void) {
     }
 }
 
-void t_create_vert_enter(void) {
+void t_create_vert_enter() {
     Fel = !Fel;
     if (Pgy && !Egypont) {
         invalidate();
     }
 }
 
-void t_create_vert_space(void) {
+void t_create_vert_space() {
     if (!Pgy || Egypont) {
         return;
     }
@@ -612,7 +612,7 @@ void t_delete_poly_nyomva(int mx, int my) {
 object::Property Food_kajatipus = object::Property::None;
 int Food_foodsorszam = 0;
 
-void t_create_food_nyomva_jobb(void) {
+void t_create_food_nyomva_jobb() {
     set_kerek_tipus("Select Create_Food subtype!", &Food_kajatipus, &Food_foodsorszam);
 }
 
@@ -709,7 +709,7 @@ void t_zoomin_nyomva(int x, int y) {
     }
 }
 
-void t_zoomin_esc(void) {
+void t_zoomin_esc() {
     if (Zoomfogva) {
         alaphelp();
         Zoomfogva = 0;
@@ -772,7 +772,7 @@ void t_zoomin_mmove(int x, int y) {
 // SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
 
 // Elougrik dialogus sprite valasztasra:
-void t_create_sprite_nyomva_jobb(void) {
+void t_create_sprite_nyomva_jobb() {
     // Lgr-en vegzi muveleteit:
     if (!Lgr) {
         internal_error("grtyy");

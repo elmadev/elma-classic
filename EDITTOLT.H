@@ -6,19 +6,19 @@
 
 class sprite;
 
-void tolt_open(void);
+void tolt_open();
 // Ha sikeresen mentettek, akkor igazak:
 int tolt_save_as();
 int tolt_save();
-void tolt_new(void);
+void tolt_new();
 
-void change_level_properties(void);
+void change_level_properties();
 
 // Editfilenev alapjan megprobal josolni, majd oda teszi eredmenyt:
-void kivalasztkezdetit(void);
+void kivalasztkezdetit();
 
 // Kivalaszt LGR listabol egy sprite-ot:
-void tolt_pickasprite(void);
+void tolt_pickasprite();
 
 // Siker eseten igaz:
 int tolt_picklgrfile(char* lgrnev); // lgrnevbe masol max 8 chart
@@ -33,6 +33,6 @@ extern int Rajzolpoligon;
 extern int Rajzolkoveto;
 extern int Rajzolkepek;
 
-void setviewoptions(void);
+void setviewoptions();
 
 #endif

@@ -2,6 +2,7 @@
 #include "EDITUJ.H"
 #include "eol/console.h"
 #include "eol/eol.h"
+#include "eol/status_messages.h"
 #include "eol_settings.h"
 #include "flagtag.h"
 #include "sound_engine.h"
@@ -675,6 +676,16 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         if (was_game_key_just_pressed(DIK_F5)) {
             EolClient->set_table(TableType::PlayersOnline);
         }
+        if (is_key_down(DIK_LSHIFT) && was_key_just_pressed(DIK_F8)) {
+            EolSettings->set_show_last_apple_time(!EolSettings->show_last_apple_time());
+            StatusMessages->add(EolSettings->show_last_apple_time() ? "last apple time shown"
+                                                                    : "last apple time hidden");
+        }
+        if (is_key_down(DIK_LSHIFT) && was_key_just_pressed(DIK_F11)) {
+            EolSettings->set_show_one_wheel_status(!EolSettings->show_one_wheel_status());
+            StatusMessages->add(EolSettings->show_one_wheel_status() ? "one-wheel status shown"
+                                                                     : "one-wheel status hidden");
+        }
 
         // Vizsgalat kilepesre:
         if (!console_was_active &&
@@ -1049,6 +1060,16 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         // Snap nyomas elintezese:
         if (was_game_key_just_pressed(State->key_screenshot)) {
             Legkozment = 1;
+        }
+        if (is_key_down(DIK_LSHIFT) && was_key_just_pressed(DIK_F8)) {
+            EolSettings->set_show_last_apple_time(!EolSettings->show_last_apple_time());
+            StatusMessages->add(EolSettings->show_last_apple_time() ? "last apple time shown"
+                                                                    : "last apple time hidden");
+        }
+        if (is_key_down(DIK_LSHIFT) && was_key_just_pressed(DIK_F11)) {
+            EolSettings->set_show_one_wheel_status(!EolSettings->show_one_wheel_status());
+            StatusMessages->add(EolSettings->show_one_wheel_status() ? "one-wheel status shown"
+                                                                     : "one-wheel status hidden");
         }
 
         // Vizsgalat kilepesre:

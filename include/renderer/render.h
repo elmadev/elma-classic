@@ -17,6 +17,7 @@ void increase_view_size();
 void decrease_view_size();
 
 void render_game(double time, valtozok* metadata1, valtozok* metadata2, bool show_minimap1,
-                 bool show_timer1, bool show_minimap2, bool show_timer2, camera& current_camera);
+                 bool show_timer1, bool show_minimap2, bool show_timer2, camera& current_camera,
+                 bool is_replay);
 
 #endif

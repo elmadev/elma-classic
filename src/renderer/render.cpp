@@ -605,7 +605,7 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
 // Render the view for one player
 static void render_view(bool player1, pic8* pic, double time, motorst* mot, valtozok* metadata,
                         bool show_minimap, bool show_timer, motorst* other_mot,
-                        valtozok* other_metadata, camera& current_camera) {
+                        valtozok* other_metadata, camera& current_camera, bool is_replay) {
     // Calculate frame of reference
     vect2 bike_center = mot->bike.r;
     if (current_camera.mode == CameraMode::MapViewer) {
@@ -746,21 +746,33 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
     }
 
     // Draw the bottom-right info panel
-    if (mot->apple_count && EolSettings->show_last_apple_time()) {
-        char tmp[100];
-        sprintf(tmp, "last apple (%d)        ", mot->apple_count - mot->apple_bug_count);
-        util::text::centiseconds_to_string(mot->last_apple_time, tmp + strlen(tmp), true, true);
+    constexpr int RIGHT_MARGIN = 10;
+    constexpr int BOTTOM_MARGIN = 10;
+    constexpr int LABEL_OFFSET = 180;
+    int status_y = BOTTOM_MARGIN;
+    int value_x = GameViewWidth - RIGHT_MARGIN;
+    int label_x = GameViewWidth - LABEL_OFFSET;
 
-        constexpr int RIGHT_MARGIN = 5;
-        constexpr int BOTTOM_MARGIN = 5;
-        int x = GameViewWidth - RIGHT_MARGIN;
-        int y = BOTTOM_MARGIN;
-        SmallFont->write_right_align(pic, x, y, tmp);
+    if (EolSettings->show_one_wheel_status() && !is_replay) {
+        SmallFont->write(pic, label_x, status_y, "one wheel");
+        SmallFont->write_right_align(pic, value_x, status_y, mot->one_wheel_failed ? "no" : "yes");
+        status_y += SmallFont->line_height();
+    }
+
+    if (mot->apple_count && EolSettings->show_last_apple_time()) {
+        char label[100];
+        sprintf(label, "last apple (%d)", mot->apple_count - mot->apple_bug_count);
+        SmallFont->write(pic, label_x, status_y, label);
+
+        char time[20];
+        util::text::centiseconds_to_string(mot->last_apple_time, time, true, true);
+        SmallFont->write_right_align(pic, value_x, status_y, time);
     }
 }
 
 void render_game(double time, valtozok* metadata1, valtozok* metadata2, bool show_minimap1,
-                 bool show_timer1, bool show_minimap2, bool show_timer2, camera& current_camera) {
+                 bool show_timer1, bool show_minimap2, bool show_timer2, camera& current_camera,
+                 bool is_replay) {
     // Determine who we are going to draw (player 1, player 2 or both)
     bool draw_player1 = metadata1->showkep;
     bool draw_player2 = metadata2->showkep;
@@ -788,19 +800,19 @@ void render_game(double time, valtozok* metadata1, valtozok* metadata2, bool sho
     if (splitscreen) {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
         render_view(true, &player_view, time, Motor1, metadata1, show_minimap1, show_timer1, Motor2,
-                    metadata2, current_camera);
+                    metadata2, current_camera, is_replay);
 
         player_view.subview(GameViewLeft, GameViewBottom2, GameViewRight, GameViewTop2, pic);
         render_view(false, &player_view, time, Motor2, metadata2, show_minimap2, show_timer2,
-                    Motor1, metadata1, current_camera);
+                    Motor1, metadata1, current_camera, is_replay);
     } else {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
         if (draw_player1) {
             render_view(true, &player_view, time, Motor1, metadata1, show_minimap1, show_timer1,
-                        Motor2, metadata2, current_camera);
+                        Motor2, metadata2, current_camera, is_replay);
         } else {
             render_view(false, &player_view, time, Motor2, metadata2, show_minimap2, show_timer2,
-                        Motor1, metadata1, current_camera);
+                        Motor1, metadata1, current_camera, is_replay);
         }
     }
 

@@ -656,7 +656,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         }
 
         render_game(eddig, &valt1, &valt2, Viewtime1.viewkinplay, Viewtime1.timekinplay,
-                    Viewtime2.viewkinplay, Viewtime2.timekinplay, current_camera);
+                    Viewtime2.viewkinplay, Viewtime2.timekinplay, current_camera, false);
 
         // Egy par kozos toggle:
         // Plusz elintezes:
@@ -1032,7 +1032,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         }
 
         render_game(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
-                    Viewtime2.viewkinreplay, Viewtime2.timekinreplay, current_camera);
+                    Viewtime2.viewkinreplay, Viewtime2.timekinreplay, current_camera, true);
 
         // Egy par kozos toggle:
         // Plusz elintezes:
@@ -1153,7 +1153,7 @@ void render_replay(const char* level_filename) {
         }
 
         render_game(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
-                    Viewtime2.viewkinreplay, Viewtime2.timekinreplay, current_camera);
+                    Viewtime2.viewkinreplay, Viewtime2.timekinreplay, current_camera, true);
 
         VideoFrameIndex++;
     }

@@ -111,6 +111,10 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(cripple_drunk);
     register_alias("drunk", "cripple_drunk");
     register_alias("dr", "cripple_drunk");
+    REGISTER_SETTINGS_BOOL(cripple_one_wheel);
+    register_alias("onewheel", "cripple_one_wheel");
+    register_alias("ow", "cripple_one_wheel");
+    REGISTER_SETTINGS_BOOL(show_one_wheel_status);
 }
 
 void console::add_line(std::string text, LineType type) {

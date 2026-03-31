@@ -34,8 +34,8 @@ abc8::abc8(const char* filename) {
     }
 
     bool res_file = false;
-    // First check the fonts folder
-    std::string path("fonts/");
+    // First check the resources folder
+    std::string path("resources/");
     path.append(filename);
     FILE* h = fopen(path.c_str(), "rb");
     if (!h) {

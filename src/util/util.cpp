@@ -24,6 +24,15 @@ namespace util::text {
 
 bool is_ascii_char(unsigned char c) { return (c >= 32 && c < 127); }
 
+bool is_ascii_digit(unsigned char c) { return ('0' <= c && c <= '9'); }
+
+std::optional<int> parse_ascii_digit(char c) {
+    if (is_ascii_digit(c)) {
+        return c - '0';
+    }
+    return std::nullopt;
+}
+
 bool is_filename_char(unsigned char c) {
     if (c == '\\' || c == '/' || c == ':' || c == '*' || c == '?' || c == '\"' || c == '<' ||
         c == '>' || c == '|') {

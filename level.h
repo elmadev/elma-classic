@@ -3,6 +3,7 @@
 
 #include "state.h"
 #include "vect2.h"
+#include <optional>
 
 class lgrfile;
 struct motorst;
@@ -79,8 +80,8 @@ class level {
 
 extern vect2 BikeStartOffset;
 
-// Similar to access(). Return 0 if level exists. Internal levels always exist.
-int access_level_file(const char* filename);
+// Return true if level exists. Internal levels always exist.
+bool level_file_exists(const char* filename);
 
 // Indexed from 0
 const char* get_internal_level_name(int index);
@@ -89,7 +90,8 @@ extern char BestTime[30];
 // Store the best time of the level to display while doing a run
 void load_best_time(const char* filename, int single);
 
-// Returns internal level index (1-55), or 0 if external level
-int get_internal_index(const char* filename);
+// Get the internal index (1-55) of a filename if it has the form "QWQUU###.LEV", case
+// insensitive, ### can be any digits.
+std::optional<int> get_internal_index(const char* filename);
 
 #endif

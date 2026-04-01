@@ -46,7 +46,7 @@ static void replay_time(const std::string& filename) {
 }
 
 static LoadReplayResult validate_replay_level(int level_id, const std::string& filename) {
-    if (access_level_file(Rec1->level_filename) != 0) {
+    if (!level_file_exists(Rec1->level_filename)) {
         DikScancode key =
             menu_dialog("Cannot find the lev file that corresponds", "to the record file!",
                         filename.c_str(), Rec1->level_filename);

@@ -35,7 +35,7 @@ static void menu_demo() {
 
         loading_screen();
         int level_id = recorder::load_rec_file(DEMO_NAMES[demo], true);
-        if (access_level_file(Rec1->level_filename) != 0) {
+        if (!level_file_exists(Rec1->level_filename)) {
             internal_error(std::string("menu_demo: cannot find level file for demo replay: ") +
                            Rec1->level_filename);
         }

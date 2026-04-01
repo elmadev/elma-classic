@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <optional>
 
 constexpr int TOP_TEN_HEADER = 6754362;
 constexpr int TOP_TEN_FOOTER = 8674642;
@@ -395,44 +396,36 @@ bool level::is_sky(polygon* poly, vect2* point) {
     return intersections % 2;
 }
 
-int get_internal_index(const char* filename) {
-    // QWQUU
-    if (strnicmp(filename, "QWQUU", 5) != 0) {
-        return 0;
+std::optional<int> get_internal_index(const char* filename) {
+    if ((strlen(filename) != 12) || (strnicmp(filename, "QWQUU", 5) != 0) ||
+        (strnicmp(&filename[8], ".lev", 4) != 0)) {
+        return std::nullopt;
     }
-    // 001
-    const char* number_string = &filename[5];
-    int sum = 0;
-    for (int i = 0; i < 3; i++) {
-        sum *= 10;
-        int add = *number_string - '0';
-        if (add < 0 || add > 9) {
-            return 0;
-        }
-        sum += add;
-        number_string++;
+
+    auto hundreds = util::text::parse_ascii_digit(filename[5]);
+    auto tens = util::text::parse_ascii_digit(filename[6]);
+    auto ones = util::text::parse_ascii_digit(filename[7]);
+    if (!hundreds.has_value() || !tens.has_value() || !ones.has_value()) {
+        return std::nullopt;
     }
-    // .lev
-    if (strcmpi(&filename[8], ".lev") != 0) {
-        return 0;
+
+    int index = 100 * hundreds.value() + 10 * tens.value() + ones.value();
+    if (index > INTERNAL_LEVEL_COUNT) {
+        return std::nullopt;
     }
-    // Valid number
-    if (sum <= INTERNAL_LEVEL_COUNT) {
-        return sum;
-    }
-    return 0;
+
+    return index;
 }
 
-int access_level_file(const char* filename) {
+bool level_file_exists(const char* filename) {
     // Internals always accessible
-    int internal_index = get_internal_index(filename);
-    if (internal_index > 0) {
-        return 0;
+    if (get_internal_index(filename).has_value()) {
+        return true;
     }
     // For externals, normal access function call
     filepath tmp;
     sprintf(tmp, "lev/%s", filename);
-    return access(tmp, 0);
+    return access(tmp, 0) == 0;
 }
 
 char BestTime[30] = "";
@@ -442,14 +435,10 @@ void load_best_time(const char* filename, int single) {
         internal_error("load_best_time strlen(filename) > 20");
     }
     // Get the topten table
-    int internal_index = get_internal_index(filename);
+    std::optional<int> internal_index = get_internal_index(filename);
     topten_set* tten_set = nullptr;
-    if (internal_index > 0) {
-        internal_index--; // Zero-indexed
-        if (internal_index >= INTERNAL_LEVEL_COUNT) {
-            internal_error("load_best_time internal_index out of range!");
-        }
-        tten_set = &State->toptens[internal_index];
+    if (internal_index.has_value()) {
+        tten_set = &State->toptens[internal_index.value() - 1];
     } else {
         if (!Ptop) {
             internal_error(
@@ -537,12 +526,12 @@ level::level(const char* filename) {
         internal_error("level::level strlen(filename) > 20");
     }
 
-    int internal_index = get_internal_index(filename);
-    if (internal_index > 0) {
-        from_file(InternalFilePaths[internal_index], true);
+    std::optional<int> internal_index = get_internal_index(filename);
+    if (internal_index.has_value()) {
+        from_file(InternalFilePaths[internal_index.value()], true);
         // Override lgr name from lgrlist.txt
         filepath lgrpath;
-        const char* lgrname = InternalLevelLgrs[internal_index];
+        const char* lgrname = InternalLevelLgrs[internal_index.value()];
         sprintf(lgrpath, "lgr/%s.lgr", lgrname);
         if (access(lgrpath, 0) == 0) {
             strcpy(lgr_name, lgrname);

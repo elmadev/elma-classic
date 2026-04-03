@@ -59,7 +59,7 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
    ```
    build/elma.res
    build/lgr/default.lgr
-   build/fonts/small.abc
+   build/resources/... (copy the files from the resources/ folder included with this project)
    etc
    ```
 

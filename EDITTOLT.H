@@ -6,33 +6,33 @@
 
 class sprite;
 
-void tolt_open();
+void editor_window_open();
 // Ha sikeresen mentettek, akkor igazak:
-int tolt_save_as();
-int tolt_save();
-void tolt_new();
+int editor_window_save_as();
+int editor_window_save();
+void editor_new();
 
-void change_level_properties();
+void editor_window_level_properties();
 
 // Editfilenev alapjan megprobal josolni, majd oda teszi eredmenyt:
-void kivalasztkezdetit();
+void editor_window_welcome();
 
 // Kivalaszt LGR listabol egy sprite-ot:
-void tolt_pickasprite();
+void editor_window_choose_sprite();
 
 // Siker eseten igaz:
-int tolt_picklgrfile(char* lgrnev); // lgrnevbe masol max 8 chart
+int editor_window_choose_lgr(char* lgrname); // lgrnevbe masol max 8 chart
 
-void setspritetav(sprite* psp);
+void editor_window_sprite_properties(sprite* spr);
 
-void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoodsorszam);
+void editor_window_food_properties(const char* title, object::Property* property, int* animation);
 
-void set_gyuru_attributes(polygon* pgy);
+void editor_window_polygon_properties(polygon* poly);
 
-extern int Rajzolpoligon;
-extern int Rajzolkoveto;
-extern int Rajzolkepek;
+extern int ShowPolygons;
+extern int ShowGrassPolygons;
+extern int ShowObjects;
 
-void setviewoptions();
+void editor_window_view_options();
 
 #endif

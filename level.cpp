@@ -248,11 +248,11 @@ polygon* level::get_closest_vertex(double x, double y, int* vertex_index, double
         }
 
         // Ignore polygons that aren't rendered in the editor
-        if (polygons[i]->is_grass && !Rajzolkoveto) {
+        if (polygons[i]->is_grass && !ShowGrassPolygons) {
             continue;
         }
 
-        if (!polygons[i]->is_grass && !Rajzolpoligon) {
+        if (!polygons[i]->is_grass && !ShowPolygons) {
             continue;
         }
 
@@ -314,7 +314,7 @@ sprite* level::get_closest_sprite(double x, double y, double* distance) {
     vect2 r(x, y);
     for (int i = 0; i < MAX_SPRITES; i++) {
         // Skip all sprites if they aren't rendered in editor
-        if (!Rajzolkepek) {
+        if (!ShowObjects) {
             continue;
         }
 
@@ -344,11 +344,11 @@ void level::render() {
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (polygons[i]) {
             if (polygons[i]->is_grass) {
-                if (Rajzolkoveto) {
+                if (ShowGrassPolygons) {
                     polygons[i]->render_outline();
                 }
             } else {
-                if (Rajzolpoligon) {
+                if (ShowPolygons) {
                     polygons[i]->render_outline();
                 }
             }
@@ -363,7 +363,7 @@ void level::render() {
 
     for (int i = 0; i < MAX_SPRITES; i++) {
         if (sprites[i]) {
-            if (Rajzolkepek) {
+            if (ShowObjects) {
                 sprites[i]->render();
             }
         }

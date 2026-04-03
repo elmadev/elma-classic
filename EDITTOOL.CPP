@@ -230,14 +230,14 @@ void t_move_nyomva_jobb(int mx, int my) {
     }
 
     if (psp) {
-        setspritetav(psp);
+        editor_window_sprite_properties(psp);
     }
     if (pgy) {
-        set_gyuru_attributes(pgy);
+        editor_window_polygon_properties(pgy);
     }
     // Csak kaja-nak lehet megvaltoztatni tipusat:
     if (pk && pk->type == object::Type::Food) {
-        set_kerek_tipus("Select food subtype!", &pk->property, &pk->animation);
+        editor_window_food_properties("Select food subtype!", &pk->property, &pk->animation);
     }
 }
 
@@ -613,7 +613,8 @@ object::Property Food_kajatipus = object::Property::None;
 int Food_foodsorszam = 0;
 
 void t_create_food_nyomva_jobb() {
-    set_kerek_tipus("Select Create_Food subtype!", &Food_kajatipus, &Food_foodsorszam);
+    editor_window_food_properties("Select Create_Food subtype!", &Food_kajatipus,
+                                  &Food_foodsorszam);
 }
 
 // Food es killer is egyben:
@@ -781,7 +782,7 @@ void t_create_sprite_nyomva_jobb() {
         dialog("There are not any pictures in the LGR file!");
         return;
     }
-    tolt_pickasprite();
+    editor_window_choose_sprite();
     /*if( Lgr->aktivindex >= Lgr->picture_count )
         internal_error( "[op0fijh" );
     kispritenev( Lgr->nevek[Lgr->aktivindex],

@@ -615,7 +615,7 @@ static void toolvaltas(int t) {
 static void editor_play(bool view_map) {
     invalidateegesz();
     if (Valtozott || State->editor_filename[0] == 0 || Ptop->topology_errors) {
-        if (!tolt_save()) {
+        if (!editor_window_save()) {
             return;
         }
     }
@@ -682,7 +682,7 @@ void editor() {
     }
 
     // Beolvassuk file-t:
-    kivalasztkezdetit();
+    editor_window_welcome();
 
     Valtozott = 0;
     if (State->editor_filename[0] == 0) {
@@ -745,10 +745,10 @@ void editor() {
                     }
                 }
                 if (c == 'o') {
-                    tolt_open();
+                    editor_window_open();
                 }
                 if (c == 's') {
-                    tolt_save();
+                    editor_window_save();
                 }
                 if (c == 'z') {
                     editor_zoom_out();
@@ -831,14 +831,14 @@ void editor() {
                         }
 
                         if (i == 1 && balnyomva) {
-                            tolt_new();
+                            editor_new();
                         }
                         if (i == 1 && jobbnyomva) {
                             editor_help_new();
                         }
 
                         if (i == 2 && balnyomva) {
-                            tolt_open();
+                            editor_window_open();
                         }
 
                         if (i == 2 && jobbnyomva) {
@@ -846,14 +846,14 @@ void editor() {
                         }
 
                         if (i == 3 && balnyomva) {
-                            tolt_save_as();
+                            editor_window_save_as();
                         }
                         if (i == 3 && jobbnyomva) {
                             editor_help_save_as();
                         }
 
                         if (i == 4 && balnyomva) {
-                            tolt_save();
+                            editor_window_save();
                         }
                         if (i == 4 && jobbnyomva) {
                             editor_help_save();
@@ -875,7 +875,7 @@ void editor() {
                         }
 
                         if (i == 7 && balnyomva) {
-                            change_level_properties();
+                            editor_window_level_properties();
                         }
                         if (i == 7 && jobbnyomva) {
                             editor_help_properties();
@@ -898,7 +898,7 @@ void editor() {
                         }
 
                         if (i == 10 && balnyomva) {
-                            setviewoptions();
+                            editor_window_view_options();
                         }
                         // menu_set_lgr_file();
                         if (i == 10 && jobbnyomva) {

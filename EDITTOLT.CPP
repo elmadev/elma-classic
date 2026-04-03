@@ -191,7 +191,7 @@ static void boxbarajz(pic8* ppic, box abox, unsigned char szin, int fel) {
     }
 }
 
-void tolt_open() {
+void editor_window_open() {
     invalidateegesz();
     if (Valtozott) {
         if (dialog("There are unsaved changes in the level file.",
@@ -203,7 +203,7 @@ void tolt_open() {
     if (!Soknev) {
         Soknev = new char[Maxnev * 10 + 100];
         if (!Soknev) {
-            internal_error("Nincs eleg memoria tolt_open-ben (hjfdf)!");
+            internal_error("Nincs eleg memoria editor_window_open-ben (hjfdf)!");
         }
     }
     for (int i = 0; i < Maxnev * 10 + 10; i++) {
@@ -367,12 +367,12 @@ void tolt_open() {
 }
 
 // Editfilenev alapjan megprobal josolni, majd oda teszi eredmenyt:
-void kivalasztkezdetit() {
+void editor_window_welcome() {
     invalidateegesz();
     if (!Soknev) {
         Soknev = new char[Maxnev * 10 + 100];
         if (!Soknev) {
-            internal_error("Nincs eleg memoria tolt_open-ben (hjfdf)!");
+            internal_error("Nincs eleg memoria editor_window_open-ben (hjfdf)!");
         }
     }
     for (int i = 0; i < Maxnev * 10 + 10; i++) {
@@ -554,7 +554,7 @@ void kivalasztkezdetit() {
     }
 }
 
-void tolt_new() {
+void editor_new() {
     invalidateegesz();
     if (Valtozott) {
         if (dialog("There are unsaved changes in the level file.", "Do you still want to continue?",
@@ -570,11 +570,11 @@ void tolt_new() {
 }
 
 // Ha sikeresen mentett, akkor igaz:
-int tolt_save() {
+int editor_window_save() {
     invalidateegesz();
     if (State->editor_filename[0] == 0) {
         // Ez a file meg nincsen elnevezve:
-        return tolt_save_as();
+        return editor_window_save_as();
     }
     Ptop->save(State->editor_filename);
     Valtozott = 0;
@@ -582,7 +582,7 @@ int tolt_save() {
 }
 
 // Ha sikeresen mentett, akkor igaz:
-int tolt_save_as() {
+int editor_window_save_as() {
     invalidateegesz();
     // Itt most be kell olvasnunk egy nevet:
     box boxnagy = {20, 200, 600, 300};
@@ -1133,9 +1133,9 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     }
 }
 
-void tolt_pickasprite() {
+void editor_window_choose_sprite() {
     if (!Lgr) {
-        internal_error("tolt_pickasprite-ban !Lgr!");
+        internal_error("editor_window_choose_sprite-ban !Lgr!");
     }
 
     makeszinkonvtomb(Lgr->palette_data);
@@ -1265,13 +1265,13 @@ void tolt_pickasprite() {
     }
 }
 
-int tolt_picklgrfile(char* lgrnev) {
+int editor_window_choose_lgr(char* lgrname) {
     invalidateegesz();
     blit8(BufferBall, BufferMain);
     if (!Soknev) {
         Soknev = new char[Maxnev * 10 + 100];
         if (!Soknev) {
-            internal_error("Nincs eleg memoria tolt_picklgrfile-ban!");
+            internal_error("Nincs eleg memoria editor_window_choose_lgr-ban!");
         }
     }
     for (int i = 0; i < Maxnev * 10 + 10; i++) {
@@ -1318,7 +1318,7 @@ int tolt_picklgrfile(char* lgrnev) {
 
     int kur = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
     for (int i = 0; i < nevszam; i++) {
-        if (strcmpi(&Soknev[i * 10], lgrnev) == 0) {
+        if (strcmpi(&Soknev[i * 10], lgrname) == 0) {
             kur = i;
         }
     }
@@ -1352,7 +1352,7 @@ int tolt_picklgrfile(char* lgrnev) {
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             igazit(&kur, &felso, nevszam, helyszam);
-            strcpy(lgrnev, &Soknev[kur * 10]);
+            strcpy(lgrname, &Soknev[kur * 10]);
             return 1;
         }
         if (was_key_down(DIK_UP)) {
@@ -1392,7 +1392,7 @@ int tolt_picklgrfile(char* lgrnev) {
                     int index = (Mouy - ly1) / dy;
                     index += felso;
                     if (index < nevszam) {
-                        strcpy(lgrnev, &Soknev[index * 10]);
+                        strcpy(lgrname, &Soknev[index * 10]);
                         return 1;
                     }
                 }
@@ -1423,7 +1423,7 @@ int tolt_picklgrfile(char* lgrnev) {
 
             // Kiirjuk eredeti file nevet:
             char tttmp[50];
-            strcpy(tttmp, lgrnev);
+            strcpy(tttmp, lgrname);
             // strcat( tttmp, ".LGR" );
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y2 - 36, "Original LGR file:");
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y2 - 18, tttmp);
@@ -1509,7 +1509,7 @@ static Clipping hatarolbeir(pic8* ppic, box abox, Clipping hatarol) {
     }
 }
 
-void setspritetav(sprite* psp) {
+void editor_window_sprite_properties(sprite* spr) {
     invalidateegesz();
 
     // Koordok megadasa:
@@ -1524,19 +1524,19 @@ void setspritetav(sprite* psp) {
     box boxclipp = {x1 + 181, y1 + 118, x1 + 181 + 34, y1 + 118 + 16};
 
     int kepvaltozott = 1;
-    int tavolsag = psp->distance;
-    Clipping hatarol = psp->clipping;
+    int tavolsag = spr->distance;
+    Clipping hatarol = spr->clipping;
     while (1) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            if (psp->distance != tavolsag || psp->clipping != hatarol) {
+            if (spr->distance != tavolsag || spr->clipping != hatarol) {
                 Valtozott = 1;
             }
-            psp->distance = tavolsag;
-            psp->clipping = hatarol;
+            spr->distance = tavolsag;
+            spr->clipping = hatarol;
             return;
         }
         // Eger lenyomas:
@@ -1544,11 +1544,11 @@ void setspritetav(sprite* psp) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
-                if (psp->distance != tavolsag || psp->clipping != hatarol) {
+                if (spr->distance != tavolsag || spr->clipping != hatarol) {
                     Valtozott = 1;
                 }
-                psp->distance = tavolsag;
-                psp->clipping = hatarol;
+                spr->distance = tavolsag;
+                spr->clipping = hatarol;
                 return;
             }
             if (is_in_box(Moux, Mouy, boxcancel)) {
@@ -1576,11 +1576,11 @@ void setspritetav(sprite* psp) {
                                   "CANCEL");
 
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15, "Set Picture Properties");
-            if (psp->picture_name[0]) {
-                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 45, psp->picture_name);
+            if (spr->picture_name[0]) {
+                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 45, spr->picture_name);
             } else {
-                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 34, psp->texture_name);
-                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 56, psp->mask_name);
+                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 34, spr->texture_name);
+                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 56, spr->mask_name);
             }
             Pabc2->write(BufferMain, x1 + 92, y1 + 76, "Distance");
             Pabc2->write(BufferMain, x1 + 172, y1 + 76, "Clipping");
@@ -1588,16 +1588,16 @@ void setspritetav(sprite* psp) {
             Pabc2->write(BufferMain, x1 + 12, y1 + 100, "Default:");
             int deftav = -1;
             Clipping defhatarol = Clipping::Unknown;
-            if (psp->picture_name[0]) {
-                int index = Lgr->get_picture_index(psp->picture_name);
+            if (spr->picture_name[0]) {
+                int index = Lgr->get_picture_index(spr->picture_name);
                 if (index < 0) {
                     internal_error("iohdiuyde");
                 }
                 deftav = Lgr->pictures[index].default_distance;
                 defhatarol = Lgr->pictures[index].default_clipping;
             }
-            if (psp->texture_name[0]) {
-                int index = Lgr->get_texture_index(psp->texture_name);
+            if (spr->texture_name[0]) {
+                int index = Lgr->get_texture_index(spr->texture_name);
                 if (index < 0) {
                     internal_error("u6ythggf");
                 }
@@ -1655,7 +1655,7 @@ void setspritetav(sprite* psp) {
     }
 }
 
-void set_gyuru_attributes(polygon* pgy) {
+void editor_window_polygon_properties(polygon* poly) {
     invalidateegesz();
 
     // Koordok megadasa:
@@ -1672,7 +1672,7 @@ void set_gyuru_attributes(polygon* pgy) {
 
     int kepvaltozott = 1;
 
-    int koveto = pgy->is_grass;
+    int koveto = poly->is_grass;
 
     while (1) {
         handle_events();
@@ -1681,10 +1681,10 @@ void set_gyuru_attributes(polygon* pgy) {
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             // Meg van ismetelve OK-nal is lejjebb:
-            if (pgy->is_grass != koveto) {
+            if (poly->is_grass != koveto) {
                 Valtozott = 1;
             }
-            pgy->is_grass = koveto;
+            poly->is_grass = koveto;
             return;
         }
         // Eger lenyomas:
@@ -1693,10 +1693,10 @@ void set_gyuru_attributes(polygon* pgy) {
             // Most nezzuk meg, hogy hova kattintott:
             if (is_in_box(Moux, Mouy, boxok)) {
                 // Meg van ismetelve ENTER-nel is feljebb:
-                if (pgy->is_grass != koveto) {
+                if (poly->is_grass != koveto) {
                     Valtozott = 1;
                 }
-                pgy->is_grass = koveto;
+                poly->is_grass = koveto;
                 return;
             }
             if (is_in_box(Moux, Mouy, boxcancel)) {
@@ -1741,7 +1741,7 @@ void set_gyuru_attributes(polygon* pgy) {
     }
 }
 
-void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoodsorszam) {
+void editor_window_food_properties(const char* title, object::Property* property, int* animation) {
     invalidateegesz();
 
     // Koordok megadasa:
@@ -1763,14 +1763,14 @@ void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoo
     // Kirajzoljuk, dialogust:
     push();
     render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, fejlec);
+    Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, title);
     render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
     Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
                           "Cancel");
     // Anim szam boxa:
     Pabc2->write(BufferMain, boxanimszam.x1 - 162, boxanimszam.y1 + 15, "Food anim number (1-9):");
     char tmp[20];
-    sprintf(tmp, "%d", (int)(*pfoodsorszam + 1));
+    sprintf(tmp, "%d", (int)(*animation + 1));
     render_box(BufferMain, boxanimszam, Feherszin, DIALOG_BORDER_PALETTE_ID);
     Pabc2->write_centered(BufferMain, (boxanimszam.x1 + boxanimszam.x2) / 2, boxanimszam.y1 + 15,
                           tmp);
@@ -1839,7 +1839,7 @@ void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoo
                     while (has_text_input()) {
                         char c = pop_text_input();
                         if (c >= '1' && c <= '9') {
-                            *pfoodsorszam = c - '1';
+                            *animation = c - '1';
                             got_digit = true;
                             break;
                         }
@@ -1860,19 +1860,19 @@ void set_kerek_tipus(const char* fejlec, object::Property* pkajatipus, int* pfoo
                 Valtozott = 1;
                 switch (index) {
                 case 0:
-                    *pkajatipus = object::Property::None;
+                    *property = object::Property::None;
                     break;
                 case 1:
-                    *pkajatipus = object::Property::GravityUp;
+                    *property = object::Property::GravityUp;
                     break;
                 case 2:
-                    *pkajatipus = object::Property::GravityDown;
+                    *property = object::Property::GravityDown;
                     break;
                 case 3:
-                    *pkajatipus = object::Property::GravityLeft;
+                    *property = object::Property::GravityLeft;
                     break;
                 case 4:
-                    *pkajatipus = object::Property::GravityRight;
+                    *property = object::Property::GravityRight;
                     break;
                 default:
                     internal_error("0893ytpoerhg");
@@ -1982,7 +1982,7 @@ static void change_level_name(char* nev) {
     }
 }
 
-void change_level_properties() {
+void editor_window_level_properties() {
     invalidateegesz();
 
     char fgnev[10];
@@ -2096,7 +2096,7 @@ void change_level_properties() {
             if (is_in_box(Moux, Mouy, boxlgrfile)) {
                 finame belgrnev = "";
                 strcpy(belgrnev, lgrnev);
-                if (!tolt_picklgrfile(lgrnev)) {
+                if (!editor_window_choose_lgr(lgrnev)) {
                     strcpy(lgrnev, belgrnev);
                 }
                 push();
@@ -2154,11 +2154,11 @@ void change_level_properties() {
     }
 }
 
-int Rajzolpoligon = 1;
-int Rajzolkoveto = 1;
-int Rajzolkepek = 1;
+int ShowPolygons = 1;
+int ShowGrassPolygons = 1;
+int ShowObjects = 1;
 
-void setviewoptions() {
+void editor_window_view_options() {
     invalidateegesz();
 
     int x1 = 200, y1 = 100;
@@ -2186,15 +2186,15 @@ void setviewoptions() {
                 return;
             }
             if (is_in_box(Moux, Mouy, boxpoligon)) {
-                Rajzolpoligon = !Rajzolpoligon;
+                ShowPolygons = !ShowPolygons;
                 invalid = 1;
             }
             if (is_in_box(Moux, Mouy, boxkoveto)) {
-                Rajzolkoveto = !Rajzolkoveto;
+                ShowGrassPolygons = !ShowGrassPolygons;
                 invalid = 1;
             }
             if (is_in_box(Moux, Mouy, boxkepek)) {
-                Rajzolkepek = !Rajzolkepek;
+                ShowObjects = !ShowObjects;
                 invalid = 1;
             }
         }
@@ -2210,7 +2210,7 @@ void setviewoptions() {
 
             Pabc2->write(BufferMain, szovx, boxpoligon.y1 + 15, "View Polygons");
             render_box(BufferMain, boxpoligon, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            if (Rajzolpoligon) {
+            if (ShowPolygons) {
                 boxbair(BufferMain, boxpoligon, Feherszin, "Yes");
             } else {
                 boxbair(BufferMain, boxpoligon, Feherszin, "No");
@@ -2218,7 +2218,7 @@ void setviewoptions() {
 
             Pabc2->write(BufferMain, szovx, boxkoveto.y1 + 15, "View Grass");
             render_box(BufferMain, boxkoveto, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            if (Rajzolkoveto) {
+            if (ShowGrassPolygons) {
                 boxbair(BufferMain, boxkoveto, Feherszin, "Yes");
             } else {
                 boxbair(BufferMain, boxkoveto, Feherszin, "No");
@@ -2226,7 +2226,7 @@ void setviewoptions() {
 
             Pabc2->write(BufferMain, szovx, boxkepek.y1 + 15, "View Pictures");
             render_box(BufferMain, boxkepek, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            if (Rajzolkepek) {
+            if (ShowObjects) {
                 boxbair(BufferMain, boxkepek, Feherszin, "Yes");
             } else {
                 boxbair(BufferMain, boxkepek, Feherszin, "No");

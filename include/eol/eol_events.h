@@ -2,6 +2,7 @@
 #define EOL_EVENTS_H
 
 #include "eol/eol_types.h"
+#include "fs_utils.h"
 
 struct login {
     bool success;
@@ -16,6 +17,11 @@ struct new_kuski {
 struct kuski_logout {
     unsigned int id;
     unsigned int id2;
+};
+
+struct kuski_set_level {
+    unsigned int id;
+    char level[MAX_FILENAME_LEN + 1];
 };
 
 #endif

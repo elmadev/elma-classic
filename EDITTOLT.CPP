@@ -808,7 +808,7 @@ static void preview_texture(pic8* dest, texture* text, mask* msk, int x, int y) 
 }
 
 static void editor_window_select_sprite_name(char* picture_name, char* texture_name,
-                                             char* mask_name, int sprite_type, int cleares = 0) {
+                                             char* mask_name, int sprite_type) {
     char* name = nullptr;
     int list_length = 0;
     if (sprite_type == 1) {
@@ -878,7 +878,6 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
     box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
     box box_down = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
     box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
-    box box_clear = {x1 + 121, y1 + 30, x1 + 121 + 70, y1 + 50};
 
     int view_index = 0;
     int view_index_prev = -1;
@@ -937,10 +936,6 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             }
             if (is_in_box(Moux, Mouy, box_cancel)) {
                 strcpy(name, original_name);
-                return;
-            }
-            if (cleares && is_in_box(Moux, Mouy, box_clear)) {
-                name[0] = 0;
                 return;
             }
             if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
@@ -1070,11 +1065,6 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                   box_cancel.y1 + 15, "CANCEL");
-            if (cleares) {
-                render_box(BufferMain, box_clear, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-                Pabc2->write_centered(BufferMain, (box_clear.x1 + box_clear.x2) / 2,
-                                      box_clear.y1 + 15, "CLEAR");
-            }
 
             bltfront(BufferMain);
             pop();
@@ -1979,7 +1969,7 @@ void editor_window_level_properties() {
             }
             if (is_in_box(Moux, Mouy, box_foreground)) {
                 char null_name[10] = "";
-                editor_window_select_sprite_name(null_name, foreground_name, null_name, 2, 0);
+                editor_window_select_sprite_name(null_name, foreground_name, null_name, 2);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
@@ -1988,7 +1978,7 @@ void editor_window_level_properties() {
             }
             if (is_in_box(Moux, Mouy, box_background)) {
                 char null_name[10] = "";
-                editor_window_select_sprite_name(null_name, background_name, null_name, 2, 0);
+                editor_window_select_sprite_name(null_name, background_name, null_name, 2);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);

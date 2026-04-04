@@ -189,23 +189,22 @@ void pic8::fill_box(unsigned char index) {
 
 void pic8::fill_box(int x1, int y1, int x2, int y2, unsigned char index) {
     if (x1 > x2) {
-        int tmp = x1;
-        x1 = x2;
-        x2 = tmp;
+        std::swap(x1, x2);
     }
     if (y1 > y2) {
-        int tmp = y1;
-        y1 = y2;
-        y2 = tmp;
+        std::swap(y1, y2);
     }
+
     x1 = std::max(x1, 0);
     y1 = std::max(y1, 0);
-    if (x2 >= width) {
-        x2 = width - 1;
+    x2 = std::min(x2, width - 1);
+    y2 = std::min(y2, height - 1);
+
+    if (x1 > x2 || y1 > y2) {
+        // box to draw is completely out of bounds
+        return;
     }
-    if (y2 >= height) {
-        y2 = height - 1;
-    }
+
     int length = x2 - x1 + 1;
     for (int y = y1; y <= y2; y++) {
         memset(rows[y] + x1, index, length);

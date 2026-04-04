@@ -20,12 +20,12 @@
 #include <cstring>
 #include <directinput/scancodes.h>
 
-constexpr unsigned char Save_as_box_szin = 4, Save_as_szelszin = 5;
+constexpr unsigned char EditorPalette_LevelNameDialog = 4, EditorPalette_LevelNameDialogBorder = 5;
 
-static unsigned char Openlistaszin = 6, Openlistainvszin = 7;
+static unsigned char EditorPalette_List = 6, EditorPalette_ListSelected = 7;
 
-static int Maxnev = 1000; // Nem lehet nagyobb 3000-nel!
-static char* Soknev = nullptr;
+static int EDITOR_LIST_MAX_LENGTH = 1000; // Nem lehet nagyobb 3000-nel!
+static char* EditorListBuffer = nullptr;
 
 // Returns true if text1 is earlier in the alphabet than text2
 static int case_insensitive_lexicographical_compare(const char* text1, const char* text2) {
@@ -80,40 +80,40 @@ static int case_insensitive_lexicographical_compare(const char* text1, const cha
     }
 }
 
-static void abcberendez(int nevszam) {
-    for (int i = 0; i < nevszam + 3; i++) {
-        for (int j = 0; j < nevszam - 1; j++) {
+static void sort_files(int length) {
+    for (int i = 0; i < length + 3; i++) {
+        for (int j = 0; j < length - 1; j++) {
             // Ha j es j+1 edik elem forditva van visszacsereljuk oket:
-            char* nev1 = &Soknev[j * 10];
-            char* nev2 = &Soknev[(j + 1) * 10];
+            char* file1 = &EditorListBuffer[j * 10];
+            char* file2 = &EditorListBuffer[(j + 1) * 10];
             int case_insensitive_lexicographical_compare(const char* text1, const char* text2);
-            if (case_insensitive_lexicographical_compare(nev2, nev1)) {
-                // if( strcmp( nev1, nev2 ) > 0 ) {
+            if (case_insensitive_lexicographical_compare(file2, file1)) {
+                // if( strcmp( file1, file2 ) > 0 ) {
                 //  Csere:
                 finame tmp;
-                strcpy(tmp, nev1);
-                strcpy(nev1, nev2);
-                strcpy(nev2, tmp);
+                strcpy(tmp, file1);
+                strcpy(file1, file2);
+                strcpy(file2, tmp);
             }
         }
     }
 }
 
-static void betolt(const char* nev) {
+static void open_level(const char* filename) {
     if (!Ptop) {
-        internal_error("uoiwfiufre");
+        internal_error("open_level !Ptop");
     }
-    if (!*nev) {
-        internal_error("oiufewguyxygxw");
+    if (!*filename) {
+        internal_error("open_level !*filename");
     }
     char tmp[15];
-    if (strlen(nev) > 8) {
-        internal_error("iovffiufi");
+    if (strlen(filename) > 8) {
+        internal_error("open_level strlen(filename) > 8");
     }
-    strcpy(tmp, nev);
+    strcpy(tmp, filename);
     strcat(tmp, ".lev");
     if (strlen(tmp) > 12) {
-        internal_error("betolt-ben strlen( tmp ) > 12!");
+        internal_error("open_level strlen( tmp ) > 12!");
     }
     strcpy(State->editor_filename, tmp);
 
@@ -126,67 +126,69 @@ static void betolt(const char* nev) {
     zoom_fill();
 }
 
-static void igazit(int* pkur, int* pfelso, int nevszam, int helyszam) {
-    if (*pkur < 0) {
-        *pkur = 0;
+static void adjust_list_view(int* selected_index, int* view_index, int length,
+                             int max_visible_entries) {
+    if (*selected_index < 0) {
+        *selected_index = 0;
     }
-    if (*pkur > nevszam - 1) {
-        *pkur = nevszam - 1;
+    if (*selected_index > length - 1) {
+        *selected_index = length - 1;
     }
-    if (*pfelso > *pkur) {
-        *pfelso = *pkur;
+    if (*view_index > *selected_index) {
+        *view_index = *selected_index;
     }
-    if (*pfelso < *pkur - helyszam + 1) {
-        *pfelso = *pkur - helyszam + 1;
+    if (*view_index < *selected_index - max_visible_entries + 1) {
+        *view_index = *selected_index - max_visible_entries + 1;
     }
 }
 
-static void boxbair(pic8* ppic, box abox, unsigned char szin, const char* text, int alahuzas = 0) {
-    ppic->fill_box(abox.x1 + 1, abox.y1 + 1, abox.x2 - 1, abox.y2 - 1, szin);
-    if (alahuzas) {
-        int hossz = Pabc2->len(text);
-        int x = (abox.x1 + abox.x2) / 2 - hossz / 2 - 3;
-        Pabc2->write(ppic, x, (abox.y1 + abox.y2) / 2 + 5, text);
+static void draw_textbox_centered(pic8* pic, box bx, unsigned char fill_id, const char* text,
+                                  int add_underline = 0) {
+    pic->fill_box(bx.x1 + 1, bx.y1 + 1, bx.x2 - 1, bx.y2 - 1, fill_id);
+    if (add_underline) {
+        int length = Pabc2->len(text);
+        int x = (bx.x1 + bx.x2) / 2 - length / 2 - 3;
+        Pabc2->write(pic, x, (bx.y1 + bx.y2) / 2 + 5, text);
         for (int i = 0; i < 6; i++) {
-            ppic->ppixel(x + hossz + i + 1, (abox.y1 + abox.y2) / 2 + 4, 0);
+            pic->ppixel(x + length + i + 1, (bx.y1 + bx.y2) / 2 + 4, 0);
         }
     } else {
-        Pabc2->write_centered(ppic, (abox.x1 + abox.x2) / 2, (abox.y1 + abox.y2) / 2 + 5, text);
+        Pabc2->write_centered(pic, (bx.x1 + bx.x2) / 2, (bx.y1 + bx.y2) / 2 + 5, text);
     }
 }
 
-static void boxbair_balra(pic8* ppic, box abox, unsigned char szin, const char* text) {
-    ppic->fill_box(abox.x1 + 1, abox.y1 + 1, abox.x2 - 1, abox.y2 - 1, szin);
-    Pabc2->write(ppic, abox.x1 + 2, (abox.y1 + abox.y2) / 2 + 5, text);
+static void draw_textbox_left(pic8* pic, box bx, unsigned char fill_id, const char* text) {
+    pic->fill_box(bx.x1 + 1, bx.y1 + 1, bx.x2 - 1, bx.y2 - 1, fill_id);
+    Pabc2->write(pic, bx.x1 + 2, (bx.y1 + bx.y2) / 2 + 5, text);
 }
 
-static void boxbarajz(pic8* ppic, box abox, unsigned char szin, int fel) {
-    int x1 = abox.x1;
-    int y1 = abox.y1;
-    int x2 = abox.x2;
-    int y2 = abox.y2;
-    int szeltav = 16;
-    x1 += szeltav;
-    x2 -= szeltav;
+static void draw_arrow(pic8* pic, box bx, unsigned char palette_id, int up_arrow) {
+    int x1 = bx.x1;
+    int y1 = bx.y1;
+    int x2 = bx.x2;
+    int y2 = bx.y2;
+    int half_width = 16;
+    x1 += half_width;
+    x2 -= half_width;
     y1 += 5;
     y2 -= 8;
-    int xkozep = (x1 + x2) / 2;
-    for (int xfut = x1; xfut <= xkozep; xfut++) {
-        int x = xfut;
-        int y = int(y1 + (y2 - y1) / double(xkozep - x1) * (x - x1));
-        if (fel) {
-            y = abox.y2 - (y - abox.y1);
-            ppic->ppixel(x, y, szin);
-            ppic->ppixel(x, y - 3, szin);
-            x = xkozep + (xkozep - x);
-            ppic->ppixel(x, y, szin);
-            ppic->ppixel(x, y - 3, szin);
+    int x_center = (x1 + x2) / 2;
+    for (int x_right = x1; x_right <= x_center; x_right++) {
+        int x = x_right;
+        int y = int(y1 + (y2 - y1) / double(x_center - x1) * (x - x1));
+        if (up_arrow) {
+            y = bx.y2 - (y - bx.y1);
+            pic->ppixel(x, y, palette_id);
+            pic->ppixel(x, y - 3, palette_id);
+            x = x_center + (x_center - x);
+            pic->ppixel(x, y, palette_id);
+            pic->ppixel(x, y - 3, palette_id);
         } else {
-            ppic->ppixel(x, y, szin);
-            ppic->ppixel(x, y + 3, szin);
-            x = xkozep + (xkozep - x);
-            ppic->ppixel(x, y, szin);
-            ppic->ppixel(x, y + 3, szin);
+            pic->ppixel(x, y, palette_id);
+            pic->ppixel(x, y + 3, palette_id);
+            x = x_center + (x_center - x);
+            pic->ppixel(x, y, palette_id);
+            pic->ppixel(x, y + 3, palette_id);
         }
     }
 }
@@ -200,40 +202,41 @@ void editor_window_open() {
             return;
         }
     }
-    if (!Soknev) {
-        Soknev = new char[Maxnev * 10 + 100];
-        if (!Soknev) {
-            internal_error("Nincs eleg memoria editor_window_open-ben (hjfdf)!");
+    if (!EditorListBuffer) {
+        EditorListBuffer = new char[EDITOR_LIST_MAX_LENGTH * 10 + 100];
+        if (!EditorListBuffer) {
+            internal_error("EditorListBuffer out of memory!");
         }
     }
-    for (int i = 0; i < Maxnev * 10 + 10; i++) {
-        Soknev[i] = 0;
+    for (int i = 0; i < EDITOR_LIST_MAX_LENGTH * 10 + 10; i++) {
+        EditorListBuffer[i] = 0;
     }
-    finame fname;
-    bool done = find_first("lev/*.lev", fname);
-    int nevszam = 0;
+    finame filename;
+    bool done = find_first("lev/*.lev", filename);
+    int list_length = 0;
     while (!done) {
-        if (strlen(fname) > 14) {
-            internal_error("ijhfiyewpp");
+        if (strlen(filename) > 14) {
+            internal_error("editor_window_open strlen(filename) > 14");
         }
-        char* nev = &Soknev[nevszam * 10];
-        strcpy(nev, fname);
+        char* cur_filename = &EditorListBuffer[list_length * 10];
+        strcpy(cur_filename, filename);
         // Leveszi kiterjesztest:
         int i = 0;
-        while (nev[i] != '.') {
-            if (!nev[i]) {
-                internal_error(std::string("Nincs pont nevben! (yewruyrewuy): ") + nev);
+        while (cur_filename[i] != '.') {
+            if (!cur_filename[i]) {
+                internal_error(std::string("editor_window_open level missing dot: ") +
+                               cur_filename);
             }
             i++;
         }
-        nev[i] = 0;
-        if (strlen(nev) > 8) {
-            internal_error("iuoriureiur");
+        cur_filename[i] = 0;
+        if (strlen(cur_filename) > 8) {
+            internal_error("editor_window_open strlen(cur_filename) > 8");
         }
 
-        done = find_next(fname);
-        nevszam++;
-        if (nevszam >= Maxnev) {
+        done = find_next(filename);
+        list_length++;
+        if (list_length >= EDITOR_LIST_MAX_LENGTH) {
             dialog("Number of files > 1000 in open dialog box!", "Could not load all the files!");
             done = 1;
         }
@@ -241,45 +244,45 @@ void editor_window_open() {
 
     find_close();
 
-    if (nevszam < 1) {
-        dialog("There is not any level file (*.lev) in this directory!");
+    if (list_length < 1) {
+        dialog("There are no level files (*.lev) in the LEV directory!");
         return;
     }
 
-    abcberendez(nevszam);
+    sort_files(list_length);
 
-    int kur = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
-    for (int i = 0; i < nevszam; i++) {
+    int selected_index = 0; // Ha megtalalja eddigit, akkor selected_index-t raallitja
+    for (int i = 0; i < list_length; i++) {
         char tmp[50];
-        strcpy(tmp, &Soknev[i * 10]);
+        strcpy(tmp, &EditorListBuffer[i * 10]);
         strcat(tmp, ".lev");
         if (strcmpi(tmp, State->editor_filename) == 0) {
-            kur = i;
+            selected_index = i;
         }
     }
 
     // State->editor_filename[0] = 0; Igy nem lesz unnamed CANCEL utan
 
     // Koordok megadasa:
-    int helyszam = 10;
+    int max_visible_entries = 10;
     int dy = 20;
     int x1 = 200;
     int y1 = 100;
     int x2 = 401;
-    int y2 = 174 + helyszam * dy;
+    int y2 = 174 + max_visible_entries * dy;
     int lx1 = x1 + 10;
     int ly1 = y1 + 37;
     int lx2 = lx1 + 100;
-    int ly2 = ly1 + helyszam * dy;
-    box boxlist = {lx1, ly1, lx2, ly2};
+    int ly2 = ly1 + max_visible_entries * dy;
 
-    box boxfel = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
-    box boxle = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
-    box boxcancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
+    box box_list = {lx1, ly1, lx2, ly2};
+    box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
+    box box_down = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
+    box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
 
-    int felso = 0;
-    int eddigfelso = -1;
-    int eddigkur = 0;
+    int view_index = 0;
+    int view_index_prev = -1;
+    int selected_index_prev = 0;
     empty_keypress_buffer();
     while (1) {
         handle_events();
@@ -287,80 +290,82 @@ void editor_window_open() {
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            igazit(&kur, &felso, nevszam, helyszam);
-            betolt(&Soknev[kur * 10]);
+            adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+            open_level(&EditorListBuffer[selected_index * 10]);
             return;
         }
         if (was_key_down(DIK_UP)) {
-            kur--;
+            selected_index--;
         }
         if (was_key_down(DIK_PRIOR)) {
-            kur -= helyszam - 1;
+            selected_index -= max_visible_entries - 1;
         }
         if (was_key_down(DIK_DOWN)) {
-            kur++;
+            selected_index++;
         }
         if (was_key_down(DIK_NEXT)) {
-            kur += helyszam - 1;
+            selected_index += max_visible_entries - 1;
         }
         int wheel = get_mouse_wheel_delta();
-        if (wheel != 0 && is_in_box(Moux, Mouy, boxlist)) {
-            kur -= wheel;
+        if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
+            selected_index -= wheel;
         }
         // Eger lenyomas:
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxle)) {
-                kur += helyszam - 1;
+            if (is_in_box(Moux, Mouy, box_down)) {
+                selected_index += max_visible_entries - 1;
             }
-            if (is_in_box(Moux, Mouy, boxfel)) {
-                kur -= helyszam - 1;
+            if (is_in_box(Moux, Mouy, box_up)) {
+                selected_index -= max_visible_entries - 1;
             }
-            if (is_in_box(Moux, Mouy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, box_cancel)) {
                 return;
             }
             if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 // Lista folott nyomta meg gombot:
-                if (Mouy < ly1 + dy * helyszam) {
+                if (Mouy < ly1 + dy * max_visible_entries) {
                     // Egy nevet el is talalt:
                     int index = (Mouy - ly1) / dy;
-                    index += felso;
-                    if (index < nevszam) {
-                        betolt(&Soknev[index * 10]);
+                    index += view_index;
+                    if (index < list_length) {
+                        open_level(&EditorListBuffer[index * 10]);
                         return;
                     }
                 }
             }
         }
-        igazit(&kur, &felso, nevszam, helyszam);
-        if (felso != eddigfelso || kur != eddigkur) {
+        adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+        if (view_index != view_index_prev || selected_index != selected_index_prev) {
             // Kirajzoljuk, mivel valtozott kep:
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
-            for (int i = 0; i < helyszam && i < nevszam; i++) {
-                if (i + felso == kur) {
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
+                       DIALOG_BORDER_PALETTE_ID);
+            for (int i = 0; i < max_visible_entries && i < list_length; i++) {
+                if (i + view_index == selected_index) {
                     // Ez most kurens nev:
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         Openlistainvszin);
+                                         EditorPalette_ListSelected);
                 }
-                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy, &Soknev[(i + felso) * 10]);
+                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
+                             &EditorListBuffer[(i + view_index) * 10]);
             }
             // Most jonnek gombok:
-            render_box(BufferMain, boxfel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            boxbarajz(BufferMain, boxfel, DIALOG_BORDER_PALETTE_ID, 1);
-            render_box(BufferMain, boxle, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            boxbarajz(BufferMain, boxle, DIALOG_BORDER_PALETTE_ID, 0);
-            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                                  "CANCEL");
+            render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, 1);
+            render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, 0);
+            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                  box_cancel.y1 + 15, "CANCEL");
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
 
-            eddigfelso = felso;
-            eddigkur = kur;
+            view_index_prev = view_index;
+            selected_index_prev = selected_index;
         }
         update_and_draw_cursor();
     }
@@ -369,41 +374,42 @@ void editor_window_open() {
 // Editfilenev alapjan megprobal josolni, majd oda teszi eredmenyt:
 void editor_window_welcome() {
     invalidateegesz();
-    if (!Soknev) {
-        Soknev = new char[Maxnev * 10 + 100];
-        if (!Soknev) {
-            internal_error("Nincs eleg memoria editor_window_open-ben (hjfdf)!");
+    if (!EditorListBuffer) {
+        EditorListBuffer = new char[EDITOR_LIST_MAX_LENGTH * 10 + 100];
+        if (!EditorListBuffer) {
+            internal_error("EditorListBuffer out of memory!");
         }
     }
-    for (int i = 0; i < Maxnev * 10 + 10; i++) {
-        Soknev[i] = 0;
+    for (int i = 0; i < EDITOR_LIST_MAX_LENGTH * 10 + 10; i++) {
+        EditorListBuffer[i] = 0;
     }
-    finame fname;
-    bool done = find_first("lev/*.lev", fname);
-    int nevszam = 0;
+    finame filename;
+    bool done = find_first("lev/*.lev", filename);
+    int list_length = 0;
     while (!done) {
-        if (strlen(fname) > 14) {
-            internal_error("ijhfiyewpp");
+        if (strlen(filename) > 14) {
+            internal_error("editor_window_welcome strlen(filename) > 14");
         }
-        char* nev = &Soknev[nevszam * 10];
-        strcpy(nev, fname);
+        char* cur_filename = &EditorListBuffer[list_length * 10];
+        strcpy(cur_filename, filename);
 
         // Leveszi kiterjesztest:
         int i = 0;
-        while (nev[i] != '.') {
-            if (!nev[i]) {
-                internal_error(std::string("Nincs pont nevben! (yewruyrewuy): ") + nev);
+        while (cur_filename[i] != '.') {
+            if (!cur_filename[i]) {
+                internal_error(std::string("editor_window_welcome level missing dot: ") +
+                               cur_filename);
             }
             i++;
         }
-        nev[i] = 0;
-        if (strlen(nev) > 8) {
-            internal_error("iuoriureiur");
+        cur_filename[i] = 0;
+        if (strlen(cur_filename) > 8) {
+            internal_error("editor_window_welcome strlen(cur_filename) > 8");
         }
 
-        done = find_next(fname);
-        nevszam++;
-        if (nevszam >= Maxnev) {
+        done = find_next(filename);
+        list_length++;
+        if (list_length >= EDITOR_LIST_MAX_LENGTH) {
             dialog("Number of files > 1000 in open dialog box!", "Could not load all the files!");
             done = 1;
         }
@@ -411,47 +417,47 @@ void editor_window_welcome() {
 
     find_close();
 
-    if (nevszam < 1) {
+    if (list_length < 1) {
         State->editor_filename[0] = 0;
         return;
     }
 
-    abcberendez(nevszam);
+    sort_files(list_length);
 
-    int kur = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
-    for (int i = 0; i < nevszam; i++) {
+    int selected_index = 0; // Ha megtalalja eddigit, akkor selected_index-t raallitja
+    for (int i = 0; i < list_length; i++) {
         char tmp[50];
-        strcpy(tmp, &Soknev[i * 10]);
+        strcpy(tmp, &EditorListBuffer[i * 10]);
         strcat(tmp, ".lev");
         if (strcmpi(tmp, State->editor_filename) == 0) {
-            kur = i;
+            selected_index = i;
         }
     }
 
     State->editor_filename[0] = 0;
 
     // Koordok megadasa:
-    int helyszam = 10;
+    int max_visible_entries = 10;
     int dy = 20;
     int x1 = 200;
     int y1 = 100;
     int x2 = 401;
-    int y2 = 174 + helyszam * dy;
+    int y2 = 174 + max_visible_entries * dy;
     int lx1 = x1 + 10;
     int ly1 = y1 + 37;
     int lx2 = lx1 + 100;
-    int ly2 = ly1 + helyszam * dy;
-    box boxlist = {lx1, ly1, lx2, ly2};
+    int ly2 = ly1 + max_visible_entries * dy;
 
-    box boxfel = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
-    box boxle = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
-    box boxcancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
-    box boxnew = {x1 + 121, (y2 + y1) / 2 - 40, x1 + 121 + 70, (y2 + y1) / 2 - 20};
+    box box_list = {lx1, ly1, lx2, ly2};
+    box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
+    box box_down = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
+    box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
+    box box_new = {x1 + 121, (y2 + y1) / 2 - 40, x1 + 121 + 70, (y2 + y1) / 2 - 20};
 
-    int felso = 0;
-    int eddigfelso = -1;
+    int view_index = 0;
+    int view_index_prev = -1;
 
-    int eddigkur = 0;
+    int selected_index_prev = 0;
     empty_keypress_buffer();
     while (1) {
         handle_events();
@@ -459,96 +465,99 @@ void editor_window_welcome() {
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            igazit(&kur, &felso, nevszam, helyszam);
-            char* nev = &Soknev[kur * 10];
-            if (strlen(nev) > 8) {
-                internal_error("iovfgsdgffiufi");
+            adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+            char* selected_filename = &EditorListBuffer[selected_index * 10];
+            if (strlen(selected_filename) > 8) {
+                internal_error("editor_window_welcome strlen(selected_filename) > 8");
             }
-            strcpy(State->editor_filename, nev);
+            strcpy(State->editor_filename, selected_filename);
             strcat(State->editor_filename, ".lev");
             return;
         }
         if (was_key_down(DIK_UP)) {
-            kur--;
+            selected_index--;
         }
         if (was_key_down(DIK_PRIOR)) {
-            kur -= helyszam - 1;
+            selected_index -= max_visible_entries - 1;
         }
         if (was_key_down(DIK_DOWN)) {
-            kur++;
+            selected_index++;
         }
         if (was_key_down(DIK_NEXT)) {
-            kur += helyszam - 1;
+            selected_index += max_visible_entries - 1;
         }
         int wheel = get_mouse_wheel_delta();
-        if (wheel != 0 && is_in_box(Moux, Mouy, boxlist)) {
-            kur -= wheel;
+        if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
+            selected_index -= wheel;
         }
         // Eger lenyomas:
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxle)) {
-                kur += helyszam - 1;
+            if (is_in_box(Moux, Mouy, box_down)) {
+                selected_index += max_visible_entries - 1;
             }
-            if (is_in_box(Moux, Mouy, boxfel)) {
-                kur -= helyszam - 1;
+            if (is_in_box(Moux, Mouy, box_up)) {
+                selected_index -= max_visible_entries - 1;
             }
-            if (is_in_box(Moux, Mouy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, box_cancel)) {
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxnew)) {
+            if (is_in_box(Moux, Mouy, box_new)) {
                 State->editor_filename[0] = 0;
                 return;
             }
             if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 // Lista folott nyomta meg gombot:
-                if (Mouy < ly1 + dy * helyszam) {
+                if (Mouy < ly1 + dy * max_visible_entries) {
                     // Egy nevet el is talalt:
                     int index = (Mouy - ly1) / dy;
-                    index += felso;
-                    if (index < nevszam) {
-                        char* nev = &Soknev[index * 10];
-                        if (strlen(nev) > 8) {
-                            internal_error("iovfgsdgffiufi");
+                    index += view_index;
+                    if (index < list_length) {
+                        char* selected_filename = &EditorListBuffer[index * 10];
+                        if (strlen(selected_filename) > 8) {
+                            internal_error("editor_window_welcome strlen(selected_filename) > 8");
                         }
-                        strcpy(State->editor_filename, nev);
+                        strcpy(State->editor_filename, selected_filename);
                         strcat(State->editor_filename, ".lev");
                         return;
                     }
                 }
             }
         }
-        igazit(&kur, &felso, nevszam, helyszam);
-        if (felso != eddigfelso || kur != eddigkur) {
+        adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+        if (view_index != view_index_prev || selected_index != selected_index_prev) {
             // Kirajzoljuk, mivel valtozott kep:
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
-            for (int i = 0; i < helyszam && i < nevszam; i++) {
-                if (i + felso == kur) {
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
+                       DIALOG_BORDER_PALETTE_ID);
+            for (int i = 0; i < max_visible_entries && i < list_length; i++) {
+                if (i + view_index == selected_index) {
                     // Ez most kurens nev:
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         Openlistainvszin);
+                                         EditorPalette_ListSelected);
                 }
-                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy, &Soknev[(i + felso) * 10]);
+                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
+                             &EditorListBuffer[(i + view_index) * 10]);
             }
             // Most jonnek gombok:
-            render_box(BufferMain, boxfel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            boxbarajz(BufferMain, boxfel, DIALOG_BORDER_PALETTE_ID, 1);
-            render_box(BufferMain, boxle, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            boxbarajz(BufferMain, boxle, DIALOG_BORDER_PALETTE_ID, 0);
-            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                                  "CANCEL");
-            render_box(BufferMain, boxnew, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxnew.x1 + boxnew.x2) / 2, boxnew.y1 + 15, "NEW");
+            render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, 1);
+            render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, 0);
+            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                  box_cancel.y1 + 15, "CANCEL");
+            render_box(BufferMain, box_new, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_new.x1 + box_new.x2) / 2, box_new.y1 + 15,
+                                  "NEW");
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
 
-            eddigfelso = felso;
-            eddigkur = kur;
+            view_index_prev = view_index;
+            selected_index_prev = selected_index;
         }
         update_and_draw_cursor();
     }
@@ -585,37 +594,37 @@ int editor_window_save() {
 int editor_window_save_as() {
     invalidateegesz();
     // Itt most be kell olvasnunk egy nevet:
-    box boxnagy = {20, 200, 600, 300};
-    box boxsave = {320 - 30, 273, 320 + 30, 290};
+    box box_window = {20, 200, 600, 300};
+    box box_save = {320 - 30, 273, 320 + 30, 290};
 
     push();
-    render_box(BufferMain, boxnagy, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    render_box(BufferMain, boxsave, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+    render_box(BufferMain, box_window, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+    render_box(BufferMain, box_save, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
     Pabc2->write_centered(
-        BufferMain, (boxnagy.x2 + boxnagy.x1) / 2, 220,
+        BufferMain, (box_window.x2 + box_window.x1) / 2, 220,
         "Type in the file name and press ENTER or click on SAVE, or press ESC to cancel!");
-    Pabc2->write_centered(BufferMain, (boxsave.x2 + boxsave.x1) / 2, boxsave.y1 + 13, "SAVE");
+    Pabc2->write_centered(BufferMain, (box_save.x2 + box_save.x1) / 2, box_save.y1 + 13, "SAVE");
 
-    bltfront(BufferMain, boxnagy.x1, boxnagy.y1, boxnagy.x2, boxnagy.y2);
+    bltfront(BufferMain, box_window.x1, box_window.y1, box_window.x2, box_window.y2);
     pop();
 
     empty_keypress_buffer();
-    finame nev = "";
+    finame filename_input = "";
     int i = 0;
-    char eddignev[10] = "$%...%^&";
+    char filename_input_prev[10] = "$%...%^&";
     while (1) {
         handle_events();
-        if (strcmp(eddignev, nev) != 0) {
-            strcpy(eddignev, nev);
+        if (strcmp(filename_input_prev, filename_input) != 0) {
+            strcpy(filename_input_prev, filename_input);
 
-            int ex1 = boxnagy.x1 + 100;
-            int ey1 = boxnagy.y1 + 30;
-            int ex2 = boxnagy.x2 - 100;
-            int ey2 = boxnagy.y1 + 55;
+            int ex1 = box_window.x1 + 100;
+            int ey1 = box_window.y1 + 30;
+            int ex2 = box_window.x2 - 100;
+            int ey2 = box_window.y1 + 55;
             BufferMain->fill_box(ex1, ey1, ex2, ey2, DIALOG_PALETTE_ID);
-            Pabc2->write(BufferMain, 290, 250, nev);
+            Pabc2->write(BufferMain, 290, 250, filename_input);
             char tmp[40];
-            strcpy(tmp, nev);
+            strcpy(tmp, filename_input);
             tmp[i] = 0;
             Pabc2->write(BufferMain, 290 + Pabc1->len(tmp), 255, "-");
             bltfront(BufferMain, ex1, ey1, ex2, ey2);
@@ -624,71 +633,72 @@ int editor_window_save_as() {
             return 0;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            if (nev[0] != 0) {
+            if (filename_input[0] != 0) {
                 // Most mentunk:
                 // Eloallitjuk nevet:
-                strcat(nev, ".lev");
-                char tmpnev[40];
-                strcpy(tmpnev, "lev/");
-                strcat(tmpnev, nev);
-                if (access(tmpnev, 0) == 0) {
-                    if (dialog("File exists, overwrite?", nev, DIALOG_BUTTONS, "Yes", "No") == 1) {
+                strcat(filename_input, ".lev");
+                char path[40];
+                strcpy(path, "lev/");
+                strcat(path, filename_input);
+                if (access(path, 0) == 0) {
+                    if (dialog("File exists, overwrite?", filename_input, DIALOG_BUTTONS, "Yes",
+                               "No") == 1) {
                         return 0;
                     }
                 }
-                Ptop->save(nev);
-                strcpy(State->editor_filename, nev);
+                Ptop->save(filename_input);
+                strcpy(State->editor_filename, filename_input);
                 Valtozott = 0;
                 return 1;
             }
         }
         if (was_key_down(DIK_BACK)) {
             // Torles:
-            int ikesebbnulla = 0;
+            int input_length_zero = 0;
             if (i <= 0) {
-                ikesebbnulla = 1;
+                input_length_zero = 1;
             }
-            if (!((nev[0] == 0) || ikesebbnulla)) {
+            if (!((filename_input[0] == 0) || input_length_zero)) {
                 // Kiszedjuk i-1-edik helyrol karaktert:
-                int hossz = strlen(nev);
-                for (int j = i - 1; j < hossz; j++) {
-                    nev[j] = nev[j + 1];
+                int filename_input_length = strlen(filename_input);
+                for (int j = i - 1; j < filename_input_length; j++) {
+                    filename_input[j] = filename_input[j + 1];
                 }
                 i--;
             }
         }
         if (was_key_down(DIK_DELETE)) {
             // Torles:
-            if (!((nev[0] == 0) || (i >= (int)strlen(nev)))) {
+            if (!((filename_input[0] == 0) || (i >= (int)strlen(filename_input)))) {
                 // Kiszedjuk i-1-edik helyrol karaktert:
-                int hossz = strlen(nev);
-                for (int j = i; j < hossz; j++) {
-                    nev[j] = nev[j + 1];
+                int filename_input_length = strlen(filename_input);
+                for (int j = i; j < filename_input_length; j++) {
+                    filename_input[j] = filename_input[j + 1];
                 }
             }
         }
         if (was_key_down(DIK_LEFT)) {
             if (i > 0) {
                 i--;
-                eddignev[0] = 0;
+                filename_input_prev[0] = 0;
             }
         }
         if (was_key_down(DIK_RIGHT)) {
-            if (i < (int)strlen(nev)) {
+            if (i < (int)strlen(filename_input)) {
                 i++;
-                eddignev[0] = 0;
+                filename_input_prev[0] = 0;
             }
         }
         while (has_text_input()) {
             char c = pop_text_input();
             if (Pabc2->has_char(c) && util::text::is_filename_char(c)) {
-                if (strlen(nev) < 8) {
+                if (strlen(filename_input) < 8) {
                     // c-t beillesztjuk i. helyre:
-                    int hossz = strlen(nev);
-                    for (int j = hossz; j >= i; j--) {
-                        nev[j + 1] = nev[j];
+                    int filename_input_length = strlen(filename_input);
+                    for (int j = filename_input_length; j >= i; j--) {
+                        filename_input[j + 1] = filename_input[j];
                     }
-                    nev[i] = c;
+                    filename_input[i] = c;
                     i++;
                 }
             }
@@ -699,22 +709,22 @@ int editor_window_save_as() {
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxsave)) {
-                if (nev[0] != 0) {
+            if (is_in_box(Moux, Mouy, box_save)) {
+                if (filename_input[0] != 0) {
                     // Most mentunk:
                     // Eloallitjuk nevet:
-                    strcat(nev, ".lev");
-                    char tmpnev[40];
-                    strcpy(tmpnev, "lev/");
-                    strcat(tmpnev, nev);
-                    if (access(tmpnev, 0) == 0) {
-                        if (dialog("File exists, overwrite?", nev, DIALOG_BUTTONS, "Yes", "No") ==
-                            1) {
+                    strcat(filename_input, ".lev");
+                    char path[40];
+                    strcpy(path, "lev/");
+                    strcat(path, filename_input);
+                    if (access(path, 0) == 0) {
+                        if (dialog("File exists, overwrite?", filename_input, DIALOG_BUTTONS, "Yes",
+                                   "No") == 1) {
                             return 0;
                         }
                     }
-                    Ptop->save(nev);
-                    strcpy(State->editor_filename, nev);
+                    Ptop->save(filename_input);
+                    strcpy(State->editor_filename, filename_input);
                     Valtozott = 0;
                     return 1;
                 }
@@ -724,9 +734,9 @@ int editor_window_save_as() {
     }
 }
 
-static unsigned char Szinkonvtomb[256];
+static unsigned char LgrPaletteMap[256];
 
-static void makeszinkonvtomb(unsigned char* pal) {
+static void create_lgr_palette_map(unsigned char* pal) {
     for (int i = 0; i < 256; i++) {
         int r = pal[i * 3];
         int g = pal[i * 3 + 1];
@@ -734,195 +744,196 @@ static void makeszinkonvtomb(unsigned char* pal) {
         r >>= 6;
         g >>= 6;
         b >>= 6;
-        int szin = r * 16 + g * 4 + b;
-        if (szin < 0 || szin >= 64) {
-            internal_error("897 648u9");
+        int target_id = r * 16 + g * 4 + b;
+        if (target_id < 0 || target_id >= 64) {
+            internal_error("create_lgr_palette_map invalid target_id");
         }
-        Szinkonvtomb[i] = (unsigned char)(szin + 64);
-        // Szinkonvtomb[i] = (unsigned char)(63 + 64);
+        LgrPaletteMap[i] = (unsigned char)(target_id + 64);
+        // LgrPaletteMap[i] = (unsigned char)(63 + 64);
     }
 }
 
 // Szimpla
-static void vegyesblt(pic8* dest, picture* pkep, int x0, int y0) {
-    if (x0 < 0 || y0 < 0 || x0 >= dest->get_width() || y0 >= dest->get_height()) {
-        internal_error("7r79yffuew");
+static void preview_picture(pic8* dest, picture* pict, int x, int y) {
+    if (x < 0 || y < 0 || x >= dest->get_width() || y >= dest->get_height()) {
+        internal_error("preview_picture out of bounds");
     }
 
-    int xsize = pkep->width;
-    int ysize = pkep->height;
-    int xtullog = 0;
-    if (x0 + xsize > dest->get_width()) {
-        xsize = dest->get_width() - x0;
-        xtullog = 1;
+    int width = pict->width;
+    int height = pict->height;
+    int possibly_out_of_bounds = 0;
+    if (x + width > dest->get_width()) {
+        width = dest->get_width() - x;
+        possibly_out_of_bounds = 1;
     }
-    if (y0 + ysize > dest->get_height()) {
-        ysize = dest->get_height() - y0;
+    if (y + height > dest->get_height()) {
+        height = dest->get_height() - y;
     }
     // Most xsize es ysize mindenkeppen benne van teljesen kepben:
 
-    int i = 0;
-    unsigned char* tomb = pkep->data;
-    for (int y = y0; y < y0 + ysize; y++) {
+    int data_offset = 0;
+    unsigned char* data = pict->data;
+    for (int i = y; i < y + height; i++) {
         // Egy sor elintezese:
-        unsigned char* dsor = dest->get_row(y) + x0;
+        unsigned char* row = dest->get_row(i) + x;
 
-        int x = 0;
+        int j = 0;
         while (1) {
             // Ures elintezes:
-            int skip = read_varint(tomb, i);
+            int skip = read_varint(data, data_offset);
             if (skip == -1) {
                 break;
             }
-            x += skip;
+            j += skip;
 
             // Teli elintezes:
-            int count = read_varint(tomb, i);
+            int count = read_varint(data, data_offset);
             // Johet konverzio:
-            if (xtullog) {
-                for (int dx = 0; dx < count; dx++) {
-                    if (x + dx < xsize) {
-                        dsor[x + dx] = Szinkonvtomb[tomb[i + dx]];
+            if (possibly_out_of_bounds) {
+                for (int j_offset = 0; j_offset < count; j_offset++) {
+                    if (j + j_offset < width) {
+                        row[j + j_offset] = LgrPaletteMap[data[data_offset + j_offset]];
                     }
                 }
             } else {
-                for (int dx = 0; dx < count; dx++) {
-                    dsor[x + dx] = Szinkonvtomb[tomb[i + dx]];
+                for (int j_offset = 0; j_offset < count; j_offset++) {
+                    row[j + j_offset] = LgrPaletteMap[data[data_offset + j_offset]];
                 }
             }
 
-            x += count;
-            i += count;
+            j += count;
+            data_offset += count;
         }
     }
 }
 
 // Maszkos:
-static void vegyesblt(pic8* dest, texture* pt, mask* pm, int x0, int y0) {
-    if (x0 < 0 || y0 < 0 || x0 >= dest->get_width() || y0 >= dest->get_height()) {
-        internal_error("7r79yffuew");
+static void preview_texture(pic8* dest, texture* text, mask* msk, int x, int y) {
+    if (x < 0 || y < 0 || x >= dest->get_width() || y >= dest->get_height()) {
+        internal_error("preview_texture out of bounds");
     }
 
-    pic8* source = pt->pic;
+    pic8* source = text->pic;
 
-    int maxysize = pm->height;
-    if (y0 + maxysize > dest->get_height()) {
-        maxysize = dest->get_height() - y0;
+    int height = msk->height;
+    if (y + height > dest->get_height()) {
+        height = dest->get_height() - y;
     }
     // Most xsize es ysize mindenkeppen benne van teljesen kepben:
-    int i = 0;
-    int picxsize = source->get_width();
-    for (int y = y0; y < y0 + maxysize; y++) {
-        unsigned char* dsor = dest->get_row(y) + x0;
-        unsigned char* ssor = source->get_row((y - y0) % source->get_height());
-        int sx = 0;
-        int abszx = x0;
+    int data_offset = 0;
+    int texture_width = source->get_width();
+    for (int i = y; i < y + height; i++) {
+        unsigned char* dest_row = dest->get_row(i) + x;
+        unsigned char* src_row = source->get_row((i - y) % source->get_height());
+        int src_x = 0;
+        int dest_x = x;
         // Maszkos eljaras:
-        while (pm->data[i].type != MaskEncoding::EndOfLine) {
-            if (pm->data[i].type == MaskEncoding::Solid) {
-                for (int j = 0; j < pm->data[i].length; j++) {
-                    if (abszx < 640) {
-                        *dsor = Szinkonvtomb[ssor[sx]];
+        while (msk->data[data_offset].type != MaskEncoding::EndOfLine) {
+            if (msk->data[data_offset].type == MaskEncoding::Solid) {
+                for (int j = 0; j < msk->data[data_offset].length; j++) {
+                    if (dest_x < 640) {
+                        *dest_row = LgrPaletteMap[src_row[src_x]];
                     }
-                    dsor++;
-                    sx++;
-                    sx %= picxsize;
-                    abszx++;
+                    dest_row++;
+                    src_x++;
+                    src_x %= texture_width;
+                    dest_x++;
                 }
             } else {
-                dsor += pm->data[i].length;
-                sx += pm->data[i].length;
-                sx %= picxsize;
-                abszx += pm->data[i].length;
+                dest_row += msk->data[data_offset].length;
+                src_x += msk->data[data_offset].length;
+                src_x %= texture_width;
+                dest_x += msk->data[data_offset].length;
             }
-            i++;
+            data_offset++;
         }
-        i++;
+        data_offset++;
     }
 }
 
 // tipus 1-tol 4-ig (4. koveto file):
-static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, int cleares = 0) {
-    char* nev = nullptr;
-    int nevszam = 0;
-    if (tipus == 1) {
-        nev = kepnev;
-        nevszam = Lgr->picture_count;
+static void editor_window_select_sprite_name(char* picture_name, char* texture_name,
+                                             char* mask_name, int sprite_type, int cleares = 0) {
+    char* name = nullptr;
+    int list_length = 0;
+    if (sprite_type == 1) {
+        name = picture_name;
+        list_length = Lgr->picture_count;
     }
-    if (tipus == 2) {
-        nev = texturanev;
-        nevszam = Lgr->texture_count;
+    if (sprite_type == 2) {
+        name = texture_name;
+        list_length = Lgr->texture_count;
     }
-    if (tipus == 3) {
-        nev = maszknev;
-        nevszam = Lgr->mask_count;
-    }
-
-    if (!nev) {
-        internal_error("liytg");
+    if (sprite_type == 3) {
+        name = mask_name;
+        list_length = Lgr->mask_count;
     }
 
-    if (nevszam < 1) {
+    if (!name) {
+        internal_error("editor_window_select_sprite_name !name");
+    }
+
+    if (list_length < 1) {
         return;
     }
 
-    char orignev[10];
-    if (strlen(nev) > 8) {
-        internal_error("8guiojg");
+    char original_name[10];
+    if (strlen(name) > 8) {
+        internal_error("editor_window_select_sprite_name strlen(name) > 8");
     }
-    strcpy(orignev, nev);
+    strcpy(original_name, name);
 
-    int kur = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
-    for (int i = 0; i < nevszam; i++) {
-        if (tipus == 1 && strcmpi(Lgr->pictures[i].name, nev) == 0) {
-            kur = i;
+    int selected_index = 0; // Ha megtalalja eddigit, akkor selected_index-t raallitja
+    for (int i = 0; i < list_length; i++) {
+        if (sprite_type == 1 && strcmpi(Lgr->pictures[i].name, name) == 0) {
+            selected_index = i;
         }
-        if (tipus == 2 && strcmpi(Lgr->textures[i].name, nev) == 0) {
-            kur = i;
+        if (sprite_type == 2 && strcmpi(Lgr->textures[i].name, name) == 0) {
+            selected_index = i;
         }
-        if (tipus == 3 && strcmpi(Lgr->masks[i].name, nev) == 0) {
-            kur = i;
+        if (sprite_type == 3 && strcmpi(Lgr->masks[i].name, name) == 0) {
+            selected_index = i;
         }
     }
 
-    if (kur == 0) {
-        if (tipus == 1) {
-            strcpy(nev, Lgr->pictures[0].name);
+    if (selected_index == 0) {
+        if (sprite_type == 1) {
+            strcpy(name, Lgr->pictures[0].name);
         }
-        if (tipus == 2) {
-            strcpy(nev, Lgr->textures[0].name);
+        if (sprite_type == 2) {
+            strcpy(name, Lgr->textures[0].name);
         }
-        if (tipus == 3) {
-            strcpy(nev, Lgr->masks[0].name);
+        if (sprite_type == 3) {
+            strcpy(name, Lgr->masks[0].name);
         }
     }
 
     // Koordok megadasa:
-    int helyszam = 10;
+    int max_visible_entries = 10;
     int dy = 20;
     int x1 = 200;
     int y1 = 100;
     int x2 = 401;
-    int y2 = 174 + helyszam * dy;
+    int y2 = 174 + max_visible_entries * dy;
     int lx1 = x1 + 10;
     int ly1 = y1 + 37;
     int lx2 = lx1 + 100;
-    int ly2 = ly1 + helyszam * dy;
-    box boxlist = {lx1, ly1, lx2, ly2};
+    int ly2 = ly1 + max_visible_entries * dy;
 
-    box boxfel = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
-    box boxle = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
-    box boxcancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
-    box boxclear = {x1 + 121, y1 + 30, x1 + 121 + 70, y1 + 50};
+    box box_list = {lx1, ly1, lx2, ly2};
+    box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
+    box box_down = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
+    box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
+    box box_clear = {x1 + 121, y1 + 30, x1 + 121 + 70, y1 + 50};
 
-    int felso = 0;
-    int eddigfelso = -1;
-    int eddigkur = 0;
+    int view_index = 0;
+    int view_index_prev = -1;
+    int selected_index_prev = 0;
     empty_keypress_buffer();
 
     // Masodik bufferben mindig ilyenkor benne van eredeti kep:
-    int buffervaltozottx = 0;
-    int buffervaltozotty = 0;
+    int preview_x2 = 0;
+    int preview_y2 = 0;
     push();
     blit8(BufferBall, BufferMain);
     // BufferBall->save( "golyo.pcx" );
@@ -932,202 +943,203 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
     while (1) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            strcpy(nev, orignev);
+            strcpy(name, original_name);
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            igazit(&kur, &felso, nevszam, helyszam);
-            if (tipus == 1) {
-                strcpy(nev, Lgr->pictures[kur].name);
+            adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+            if (sprite_type == 1) {
+                strcpy(name, Lgr->pictures[selected_index].name);
             }
-            if (tipus == 2) {
-                strcpy(nev, Lgr->textures[kur].name);
+            if (sprite_type == 2) {
+                strcpy(name, Lgr->textures[selected_index].name);
             }
-            if (tipus == 3) {
-                strcpy(nev, Lgr->masks[kur].name);
+            if (sprite_type == 3) {
+                strcpy(name, Lgr->masks[selected_index].name);
             }
             return;
         }
         if (was_key_down(DIK_UP)) {
-            kur--;
+            selected_index--;
         }
         if (was_key_down(DIK_PRIOR)) {
-            kur -= helyszam - 1;
+            selected_index -= max_visible_entries - 1;
         }
         if (was_key_down(DIK_DOWN)) {
-            kur++;
+            selected_index++;
         }
         if (was_key_down(DIK_NEXT)) {
-            kur += helyszam - 1;
+            selected_index += max_visible_entries - 1;
         }
         int wheel = get_mouse_wheel_delta();
-        if (wheel != 0 && is_in_box(Moux, Mouy, boxlist)) {
-            kur -= wheel;
+        if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
+            selected_index -= wheel;
         }
         // Eger lenyomas:
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxle)) {
-                kur += helyszam - 1;
+            if (is_in_box(Moux, Mouy, box_down)) {
+                selected_index += max_visible_entries - 1;
             }
-            if (is_in_box(Moux, Mouy, boxfel)) {
-                kur -= helyszam - 1;
+            if (is_in_box(Moux, Mouy, box_up)) {
+                selected_index -= max_visible_entries - 1;
             }
-            if (is_in_box(Moux, Mouy, boxcancel)) {
-                strcpy(nev, orignev);
+            if (is_in_box(Moux, Mouy, box_cancel)) {
+                strcpy(name, original_name);
                 return;
             }
-            if (cleares && is_in_box(Moux, Mouy, boxclear)) {
-                nev[0] = 0;
+            if (cleares && is_in_box(Moux, Mouy, box_clear)) {
+                name[0] = 0;
                 return;
             }
             if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 // Lista folott nyomta meg gombot:
-                if (Mouy < ly1 + dy * helyszam) {
+                if (Mouy < ly1 + dy * max_visible_entries) {
                     // Egy nevet el is talalt:
                     int index = (Mouy - ly1) / dy;
-                    index += felso;
-                    if (index < nevszam) {
-                        if (tipus == 1) {
-                            strcpy(nev, Lgr->pictures[index].name);
+                    index += view_index;
+                    if (index < list_length) {
+                        if (sprite_type == 1) {
+                            strcpy(name, Lgr->pictures[index].name);
                         }
-                        if (tipus == 2) {
-                            strcpy(nev, Lgr->textures[index].name);
+                        if (sprite_type == 2) {
+                            strcpy(name, Lgr->textures[index].name);
                         }
-                        if (tipus == 3) {
-                            strcpy(nev, Lgr->masks[index].name);
+                        if (sprite_type == 3) {
+                            strcpy(name, Lgr->masks[index].name);
                         }
                         return;
                     }
                 }
             }
         }
-        igazit(&kur, &felso, nevszam, helyszam);
-        if (felso != eddigfelso || kur != eddigkur) {
+        adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+        if (view_index != view_index_prev || selected_index != selected_index_prev) {
             // Rajzolunk:
 
-            // Nevet beallitjuk kur-nak megfeleloen:
-            if (tipus == 1) {
-                strcpy(nev, Lgr->pictures[kur].name);
+            // Nevet beallitjuk selected_index-nak megfeleloen:
+            if (sprite_type == 1) {
+                strcpy(name, Lgr->pictures[selected_index].name);
             }
-            if (tipus == 2) {
-                strcpy(nev, Lgr->textures[kur].name);
+            if (sprite_type == 2) {
+                strcpy(name, Lgr->textures[selected_index].name);
             }
-            if (tipus == 3) {
-                strcpy(nev, Lgr->masks[kur].name);
+            if (sprite_type == 3) {
+                strcpy(name, Lgr->masks[selected_index].name);
             }
 
             push();
 
-            blit8(BufferMain, BufferBall, 0, 0, 0, 0, buffervaltozottx, buffervaltozotty);
+            blit8(BufferMain, BufferBall, 0, 0, 0, 0, preview_x2, preview_y2);
 
-            if (kepnev[0] && (texturanev[0] || maszknev[0])) {
-                internal_error("iugriurg");
+            if (picture_name[0] && (texture_name[0] || mask_name[0])) {
+                internal_error("editor_window_select_sprite_name too many names");
             }
 
-            if (kepnev[0]) {
+            if (picture_name[0]) {
                 // Ez egy kep:
-                int index = Lgr->get_picture_index(kepnev);
+                int index = Lgr->get_picture_index(picture_name);
                 if (index < 0) {
-                    internal_error("hjguyt");
+                    internal_error("editor_window_select_sprite_name picture_index < 0");
                 }
-                picture* pkep = &Lgr->pictures[index];
-                vegyesblt(BufferMain, pkep, 10, 10);
-                buffervaltozottx = 10 + pkep->width - 1;
-                buffervaltozotty = 10 + pkep->height - 1;
+                picture* pict = &Lgr->pictures[index];
+                preview_picture(BufferMain, pict, 10, 10);
+                preview_x2 = 10 + pict->width - 1;
+                preview_y2 = 10 + pict->height - 1;
             }
 
-            if (texturanev[0] && maszknev[0]) {
+            if (texture_name[0] && mask_name[0]) {
                 // Ez egy texturas maszk:
-                int index = Lgr->get_texture_index(texturanev);
+                int index = Lgr->get_texture_index(texture_name);
                 if (index < 0) {
-                    internal_error(";lgrtijo");
+                    internal_error("editor_window_select_sprite_name texture index < 0");
                 }
-                texture* ptextura = &Lgr->textures[index];
+                texture* text = &Lgr->textures[index];
 
-                index = Lgr->get_mask_index(maszknev);
+                index = Lgr->get_mask_index(mask_name);
                 if (index < 0) {
-                    internal_error("lkjefrg");
+                    internal_error("editor_window_select_sprite_name mask index < 0");
                 }
-                mask* pmaszk = &Lgr->masks[index];
+                mask* msk = &Lgr->masks[index];
 
-                vegyesblt(BufferMain, ptextura, pmaszk, 10, 10);
-                buffervaltozottx = 10 + pmaszk->width - 1;
-                buffervaltozotty = 10 + pmaszk->height - 1;
+                preview_texture(BufferMain, text, msk, 10, 10);
+                preview_x2 = 10 + msk->width - 1;
+                preview_y2 = 10 + msk->height - 1;
             }
 
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
-            for (int i = 0; i < helyszam && i + felso < nevszam; i++) {
-                if (i + felso == kur) {
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
+                       DIALOG_BORDER_PALETTE_ID);
+            for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
+                if (i + view_index == selected_index) {
                     // Ez most kurens nev:
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         Openlistainvszin);
+                                         EditorPalette_ListSelected);
                 }
                 // Kiirjuk nevet:
-                if (tipus == 1) {
+                if (sprite_type == 1) {
                     Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                                 Lgr->pictures[i + felso].name);
+                                 Lgr->pictures[i + view_index].name);
                 }
-                if (tipus == 2) {
+                if (sprite_type == 2) {
                     Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                                 Lgr->textures[i + felso].name);
+                                 Lgr->textures[i + view_index].name);
                 }
-                if (tipus == 3) {
+                if (sprite_type == 3) {
                     Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                                 Lgr->masks[i + felso].name);
+                                 Lgr->masks[i + view_index].name);
                 }
 
                 // Kiirjuk tavot:
-                if (kepnev[0] || texturanev[0]) {
-                    int tavolsag = 0;
-                    if (kepnev[0]) {
-                        tavolsag = Lgr->pictures[i + felso].default_distance;
+                if (picture_name[0] || texture_name[0]) {
+                    int default_distance = 0;
+                    if (picture_name[0]) {
+                        default_distance = Lgr->pictures[i + view_index].default_distance;
                     } else {
-                        tavolsag = Lgr->textures[i + felso].default_distance;
+                        default_distance = Lgr->textures[i + view_index].default_distance;
                     }
 
-                    char tavstr[20];
-                    sprintf(tavstr, "%d", tavolsag);
-                    Pabc2->write(BufferMain, lx1 + 67, ly1 + 15 + i * dy, tavstr);
+                    char details[20];
+                    sprintf(details, "%d", default_distance);
+                    Pabc2->write(BufferMain, lx1 + 67, ly1 + 15 + i * dy, details);
                     // Kiirjuk hatarolokat:
-                    Clipping hatarol = Clipping::Unclipped;
-                    if (kepnev[0]) {
-                        hatarol = Lgr->pictures[i + felso].default_clipping;
+                    Clipping default_clipping = Clipping::Unclipped;
+                    if (picture_name[0]) {
+                        default_clipping = Lgr->pictures[i + view_index].default_clipping;
                     } else {
-                        hatarol = Lgr->textures[i + felso].default_clipping;
+                        default_clipping = Lgr->textures[i + view_index].default_clipping;
                     }
 
-                    strcpy(tavstr, "U");
-                    if (hatarol == Clipping::Ground) {
-                        strcpy(tavstr, "G");
+                    strcpy(details, "U");
+                    if (default_clipping == Clipping::Ground) {
+                        strcpy(details, "G");
                     }
-                    if (hatarol == Clipping::Sky) {
-                        strcpy(tavstr, "S");
+                    if (default_clipping == Clipping::Sky) {
+                        strcpy(details, "S");
                     }
-                    Pabc2->write(BufferMain, lx1 + 92, ly1 + 15 + i * dy, tavstr);
+                    Pabc2->write(BufferMain, lx1 + 92, ly1 + 15 + i * dy, details);
                 }
             }
             // Most jonnek gombok:
-            render_box(BufferMain, boxfel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            boxbarajz(BufferMain, boxfel, DIALOG_BORDER_PALETTE_ID, 1);
-            render_box(BufferMain, boxle, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            boxbarajz(BufferMain, boxle, DIALOG_BORDER_PALETTE_ID, 0);
-            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                                  "CANCEL");
+            render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, 1);
+            render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, 0);
+            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                  box_cancel.y1 + 15, "CANCEL");
             if (cleares) {
-                render_box(BufferMain, boxclear, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-                Pabc2->write_centered(BufferMain, (boxclear.x1 + boxclear.x2) / 2, boxclear.y1 + 15,
-                                      "CLEAR");
+                render_box(BufferMain, box_clear, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+                Pabc2->write_centered(BufferMain, (box_clear.x1 + box_clear.x2) / 2,
+                                      box_clear.y1 + 15, "CLEAR");
             }
 
             bltfront(BufferMain);
             pop();
 
-            eddigfelso = felso;
-            eddigkur = kur;
+            view_index_prev = view_index;
+            selected_index_prev = selected_index;
         }
         update_and_draw_cursor();
     }
@@ -1135,17 +1147,17 @@ static void pickanev(char* kepnev, char* texturanev, char* maszknev, int tipus, 
 
 void editor_window_choose_sprite() {
     if (!Lgr) {
-        internal_error("editor_window_choose_sprite-ban !Lgr!");
+        internal_error("editor_window_choose_sprite !Lgr!");
     }
 
-    makeszinkonvtomb(Lgr->palette_data);
+    create_lgr_palette_map(Lgr->palette_data);
 
     invalidateegesz();
 
-    char kepnev[10], texturanev[10], maszknev[10], uresnev[10] = "";
-    strcpy(kepnev, Lgr->editor_picture_name);
-    strcpy(texturanev, Lgr->editor_texture_name);
-    strcpy(maszknev, Lgr->editor_mask_name);
+    char picture_name[10], texture_name[10], mask_name[10], null_name[10] = "";
+    strcpy(picture_name, Lgr->editor_picture_name);
+    strcpy(texture_name, Lgr->editor_texture_name);
+    strcpy(mask_name, Lgr->editor_mask_name);
 
     // Koordok megadasa:
     int x1 = 160;
@@ -1153,80 +1165,80 @@ void editor_window_choose_sprite() {
     int x2 = 390; // 340;
     int y2 = y1 + 185;
 
-    int boxx1 = x1 + 120; // 70;
-    box boxkepnev = {boxx1, y1 + 40, boxx1 + 100, y1 + 40 + 20};
-    box boxtexturanev = {boxx1, y1 + 70, boxx1 + 100, y1 + 70 + 20};
-    box boxmaszknev = {boxx1, y1 + 100, boxx1 + 100, y1 + 100 + 20};
+    int text_x1 = x1 + 120; // 70;
+    box box_picture = {text_x1, y1 + 40, text_x1 + 100, y1 + 40 + 20};
+    box box_texture = {text_x1, y1 + 70, text_x1 + 100, y1 + 70 + 20};
+    box box_mask = {text_x1, y1 + 100, text_x1 + 100, y1 + 100 + 20};
 
-    box boxok = {x1 + 50, y2 - 30, x1 + 100, y2 - 10};
-    box boxcancel = {x1 + 130, y2 - 30, x1 + 180, y2 - 10};
+    box box_ok = {x1 + 50, y2 - 30, x1 + 100, y2 - 10};
+    box box_cancel = {x1 + 130, y2 - 30, x1 + 180, y2 - 10};
 
     empty_keypress_buffer();
-    int invalid = 1;
+    int rerender = 1;
     while (1) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            strcpy(Lgr->editor_picture_name, kepnev);
-            strcpy(Lgr->editor_texture_name, texturanev);
-            strcpy(Lgr->editor_mask_name, maszknev);
+            strcpy(Lgr->editor_picture_name, picture_name);
+            strcpy(Lgr->editor_texture_name, texture_name);
+            strcpy(Lgr->editor_mask_name, mask_name);
             return;
         }
         // Eger lenyomas:
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxok)) {
-                strcpy(Lgr->editor_picture_name, kepnev);
-                strcpy(Lgr->editor_texture_name, texturanev);
-                strcpy(Lgr->editor_mask_name, maszknev);
+            if (is_in_box(Moux, Mouy, box_ok)) {
+                strcpy(Lgr->editor_picture_name, picture_name);
+                strcpy(Lgr->editor_texture_name, texture_name);
+                strcpy(Lgr->editor_mask_name, mask_name);
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, box_cancel)) {
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxkepnev)) {
+            if (is_in_box(Moux, Mouy, box_picture)) {
                 // Kepnevet akarja valtoztatni:
-                pickanev(kepnev, uresnev, uresnev, 1);
+                editor_window_select_sprite_name(picture_name, null_name, null_name, 1);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                if (kepnev[0]) {
-                    texturanev[0] = maszknev[0] = 0;
+                if (picture_name[0]) {
+                    texture_name[0] = mask_name[0] = 0;
                 }
-                invalid = 1;
+                rerender = 1;
             }
-            if (is_in_box(Moux, Mouy, boxtexturanev)) {
+            if (is_in_box(Moux, Mouy, box_texture)) {
                 // Texturanevet akarja valtoztatni:
-                pickanev(uresnev, texturanev, maszknev, 2);
+                editor_window_select_sprite_name(null_name, texture_name, mask_name, 2);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                if (texturanev[0]) {
-                    kepnev[0] = 0;
+                if (texture_name[0]) {
+                    picture_name[0] = 0;
                 }
-                invalid = 1;
+                rerender = 1;
             }
-            if (is_in_box(Moux, Mouy, boxmaszknev)) {
+            if (is_in_box(Moux, Mouy, box_mask)) {
                 // Maszknevet akarja valtoztatni:
-                pickanev(uresnev, texturanev, maszknev, 3);
+                editor_window_select_sprite_name(null_name, texture_name, mask_name, 3);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                if (maszknev[0]) {
-                    kepnev[0] = 0;
+                if (mask_name[0]) {
+                    picture_name[0] = 0;
                 }
-                invalid = 1;
+                rerender = 1;
             }
         }
-        if (invalid) {
+        if (rerender) {
             // RAJZOLAS:
-            invalid = 0;
+            rerender = 0;
 
             // Kirajzoljuk, mivel valtozott kep:
             push();
@@ -1237,26 +1249,26 @@ void editor_window_choose_sprite() {
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, "Choose picture");
 
             // Most jonnek gombok:
-            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
-            Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                                  "CANCEL");
+            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
+            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                  box_cancel.y1 + 15, "CANCEL");
 
             // Most jonnek nevek:
             // Picture:
-            int szovx1 = x1 + 8;
-            Pabc2->write(BufferMain, szovx1, boxkepnev.y1 + 15, "Normal Picture:");
-            render_box(BufferMain, boxkepnev, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            boxbair_balra(BufferMain, boxkepnev, Feherszin, kepnev);
+            int label_x1 = x1 + 8;
+            Pabc2->write(BufferMain, label_x1, box_picture.y1 + 15, "Normal Picture:");
+            render_box(BufferMain, box_picture, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            draw_textbox_left(BufferMain, box_picture, Feherszin, picture_name);
             // Textura:
-            Pabc2->write(BufferMain, szovx1, boxtexturanev.y1 + 15, "Texture:");
-            render_box(BufferMain, boxtexturanev, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            boxbair_balra(BufferMain, boxtexturanev, Feherszin, texturanev);
+            Pabc2->write(BufferMain, label_x1, box_texture.y1 + 15, "Texture:");
+            render_box(BufferMain, box_texture, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            draw_textbox_left(BufferMain, box_texture, Feherszin, texture_name);
             // Maszk:
-            Pabc2->write(BufferMain, szovx1, boxmaszknev.y1 + 15, "Mask:");
-            render_box(BufferMain, boxmaszknev, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            boxbair_balra(BufferMain, boxmaszknev, Feherszin, maszknev);
+            Pabc2->write(BufferMain, label_x1, box_mask.y1 + 15, "Mask:");
+            render_box(BufferMain, box_mask, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            draw_textbox_left(BufferMain, box_mask, Feherszin, mask_name);
 
             bltfront(BufferMain);
             pop();
@@ -1268,40 +1280,41 @@ void editor_window_choose_sprite() {
 int editor_window_choose_lgr(char* lgrname) {
     invalidateegesz();
     blit8(BufferBall, BufferMain);
-    if (!Soknev) {
-        Soknev = new char[Maxnev * 10 + 100];
-        if (!Soknev) {
-            internal_error("Nincs eleg memoria editor_window_choose_lgr-ban!");
+    if (!EditorListBuffer) {
+        EditorListBuffer = new char[EDITOR_LIST_MAX_LENGTH * 10 + 100];
+        if (!EditorListBuffer) {
+            internal_error("EditorListBuffer out of memory!!");
         }
     }
-    for (int i = 0; i < Maxnev * 10 + 10; i++) {
-        Soknev[i] = 0;
+    for (int i = 0; i < EDITOR_LIST_MAX_LENGTH * 10 + 10; i++) {
+        EditorListBuffer[i] = 0;
     }
-    finame fname;
-    bool done = find_first("lgr/*.lgr", fname);
-    int nevszam = 0;
+    finame filename;
+    bool done = find_first("lgr/*.lgr", filename);
+    int list_length = 0;
     while (!done) {
-        if (strlen(fname) > 14) {
-            internal_error("876759989");
+        if (strlen(filename) > 14) {
+            internal_error("editor_window_choose_lgr strlen(filename) > 14");
         }
-        char* nev = &Soknev[nevszam * 10];
-        strcpy(nev, fname);
+        char* cur_filename = &EditorListBuffer[list_length * 10];
+        strcpy(cur_filename, filename);
         // Leveszi kiterjesztest:
         int i = 0;
-        while (nev[i] != '.') {
-            if (!nev[i]) {
-                internal_error(std::string("Nincs pont nevben! (454534): ") + nev);
+        while (cur_filename[i] != '.') {
+            if (!cur_filename[i]) {
+                internal_error(std::string("editor_window_choose_lgr level missing dot: ") +
+                               cur_filename);
             }
             i++;
         }
-        nev[i] = 0;
-        if (strlen(nev) > 8) {
-            internal_error("3875665");
+        cur_filename[i] = 0;
+        if (strlen(cur_filename) > 8) {
+            internal_error("editor_window_choose_lgr strlen(cur_filename) > 8");
         }
 
-        done = find_next(fname);
-        nevszam++;
-        if (nevszam >= Maxnev) {
+        done = find_next(filename);
+        list_length++;
+        if (list_length >= EDITOR_LIST_MAX_LENGTH) {
             dialog("Number of files > 1000 in Pick LGR File dialog box!",
                    "Could not load all the files!");
             done = 1;
@@ -1310,40 +1323,40 @@ int editor_window_choose_lgr(char* lgrname) {
 
     find_close();
 
-    if (nevszam < 1) {
-        external_error("There is not any LGR files (*.lgr) in LGR directory!");
+    if (list_length < 1) {
+        external_error("There are no LGR files (*.lgr) in the LGR directory!");
     }
 
-    abcberendez(nevszam);
+    sort_files(list_length);
 
-    int kur = 0; // Ha megtalalja eddigit, akkor kur-t raallitja
-    for (int i = 0; i < nevszam; i++) {
-        if (strcmpi(&Soknev[i * 10], lgrname) == 0) {
-            kur = i;
+    int selected_index = 0; // Ha megtalalja eddigit, akkor selected_index-t raallitja
+    for (int i = 0; i < list_length; i++) {
+        if (strcmpi(&EditorListBuffer[i * 10], lgrname) == 0) {
+            selected_index = i;
         }
     }
 
     // Koordok megadasa:
-    int helyszam = 10;
+    int max_visible_entries = 10;
     int dy = 20;
     int x1 = 200;
     int y1 = 100;
     int x2 = 401;
-    int dyorigszov = 40;
-    int y2 = 174 + helyszam * dy + dyorigszov;
+    int bottom_margin = 40;
+    int y2 = 174 + max_visible_entries * dy + bottom_margin;
     int lx1 = x1 + 10;
     int ly1 = y1 + 37;
     int lx2 = lx1 + 100;
-    int ly2 = ly1 + helyszam * dy;
-    box boxlist = {lx1, ly1, lx2, ly2};
+    int ly2 = ly1 + max_visible_entries * dy;
 
-    box boxfel = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
-    box boxle = {x1 + 10, y2 - 30 - dyorigszov, x1 + 110, y2 - 10 - dyorigszov};
-    box boxcancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
+    box box_list = {lx1, ly1, lx2, ly2};
+    box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
+    box box_down = {x1 + 10, y2 - 30 - bottom_margin, x1 + 110, y2 - 10 - bottom_margin};
+    box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
 
-    int felso = 0;
-    int eddigfelso = -1;
-    int eddigkur = 0;
+    int view_index = 0;
+    int view_index_prev = -1;
+    int selected_index_prev = 0;
     empty_keypress_buffer();
     while (1) {
         handle_events();
@@ -1351,75 +1364,77 @@ int editor_window_choose_lgr(char* lgrname) {
             return 0;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            igazit(&kur, &felso, nevszam, helyszam);
-            strcpy(lgrname, &Soknev[kur * 10]);
+            adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+            strcpy(lgrname, &EditorListBuffer[selected_index * 10]);
             return 1;
         }
         if (was_key_down(DIK_UP)) {
-            kur--;
+            selected_index--;
         }
         if (was_key_down(DIK_PRIOR)) {
-            kur -= helyszam - 1;
+            selected_index -= max_visible_entries - 1;
         }
         if (was_key_down(DIK_DOWN)) {
-            kur++;
+            selected_index++;
         }
         if (was_key_down(DIK_NEXT)) {
-            kur += helyszam - 1;
+            selected_index += max_visible_entries - 1;
         }
         int wheel = get_mouse_wheel_delta();
-        if (wheel != 0 && is_in_box(Moux, Mouy, boxlist)) {
-            kur -= wheel;
+        if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
+            selected_index -= wheel;
         }
 
         // Eger lenyomas:
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxle)) {
-                kur += helyszam - 1;
+            if (is_in_box(Moux, Mouy, box_down)) {
+                selected_index += max_visible_entries - 1;
             }
-            if (is_in_box(Moux, Mouy, boxfel)) {
-                kur -= helyszam - 1;
+            if (is_in_box(Moux, Mouy, box_up)) {
+                selected_index -= max_visible_entries - 1;
             }
-            if (is_in_box(Moux, Mouy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, box_cancel)) {
                 return 0;
             }
             if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 // Lista folott nyomta meg gombot:
-                if (Mouy < ly1 + dy * helyszam) {
+                if (Mouy < ly1 + dy * max_visible_entries) {
                     // Egy nevet el is talalt:
                     int index = (Mouy - ly1) / dy;
-                    index += felso;
-                    if (index < nevszam) {
-                        strcpy(lgrname, &Soknev[index * 10]);
+                    index += view_index;
+                    if (index < list_length) {
+                        strcpy(lgrname, &EditorListBuffer[index * 10]);
                         return 1;
                     }
                 }
             }
         }
-        igazit(&kur, &felso, nevszam, helyszam);
-        if (felso != eddigfelso || kur != eddigkur) {
+        adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+        if (view_index != view_index_prev || selected_index != selected_index_prev) {
             // Kirajzoljuk, mivel valtozott kep:
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
-            for (int i = 0; i < helyszam && i < nevszam; i++) {
-                if (i + felso == kur) {
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
+                       DIALOG_BORDER_PALETTE_ID);
+            for (int i = 0; i < max_visible_entries && i < list_length; i++) {
+                if (i + view_index == selected_index) {
                     // Ez most kurens nev:
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         Openlistainvszin);
+                                         EditorPalette_ListSelected);
                 }
-                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy, &Soknev[(i + felso) * 10]);
+                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
+                             &EditorListBuffer[(i + view_index) * 10]);
             }
             // Most jonnek gombok:
-            render_box(BufferMain, boxfel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            boxbarajz(BufferMain, boxfel, DIALOG_BORDER_PALETTE_ID, 1);
-            render_box(BufferMain, boxle, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            boxbarajz(BufferMain, boxle, DIALOG_BORDER_PALETTE_ID, 0);
-            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                                  "CANCEL");
+            render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, 1);
+            render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, 0);
+            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                  box_cancel.y1 + 15, "CANCEL");
 
             // Kiirjuk eredeti file nevet:
             char tttmp[50];
@@ -1431,65 +1446,65 @@ int editor_window_choose_lgr(char* lgrname) {
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
 
-            eddigfelso = felso;
-            eddigkur = kur;
+            view_index_prev = view_index;
+            selected_index_prev = selected_index;
         }
         update_and_draw_cursor();
     }
 }
 
-static int tavolsagbeir(pic8* ppic, box abox, int tavolsag) {
+static int prompt_distance(pic8* pic, box bx, int distance) {
     push();
 
     empty_keypress_buffer();
-    int valtozott = 1;
-    int oldtavolsag = tavolsag;
+    int rerender = 1;
+    int distance_prev = distance;
     while (1) {
         handle_events();
-        if (valtozott) {
-            valtozott = 0;
+        if (rerender) {
+            rerender = 0;
             char tmp[10];
-            sprintf(tmp, "%d", tavolsag);
-            boxbair(ppic, abox, Feherszin, tmp, 1);
-            bltfront(ppic, abox.x1, abox.y1, abox.x2, abox.y2);
+            sprintf(tmp, "%d", distance);
+            draw_textbox_centered(pic, bx, Feherszin, tmp, 1);
+            bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
         }
         if (was_key_just_pressed(DIK_ESCAPE)) {
             pop();
-            return oldtavolsag;
+            return distance_prev;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             pop();
-            return tavolsag;
+            return distance;
         }
         if (was_key_down(DIK_BACK)) {
-            if (tavolsag > 0) {
-                tavolsag /= 10;
-                valtozott = 1;
+            if (distance > 0) {
+                distance /= 10;
+                rerender = 1;
             }
         }
         while (has_text_input()) {
             char c = pop_text_input();
             if (c >= '0' && c <= '9') {
-                if (tavolsag < 100) {
-                    tavolsag *= 10;
-                    tavolsag += c - '0';
-                    valtozott = 1;
+                if (distance < 100) {
+                    distance *= 10;
+                    distance += c - '0';
+                    rerender = 1;
                 }
             }
         }
     }
 }
 
-static Clipping hatarolbeir(pic8* ppic, box abox, Clipping hatarol) {
+static Clipping prompt_clipping(pic8* pic, box bx, Clipping clipping) {
     push();
-    boxbair(ppic, abox, Feherszin, "", 1);
-    bltfront(ppic, abox.x1, abox.y1, abox.x2, abox.y2);
+    draw_textbox_centered(pic, bx, Feherszin, "", 1);
+    bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
     empty_keypress_buffer();
     while (1) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             pop();
-            return hatarol;
+            return clipping;
         }
         while (has_text_input()) {
             char c = pop_text_input();
@@ -1518,62 +1533,62 @@ void editor_window_sprite_properties(sprite* spr) {
     int x2 = 442;
     int y2 = 300;
 
-    box boxok = {x1 + 32, y2 - 30, x1 + 32 + 70, y2 - 10};
-    box boxcancel = {x1 + 135, y2 - 30, x1 + 135 + 70, y2 - 10};
-    box boxtav = {x1 + 102, y1 + 118, x1 + 102 + 34, y1 + 118 + 16};
-    box boxclipp = {x1 + 181, y1 + 118, x1 + 181 + 34, y1 + 118 + 16};
+    box box_ok = {x1 + 32, y2 - 30, x1 + 32 + 70, y2 - 10};
+    box box_cancel = {x1 + 135, y2 - 30, x1 + 135 + 70, y2 - 10};
+    box box_distance = {x1 + 102, y1 + 118, x1 + 102 + 34, y1 + 118 + 16};
+    box box_clipping = {x1 + 181, y1 + 118, x1 + 181 + 34, y1 + 118 + 16};
 
-    int kepvaltozott = 1;
-    int tavolsag = spr->distance;
-    Clipping hatarol = spr->clipping;
+    int rerender = 1;
+    int distance = spr->distance;
+    Clipping clipping = spr->clipping;
     while (1) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            if (spr->distance != tavolsag || spr->clipping != hatarol) {
+            if (spr->distance != distance || spr->clipping != clipping) {
                 Valtozott = 1;
             }
-            spr->distance = tavolsag;
-            spr->clipping = hatarol;
+            spr->distance = distance;
+            spr->clipping = clipping;
             return;
         }
         // Eger lenyomas:
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxok)) {
-                if (spr->distance != tavolsag || spr->clipping != hatarol) {
+            if (is_in_box(Moux, Mouy, box_ok)) {
+                if (spr->distance != distance || spr->clipping != clipping) {
                     Valtozott = 1;
                 }
-                spr->distance = tavolsag;
-                spr->clipping = hatarol;
+                spr->distance = distance;
+                spr->clipping = clipping;
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, box_cancel)) {
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxtav)) {
-                tavolsag = tavolsagbeir(BufferMain, boxtav, tavolsag);
-                kepvaltozott = 1;
+            if (is_in_box(Moux, Mouy, box_distance)) {
+                distance = prompt_distance(BufferMain, box_distance, distance);
+                rerender = 1;
             }
-            if (is_in_box(Moux, Mouy, boxclipp)) {
-                hatarol = hatarolbeir(BufferMain, boxclipp, hatarol);
-                kepvaltozott = 1;
+            if (is_in_box(Moux, Mouy, box_clipping)) {
+                clipping = prompt_clipping(BufferMain, box_clipping, clipping);
+                rerender = 1;
             }
         }
-        if (kepvaltozott) {
-            kepvaltozott = 0;
+        if (rerender) {
+            rerender = 0;
             // Kirajzoljuk, mivel valtozott kep:
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             // Most jonnek gombok:
-            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
-            Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                                  "CANCEL");
+            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
+            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                  box_cancel.y1 + 15, "CANCEL");
 
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15, "Set Picture Properties");
             if (spr->picture_name[0]) {
@@ -1586,67 +1601,67 @@ void editor_window_sprite_properties(sprite* spr) {
             Pabc2->write(BufferMain, x1 + 172, y1 + 76, "Clipping");
             // Default-ok kiirasa:
             Pabc2->write(BufferMain, x1 + 12, y1 + 100, "Default:");
-            int deftav = -1;
-            Clipping defhatarol = Clipping::Unknown;
+            int default_distance = -1;
+            Clipping default_clipping = Clipping::Unknown;
             if (spr->picture_name[0]) {
                 int index = Lgr->get_picture_index(spr->picture_name);
                 if (index < 0) {
-                    internal_error("iohdiuyde");
+                    internal_error("editor_window_sprite_properties index < 0");
                 }
-                deftav = Lgr->pictures[index].default_distance;
-                defhatarol = Lgr->pictures[index].default_clipping;
+                default_distance = Lgr->pictures[index].default_distance;
+                default_clipping = Lgr->pictures[index].default_clipping;
             }
             if (spr->texture_name[0]) {
                 int index = Lgr->get_texture_index(spr->texture_name);
                 if (index < 0) {
-                    internal_error("u6ythggf");
+                    internal_error("editor_window_sprite_properties index < 0");
                 }
-                deftav = Lgr->textures[index].default_distance;
-                defhatarol = Lgr->textures[index].default_clipping;
+                default_distance = Lgr->textures[index].default_distance;
+                default_clipping = Lgr->textures[index].default_clipping;
             }
             // Tavolsag:
             char tmp[10];
-            if (deftav >= 0) {
-                sprintf(tmp, "%d", deftav);
+            if (default_distance >= 0) {
+                sprintf(tmp, "%d", default_distance);
             } else {
                 sprintf(tmp, "-");
             }
             Pabc2->write_centered(BufferMain, x1 + 119, y1 + 100, tmp);
 
             // Hatarolas:
-            if (defhatarol == Clipping::Unknown) {
+            if (default_clipping == Clipping::Unknown) {
                 strcpy(tmp, "-");
             }
-            if (defhatarol == Clipping::Unclipped) {
+            if (default_clipping == Clipping::Unclipped) {
                 strcpy(tmp, "U");
             }
-            if (defhatarol == Clipping::Ground) {
+            if (default_clipping == Clipping::Ground) {
                 strcpy(tmp, "G");
             }
-            if (defhatarol == Clipping::Sky) {
+            if (default_clipping == Clipping::Sky) {
                 strcpy(tmp, "S");
             }
             Pabc2->write_centered(BufferMain, x1 + 198, y1 + 100, tmp);
 
             Pabc2->write(BufferMain, x1 + 12, y1 + 130, "Current:");
             // Tavolsag boxba:
-            render_box(BufferMain, boxtav, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            sprintf(tmp, "%d", tavolsag);
-            boxbair(BufferMain, boxtav, Feherszin, tmp);
-            Pabc2->write_centered(BufferMain, x1 + 119, boxtav.y2 + 14, "(1-999)");
+            render_box(BufferMain, box_distance, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            sprintf(tmp, "%d", distance);
+            draw_textbox_centered(BufferMain, box_distance, Feherszin, tmp);
+            Pabc2->write_centered(BufferMain, x1 + 119, box_distance.y2 + 14, "(1-999)");
             // Clipping boxba:
-            render_box(BufferMain, boxclipp, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            if (hatarol == Clipping::Unclipped) {
+            render_box(BufferMain, box_clipping, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            if (clipping == Clipping::Unclipped) {
                 strcpy(tmp, "U");
             }
-            if (hatarol == Clipping::Ground) {
+            if (clipping == Clipping::Ground) {
                 strcpy(tmp, "G");
             }
-            if (hatarol == Clipping::Sky) {
+            if (clipping == Clipping::Sky) {
                 strcpy(tmp, "S");
             }
-            boxbair(BufferMain, boxclipp, Feherszin, tmp);
-            Pabc2->write_centered(BufferMain, x1 + 198, boxclipp.y2 + 14, "(U, S, G)");
+            draw_textbox_centered(BufferMain, box_clipping, Feherszin, tmp);
+            Pabc2->write_centered(BufferMain, x1 + 198, box_clipping.y2 + 14, "(U, S, G)");
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
@@ -1664,15 +1679,15 @@ void editor_window_polygon_properties(polygon* poly) {
     int x2 = 384;
     int y2 = 200;
 
-    box boxok = {x1 + 12, y2 - 30, x1 + 12 + 70, y2 - 10};
-    box boxcancel = {x1 + 103, y2 - 30, x1 + 103 + 70, y2 - 10};
+    box box_ok = {x1 + 12, y2 - 30, x1 + 12 + 70, y2 - 10};
+    box box_cancel = {x1 + 103, y2 - 30, x1 + 103 + 70, y2 - 10};
 
-    int boxx1 = x1 + 132;
-    box boxkoveto = {boxx1, y1 + 35, boxx1 + 30, y1 + 55};
+    int box_left = x1 + 132;
+    box box_grass = {box_left, y1 + 35, box_left + 30, y1 + 55};
 
-    int kepvaltozott = 1;
+    int rerender = 1;
 
-    int koveto = poly->is_grass;
+    int is_grass = poly->is_grass;
 
     while (1) {
         handle_events();
@@ -1681,34 +1696,34 @@ void editor_window_polygon_properties(polygon* poly) {
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             // Meg van ismetelve OK-nal is lejjebb:
-            if (poly->is_grass != koveto) {
+            if (poly->is_grass != is_grass) {
                 Valtozott = 1;
             }
-            poly->is_grass = koveto;
+            poly->is_grass = is_grass;
             return;
         }
         // Eger lenyomas:
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxok)) {
+            if (is_in_box(Moux, Mouy, box_ok)) {
                 // Meg van ismetelve ENTER-nel is feljebb:
-                if (poly->is_grass != koveto) {
+                if (poly->is_grass != is_grass) {
                     Valtozott = 1;
                 }
-                poly->is_grass = koveto;
+                poly->is_grass = is_grass;
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, box_cancel)) {
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxkoveto)) {
-                koveto = !koveto;
-                kepvaltozott = 1;
+            if (is_in_box(Moux, Mouy, box_grass)) {
+                is_grass = !is_grass;
+                rerender = 1;
             }
         }
-        if (kepvaltozott) {
-            kepvaltozott = 0;
+        if (rerender) {
+            rerender = 0;
             // Kirajzoljuk, mivel valtozott kep:
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
@@ -1717,22 +1732,22 @@ void editor_window_polygon_properties(polygon* poly) {
 
             // Most jonnek gombok:
             // Koveto vagy nem gomb:
-            int szovegx1 = x1 + 18;
-            Pabc2->write(BufferMain, szovegx1, boxkoveto.y1 + 15, "Grass polygon:");
-            render_box(BufferMain, boxkoveto, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            if (koveto) {
-                Pabc2->write_centered(BufferMain, (boxkoveto.x1 + boxkoveto.x2) / 2,
-                                      boxkoveto.y1 + 15, "YES");
+            int label_x1 = x1 + 18;
+            Pabc2->write(BufferMain, label_x1, box_grass.y1 + 15, "Grass polygon:");
+            render_box(BufferMain, box_grass, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            if (is_grass) {
+                Pabc2->write_centered(BufferMain, (box_grass.x1 + box_grass.x2) / 2,
+                                      box_grass.y1 + 15, "YES");
             } else {
-                Pabc2->write_centered(BufferMain, (boxkoveto.x1 + boxkoveto.x2) / 2,
-                                      boxkoveto.y1 + 15, "NO");
+                Pabc2->write_centered(BufferMain, (box_grass.x1 + box_grass.x2) / 2,
+                                      box_grass.y1 + 15, "NO");
             }
 
-            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
-            Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                                  "CANCEL");
+            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
+            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                  box_cancel.y1 + 15, "CANCEL");
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
@@ -1745,40 +1760,41 @@ void editor_window_food_properties(const char* title, object::Property* property
     invalidateegesz();
 
     // Koordok megadasa:
-    int listaszam = 5;
+    int list_length = 5;
     int dy = 20;
 
     int x1 = 200;
     int y1 = 100;
     int x2 = 442;
-    int y2 = y1 + listaszam * dy + 120;
+    int y2 = y1 + list_length * dy + 120;
 
-    box boxcancel = {(x1 + x2) / 2 - 50, y2 - 30, (x1 + x2) / 2 + 50, y2 - 10};
-    box boxanimszam = {x2 - 50, y2 - 56, x2 - 50 + 20, y2 - 56 + 20};
+    box box_cancel = {(x1 + x2) / 2 - 50, y2 - 30, (x1 + x2) / 2 + 50, y2 - 10};
+    box box_animation = {x2 - 50, y2 - 56, x2 - 50 + 20, y2 - 56 + 20};
     int ly1 = y1 + 38;
-    int ly2 = ly1 + dy * listaszam - 1;
+    int ly2 = ly1 + dy * list_length - 1;
     // Csak elso rubrika:
-    box boxlista = {(x1 + x2) / 2 - 70, ly1, (x1 + x2) / 2 + 70, ly1 + dy};
+    box box_list = {(x1 + x2) / 2 - 70, ly1, (x1 + x2) / 2 + 70, ly1 + dy};
 
     // Kirajzoljuk, dialogust:
     push();
     render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
     Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, title);
-    render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
+    render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+    Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2, box_cancel.y1 + 15,
                           "Cancel");
     // Anim szam boxa:
-    Pabc2->write(BufferMain, boxanimszam.x1 - 162, boxanimszam.y1 + 15, "Food anim number (1-9):");
+    Pabc2->write(BufferMain, box_animation.x1 - 162, box_animation.y1 + 15,
+                 "Food anim number (1-9):");
     char tmp[20];
     sprintf(tmp, "%d", (int)(*animation + 1));
-    render_box(BufferMain, boxanimszam, Feherszin, DIALOG_BORDER_PALETTE_ID);
-    Pabc2->write_centered(BufferMain, (boxanimszam.x1 + boxanimszam.x2) / 2, boxanimszam.y1 + 15,
-                          tmp);
+    render_box(BufferMain, box_animation, Feherszin, DIALOG_BORDER_PALETTE_ID);
+    Pabc2->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
+                          box_animation.y1 + 15, tmp);
 
-    for (int i = 0; i < listaszam; i++) {
-        render_box(BufferMain, boxlista, Openlistaszin, DIALOG_BORDER_PALETTE_ID);
-        int lx = (boxlista.x1 + boxlista.x2) / 2;
-        int ly = boxlista.y1 + 15;
+    for (int i = 0; i < list_length; i++) {
+        render_box(BufferMain, box_list, EditorPalette_List, DIALOG_BORDER_PALETTE_ID);
+        int lx = (box_list.x1 + box_list.x2) / 2;
+        int ly = box_list.y1 + 15;
         switch (i) {
         case 0:
             Pabc2->write_centered(BufferMain, lx, ly, "Normal Food");
@@ -1798,11 +1814,11 @@ void editor_window_food_properties(const char* title, object::Property* property
         default:
             internal_error("yuiwegfyjkweg");
         }
-        boxlista.y1 += dy;
-        boxlista.y2 += dy;
+        box_list.y1 += dy;
+        box_list.y2 += dy;
     }
-    boxlista.y1 = ly1;
-    boxlista.y2 = ly2;
+    box_list.y1 = ly1;
+    box_list.y2 = ly2;
 
     bltfront(BufferMain, x1, y1, x2, y2);
     pop();
@@ -1817,15 +1833,15 @@ void editor_window_food_properties(const char* title, object::Property* property
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, box_cancel)) {
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxanimszam)) {
+            if (is_in_box(Moux, Mouy, box_animation)) {
                 // Berajzolunk egy vizszintes kurzort:
                 push(); // Leveszi egeret
-                render_box(BufferMain, boxanimszam, Feherszin, DIALOG_BORDER_PALETTE_ID);
-                Pabc2->write_centered(BufferMain, (boxanimszam.x1 + boxanimszam.x2) / 2,
-                                      boxanimszam.y1 + 18, "-");
+                render_box(BufferMain, box_animation, Feherszin, DIALOG_BORDER_PALETTE_ID);
+                Pabc2->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
+                                      box_animation.y1 + 18, "-");
                 bltfront(BufferMain, x1, y1, x2, y2);
 
                 empty_keypress_buffer();
@@ -1851,11 +1867,11 @@ void editor_window_food_properties(const char* title, object::Property* property
                 pop();
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxlista)) {
+            if (is_in_box(Moux, Mouy, box_list)) {
                 // Benne van listaban:
-                int index = (Mouy - boxlista.y1) / dy;
-                if (index >= listaszam) {
-                    index = listaszam - 1;
+                int index = (Mouy - box_list.y1) / dy;
+                if (index >= list_length) {
+                    index = list_length - 1;
                 }
                 Valtozott = 1;
                 switch (index) {
@@ -1875,7 +1891,7 @@ void editor_window_food_properties(const char* title, object::Property* property
                     *property = object::Property::GravityRight;
                     break;
                 default:
-                    internal_error("0893ytpoerhg");
+                    internal_error("editor_window_food_properties invalid property");
                 }
                 return;
             }
@@ -1884,9 +1900,9 @@ void editor_window_food_properties(const char* title, object::Property* property
     }
 }
 
-static void change_level_name(char* nev) {
-    char orignev[LEVEL_NAME_LENGTH + 10];
-    strcpy(orignev, nev);
+static void editor_window_level_name(char* level_name) {
+    char orig_level_name[LEVEL_NAME_LENGTH + 10];
+    strcpy(orig_level_name, level_name);
 
     push(); // Itt levesszuk egeret es nem is tesszuk vissza vegeig:
 
@@ -1904,51 +1920,51 @@ static void change_level_name(char* nev) {
     while (1) {
         handle_events();
         // Kiir:
-        BufferMain->fill_box(x1, y1, x2, y2, Save_as_box_szin);
-        BufferMain->line(x1, y1, x2, y1, Save_as_szelszin);
-        BufferMain->line(x1, y2, x2, y2, Save_as_szelszin);
-        BufferMain->line(x1, y1, x1, y2, Save_as_szelszin);
-        BufferMain->line(x2, y1, x2, y2, Save_as_szelszin);
+        BufferMain->fill_box(x1, y1, x2, y2, EditorPalette_LevelNameDialog);
+        BufferMain->line(x1, y1, x2, y1, EditorPalette_LevelNameDialogBorder);
+        BufferMain->line(x1, y2, x2, y2, EditorPalette_LevelNameDialogBorder);
+        BufferMain->line(x1, y1, x1, y2, EditorPalette_LevelNameDialogBorder);
+        BufferMain->line(x2, y1, x2, y2, EditorPalette_LevelNameDialogBorder);
         Pabc2->write_centered(
             BufferMain, (x2 + x1) / 2, 220,
             "Type in the name of the level and the designer and press ENTER (ESC to cancel)!");
-        int kezdes = (x2 + x1) / 2 - Pabc1->len(nev) / 2;
-        Pabc2->write(BufferMain, kezdes, 250, nev);
+        int x = (x2 + x1) / 2 - Pabc1->len(level_name) / 2;
+        Pabc2->write(BufferMain, x, 250, level_name);
         char tmp[LEVEL_NAME_LENGTH + 10];
-        strcpy(tmp, nev);
+        strcpy(tmp, level_name);
         tmp[i] = 0;
-        Pabc2->write(BufferMain, kezdes + Pabc1->len(tmp), 255, "-");
+        Pabc2->write(BufferMain, x + Pabc1->len(tmp), 255, "-");
         bltfront(BufferMain, x1, y1, x2, y2);
 
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            strcpy(nev, orignev);
+            strcpy(level_name, orig_level_name);
             pop();
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            if (nev[0] != 0) {
+            if (level_name[0] != 0) {
                 pop();
                 return;
             }
         }
         if (was_key_down(DIK_BACK)) {
             // Torles:
-            if (nev[0] != 0 && i > 0) {
+            if (level_name[0] != 0 && i > 0) {
                 // Kiszedjuk i-1-edik helyrol karaktert:
-                int hossz = strlen(nev);
-                for (int j = i - 1; j < hossz; j++) {
-                    nev[j] = nev[j + 1];
+                int level_name_length = strlen(level_name);
+                for (int j = i - 1; j < level_name_length; j++) {
+                    level_name[j] = level_name[j + 1];
                 }
                 i--;
             }
         }
         if (was_key_down(DIK_DELETE)) {
             // Torles:
-            if (nev[0] != 0 && i < (int)strlen(nev)) {
+            if (level_name[0] != 0 && i < (int)strlen(level_name)) {
                 // Kiszedjuk i-1-edik helyrol karaktert:
-                int hossz = strlen(nev);
-                for (int j = i; j < hossz; j++) {
-                    nev[j] = nev[j + 1];
+                int level_name_length = strlen(level_name);
+                for (int j = i; j < level_name_length; j++) {
+                    level_name[j] = level_name[j + 1];
                 }
             }
         }
@@ -1958,23 +1974,23 @@ static void change_level_name(char* nev) {
             }
         }
         if (was_key_down(DIK_RIGHT)) {
-            if (i < (int)strlen(nev)) {
+            if (i < (int)strlen(level_name)) {
                 i++;
             }
         }
         while (has_text_input()) {
             char c = pop_text_input();
             if (Pabc2->has_char(c) && util::text::is_filename_char(c)) {
-                char tmpfejlec[LEVEL_NAME_LENGTH + 10];
-                sprintf(tmpfejlec, "Ext: %s", nev);
+                char tmp[LEVEL_NAME_LENGTH + 10];
+                sprintf(tmp, "Ext: %s", level_name);
 
-                if (strlen(nev) < LEVEL_NAME_LENGTH && MenuFont->len(tmpfejlec) <= 625) {
+                if (strlen(level_name) < LEVEL_NAME_LENGTH && MenuFont->len(tmp) <= 625) {
                     // c-t beillesztjuk i. helyre:
-                    int hossz = strlen(nev);
-                    for (int j = hossz; j >= i; j--) {
-                        nev[j + 1] = nev[j];
+                    int level_name_length = strlen(level_name);
+                    for (int j = level_name_length; j >= i; j--) {
+                        level_name[j + 1] = level_name[j];
                     }
-                    nev[i] = c;
+                    level_name[i] = c;
                     i++;
                 }
             }
@@ -1985,51 +2001,53 @@ static void change_level_name(char* nev) {
 void editor_window_level_properties() {
     invalidateegesz();
 
-    char fgnev[10];
-    char bgnev[10];
-    char levelname[LEVEL_NAME_LENGTH + 20];
-    strcpy(fgnev, Ptop->foreground_name);
-    strcpy(bgnev, Ptop->background_name);
-    strcpy(levelname, Ptop->level_name);
+    char foreground_name[10];
+    char background_name[10];
+    char level_name[LEVEL_NAME_LENGTH + 20];
+    strcpy(foreground_name, Ptop->foreground_name);
+    strcpy(background_name, Ptop->background_name);
+    strcpy(level_name, Ptop->level_name);
 
-    finame lgrnev = "";
-    strcpy(lgrnev, Ptop->lgr_name);
+    finame lgr_name = "";
+    strcpy(lgr_name, Ptop->lgr_name);
 
     int x1 = 130, y1 = 100;
     int x2 = 570, y2 = 280;
 
-    int bxtav = 10;
-    int bxs = 70;
-    int bxkoz = (x1 + x2) / 2;
-    box boxok = {bxkoz - bxtav - bxs, y2 - 30, bxkoz - bxtav, y2 - 10};
-    box boxcancel = {bxkoz + bxtav, y2 - 30, bxkoz + bxtav + bxs, y2 - 10};
+    int okcancel_spacing = 10;
+    int okcancel_width = 70;
+    int x_middle = (x1 + x2) / 2;
+    box box_ok = {x_middle - okcancel_spacing - okcancel_width, y2 - 30,
+                  x_middle - okcancel_spacing, y2 - 10};
+    box box_cancel = {x_middle + okcancel_spacing, y2 - 30,
+                      x_middle + okcancel_spacing + okcancel_width, y2 - 10};
 
-    int boxx1 = x1 + 100;
-    box boxfgnev = {boxx1, y1 + 38, boxx1 + 80, y1 + 58};
-    box boxbgnev = {boxx1, y1 + 60, boxx1 + 80, y1 + 80};
-    // box boxlevelname = { boxx1, y1+85, boxx1+180, y1+105 };
-    box boxlevelname = {boxx1, y1 + 85, boxx1 + 320, y1 + 105};
-    box boxlgrfile = {boxx1, y1 + 110, boxx1 + 80, y1 + 130};
+    int box_left = x1 + 100;
+    box box_foreground = {box_left, y1 + 38, box_left + 80, y1 + 58};
+    box box_background = {box_left, y1 + 60, box_left + 80, y1 + 80};
+    // box box_levelname = { box_left, y1+85, box_left+180, y1+105 };
+    box box_levelname = {box_left, y1 + 85, box_left + 320, y1 + 105};
+    box box_lgr = {box_left, y1 + 110, box_left + 80, y1 + 130};
 
-    int invalid = 1;
+    int rerender = 1;
     while (1) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            if (strcmpi(Ptop->foreground_name, fgnev) != 0 ||
-                strcmpi(Ptop->background_name, bgnev) != 0 ||
-                strcmp(Ptop->level_name, levelname) != 0) {
+            if (strcmpi(Ptop->foreground_name, foreground_name) != 0 ||
+                strcmpi(Ptop->background_name, background_name) != 0 ||
+                strcmp(Ptop->level_name, level_name) != 0) {
                 Valtozott = 1;
             }
-            strcpy(Ptop->foreground_name, fgnev);
-            strcpy(Ptop->background_name, bgnev);
-            strcpy(Ptop->level_name, levelname);
+            strcpy(Ptop->foreground_name, foreground_name);
+            strcpy(Ptop->background_name, background_name);
+            strcpy(Ptop->level_name, level_name);
 
-            if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
+            if (strcmpi(lgr_name, Ptop->lgr_name) != 0) {
                 Valtozott = 1;
-                strcpy(Ptop->lgr_name, lgrnev);
+                strcpy(Ptop->lgr_name, lgr_name);
                 lgrfile::load_lgr_file(Ptop->lgr_name);
                 if (Ptop->discard_missing_lgr_assets(Lgr)) {
                     dialog_warn_lgr_assets_deleted();
@@ -2041,19 +2059,19 @@ void editor_window_level_properties() {
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxok)) {
-                if (strcmpi(Ptop->foreground_name, fgnev) != 0 ||
-                    strcmpi(Ptop->background_name, bgnev) != 0 ||
-                    strcmp(Ptop->level_name, levelname) != 0) {
+            if (is_in_box(Moux, Mouy, box_ok)) {
+                if (strcmpi(Ptop->foreground_name, foreground_name) != 0 ||
+                    strcmpi(Ptop->background_name, background_name) != 0 ||
+                    strcmp(Ptop->level_name, level_name) != 0) {
                     Valtozott = 1;
                 }
-                strcpy(Ptop->foreground_name, fgnev);
-                strcpy(Ptop->background_name, bgnev);
-                strcpy(Ptop->level_name, levelname);
+                strcpy(Ptop->foreground_name, foreground_name);
+                strcpy(Ptop->background_name, background_name);
+                strcpy(Ptop->level_name, level_name);
 
-                if (strcmpi(lgrnev, Ptop->lgr_name) != 0) {
+                if (strcmpi(lgr_name, Ptop->lgr_name) != 0) {
                     Valtozott = 1;
-                    strcpy(Ptop->lgr_name, lgrnev);
+                    strcpy(Ptop->lgr_name, lgr_name);
                     lgrfile::load_lgr_file(Ptop->lgr_name);
                     if (Ptop->discard_missing_lgr_assets(Lgr)) {
                         dialog_warn_lgr_assets_deleted();
@@ -2061,58 +2079,58 @@ void editor_window_level_properties() {
                 }
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxcancel)) {
+            if (is_in_box(Moux, Mouy, box_cancel)) {
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxfgnev)) {
+            if (is_in_box(Moux, Mouy, box_foreground)) {
                 // Foreground nevet akarja valtoztatni:
-                char uresnev[10] = "";
-                pickanev(uresnev, fgnev, uresnev, 2, 0);
+                char null_name[10] = "";
+                editor_window_select_sprite_name(null_name, foreground_name, null_name, 2, 0);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                invalid = 1;
+                rerender = 1;
             }
-            if (is_in_box(Moux, Mouy, boxbgnev)) {
+            if (is_in_box(Moux, Mouy, box_background)) {
                 // Background nevet akarja valtoztatni:
-                char uresnev[10] = "";
-                pickanev(uresnev, bgnev, uresnev, 2, 0);
+                char null_name[10] = "";
+                editor_window_select_sprite_name(null_name, background_name, null_name, 2, 0);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                invalid = 1;
+                rerender = 1;
             }
-            if (is_in_box(Moux, Mouy, boxlevelname)) {
+            if (is_in_box(Moux, Mouy, box_levelname)) {
                 // Palya nevet akarja valtoztatni:
-                change_level_name(levelname);
+                editor_window_level_name(level_name);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                invalid = 1;
+                rerender = 1;
             }
-            if (is_in_box(Moux, Mouy, boxlgrfile)) {
+            if (is_in_box(Moux, Mouy, box_lgr)) {
                 finame belgrnev = "";
-                strcpy(belgrnev, lgrnev);
-                if (!editor_window_choose_lgr(lgrnev)) {
-                    strcpy(lgrnev, belgrnev);
+                strcpy(belgrnev, lgr_name);
+                if (!editor_window_choose_lgr(lgr_name)) {
+                    strcpy(lgr_name, belgrnev);
                 }
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                invalid = 1;
+                rerender = 1;
             }
         }
-        if (invalid) {
+        if (rerender) {
             /*static int nyomasszam = 0;
             nyomasszam++;
             if( nyomasszam > 10 )
                 external_error( "nyomasszam >" );*/
 
-            invalid = 0;
+            rerender = 0;
 
             push();
             // Kirajzoljuk, mivel valtozott kep:
@@ -2122,30 +2140,30 @@ void editor_window_level_properties() {
 
             // Most jonnek gombok:
             // OK:
-            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
+            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
             // CANCEL:
-            render_box(BufferMain, boxcancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxcancel.x1 + boxcancel.x2) / 2, boxcancel.y1 + 15,
-                                  "CANCEL");
+            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                  box_cancel.y1 + 15, "CANCEL");
 
             // Foreground sor:
-            int szovegx = x1 + 10;
-            Pabc2->write(BufferMain, szovegx, boxfgnev.y1 + 15, "Foreground:");
-            render_box(BufferMain, boxfgnev, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            boxbair_balra(BufferMain, boxfgnev, Feherszin, fgnev);
+            int label_x1 = x1 + 10;
+            Pabc2->write(BufferMain, label_x1, box_foreground.y1 + 15, "Foreground:");
+            render_box(BufferMain, box_foreground, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            draw_textbox_left(BufferMain, box_foreground, Feherszin, foreground_name);
             // Background sor:
-            Pabc2->write(BufferMain, szovegx, boxbgnev.y1 + 15, "Background:");
-            render_box(BufferMain, boxbgnev, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            boxbair_balra(BufferMain, boxbgnev, Feherszin, bgnev);
+            Pabc2->write(BufferMain, label_x1, box_background.y1 + 15, "Background:");
+            render_box(BufferMain, box_background, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            draw_textbox_left(BufferMain, box_background, Feherszin, background_name);
             // Level name sor:
-            Pabc2->write(BufferMain, szovegx, boxlevelname.y1 + 15, "Level name:");
-            render_box(BufferMain, boxlevelname, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            boxbair_balra(BufferMain, boxlevelname, Feherszin, levelname);
+            Pabc2->write(BufferMain, label_x1, box_levelname.y1 + 15, "Level name:");
+            render_box(BufferMain, box_levelname, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            draw_textbox_left(BufferMain, box_levelname, Feherszin, level_name);
             // LGR file nev sor:
-            Pabc2->write(BufferMain, szovegx, boxlgrfile.y1 + 15, "LGR file:");
-            render_box(BufferMain, boxlgrfile, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            boxbair_balra(BufferMain, boxlgrfile, Feherszin, lgrnev);
+            Pabc2->write(BufferMain, label_x1, box_lgr.y1 + 15, "LGR file:");
+            render_box(BufferMain, box_lgr, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            draw_textbox_left(BufferMain, box_lgr, Feherszin, lgr_name);
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
@@ -2164,15 +2182,15 @@ void editor_window_view_options() {
     int x1 = 200, y1 = 100;
     int x2 = 360, y2 = 230;
 
-    int szovx = x1 + 14;
+    int label_x1 = x1 + 14;
 
-    box boxok = {(x1 + x2) / 2 - 20, y2 - 30, (x1 + x2) / 2 + 20, y2 - 10};
+    box box_ok = {(x1 + x2) / 2 - 20, y2 - 30, (x1 + x2) / 2 + 20, y2 - 10};
 
-    box boxpoligon = {x1 + 110, y1 + 18, x1 + 140, y1 + 38};
-    box boxkoveto = {x1 + 110, y1 + 40, x1 + 140, y1 + 60};
-    box boxkepek = {x1 + 110, y1 + 65, x1 + 140, y1 + 85};
+    box box_polygons = {x1 + 110, y1 + 18, x1 + 140, y1 + 38};
+    box box_grass = {x1 + 110, y1 + 40, x1 + 140, y1 + 60};
+    box box_objects = {x1 + 110, y1 + 65, x1 + 140, y1 + 85};
 
-    int invalid = 1;
+    int rerender = 1;
     while (1) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
@@ -2182,54 +2200,54 @@ void editor_window_view_options() {
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
             // Most nezzuk meg, hogy hova kattintott:
-            if (is_in_box(Moux, Mouy, boxok)) {
+            if (is_in_box(Moux, Mouy, box_ok)) {
                 return;
             }
-            if (is_in_box(Moux, Mouy, boxpoligon)) {
+            if (is_in_box(Moux, Mouy, box_polygons)) {
                 ShowPolygons = !ShowPolygons;
-                invalid = 1;
+                rerender = 1;
             }
-            if (is_in_box(Moux, Mouy, boxkoveto)) {
+            if (is_in_box(Moux, Mouy, box_grass)) {
                 ShowGrassPolygons = !ShowGrassPolygons;
-                invalid = 1;
+                rerender = 1;
             }
-            if (is_in_box(Moux, Mouy, boxkepek)) {
+            if (is_in_box(Moux, Mouy, box_objects)) {
                 ShowObjects = !ShowObjects;
-                invalid = 1;
+                rerender = 1;
             }
         }
-        if (invalid) {
-            invalid = 0;
+        if (rerender) {
+            rerender = 0;
             push();
             // Kirajzoljuk, mivel valtozott kep:
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             // Most jonnek gombok:
             // OK:
-            render_box(BufferMain, boxok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (boxok.x1 + boxok.x2) / 2, boxok.y1 + 15, "OK");
+            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
 
-            Pabc2->write(BufferMain, szovx, boxpoligon.y1 + 15, "View Polygons");
-            render_box(BufferMain, boxpoligon, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write(BufferMain, label_x1, box_polygons.y1 + 15, "View Polygons");
+            render_box(BufferMain, box_polygons, Feherszin, DIALOG_BORDER_PALETTE_ID);
             if (ShowPolygons) {
-                boxbair(BufferMain, boxpoligon, Feherszin, "Yes");
+                draw_textbox_centered(BufferMain, box_polygons, Feherszin, "Yes");
             } else {
-                boxbair(BufferMain, boxpoligon, Feherszin, "No");
+                draw_textbox_centered(BufferMain, box_polygons, Feherszin, "No");
             }
 
-            Pabc2->write(BufferMain, szovx, boxkoveto.y1 + 15, "View Grass");
-            render_box(BufferMain, boxkoveto, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write(BufferMain, label_x1, box_grass.y1 + 15, "View Grass");
+            render_box(BufferMain, box_grass, Feherszin, DIALOG_BORDER_PALETTE_ID);
             if (ShowGrassPolygons) {
-                boxbair(BufferMain, boxkoveto, Feherszin, "Yes");
+                draw_textbox_centered(BufferMain, box_grass, Feherszin, "Yes");
             } else {
-                boxbair(BufferMain, boxkoveto, Feherszin, "No");
+                draw_textbox_centered(BufferMain, box_grass, Feherszin, "No");
             }
 
-            Pabc2->write(BufferMain, szovx, boxkepek.y1 + 15, "View Pictures");
-            render_box(BufferMain, boxkepek, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            Pabc2->write(BufferMain, label_x1, box_objects.y1 + 15, "View Pictures");
+            render_box(BufferMain, box_objects, Feherszin, DIALOG_BORDER_PALETTE_ID);
             if (ShowObjects) {
-                boxbair(BufferMain, boxkepek, Feherszin, "Yes");
+                draw_textbox_centered(BufferMain, box_objects, Feherszin, "Yes");
             } else {
-                boxbair(BufferMain, boxkepek, Feherszin, "No");
+                draw_textbox_centered(BufferMain, box_objects, Feherszin, "No");
             }
 
             bltfront(BufferMain, x1, y1, x2, y2);

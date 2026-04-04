@@ -20,11 +20,12 @@
 #include <cstring>
 #include <directinput/scancodes.h>
 
-constexpr unsigned char EditorPalette_LevelNameDialog = 4, EditorPalette_LevelNameDialogBorder = 5;
+constexpr unsigned char EditorPalette_LevelNameDialog = 4;
+constexpr unsigned char EditorPalette_LevelNameDialogBorder = 5;
+constexpr unsigned char EditorPalette_List = 6;
+constexpr unsigned char EditorPalette_ListSelected = 7;
 
-static unsigned char EditorPalette_List = 6, EditorPalette_ListSelected = 7;
-
-static int EDITOR_LIST_MAX_LENGTH = 1000;
+constexpr int EDITOR_LIST_MAX_LENGTH = 1000;
 static char* EditorListBuffer = nullptr;
 
 // Returns true if text1 is earlier in the alphabet than text2
@@ -85,7 +86,6 @@ static void sort_files(int length) {
         for (int j = 0; j < length - 1; j++) {
             char* file1 = &EditorListBuffer[j * 10];
             char* file2 = &EditorListBuffer[(j + 1) * 10];
-            int case_insensitive_lexicographical_compare(const char* text1, const char* text2);
             if (case_insensitive_lexicographical_compare(file2, file1)) {
                 finame tmp;
                 strcpy(tmp, file1);
@@ -105,8 +105,8 @@ static void open_level(const char* filename) {
         internal_error("open_level !*filename");
     }
     char tmp[15];
-    if (strlen(filename) > 8) {
-        internal_error("open_level strlen(filename) > 8");
+    if (strlen(filename) > MAX_FILENAME_LEN) {
+        internal_error("open_level strlen(filename) > MAX_FILENAME_LEN");
     }
     strcpy(tmp, filename);
     strcat(tmp, ".lev");
@@ -143,7 +143,7 @@ static void adjust_list_view(int* selected_index, int* view_index, int length,
 // Draw a borderless box with background color and centered text
 // Optionally add '_' to the end of the string for input prompt
 static void draw_textbox_centered(pic8* pic, box bx, unsigned char fill_id, const char* text,
-                                  int add_underline = 0) {
+                                  bool add_underline = false) {
     pic->fill_box(bx.x1 + 1, bx.y1 + 1, bx.x2 - 1, bx.y2 - 1, fill_id);
     if (add_underline) {
         int length = Pabc2->len(text);
@@ -164,7 +164,7 @@ static void draw_textbox_left(pic8* pic, box bx, unsigned char fill_id, const ch
 }
 
 // Draw an up or down arrow (no background box)
-static void draw_arrow(pic8* pic, box bx, unsigned char palette_id, int up_arrow) {
+static void draw_arrow(pic8* pic, box bx, unsigned char palette_id, bool up_arrow) {
     int x1 = bx.x1;
     int y1 = bx.y1;
     int x2 = bx.x2;
@@ -176,21 +176,19 @@ static void draw_arrow(pic8* pic, box bx, unsigned char palette_id, int up_arrow
     y2 -= 8;
     int x_center = (x1 + x2) / 2;
     for (int x_right = x1; x_right <= x_center; x_right++) {
-        int x = x_right;
-        int y = int(y1 + (y2 - y1) / double(x_center - x1) * (x - x1));
+        int x_left = x_center + (x_center - x_right);
+        int y = int(y1 + (y2 - y1) / double(x_center - x1) * (x_right - x1));
         if (up_arrow) {
             y = bx.y2 - (y - bx.y1);
-            pic->ppixel(x, y, palette_id);
-            pic->ppixel(x, y - 3, palette_id);
-            x = x_center + (x_center - x);
-            pic->ppixel(x, y, palette_id);
-            pic->ppixel(x, y - 3, palette_id);
+            pic->ppixel(x_right, y, palette_id);
+            pic->ppixel(x_right, y - 3, palette_id);
+            pic->ppixel(x_left, y, palette_id);
+            pic->ppixel(x_left, y - 3, palette_id);
         } else {
-            pic->ppixel(x, y, palette_id);
-            pic->ppixel(x, y + 3, palette_id);
-            x = x_center + (x_center - x);
-            pic->ppixel(x, y, palette_id);
-            pic->ppixel(x, y + 3, palette_id);
+            pic->ppixel(x_right, y, palette_id);
+            pic->ppixel(x_right, y + 3, palette_id);
+            pic->ppixel(x_left, y, palette_id);
+            pic->ppixel(x_left, y + 3, palette_id);
         }
     }
 }
@@ -236,15 +234,15 @@ void editor_window_open() {
             i++;
         }
         cur_filename[i] = 0;
-        if (strlen(cur_filename) > 8) {
-            internal_error("editor_window_open strlen(cur_filename) > 8");
+        if (strlen(cur_filename) > MAX_FILENAME_LEN) {
+            internal_error("editor_window_open strlen(cur_filename) > MAX_FILENAME_LEN");
         }
 
         done = find_next(filename);
         list_length++;
         if (list_length >= EDITOR_LIST_MAX_LENGTH) {
             dialog("Number of files > 1000 in open dialog box!", "Could not load all the files!");
-            done = 1;
+            done = true;
         }
     }
     find_close();
@@ -290,7 +288,7 @@ void editor_window_open() {
     int view_index_prev = -1;
     int selected_index_prev = 0;
     empty_keypress_buffer();
-    while (1) {
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
@@ -353,9 +351,9 @@ void editor_window_open() {
                              &EditorListBuffer[(i + view_index) * 10]);
             }
             render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, 1);
+            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
             render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, 0);
+            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, false);
             render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                   box_cancel.y1 + 15, "CANCEL");
@@ -404,15 +402,15 @@ void editor_window_welcome() {
             i++;
         }
         cur_filename[i] = 0;
-        if (strlen(cur_filename) > 8) {
-            internal_error("editor_window_welcome strlen(cur_filename) > 8");
+        if (strlen(cur_filename) > MAX_FILENAME_LEN) {
+            internal_error("editor_window_welcome strlen(cur_filename) > MAX_FILENAME_LEN");
         }
 
         done = find_next(filename);
         list_length++;
         if (list_length >= EDITOR_LIST_MAX_LENGTH) {
             dialog("Number of files > 1000 in open dialog box!", "Could not load all the files!");
-            done = 1;
+            done = true;
         }
     }
 
@@ -459,7 +457,7 @@ void editor_window_welcome() {
     int view_index_prev = -1;
     int selected_index_prev = 0;
     empty_keypress_buffer();
-    while (1) {
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
@@ -468,8 +466,9 @@ void editor_window_welcome() {
             adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
             // This part differs from editor_window_open()
             char* selected_filename = &EditorListBuffer[selected_index * 10];
-            if (strlen(selected_filename) > 8) {
-                internal_error("editor_window_welcome strlen(selected_filename) > 8");
+            if (strlen(selected_filename) > MAX_FILENAME_LEN) {
+                internal_error(
+                    "editor_window_welcome strlen(selected_filename) > MAX_FILENAME_LEN");
             }
             strcpy(State->editor_filename, selected_filename);
             strcat(State->editor_filename, ".lev");
@@ -513,8 +512,9 @@ void editor_window_welcome() {
                     if (index < list_length) {
                         // This part differs from editor_window_open()
                         char* selected_filename = &EditorListBuffer[index * 10];
-                        if (strlen(selected_filename) > 8) {
-                            internal_error("editor_window_welcome strlen(selected_filename) > 8");
+                        if (strlen(selected_filename) > MAX_FILENAME_LEN) {
+                            internal_error("editor_window_welcome strlen(selected_filename) > "
+                                           "MAX_FILENAME_LEN");
                         }
                         strcpy(State->editor_filename, selected_filename);
                         strcat(State->editor_filename, ".lev");
@@ -538,9 +538,9 @@ void editor_window_welcome() {
                              &EditorListBuffer[(i + view_index) * 10]);
             }
             render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, 1);
+            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
             render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, 0);
+            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, false);
             render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                   box_cancel.y1 + 15, "CANCEL");
@@ -574,17 +574,17 @@ void editor_new() {
     zoom_fill();
 }
 
-int editor_window_save() {
+bool editor_window_save() {
     invalidateegesz();
     if (State->editor_filename[0] == 0) {
         return editor_window_save_as();
     }
     Ptop->save(State->editor_filename);
     Valtozott = 0;
-    return 1;
+    return true;
 }
 
-int editor_window_save_as() {
+bool editor_window_save_as() {
     invalidateegesz();
 
     box box_window = {20, 200, 600, 300};
@@ -605,7 +605,7 @@ int editor_window_save_as() {
     finame filename_input = "";
     int i = 0;
     char filename_input_prev[10] = "$%...%^&";
-    while (1) {
+    while (true) {
         handle_events();
         if (strcmp(filename_input_prev, filename_input) != 0) {
             strcpy(filename_input_prev, filename_input);
@@ -623,7 +623,7 @@ int editor_window_save_as() {
             bltfront(BufferMain, ex1, ey1, ex2, ey2);
         }
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            return 0;
+            return false;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             if (filename_input[0] != 0) {
@@ -634,21 +634,17 @@ int editor_window_save_as() {
                 if (access(path, 0) == 0) {
                     if (dialog("File exists, overwrite?", filename_input, DIALOG_BUTTONS, "Yes",
                                "No") == 1) {
-                        return 0;
+                        return false;
                     }
                 }
                 Ptop->save(filename_input);
                 strcpy(State->editor_filename, filename_input);
                 Valtozott = 0;
-                return 1;
+                return true;
             }
         }
         if (was_key_down(DIK_BACK)) {
-            int input_length_zero = 0;
-            if (i <= 0) {
-                input_length_zero = 1;
-            }
-            if (!((filename_input[0] == 0) || input_length_zero)) {
+            if (filename_input[0] && i > 0) {
                 int filename_input_length = strlen(filename_input);
                 for (int j = i - 1; j < filename_input_length; j++) {
                     filename_input[j] = filename_input[j + 1];
@@ -679,7 +675,7 @@ int editor_window_save_as() {
         while (has_text_input()) {
             char c = pop_text_input();
             if (Pabc2->has_char(c) && util::text::is_filename_char(c)) {
-                if (strlen(filename_input) < 8) {
+                if (strlen(filename_input) < MAX_FILENAME_LEN) {
                     int filename_input_length = strlen(filename_input);
                     for (int j = filename_input_length; j >= i; j--) {
                         filename_input[j + 1] = filename_input[j];
@@ -690,7 +686,7 @@ int editor_window_save_as() {
             }
         }
         if (was_right_mouse_just_clicked()) {
-            return 0;
+            return false;
         }
         if (was_left_mouse_just_clicked()) {
             update_and_draw_cursor();
@@ -703,13 +699,13 @@ int editor_window_save_as() {
                     if (access(path, 0) == 0) {
                         if (dialog("File exists, overwrite?", filename_input, DIALOG_BUTTONS, "Yes",
                                    "No") == 1) {
-                            return 0;
+                            return false;
                         }
                     }
                     Ptop->save(filename_input);
                     strcpy(State->editor_filename, filename_input);
                     Valtozott = 0;
-                    return 1;
+                    return true;
                 }
             }
         }
@@ -746,10 +742,10 @@ static void preview_picture(pic8* dest, picture* pict, int x, int y) {
     // Trim width and height to be in-bounds
     int width = pict->width;
     int height = pict->height;
-    int possibly_out_of_bounds = 0;
+    bool possibly_out_of_bounds = false;
     if (x + width > dest->get_width()) {
         width = dest->get_width() - x;
-        possibly_out_of_bounds = 1;
+        possibly_out_of_bounds = true;
     }
     if (y + height > dest->get_height()) {
         height = dest->get_height() - y;
@@ -761,7 +757,7 @@ static void preview_picture(pic8* dest, picture* pict, int x, int y) {
     for (int i = y; i < y + height; i++) {
         unsigned char* row = dest->get_row(i) + x;
         int j = 0;
-        while (1) {
+        while (true) {
             int skip = read_varint(data, data_offset);
             if (skip == -1) {
                 break;
@@ -918,7 +914,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
     blit8(BufferBall, BufferMain);
     pop();
 
-    while (1) {
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             strcpy(name, original_name);
@@ -1090,9 +1086,9 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
 
             // Draw other buttons
             render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, 1);
+            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
             render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, 0);
+            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, false);
             render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                   box_cancel.y1 + 15, "CANCEL");
@@ -1140,8 +1136,8 @@ void editor_window_choose_sprite() {
     box box_cancel = {x1 + 130, y2 - 30, x1 + 180, y2 - 10};
 
     empty_keypress_buffer();
-    int rerender = 1;
-    while (1) {
+    bool rerender = true;
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
@@ -1172,7 +1168,7 @@ void editor_window_choose_sprite() {
                 if (picture_name[0]) {
                     texture_name[0] = mask_name[0] = 0;
                 }
-                rerender = 1;
+                rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_texture)) {
                 editor_window_select_sprite_name(null_name, texture_name, mask_name, 2);
@@ -1183,7 +1179,7 @@ void editor_window_choose_sprite() {
                 if (texture_name[0]) {
                     picture_name[0] = 0;
                 }
-                rerender = 1;
+                rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_mask)) {
                 editor_window_select_sprite_name(null_name, texture_name, mask_name, 3);
@@ -1194,11 +1190,11 @@ void editor_window_choose_sprite() {
                 if (mask_name[0]) {
                     picture_name[0] = 0;
                 }
-                rerender = 1;
+                rerender = true;
             }
         }
         if (rerender) {
-            rerender = 0;
+            rerender = false;
 
             push();
 
@@ -1232,7 +1228,7 @@ void editor_window_choose_sprite() {
     }
 }
 
-int editor_window_choose_lgr(char* lgrname) {
+bool editor_window_choose_lgr(char* lgrname) {
     invalidateegesz();
 
     blit8(BufferBall, BufferMain);
@@ -1267,8 +1263,8 @@ int editor_window_choose_lgr(char* lgrname) {
             i++;
         }
         cur_filename[i] = 0;
-        if (strlen(cur_filename) > 8) {
-            internal_error("editor_window_choose_lgr strlen(cur_filename) > 8");
+        if (strlen(cur_filename) > MAX_FILENAME_LEN) {
+            internal_error("editor_window_choose_lgr strlen(cur_filename) > MAX_FILENAME_LEN");
         }
 
         done = find_next(filename);
@@ -1276,7 +1272,7 @@ int editor_window_choose_lgr(char* lgrname) {
         if (list_length >= EDITOR_LIST_MAX_LENGTH) {
             dialog("Number of files > 1000 in Pick LGR File dialog box!",
                    "Could not load all the files!");
-            done = 1;
+            done = true;
         }
     }
 
@@ -1317,15 +1313,15 @@ int editor_window_choose_lgr(char* lgrname) {
     int view_index_prev = -1;
     int selected_index_prev = 0;
     empty_keypress_buffer();
-    while (1) {
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            return 0;
+            return false;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
             strcpy(lgrname, &EditorListBuffer[selected_index * 10]);
-            return 1;
+            return true;
         }
         if (was_key_down(DIK_UP)) {
             selected_index--;
@@ -1353,7 +1349,7 @@ int editor_window_choose_lgr(char* lgrname) {
                 selected_index -= max_visible_entries - 1;
             }
             if (is_in_box(Moux, Mouy, box_cancel)) {
-                return 0;
+                return false;
             }
             if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 if (Mouy < ly1 + dy * max_visible_entries) {
@@ -1361,7 +1357,7 @@ int editor_window_choose_lgr(char* lgrname) {
                     index += view_index;
                     if (index < list_length) {
                         strcpy(lgrname, &EditorListBuffer[index * 10]);
-                        return 1;
+                        return true;
                     }
                 }
             }
@@ -1381,17 +1377,15 @@ int editor_window_choose_lgr(char* lgrname) {
                              &EditorListBuffer[(i + view_index) * 10]);
             }
             render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, 1);
+            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
             render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, 0);
+            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, false);
             render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                   box_cancel.y1 + 15, "CANCEL");
 
-            char tttmp[50];
-            strcpy(tttmp, lgrname);
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y2 - 36, "Original LGR file:");
-            Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y2 - 18, tttmp);
+            Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y2 - 18, lgrname);
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
@@ -1407,15 +1401,15 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
     push();
 
     empty_keypress_buffer();
-    int rerender = 1;
+    bool rerender = true;
     int distance_prev = distance;
-    while (1) {
+    while (true) {
         handle_events();
         if (rerender) {
-            rerender = 0;
+            rerender = false;
             char tmp[10];
             sprintf(tmp, "%d", distance);
-            draw_textbox_centered(pic, bx, Feherszin, tmp, 1);
+            draw_textbox_centered(pic, bx, Feherszin, tmp, true);
             bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
         }
         if (was_key_just_pressed(DIK_ESCAPE)) {
@@ -1429,7 +1423,7 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
         if (was_key_down(DIK_BACK)) {
             if (distance > 0) {
                 distance /= 10;
-                rerender = 1;
+                rerender = true;
             }
         }
         while (has_text_input()) {
@@ -1438,7 +1432,7 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
                 if (distance < 100) {
                     distance *= 10;
                     distance += c - '0';
-                    rerender = 1;
+                    rerender = true;
                 }
             }
         }
@@ -1447,10 +1441,10 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
 
 static Clipping prompt_clipping(pic8* pic, box bx, Clipping clipping) {
     push();
-    draw_textbox_centered(pic, bx, Feherszin, "", 1);
+    draw_textbox_centered(pic, bx, Feherszin, "", true);
     bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
     empty_keypress_buffer();
-    while (1) {
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             pop();
@@ -1487,10 +1481,10 @@ void editor_window_sprite_properties(sprite* spr) {
     box box_distance = {x1 + 102, y1 + 118, x1 + 102 + 34, y1 + 118 + 16};
     box box_clipping = {x1 + 181, y1 + 118, x1 + 181 + 34, y1 + 118 + 16};
 
-    int rerender = 1;
+    bool rerender = true;
     int distance = spr->distance;
     Clipping clipping = spr->clipping;
-    while (1) {
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
@@ -1518,15 +1512,15 @@ void editor_window_sprite_properties(sprite* spr) {
             }
             if (is_in_box(Moux, Mouy, box_distance)) {
                 distance = prompt_distance(BufferMain, box_distance, distance);
-                rerender = 1;
+                rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_clipping)) {
                 clipping = prompt_clipping(BufferMain, box_clipping, clipping);
-                rerender = 1;
+                rerender = true;
             }
         }
         if (rerender) {
-            rerender = 0;
+            rerender = false;
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
@@ -1631,11 +1625,11 @@ void editor_window_polygon_properties(polygon* poly) {
     int box_left = x1 + 132;
     box box_grass = {box_left, y1 + 35, box_left + 30, y1 + 55};
 
-    int rerender = 1;
+    bool rerender = true;
 
     int is_grass = poly->is_grass;
 
-    while (1) {
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
@@ -1661,11 +1655,11 @@ void editor_window_polygon_properties(polygon* poly) {
             }
             if (is_in_box(Moux, Mouy, box_grass)) {
                 is_grass = !is_grass;
-                rerender = 1;
+                rerender = true;
             }
         }
         if (rerender) {
-            rerender = 0;
+            rerender = false;
 
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
@@ -1763,7 +1757,7 @@ void editor_window_food_properties(const char* title, object::Property* property
     bltfront(BufferMain, x1, y1, x2, y2);
     pop();
 
-    while (1) {
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
@@ -1781,26 +1775,21 @@ void editor_window_food_properties(const char* title, object::Property* property
                 bltfront(BufferMain, x1, y1, x2, y2);
 
                 empty_keypress_buffer();
-                while (1) {
+                while (true) {
                     handle_events();
                     if (was_key_just_pressed(DIK_ESCAPE)) {
-                        break;
+                        pop();
+                        return;
                     }
-                    bool got_digit = false;
                     while (has_text_input()) {
                         char c = pop_text_input();
                         if (c >= '1' && c <= '9') {
                             *animation = c - '1';
-                            got_digit = true;
-                            break;
+                            pop();
+                            return;
                         }
                     }
-                    if (got_digit) {
-                        break;
-                    }
                 }
-                pop();
-                return;
             }
             if (is_in_box(Moux, Mouy, box_list)) {
                 int index = (Mouy - box_list.y1) / dy;
@@ -1851,7 +1840,7 @@ static void editor_window_level_name(char* level_name) {
 
     empty_keypress_buffer();
     int i = 0;
-    while (1) {
+    while (true) {
         handle_events();
 
         BufferMain->fill_box(x1, y1, x2, y2, EditorPalette_LevelNameDialog);
@@ -1940,8 +1929,10 @@ void editor_window_level_properties() {
     finame lgr_name = "";
     strcpy(lgr_name, Ptop->lgr_name);
 
-    int x1 = 130, y1 = 100;
-    int x2 = 570, y2 = 280;
+    int x1 = 130;
+    int y1 = 100;
+    int x2 = 570;
+    int y2 = 280;
 
     int okcancel_spacing = 10;
     int okcancel_width = 70;
@@ -1957,8 +1948,8 @@ void editor_window_level_properties() {
     box box_levelname = {box_left, y1 + 85, box_left + 320, y1 + 105};
     box box_lgr = {box_left, y1 + 110, box_left + 80, y1 + 130};
 
-    int rerender = 1;
-    while (1) {
+    bool rerender = true;
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return;
@@ -2015,7 +2006,7 @@ void editor_window_level_properties() {
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                rerender = 1;
+                rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_background)) {
                 char null_name[10] = "";
@@ -2024,7 +2015,7 @@ void editor_window_level_properties() {
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                rerender = 1;
+                rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_levelname)) {
                 editor_window_level_name(level_name);
@@ -2032,7 +2023,7 @@ void editor_window_level_properties() {
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                rerender = 1;
+                rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_lgr)) {
                 finame belgrnev = "";
@@ -2044,11 +2035,11 @@ void editor_window_level_properties() {
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
                 pop();
-                rerender = 1;
+                rerender = true;
             }
         }
         if (rerender) {
-            rerender = 0;
+            rerender = false;
 
             push();
 
@@ -2087,15 +2078,17 @@ void editor_window_level_properties() {
     }
 }
 
-int ShowPolygons = 1;
-int ShowGrassPolygons = 1;
-int ShowObjects = 1;
+bool ShowPolygons = true;
+bool ShowGrassPolygons = true;
+bool ShowObjects = true;
 
 void editor_window_view_options() {
     invalidateegesz();
 
-    int x1 = 200, y1 = 100;
-    int x2 = 360, y2 = 230;
+    int x1 = 200;
+    int y1 = 100;
+    int x2 = 360;
+    int y2 = 230;
 
     int label_x1 = x1 + 14;
 
@@ -2105,8 +2098,8 @@ void editor_window_view_options() {
     box box_grass = {x1 + 110, y1 + 40, x1 + 140, y1 + 60};
     box box_objects = {x1 + 110, y1 + 65, x1 + 140, y1 + 85};
 
-    int rerender = 1;
-    while (1) {
+    bool rerender = true;
+    while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
             return;
@@ -2118,19 +2111,19 @@ void editor_window_view_options() {
             }
             if (is_in_box(Moux, Mouy, box_polygons)) {
                 ShowPolygons = !ShowPolygons;
-                rerender = 1;
+                rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_grass)) {
                 ShowGrassPolygons = !ShowGrassPolygons;
-                rerender = 1;
+                rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_objects)) {
                 ShowObjects = !ShowObjects;
-                rerender = 1;
+                rerender = true;
             }
         }
         if (rerender) {
-            rerender = 0;
+            rerender = false;
             push();
 
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);

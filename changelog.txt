@@ -47,6 +47,7 @@
 * You can now filter the options menu to find options
 * Level names in the internal editor can now be up to 50 characters long
 * When choosing foreground or background texture, internal editor will preview the image
+* Unlimited amount of files supported in lev/ and rec/ folders
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems
@@ -76,6 +77,7 @@
 * Out-of-bounds grass and masks no longer cause a hard crash
 * You can no longer create a player with a duplicate name
 * Warning instead of crash if you reach max number of players in state.dat
+* You can open level and replay files with multiple dots e.g. pack.01.lev
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

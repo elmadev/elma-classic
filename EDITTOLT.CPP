@@ -809,21 +809,22 @@ static void preview_texture(pic8* dest, texture* text, mask* msk, int x, int y) 
     }
 }
 
+enum class SpriteType { Picture, Texture, Mask };
 static void editor_window_select_sprite_name(char* picture_name, char* texture_name,
-                                             char* mask_name, int sprite_type) {
+                                             char* mask_name, SpriteType sprite_type) {
     create_lgr_palette_map(Lgr->palette_data);
 
     char* name = nullptr;
     int list_length = 0;
-    if (sprite_type == 1) {
+    if (sprite_type == SpriteType::Picture) {
         name = picture_name;
         list_length = Lgr->picture_count;
     }
-    if (sprite_type == 2) {
+    if (sprite_type == SpriteType::Texture) {
         name = texture_name;
         list_length = Lgr->texture_count;
     }
-    if (sprite_type == 3) {
+    if (sprite_type == SpriteType::Mask) {
         name = mask_name;
         list_length = Lgr->mask_count;
     }
@@ -844,25 +845,25 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
 
     int selected_index = 0;
     for (int i = 0; i < list_length; i++) {
-        if (sprite_type == 1 && strcmpi(Lgr->pictures[i].name, name) == 0) {
+        if (sprite_type == SpriteType::Picture && strcmpi(Lgr->pictures[i].name, name) == 0) {
             selected_index = i;
         }
-        if (sprite_type == 2 && strcmpi(Lgr->textures[i].name, name) == 0) {
+        if (sprite_type == SpriteType::Texture && strcmpi(Lgr->textures[i].name, name) == 0) {
             selected_index = i;
         }
-        if (sprite_type == 3 && strcmpi(Lgr->masks[i].name, name) == 0) {
+        if (sprite_type == SpriteType::Mask && strcmpi(Lgr->masks[i].name, name) == 0) {
             selected_index = i;
         }
     }
 
     if (selected_index == 0) {
-        if (sprite_type == 1) {
+        if (sprite_type == SpriteType::Picture) {
             strcpy(name, Lgr->pictures[0].name);
         }
-        if (sprite_type == 2) {
+        if (sprite_type == SpriteType::Texture) {
             strcpy(name, Lgr->textures[0].name);
         }
-        if (sprite_type == 3) {
+        if (sprite_type == SpriteType::Mask) {
             strcpy(name, Lgr->masks[0].name);
         }
     }
@@ -903,13 +904,13 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
-            if (sprite_type == 1) {
+            if (sprite_type == SpriteType::Picture) {
                 strcpy(name, Lgr->pictures[selected_index].name);
             }
-            if (sprite_type == 2) {
+            if (sprite_type == SpriteType::Texture) {
                 strcpy(name, Lgr->textures[selected_index].name);
             }
-            if (sprite_type == 3) {
+            if (sprite_type == SpriteType::Mask) {
                 strcpy(name, Lgr->masks[selected_index].name);
             }
             return;
@@ -947,13 +948,13 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                     int index = (Mouy - ly1) / dy;
                     index += view_index;
                     if (index < list_length) {
-                        if (sprite_type == 1) {
+                        if (sprite_type == SpriteType::Picture) {
                             strcpy(name, Lgr->pictures[index].name);
                         }
-                        if (sprite_type == 2) {
+                        if (sprite_type == SpriteType::Texture) {
                             strcpy(name, Lgr->textures[index].name);
                         }
-                        if (sprite_type == 3) {
+                        if (sprite_type == SpriteType::Mask) {
                             strcpy(name, Lgr->masks[index].name);
                         }
                         return;
@@ -963,13 +964,13 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
         }
         adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
         if (view_index != view_index_prev || selected_index != selected_index_prev) {
-            if (sprite_type == 1) {
+            if (sprite_type == SpriteType::Picture) {
                 strcpy(name, Lgr->pictures[selected_index].name);
             }
-            if (sprite_type == 2) {
+            if (sprite_type == SpriteType::Texture) {
                 strcpy(name, Lgr->textures[selected_index].name);
             }
-            if (sprite_type == 3) {
+            if (sprite_type == SpriteType::Mask) {
                 strcpy(name, Lgr->masks[selected_index].name);
             }
 
@@ -1019,15 +1020,15 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
                                          EditorPalette_ListSelected);
                 }
-                if (sprite_type == 1) {
+                if (sprite_type == SpriteType::Picture) {
                     Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
                                  Lgr->pictures[i + view_index].name);
                 }
-                if (sprite_type == 2) {
+                if (sprite_type == SpriteType::Texture) {
                     Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
                                  Lgr->textures[i + view_index].name);
                 }
-                if (sprite_type == 3) {
+                if (sprite_type == SpriteType::Mask) {
                     Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
                                  Lgr->masks[i + view_index].name);
                 }
@@ -1130,7 +1131,8 @@ void editor_window_choose_sprite() {
                 return;
             }
             if (is_in_box(Moux, Mouy, box_picture)) {
-                editor_window_select_sprite_name(picture_name, null_name, null_name, 1);
+                editor_window_select_sprite_name(picture_name, null_name, null_name,
+                                                 SpriteType::Picture);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
@@ -1141,7 +1143,8 @@ void editor_window_choose_sprite() {
                 rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_texture)) {
-                editor_window_select_sprite_name(null_name, texture_name, mask_name, 2);
+                editor_window_select_sprite_name(null_name, texture_name, mask_name,
+                                                 SpriteType::Texture);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
@@ -1152,7 +1155,8 @@ void editor_window_choose_sprite() {
                 rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_mask)) {
-                editor_window_select_sprite_name(null_name, texture_name, mask_name, 3);
+                editor_window_select_sprite_name(null_name, texture_name, mask_name,
+                                                 SpriteType::Mask);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
@@ -1975,7 +1979,8 @@ void editor_window_level_properties() {
                 if (Lgr->get_mask_index("maskbig") >= 0) {
                     strcpy(mask_name, "maskbig");
                 }
-                editor_window_select_sprite_name(null_name, foreground_name, mask_name, 2);
+                editor_window_select_sprite_name(null_name, foreground_name, mask_name,
+                                                 SpriteType::Texture);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
@@ -1988,7 +1993,8 @@ void editor_window_level_properties() {
                 if (Lgr->get_mask_index("maskbig") >= 0) {
                     strcpy(mask_name, "maskbig");
                 }
-                editor_window_select_sprite_name(null_name, background_name, mask_name, 2);
+                editor_window_select_sprite_name(null_name, background_name, mask_name,
+                                                 SpriteType::Texture);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);

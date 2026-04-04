@@ -478,8 +478,11 @@ static void create_lgr_palette_map(unsigned char* pal) {
 }
 
 static void preview_picture(pic8* dest, picture* pict, int x, int y) {
-    if (x < 0 || y < 0 || x >= dest->get_width() || y >= dest->get_height()) {
+    if (x < 0 || y < 0) {
         internal_error("preview_picture out of bounds");
+    }
+    if (x >= dest->get_width() || y >= dest->get_height()) {
+        return;
     }
 
     // Trim width and height to be in-bounds
@@ -513,8 +516,11 @@ static void preview_picture(pic8* dest, picture* pict, int x, int y) {
 }
 
 static void preview_texture(pic8* dest, texture* text, mask* msk, int x, int y) {
-    if (x < 0 || y < 0 || x >= dest->get_width() || y >= dest->get_height()) {
+    if (x < 0 || y < 0) {
         internal_error("preview_texture out of bounds");
+    }
+    if (x >= dest->get_width() || y >= dest->get_height()) {
+        return;
     }
 
     pic8* source = text->pic;

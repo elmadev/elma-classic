@@ -1,7 +1,7 @@
 #include "EDITTOOL.H"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
-#include "EDITTOLT.H"
+#include "editor/window.h"
 #include "EDITUJ.H"
 #include "platform_impl.h"
 #include "polygon.h"

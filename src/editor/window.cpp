@@ -1,4 +1,4 @@
-#include "EDITTOLT.H"
+#include "editor/window.h"
 #include "abc8.h"
 #include "editor_canvas.h"
 #include "editor_dialog.h"

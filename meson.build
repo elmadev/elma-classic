@@ -25,7 +25,7 @@ elma_sources = files(
     'D_PIC.CPP',
     'canvas.cpp',
     'editor_help.cpp',
-    'EDITTOLT.CPP',
+    'src/editor/window.cpp',
     'EDITTOOL.CPP',
     'EDITUJ.CPP',
     'editor_topology.cpp',

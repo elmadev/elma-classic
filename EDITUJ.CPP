@@ -3,7 +3,7 @@
 #include "editor_help.h"
 #include "editor_canvas.h"
 #include "editor_dialog.h"
-#include "EDITTOLT.H"
+#include "editor/window.h"
 #include "EDITTOOL.H"
 #include "editor_topology.h"
 #include "keys.h"

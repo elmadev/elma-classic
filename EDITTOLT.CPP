@@ -238,14 +238,11 @@ static std::string editor_window_list_levels(bool show_new_button) {
                          box_up, box_down, box_list);
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return "";
-        }
-        if (show_new_button && clicked_box(box_new)) {
+        } else if (show_new_button && clicked_box(box_new)) {
             return "";
-        }
-        if (was_key_just_pressed(DIK_RETURN)) {
+        } else if (was_key_just_pressed(DIK_RETURN)) {
             return ListEntries[selected_index];
-        }
-        if (clicked_box(box_list)) {
+        } else if (clicked_box(box_list)) {
             if (Mouy < ly1 + dy * max_visible_entries) {
                 int index = (Mouy - ly1) / dy;
                 index += view_index;
@@ -656,8 +653,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             strcpy(name, original_name);
             return;
-        }
-        if (was_key_just_pressed(DIK_RETURN)) {
+        } else if (was_key_just_pressed(DIK_RETURN)) {
             if (sprite_type == SpriteType::Picture) {
                 strcpy(name, Lgr->pictures[selected_index].name);
             }
@@ -668,8 +664,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                 strcpy(name, Lgr->masks[selected_index].name);
             }
             return;
-        }
-        if (clicked_box(box_list)) {
+        } else if (clicked_box(box_list)) {
             if (Mouy < ly1 + dy * max_visible_entries) {
                 int index = (Mouy - ly1) / dy;
                 index += view_index;
@@ -834,14 +829,12 @@ void editor_window_choose_sprite() {
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        }
-        if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
+        } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             strcpy(Lgr->editor_picture_name, picture_name);
             strcpy(Lgr->editor_texture_name, texture_name);
             strcpy(Lgr->editor_mask_name, mask_name);
             return;
-        }
-        if (clicked_box(box_picture)) {
+        } else if (clicked_box(box_picture)) {
             editor_window_select_sprite_name(picture_name, null_name, null_name,
                                              SpriteType::Picture);
             push();
@@ -852,8 +845,7 @@ void editor_window_choose_sprite() {
                 texture_name[0] = mask_name[0] = 0;
             }
             rerender = true;
-        }
-        if (clicked_box(box_texture)) {
+        } else if (clicked_box(box_texture)) {
             editor_window_select_sprite_name(null_name, texture_name, mask_name,
                                              SpriteType::Texture);
             push();
@@ -864,8 +856,7 @@ void editor_window_choose_sprite() {
                 picture_name[0] = 0;
             }
             rerender = true;
-        }
-        if (clicked_box(box_mask)) {
+        } else if (clicked_box(box_mask)) {
             editor_window_select_sprite_name(null_name, texture_name, mask_name, SpriteType::Mask);
             push();
             blit8(BufferMain, BufferBall);
@@ -951,12 +942,10 @@ bool editor_window_choose_lgr(char* lgrname) {
                          box_up, box_down, box_list);
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return false;
-        }
-        if (was_key_just_pressed(DIK_RETURN)) {
+        } else if (was_key_just_pressed(DIK_RETURN)) {
             strcpy(lgrname, ListEntries[selected_index].c_str());
             return true;
-        }
-        if (clicked_box(box_list)) {
+        } else if (clicked_box(box_list)) {
             if (Mouy < ly1 + dy * max_visible_entries) {
                 int index = (Mouy - ly1) / dy;
                 index += view_index;
@@ -1090,20 +1079,17 @@ void editor_window_sprite_properties(sprite* spr) {
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        }
-        if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
+        } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (spr->distance != distance || spr->clipping != clipping) {
                 Valtozott = 1;
             }
             spr->distance = distance;
             spr->clipping = clipping;
             return;
-        }
-        if (clicked_box(box_distance)) {
+        } else if (clicked_box(box_distance)) {
             distance = prompt_distance(BufferMain, box_distance, distance);
             rerender = true;
-        }
-        if (clicked_box(box_clipping)) {
+        } else if (clicked_box(box_clipping)) {
             clipping = prompt_clipping(BufferMain, box_clipping, clipping);
             rerender = true;
         }
@@ -1221,15 +1207,13 @@ void editor_window_polygon_properties(polygon* poly) {
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        }
-        if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
+        } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (poly->is_grass != is_grass) {
                 Valtozott = 1;
             }
             poly->is_grass = is_grass;
             return;
-        }
-        if (clicked_box(box_grass)) {
+        } else if (clicked_box(box_grass)) {
             is_grass = !is_grass;
             rerender = true;
         }
@@ -1336,8 +1320,7 @@ void editor_window_food_properties(const char* title, object::Property* property
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        }
-        if (clicked_box(box_animation)) {
+        } else if (clicked_box(box_animation)) {
             push();
             render_box(BufferMain, box_animation, Feherszin, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
@@ -1360,8 +1343,7 @@ void editor_window_food_properties(const char* title, object::Property* property
                     }
                 }
             }
-        }
-        if (clicked_box(box_list)) {
+        } else if (clicked_box(box_list)) {
             int index = (Mouy - box_list.y1) / dy;
             if (index >= list_length) {
                 index = list_length - 1;
@@ -1522,8 +1504,7 @@ void editor_window_level_properties() {
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        }
-        if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
+        } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (strcmpi(Ptop->foreground_name, foreground_name) != 0 ||
                 strcmpi(Ptop->background_name, background_name) != 0 ||
                 strcmp(Ptop->level_name, level_name) != 0) {
@@ -1542,8 +1523,7 @@ void editor_window_level_properties() {
                 }
             }
             return;
-        }
-        if (clicked_box(box_foreground)) {
+        } else if (clicked_box(box_foreground)) {
             char null_name[10] = "";
             char mask_name[10] = "";
             if (Lgr->get_mask_index("maskbig") >= 0) {
@@ -1556,8 +1536,7 @@ void editor_window_level_properties() {
             bltfront(BufferMain);
             pop();
             rerender = true;
-        }
-        if (clicked_box(box_background)) {
+        } else if (clicked_box(box_background)) {
             char null_name[10] = "";
             char mask_name[10] = "";
             if (Lgr->get_mask_index("maskbig") >= 0) {
@@ -1570,16 +1549,14 @@ void editor_window_level_properties() {
             bltfront(BufferMain);
             pop();
             rerender = true;
-        }
-        if (clicked_box(box_levelname)) {
+        } else if (clicked_box(box_levelname)) {
             editor_window_level_name(level_name);
             push();
             blit8(BufferMain, BufferBall);
             bltfront(BufferMain);
             pop();
             rerender = true;
-        }
-        if (clicked_box(box_lgr)) {
+        } else if (clicked_box(box_lgr)) {
             editor_window_choose_lgr(lgr_name);
 
             push();
@@ -1654,16 +1631,13 @@ void editor_window_view_options() {
         if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN) ||
             clicked_box(box_ok)) {
             return;
-        }
-        if (clicked_box(box_polygons)) {
+        } else if (clicked_box(box_polygons)) {
             ShowPolygons = !ShowPolygons;
             rerender = true;
-        }
-        if (clicked_box(box_grass)) {
+        } else if (clicked_box(box_grass)) {
             ShowGrassPolygons = !ShowGrassPolygons;
             rerender = true;
-        }
-        if (clicked_box(box_objects)) {
+        } else if (clicked_box(box_objects)) {
             ShowObjects = !ShowObjects;
             rerender = true;
         }

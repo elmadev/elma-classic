@@ -124,20 +124,12 @@ static void open_level(const char* filename) {
     zoom_fill();
 }
 
-static void adjust_list_view(int* selected_index, int* view_index, int length,
+static void adjust_list_view(int& selected_index, int& view_index, int length,
                              int max_visible_entries) {
-    if (*selected_index < 0) {
-        *selected_index = 0;
-    }
-    if (*selected_index > length - 1) {
-        *selected_index = length - 1;
-    }
-    if (*view_index > *selected_index) {
-        *view_index = *selected_index;
-    }
-    if (*view_index < *selected_index - max_visible_entries + 1) {
-        *view_index = *selected_index - max_visible_entries + 1;
-    }
+    selected_index = std::max(selected_index, 0);
+    selected_index = std::min(selected_index, length - 1);
+    view_index = std::min(view_index, selected_index);
+    view_index = std::max(view_index, selected_index - max_visible_entries + 1);
 }
 
 // Draw a borderless box with background color and centered text
@@ -294,7 +286,7 @@ void editor_window_open() {
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+            adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
             open_level(&EditorListBuffer[selected_index * 10]);
             return;
         }
@@ -336,7 +328,7 @@ void editor_window_open() {
                 }
             }
         }
-        adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+        adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
         if (view_index != view_index_prev || selected_index != selected_index_prev) {
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
@@ -463,7 +455,7 @@ void editor_window_welcome() {
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+            adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
             // This part differs from editor_window_open()
             char* selected_filename = &EditorListBuffer[selected_index * 10];
             if (strlen(selected_filename) > MAX_FILENAME_LEN) {
@@ -523,7 +515,7 @@ void editor_window_welcome() {
                 }
             }
         }
-        adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+        adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
         if (view_index != view_index_prev || selected_index != selected_index_prev) {
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
@@ -921,7 +913,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+            adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
             if (sprite_type == 1) {
                 strcpy(name, Lgr->pictures[selected_index].name);
             }
@@ -984,7 +976,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                 }
             }
         }
-        adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+        adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
         if (view_index != view_index_prev || selected_index != selected_index_prev) {
             if (sprite_type == 1) {
                 strcpy(name, Lgr->pictures[selected_index].name);
@@ -1319,7 +1311,7 @@ bool editor_window_choose_lgr(char* lgrname) {
             return false;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+            adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
             strcpy(lgrname, &EditorListBuffer[selected_index * 10]);
             return true;
         }
@@ -1362,7 +1354,7 @@ bool editor_window_choose_lgr(char* lgrname) {
                 }
             }
         }
-        adjust_list_view(&selected_index, &view_index, list_length, max_visible_entries);
+        adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
         if (view_index != view_index_prev || selected_index != selected_index_prev) {
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);

@@ -279,7 +279,7 @@ void editor_window_open() {
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
                        DIALOG_BORDER_PALETTE_ID);
-            for (int i = 0; i < max_visible_entries && i < list_length; i++) {
+            for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
                                          EditorPalette_ListSelected);
@@ -417,7 +417,7 @@ void editor_window_welcome() {
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
                        DIALOG_BORDER_PALETTE_ID);
-            for (int i = 0; i < max_visible_entries && i < list_length; i++) {
+            for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
                                          EditorPalette_ListSelected);
@@ -910,7 +910,6 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
                        DIALOG_BORDER_PALETTE_ID);
-            // The conditional of this for loop differs slightly from editor_window_open
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
@@ -1188,7 +1187,7 @@ bool editor_window_choose_lgr(char* lgrname) {
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
                        DIALOG_BORDER_PALETTE_ID);
-            for (int i = 0; i < max_visible_entries && i < list_length; i++) {
+            for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
                                          EditorPalette_ListSelected);

@@ -1871,7 +1871,7 @@ static void editor_window_level_name(char* level_name) {
                 char tmp[LEVEL_NAME_LENGTH + 10];
                 sprintf(tmp, "Ext: %s", level_name);
 
-                if (strlen(level_name) < LEVEL_NAME_LENGTH && MenuFont->len(tmp) <= 625) {
+                if (strlen(level_name) < LEVEL_NAME_LENGTH) {
                     int level_name_length = strlen(level_name);
                     for (int j = level_name_length; j >= i; j--) {
                         level_name[j + 1] = level_name[j];

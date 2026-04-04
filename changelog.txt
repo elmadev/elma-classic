@@ -48,6 +48,7 @@
 * Level names in the internal editor can now be up to 50 characters long
 * When choosing foreground or background texture, internal editor will preview the image
 * Unlimited amount of files supported in lev/ and rec/ folders
+* Mask previews are no longer horizontally truncated in the internal editor
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems

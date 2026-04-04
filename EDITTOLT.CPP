@@ -525,11 +525,11 @@ static void preview_texture(pic8* dest, texture* text, mask* msk, int x, int y) 
 
     pic8* source = text->pic;
 
+    int dest_width = dest->get_width();
+
     // Trim height to be in-bounds
     int height = msk->height;
-    if (y + height > dest->get_height()) {
-        height = dest->get_height() - y;
-    }
+    height = std::min(height, dest->get_height() - y);
 
     // Draw texture/mask
     int data_offset = 0;
@@ -542,9 +542,8 @@ static void preview_texture(pic8* dest, texture* text, mask* msk, int x, int y) 
         while (msk->data[data_offset].type != MaskEncoding::EndOfLine) {
             if (msk->data[data_offset].type == MaskEncoding::Solid) {
                 for (int j = 0; j < msk->data[data_offset].length; j++) {
-                    // Trim width to be in-bounds, assuming screen size is exactly 640
-                    // Crash here if screen is too small
-                    if (dest_x < 640) {
+                    // Trim width to be in-bounds
+                    if (dest_x < dest_width) {
                         *dest_row = LgrPaletteMap[src_row[src_x]];
                     }
                     dest_row++;

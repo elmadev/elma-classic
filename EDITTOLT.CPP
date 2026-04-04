@@ -114,7 +114,32 @@ static void open_level(const char* filename) {
 }
 
 static void adjust_list_view(int& selected_index, int& view_index, int length,
-                             int max_visible_entries) {
+                             int max_visible_entries, bool& rerender, box& box_up, box& box_down,
+                             box& box_list) {
+    if (was_key_down(DIK_UP)) {
+        selected_index--;
+        rerender = true;
+    }
+    if (was_key_down(DIK_PRIOR) ||
+        (was_left_mouse_just_clicked() && is_in_box(Moux, Mouy, box_up))) {
+        selected_index -= max_visible_entries - 1;
+        rerender = true;
+    }
+    if (was_key_down(DIK_DOWN)) {
+        selected_index++;
+        rerender = true;
+    }
+    if (was_key_down(DIK_NEXT) ||
+        (was_left_mouse_just_clicked() && is_in_box(Moux, Mouy, box_down))) {
+        selected_index += max_visible_entries - 1;
+        rerender = true;
+    }
+    int wheel = get_mouse_wheel_delta();
+    if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
+        selected_index -= wheel;
+        rerender = true;
+    }
+
     selected_index = std::max(selected_index, 0);
     selected_index = std::min(selected_index, length - 1);
     view_index = std::min(view_index, selected_index);
@@ -206,42 +231,20 @@ static std::string editor_window_list_levels(bool show_new_button) {
     box box_new = {x1 + 121, (y2 + y1) / 2 - 40, x1 + 121 + 70, (y2 + y1) / 2 - 20};
 
     int view_index = 0;
-    int view_index_prev = -1;
-    int selected_index_prev = 0;
+    bool rerender = true;
     empty_keypress_buffer();
     while (true) {
         handle_events();
+        update_and_draw_cursor();
+        adjust_list_view(selected_index, view_index, list_length, max_visible_entries, rerender,
+                         box_up, box_down, box_list);
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return "";
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
             return ListEntries[selected_index];
         }
-        if (was_key_down(DIK_UP)) {
-            selected_index--;
-        }
-        if (was_key_down(DIK_PRIOR)) {
-            selected_index -= max_visible_entries - 1;
-        }
-        if (was_key_down(DIK_DOWN)) {
-            selected_index++;
-        }
-        if (was_key_down(DIK_NEXT)) {
-            selected_index += max_visible_entries - 1;
-        }
-        int wheel = get_mouse_wheel_delta();
-        if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
-            selected_index -= wheel;
-        }
         if (was_left_mouse_just_clicked()) {
-            update_and_draw_cursor();
-            if (is_in_box(Moux, Mouy, box_down)) {
-                selected_index += max_visible_entries - 1;
-            }
-            if (is_in_box(Moux, Mouy, box_up)) {
-                selected_index -= max_visible_entries - 1;
-            }
             if (is_in_box(Moux, Mouy, box_cancel)) {
                 return "";
             }
@@ -258,8 +261,9 @@ static std::string editor_window_list_levels(bool show_new_button) {
                 }
             }
         }
-        adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
-        if (view_index != view_index_prev || selected_index != selected_index_prev) {
+        if (rerender) {
+            rerender = false;
+
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
@@ -287,11 +291,7 @@ static std::string editor_window_list_levels(bool show_new_button) {
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
-
-            view_index_prev = view_index;
-            selected_index_prev = selected_index;
         }
-        update_and_draw_cursor();
     }
 }
 
@@ -669,8 +669,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
     box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
 
     int view_index = 0;
-    int view_index_prev = -1;
-    int selected_index_prev = 0;
+    bool rerender = true;
     empty_keypress_buffer();
 
     // Keep track of the box where we are drawing, so we can restore the background later
@@ -682,12 +681,14 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
 
     while (true) {
         handle_events();
+        update_and_draw_cursor();
+        adjust_list_view(selected_index, view_index, list_length, max_visible_entries, rerender,
+                         box_up, box_down, box_list);
         if (was_key_just_pressed(DIK_ESCAPE)) {
             strcpy(name, original_name);
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
             if (sprite_type == SpriteType::Picture) {
                 strcpy(name, Lgr->pictures[selected_index].name);
             }
@@ -699,30 +700,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             }
             return;
         }
-        if (was_key_down(DIK_UP)) {
-            selected_index--;
-        }
-        if (was_key_down(DIK_PRIOR)) {
-            selected_index -= max_visible_entries - 1;
-        }
-        if (was_key_down(DIK_DOWN)) {
-            selected_index++;
-        }
-        if (was_key_down(DIK_NEXT)) {
-            selected_index += max_visible_entries - 1;
-        }
-        int wheel = get_mouse_wheel_delta();
-        if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
-            selected_index -= wheel;
-        }
         if (was_left_mouse_just_clicked()) {
-            update_and_draw_cursor();
-            if (is_in_box(Moux, Mouy, box_down)) {
-                selected_index += max_visible_entries - 1;
-            }
-            if (is_in_box(Moux, Mouy, box_up)) {
-                selected_index -= max_visible_entries - 1;
-            }
             if (is_in_box(Moux, Mouy, box_cancel)) {
                 strcpy(name, original_name);
                 return;
@@ -746,8 +724,9 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                 }
             }
         }
-        adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
-        if (view_index != view_index_prev || selected_index != selected_index_prev) {
+        if (rerender) {
+            rerender = false;
+
             if (sprite_type == SpriteType::Picture) {
                 strcpy(name, Lgr->pictures[selected_index].name);
             }
@@ -856,11 +835,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
 
             bltfront(BufferMain);
             pop();
-
-            view_index_prev = view_index;
-            selected_index_prev = selected_index;
         }
-        update_and_draw_cursor();
     }
 }
 
@@ -1017,44 +992,21 @@ bool editor_window_choose_lgr(char* lgrname) {
     box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
 
     int view_index = 0;
-    int view_index_prev = -1;
-    int selected_index_prev = 0;
+    bool rerender = true;
     empty_keypress_buffer();
     while (true) {
         handle_events();
+        update_and_draw_cursor();
+        adjust_list_view(selected_index, view_index, list_length, max_visible_entries, rerender,
+                         box_up, box_down, box_list);
         if (was_key_just_pressed(DIK_ESCAPE)) {
             return false;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
             strcpy(lgrname, ListEntries[selected_index].c_str());
             return true;
         }
-        if (was_key_down(DIK_UP)) {
-            selected_index--;
-        }
-        if (was_key_down(DIK_PRIOR)) {
-            selected_index -= max_visible_entries - 1;
-        }
-        if (was_key_down(DIK_DOWN)) {
-            selected_index++;
-        }
-        if (was_key_down(DIK_NEXT)) {
-            selected_index += max_visible_entries - 1;
-        }
-        int wheel = get_mouse_wheel_delta();
-        if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
-            selected_index -= wheel;
-        }
-
         if (was_left_mouse_just_clicked()) {
-            update_and_draw_cursor();
-            if (is_in_box(Moux, Mouy, box_down)) {
-                selected_index += max_visible_entries - 1;
-            }
-            if (is_in_box(Moux, Mouy, box_up)) {
-                selected_index -= max_visible_entries - 1;
-            }
             if (is_in_box(Moux, Mouy, box_cancel)) {
                 return false;
             }
@@ -1069,8 +1021,9 @@ bool editor_window_choose_lgr(char* lgrname) {
                 }
             }
         }
-        adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
-        if (view_index != view_index_prev || selected_index != selected_index_prev) {
+        if (rerender) {
+            rerender = false;
+
             push();
             render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
@@ -1096,11 +1049,7 @@ bool editor_window_choose_lgr(char* lgrname) {
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
-
-            view_index_prev = view_index;
-            selected_index_prev = selected_index;
         }
-        update_and_draw_cursor();
     }
 }
 

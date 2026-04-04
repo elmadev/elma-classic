@@ -19,9 +19,9 @@
 #include "sprite.h"
 #include <cstring>
 #include <directinput/scancodes.h>
+#include <vector>
 
-constexpr int EDITOR_LIST_MAX_LENGTH = 1000;
-static char* EditorListBuffer = nullptr;
+std::vector<std::string> ListEntries;
 
 // Returns true if text1 is earlier in the alphabet than text2
 static int case_insensitive_lexicographical_compare(const char* text1, const char* text2) {
@@ -76,19 +76,62 @@ static int case_insensitive_lexicographical_compare(const char* text1, const cha
     }
 }
 
-static void sort_files(int length) {
+static void sort_files() {
+    int length = ListEntries.size();
     for (int i = 0; i < length + 3; i++) {
         for (int j = 0; j < length - 1; j++) {
-            char* file1 = &EditorListBuffer[j * 10];
-            char* file2 = &EditorListBuffer[(j + 1) * 10];
-            if (case_insensitive_lexicographical_compare(file2, file1)) {
-                finame tmp;
-                strcpy(tmp, file1);
-                strcpy(file1, file2);
-                strcpy(file2, tmp);
+            std::string& file1 = ListEntries[j];
+            std::string& file2 = ListEntries[j + 1];
+            if (case_insensitive_lexicographical_compare(file2.c_str(), file1.c_str())) {
+                std::swap(file1, file2);
             }
         }
     }
+}
+
+static int populate_list(const char* pattern, int max_filename_length) {
+    ListEntries.clear();
+    ListEntries.reserve(100);
+
+    finame filename;
+    bool done = find_first(pattern, filename, max_filename_length);
+    while (!done) {
+        if (strlen(filename) > max_filename_length + 4) {
+            internal_error("populate_list strlen(filename) > max_filename_length + 4");
+        }
+
+        // Remove extension
+        int i = strlen(filename) - 1;
+        while (i > 0) {
+            if (filename[i] == '.') {
+                filename[i] = 0;
+                break;
+            }
+            i--;
+        }
+
+        if (strlen(filename) > max_filename_length) {
+            internal_error("populate_list strlen(filename) > max_filename_length");
+        }
+
+        ListEntries.emplace_back(filename);
+
+        done = find_next(filename);
+    }
+    find_close();
+
+    sort_files();
+
+    return ListEntries.size();
+}
+
+static int list_index(const std::string& target) {
+    for (int i = 0; i < ListEntries.size(); i++) {
+        if (strcmpi(ListEntries[i].c_str(), target.c_str()) == 0) {
+            return i;
+        }
+    }
+    return 0;
 }
 
 static void open_level(const char* filename) {
@@ -191,48 +234,7 @@ void editor_window_open() {
         }
     }
 
-    // Initialize list memory
-    if (!EditorListBuffer) {
-        EditorListBuffer = new char[EDITOR_LIST_MAX_LENGTH * 10 + 100];
-        if (!EditorListBuffer) {
-            internal_error("EditorListBuffer out of memory!");
-        }
-    }
-    for (int i = 0; i < EDITOR_LIST_MAX_LENGTH * 10 + 10; i++) {
-        EditorListBuffer[i] = 0;
-    }
-
-    // Populate list
-    finame filename;
-    bool done = find_first("lev/*.lev", filename);
-    int list_length = 0;
-    while (!done) {
-        if (strlen(filename) > 14) {
-            internal_error("editor_window_open strlen(filename) > 14");
-        }
-        char* cur_filename = &EditorListBuffer[list_length * 10];
-        strcpy(cur_filename, filename);
-        int i = 0;
-        while (cur_filename[i] != '.') {
-            if (!cur_filename[i]) {
-                internal_error(std::string("editor_window_open level missing dot: ") +
-                               cur_filename);
-            }
-            i++;
-        }
-        cur_filename[i] = 0;
-        if (strlen(cur_filename) > MAX_FILENAME_LEN) {
-            internal_error("editor_window_open strlen(cur_filename) > MAX_FILENAME_LEN");
-        }
-
-        done = find_next(filename);
-        list_length++;
-        if (list_length >= EDITOR_LIST_MAX_LENGTH) {
-            dialog("Number of files > 1000 in open dialog box!", "Could not load all the files!");
-            done = true;
-        }
-    }
-    find_close();
+    int list_length = populate_list("lev/*.lev", MAX_FILENAME_LEN);
 
     if (list_length < 1) {
         // Differs from editor_window_welcome()
@@ -240,17 +242,11 @@ void editor_window_open() {
         return;
     }
 
-    sort_files(list_length);
-
-    int selected_index = 0;
-    for (int i = 0; i < list_length; i++) {
-        char tmp[50];
-        strcpy(tmp, &EditorListBuffer[i * 10]);
-        strcat(tmp, ".lev");
-        if (strcmpi(tmp, State->editor_filename) == 0) {
-            selected_index = i;
-        }
+    std::string current_filename = State->editor_filename;
+    if (current_filename.length() > 4) {
+        current_filename.erase(current_filename.length() - 4);
     }
+    int selected_index = list_index(current_filename);
 
     // State->editor_filename[0] = 0; // This line exists in editor_window_welcome()
 
@@ -282,7 +278,7 @@ void editor_window_open() {
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
-            open_level(&EditorListBuffer[selected_index * 10]);
+            open_level(ListEntries[selected_index].c_str());
             return;
         }
         if (was_key_down(DIK_UP)) {
@@ -317,7 +313,7 @@ void editor_window_open() {
                     int index = (Mouy - ly1) / dy;
                     index += view_index;
                     if (index < list_length) {
-                        open_level(&EditorListBuffer[index * 10]);
+                        open_level(ListEntries[index].c_str());
                         return;
                     }
                 }
@@ -335,7 +331,7 @@ void editor_window_open() {
                                          EditorPalette_ListSelected);
                 }
                 Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                             &EditorListBuffer[(i + view_index) * 10]);
+                             ListEntries[i + view_index].c_str());
             }
             render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
@@ -358,67 +354,18 @@ void editor_window_open() {
 void editor_window_welcome() {
     invalidateegesz();
 
-    // Initialize list memory
-    if (!EditorListBuffer) {
-        EditorListBuffer = new char[EDITOR_LIST_MAX_LENGTH * 10 + 100];
-        if (!EditorListBuffer) {
-            internal_error("EditorListBuffer out of memory!");
-        }
-    }
-    for (int i = 0; i < EDITOR_LIST_MAX_LENGTH * 10 + 10; i++) {
-        EditorListBuffer[i] = 0;
-    }
-
-    // Populate list
-    finame filename;
-    bool done = find_first("lev/*.lev", filename);
-    int list_length = 0;
-    while (!done) {
-        if (strlen(filename) > 14) {
-            internal_error("editor_window_welcome strlen(filename) > 14");
-        }
-        char* cur_filename = &EditorListBuffer[list_length * 10];
-        strcpy(cur_filename, filename);
-
-        int i = 0;
-        while (cur_filename[i] != '.') {
-            if (!cur_filename[i]) {
-                internal_error(std::string("editor_window_welcome level missing dot: ") +
-                               cur_filename);
-            }
-            i++;
-        }
-        cur_filename[i] = 0;
-        if (strlen(cur_filename) > MAX_FILENAME_LEN) {
-            internal_error("editor_window_welcome strlen(cur_filename) > MAX_FILENAME_LEN");
-        }
-
-        done = find_next(filename);
-        list_length++;
-        if (list_length >= EDITOR_LIST_MAX_LENGTH) {
-            dialog("Number of files > 1000 in open dialog box!", "Could not load all the files!");
-            done = true;
-        }
-    }
-
-    find_close();
+    int list_length = populate_list("lev/*.lev", MAX_FILENAME_LEN);
 
     if (list_length < 1) {
         State->editor_filename[0] = 0; // Differs from editor_window_open()
         return;
     }
 
-    sort_files(list_length);
-
-    int selected_index = 0;
-    for (int i = 0; i < list_length; i++) {
-        char tmp[50];
-        strcpy(tmp, &EditorListBuffer[i * 10]);
-        strcat(tmp, ".lev");
-        if (strcmpi(tmp, State->editor_filename) == 0) {
-            selected_index = i;
-        }
+    std::string current_filename = State->editor_filename;
+    if (current_filename.length() > 4) {
+        current_filename.erase(current_filename.length() - 4);
     }
+    int selected_index = list_index(current_filename);
 
     State->editor_filename[0] = 0; // This line deleted in editor_window_open()
 
@@ -452,7 +399,7 @@ void editor_window_welcome() {
         if (was_key_just_pressed(DIK_RETURN)) {
             adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
             // This part differs from editor_window_open()
-            char* selected_filename = &EditorListBuffer[selected_index * 10];
+            const char* selected_filename = ListEntries[selected_index].c_str();
             if (strlen(selected_filename) > MAX_FILENAME_LEN) {
                 internal_error(
                     "editor_window_welcome strlen(selected_filename) > MAX_FILENAME_LEN");
@@ -498,7 +445,7 @@ void editor_window_welcome() {
                     index += view_index;
                     if (index < list_length) {
                         // This part differs from editor_window_open()
-                        char* selected_filename = &EditorListBuffer[index * 10];
+                        const char* selected_filename = ListEntries[index].c_str();
                         if (strlen(selected_filename) > MAX_FILENAME_LEN) {
                             internal_error("editor_window_welcome strlen(selected_filename) > "
                                            "MAX_FILENAME_LEN");
@@ -522,7 +469,7 @@ void editor_window_welcome() {
                                          EditorPalette_ListSelected);
                 }
                 Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                             &EditorListBuffer[(i + view_index) * 10]);
+                             ListEntries[i + view_index].c_str());
             }
             render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
@@ -1201,63 +1148,13 @@ bool editor_window_choose_lgr(char* lgrname) {
 
     blit8(BufferBall, BufferMain);
 
-    // Initialize list memory
-    if (!EditorListBuffer) {
-        EditorListBuffer = new char[EDITOR_LIST_MAX_LENGTH * 10 + 100];
-        if (!EditorListBuffer) {
-            internal_error("EditorListBuffer out of memory!!");
-        }
-    }
-    for (int i = 0; i < EDITOR_LIST_MAX_LENGTH * 10 + 10; i++) {
-        EditorListBuffer[i] = 0;
-    }
-
-    // Populate list
-    finame filename;
-    bool done = find_first("lgr/*.lgr", filename);
-    int list_length = 0;
-    while (!done) {
-        if (strlen(filename) > 14) {
-            internal_error("editor_window_choose_lgr strlen(filename) > 14");
-        }
-        char* cur_filename = &EditorListBuffer[list_length * 10];
-        strcpy(cur_filename, filename);
-        int i = 0;
-        while (cur_filename[i] != '.') {
-            if (!cur_filename[i]) {
-                internal_error(std::string("editor_window_choose_lgr level missing dot: ") +
-                               cur_filename);
-            }
-            i++;
-        }
-        cur_filename[i] = 0;
-        if (strlen(cur_filename) > MAX_FILENAME_LEN) {
-            internal_error("editor_window_choose_lgr strlen(cur_filename) > MAX_FILENAME_LEN");
-        }
-
-        done = find_next(filename);
-        list_length++;
-        if (list_length >= EDITOR_LIST_MAX_LENGTH) {
-            dialog("Number of files > 1000 in Pick LGR File dialog box!",
-                   "Could not load all the files!");
-            done = true;
-        }
-    }
-
-    find_close();
+    int list_length = populate_list("lgr/*.lgr", MAX_FILENAME_LEN);
 
     if (list_length < 1) {
         external_error("There are no LGR files (*.lgr) in the LGR directory!");
     }
 
-    sort_files(list_length);
-
-    int selected_index = 0;
-    for (int i = 0; i < list_length; i++) {
-        if (strcmpi(&EditorListBuffer[i * 10], lgrname) == 0) {
-            selected_index = i;
-        }
-    }
+    int selected_index = list_index(lgrname);
 
     // Display menu
     int max_visible_entries = 10;
@@ -1288,7 +1185,7 @@ bool editor_window_choose_lgr(char* lgrname) {
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
-            strcpy(lgrname, &EditorListBuffer[selected_index * 10]);
+            strcpy(lgrname, ListEntries[selected_index].c_str());
             return true;
         }
         if (was_key_down(DIK_UP)) {
@@ -1324,7 +1221,7 @@ bool editor_window_choose_lgr(char* lgrname) {
                     int index = (Mouy - ly1) / dy;
                     index += view_index;
                     if (index < list_length) {
-                        strcpy(lgrname, &EditorListBuffer[index * 10]);
+                        strcpy(lgrname, ListEntries[index].c_str());
                         return true;
                     }
                 }
@@ -1342,7 +1239,7 @@ bool editor_window_choose_lgr(char* lgrname) {
                                          EditorPalette_ListSelected);
                 }
                 Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                             &EditorListBuffer[(i + view_index) * 10]);
+                             ListEntries[i + view_index].c_str());
             }
             render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);

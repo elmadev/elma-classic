@@ -17,76 +17,27 @@
 #include "polygon.h"
 #include "util/util.h"
 #include "sprite.h"
+#include <algorithm>
 #include <cstring>
 #include <directinput/scancodes.h>
 #include <vector>
 
 std::vector<std::string> ListEntries;
 
-// Returns true if text1 is earlier in the alphabet than text2
-static int case_insensitive_lexicographical_compare(const char* text1, const char* text2) {
-    // If they differ only by case, we track which one had the precedence
-    int earlier_case1 = 0;
-    int earlier_case2 = 0;
-    while (true) {
-        char char1 = *text1;
-        char char2 = *text2;
-
-        if (!char1 && !char2) {
-            // Letters matched, maybe case difference decides:
-            if (earlier_case2) {
-                return 0;
-            }
-            return 1;
-        }
-
-        if (!char1) {
-            return 1;
-        }
-        if (!char2) {
-            return 0;
-        }
-
-        if (char1 >= 'a') {
-            char1 -= 'a' - 'A';
-        }
-        if (char2 >= 'a') {
-            char2 -= 'a' - 'A';
-        }
-        if (char1 == char2) {
-            if (!earlier_case1 && !earlier_case2) {
-                if (*text1 < *text2) {
-                    earlier_case1 = 1;
-                }
-                if (*text2 < *text1) {
-                    earlier_case2 = 1;
-                }
-            }
-        } else {
-            if (char1 < char2) {
-                return 1;
-            }
-            if (char2 < char1) {
-                return 0;
-            }
-        }
-
-        text1++;
-        text2++;
-    }
-}
-
 static void sort_files() {
-    int length = ListEntries.size();
-    for (int i = 0; i < length + 3; i++) {
-        for (int j = 0; j < length - 1; j++) {
-            std::string& file1 = ListEntries[j];
-            std::string& file2 = ListEntries[j + 1];
-            if (case_insensitive_lexicographical_compare(file2.c_str(), file1.c_str())) {
-                std::swap(file1, file2);
-            }
-        }
-    }
+    std::sort(ListEntries.begin(), ListEntries.end(),
+              [](const std::string& a, const std::string& b) {
+                  // Case-insensitive comparison
+                  int result = strcmpi(b.c_str(), a.c_str());
+                  if (result > 0) {
+                      return true;
+                  }
+                  if (result < 0) {
+                      return false;
+                  }
+                  // If identical, case-sensitive comparison
+                  return b > a;
+              });
 }
 
 static int populate_list(const char* pattern, int max_filename_length) {

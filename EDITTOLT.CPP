@@ -732,16 +732,8 @@ static void preview_picture(pic8* dest, picture* pict, int x, int y) {
     }
 
     // Trim width and height to be in-bounds
-    int width = pict->width;
-    int height = pict->height;
-    bool possibly_out_of_bounds = false;
-    if (x + width > dest->get_width()) {
-        width = dest->get_width() - x;
-        possibly_out_of_bounds = true;
-    }
-    if (y + height > dest->get_height()) {
-        height = dest->get_height() - y;
-    }
+    int width = std::min(pict->width, dest->get_width() - x);
+    int height = std::min(pict->height, dest->get_height() - y);
 
     // Draw picture
     int data_offset = 0;
@@ -757,14 +749,8 @@ static void preview_picture(pic8* dest, picture* pict, int x, int y) {
             j += skip;
 
             int count = read_varint(data, data_offset);
-            if (possibly_out_of_bounds) {
-                for (int j_offset = 0; j_offset < count; j_offset++) {
-                    if (j + j_offset < width) {
-                        row[j + j_offset] = LgrPaletteMap[data[data_offset + j_offset]];
-                    }
-                }
-            } else {
-                for (int j_offset = 0; j_offset < count; j_offset++) {
+            for (int j_offset = 0; j_offset < count; j_offset++) {
+                if (j + j_offset < width) {
                     row[j + j_offset] = LgrPaletteMap[data[data_offset + j_offset]];
                 }
             }

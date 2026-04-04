@@ -48,10 +48,18 @@ extern int Tool;
 
 // extern char Editfilenev[20]; // "nincsnev.lev" eseten meg nincs neve
 
-// extern unsigned char Feketeindex;
-extern unsigned char Feherszin;
-
-extern unsigned char Hatterindex;
+constexpr unsigned char Menulineszin = 0;
+constexpr unsigned char DIALOG_BORDER_PALETTE_ID = 0;
+constexpr unsigned char Menuszin = 1;
+constexpr unsigned char Menu_nyomottszin = 2;
+constexpr unsigned char Hatterindex = 3;
+constexpr unsigned char DIALOG_PALETTE_ID = 4;
+constexpr unsigned char EditorPalette_LevelNameDialog = 4;
+constexpr unsigned char EditorPalette_LevelNameDialogBorder = 5;
+constexpr unsigned char EditorPalette_List = 6;
+constexpr unsigned char EditorPalette_ListSelected = 7;
+constexpr unsigned char BUTTON_PALETTE_ID = 8;
+constexpr unsigned char Feherszin = 9;
 
 extern int Moux, Mouy;
 void push(); // levesz

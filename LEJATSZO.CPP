@@ -1,6 +1,7 @@
 #include "LEJATSZO.H"
 #include "EDITUJ.H"
 #include "eol/console.h"
+#include "eol/eol.h"
 #include "eol_settings.h"
 #include "keys.h"
 #include "flagtag.h"
@@ -655,6 +656,10 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         // Snap nyomas elintezese:
         if (was_game_key_just_pressed(State->key_screenshot)) {
             Legkozment = 1;
+        }
+
+        if (was_game_key_just_pressed(DIK_F5)) {
+            EolClient->set_table(eol::TableType::PlayersOnline);
         }
 
         // Vizsgalat kilepesre:

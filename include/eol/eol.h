@@ -23,16 +23,19 @@ class eol {
     void process(const kuski_logout&);
     void process(const kuski_set_level&);
 
-    enum class TableType { None };
+    enum class TableType { None, PlayersOnline };
     void set_table(TableType);
     void render_table(pic8& dest, abc8& title_font, abc8& data_font) const;
 
   private:
+    void sync_players_online_table();
+
     protocol proto;
     unsigned int id;
     unsigned int id2;
     std::vector<kuski> kuskis;
     eol_table* cur_table;
+    eol_table players_online_table;
 };
 
 extern eol* EolClient;

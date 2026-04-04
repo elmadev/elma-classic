@@ -35,6 +35,18 @@ bool is_in_box(int x, int y, box bx) {
     return x >= bx.x1 && x <= bx.x2 && y >= bx.y1 && y <= bx.y2;
 }
 
+// Return true if we clicked within the specified box
+bool clicked_box(box bx, Click click) {
+    if (click == Click::Left && !was_left_mouse_just_clicked()) {
+        return false;
+    }
+    if (click == Click::Right && !was_right_mouse_just_clicked()) {
+        return false;
+    }
+
+    return is_in_box(Moux, Mouy, bx);
+}
+
 // Show a dialog (editor-style).
 // DIALOG_BUTTONS is a special code for the next entries to be buttons
 // DIALOG_RETURN is a special code in the first button to immediately return and not wait for input

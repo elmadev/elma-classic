@@ -30,9 +30,15 @@ void render_box(pic8* pic, box bx, unsigned char fill_id, unsigned char border_i
     render_box(pic, bx.x1, bx.y1, bx.x2, bx.y2, fill_id, border_id);
 }
 
-// Return true if the coordinates are within the specified box
-bool is_in_box(int x, int y, box bx) {
-    return x >= bx.x1 && x <= bx.x2 && y >= bx.y1 && y <= bx.y2;
+// Return true if we clicked within the specified box
+bool clicked_box(box bx, Click click) {
+    if (click == Click::Left && !was_left_mouse_just_clicked()) {
+        return false;
+    }
+    if (click == Click::Right && !was_right_mouse_just_clicked()) {
+        return false;
+    }
+    return Moux >= bx.x1 && Moux <= bx.x2 && Mouy >= bx.y1 && Mouy <= bx.y2;
 }
 
 // Show a dialog (editor-style).

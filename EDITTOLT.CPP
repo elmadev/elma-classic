@@ -20,11 +20,6 @@
 #include <cstring>
 #include <directinput/scancodes.h>
 
-constexpr unsigned char EditorPalette_LevelNameDialog = 4;
-constexpr unsigned char EditorPalette_LevelNameDialogBorder = 5;
-constexpr unsigned char EditorPalette_List = 6;
-constexpr unsigned char EditorPalette_ListSelected = 7;
-
 constexpr int EDITOR_LIST_MAX_LENGTH = 1000;
 static char* EditorListBuffer = nullptr;
 

@@ -37,11 +37,6 @@ sprite* Psp = nullptr;
 
 int Valtozott = 0;
 
-static unsigned char Menulineszin = 0, Menuszin = 1, Menu_nyomottszin = 2;
-unsigned char Hatterindex = 3;
-unsigned char Feherszin = 9;
-// unsigned char Feketeindex = Hatterindex+128;
-
 palette* Pal_editor = nullptr;
 static unsigned char Pal_editor_byteok[768];
 

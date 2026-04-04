@@ -3,10 +3,6 @@
 
 class pic8;
 
-constexpr unsigned char DIALOG_PALETTE_ID = 4;
-constexpr unsigned char DIALOG_BORDER_PALETTE_ID = 0;
-constexpr unsigned char BUTTON_PALETTE_ID = 8;
-
 extern bool InEditor;
 
 #define DIALOG_BUTTONS "GOMBOK"

@@ -811,6 +811,8 @@ static void preview_texture(pic8* dest, texture* text, mask* msk, int x, int y) 
 
 static void editor_window_select_sprite_name(char* picture_name, char* texture_name,
                                              char* mask_name, int sprite_type) {
+    create_lgr_palette_map(Lgr->palette_data);
+
     char* name = nullptr;
     int list_length = 0;
     if (sprite_type == 1) {
@@ -1082,8 +1084,6 @@ void editor_window_choose_sprite() {
     if (!Lgr) {
         internal_error("editor_window_choose_sprite !Lgr!");
     }
-
-    create_lgr_palette_map(Lgr->palette_data);
 
     invalidateegesz();
 
@@ -1971,7 +1971,11 @@ void editor_window_level_properties() {
             }
             if (is_in_box(Moux, Mouy, box_foreground)) {
                 char null_name[10] = "";
-                editor_window_select_sprite_name(null_name, foreground_name, null_name, 2);
+                char mask_name[10] = "";
+                if (Lgr->get_mask_index("maskbig") >= 0) {
+                    strcpy(mask_name, "maskbig");
+                }
+                editor_window_select_sprite_name(null_name, foreground_name, mask_name, 2);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);
@@ -1980,7 +1984,11 @@ void editor_window_level_properties() {
             }
             if (is_in_box(Moux, Mouy, box_background)) {
                 char null_name[10] = "";
-                editor_window_select_sprite_name(null_name, background_name, null_name, 2);
+                char mask_name[10] = "";
+                if (Lgr->get_mask_index("maskbig") >= 0) {
+                    strcpy(mask_name, "maskbig");
+                }
+                editor_window_select_sprite_name(null_name, background_name, mask_name, 2);
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);

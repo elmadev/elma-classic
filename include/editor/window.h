@@ -1,5 +1,5 @@
-#ifndef EDITTOLT_H
-#define EDITTOLT_H
+#ifndef EDITOR_WINDOW_H
+#define EDITOR_WINDOW_H
 
 #include "object.h"
 #include "polygon.h"

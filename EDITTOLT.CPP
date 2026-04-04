@@ -1994,11 +1994,8 @@ void editor_window_level_properties() {
                 rerender = true;
             }
             if (is_in_box(Moux, Mouy, box_lgr)) {
-                finame belgrnev = "";
-                strcpy(belgrnev, lgr_name);
-                if (!editor_window_choose_lgr(lgr_name)) {
-                    strcpy(lgr_name, belgrnev);
-                }
+                editor_window_choose_lgr(lgr_name);
+
                 push();
                 blit8(BufferMain, BufferBall);
                 bltfront(BufferMain);

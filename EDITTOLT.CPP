@@ -174,23 +174,11 @@ static void draw_arrow(pic8* pic, box bx, unsigned char palette_id, bool up_arro
     }
 }
 
-void editor_window_open() {
-    invalidateegesz();
-
-    if (Valtozott) {
-        if (dialog("There are unsaved changes in the level file.",
-                   "If you open another file, you will loose these changes.",
-                   "Do you still want to continue?", DIALOG_BUTTONS, "Yes", "No") == 1) {
-            return;
-        }
-    }
-
+static std::string editor_window_list_levels(bool show_new_button) {
     int list_length = populate_list("lev/*.lev", MAX_FILENAME_LEN);
 
     if (list_length < 1) {
-        // Differs from editor_window_welcome()
-        dialog("There are no level files (*.lev) in the LEV directory!");
-        return;
+        return "";
     }
 
     std::string current_filename = State->editor_filename;
@@ -198,127 +186,6 @@ void editor_window_open() {
         current_filename.erase(current_filename.length() - 4);
     }
     int selected_index = list_index(current_filename);
-
-    // State->editor_filename[0] = 0; // This line exists in editor_window_welcome()
-
-    // Display menu
-    int max_visible_entries = 10;
-    int dy = 20;
-    int x1 = 200;
-    int y1 = 100;
-    int x2 = 401;
-    int y2 = 174 + max_visible_entries * dy;
-    int lx1 = x1 + 10;
-    int ly1 = y1 + 37;
-    int lx2 = lx1 + 100;
-    int ly2 = ly1 + max_visible_entries * dy;
-
-    box box_list = {lx1, ly1, lx2, ly2};
-    box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
-    box box_down = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
-    box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
-
-    int view_index = 0;
-    int view_index_prev = -1;
-    int selected_index_prev = 0;
-    empty_keypress_buffer();
-    while (true) {
-        handle_events();
-        if (was_key_just_pressed(DIK_ESCAPE)) {
-            return;
-        }
-        if (was_key_just_pressed(DIK_RETURN)) {
-            adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
-            open_level(ListEntries[selected_index].c_str());
-            return;
-        }
-        if (was_key_down(DIK_UP)) {
-            selected_index--;
-        }
-        if (was_key_down(DIK_PRIOR)) {
-            selected_index -= max_visible_entries - 1;
-        }
-        if (was_key_down(DIK_DOWN)) {
-            selected_index++;
-        }
-        if (was_key_down(DIK_NEXT)) {
-            selected_index += max_visible_entries - 1;
-        }
-        int wheel = get_mouse_wheel_delta();
-        if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
-            selected_index -= wheel;
-        }
-        if (was_left_mouse_just_clicked()) {
-            update_and_draw_cursor();
-            if (is_in_box(Moux, Mouy, box_down)) {
-                selected_index += max_visible_entries - 1;
-            }
-            if (is_in_box(Moux, Mouy, box_up)) {
-                selected_index -= max_visible_entries - 1;
-            }
-            if (is_in_box(Moux, Mouy, box_cancel)) {
-                return;
-            }
-            if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
-                if (Mouy < ly1 + dy * max_visible_entries) {
-                    int index = (Mouy - ly1) / dy;
-                    index += view_index;
-                    if (index < list_length) {
-                        open_level(ListEntries[index].c_str());
-                        return;
-                    }
-                }
-            }
-        }
-        adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
-        if (view_index != view_index_prev || selected_index != selected_index_prev) {
-            push();
-            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
-                       DIALOG_BORDER_PALETTE_ID);
-            for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
-                if (i + view_index == selected_index) {
-                    BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPalette_ListSelected);
-                }
-                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                             ListEntries[i + view_index].c_str());
-            }
-            render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
-            render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, false);
-            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
-                                  box_cancel.y1 + 15, "CANCEL");
-
-            bltfront(BufferMain, x1, y1, x2, y2);
-            pop();
-
-            view_index_prev = view_index;
-            selected_index_prev = selected_index;
-        }
-        update_and_draw_cursor();
-    }
-}
-
-void editor_window_welcome() {
-    invalidateegesz();
-
-    int list_length = populate_list("lev/*.lev", MAX_FILENAME_LEN);
-
-    if (list_length < 1) {
-        State->editor_filename[0] = 0; // Differs from editor_window_open()
-        return;
-    }
-
-    std::string current_filename = State->editor_filename;
-    if (current_filename.length() > 4) {
-        current_filename.erase(current_filename.length() - 4);
-    }
-    int selected_index = list_index(current_filename);
-
-    State->editor_filename[0] = 0; // This line deleted in editor_window_open()
 
     // Display menu
     int max_visible_entries = 10;
@@ -345,19 +212,11 @@ void editor_window_welcome() {
     while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            return;
+            return "";
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             adjust_list_view(selected_index, view_index, list_length, max_visible_entries);
-            // This part differs from editor_window_open()
-            const char* selected_filename = ListEntries[selected_index].c_str();
-            if (strlen(selected_filename) > MAX_FILENAME_LEN) {
-                internal_error(
-                    "editor_window_welcome strlen(selected_filename) > MAX_FILENAME_LEN");
-            }
-            strcpy(State->editor_filename, selected_filename);
-            strcat(State->editor_filename, ".lev");
-            return;
+            return ListEntries[selected_index];
         }
         if (was_key_down(DIK_UP)) {
             selected_index--;
@@ -384,26 +243,17 @@ void editor_window_welcome() {
                 selected_index -= max_visible_entries - 1;
             }
             if (is_in_box(Moux, Mouy, box_cancel)) {
-                return;
+                return "";
             }
-            if (is_in_box(Moux, Mouy, box_new)) {
-                State->editor_filename[0] = 0;
-                return;
+            if (show_new_button && is_in_box(Moux, Mouy, box_new)) {
+                return "";
             }
             if (Moux > lx1 && Moux < lx2 && Mouy > ly1 && Mouy < ly2) {
                 if (Mouy < ly1 + dy * max_visible_entries) {
                     int index = (Mouy - ly1) / dy;
                     index += view_index;
                     if (index < list_length) {
-                        // This part differs from editor_window_open()
-                        const char* selected_filename = ListEntries[index].c_str();
-                        if (strlen(selected_filename) > MAX_FILENAME_LEN) {
-                            internal_error("editor_window_welcome strlen(selected_filename) > "
-                                           "MAX_FILENAME_LEN");
-                        }
-                        strcpy(State->editor_filename, selected_filename);
-                        strcat(State->editor_filename, ".lev");
-                        return;
+                        return ListEntries[index];
                     }
                 }
             }
@@ -429,10 +279,11 @@ void editor_window_welcome() {
             render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                   box_cancel.y1 + 15, "CANCEL");
-            render_box(BufferMain, box_new, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            // NEW button does not exist in editor_window_open() (behaviour identical to Cancel)
-            Pabc2->write_centered(BufferMain, (box_new.x1 + box_new.x2) / 2, box_new.y1 + 15,
-                                  "NEW");
+            if (show_new_button) {
+                render_box(BufferMain, box_new, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+                Pabc2->write_centered(BufferMain, (box_new.x1 + box_new.x2) / 2, box_new.y1 + 15,
+                                      "NEW");
+            }
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();
@@ -442,6 +293,47 @@ void editor_window_welcome() {
         }
         update_and_draw_cursor();
     }
+}
+
+void editor_window_welcome() {
+    invalidateegesz();
+
+    std::string filename = editor_window_list_levels(true);
+
+    if (filename.length() > MAX_FILENAME_LEN) {
+        internal_error("editor_window_welcome strlen(selected_filename) > MAX_FILENAME_LEN");
+    }
+
+    if (filename.length() == 0) {
+        State->editor_filename[0] = 0;
+    } else {
+        strcpy(State->editor_filename, (filename + ".lev").c_str());
+    }
+}
+
+void editor_window_open() {
+    invalidateegesz();
+
+    if (Valtozott) {
+        if (dialog("There are unsaved changes in the level file.",
+                   "If you open another file, you will loose these changes.",
+                   "Do you still want to continue?", DIALOG_BUTTONS, "Yes", "No") == 1) {
+            return;
+        }
+    }
+
+    std::string filename = editor_window_list_levels(false);
+
+    if (ListEntries.size() < 1) {
+        dialog("There are no level files (*.lev) in the LEV directory!");
+        return;
+    }
+
+    if (filename.length() == 0) {
+        return;
+    }
+
+    open_level(filename.c_str());
 }
 
 void editor_new() {

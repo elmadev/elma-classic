@@ -2,10 +2,14 @@
 #define EOL_H
 
 #include "eol/eol_events.h"
+#include "eol/eol_table.h"
 #include "eol/null_protocol.h"
 #include <vector>
 
 using protocol = null_protocol;
+
+class abc8;
+class pic8;
 
 class eol {
   public:
@@ -19,11 +23,16 @@ class eol {
     void process(const kuski_logout&);
     void process(const kuski_set_level&);
 
+    enum class TableType { None };
+    void set_table(TableType);
+    void render_table(pic8& dest, abc8& title_font, abc8& data_font) const;
+
   private:
     protocol proto;
     unsigned int id;
     unsigned int id2;
     std::vector<kuski> kuskis;
+    eol_table* cur_table;
 };
 
 extern eol* EolClient;

@@ -6,6 +6,7 @@
 #include "canvas.h"
 #include "EDITUJ.H"
 #include "eol/console.h"
+#include "eol/eol.h"
 #include "eol/status_messages.h"
 #include "eol_settings.h"
 #include "flagtag.h"
@@ -908,6 +909,7 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
 
     Console->render(*npic, *SmallFont);
     StatusMessages->render(*npic, *SmallFont);
+    EolClient->render_table(*npic, *MediumFont, *SmallFont);
 
     // Mentes lemezre:
     menteshakell(npic);

@@ -13,7 +13,8 @@ static kuski* get_kuski(std::vector<kuski>& kuskis, unsigned int id) {
 }
 
 eol::eol()
-    : proto(*this) {}
+    : proto(*this),
+      cur_table(nullptr) {}
 
 void eol::process(const login& l) {
     if (l.success) {
@@ -38,4 +39,20 @@ void eol::process(const kuski_set_level& l) {
     }
 
     strncpy(k->level, (const char*)l.level, MAX_FILENAME_LEN);
+}
+
+void eol::set_table(TableType table) {
+    switch (table) {
+    case TableType::None:
+        cur_table = nullptr;
+        return;
+    }
+}
+
+void eol::render_table(pic8& dest, abc8& title_font, abc8& data_font) const {
+    if (!cur_table) {
+        return;
+    }
+
+    cur_table->render(dest, title_font, data_font, eol_table::Align::Center);
 }

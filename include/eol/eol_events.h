@@ -13,4 +13,9 @@ struct new_kuski {
     kuski k;
 };
 
+struct kuski_logout {
+    unsigned int id;
+    unsigned int id2;
+};
+
 #endif

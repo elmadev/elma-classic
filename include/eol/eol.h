@@ -16,6 +16,7 @@ class eol {
 
     void process(const login&);
     void process(const new_kuski&);
+    void process(const kuski_logout&);
 
   private:
     protocol proto;

@@ -15,3 +15,7 @@ void eol::process(const login& l) {
 }
 
 void eol::process(const new_kuski& nk) { kuskis.push_back(nk.k); }
+
+void eol::process(const kuski_logout& kl) {
+    std::erase_if(kuskis, [&kl](const kuski& k) { return k.id == kl.id || k.id == kl.id2; });
+}

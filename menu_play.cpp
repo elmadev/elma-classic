@@ -408,13 +408,15 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
 
         nav.select_row(default_choice);
 
-        int choice = nav.navigate();
+        while (true) {
+            int choice = nav.navigate();
 
-        if (choice < 0) {
-            return MenuLevel::Esc;
-        }
-        if (ret) {
-            return *ret;
+            if (choice < 0) {
+                return MenuLevel::Esc;
+            }
+            if (ret) {
+                return *ret;
+            }
         }
     }
 }

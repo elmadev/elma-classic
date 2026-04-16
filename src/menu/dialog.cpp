@@ -1,6 +1,6 @@
-#include "menu_dialog.h"
+#include "menu/dialog.h"
 #include "main.h"
-#include "menu_pic.h"
+#include "menu/pic.h"
 #include "platform_impl.h"
 #include <directinput/scancodes.h>
 

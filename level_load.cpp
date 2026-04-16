@@ -6,7 +6,7 @@
 #include "level.h"
 #include "lgr.h"
 #include "main.h"
-#include "menu_pic.h"
+#include "menu/pic.h"
 #include "physics_init.h"
 #include "platform_utils.h"
 #include "segments.h"

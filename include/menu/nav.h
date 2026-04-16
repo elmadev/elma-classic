@@ -1,7 +1,7 @@
 #ifndef MENU_NAV_H
 #define MENU_NAV_H
 
-#include "menu_pic.h"
+#include "menu/pic.h"
 #include <functional>
 #include <memory>
 #include <string>

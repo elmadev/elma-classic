@@ -3,8 +3,8 @@
 #include "eol_settings.h"
 #include "M_PIC.H"
 #include "main.h"
-#include "menu_intro.h"
-#include "menu_pic.h"
+#include "menu/intro.h"
+#include "menu/pic.h"
 #include "platform_impl.h"
 #include "util/util.h"
 #include <cstdio>

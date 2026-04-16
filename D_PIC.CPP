@@ -4,7 +4,7 @@
 #include "editor_canvas.h"
 #include "lgr.h"
 #include "main.h"
-#include "menu_pic.h"
+#include "menu/pic.h"
 #include "pic8.h"
 #include "platform_impl.h"
 

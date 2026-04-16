@@ -8,7 +8,7 @@
 #include "lgr.h"
 #include "main.h"
 #include "M_PIC.H"
-#include "menu_pic.h"
+#include "menu/pic.h"
 #include "object.h"
 #include "physics_init.h"
 #include "pic8.h"

@@ -1,6 +1,6 @@
 #include "skip.h"
 #include "main.h"
-#include "menu_pic.h"
+#include "menu/pic.h"
 #include "platform_utils.h"
 #include "state.h"
 #include <cstring>

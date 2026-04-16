@@ -1,9 +1,9 @@
-#include "menu_controls.h"
+#include "menu/controls.h"
 #include <directinput/scancodes.h>
 #include "eol_settings.h"
 #include "keys.h"
 #include "main.h"
-#include "menu_nav.h"
+#include "menu/nav.h"
 #include "platform_impl.h"
 #include "state.h"
 #include <cstring>

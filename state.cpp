@@ -2,7 +2,7 @@
 #include "eol_settings.h"
 #include "level.h"
 #include "main.h"
-#include "menu_dialog.h"
+#include "menu/dialog.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cstring>

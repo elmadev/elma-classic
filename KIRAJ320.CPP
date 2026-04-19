@@ -36,38 +36,38 @@ int GAME_BACKGROUND_RENDER_SET_VALUE = 10;
 static abc8* SmallFont = nullptr;
 static abc8* MediumFont = nullptr;
 
-static double Kepmeret = 1.0;
+static double VisibleFraction = 1.0;
 
-static double Szorzo = 1.1;
+static double VISIBLE_FRACTION_SCALING_FACTOR = 1.1;
 void increase_view_size() {
-    Kepmeret *= Szorzo;
-    if (Kepmeret >= 0.999) {
-        Kepmeret = 1.0;
+    VisibleFraction *= VISIBLE_FRACTION_SCALING_FACTOR;
+    if (VisibleFraction >= 0.999) {
+        VisibleFraction = 1.0;
     }
     GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
 }
 
 void decrease_view_size() {
-    Kepmeret /= Szorzo;
-    if (Kepmeret < 0.7) {
-        Kepmeret = 0.7;
+    VisibleFraction /= VISIBLE_FRACTION_SCALING_FACTOR;
+    if (VisibleFraction < 0.7) {
+        VisibleFraction = 0.7;
     }
     GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
 }
 
 // Kirajzolando terulet nagysaga:
-static int Cx1 = 0, Cy1 = 0, Cx2 = SCREEN_WIDTH - 1, Cy2 = SCREEN_HEIGHT - 1, Cy1Bplayer = 0,
-           Cy2Bplayer = 0;
+static int GameViewLeft = 0, GameViewBottom1 = 0, GameViewRight = SCREEN_WIDTH - 1,
+           GameViewTop1 = SCREEN_HEIGHT - 1, GameViewBottom2 = 0, GameViewTop2 = 0;
 int GameViewWidth = SCREEN_WIDTH, GameViewHeight = SCREEN_HEIGHT;
 
 // Motoros kepernyo mely reszen helyezkedik el:
-static double Mo_y = 0.0, Mo_bal = 0.0, Mo_dx = 0.0;
+static double CameraY = 0.0, CameraX = 0.0, CameraDx = 0.0;
 
 double AffinePicScreenLeft, AffinePicScreenRight, AffinePicScreenBottom, AffinePicScreenTop;
 
 // View ablak meretei:
-static int Viewxsize, Viewysize;
-static int Viewxorig, Viewxtolas;
+static int MinimapWidth, MinimapHeight;
+static int MinimapX, MinimapDx;
 
 affine_pic* shirt = nullptr;
 
@@ -102,28 +102,29 @@ void init_renderer() {
     StatusMessages = new status_messages();
 }
 
-void beallitmereteket(int splitscreen) {
-    Cy1Bplayer = 100, Cy2Bplayer = 200;
+void calculate_viewpoints(int splitscreen) {
+    GameViewBottom2 = 100, GameViewTop2 = 200;
 
-    GameViewWidth = (int)(SCREEN_WIDTH * Kepmeret);
-    GameViewHeight = (int)(SCREEN_HEIGHT * Kepmeret);
-    Cx1 = (SCREEN_WIDTH - GameViewWidth) / 2;
-    Cy1 = (SCREEN_HEIGHT - GameViewHeight) / 2;
-    Cx2 = Cx1 + GameViewWidth - 1;
-    Cy2 = Cy1 + GameViewHeight - 1;
+    GameViewWidth = (int)(SCREEN_WIDTH * VisibleFraction);
+    GameViewHeight = (int)(SCREEN_HEIGHT * VisibleFraction);
+    GameViewLeft = (SCREEN_WIDTH - GameViewWidth) / 2;
+    GameViewBottom1 = (SCREEN_HEIGHT - GameViewHeight) / 2;
+    GameViewRight = GameViewLeft + GameViewWidth - 1;
+    GameViewTop1 = GameViewBottom1 + GameViewHeight - 1;
     if (splitscreen) {
         GameViewHeight = (SCREEN_HEIGHT / 2) - 6;
-        Cy1 = (SCREEN_HEIGHT / 2) + 6; // Mivel kep fejjel lefele van, forditva vannak koordok
-        Cy2 = SCREEN_HEIGHT - 1;       // Vagyis A player van felul, B pedig lent
-        Cy1Bplayer = 0;
-        Cy2Bplayer = (SCREEN_HEIGHT / 2) - 7;
+        GameViewBottom1 =
+            (SCREEN_HEIGHT / 2) + 6;      // Mivel kep fejjel lefele van, forditva vannak koordok
+        GameViewTop1 = SCREEN_HEIGHT - 1; // Vagyis A player van felul, B pedig lent
+        GameViewBottom2 = 0;
+        GameViewTop2 = (SCREEN_HEIGHT / 2) - 7;
     }
 #ifdef DEBUG
-    if (Cx2 >= SCREEN_WIDTH) {
-        internal_error("beallitmereteket Cx2 >= SCREEN_WIDTH!");
+    if (GameViewRight >= SCREEN_WIDTH) {
+        internal_error("calculate_viewpoints GameViewRight >= SCREEN_WIDTH!");
     }
-    if (Cy2 >= SCREEN_HEIGHT) {
-        internal_error("beallitmereteket Cy2 >= SCREEN_HEIGHT!");
+    if (GameViewTop1 >= SCREEN_HEIGHT) {
+        internal_error("calculate_viewpoints GameViewTop1 >= SCREEN_HEIGHT!");
     }
 #endif
 
@@ -135,19 +136,19 @@ void beallitmereteket(int splitscreen) {
 
     // Motoros kepernyo mely reszen helyezkedik el:
     if (EolSettings->center_camera()) {
-        Mo_bal = (GameViewWidth / MetersToPixels) * 0.50;
+        CameraX = (GameViewWidth / MetersToPixels) * 0.50;
     } else {
-        Mo_bal = (SCREEN_WIDTH / MetersToPixels) * 0.15 * EolSettings->zoom();
+        CameraX = (SCREEN_WIDTH / MetersToPixels) * 0.15 * EolSettings->zoom();
     }
-    Mo_dx = GameViewWidth / MetersToPixels - 2.0 * Mo_bal;
-    Mo_y = GameViewHeight / MetersToPixels / 2.0;
+    CameraDx = GameViewWidth / MetersToPixels - 2.0 * CameraX;
+    CameraY = GameViewHeight / MetersToPixels / 2.0;
 
-    Viewxsize =
+    MinimapWidth =
         (int)(EolSettings->minimap_width() * sqrt(double(GameViewHeight) / double(SCREEN_HEIGHT)));
-    Viewysize =
+    MinimapHeight =
         (int)(EolSettings->minimap_height() * sqrt(double(GameViewHeight) / double(SCREEN_HEIGHT)));
-    Viewxorig = (int)(40.0 * (Kepmeret - 0.6) / 0.4);
-    Viewxtolas = GameViewWidth - 2 * Viewxorig - Viewxsize;
+    MinimapX = (int)(40.0 * (VisibleFraction - 0.6) / 0.4);
+    MinimapDx = GameViewWidth - 2 * MinimapX - MinimapWidth;
 }
 
 // v1 iranyabol v2 fele interpolal:
@@ -157,69 +158,71 @@ void beallitmereteket(int splitscreen) {
 } */
 
 // Meg nem affin koordok:
-static void kidoboz(vect2 a, vect2 b, pic8* ppic8, double szelesseg, affine_pic* pk, double tulloga,
-                    double tullogb, int tukor = 0) {
-    vect2 vegys = unit_vector(b - a);
-    b = b + vegys * tullogb;
-    a = a - vegys * tulloga;
-    vect2 v = b - a;
-    vect2 v2fel;
-    if (tukor) {
-        v2fel = rotate_90deg(vegys) * szelesseg;
+static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, affine_pic* affine,
+                              double a_stretch, double b_stretch, int flip = 0) {
+    vect2 i = unit_vector(b - a);
+    b = b + i * b_stretch;
+    a = a - i * a_stretch;
+    vect2 u = b - a;
+    vect2 v;
+    if (flip) {
+        v = rotate_90deg(i) * height;
     } else {
-        v2fel = rotate_minus90deg(vegys) * szelesseg;
+        v = rotate_minus90deg(i) * height;
     }
-    a = a - v2fel;
+    a = a - v;
 
     a.x *= MetersToPixels;
     a.y *= MetersToPixels;
+    u.x *= MetersToPixels;
+    u.y *= MetersToPixels;
     v.x *= MetersToPixels;
     v.y *= MetersToPixels;
-    v2fel.x *= MetersToPixels;
-    v2fel.y *= MetersToPixels;
-    draw_affine_pic(ppic8, pk, v, v2fel * 2.0, a);
+    draw_affine_pic(dest, affine, u, v * 2.0, a);
 }
 
 // radius meg nincs megszorozva:
 // Meg nem affin koordok:
-static void kidobozkerek(vect2 r, double radius, double rotation, pic8* ppicbuffer, affine_pic* pk,
-                         int tukor = 0) {
-    vect2 vfel(cos(rotation) * radius, sin(rotation) * radius);
-    if (tukor) {
-        kidoboz(r + vfel, r - vfel, ppicbuffer, radius, pk, 0.0, 0.0, tukor);
+static void render_rigidbody(vect2 r, double radius, double rotation, pic8* dest,
+                             affine_pic* affine, int flip = 0) {
+    vect2 direction(cos(rotation) * radius, sin(rotation) * radius);
+    if (flip) {
+        render_affine_pic(r + direction, r - direction, dest, radius, affine, 0.0, 0.0, flip);
     } else {
-        kidoboz(r - vfel, r + vfel, ppicbuffer, radius, pk, 0.0, 0.0, tukor);
+        render_affine_pic(r - direction, r + direction, dest, radius, affine, 0.0, 0.0, flip);
     }
 }
 
-static double Mx = -1, My = -1;
-static vect2 Mi, Mj, Mr;
-static vect2 Miar, Mjar, Mrar; // Ezek meg vannak szorozva Aranyossaggal
+static double BikeFrameX = -1, BikeFrameY = -1;
+static vect2 BikeFrameI, BikeFrameJ, BikeFrameR;
+static vect2 BikeFrameIPixels, BikeFrameJPixels,
+    BikeFrameRPixels; // Ezek meg vannak szorozva Aranyossaggal
 
-static void kitag(pic8* ppic8, affine_pic* pk, bike_box* pb) {
-    vect2 r = Miar * (pb->x1 + 260 - Mx) + Mjar * (My - (pb->y1 + 260)) + Mrar;
-    vect2 u = Miar * (pb->x2 - pb->x1);
-    vect2 v = Mjar * (pb->y1 - pb->y2);
+static void render_bike_part(pic8* dest, affine_pic* part, bike_box* box) {
+    vect2 r = BikeFrameIPixels * (box->x1 + 260 - BikeFrameX) +
+              BikeFrameJPixels * (BikeFrameY - (box->y1 + 260)) + BikeFrameRPixels;
+    vect2 u = BikeFrameIPixels * (box->x2 - box->x1);
+    vect2 v = BikeFrameJPixels * (box->y1 - box->y2);
 
-    draw_affine_pic(ppic8, pk, u, v, r);
+    draw_affine_pic(dest, part, u, v, r);
 }
 
-static void kigyuru(pic8* ppic8, int x, int y, unsigned char szin) {
+static void render_minimap_icon(pic8* pic, int x, int y, unsigned char palette_id) {
 #ifdef DEBUG
-    if (x < 1 || x >= ppic8->get_width() - 1 || y < 1 || y >= ppic8->get_height() - 1) {
-        internal_error("kigyuru-ben x, vagy y lelog!");
+    if (x < 1 || x >= pic->get_width() - 1 || y < 1 || y >= pic->get_height() - 1) {
+        internal_error("render_minimap_icon out of bounds!");
     }
 #endif
-    unsigned char* sor = ppic8->get_row(y - 1);
-    sor[x - 1] = szin;
-    sor[x] = szin;
-    sor[x + 1] = szin;
-    sor = ppic8->get_row(y + 1);
-    sor[x - 1] = szin;
-    sor[x] = szin;
-    sor[x + 1] = szin;
-    ppic8->ppixel(x - 1, y, szin);
-    ppic8->ppixel(x + 1, y, szin);
+    unsigned char* row = pic->get_row(y - 1);
+    row[x - 1] = palette_id;
+    row[x] = palette_id;
+    row[x + 1] = palette_id;
+    row = pic->get_row(y + 1);
+    row[x - 1] = palette_id;
+    row[x] = palette_id;
+    row[x + 1] = palette_id;
+    pic->ppixel(x - 1, y, palette_id);
+    pic->ppixel(x + 1, y, palette_id);
 }
 
 /* Most nincsen felho:
@@ -244,20 +247,22 @@ static void felhokfel( int x, int y, pic8* ppicbuffer, pic8* pfelho,
     }
 } */
 
-static void kiview(bool ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, motorst* pmot2) {
+static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, vect2 bike_center,
+                           motorst* other_motor) {
 
-    double Viewxsize_d = Viewxsize * MinimapScaleFactor * PixelsToMeters;
-    double Viewysize_d = Viewysize * MinimapScaleFactor * PixelsToMeters;
+    double minimap_width = MinimapWidth * MinimapScaleFactor * PixelsToMeters;
+    double minimap_height = MinimapHeight * MinimapScaleFactor * PixelsToMeters;
 
-    double szeltoltav = EolSettings->center_map() ? 0.5 : 0.2;
-    double atfuthossz = 1.0 - 2.0 * szeltoltav;
-    vect2 sarokbolkozepre(Viewxsize_d * (szeltoltav + baljobb * atfuthossz), Viewysize_d / 2);
-    vect2 sarok = motorkozep - sarokbolkozepre;
+    double camera_x = EolSettings->center_map() ? 0.5 : 0.2;
+    double camera_dx = 1.0 - 2.0 * camera_x;
+    vect2 camera_pos(minimap_width * (camera_x + camera_turn_phase * camera_dx),
+                     minimap_height / 2);
+    vect2 bottomleft_corner = bike_center - camera_pos;
 
     double align;
     switch (EolSettings->map_alignment()) {
     case MapAlignment::None:
-        align = baljobb;
+        align = camera_turn_phase;
         break;
     case MapAlignment::Left:
         align = 0.0;
@@ -269,18 +274,18 @@ static void kiview(bool ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, 
         align = 1.0;
         break;
     }
-    int vx1 = (int)(Viewxorig + align * Viewxtolas);
-    int vx2 = vx1 + Viewxsize - 1;
-    int vy1 = 1;
-    int vy2 = vy1 + Viewysize - 1;
+    int minimap_x1 = (int)(MinimapX + align * MinimapDx);
+    int minimap_x2 = minimap_x1 + MinimapWidth - 1;
+    int minimap_y1 = 1;
+    int minimap_y2 = minimap_y1 + MinimapHeight - 1;
 
     int opacity = EolSettings->minimap_opacity();
 
     // Save game scene pixels under the minimap area (including 1px border margin)
-    int save_x1 = vx1 - 1;
-    int save_y1 = vy1 - 1;
-    int save_x2 = vx2 + 1;
-    int save_y2 = vy2 + 1;
+    int save_x1 = minimap_x1 - 1;
+    int save_y1 = minimap_y1 - 1;
+    int save_x2 = minimap_x2 + 1;
+    int save_y2 = minimap_y2 + 1;
     int save_w = save_x2 - save_x1 + 1;
     int save_h = save_y2 - save_y1 + 1;
     static pic8* save_pic = nullptr;
@@ -289,98 +294,104 @@ static void kiview(bool ajatekos, pic8* ppic, double baljobb, vect2 motorkozep, 
             delete save_pic;
             save_pic = new pic8(save_w, save_h);
         }
-        blit8(save_pic, ppic, 0, 0, save_x1, save_y1, save_x2, save_y2);
+        blit8(save_pic, pic, 0, 0, save_x1, save_y1, save_x2, save_y2);
     }
 
-    CanvasMinimap->render_minimap(ajatekos, ppic, sarok, vx1, vy1, vx2, vy2);
+    CanvasMinimap->render_minimap(player1, pic, bottomleft_corner, minimap_x1, minimap_y1,
+                                  minimap_x2, minimap_y2);
 
     // Most kirajzoljuk food-okat:
-    int balalsox, balalsoy;
-    CanvasMinimap->meters_to_pixels(sarok, &balalsox, &balalsoy);
-    int objminx = balalsox;
-    int objminy = balalsoy;
-    int objmaxx = balalsox + Viewxsize - 1;
-    int objmaxy = balalsoy + Viewysize - 1;
+    int corner_x, corner_y;
+    CanvasMinimap->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
+    int object_border_left = corner_x;
+    int object_border_bottom = corner_y;
+    int object_border_right = corner_x + MinimapWidth - 1;
+    int object_border_top = corner_y + MinimapHeight - 1;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* pker = Ptop->objects[i];
-        if (!pker) {
+        object* obj = Ptop->objects[i];
+        if (!obj) {
             break;
         }
 
-        int kell1 = pker->type == object::Type::Food && pker->active;
-        int kell2 = (Single || !Tag) && pker->type == object::Type::Exit;
+        int draw_food = obj->type == object::Type::Food && obj->active;
+        int draw_exit = (Single || !Tag) && obj->type == object::Type::Exit;
 
-        if (!kell1 && !kell2) {
+        if (!draw_food && !draw_exit) {
             continue;
         }
 
-        if (pker->minimap_canvas_x < objminx || pker->minimap_canvas_y < objminy ||
-            pker->minimap_canvas_x > objmaxx || pker->minimap_canvas_y > objmaxy) {
+        if (obj->minimap_canvas_x < object_border_left ||
+            obj->minimap_canvas_y < object_border_bottom ||
+            obj->minimap_canvas_x > object_border_right ||
+            obj->minimap_canvas_y > object_border_top) {
             continue;
         }
 
         // Potty kirajzolasa View ablakba:
-        if (pker->type == object::Type::Food) {
-            kigyuru(ppic, pker->minimap_canvas_x - balalsox + vx1,
-                    pker->minimap_canvas_y - balalsoy + vy1, Lgr->minimap_food_palette_id);
+        if (obj->type == object::Type::Food) {
+            render_minimap_icon(pic, obj->minimap_canvas_x - corner_x + minimap_x1,
+                                obj->minimap_canvas_y - corner_y + minimap_y1,
+                                Lgr->minimap_food_palette_id);
         } else {
-            kigyuru(ppic, pker->minimap_canvas_x - balalsox + vx1,
-                    pker->minimap_canvas_y - balalsoy + vy1, Lgr->minimap_exit_palette_id);
+            render_minimap_icon(pic, obj->minimap_canvas_x - corner_x + minimap_x1,
+                                obj->minimap_canvas_y - corner_y + minimap_y1,
+                                Lgr->minimap_exit_palette_id);
         }
     }
 
     // Most kirajzoljuk motorost:
     // Eldontjuk szineket:
-    unsigned char viewindex1 = Lgr->minimap_bike1_palette_id;
-    unsigned char viewindex2 = Lgr->minimap_bike2_palette_id;
-    if ((State->player1_bike1 && !ajatekos) || (!State->player1_bike1 && ajatekos)) {
-        viewindex1 = Lgr->minimap_bike2_palette_id;
-        viewindex2 = Lgr->minimap_bike1_palette_id;
+    unsigned char bike1_id = Lgr->minimap_bike1_palette_id;
+    unsigned char bike2_id = Lgr->minimap_bike2_palette_id;
+    if ((State->player1_bike1 && !player1) || (!State->player1_bike1 && player1)) {
+        bike1_id = Lgr->minimap_bike2_palette_id;
+        bike2_id = Lgr->minimap_bike1_palette_id;
     }
 
     // Most kirajzoljuk masik (hatso) motorost:
-    if (pmot2) {
-        vect2 sarokrel = pmot2->bike.r - sarok;
-        int mx = (int)(sarokrel.x * MetersToMinimapPixels + vx1);
-        int my = (int)(sarokrel.y * MetersToMinimapPixels + vy1);
-        if (mx >= vx1 && mx <= vx2 && my >= vy1 && my <= vy2) {
-            kigyuru(ppic, mx, my, viewindex2);
+    if (other_motor) {
+        vect2 other_pos = other_motor->bike.r - bottomleft_corner;
+        int other_x = (int)(other_pos.x * MetersToMinimapPixels + minimap_x1);
+        int other_y = (int)(other_pos.y * MetersToMinimapPixels + minimap_y1);
+        if (other_x >= minimap_x1 && other_x <= minimap_x2 && other_y >= minimap_y1 &&
+            other_y <= minimap_y2) {
+            render_minimap_icon(pic, other_x, other_y, bike2_id);
         }
     }
 
     // Most kirajzoljuk elso motorost:
-    int mx = (int)(sarokbolkozepre.x * MetersToMinimapPixels);
-    int my = (int)(sarokbolkozepre.y * MetersToMinimapPixels);
-    kigyuru(ppic, vx1 + mx, vy1 + my, viewindex1);
+    int bike_x = (int)(camera_pos.x * MetersToMinimapPixels);
+    int bike_y = (int)(camera_pos.y * MetersToMinimapPixels);
+    render_minimap_icon(pic, minimap_x1 + bike_x, minimap_y1 + bike_y, bike1_id);
 
     // Kirajzoljuk keretet:
-    vx1--;
-    vy1--;
-    vx2++;
-    vy2++;
-    for (int y = vy1; y <= vy2; y++) {
-        ppic->ppixel(vx1, y, Lgr->minimap_border_palette_id);
-        ppic->ppixel(vx2, y, Lgr->minimap_border_palette_id);
+    minimap_x1--;
+    minimap_y1--;
+    minimap_x2++;
+    minimap_y2++;
+    for (int y = minimap_y1; y <= minimap_y2; y++) {
+        pic->ppixel(minimap_x1, y, Lgr->minimap_border_palette_id);
+        pic->ppixel(minimap_x2, y, Lgr->minimap_border_palette_id);
     }
-    unsigned char* sor = ppic->get_row(vy1) + vx1 + 1;
-    memset(sor, Lgr->minimap_border_palette_id, Viewxsize);
-    sor = ppic->get_row(vy2) + vx1 + 1;
-    memset(sor, Lgr->minimap_border_palette_id, Viewxsize);
+    unsigned char* row = pic->get_row(minimap_y1) + minimap_x1 + 1;
+    memset(row, Lgr->minimap_border_palette_id, MinimapWidth);
+    row = pic->get_row(minimap_y2) + minimap_x1 + 1;
+    memset(row, Lgr->minimap_border_palette_id, MinimapWidth);
 
     // bring back pixels from the saved game scene based on opacity
     if (opacity < 100) {
-        blit8_dither(ppic, save_pic, save_x1, save_y1, opacity);
+        blit8_dither(pic, save_pic, save_x1, save_y1, opacity);
     }
 }
 
 // Mentes lemezre:
-static void menteshakell(pic8* ppic) {
+static void handle_screenshot(pic8* pic) {
     if (VideoRecordingMode) {
-        std::string filenameStr = std::format("snp{:05}.pcx", VideoFrameIndex);
-        std::filesystem::path filename = std::filesystem::path(VideoOutputDirectory) / filenameStr;
-        ppic->vertical_flip();
-        ppic->save(filename.string().c_str(), Lgr->palette_data);
-        ppic->vertical_flip();
+        std::string filename = std::format("snp{:05}.pcx", VideoFrameIndex);
+        std::filesystem::path path = std::filesystem::path(VideoOutputDirectory) / filename;
+        pic->vertical_flip();
+        pic->save(path.string().c_str(), Lgr->palette_data);
+        pic->vertical_flip();
         return;
     }
 
@@ -388,11 +399,11 @@ static void menteshakell(pic8* ppic) {
         Legkozment = 0;
         int i = 0;
         while (1) {
-            std::string filenev = std::format("snp{:05}.pcx", i);
-            if (!std::filesystem::exists(filenev)) {
-                ppic->vertical_flip();
-                ppic->save(filenev.c_str(), Lgr->palette_data);
-                ppic->vertical_flip();
+            std::string filename = std::format("snp{:05}.pcx", i);
+            if (!std::filesystem::exists(filename)) {
+                pic->vertical_flip();
+                pic->save(filename.c_str(), Lgr->palette_data);
+                pic->vertical_flip();
                 break;
             }
             i++;
@@ -400,7 +411,7 @@ static void menteshakell(pic8* ppic) {
     }
 }
 
-static void kitolthatteret(pic8* ppic) {
+static void render_background(pic8* pic) {
     int y = 0;
     while (y < SCREEN_HEIGHT) {
         int x = 0;
@@ -410,7 +421,7 @@ static void kitolthatteret(pic8* ppic) {
 
             // extern int Debugblt;
             // Debugblt = 1;
-            blit8(ppic, Lgr->qframe, x, y);
+            blit8(pic, Lgr->qframe, x, y);
             // Debugblt = 0;
             //  internal_error( "Itt van 20!" ); idejott
             x += Lgr->qframe->get_width();
@@ -426,385 +437,396 @@ static void kitolthatteret(pic8* ppic) {
 int Voltkilogas = 0;
 #endif
 
-static void kibike(int ajatekos, pic8* ppic, double t, vect2 sarok, motorst* pmot, valtozok* pvalt,
-                   bike_pics* pmk, affine_pic* shirt) {
+static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_corner, motorst* mot,
+                        valtozok* metadata, bike_pics* bike, affine_pic* shirt) {
 
     // Mivel ezeket fv megvaltoztatja:
-    double ugrasnagysag = pvalt->ugrasnagysag;
-    double forgas = pvalt->baljobbv_f.forgas;
+    double arm_position = metadata->ugrasnagysag;
+    double turn_phase = metadata->baljobbv_f.forgas;
 
-    // if( pvalt->baljobb < 0 || pvalt->baljobb > 1.0 )
-    //     internal_error( "pvalt->baljobb < 0 || pvalt->baljobb > 1.0!" );
-    // if( forgas < 0.0 || forgas > 1.0 )
-    //     internal_error( "forgas < 0.0 || forgas > 1.0!" );
+    // if( metadata->baljobb < 0 || metadata->baljobb > 1.0 )
+    //     internal_error( "metadata->baljobb < 0 || metadata->baljobb > 1.0!" );
+    // if( turn_phase < 0.0 || turn_phase > 1.0 )
+    //     internal_error( "turn_phase < 0.0 || turn_phase > 1.0!" );
 
     // Ha kell affinitassal torodni:
-    int vanforgas = 0;
+    int is_turning = 0;
     StretchEnabled = false;
-    if (forgas < 0.999) {
-        vanforgas = 1;
+    if (turn_phase < 0.999) {
+        is_turning = 1;
         // forgast 0, 1 intervallumbol atkonvertaljuk -1, 1 intervallumba:
-        forgas = -cos(forgas * PI);
+        turn_phase = -cos(turn_phase * PI);
     }
 
-    vect2 p_k1 = (pmot->left_wheel.r - sarok);
-    vect2 p_k2 = (pmot->right_wheel.r - sarok);
+    vect2 left_wheel_r = (mot->left_wheel.r - bottomleft_corner);
+    vect2 right_wheel_r = (mot->right_wheel.r - bottomleft_corner);
 
-    int elsokerekrogton = 1;
-    int hatsokerekrogton = 1;
+    int left_wheel_in_back = 1;
+    int right_wheel_in_back = 1;
 
-    if (vanforgas) {
-        if ((forgas > 0.0 && !pmot->flipped_bike) || (forgas <= 0.0 && pmot->flipped_bike)) {
-            elsokerekrogton = 0;
+    if (is_turning) {
+        if ((turn_phase > 0.0 && !mot->flipped_bike) || (turn_phase <= 0.0 && mot->flipped_bike)) {
+            left_wheel_in_back = 0;
         } else {
-            hatsokerekrogton = 0;
+            right_wheel_in_back = 0;
         }
     }
 
     // Kerekek:
-    if (elsokerekrogton) {
-        kidobozkerek(p_k1, WheelBackgroundRenderRadius, pmot->left_wheel.rotation, ppic,
-                     pmk->wheel);
+    if (left_wheel_in_back) {
+        render_rigidbody(left_wheel_r, WheelBackgroundRenderRadius, mot->left_wheel.rotation, pic,
+                         bike->wheel);
     }
-    if (hatsokerekrogton) {
-        kidobozkerek(p_k2, WheelBackgroundRenderRadius, pmot->right_wheel.rotation, ppic,
-                     pmk->wheel);
+    if (right_wheel_in_back) {
+        render_rigidbody(right_wheel_r, WheelBackgroundRenderRadius, mot->right_wheel.rotation, pic,
+                         bike->wheel);
     }
 
-    vect2 kozep = pmot->bike.r - sarok;
-    vect2 jobbra = vect2(cos(pmot->bike.rotation), sin(pmot->bike.rotation));
-    vect2 fel = rotate_90deg(jobbra);
+    vect2 bike_r = mot->bike.r - bottomleft_corner;
+    vect2 bike_i = vect2(cos(mot->bike.rotation), sin(mot->bike.rotation));
+    vect2 bike_j = rotate_90deg(bike_i);
 
-    if (vanforgas) {
+    if (is_turning) {
         StretchEnabled = true;
-        set_stretch_parameters(kozep, jobbra, forgas, MetersToPixels);
+        set_stretch_parameters(bike_r, bike_i, turn_phase, MetersToPixels);
     }
 
-    if (pmot->flipped_bike) {
-        jobbra = Vect2null - jobbra;
-        vect2 tmpv = p_k1;
-        p_k1 = p_k2;
-        p_k2 = tmpv;
+    if (mot->flipped_bike) {
+        bike_i = Vect2null - bike_i;
+        vect2 tmpv = left_wheel_r;
+        left_wheel_r = right_wheel_r;
+        right_wheel_r = tmpv;
     }
 
-    Mx = 390.0, My = 420.0;
-    double malfa = 0.62;
-    double mmeret = 0.0045;
-    Mi = jobbra * (mmeret * cos(malfa)) + fel * (mmeret * sin(malfa));
-    Mj = rotate_90deg(Mi);
-    if (pmot->flipped_bike) {
-        Mj = Vect2null - Mj;
+    BikeFrameX = 390.0, BikeFrameY = 420.0;
+    double BIKE_FRAME_ROTATION = 0.62;
+    double BIKE_FRAME_WIDTH = 0.0045;
+    BikeFrameI = bike_i * (BIKE_FRAME_WIDTH * cos(BIKE_FRAME_ROTATION)) +
+                 bike_j * (BIKE_FRAME_WIDTH * sin(BIKE_FRAME_ROTATION));
+    BikeFrameJ = rotate_90deg(BikeFrameI);
+    if (mot->flipped_bike) {
+        BikeFrameJ = Vect2null - BikeFrameJ;
     }
-    Mr = kozep;
-    // Most MetersToPixels-t betesszuk Mi, Mj, Mr-be:
-    Miar = Mi * MetersToPixels;
-    Mjar = Mj * MetersToPixels;
-    Mrar = Mr * MetersToPixels;
+    BikeFrameR = bike_r;
+    // Most MetersToPixels-t betesszuk BikeFrameI, BikeFrameJ, BikeFrameR-be:
+    BikeFrameIPixels = BikeFrameI * MetersToPixels;
+    BikeFrameJPixels = BikeFrameJ * MetersToPixels;
+    BikeFrameRPixels = BikeFrameR * MetersToPixels;
 
     // Elso felfuggesztes:
-    vect2 p_fogantyu = Mi * (365.0 - Mx) + Mj * (My - 292.0) + Mr; // Uj
-    kidoboz(p_k1, p_fogantyu, ppic, 0.06, pmk->susp1, 0.05, 0.03);
+    vect2 susp1_r =
+        BikeFrameI * (365.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 292.0) + BikeFrameR; // Uj
+    render_affine_pic(left_wheel_r, susp1_r, pic, 0.06, bike->susp1, 0.05, 0.03);
 
     // Hatso felfuggesztes:
-    vect2 p_darab2 = Mi * (370.0 - Mx) + Mj * (My - 520.0) + Mr;
-    kidoboz(p_darab2, p_k2, ppic, 0.06, pmk->susp2, 0.0, 0.1);
+    vect2 susp2_r =
+        BikeFrameI * (370.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 520.0) + BikeFrameR;
+    render_affine_pic(susp2_r, right_wheel_r, pic, 0.06, bike->susp2, 0.0, 0.1);
 
     // Ha kell zaszlot rajzol:
-    int flages = 0;
+    int draw_flag = 0;
     if (!Single && Tag) {
-        if ((ajatekos && FlagTagAHasFlag) || (!ajatekos && !FlagTagAHasFlag)) {
-            flages = 1;
+        if ((player1 && FlagTagAHasFlag) || (!player1 && !FlagTagAHasFlag)) {
+            draw_flag = 1;
         }
 
-        if (!flages && FlagTagImmunity) {
-            int egeszido = (int)(t * 30.0);
-            if (egeszido % 2) {
-                flages = 1;
+        if (!draw_flag && FlagTagImmunity) {
+            int blinking_flag_phase = (int)(time * 30.0);
+            if (blinking_flag_phase % 2) {
+                draw_flag = 1;
             }
         }
     }
-    vect2 zaszlotalp = Mi * (500.0 + 107 - Mx) + Mj * (My + 114 - 600.0) + Mr;
+    vect2 flag_base_r = BikeFrameI * (500.0 + 107 - BikeFrameX) +
+                        BikeFrameJ * (BikeFrameY + 114 - 600.0) + BikeFrameR;
     // 330 bal oldal (5)
     // 340 bal oldal (3)
     // 355 bal oldal (1.5)
     // 365 jobb oldal (1)
     // 361 jobb hajszalnyit
-    vect2 zaszloteto = zaszlotalp + (Mi * 356.0 + Mj * 500.0) * 0.2;
-    if (flages) {
-        kidoboz(zaszlotalp, zaszloteto, ppic, 0.2, Lgr->flag, 0.0, 0.0, pmot->flipped_bike);
+    vect2 flag_tip_r = flag_base_r + (BikeFrameI * 356.0 + BikeFrameJ * 500.0) * 0.2;
+    if (draw_flag) {
+        render_affine_pic(flag_base_r, flag_tip_r, pic, 0.2, Lgr->flag, 0.0, 0.0,
+                          mot->flipped_bike);
     }
 
     // Motor teste:
-    kitag(ppic, pmk->bike_part1, &BikeBox1);
-    kitag(ppic, pmk->bike_part2, &BikeBox2);
-    kitag(ppic, pmk->bike_part3, &BikeBox3);
-    kitag(ppic, pmk->bike_part4, &BikeBox4);
+    render_bike_part(pic, bike->bike_part1, &BikeBox1);
+    render_bike_part(pic, bike->bike_part2, &BikeBox2);
+    render_bike_part(pic, bike->bike_part3, &BikeBox3);
+    render_bike_part(pic, bike->bike_part4, &BikeBox4);
 
     // Mozgo test:
-    vect2 p_vezeto = (pmot->body_r - sarok); // Vezeto
-    vect2 p_csipo = p_vezeto + Mi * 75.0 + Mj * (-47.0);
-    vect2 p_vall = p_vezeto + Mi * 47.0 + Mj * 65.0;
-    vect2 p_valltest = p_vezeto + Mi * 41.0 + Mj * 70.0;
-    vect2 p_labfej = Mi * (346.0 - Mx) + Mj * (My - 514.0) + Mr;
-    vect2 p_terd;
+    vect2 body_r = (mot->body_r - bottomleft_corner); // Vezeto
+    vect2 hip_r = body_r + BikeFrameI * 75.0 + BikeFrameJ * (-47.0);
+    vect2 shoulder_r = body_r + BikeFrameI * 47.0 + BikeFrameJ * 65.0;
+    vect2 neck_r = body_r + BikeFrameI * 41.0 + BikeFrameJ * 70.0;
+    vect2 foot_r =
+        BikeFrameI * (346.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 514.0) + BikeFrameR;
+    vect2 knee_r;
 
-    double combhossz = 0.51;
-    double labszarhossz = 0.51;
+    double THIGH_LENGTH = 0.51;
+    double LEG_LENGTH = 0.51;
     /* Bicigli lab hosszak:
-    double combhossz = 0.56;
-    double labszarhossz = 0.56;
+    double THIGH_LENGTH = 0.56;
+    double LEG_LENGTH = 0.56;
     */
 
-    if (pmot->flipped_bike) {
-        p_terd = circles_intersection(p_csipo, p_labfej, combhossz, labszarhossz);
+    if (mot->flipped_bike) {
+        knee_r = circles_intersection(hip_r, foot_r, THIGH_LENGTH, LEG_LENGTH);
     } else {
-        p_terd = circles_intersection(p_labfej, p_csipo, labszarhossz, combhossz);
+        knee_r = circles_intersection(foot_r, hip_r, LEG_LENGTH, THIGH_LENGTH);
     }
 
     // Fej:
-    // double fejalfa = 0.20;
-    double fejalfa = 0.0;
-    if (pmot->flipped_bike) {
-        fejalfa = 0 - fejalfa;
+    // double head_rotation = 0.20;
+    double head_rotation = 0.0;
+    if (mot->flipped_bike) {
+        head_rotation = 0 - head_rotation;
     }
-    kidobozkerek(pmot->head_r - sarok, HeadRadius, pmot->bike.rotation + fejalfa, ppic, pmk->head,
-                 pmot->flipped_bike);
+    render_rigidbody(mot->head_r - bottomleft_corner, HeadRadius,
+                     mot->bike.rotation + head_rotation, pic, bike->head, mot->flipped_bike);
 
     // Kar ket reszletben:
-    vect2 p_kezfej = p_fogantyu;
+    vect2 hand_r = susp1_r;
 
     // Ugras belekombinalasa kar kirajzolasaba:
-    // p_kezfej-et mozditjuk el szukseges mertekben:
-    if (ugrasnagysag > 0.0001) {
-        ugrasnagysag = 1.0 - ugrasnagysag;
-        int fellendit = 1; // kar kiteresenek iranya
-        if ((pvalt->ugras1volt && !pmot->flipped_bike) ||
-            (!pvalt->ugras1volt && pmot->flipped_bike)) { // XOR
-            fellendit = 0;
+    // hand_r-et mozditjuk el szukseges mertekben:
+    if (arm_position > 0.0001) {
+        arm_position = 1.0 - arm_position;
+        int arm_goes_up = 1; // kar kiteresenek iranya
+        if ((metadata->ugras1volt && !mot->flipped_bike) ||
+            (!metadata->ugras1volt && mot->flipped_bike)) { // XOR
+            arm_goes_up = 0;
         }
         // alfa es hosszit kiszamolasa:
-        double alfa = 0.0;
-        double hosszit = 0.1;
-        if (fellendit) {
+        double arm_rotation = 0.0;
+        double arm_stretch = 0.1;
+        if (arm_goes_up) {
             // KAR FELFELE LENDUL KI:
-            double hatar = 0.25;
-            double maxalfa = 2.7;
-            double maxhosszit = -0.3;
-            if (ugrasnagysag < hatar) {
+            double arm_apex_time = 0.25;
+            double max_arm_rotation = 2.7;
+            double max_arm_stretch = -0.3;
+            if (arm_position < arm_apex_time) {
                 // Kilendit:
-                alfa = maxalfa * ugrasnagysag / hatar;
-                hosszit = maxhosszit * ugrasnagysag / hatar + 1.0;
+                arm_rotation = max_arm_rotation * arm_position / arm_apex_time;
+                arm_stretch = max_arm_stretch * arm_position / arm_apex_time + 1.0;
             } else {
                 // Visszaenged:
-                double mertek = 1.0 - (ugrasnagysag - hatar) / (1.0 - hatar);
-                alfa = maxalfa * mertek;
-                hosszit = maxhosszit * mertek + 1.0;
+                double interpolation = 1.0 - (arm_position - arm_apex_time) / (1.0 - arm_apex_time);
+                arm_rotation = max_arm_rotation * interpolation;
+                arm_stretch = max_arm_stretch * interpolation + 1.0;
             }
         } else {
             // KAR LEFELE LENDUL KI:
-            double hatar = 0.2;
-            double maxalfa = -1.6;
-            double maxhosszit = 0.15;
-            if (ugrasnagysag < hatar) {
+            double arm_apex_time = 0.2;
+            double max_arm_rotation = -1.6;
+            double max_arm_stretch = 0.15;
+            if (arm_position < arm_apex_time) {
                 // Kilendit:
-                alfa = maxalfa * ugrasnagysag / hatar;
-                hosszit = maxhosszit * ugrasnagysag / hatar + 1.0;
+                arm_rotation = max_arm_rotation * arm_position / arm_apex_time;
+                arm_stretch = max_arm_stretch * arm_position / arm_apex_time + 1.0;
             } else {
                 // Visszaenged:
-                double mertek = 1.0 - (ugrasnagysag - hatar) / (1.0 - hatar);
-                alfa = maxalfa * mertek;
-                hosszit = maxhosszit * mertek + 1.0;
+                double interpolation = 1.0 - (arm_position - arm_apex_time) / (1.0 - arm_apex_time);
+                arm_rotation = max_arm_rotation * interpolation;
+                arm_stretch = max_arm_stretch * interpolation + 1.0;
             }
         }
-        // alfa es hosszit alapjan p_kezfej forgatasa es nyujtasa vall korul:
-        vect2 kar = p_kezfej - p_vall;
-        if (!pmot->flipped_bike) {
-            kar.rotate(-alfa);
+        // alfa es hosszit alapjan hand_r forgatasa es nyujtasa vall korul:
+        vect2 arm_vector = hand_r - shoulder_r;
+        if (!mot->flipped_bike) {
+            arm_vector.rotate(-arm_rotation);
         } else {
-            kar.rotate(alfa);
+            arm_vector.rotate(arm_rotation);
         }
-        kar = kar * hosszit;
-        p_kezfej = p_vall + kar;
+        arm_vector = arm_vector * arm_stretch;
+        hand_r = shoulder_r + arm_vector;
     }
 
-    double alkarhossz = 0.308 * 1.05;
-    double felkarhossz = 0.328 * 1.05;
-    vect2 p_konyok;
-    if (pmot->flipped_bike) {
-        p_konyok = circles_intersection(p_kezfej, p_vall, alkarhossz, felkarhossz);
+    double FORARM_LENGTH = 0.308 * 1.05;
+    double UP_ARM_LENGTH = 0.328 * 1.05;
+    vect2 elbow_r;
+    if (mot->flipped_bike) {
+        elbow_r = circles_intersection(hand_r, shoulder_r, FORARM_LENGTH, UP_ARM_LENGTH);
     } else {
-        p_konyok = circles_intersection(p_vall, p_kezfej, felkarhossz, alkarhossz);
+        elbow_r = circles_intersection(shoulder_r, hand_r, UP_ARM_LENGTH, FORARM_LENGTH);
     }
 
     // Lab:
-    kidoboz(p_terd, p_csipo, ppic, 0.14, pmk->thigh, 0.03, 0.1, pmot->flipped_bike);
+    render_affine_pic(knee_r, hip_r, pic, 0.14, bike->thigh, 0.03, 0.1, mot->flipped_bike);
 
-    kidoboz(p_labfej, p_terd, ppic, 0.21, pmk->leg, 0.03, 0.03, pmot->flipped_bike);
+    render_affine_pic(foot_r, knee_r, pic, 0.21, bike->leg, 0.03, 0.03, mot->flipped_bike);
 
     // Vezeto:
-    affine_pic* body = shirt ? shirt : pmk->body;
-    kidoboz(p_csipo, p_valltest, ppic, 0.2, body, 0.1, 0.05, pmot->flipped_bike);
+    affine_pic* body = shirt ? shirt : bike->body;
+    render_affine_pic(hip_r, neck_r, pic, 0.2, body, 0.1, 0.05, mot->flipped_bike);
 
     // Kez:
-    kidoboz(p_konyok, p_vall, ppic, 0.11, pmk->up_arm, 0.08, 0.1, !pmot->flipped_bike);
+    render_affine_pic(elbow_r, shoulder_r, pic, 0.11, bike->up_arm, 0.08, 0.1, !mot->flipped_bike);
 
-    kidoboz(p_kezfej, p_konyok, ppic, 0.076, pmk->forarm, 0.08, 0.1, pmot->flipped_bike);
+    render_affine_pic(hand_r, elbow_r, pic, 0.076, bike->forarm, 0.08, 0.1, mot->flipped_bike);
 
     StretchEnabled = false;
 
     // Kerekek:
-    if (!elsokerekrogton || !hatsokerekrogton) {
-        if (pmot->flipped_bike) {
+    if (!left_wheel_in_back || !right_wheel_in_back) {
+        if (mot->flipped_bike) {
             // Visszacserelem kerekek koordjait:
-            vect2 tmpv = p_k1;
-            p_k1 = p_k2;
-            p_k2 = tmpv;
+            vect2 tmpv = left_wheel_r;
+            left_wheel_r = right_wheel_r;
+            right_wheel_r = tmpv;
         }
-        if (!elsokerekrogton) {
-            kidobozkerek(p_k1, pmot->left_wheel.radius, pmot->left_wheel.rotation, ppic,
-                         pmk->wheel);
+        if (!left_wheel_in_back) {
+            render_rigidbody(left_wheel_r, mot->left_wheel.radius, mot->left_wheel.rotation, pic,
+                             bike->wheel);
         }
-        if (!hatsokerekrogton) {
-            kidobozkerek(p_k2, pmot->right_wheel.radius, pmot->right_wheel.rotation, ppic,
-                         pmk->wheel);
+        if (!right_wheel_in_back) {
+            render_rigidbody(right_wheel_r, mot->right_wheel.radius, mot->right_wheel.rotation, pic,
+                             bike->wheel);
         }
     }
 }
 
-static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot, valtozok* pvalt,
-                             int viewki, int timeki, motorst* pmot2, valtozok* pvalt2,
-                             camera& current_camera) {
+static void render_view(bool player1, pic8* pic, double time, motorst* mot, valtozok* metadata,
+                        int show_minimap, int show_timer, motorst* other_mot,
+                        valtozok* other_metadata, camera& current_camera) {
 
     // Kiszamoljuk kepernyo bal also sarkat:
-    vect2 motorkozep = pmot->bike.r;
+    vect2 bike_center = mot->bike.r;
     if (current_camera.mode == CameraMode::MapViewer) {
-        motorkozep = vect2(current_camera.x, current_camera.y);
+        bike_center = vect2(current_camera.x, current_camera.y);
     }
 
-    vect2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
+    vect2 bottomleft_corner(bike_center.x - (CameraX + metadata->baljobbv_h.baljobb * CameraDx),
+                            bike_center.y - CameraY);
 
     // ppic->fill_box( 100 );
-    CanvasBack->render(ajatekos, ppic, sarok, 0, 0, GameViewWidth - 1, GameViewHeight - 1);
+    CanvasBack->render(player1, pic, bottomleft_corner, 0, 0, GameViewWidth - 1,
+                       GameViewHeight - 1);
 
     // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
-    int balalsox, balalsoy;
-    CanvasBack->meters_to_pixels(sarok, &balalsox, &balalsoy);
-    int objminx = balalsox - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
-    int objminy = balalsoy - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
-    int objmaxx = balalsox + SCREEN_WIDTH;
-    int objmaxy = balalsoy + SCREEN_HEIGHT;
+    int corner_x, corner_y;
+    CanvasBack->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
+    int object_border_left = corner_x - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
+    int object_border_bottom = corner_y - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
+    int object_border_right = corner_x + SCREEN_WIDTH;
+    int object_border_top = corner_y + SCREEN_HEIGHT;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* pker = Ptop->objects[i];
-        if (!pker) {
+        object* obj = Ptop->objects[i];
+        if (!obj) {
             break;
         }
 
-        if (pker->type == object::Type::Start ||
-            (pker->type == object::Type::Food && !pker->active) ||
-            (!Single && Tag && pker->type == object::Type::Exit)) {
+        if (obj->type == object::Type::Start || (obj->type == object::Type::Food && !obj->active) ||
+            (!Single && Tag && obj->type == object::Type::Exit)) {
             continue;
         }
 
-        if (pker->canvas_x < objminx || pker->canvas_y < objminy || pker->canvas_x > objmaxx ||
-            pker->canvas_y > objmaxy) {
+        if (obj->canvas_x < object_border_left || obj->canvas_y < object_border_bottom ||
+            obj->canvas_x > object_border_right || obj->canvas_y > object_border_top) {
             continue;
         }
 
-        pic8* pobjpic = nullptr;
-        int dy = 0;
+        pic8* obj_frame = nullptr;
+        int phase_y_offset = 0;
         if (State->animated_objects) {
-            switch (pker->type) {
+            switch (obj->type) {
             case object::Type::Food:
-                pobjpic = Lgr->food[pker->animation % Lgr->food_count]->get_frame_by_time(t);
-                dy = (int)(5.0 * EolSettings->zoom() * sin(t * 15.5 + pker->floating_phase));
+                obj_frame = Lgr->food[obj->animation % Lgr->food_count]->get_frame_by_time(time);
+                phase_y_offset =
+                    (int)(5.0 * EolSettings->zoom() * sin(time * 15.5 + obj->floating_phase));
                 break;
             case object::Type::Exit:
-                pobjpic = Lgr->exit->get_frame_by_time(t);
-                dy = (int)(5.0 * EolSettings->zoom() * sin(t * 15.5 + pker->floating_phase));
+                obj_frame = Lgr->exit->get_frame_by_time(time);
+                phase_y_offset =
+                    (int)(5.0 * EolSettings->zoom() * sin(time * 15.5 + obj->floating_phase));
                 break;
             case object::Type::Killer:
-                pobjpic = Lgr->killer->get_frame_by_time(t);
+                obj_frame = Lgr->killer->get_frame_by_time(time);
                 break;
             default:
-                internal_error("HIBA6751353");
+                internal_error("render_view invalid object type");
             }
 
             if (EolSettings->still_objects()) {
-                dy = 0;
+                phase_y_offset = 0;
             }
         } else {
             // Elso frame-et adja vissza mindig:
-            switch (pker->type) {
+            switch (obj->type) {
             case object::Type::Food:
-                pobjpic = Lgr->food[pker->animation % Lgr->food_count]->get_frame_by_index(0);
+                obj_frame = Lgr->food[obj->animation % Lgr->food_count]->get_frame_by_index(0);
                 break;
             case object::Type::Exit:
-                pobjpic = Lgr->exit->get_frame_by_index(0);
+                obj_frame = Lgr->exit->get_frame_by_index(0);
                 break;
             case object::Type::Killer:
-                pobjpic = Lgr->killer->get_frame_by_index(0);
+                obj_frame = Lgr->killer->get_frame_by_index(0);
                 break;
             default:
-                internal_error("6754783");
+                internal_error("render_view invalid object type");
             }
         }
 
-        blit8(ppic, pobjpic, pker->canvas_x - balalsox, pker->canvas_y - balalsoy + dy);
+        blit8(pic, obj_frame, obj->canvas_x - corner_x, obj->canvas_y - corner_y + phase_y_offset);
 
-        if (EolSettings->show_gravity_arrows() && pker->type == object::Type::Food &&
-            pker->property != object::Property::None) {
-            draw_gravity_arrow(ppic, pker->canvas_x - balalsox, pker->canvas_y - balalsoy + dy,
-                               pker->property);
+        if (EolSettings->show_gravity_arrows() && obj->type == object::Type::Food &&
+            obj->property != object::Property::None) {
+            draw_gravity_arrow(pic, obj->canvas_x - corner_x,
+                               obj->canvas_y - corner_y + phase_y_offset, obj->property);
         }
     }
 
     // Motorosok kirajzolasa:
-    bike_pics* pmkepek1 = &Lgr->bike1;
-    bike_pics* pmkepek2 = &Lgr->bike2;
-    if ((State->player1_bike1 && !ajatekos) || (!State->player1_bike1 && ajatekos)) {
-        pmkepek1 = &Lgr->bike2;
-        pmkepek2 = &Lgr->bike1;
+    bike_pics* bike1 = &Lgr->bike1;
+    bike_pics* bike2 = &Lgr->bike2;
+    if ((State->player1_bike1 && !player1) || (!State->player1_bike1 && player1)) {
+        bike1 = &Lgr->bike2;
+        bike2 = &Lgr->bike1;
     }
 
     if (current_camera.mode == CameraMode::Normal) {
         if (!Single) {
             // Hatso motoros kirajzolasa:
-            vect2 kozep(sarok.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
-                        sarok.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
-            double tav = (pmot2->bike.r - kozep).length();
-            if (tav < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters) {
-                kibike(!ajatekos, ppic, t, sarok, pmot2, pvalt2, pmkepek2, nullptr);
+            vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
+                         bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
+            double distance = (other_mot->bike.r - center).length();
+            if (distance < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters) {
+                render_bike(!player1, pic, time, bottomleft_corner, other_mot, other_metadata,
+                            bike2, nullptr);
             }
         }
 
         // Motoros kirajzolasa:
-        kibike(ajatekos, ppic, t, sarok, pmot, pvalt, pmkepek1, shirt);
+        render_bike(player1, pic, time, bottomleft_corner, mot, metadata, bike1, shirt);
     }
 
     if (!EolSettings->pictures_in_background()) {
         // Felso canvas kitevese:
-        CanvasFront->render(ajatekos, ppic, sarok, 0, 0, GameViewWidth - 1, GameViewHeight - 1);
+        CanvasFront->render(player1, pic, bottomleft_corner, 0, 0, GameViewWidth - 1,
+                            GameViewHeight - 1);
     }
 
-    if (viewki) {
+    if (show_minimap) {
         if (Single) {
-            kiview(ajatekos, ppic, pvalt->baljobbv_h.baljobb, motorkozep, nullptr);
+            render_minimap(player1, pic, metadata->baljobbv_h.baljobb, bike_center, nullptr);
         } else {
-            kiview(ajatekos, ppic, pvalt->baljobbv_h.baljobb, motorkozep, pmot2);
+            render_minimap(player1, pic, metadata->baljobbv_h.baljobb, bike_center, other_mot);
         }
     }
 
-    double fogoido = -1.0;
+    double flagtag_time = -1.0;
     if (!Single) {
-        if (ajatekos) {
-            fogoido = FlagTimeA;
+        if (player1) {
+            flagtag_time = FlagTimeA;
         } else {
-            fogoido = FlagTimeB;
+            flagtag_time = FlagTimeB;
         }
     }
 
     // Idokiiras:
-    if (timeki) {
+    if (show_timer) {
         // Korny->legjobbido - volt eredetileg "" helyett:
         /*if( sordarabszam > 0 ) {
             char darabok[10];
@@ -817,30 +839,30 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
             darabok[6] = darabok[4];
             darabok[4] = darabok[3];
             darabok[3] = darabok[2];
-            draw_timers( darabok, fogoido, t, ppic, GameViewWidth, GameViewHeight );
+            draw_timers( darabok, flagtag_time, time, ppic, GameViewWidth, GameViewHeight );
         }
         else*/
         if (Tag) {
-            draw_timers(BestTime, fogoido, t, ppic, GameViewWidth, GameViewHeight);
+            draw_timers(BestTime, flagtag_time, time, pic, GameViewWidth, GameViewHeight);
         } else {
-            draw_timers(BestTime, -1.0, t, ppic, GameViewWidth, GameViewHeight);
+            draw_timers(BestTime, -1.0, time, pic, GameViewWidth, GameViewHeight);
         }
     }
 
-    if (pmot->apple_count && EolSettings->show_last_apple_time()) {
+    if (mot->apple_count && EolSettings->show_last_apple_time()) {
         char tmp[100];
-        sprintf(tmp, "last apple (%d)        ", pmot->apple_count - pmot->apple_bug_count);
-        util::text::centiseconds_to_string(pmot->last_apple_time, tmp + strlen(tmp), true, true);
+        sprintf(tmp, "last apple (%d)        ", mot->apple_count - mot->apple_bug_count);
+        util::text::centiseconds_to_string(mot->last_apple_time, tmp + strlen(tmp), true, true);
 
         constexpr int RIGHT_MARGIN = 5;
         constexpr int BOTTOM_MARGIN = 5;
         int x = GameViewWidth - RIGHT_MARGIN;
         int y = BOTTOM_MARGIN;
-        SmallFont->write_right_align(ppic, x, y, tmp);
+        SmallFont->write_right_align(pic, x, y, tmp);
     }
 }
 
-static pic8 Bpic = pic8();
+static pic8 player_view = pic8();
 
 extern int Ucsosurlodas;
 
@@ -848,76 +870,76 @@ void render_game(double time, valtozok* metadata1, valtozok* metadata2, int show
                  int show_timer1, int show_minimap2, int show_timer2, camera& current_camera) {
 
     int splitscreen = 0;
-    int fulljatekosA = 1;
+    int draw_player1_only = 1;
 
     if (!Single) {
         // Multiplayer modban:
         if (!metadata1->showkep && !metadata2->showkep) {
-            internal_error("g45jnuhbvfr");
+            internal_error("render_game nobody visible!");
         }
         if (metadata1->showkep && metadata2->showkep) {
             splitscreen = 1;
         } else {
             // Csak egyik latszik:
             if (metadata1->showkep) {
-                fulljatekosA = 1;
+                draw_player1_only = 1;
             } else {
-                fulljatekosA = 0;
+                draw_player1_only = 0;
             }
         }
         if (current_camera.mode == CameraMode::MapViewer) {
             splitscreen = 0;
-            fulljatekosA = 1;
+            draw_player1_only = 1;
         }
     }
 
-    pic8* npic = lockbackbuffer_pic();
+    pic8* pic = lockbackbuffer_pic();
 
     // internal_error( "Itt van 11!" ); idejott
 
     if (GameBackgroundRender > 0) {
         GameBackgroundRender--;
-        beallitmereteket(splitscreen);
+        calculate_viewpoints(splitscreen);
 
         // internal_error( "Itt van 13!" ); idejott
 
-        kitolthatteret(npic);
+        render_background(pic);
     }
 
     // internal_error( "Itt van 12!" ); ide nemjon
 
     if (splitscreen) {
         // 1. Jatekos:
-        Bpic.subview(Cx1, Cy1, Cx2, Cy2, npic);
+        player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
 
-        kirakegyjatekost(true, &Bpic, time, Motor1, metadata1, show_minimap1, show_timer1, Motor2,
-                         metadata2, current_camera);
+        render_view(true, &player_view, time, Motor1, metadata1, show_minimap1, show_timer1, Motor2,
+                    metadata2, current_camera);
 
         // 2. Jatekos:
-        Bpic.subview(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
+        player_view.subview(GameViewLeft, GameViewBottom2, GameViewRight, GameViewTop2, pic);
 
-        kirakegyjatekost(false, &Bpic, time, Motor2, metadata2, show_minimap2, show_timer2, Motor1,
-                         metadata1, current_camera);
+        render_view(false, &player_view, time, Motor2, metadata2, show_minimap2, show_timer2,
+                    Motor1, metadata1, current_camera);
     } else {
-        Bpic.subview(Cx1, Cy1, Cx2, Cy2, npic);
-        if (fulljatekosA) {
-            kirakegyjatekost(true, &Bpic, time, Motor1, metadata1, show_minimap1, show_timer1,
-                             Motor2, metadata2, current_camera);
+        player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
+        if (draw_player1_only) {
+            render_view(true, &player_view, time, Motor1, metadata1, show_minimap1, show_timer1,
+                        Motor2, metadata2, current_camera);
         } else {
-            kirakegyjatekost(false, &Bpic, time, Motor2, metadata2, show_minimap2, show_timer2,
-                             Motor1, metadata1, current_camera);
+            render_view(false, &player_view, time, Motor2, metadata2, show_minimap2, show_timer2,
+                        Motor1, metadata1, current_camera);
         }
     }
 
-    Console->render(*npic, *SmallFont);
-    StatusMessages->render(*npic, *SmallFont);
-    EolClient->render_table(*npic, *MediumFont, *SmallFont);
+    Console->render(*pic, *SmallFont);
+    StatusMessages->render(*pic, *SmallFont);
+    EolClient->render_table(*pic, *MediumFont, *SmallFont);
 
     // Mentes lemezre:
-    menteshakell(npic);
+    handle_screenshot(pic);
 
     // for( int i = 0; i < Ucsosurlodas; i++ )
-    //	npic->ppixel( i, 100, 0 );
+    //	pic->ppixel( i, 100, 0 );
 
     unlockbackbuffer_pic();
 }

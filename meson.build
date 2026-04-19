@@ -89,6 +89,7 @@ inc = include_directories('include')
 cpp = meson.get_compiler('cpp')
 link_args = []
 cpp_args = []
+deps = []
 
 # Required for nlohmann_json on Apple clang < 12
 if cpp.get_id() == 'clang' and cpp.version().version_compare('<12.0')
@@ -122,12 +123,14 @@ gl_dep = dependency('gl', required: true)
 
 nlohmann_json_dep = dependency('nlohmann_json')
 
+deps += [nlohmann_json_dep, gl_dep, sdl2_dep]
+
 executable(
     'elma',
     elma_sources,
     include_directories: inc,
     cpp_args: cpp_args,
     link_args: link_args,
-    dependencies: [nlohmann_json_dep, gl_dep, sdl2_dep],
+    dependencies: deps,
     win_subsystem: win_subsystem,
 )

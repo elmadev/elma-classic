@@ -236,7 +236,8 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     double max_y = apex.y;
 
     bool possibly_out_of_bounds = false;
-    if (max_x > Hatarx2 || min_x < Hatarx1 || max_y > Hatary2 || min_y < Hatary1) {
+    if (max_x > AffinePicScreenRight || min_x < AffinePicScreenLeft || max_y > AffinePicScreenTop ||
+        min_y < AffinePicScreenBottom) {
         possibly_out_of_bounds = true;
     }
 
@@ -287,9 +288,9 @@ void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
             int x2_plane = (int)(std::floor(std::min(plane1_right, plane2_right)));
             // Extra x out of bounds check
             int x1 = std::max(0, x1_plane);
-            int x2 = std::min(Cxsize - 1, x2_plane);
+            int x2 = std::min(GameViewWidth - 1, x2_plane);
             // Extra y out of bounds check
-            if (x1 <= x2 && y < Cysize) {
+            if (x1 <= x2 && y < GameViewHeight) {
                 while (x_left > x1) {
                     x_left--;
                     affine_x -= inverse_i.x;

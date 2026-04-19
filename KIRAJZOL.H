@@ -8,21 +8,21 @@ struct camera;
 extern int Voltkilogas; // Csak tesztelesre
 
 // Annak eldontesere, hogy kirajzolando doboz nem log-e ki:
-// peldaul: Hatarx1 = 2.0, Hatarx2 = 318.0 (resetkirajzol tolti ki):
-extern double Hatarx1, Hatarx2, Hatary1, Hatary2;
+// peldaul: AffinePicScreenLeft = 2.0, AffinePicScreenRight = 318.0 (resetkirajzol tolti ki):
+extern double AffinePicScreenLeft, AffinePicScreenRight, AffinePicScreenBottom, AffinePicScreenTop;
 
-extern int Cxsize, Cysize; // Belso kep meretei
+extern int GameViewWidth, GameViewHeight; // Belso kep meretei
 
-extern int Kitoltestmegrak;
+extern int GameBackgroundRender;
 // Es ennyire toltjuk:
-extern int Kitoltestmegrakkezd;
+extern int GAME_BACKGROUND_RENDER_SET_VALUE;
 
 void init_renderer();
 
-void novelkepmeret();
-void csokkentkepmeret();
+void increase_view_size();
+void decrease_view_size();
 
-void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
-                 int viewki2, int timeki2, camera& current_camera);
+void render_game(double time, valtozok* metadata1, valtozok* metadata2, int show_minimap1,
+                 int show_timer1, int show_minimap2, int show_timer2, camera& current_camera);
 
 #endif

@@ -30,8 +30,8 @@
 
 // Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
 
-int Kitoltestmegrak = 0;
-int Kitoltestmegrakkezd = 10;
+int GameBackgroundRender = 0;
+int GAME_BACKGROUND_RENDER_SET_VALUE = 10;
 
 static abc8* SmallFont = nullptr;
 static abc8* MediumFont = nullptr;
@@ -39,31 +39,31 @@ static abc8* MediumFont = nullptr;
 static double Kepmeret = 1.0;
 
 static double Szorzo = 1.1;
-void novelkepmeret() {
+void increase_view_size() {
     Kepmeret *= Szorzo;
     if (Kepmeret >= 0.999) {
         Kepmeret = 1.0;
     }
-    Kitoltestmegrak = Kitoltestmegrakkezd;
+    GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
 }
 
-void csokkentkepmeret() {
+void decrease_view_size() {
     Kepmeret /= Szorzo;
     if (Kepmeret < 0.7) {
         Kepmeret = 0.7;
     }
-    Kitoltestmegrak = Kitoltestmegrakkezd;
+    GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
 }
 
 // Kirajzolando terulet nagysaga:
 static int Cx1 = 0, Cy1 = 0, Cx2 = SCREEN_WIDTH - 1, Cy2 = SCREEN_HEIGHT - 1, Cy1Bplayer = 0,
            Cy2Bplayer = 0;
-int Cxsize = SCREEN_WIDTH, Cysize = SCREEN_HEIGHT;
+int GameViewWidth = SCREEN_WIDTH, GameViewHeight = SCREEN_HEIGHT;
 
 // Motoros kepernyo mely reszen helyezkedik el:
 static double Mo_y = 0.0, Mo_bal = 0.0, Mo_dx = 0.0;
 
-double Hatarx1, Hatarx2, Hatary1, Hatary2;
+double AffinePicScreenLeft, AffinePicScreenRight, AffinePicScreenBottom, AffinePicScreenTop;
 
 // View ablak meretei:
 static int Viewxsize, Viewysize;
@@ -105,14 +105,14 @@ void init_renderer() {
 void beallitmereteket(int splitscreen) {
     Cy1Bplayer = 100, Cy2Bplayer = 200;
 
-    Cxsize = (int)(SCREEN_WIDTH * Kepmeret);
-    Cysize = (int)(SCREEN_HEIGHT * Kepmeret);
-    Cx1 = (SCREEN_WIDTH - Cxsize) / 2;
-    Cy1 = (SCREEN_HEIGHT - Cysize) / 2;
-    Cx2 = Cx1 + Cxsize - 1;
-    Cy2 = Cy1 + Cysize - 1;
+    GameViewWidth = (int)(SCREEN_WIDTH * Kepmeret);
+    GameViewHeight = (int)(SCREEN_HEIGHT * Kepmeret);
+    Cx1 = (SCREEN_WIDTH - GameViewWidth) / 2;
+    Cy1 = (SCREEN_HEIGHT - GameViewHeight) / 2;
+    Cx2 = Cx1 + GameViewWidth - 1;
+    Cy2 = Cy1 + GameViewHeight - 1;
     if (splitscreen) {
-        Cysize = (SCREEN_HEIGHT / 2) - 6;
+        GameViewHeight = (SCREEN_HEIGHT / 2) - 6;
         Cy1 = (SCREEN_HEIGHT / 2) + 6; // Mivel kep fejjel lefele van, forditva vannak koordok
         Cy2 = SCREEN_HEIGHT - 1;       // Vagyis A player van felul, B pedig lent
         Cy1Bplayer = 0;
@@ -128,24 +128,26 @@ void beallitmereteket(int splitscreen) {
 #endif
 
     // Ezek csak doboz kirajzolashoz kellenek:
-    Hatarx1 = 2.0;
-    Hatary1 = 2.0;
-    Hatarx2 = Cxsize - 3.0;
-    Hatary2 = Cysize - 3.0;
+    AffinePicScreenLeft = 2.0;
+    AffinePicScreenBottom = 2.0;
+    AffinePicScreenRight = GameViewWidth - 3.0;
+    AffinePicScreenTop = GameViewHeight - 3.0;
 
     // Motoros kepernyo mely reszen helyezkedik el:
     if (EolSettings->center_camera()) {
-        Mo_bal = (Cxsize / MetersToPixels) * 0.50;
+        Mo_bal = (GameViewWidth / MetersToPixels) * 0.50;
     } else {
         Mo_bal = (SCREEN_WIDTH / MetersToPixels) * 0.15 * EolSettings->zoom();
     }
-    Mo_dx = Cxsize / MetersToPixels - 2.0 * Mo_bal;
-    Mo_y = Cysize / MetersToPixels / 2.0;
+    Mo_dx = GameViewWidth / MetersToPixels - 2.0 * Mo_bal;
+    Mo_y = GameViewHeight / MetersToPixels / 2.0;
 
-    Viewxsize = (int)(EolSettings->minimap_width() * sqrt(double(Cysize) / double(SCREEN_HEIGHT)));
-    Viewysize = (int)(EolSettings->minimap_height() * sqrt(double(Cysize) / double(SCREEN_HEIGHT)));
+    Viewxsize =
+        (int)(EolSettings->minimap_width() * sqrt(double(GameViewHeight) / double(SCREEN_HEIGHT)));
+    Viewysize =
+        (int)(EolSettings->minimap_height() * sqrt(double(GameViewHeight) / double(SCREEN_HEIGHT)));
     Viewxorig = (int)(40.0 * (Kepmeret - 0.6) / 0.4);
-    Viewxtolas = Cxsize - 2 * Viewxorig - Viewxsize;
+    Viewxtolas = GameViewWidth - 2 * Viewxorig - Viewxsize;
 }
 
 // v1 iranyabol v2 fele interpolal:
@@ -682,7 +684,7 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
     vect2 sarok(motorkozep.x - (Mo_bal + pvalt->baljobbv_h.baljobb * Mo_dx), motorkozep.y - Mo_y);
 
     // ppic->fill_box( 100 );
-    CanvasBack->render(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+    CanvasBack->render(ajatekos, ppic, sarok, 0, 0, GameViewWidth - 1, GameViewHeight - 1);
 
     // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
     int balalsox, balalsoy;
@@ -781,7 +783,7 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
 
     if (!EolSettings->pictures_in_background()) {
         // Felso canvas kitevese:
-        CanvasFront->render(ajatekos, ppic, sarok, 0, 0, Cxsize - 1, Cysize - 1);
+        CanvasFront->render(ajatekos, ppic, sarok, 0, 0, GameViewWidth - 1, GameViewHeight - 1);
     }
 
     if (viewki) {
@@ -815,13 +817,13 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
             darabok[6] = darabok[4];
             darabok[4] = darabok[3];
             darabok[3] = darabok[2];
-            draw_timers( darabok, fogoido, t, ppic, Cxsize, Cysize );
+            draw_timers( darabok, fogoido, t, ppic, GameViewWidth, GameViewHeight );
         }
         else*/
         if (Tag) {
-            draw_timers(BestTime, fogoido, t, ppic, Cxsize, Cysize);
+            draw_timers(BestTime, fogoido, t, ppic, GameViewWidth, GameViewHeight);
         } else {
-            draw_timers(BestTime, -1.0, t, ppic, Cxsize, Cysize);
+            draw_timers(BestTime, -1.0, t, ppic, GameViewWidth, GameViewHeight);
         }
     }
 
@@ -832,7 +834,7 @@ static void kirakegyjatekost(bool ajatekos, pic8* ppic, double t, motorst* pmot,
 
         constexpr int RIGHT_MARGIN = 5;
         constexpr int BOTTOM_MARGIN = 5;
-        int x = Cxsize - RIGHT_MARGIN;
+        int x = GameViewWidth - RIGHT_MARGIN;
         int y = BOTTOM_MARGIN;
         SmallFont->write_right_align(ppic, x, y, tmp);
     }
@@ -842,22 +844,22 @@ static pic8 Bpic = pic8();
 
 extern int Ucsosurlodas;
 
-void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int timeki1,
-                 int viewki2, int timeki2, camera& current_camera) {
+void render_game(double time, valtozok* metadata1, valtozok* metadata2, int show_minimap1,
+                 int show_timer1, int show_minimap2, int show_timer2, camera& current_camera) {
 
     int splitscreen = 0;
     int fulljatekosA = 1;
 
     if (!Single) {
         // Multiplayer modban:
-        if (!pvalt1->showkep && !pvalt2->showkep) {
+        if (!metadata1->showkep && !metadata2->showkep) {
             internal_error("g45jnuhbvfr");
         }
-        if (pvalt1->showkep && pvalt2->showkep) {
+        if (metadata1->showkep && metadata2->showkep) {
             splitscreen = 1;
         } else {
             // Csak egyik latszik:
-            if (pvalt1->showkep) {
+            if (metadata1->showkep) {
                 fulljatekosA = 1;
             } else {
                 fulljatekosA = 0;
@@ -873,8 +875,8 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
 
     // internal_error( "Itt van 11!" ); idejott
 
-    if (Kitoltestmegrak > 0) {
-        Kitoltestmegrak--;
+    if (GameBackgroundRender > 0) {
+        GameBackgroundRender--;
         beallitmereteket(splitscreen);
 
         // internal_error( "Itt van 13!" ); idejott
@@ -888,22 +890,22 @@ void kirajzol320(double t, valtozok* pvalt1, valtozok* pvalt2, int viewki1, int 
         // 1. Jatekos:
         Bpic.subview(Cx1, Cy1, Cx2, Cy2, npic);
 
-        kirakegyjatekost(true, &Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
-                         current_camera);
+        kirakegyjatekost(true, &Bpic, time, Motor1, metadata1, show_minimap1, show_timer1, Motor2,
+                         metadata2, current_camera);
 
         // 2. Jatekos:
         Bpic.subview(Cx1, Cy1Bplayer, Cx2, Cy2Bplayer, npic);
 
-        kirakegyjatekost(false, &Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
-                         current_camera);
+        kirakegyjatekost(false, &Bpic, time, Motor2, metadata2, show_minimap2, show_timer2, Motor1,
+                         metadata1, current_camera);
     } else {
         Bpic.subview(Cx1, Cy1, Cx2, Cy2, npic);
         if (fulljatekosA) {
-            kirakegyjatekost(true, &Bpic, t, Motor1, pvalt1, viewki1, timeki1, Motor2, pvalt2,
-                             current_camera);
+            kirakegyjatekost(true, &Bpic, time, Motor1, metadata1, show_minimap1, show_timer1,
+                             Motor2, metadata2, current_camera);
         } else {
-            kirakegyjatekost(false, &Bpic, t, Motor2, pvalt2, viewki2, timeki2, Motor1, pvalt1,
-                             current_camera);
+            kirakegyjatekost(false, &Bpic, time, Motor2, metadata2, show_minimap2, show_timer2,
+                             Motor1, metadata1, current_camera);
         }
     }
 

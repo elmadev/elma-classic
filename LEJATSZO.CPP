@@ -294,7 +294,7 @@ static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int
                        int* pmasikshow) {
     // Showkep:
     if (was_game_key_just_pressed(popciok->toggle_visibility)) {
-        Kitoltestmegrak = Kitoltestmegrakkezd;
+        GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
         if (!*pmasikshow) {
             // Ha masik jatekos ablaka nem latszott, mindegyik fog latszani:
             *pmasikshow = 1;
@@ -404,7 +404,7 @@ static void setup_gameloop(const char* filenev) {
     Ptop->initialize_objects(Motor2);
 
     // Eloszor keretet tobbszor is kirakja kirajzol320:
-    Kitoltestmegrak = Kitoltestmegrakkezd;
+    GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
 
     flagtag_reset();
 
@@ -652,17 +652,17 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
                       meghalt2);
         }
 
-        kirajzol320(eddig, &valt1, &valt2, Viewtime1.viewkinplay, Viewtime1.timekinplay,
+        render_game(eddig, &valt1, &valt2, Viewtime1.viewkinplay, Viewtime1.timekinplay,
                     Viewtime2.viewkinplay, Viewtime2.timekinplay, current_camera);
 
         // Egy par kozos toggle:
         // Plusz elintezes:
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
-            novelkepmeret();
+            increase_view_size();
         }
         // Minusz elintezes:
         if (was_game_key_just_pressed(State->key_decrease_screen_size)) {
-            csokkentkepmeret();
+            decrease_view_size();
         }
         // Snap nyomas elintezese:
         if (was_game_key_just_pressed(State->key_screenshot)) {
@@ -1028,20 +1028,20 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             set_friction_volume(valt1.inf.friction_volume + valt2.inf.friction_volume);
         }
 
-        kirajzol320(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
+        render_game(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
                     Viewtime2.viewkinreplay, Viewtime2.timekinreplay, current_camera);
 
         // Egy par kozos toggle:
         // Plusz elintezes:
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
-            novelkepmeret();
+            increase_view_size();
 
             // extern int Mostirdki;
             // Mostirdki = 1;
         }
         // Minusz elintezes:
         if (was_game_key_just_pressed(State->key_decrease_screen_size)) {
-            csokkentkepmeret();
+            decrease_view_size();
         }
         // Snap nyomas elintezese:
         if (was_game_key_just_pressed(State->key_screenshot)) {
@@ -1149,7 +1149,7 @@ void render_replay(const char* level_filename) {
             flagtag_replay(eddig);
         }
 
-        kirajzol320(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
+        render_game(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
                     Viewtime2.viewkinreplay, Viewtime2.timekinreplay, current_camera);
 
         VideoFrameIndex++;

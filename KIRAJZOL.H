@@ -10,10 +10,8 @@ extern double AffinePicScreenLeft, AffinePicScreenRight, AffinePicScreenBottom, 
 
 extern int GameViewWidth, GameViewHeight;
 
-extern int GameBackgroundRender;
-constexpr int GAME_BACKGROUND_RENDER_SET_VALUE = 10;
-
 void init_renderer();
+void reset_game_background();
 
 void increase_view_size();
 void decrease_view_size();

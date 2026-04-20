@@ -23,7 +23,7 @@ static void on_resolution_change() {
         Lgr->reload_default_textures(true);
     }
     invalidateegesz();
-    GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
+    reset_game_background();
 }
 
 void update_resolution(int w, int h) {

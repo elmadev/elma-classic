@@ -292,7 +292,7 @@ static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int
                        int* pmasikshow) {
     // Showkep:
     if (was_game_key_just_pressed(popciok->toggle_visibility)) {
-        GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
+        reset_game_background();
         if (!*pmasikshow) {
             // Ha masik jatekos ablaka nem latszott, mindegyik fog latszani:
             *pmasikshow = 1;
@@ -402,7 +402,7 @@ static void setup_gameloop(const char* filenev) {
     Ptop->initialize_objects(Motor2);
 
     // Eloszor keretet tobbszor is kirakja kirajzol320:
-    GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
+    reset_game_background();
 
     flagtag_reset();
 

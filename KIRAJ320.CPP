@@ -30,7 +30,7 @@
 #include <format>
 #include <filesystem>
 
-int GameBackgroundRender = 0;
+static bool GameBackgroundRender = false;
 
 static abc8* SmallFont = nullptr;
 static abc8* MediumFont = nullptr;
@@ -39,12 +39,14 @@ static abc8* MediumFont = nullptr;
 static double VisibleFraction = 1.0;
 constexpr double VISIBLE_FRACTION_SCALING_FACTOR = 1.1;
 
+void reset_game_background() { GameBackgroundRender = true; }
+
 void increase_view_size() {
     VisibleFraction *= VISIBLE_FRACTION_SCALING_FACTOR;
     if (VisibleFraction >= 0.999) {
         VisibleFraction = 1.0;
     }
-    GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
+    reset_game_background();
 }
 
 void decrease_view_size() {
@@ -52,7 +54,7 @@ void decrease_view_size() {
     if (VisibleFraction < 0.7) {
         VisibleFraction = 0.7;
     }
-    GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
+    reset_game_background();
 }
 
 // Position of the view of player1 and player2 in pixels on the screen
@@ -775,8 +777,8 @@ void render_game(double time, valtozok* metadata1, valtozok* metadata2, bool sho
     pic8* pic = lockbackbuffer_pic();
 
     // If we need to recalculate the screen position, redraw the background qframe
-    if (GameBackgroundRender > 0) {
-        GameBackgroundRender--;
+    if (GameBackgroundRender) {
+        GameBackgroundRender = false;
         calculate_viewpoints(splitscreen);
         render_background(pic);
     }

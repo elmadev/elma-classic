@@ -509,10 +509,11 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
     bool draw_flag = false;
     if (!Single && Tag) {
         if ((player1 && FlagTagAHasFlag) || (!player1 && !FlagTagAHasFlag)) {
+            // Current player has flag
             draw_flag = true;
-        }
-
-        if (!draw_flag && FlagTagImmunity) {
+        } else if (FlagTagImmunity) {
+            // Other player has flag, but current player just lost the flag
+            // Blink the flag away while immunity applies
             int blinking_flag_phase = (int)(time * 30.0);
             if (blinking_flag_phase % 2) {
                 draw_flag = true;

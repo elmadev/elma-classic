@@ -269,28 +269,34 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
     const int minimap_x2 = minimap_x1 + MinimapWidth - 1;
     const int minimap_y1 = 1;
     const int minimap_y2 = minimap_y1 + MinimapHeight - 1;
+    static pic8 minimap_view = pic8();
+    minimap_view.subview(minimap_x1, minimap_y1, minimap_x2, minimap_y2, pic);
+
     const int border_x1 = minimap_x1 - 1;
     const int border_x2 = minimap_x2 + 1;
     const int border_y1 = minimap_y1 - 1;
     const int border_y2 = minimap_y2 + 1;
-    const int border_width = MinimapWidth + 2;
-    const int border_height = MinimapHeight + 2;
+    static pic8 border_view = pic8();
+    border_view.subview(border_x1, border_y1, border_x2, border_y2, pic);
 
     // Save game scene pixels under the minimap area (including 1px border margin)
     int opacity = EolSettings->minimap_opacity();
     static pic8* save_pic = nullptr;
     if (opacity < 100) {
-        if (!save_pic || save_pic->get_width() != border_width ||
-            save_pic->get_height() != border_height) {
+        if (!save_pic || save_pic->get_width() != border_view.get_width() ||
+            save_pic->get_height() != border_view.get_height()) {
             delete save_pic;
-            save_pic = new pic8(border_width, border_height);
+            save_pic = new pic8(border_view.get_width(), border_view.get_height());
         }
-        blit8(save_pic, pic, 0, 0, border_x1, border_y1, border_x2, border_y2);
+        blit8(save_pic, &border_view);
     }
 
+    // Draw the minimap border
+    border_view.fill_box(Lgr->minimap_border_palette_id);
+
     // Draw the background (polygons)
-    CanvasMinimap->render_minimap(player1, pic, bottomleft_corner, minimap_x1, minimap_y1,
-                                  minimap_x2, minimap_y2);
+    CanvasMinimap->render_minimap(player1, &minimap_view, bottomleft_corner, 0, 0, MinimapWidth - 1,
+                                  MinimapHeight - 1);
 
     // Draw the objects
     int corner_x;
@@ -331,8 +337,8 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
             continue;
         }
 
-        render_minimap_icon(pic, obj->minimap_canvas_x - corner_x + minimap_x1,
-                            obj->minimap_canvas_y - corner_y + minimap_y1, palette_id);
+        render_minimap_icon(&minimap_view, obj->minimap_canvas_x - corner_x,
+                            obj->minimap_canvas_y - corner_y, palette_id);
     }
 
     // Select the correct color for each bike
@@ -346,32 +352,19 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
     // Draw the other bike
     if (other_motor) {
         vect2 other_pos = other_motor->bike.r - bottomleft_corner;
-        int other_x = (int)(other_pos.x * MetersToMinimapPixels + minimap_x1);
-        int other_y = (int)(other_pos.y * MetersToMinimapPixels + minimap_y1);
-        if (other_x >= minimap_x1 && other_x <= minimap_x2 && other_y >= minimap_y1 &&
-            other_y <= minimap_y2) {
-            render_minimap_icon(pic, other_x, other_y, bike2_id);
-        }
+        int other_x = (int)(other_pos.x * MetersToMinimapPixels);
+        int other_y = (int)(other_pos.y * MetersToMinimapPixels);
+        render_minimap_icon(&minimap_view, other_x, other_y, bike2_id);
     }
 
     // Draw the current player's bike
     int bike_x = (int)(camera_pos.x * MetersToMinimapPixels);
     int bike_y = (int)(camera_pos.y * MetersToMinimapPixels);
-    render_minimap_icon(pic, minimap_x1 + bike_x, minimap_y1 + bike_y, bike1_id);
-
-    // Draw the minimap border
-    for (int y = border_y1; y <= border_y2; y++) {
-        pic->ppixel(border_x1, y, Lgr->minimap_border_palette_id);
-        pic->ppixel(border_x2, y, Lgr->minimap_border_palette_id);
-    }
-    unsigned char* row = pic->get_row(border_y1) + border_x1 + 1;
-    memset(row, Lgr->minimap_border_palette_id, MinimapWidth);
-    row = pic->get_row(border_y2) + border_x1 + 1;
-    memset(row, Lgr->minimap_border_palette_id, MinimapWidth);
+    render_minimap_icon(&minimap_view, bike_x, bike_y, bike1_id);
 
     // Bring back pixels from the saved game scene based on opacity
     if (opacity < 100) {
-        blit8_dither(pic, save_pic, border_x1, border_y1, opacity);
+        blit8_dither(&border_view, save_pic, 0, 0, opacity);
     }
 }
 

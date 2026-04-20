@@ -568,48 +568,25 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
             // Right volt + facing left OR left volt + facing right -> arm goes down
             arm_goes_up = false;
         }
-        double arm_rotation = 0.0;
-        double arm_stretch = 0.1;
-        if (arm_goes_up) {
-            // Arm up
-            constexpr double arm_apex_time = 0.25;
-            constexpr double max_arm_rotation = 2.7;
-            constexpr double max_arm_stretch = -0.3;
-            if (arm_position < arm_apex_time) {
-                // Move arm to head (25%)
-                // arm_rotation (rotation) <- linear interpolation from 0 to max_arm_rotation
-                // arm_stretch (length) <- linear interpolation from 1.0 to (1.0 + max_arm_stretch)
-                arm_rotation = max_arm_rotation * arm_position / arm_apex_time;
-                arm_stretch = max_arm_stretch * arm_position / arm_apex_time + 1.0;
-            } else {
-                // Move back (75%)
-                // arm_rotation <- linear interpolation from max_arm_rotation to 0
-                // arm_stretch (length) <- linear interpolation from (1.0 + max_arm_stretch) to 1.0
-                double interpolation = 1.0 - (arm_position - arm_apex_time) / (1.0 - arm_apex_time);
-                arm_rotation = max_arm_rotation * interpolation;
-                arm_stretch = max_arm_stretch * interpolation + 1.0;
-            }
+
+        // Describe the arm movement for up and down movements
+        const double arm_apex_time = arm_goes_up ? 0.25 : 0.2;    // 0.0 to 1.0
+        const double max_arm_rotation = arm_goes_up ? 2.7 : -1.6; // radians
+        const double max_arm_stretch = arm_goes_up ? -0.3 : 0.15; // meters
+
+        // Calculate arm movement progression away from neutral (0.0 to 1.0)
+        double interpolation;
+        if (arm_position < arm_apex_time) {
+            interpolation = arm_position / arm_apex_time;
         } else {
-            // Arm down
-            constexpr double arm_apex_time = 0.2;
-            constexpr double max_arm_rotation = -1.6;
-            constexpr double max_arm_stretch = 0.15;
-            if (arm_position < arm_apex_time) {
-                // Move arm down (20%)
-                // arm_rotation (rotation) <- linear interpolation from 0 to max_arm_rotation
-                // arm_stretch (length) <- linear interpolation from 1.0 to (1.0 + max_arm_stretch)
-                arm_rotation = max_arm_rotation * arm_position / arm_apex_time;
-                arm_stretch = max_arm_stretch * arm_position / arm_apex_time + 1.0;
-            } else {
-                // Move back (80%)
-                // arm_rotation (rotation) <- linear interpolation from max_arm_rotation to 0
-                // arm_stretch (length) <- linear interpolation from (1.0 + max_arm_stretch) to 1.0
-                double interpolation = 1.0 - (arm_position - arm_apex_time) / (1.0 - arm_apex_time);
-                arm_rotation = max_arm_rotation * interpolation;
-                arm_stretch = max_arm_stretch * interpolation + 1.0;
-            }
+            interpolation = 1.0 - (arm_position - arm_apex_time) / (1.0 - arm_apex_time);
         }
-        // Apply the arm_rotation and arm_stretch from the volting movement
+
+        // Calculate arm rotation and stretch
+        double arm_rotation = max_arm_rotation * interpolation;
+        double arm_stretch = max_arm_stretch * interpolation + 1.0;
+
+        // Update hand position based on arm rotation and stretch
         vect2 arm_vector = hand_r - shoulder_r;
         if (!mot->flipped_bike) {
             arm_vector.rotate(-arm_rotation);

@@ -28,14 +28,13 @@
 #include <format>
 #include <filesystem>
 
-// Ezek mindig beallitodnak Kepmeret-bol kirajzol320-ban:
-
 int GameBackgroundRender = 0;
 int GAME_BACKGROUND_RENDER_SET_VALUE = 10;
 
 static abc8* SmallFont = nullptr;
 static abc8* MediumFont = nullptr;
 
+// Percentage of the screen used to render the game (QFRAME drawn on the edge)
 static double VisibleFraction = 1.0;
 
 static double VISIBLE_FRACTION_SCALING_FACTOR = 1.1;
@@ -55,17 +54,18 @@ void decrease_view_size() {
     GameBackgroundRender = GAME_BACKGROUND_RENDER_SET_VALUE;
 }
 
-// Kirajzolando terulet nagysaga:
+// Position of the view of player1 and player2 in pixels on the screen
 static int GameViewLeft = 0, GameViewBottom1 = 0, GameViewRight = SCREEN_WIDTH - 1,
            GameViewTop1 = SCREEN_HEIGHT - 1, GameViewBottom2 = 0, GameViewTop2 = 0;
 int GameViewWidth = SCREEN_WIDTH, GameViewHeight = SCREEN_HEIGHT;
 
-// Motoros kepernyo mely reszen helyezkedik el:
+// In meters from the bottom-left corner of screen
 static double CameraY = 0.0, CameraX = 0.0, CameraDx = 0.0;
 
+// In pixels from the bottom-left corner of screen
 double AffinePicScreenLeft, AffinePicScreenRight, AffinePicScreenBottom, AffinePicScreenTop;
 
-// View ablak meretei:
+// In pixels from the bottom-left corner of screen
 static int MinimapWidth, MinimapHeight;
 static int MinimapX, MinimapDx;
 
@@ -102,7 +102,9 @@ void init_renderer() {
     StatusMessages = new status_messages();
 }
 
+// Determine the position of the view of player1 +- player2 on the screen
 void calculate_viewpoints(int splitscreen) {
+    // Determine viewpoint of player1 and player2
     GameViewBottom2 = 100, GameViewTop2 = 200;
 
     GameViewWidth = (int)(SCREEN_WIDTH * VisibleFraction);
@@ -113,9 +115,8 @@ void calculate_viewpoints(int splitscreen) {
     GameViewTop1 = GameViewBottom1 + GameViewHeight - 1;
     if (splitscreen) {
         GameViewHeight = (SCREEN_HEIGHT / 2) - 6;
-        GameViewBottom1 =
-            (SCREEN_HEIGHT / 2) + 6;      // Mivel kep fejjel lefele van, forditva vannak koordok
-        GameViewTop1 = SCREEN_HEIGHT - 1; // Vagyis A player van felul, B pedig lent
+        GameViewBottom1 = (SCREEN_HEIGHT / 2) + 6;
+        GameViewTop1 = SCREEN_HEIGHT - 1;
         GameViewBottom2 = 0;
         GameViewTop2 = (SCREEN_HEIGHT / 2) - 7;
     }
@@ -128,13 +129,13 @@ void calculate_viewpoints(int splitscreen) {
     }
 #endif
 
-    // Ezek csak doboz kirajzolashoz kellenek:
+    // Determine boundary for the purposes of drawing affine pictures
     AffinePicScreenLeft = 2.0;
     AffinePicScreenBottom = 2.0;
     AffinePicScreenRight = GameViewWidth - 3.0;
     AffinePicScreenTop = GameViewHeight - 3.0;
 
-    // Motoros kepernyo mely reszen helyezkedik el:
+    // Determine camera position in meters from the bottom-left corner
     if (EolSettings->center_camera()) {
         CameraX = (GameViewWidth / MetersToPixels) * 0.50;
     } else {
@@ -143,6 +144,7 @@ void calculate_viewpoints(int splitscreen) {
     CameraDx = GameViewWidth / MetersToPixels - 2.0 * CameraX;
     CameraY = GameViewHeight / MetersToPixels / 2.0;
 
+    // Determine minimap position and size
     MinimapWidth =
         (int)(EolSettings->minimap_width() * sqrt(double(GameViewHeight) / double(SCREEN_HEIGHT)));
     MinimapHeight =
@@ -151,13 +153,13 @@ void calculate_viewpoints(int splitscreen) {
     MinimapDx = GameViewWidth - 2 * MinimapX - MinimapWidth;
 }
 
-// v1 iranyabol v2 fele interpolal:
-/*static vect2 interpolal( vect2 v1, vect2 v2, double x ) {
-    vect2 vissza = v1+(v2-v1)*x;
-    return vissza;
-} */
-
-// Meg nem affin koordok:
+// Render an affine_pic (remember all affine_pic images are loaded sideways in the lgr)
+// All units are in meters
+// a = coordinate of middle left of affine_pic position (distal end of the limb)
+// b = coordinate of middle right of affine_pic position (proximal end of the limb)
+// Along the axis of the vector b->a, displace coordinate a by `a_stretch` meters
+// Along the axis of the vector a->b, displace coordinate b by `b_stretch` meters
+// height represents the vertical length of the affine_pic (thickness of the limb)
 static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, affine_pic* affine,
                               double a_stretch, double b_stretch, int flip = 0) {
     vect2 i = unit_vector(b - a);
@@ -181,8 +183,7 @@ static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, affin
     draw_affine_pic(dest, affine, u, v * 2.0, a);
 }
 
-// radius meg nincs megszorozva:
-// Meg nem affin koordok:
+// Render a wheel or head affine_pic
 static void render_rigidbody(vect2 r, double radius, double rotation, pic8* dest,
                              affine_pic* affine, int flip = 0) {
     vect2 direction(cos(rotation) * radius, sin(rotation) * radius);
@@ -195,9 +196,9 @@ static void render_rigidbody(vect2 r, double radius, double rotation, pic8* dest
 
 static double BikeFrameX = -1, BikeFrameY = -1;
 static vect2 BikeFrameI, BikeFrameJ, BikeFrameR;
-static vect2 BikeFrameIPixels, BikeFrameJPixels,
-    BikeFrameRPixels; // Ezek meg vannak szorozva Aranyossaggal
+static vect2 BikeFrameIPixels, BikeFrameJPixels, BikeFrameRPixels;
 
+// Render a bike frame fragment
 static void render_bike_part(pic8* dest, affine_pic* part, bike_box* box) {
     vect2 r = BikeFrameIPixels * (box->x1 + 260 - BikeFrameX) +
               BikeFrameJPixels * (BikeFrameY - (box->y1 + 260)) + BikeFrameRPixels;
@@ -207,6 +208,7 @@ static void render_bike_part(pic8* dest, affine_pic* part, bike_box* box) {
     draw_affine_pic(dest, part, u, v, r);
 }
 
+// Render a 3x3 square onto the minimap
 static void render_minimap_icon(pic8* pic, int x, int y, unsigned char palette_id) {
 #ifdef DEBUG
     if (x < 1 || x >= pic->get_width() - 1 || y < 1 || y >= pic->get_height() - 1) {
@@ -247,9 +249,10 @@ static void felhokfel( int x, int y, pic8* ppicbuffer, pic8* pfelho,
     }
 } */
 
+// Render the entire minimap
 static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, vect2 bike_center,
                            motorst* other_motor) {
-
+    // Calculate minimap size and minimap frame of reference
     double minimap_width = MinimapWidth * MinimapScaleFactor * PixelsToMeters;
     double minimap_height = MinimapHeight * MinimapScaleFactor * PixelsToMeters;
 
@@ -274,14 +277,15 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         align = 1.0;
         break;
     }
+
     int minimap_x1 = (int)(MinimapX + align * MinimapDx);
     int minimap_x2 = minimap_x1 + MinimapWidth - 1;
     int minimap_y1 = 1;
     int minimap_y2 = minimap_y1 + MinimapHeight - 1;
 
+    // Save game scene pixels under the minimap area (including 1px border margin)
     int opacity = EolSettings->minimap_opacity();
 
-    // Save game scene pixels under the minimap area (including 1px border margin)
     int save_x1 = minimap_x1 - 1;
     int save_y1 = minimap_y1 - 1;
     int save_x2 = minimap_x2 + 1;
@@ -297,10 +301,11 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         blit8(save_pic, pic, 0, 0, save_x1, save_y1, save_x2, save_y2);
     }
 
+    // Draw the background (polygons)
     CanvasMinimap->render_minimap(player1, pic, bottomleft_corner, minimap_x1, minimap_y1,
                                   minimap_x2, minimap_y2);
 
-    // Most kirajzoljuk food-okat:
+    // Draw the objects
     int corner_x, corner_y;
     CanvasMinimap->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
     int object_border_left = corner_x;
@@ -327,7 +332,6 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
             continue;
         }
 
-        // Potty kirajzolasa View ablakba:
         if (obj->type == object::Type::Food) {
             render_minimap_icon(pic, obj->minimap_canvas_x - corner_x + minimap_x1,
                                 obj->minimap_canvas_y - corner_y + minimap_y1,
@@ -339,8 +343,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         }
     }
 
-    // Most kirajzoljuk motorost:
-    // Eldontjuk szineket:
+    // Select the correct color for each bike
     unsigned char bike1_id = Lgr->minimap_bike1_palette_id;
     unsigned char bike2_id = Lgr->minimap_bike2_palette_id;
     if ((State->player1_bike1 && !player1) || (!State->player1_bike1 && player1)) {
@@ -348,7 +351,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         bike2_id = Lgr->minimap_bike1_palette_id;
     }
 
-    // Most kirajzoljuk masik (hatso) motorost:
+    // Draw the other bike
     if (other_motor) {
         vect2 other_pos = other_motor->bike.r - bottomleft_corner;
         int other_x = (int)(other_pos.x * MetersToMinimapPixels + minimap_x1);
@@ -359,12 +362,12 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         }
     }
 
-    // Most kirajzoljuk elso motorost:
+    // Draw the current player's bike
     int bike_x = (int)(camera_pos.x * MetersToMinimapPixels);
     int bike_y = (int)(camera_pos.y * MetersToMinimapPixels);
     render_minimap_icon(pic, minimap_x1 + bike_x, minimap_y1 + bike_y, bike1_id);
 
-    // Kirajzoljuk keretet:
+    // Draw the minimap border
     minimap_x1--;
     minimap_y1--;
     minimap_x2++;
@@ -378,13 +381,12 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
     row = pic->get_row(minimap_y2) + minimap_x1 + 1;
     memset(row, Lgr->minimap_border_palette_id, MinimapWidth);
 
-    // bring back pixels from the saved game scene based on opacity
+    // Bring back pixels from the saved game scene based on opacity
     if (opacity < 100) {
         blit8_dither(pic, save_pic, save_x1, save_y1, opacity);
     }
 }
 
-// Mentes lemezre:
 static void handle_screenshot(pic8* pic) {
     if (VideoRecordingMode) {
         std::string filename = std::format("snp{:05}.pcx", VideoFrameIndex);
@@ -411,24 +413,15 @@ static void handle_screenshot(pic8* pic) {
     }
 }
 
+// Cover the screen with qframe
 static void render_background(pic8* pic) {
     int y = 0;
     while (y < SCREEN_HEIGHT) {
         int x = 0;
         while (x < SCREEN_WIDTH) {
-            // internal_error( "Itt van 14!" ); idejott
-            // internal_error( tmp ); (16) kiirja koordokat szepen
-
-            // extern int Debugblt;
-            // Debugblt = 1;
             blit8(pic, Lgr->qframe, x, y);
-            // Debugblt = 0;
-            //  internal_error( "Itt van 20!" ); idejott
             x += Lgr->qframe->get_width();
-
-            // internal_error( tmp ); (21) kiirja x-et 207-nek
         }
-        // internal_error( "Itt van 15!" );
         y += Lgr->qframe->get_height();
     }
 }
@@ -437,33 +430,28 @@ static void render_background(pic8* pic) {
 int Voltkilogas = 0;
 #endif
 
+// Render an entire bike + kuski
 static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_corner, motorst* mot,
                         valtozok* metadata, bike_pics* bike, affine_pic* shirt) {
-
-    // Mivel ezeket fv megvaltoztatja:
     double arm_position = metadata->ugrasnagysag;
     double turn_phase = metadata->baljobbv_f.forgas;
 
-    // if( metadata->baljobb < 0 || metadata->baljobb > 1.0 )
-    //     internal_error( "metadata->baljobb < 0 || metadata->baljobb > 1.0!" );
-    // if( turn_phase < 0.0 || turn_phase > 1.0 )
-    //     internal_error( "turn_phase < 0.0 || turn_phase > 1.0!" );
-
-    // Ha kell affinitassal torodni:
+    // Check to see if bike is turning, and calculate the progress from -1.0 to 1.0 using cos
     int is_turning = 0;
     StretchEnabled = false;
     if (turn_phase < 0.999) {
         is_turning = 1;
-        // forgast 0, 1 intervallumbol atkonvertaljuk -1, 1 intervallumba:
         turn_phase = -cos(turn_phase * PI);
     }
 
+    // Calculate wheel position relative to screen
     vect2 left_wheel_r = (mot->left_wheel.r - bottomleft_corner);
     vect2 right_wheel_r = (mot->right_wheel.r - bottomleft_corner);
 
+    // If turning, we will be rendering one wheel in the foreground (usually they are rendered in
+    // background)
     int left_wheel_in_back = 1;
     int right_wheel_in_back = 1;
-
     if (is_turning) {
         if ((turn_phase > 0.0 && !mot->flipped_bike) || (turn_phase <= 0.0 && mot->flipped_bike)) {
             left_wheel_in_back = 0;
@@ -472,7 +460,7 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
         }
     }
 
-    // Kerekek:
+    // Render background wheels
     if (left_wheel_in_back) {
         render_rigidbody(left_wheel_r, WheelBackgroundRenderRadius, mot->left_wheel.rotation, pic,
                          bike->wheel);
@@ -482,15 +470,19 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
                          bike->wheel);
     }
 
+    // Get the bike position and angle
     vect2 bike_r = mot->bike.r - bottomleft_corner;
     vect2 bike_i = vect2(cos(mot->bike.rotation), sin(mot->bike.rotation));
     vect2 bike_j = rotate_90deg(bike_i);
 
+    // If bike is turning, squish the bike
     if (is_turning) {
         StretchEnabled = true;
         set_stretch_parameters(bike_r, bike_i, turn_phase, MetersToPixels);
     }
 
+    // If the bike is turned, flip the bike
+    // Swap the wheels temporarily for the purposes of drawing the suspension
     if (mot->flipped_bike) {
         bike_i = Vect2null - bike_i;
         vect2 tmpv = left_wheel_r;
@@ -498,6 +490,7 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
         right_wheel_r = tmpv;
     }
 
+    // Bike frame calculations. Rotate the bike frame by 0.62 radians
     BikeFrameX = 390.0, BikeFrameY = 420.0;
     double BIKE_FRAME_ROTATION = 0.62;
     double BIKE_FRAME_WIDTH = 0.0045;
@@ -508,22 +501,23 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
         BikeFrameJ = Vect2null - BikeFrameJ;
     }
     BikeFrameR = bike_r;
-    // Most MetersToPixels-t betesszuk BikeFrameI, BikeFrameJ, BikeFrameR-be:
+
+    // Convert bike position from meters to pixels
     BikeFrameIPixels = BikeFrameI * MetersToPixels;
     BikeFrameJPixels = BikeFrameJ * MetersToPixels;
     BikeFrameRPixels = BikeFrameR * MetersToPixels;
 
-    // Elso felfuggesztes:
+    // Draw susp1
     vect2 susp1_r =
-        BikeFrameI * (365.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 292.0) + BikeFrameR; // Uj
+        BikeFrameI * (365.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 292.0) + BikeFrameR;
     render_affine_pic(left_wheel_r, susp1_r, pic, 0.06, bike->susp1, 0.05, 0.03);
 
-    // Hatso felfuggesztes:
+    // Draw susp2
     vect2 susp2_r =
         BikeFrameI * (370.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 520.0) + BikeFrameR;
     render_affine_pic(susp2_r, right_wheel_r, pic, 0.06, bike->susp2, 0.0, 0.1);
 
-    // Ha kell zaszlot rajzol:
+    // Draw flagtag flag
     int draw_flag = 0;
     if (!Single && Tag) {
         if ((player1 && FlagTagAHasFlag) || (!player1 && !FlagTagAHasFlag)) {
@@ -539,47 +533,37 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
     }
     vect2 flag_base_r = BikeFrameI * (500.0 + 107 - BikeFrameX) +
                         BikeFrameJ * (BikeFrameY + 114 - 600.0) + BikeFrameR;
-    // 330 bal oldal (5)
-    // 340 bal oldal (3)
-    // 355 bal oldal (1.5)
-    // 365 jobb oldal (1)
-    // 361 jobb hajszalnyit
     vect2 flag_tip_r = flag_base_r + (BikeFrameI * 356.0 + BikeFrameJ * 500.0) * 0.2;
     if (draw_flag) {
         render_affine_pic(flag_base_r, flag_tip_r, pic, 0.2, Lgr->flag, 0.0, 0.0,
                           mot->flipped_bike);
     }
 
-    // Motor teste:
+    // Draw bike frame
     render_bike_part(pic, bike->bike_part1, &BikeBox1);
     render_bike_part(pic, bike->bike_part2, &BikeBox2);
     render_bike_part(pic, bike->bike_part3, &BikeBox3);
     render_bike_part(pic, bike->bike_part4, &BikeBox4);
 
-    // Mozgo test:
-    vect2 body_r = (mot->body_r - bottomleft_corner); // Vezeto
+    // Calculations to draw the kuski
+    vect2 body_r = (mot->body_r - bottomleft_corner);
     vect2 hip_r = body_r + BikeFrameI * 75.0 + BikeFrameJ * (-47.0);
     vect2 shoulder_r = body_r + BikeFrameI * 47.0 + BikeFrameJ * 65.0;
     vect2 neck_r = body_r + BikeFrameI * 41.0 + BikeFrameJ * 70.0;
     vect2 foot_r =
         BikeFrameI * (346.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 514.0) + BikeFrameR;
-    vect2 knee_r;
 
+    // Calculate how to bend the knee based on the hip and foot positions
+    vect2 knee_r;
     double THIGH_LENGTH = 0.51;
     double LEG_LENGTH = 0.51;
-    /* Bicigli lab hosszak:
-    double THIGH_LENGTH = 0.56;
-    double LEG_LENGTH = 0.56;
-    */
-
     if (mot->flipped_bike) {
         knee_r = circles_intersection(hip_r, foot_r, THIGH_LENGTH, LEG_LENGTH);
     } else {
         knee_r = circles_intersection(foot_r, hip_r, LEG_LENGTH, THIGH_LENGTH);
     }
 
-    // Fej:
-    // double head_rotation = 0.20;
+    // Draw head
     double head_rotation = 0.0;
     if (mot->flipped_bike) {
         head_rotation = 0 - head_rotation;
@@ -587,53 +571,60 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
     render_rigidbody(mot->head_r - bottomleft_corner, HeadRadius,
                      mot->bike.rotation + head_rotation, pic, bike->head, mot->flipped_bike);
 
-    // Kar ket reszletben:
+    // Hand is located on the handlebars, unless we are volting
     vect2 hand_r = susp1_r;
-
-    // Ugras belekombinalasa kar kirajzolasaba:
-    // hand_r-et mozditjuk el szukseges mertekben:
     if (arm_position > 0.0001) {
+        // Invert the arm volt percentage to progress from 0->1
         arm_position = 1.0 - arm_position;
-        int arm_goes_up = 1; // kar kiteresenek iranya
+        // Left volt + facing left OR right volt + facing left -> Arm goes up
+        int arm_goes_up = 1;
         if ((metadata->ugras1volt && !mot->flipped_bike) ||
-            (!metadata->ugras1volt && mot->flipped_bike)) { // XOR
+            (!metadata->ugras1volt && mot->flipped_bike)) {
+            // Right volt + facing left OR left volt + facing right -> arm goes down
             arm_goes_up = 0;
         }
-        // alfa es hosszit kiszamolasa:
         double arm_rotation = 0.0;
         double arm_stretch = 0.1;
         if (arm_goes_up) {
-            // KAR FELFELE LENDUL KI:
+            // Arm up
             double arm_apex_time = 0.25;
             double max_arm_rotation = 2.7;
             double max_arm_stretch = -0.3;
             if (arm_position < arm_apex_time) {
-                // Kilendit:
+                // Move arm to head (25%)
+                // arm_rotation (rotation) <- linear interpolation from 0 to max_arm_rotation
+                // arm_stretch (length) <- linear interpolation from 1.0 to (1.0 + max_arm_stretch)
                 arm_rotation = max_arm_rotation * arm_position / arm_apex_time;
                 arm_stretch = max_arm_stretch * arm_position / arm_apex_time + 1.0;
             } else {
-                // Visszaenged:
+                // Move back (75%)
+                // arm_rotation <- linear interpolation from max_arm_rotation to 0
+                // arm_stretch (length) <- linear interpolation from (1.0 + max_arm_stretch) to 1.0
                 double interpolation = 1.0 - (arm_position - arm_apex_time) / (1.0 - arm_apex_time);
                 arm_rotation = max_arm_rotation * interpolation;
                 arm_stretch = max_arm_stretch * interpolation + 1.0;
             }
         } else {
-            // KAR LEFELE LENDUL KI:
+            // Arm down
             double arm_apex_time = 0.2;
             double max_arm_rotation = -1.6;
             double max_arm_stretch = 0.15;
             if (arm_position < arm_apex_time) {
-                // Kilendit:
+                // Move arm down (20%)
+                // arm_rotation (rotation) <- linear interpolation from 0 to max_arm_rotation
+                // arm_stretch (length) <- linear interpolation from 1.0 to (1.0 + max_arm_stretch)
                 arm_rotation = max_arm_rotation * arm_position / arm_apex_time;
                 arm_stretch = max_arm_stretch * arm_position / arm_apex_time + 1.0;
             } else {
-                // Visszaenged:
+                // Move back (80%)
+                // arm_rotation (rotation) <- linear interpolation from max_arm_rotation to 0
+                // arm_stretch (length) <- linear interpolation from (1.0 + max_arm_stretch) to 1.0
                 double interpolation = 1.0 - (arm_position - arm_apex_time) / (1.0 - arm_apex_time);
                 arm_rotation = max_arm_rotation * interpolation;
                 arm_stretch = max_arm_stretch * interpolation + 1.0;
             }
         }
-        // alfa es hosszit alapjan hand_r forgatasa es nyujtasa vall korul:
+        // Apply the arm_rotation and arm_stretch from the volting movement
         vect2 arm_vector = hand_r - shoulder_r;
         if (!mot->flipped_bike) {
             arm_vector.rotate(-arm_rotation);
@@ -644,6 +635,7 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
         hand_r = shoulder_r + arm_vector;
     }
 
+    // Calculate how to bend the elbow based on shoulder and hand position
     double FORARM_LENGTH = 0.308 * 1.05;
     double UP_ARM_LENGTH = 0.328 * 1.05;
     vect2 elbow_r;
@@ -653,26 +645,19 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
         elbow_r = circles_intersection(shoulder_r, hand_r, UP_ARM_LENGTH, FORARM_LENGTH);
     }
 
-    // Lab:
+    // Draw the whole kuski (excluding head)
     render_affine_pic(knee_r, hip_r, pic, 0.14, bike->thigh, 0.03, 0.1, mot->flipped_bike);
-
     render_affine_pic(foot_r, knee_r, pic, 0.21, bike->leg, 0.03, 0.03, mot->flipped_bike);
-
-    // Vezeto:
     affine_pic* body = shirt ? shirt : bike->body;
     render_affine_pic(hip_r, neck_r, pic, 0.2, body, 0.1, 0.05, mot->flipped_bike);
-
-    // Kez:
     render_affine_pic(elbow_r, shoulder_r, pic, 0.11, bike->up_arm, 0.08, 0.1, !mot->flipped_bike);
-
     render_affine_pic(hand_r, elbow_r, pic, 0.076, bike->forarm, 0.08, 0.1, mot->flipped_bike);
 
+    // Draw foreground wheels
     StretchEnabled = false;
-
-    // Kerekek:
     if (!left_wheel_in_back || !right_wheel_in_back) {
         if (mot->flipped_bike) {
-            // Visszacserelem kerekek koordjait:
+            // If we had temporarily inverted the wheels earlier in this function, undo that now
             vect2 tmpv = left_wheel_r;
             left_wheel_r = right_wheel_r;
             right_wheel_r = tmpv;
@@ -688,11 +673,11 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
     }
 }
 
+// Render the view for one player
 static void render_view(bool player1, pic8* pic, double time, motorst* mot, valtozok* metadata,
                         int show_minimap, int show_timer, motorst* other_mot,
                         valtozok* other_metadata, camera& current_camera) {
-
-    // Kiszamoljuk kepernyo bal also sarkat:
+    // Calculate frame of reference
     vect2 bike_center = mot->bike.r;
     if (current_camera.mode == CameraMode::MapViewer) {
         bike_center = vect2(current_camera.x, current_camera.y);
@@ -701,11 +686,11 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
     vect2 bottomleft_corner(bike_center.x - (CameraX + metadata->baljobbv_h.baljobb * CameraDx),
                             bike_center.y - CameraY);
 
-    // ppic->fill_box( 100 );
+    // Draw the background
     CanvasBack->render(player1, pic, bottomleft_corner, 0, 0, GameViewWidth - 1,
                        GameViewHeight - 1);
 
-    // Objektumok kirajzolasa, de view-ba csak kesobb kerulnek:
+    // Draw the objects
     int corner_x, corner_y;
     CanvasBack->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
     int object_border_left = corner_x - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
@@ -753,7 +738,6 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
                 phase_y_offset = 0;
             }
         } else {
-            // Elso frame-et adja vissza mindig:
             switch (obj->type) {
             case object::Type::Food:
                 obj_frame = Lgr->food[obj->animation % Lgr->food_count]->get_frame_by_index(0);
@@ -778,7 +762,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
         }
     }
 
-    // Motorosok kirajzolasa:
+    // Select the correct bike for each player
     bike_pics* bike1 = &Lgr->bike1;
     bike_pics* bike2 = &Lgr->bike2;
     if ((State->player1_bike1 && !player1) || (!State->player1_bike1 && player1)) {
@@ -788,7 +772,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
 
     if (current_camera.mode == CameraMode::Normal) {
         if (!Single) {
-            // Hatso motoros kirajzolasa:
+            // Draw the other bike if it's on-screen
             vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
                          bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
             double distance = (other_mot->bike.r - center).length();
@@ -798,16 +782,17 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
             }
         }
 
-        // Motoros kirajzolasa:
+        // Draw the current player's bike
         render_bike(player1, pic, time, bottomleft_corner, mot, metadata, bike1, shirt);
     }
 
+    // Draw the foreground
     if (!EolSettings->pictures_in_background()) {
-        // Felso canvas kitevese:
         CanvasFront->render(player1, pic, bottomleft_corner, 0, 0, GameViewWidth - 1,
                             GameViewHeight - 1);
     }
 
+    // Draw the minimap
     if (show_minimap) {
         if (Single) {
             render_minimap(player1, pic, metadata->baljobbv_h.baljobb, bike_center, nullptr);
@@ -816,6 +801,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
         }
     }
 
+    // Draw the timers
     double flagtag_time = -1.0;
     if (!Single) {
         if (player1) {
@@ -824,24 +810,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
             flagtag_time = FlagTimeB;
         }
     }
-
-    // Idokiiras:
     if (show_timer) {
-        // Korny->legjobbido - volt eredetileg "" helyett:
-        /*if( sordarabszam > 0 ) {
-            char darabok[10];
-            sprintf( darabok, "%d", sordarabszam );
-            strrev( darabok );
-            while( strlen( darabok ) < 6 )
-                strcat( darabok, "0" );
-            strrev( darabok );
-            darabok[7] = darabok[5];
-            darabok[6] = darabok[4];
-            darabok[4] = darabok[3];
-            darabok[3] = darabok[2];
-            draw_timers( darabok, flagtag_time, time, ppic, GameViewWidth, GameViewHeight );
-        }
-        else*/
         if (Tag) {
             draw_timers(BestTime, flagtag_time, time, pic, GameViewWidth, GameViewHeight);
         } else {
@@ -849,6 +818,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
         }
     }
 
+    // Draw the bottom-right info panel
     if (mot->apple_count && EolSettings->show_last_apple_time()) {
         char tmp[100];
         sprintf(tmp, "last apple (%d)        ", mot->apple_count - mot->apple_bug_count);
@@ -868,19 +838,16 @@ extern int Ucsosurlodas;
 
 void render_game(double time, valtozok* metadata1, valtozok* metadata2, int show_minimap1,
                  int show_timer1, int show_minimap2, int show_timer2, camera& current_camera) {
-
+    // Determine who we are going to draw (player 1, player 2 or both)
     int splitscreen = 0;
     int draw_player1_only = 1;
-
     if (!Single) {
-        // Multiplayer modban:
         if (!metadata1->showkep && !metadata2->showkep) {
             internal_error("render_game nobody visible!");
         }
         if (metadata1->showkep && metadata2->showkep) {
             splitscreen = 1;
         } else {
-            // Csak egyik latszik:
             if (metadata1->showkep) {
                 draw_player1_only = 1;
             } else {
@@ -893,31 +860,23 @@ void render_game(double time, valtozok* metadata1, valtozok* metadata2, int show
         }
     }
 
+    // Get the screen, upside-down
     pic8* pic = lockbackbuffer_pic();
 
-    // internal_error( "Itt van 11!" ); idejott
-
+    // If we need to recalculate the screen position, redraw the background qframe
     if (GameBackgroundRender > 0) {
         GameBackgroundRender--;
         calculate_viewpoints(splitscreen);
-
-        // internal_error( "Itt van 13!" ); idejott
-
         render_background(pic);
     }
 
-    // internal_error( "Itt van 12!" ); ide nemjon
-
+    // Draw 1 or 2 players
     if (splitscreen) {
-        // 1. Jatekos:
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
-
         render_view(true, &player_view, time, Motor1, metadata1, show_minimap1, show_timer1, Motor2,
                     metadata2, current_camera);
 
-        // 2. Jatekos:
         player_view.subview(GameViewLeft, GameViewBottom2, GameViewRight, GameViewTop2, pic);
-
         render_view(false, &player_view, time, Motor2, metadata2, show_minimap2, show_timer2,
                     Motor1, metadata1, current_camera);
     } else {
@@ -931,15 +890,13 @@ void render_game(double time, valtozok* metadata1, valtozok* metadata2, int show
         }
     }
 
+    // Draw EOL overlays
     Console->render(*pic, *SmallFont);
     StatusMessages->render(*pic, *SmallFont);
     EolClient->render_table(*pic, *MediumFont, *SmallFont);
 
-    // Mentes lemezre:
+    // Conditionally save screenshot
     handle_screenshot(pic);
-
-    // for( int i = 0; i < Ucsosurlodas; i++ )
-    //	pic->ppixel( i, 100, 0 );
 
     unlockbackbuffer_pic();
 }

@@ -7,14 +7,12 @@ struct camera;
 
 extern int Voltkilogas; // Csak tesztelesre
 
-// Annak eldontesere, hogy kirajzolando doboz nem log-e ki:
-// peldaul: AffinePicScreenLeft = 2.0, AffinePicScreenRight = 318.0 (resetkirajzol tolti ki):
+// Boundary of the screen with a slight buffer - used to render affine pics
 extern double AffinePicScreenLeft, AffinePicScreenRight, AffinePicScreenBottom, AffinePicScreenTop;
 
-extern int GameViewWidth, GameViewHeight; // Belso kep meretei
+extern int GameViewWidth, GameViewHeight;
 
 extern int GameBackgroundRender;
-// Es ennyire toltjuk:
 extern int GAME_BACKGROUND_RENDER_SET_VALUE;
 
 void init_renderer();

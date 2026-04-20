@@ -241,28 +241,6 @@ static void render_minimap_icon(pic8* pic, int x, int y, unsigned char palette_i
     pic->ppixel(x + 1, y, palette_id);
 }
 
-/* Most nincsen felho:
-static void felhokfel( int x, int y, pic8* ppicbuffer, pic8* pfelho,
-                            double lassit ) {
-    int kerx = -x*lassit;
-    int kery = -y*lassit;
-    // Vegigmegy kepernyon:
-    int kerxsize = pfelho->get_width();
-    kerx %= kerxsize;
-    kerx -= kerxsize; // Lehet, hogy enelkul is negativ?
-    while( kerx < Displaysizex ) {
-        int kerysize = pfelho->get_height();
-        kery %= kerysize;
-        kery -= kerysize; // Lehet, hogy enelkul is negativ?
-        while( kery < Displaysizey ) {
-            blit8( ppicbuffer, pfelho, kerx, kery );
-
-            kery += kerysize;
-        }
-        kerx += kerxsize;
-    }
-} */
-
 // Render the entire minimap
 static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, vect2 bike_center,
                            motorst* other_motor) {

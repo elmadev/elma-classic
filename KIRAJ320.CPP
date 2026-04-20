@@ -265,27 +265,27 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         break;
     }
 
-    int minimap_x1 = (int)(MinimapX + align * MinimapDx);
-    int minimap_x2 = minimap_x1 + MinimapWidth - 1;
-    int minimap_y1 = 1;
-    int minimap_y2 = minimap_y1 + MinimapHeight - 1;
+    const int minimap_x1 = (int)(MinimapX + align * MinimapDx);
+    const int minimap_x2 = minimap_x1 + MinimapWidth - 1;
+    const int minimap_y1 = 1;
+    const int minimap_y2 = minimap_y1 + MinimapHeight - 1;
+    const int border_x1 = minimap_x1 - 1;
+    const int border_x2 = minimap_x2 + 1;
+    const int border_y1 = minimap_y1 - 1;
+    const int border_y2 = minimap_y2 + 1;
+    const int border_width = MinimapWidth + 2;
+    const int border_height = MinimapHeight + 2;
 
     // Save game scene pixels under the minimap area (including 1px border margin)
     int opacity = EolSettings->minimap_opacity();
-
-    int save_x1 = minimap_x1 - 1;
-    int save_y1 = minimap_y1 - 1;
-    int save_x2 = minimap_x2 + 1;
-    int save_y2 = minimap_y2 + 1;
-    int save_w = save_x2 - save_x1 + 1;
-    int save_h = save_y2 - save_y1 + 1;
     static pic8* save_pic = nullptr;
     if (opacity < 100) {
-        if (!save_pic || save_pic->get_width() != save_w || save_pic->get_height() != save_h) {
+        if (!save_pic || save_pic->get_width() != border_width ||
+            save_pic->get_height() != border_height) {
             delete save_pic;
-            save_pic = new pic8(save_w, save_h);
+            save_pic = new pic8(border_width, border_height);
         }
-        blit8(save_pic, pic, 0, 0, save_x1, save_y1, save_x2, save_y2);
+        blit8(save_pic, pic, 0, 0, border_x1, border_y1, border_x2, border_y2);
     }
 
     // Draw the background (polygons)
@@ -360,22 +360,18 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
     render_minimap_icon(pic, minimap_x1 + bike_x, minimap_y1 + bike_y, bike1_id);
 
     // Draw the minimap border
-    minimap_x1--;
-    minimap_y1--;
-    minimap_x2++;
-    minimap_y2++;
-    for (int y = minimap_y1; y <= minimap_y2; y++) {
-        pic->ppixel(minimap_x1, y, Lgr->minimap_border_palette_id);
-        pic->ppixel(minimap_x2, y, Lgr->minimap_border_palette_id);
+    for (int y = border_y1; y <= border_y2; y++) {
+        pic->ppixel(border_x1, y, Lgr->minimap_border_palette_id);
+        pic->ppixel(border_x2, y, Lgr->minimap_border_palette_id);
     }
-    unsigned char* row = pic->get_row(minimap_y1) + minimap_x1 + 1;
+    unsigned char* row = pic->get_row(border_y1) + border_x1 + 1;
     memset(row, Lgr->minimap_border_palette_id, MinimapWidth);
-    row = pic->get_row(minimap_y2) + minimap_x1 + 1;
+    row = pic->get_row(border_y2) + border_x1 + 1;
     memset(row, Lgr->minimap_border_palette_id, MinimapWidth);
 
     // Bring back pixels from the saved game scene based on opacity
     if (opacity < 100) {
-        blit8_dither(pic, save_pic, save_x1, save_y1, opacity);
+        blit8_dither(pic, save_pic, border_x1, border_y1, opacity);
     }
 }
 

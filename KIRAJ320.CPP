@@ -791,20 +791,12 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
     }
 
     // Draw the timers
-    double flagtag_time = -1.0;
-    if (!Single) {
-        if (player1) {
-            flagtag_time = FlagTimeA;
-        } else {
-            flagtag_time = FlagTimeB;
-        }
-    }
     if (show_timer) {
-        if (Tag) {
-            draw_timers(BestTime, flagtag_time, time, pic, GameViewWidth, GameViewHeight);
-        } else {
-            draw_timers(BestTime, -1.0, time, pic, GameViewWidth, GameViewHeight);
+        double flagtag_time = -1.0;
+        if (!Single && Tag) {
+            flagtag_time = player1 ? FlagTimeA : FlagTimeB;
         }
+        draw_timers(BestTime, flagtag_time, time, pic, GameViewWidth, GameViewHeight);
     }
 
     // Draw the bottom-right info panel

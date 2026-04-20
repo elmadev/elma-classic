@@ -29,15 +29,14 @@
 #include <filesystem>
 
 int GameBackgroundRender = 0;
-int GAME_BACKGROUND_RENDER_SET_VALUE = 10;
 
 static abc8* SmallFont = nullptr;
 static abc8* MediumFont = nullptr;
 
 // Percentage of the screen used to render the game (QFRAME drawn on the edge)
 static double VisibleFraction = 1.0;
+constexpr double VISIBLE_FRACTION_SCALING_FACTOR = 1.1;
 
-static double VISIBLE_FRACTION_SCALING_FACTOR = 1.1;
 void increase_view_size() {
     VisibleFraction *= VISIBLE_FRACTION_SCALING_FACTOR;
     if (VisibleFraction >= 0.999) {
@@ -55,19 +54,31 @@ void decrease_view_size() {
 }
 
 // Position of the view of player1 and player2 in pixels on the screen
-static int GameViewLeft = 0, GameViewBottom1 = 0, GameViewRight = SCREEN_WIDTH - 1,
-           GameViewTop1 = SCREEN_HEIGHT - 1, GameViewBottom2 = 0, GameViewTop2 = 0;
-int GameViewWidth = SCREEN_WIDTH, GameViewHeight = SCREEN_HEIGHT;
+static int GameViewLeft;
+static int GameViewBottom1;
+static int GameViewRight;
+static int GameViewTop1;
+static int GameViewBottom2;
+static int GameViewTop2;
+int GameViewWidth;
+int GameViewHeight;
 
 // In meters from the bottom-left corner of screen
-static double CameraY = 0.0, CameraX = 0.0, CameraDx = 0.0;
+static double CameraY;
+static double CameraX;
+static double CameraDx;
 
 // In pixels from the bottom-left corner of screen
-double AffinePicScreenLeft, AffinePicScreenRight, AffinePicScreenBottom, AffinePicScreenTop;
+double AffinePicScreenLeft;
+double AffinePicScreenRight;
+double AffinePicScreenBottom;
+double AffinePicScreenTop;
 
 // In pixels from the bottom-left corner of screen
-static int MinimapWidth, MinimapHeight;
-static int MinimapX, MinimapDx;
+static int MinimapWidth;
+static int MinimapHeight;
+static int MinimapX;
+static int MinimapDx;
 
 affine_pic* shirt = nullptr;
 
@@ -103,10 +114,8 @@ void init_renderer() {
 }
 
 // Determine the position of the view of player1 +- player2 on the screen
-void calculate_viewpoints(int splitscreen) {
+static void calculate_viewpoints(bool splitscreen) {
     // Determine viewpoint of player1 and player2
-    GameViewBottom2 = 100, GameViewTop2 = 200;
-
     GameViewWidth = (int)(SCREEN_WIDTH * VisibleFraction);
     GameViewHeight = (int)(SCREEN_HEIGHT * VisibleFraction);
     GameViewLeft = (SCREEN_WIDTH - GameViewWidth) / 2;
@@ -161,7 +170,7 @@ void calculate_viewpoints(int splitscreen) {
 // Along the axis of the vector a->b, displace coordinate b by `b_stretch` meters
 // height represents the vertical length of the affine_pic (thickness of the limb)
 static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, affine_pic* affine,
-                              double a_stretch, double b_stretch, int flip = 0) {
+                              double a_stretch, double b_stretch, bool flip) {
     vect2 i = unit_vector(b - a);
     b = b + i * b_stretch;
     a = a - i * a_stretch;
@@ -185,7 +194,7 @@ static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, affin
 
 // Render a wheel or head affine_pic
 static void render_rigidbody(vect2 r, double radius, double rotation, pic8* dest,
-                             affine_pic* affine, int flip = 0) {
+                             affine_pic* affine, bool flip) {
     vect2 direction(cos(rotation) * radius, sin(rotation) * radius);
     if (flip) {
         render_affine_pic(r + direction, r - direction, dest, radius, affine, 0.0, 0.0, flip);
@@ -194,9 +203,14 @@ static void render_rigidbody(vect2 r, double radius, double rotation, pic8* dest
     }
 }
 
-static double BikeFrameX = -1, BikeFrameY = -1;
-static vect2 BikeFrameI, BikeFrameJ, BikeFrameR;
-static vect2 BikeFrameIPixels, BikeFrameJPixels, BikeFrameRPixels;
+static double BikeFrameX;
+static double BikeFrameY;
+static vect2 BikeFrameI;
+static vect2 BikeFrameJ;
+static vect2 BikeFrameR;
+static vect2 BikeFrameIPixels;
+static vect2 BikeFrameJPixels;
+static vect2 BikeFrameRPixels;
 
 // Render a bike frame fragment
 static void render_bike_part(pic8* dest, affine_pic* part, bike_box* box) {
@@ -306,7 +320,8 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
                                   minimap_x2, minimap_y2);
 
     // Draw the objects
-    int corner_x, corner_y;
+    int corner_x;
+    int corner_y;
     CanvasMinimap->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
     int object_border_left = corner_x;
     int object_border_bottom = corner_y;
@@ -400,7 +415,7 @@ static void handle_screenshot(pic8* pic) {
     if (Legkozment) {
         Legkozment = 0;
         int i = 0;
-        while (1) {
+        while (true) {
             std::string filename = std::format("snp{:05}.pcx", i);
             if (!std::filesystem::exists(filename)) {
                 pic->vertical_flip();
@@ -426,21 +441,17 @@ static void render_background(pic8* pic) {
     }
 }
 
-#ifdef DEBUG
-int Voltkilogas = 0;
-#endif
-
 // Render an entire bike + kuski
-static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_corner, motorst* mot,
+static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_corner, motorst* mot,
                         valtozok* metadata, bike_pics* bike, affine_pic* shirt) {
     double arm_position = metadata->ugrasnagysag;
     double turn_phase = metadata->baljobbv_f.forgas;
 
     // Check to see if bike is turning, and calculate the progress from -1.0 to 1.0 using cos
-    int is_turning = 0;
+    bool is_turning = false;
     StretchEnabled = false;
     if (turn_phase < 0.999) {
-        is_turning = 1;
+        is_turning = true;
         turn_phase = -cos(turn_phase * PI);
     }
 
@@ -450,24 +461,24 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
 
     // If turning, we will be rendering one wheel in the foreground (usually they are rendered in
     // background)
-    int left_wheel_in_back = 1;
-    int right_wheel_in_back = 1;
+    bool left_wheel_in_back = true;
+    bool right_wheel_in_back = true;
     if (is_turning) {
         if ((turn_phase > 0.0 && !mot->flipped_bike) || (turn_phase <= 0.0 && mot->flipped_bike)) {
-            left_wheel_in_back = 0;
+            left_wheel_in_back = false;
         } else {
-            right_wheel_in_back = 0;
+            right_wheel_in_back = false;
         }
     }
 
     // Render background wheels
     if (left_wheel_in_back) {
         render_rigidbody(left_wheel_r, WheelBackgroundRenderRadius, mot->left_wheel.rotation, pic,
-                         bike->wheel);
+                         bike->wheel, false);
     }
     if (right_wheel_in_back) {
         render_rigidbody(right_wheel_r, WheelBackgroundRenderRadius, mot->right_wheel.rotation, pic,
-                         bike->wheel);
+                         bike->wheel, false);
     }
 
     // Get the bike position and angle
@@ -485,15 +496,14 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
     // Swap the wheels temporarily for the purposes of drawing the suspension
     if (mot->flipped_bike) {
         bike_i = Vect2null - bike_i;
-        vect2 tmpv = left_wheel_r;
-        left_wheel_r = right_wheel_r;
-        right_wheel_r = tmpv;
+        std::swap(left_wheel_r, right_wheel_r);
     }
 
     // Bike frame calculations. Rotate the bike frame by 0.62 radians
-    BikeFrameX = 390.0, BikeFrameY = 420.0;
-    double BIKE_FRAME_ROTATION = 0.62;
-    double BIKE_FRAME_WIDTH = 0.0045;
+    BikeFrameX = 390.0;
+    BikeFrameY = 420.0;
+    constexpr double BIKE_FRAME_ROTATION = 0.62;
+    constexpr double BIKE_FRAME_WIDTH = 0.0045;
     BikeFrameI = bike_i * (BIKE_FRAME_WIDTH * cos(BIKE_FRAME_ROTATION)) +
                  bike_j * (BIKE_FRAME_WIDTH * sin(BIKE_FRAME_ROTATION));
     BikeFrameJ = rotate_90deg(BikeFrameI);
@@ -510,31 +520,31 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
     // Draw susp1
     vect2 susp1_r =
         BikeFrameI * (365.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 292.0) + BikeFrameR;
-    render_affine_pic(left_wheel_r, susp1_r, pic, 0.06, bike->susp1, 0.05, 0.03);
+    render_affine_pic(left_wheel_r, susp1_r, pic, 0.06, bike->susp1, 0.05, 0.03, false);
 
     // Draw susp2
     vect2 susp2_r =
         BikeFrameI * (370.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 520.0) + BikeFrameR;
-    render_affine_pic(susp2_r, right_wheel_r, pic, 0.06, bike->susp2, 0.0, 0.1);
+    render_affine_pic(susp2_r, right_wheel_r, pic, 0.06, bike->susp2, 0.0, 0.1, false);
 
     // Draw flagtag flag
-    int draw_flag = 0;
+    bool draw_flag = false;
     if (!Single && Tag) {
         if ((player1 && FlagTagAHasFlag) || (!player1 && !FlagTagAHasFlag)) {
-            draw_flag = 1;
+            draw_flag = true;
         }
 
         if (!draw_flag && FlagTagImmunity) {
             int blinking_flag_phase = (int)(time * 30.0);
             if (blinking_flag_phase % 2) {
-                draw_flag = 1;
+                draw_flag = true;
             }
         }
     }
-    vect2 flag_base_r = BikeFrameI * (500.0 + 107 - BikeFrameX) +
-                        BikeFrameJ * (BikeFrameY + 114 - 600.0) + BikeFrameR;
-    vect2 flag_tip_r = flag_base_r + (BikeFrameI * 356.0 + BikeFrameJ * 500.0) * 0.2;
     if (draw_flag) {
+        vect2 flag_base_r = BikeFrameI * (500.0 + 107 - BikeFrameX) +
+                            BikeFrameJ * (BikeFrameY + 114 - 600.0) + BikeFrameR;
+        vect2 flag_tip_r = flag_base_r + (BikeFrameI * 356.0 + BikeFrameJ * 500.0) * 0.2;
         render_affine_pic(flag_base_r, flag_tip_r, pic, 0.2, Lgr->flag, 0.0, 0.0,
                           mot->flipped_bike);
     }
@@ -555,8 +565,8 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
 
     // Calculate how to bend the knee based on the hip and foot positions
     vect2 knee_r;
-    double THIGH_LENGTH = 0.51;
-    double LEG_LENGTH = 0.51;
+    constexpr double THIGH_LENGTH = 0.51;
+    constexpr double LEG_LENGTH = 0.51;
     if (mot->flipped_bike) {
         knee_r = circles_intersection(hip_r, foot_r, THIGH_LENGTH, LEG_LENGTH);
     } else {
@@ -566,7 +576,7 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
     // Draw head
     double head_rotation = 0.0;
     if (mot->flipped_bike) {
-        head_rotation = 0 - head_rotation;
+        head_rotation = 0.0 - head_rotation;
     }
     render_rigidbody(mot->head_r - bottomleft_corner, HeadRadius,
                      mot->bike.rotation + head_rotation, pic, bike->head, mot->flipped_bike);
@@ -577,19 +587,19 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
         // Invert the arm volt percentage to progress from 0->1
         arm_position = 1.0 - arm_position;
         // Left volt + facing left OR right volt + facing left -> Arm goes up
-        int arm_goes_up = 1;
+        bool arm_goes_up = true;
         if ((metadata->ugras1volt && !mot->flipped_bike) ||
             (!metadata->ugras1volt && mot->flipped_bike)) {
             // Right volt + facing left OR left volt + facing right -> arm goes down
-            arm_goes_up = 0;
+            arm_goes_up = false;
         }
         double arm_rotation = 0.0;
         double arm_stretch = 0.1;
         if (arm_goes_up) {
             // Arm up
-            double arm_apex_time = 0.25;
-            double max_arm_rotation = 2.7;
-            double max_arm_stretch = -0.3;
+            constexpr double arm_apex_time = 0.25;
+            constexpr double max_arm_rotation = 2.7;
+            constexpr double max_arm_stretch = -0.3;
             if (arm_position < arm_apex_time) {
                 // Move arm to head (25%)
                 // arm_rotation (rotation) <- linear interpolation from 0 to max_arm_rotation
@@ -606,9 +616,9 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
             }
         } else {
             // Arm down
-            double arm_apex_time = 0.2;
-            double max_arm_rotation = -1.6;
-            double max_arm_stretch = 0.15;
+            constexpr double arm_apex_time = 0.2;
+            constexpr double max_arm_rotation = -1.6;
+            constexpr double max_arm_stretch = 0.15;
             if (arm_position < arm_apex_time) {
                 // Move arm down (20%)
                 // arm_rotation (rotation) <- linear interpolation from 0 to max_arm_rotation
@@ -636,8 +646,8 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
     }
 
     // Calculate how to bend the elbow based on shoulder and hand position
-    double FORARM_LENGTH = 0.308 * 1.05;
-    double UP_ARM_LENGTH = 0.328 * 1.05;
+    constexpr double FORARM_LENGTH = 0.308 * 1.05;
+    constexpr double UP_ARM_LENGTH = 0.328 * 1.05;
     vect2 elbow_r;
     if (mot->flipped_bike) {
         elbow_r = circles_intersection(hand_r, shoulder_r, FORARM_LENGTH, UP_ARM_LENGTH);
@@ -658,24 +668,22 @@ static void render_bike(int player1, pic8* pic, double time, vect2 bottomleft_co
     if (!left_wheel_in_back || !right_wheel_in_back) {
         if (mot->flipped_bike) {
             // If we had temporarily inverted the wheels earlier in this function, undo that now
-            vect2 tmpv = left_wheel_r;
-            left_wheel_r = right_wheel_r;
-            right_wheel_r = tmpv;
+            std::swap(left_wheel_r, right_wheel_r);
         }
         if (!left_wheel_in_back) {
             render_rigidbody(left_wheel_r, mot->left_wheel.radius, mot->left_wheel.rotation, pic,
-                             bike->wheel);
+                             bike->wheel, false);
         }
         if (!right_wheel_in_back) {
             render_rigidbody(right_wheel_r, mot->right_wheel.radius, mot->right_wheel.rotation, pic,
-                             bike->wheel);
+                             bike->wheel, false);
         }
     }
 }
 
 // Render the view for one player
 static void render_view(bool player1, pic8* pic, double time, motorst* mot, valtozok* metadata,
-                        int show_minimap, int show_timer, motorst* other_mot,
+                        bool show_minimap, bool show_timer, motorst* other_mot,
                         valtozok* other_metadata, camera& current_camera) {
     // Calculate frame of reference
     vect2 bike_center = mot->bike.r;
@@ -691,7 +699,8 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
                        GameViewHeight - 1);
 
     // Draw the objects
-    int corner_x, corner_y;
+    int corner_x;
+    int corner_y;
     CanvasBack->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
     int object_border_left = corner_x - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
     int object_border_bottom = corner_y - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
@@ -832,31 +841,27 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
     }
 }
 
-static pic8 player_view = pic8();
-
-extern int Ucsosurlodas;
-
-void render_game(double time, valtozok* metadata1, valtozok* metadata2, int show_minimap1,
-                 int show_timer1, int show_minimap2, int show_timer2, camera& current_camera) {
+void render_game(double time, valtozok* metadata1, valtozok* metadata2, bool show_minimap1,
+                 bool show_timer1, bool show_minimap2, bool show_timer2, camera& current_camera) {
     // Determine who we are going to draw (player 1, player 2 or both)
-    int splitscreen = 0;
-    int draw_player1_only = 1;
+    bool splitscreen = false;
+    bool draw_player1_only = true;
     if (!Single) {
         if (!metadata1->showkep && !metadata2->showkep) {
             internal_error("render_game nobody visible!");
         }
         if (metadata1->showkep && metadata2->showkep) {
-            splitscreen = 1;
+            splitscreen = true;
         } else {
             if (metadata1->showkep) {
-                draw_player1_only = 1;
+                draw_player1_only = true;
             } else {
-                draw_player1_only = 0;
+                draw_player1_only = false;
             }
         }
         if (current_camera.mode == CameraMode::MapViewer) {
-            splitscreen = 0;
-            draw_player1_only = 1;
+            splitscreen = false;
+            draw_player1_only = true;
         }
     }
 
@@ -871,6 +876,7 @@ void render_game(double time, valtozok* metadata1, valtozok* metadata2, int show
     }
 
     // Draw 1 or 2 players
+    static pic8 player_view = pic8();
     if (splitscreen) {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
         render_view(true, &player_view, time, Motor1, metadata1, show_minimap1, show_timer1, Motor2,

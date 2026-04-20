@@ -818,26 +818,16 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
 void render_game(double time, valtozok* metadata1, valtozok* metadata2, bool show_minimap1,
                  bool show_timer1, bool show_minimap2, bool show_timer2, camera& current_camera) {
     // Determine who we are going to draw (player 1, player 2 or both)
-    bool splitscreen = false;
-    bool draw_player1_only = true;
-    if (!Single) {
-        if (!metadata1->showkep && !metadata2->showkep) {
-            internal_error("render_game nobody visible!");
-        }
-        if (metadata1->showkep && metadata2->showkep) {
-            splitscreen = true;
-        } else {
-            if (metadata1->showkep) {
-                draw_player1_only = true;
-            } else {
-                draw_player1_only = false;
-            }
-        }
-        if (current_camera.mode == CameraMode::MapViewer) {
-            splitscreen = false;
-            draw_player1_only = true;
-        }
+    bool draw_player1 = metadata1->showkep;
+    bool draw_player2 = metadata2->showkep;
+    if (Single || current_camera.mode == CameraMode::MapViewer) {
+        draw_player1 = true;
+        draw_player2 = false;
     }
+    if (!draw_player1 && !draw_player2) {
+        internal_error("render_game nobody visible!");
+    }
+    bool splitscreen = draw_player1 && draw_player2;
 
     // Get the screen, upside-down
     pic8* pic = lockbackbuffer_pic();
@@ -861,7 +851,7 @@ void render_game(double time, valtozok* metadata1, valtozok* metadata2, bool sho
                     Motor1, metadata1, current_camera);
     } else {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
-        if (draw_player1_only) {
+        if (draw_player1) {
             render_view(true, &player_view, time, Motor1, metadata1, show_minimap1, show_timer1,
                         Motor2, metadata2, current_camera);
         } else {

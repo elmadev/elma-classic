@@ -408,14 +408,10 @@ static void handle_screenshot(pic8* pic) {
 
 // Cover the screen with qframe
 static void render_background(pic8* pic) {
-    int y = 0;
-    while (y < SCREEN_HEIGHT) {
-        int x = 0;
-        while (x < SCREEN_WIDTH) {
-            blit8(pic, Lgr->qframe, x, y);
-            x += Lgr->qframe->get_width();
+    for (int i = 0; i < pic->get_height(); i += Lgr->qframe->get_height()) {
+        for (int j = 0; j < pic->get_width(); j += Lgr->qframe->get_width()) {
+            blit8(pic, Lgr->qframe, j, i);
         }
-        y += Lgr->qframe->get_height();
     }
 }
 

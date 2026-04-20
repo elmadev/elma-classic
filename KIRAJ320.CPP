@@ -226,21 +226,14 @@ static void render_bike_part(pic8* dest, affine_pic* part, bike_box* box) {
 
 // Render a 3x3 square onto the minimap
 static void render_minimap_icon(pic8* pic, int x, int y, unsigned char palette_id) {
-#ifdef DEBUG
-    if (x < 1 || x >= pic->get_width() - 1 || y < 1 || y >= pic->get_height() - 1) {
-        internal_error("render_minimap_icon out of bounds!");
-    }
-#endif
-    unsigned char* row = pic->get_row(y - 1);
-    row[x - 1] = palette_id;
-    row[x] = palette_id;
-    row[x + 1] = palette_id;
-    row = pic->get_row(y + 1);
-    row[x - 1] = palette_id;
-    row[x] = palette_id;
-    row[x + 1] = palette_id;
+    pic->ppixel(x - 1, y - 1, palette_id);
+    pic->ppixel(x, y - 1, palette_id);
+    pic->ppixel(x + 1, y - 1, palette_id);
     pic->ppixel(x - 1, y, palette_id);
     pic->ppixel(x + 1, y, palette_id);
+    pic->ppixel(x - 1, y + 1, palette_id);
+    pic->ppixel(x, y + 1, palette_id);
+    pic->ppixel(x + 1, y + 1, palette_id);
 }
 
 // Render the entire minimap

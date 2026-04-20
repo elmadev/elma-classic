@@ -3,7 +3,7 @@
 #include "menu/ball_collision.h"
 #include "EDITUJ.H"
 #include "eol_settings.h"
-#include "KIRAJZOL.H"
+#include "renderer/render.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu/main.h"

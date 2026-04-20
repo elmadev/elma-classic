@@ -2,7 +2,7 @@
 #include "abc8.h"
 #include "anim.h"
 #include "menu/ball.h"
-#include "KIRAJZOL.H"
+#include "renderer/render.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "pic8.h"

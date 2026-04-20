@@ -36,7 +36,7 @@ elma_sources = files(
     'polygon.cpp',
     'wav.cpp',
     'src/menu/player.cpp',
-    'KIRAJ320.CPP',
+    'src/renderer/render.cpp',
     'affine_pic.cpp',
     'grass.cpp',
     'src/platform/utils.cpp',

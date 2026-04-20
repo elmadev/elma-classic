@@ -1,6 +1,6 @@
 #include "anim.h"
 #include "main.h"
-#include "KIRAJZOL.H"
+#include "renderer/render.h"
 #include "pic8.h"
 #include <cstring>
 #include <format>

@@ -5,7 +5,7 @@
 #include "eol_settings.h"
 #include "flagtag.h"
 #include "sound_engine.h"
-#include "KIRAJZOL.H"
+#include "renderer/render.h"
 #include "physics_forces.h"
 #include "level.h"
 #include "lgr.h"

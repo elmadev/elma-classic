@@ -1,5 +1,5 @@
-#ifndef KIRAJZOL_H
-#define KIRAJZOL_H
+#ifndef RENDER_H
+#define RENDER_H
 
 class pic8;
 struct valtozok;

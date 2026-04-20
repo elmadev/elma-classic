@@ -1,4 +1,4 @@
-#include "KIRAJZOL.H"
+#include "renderer/render.h"
 #include "abc8.h"
 #include "affine_pic.h"
 #include "anim.h"

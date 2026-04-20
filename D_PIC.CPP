@@ -2,12 +2,12 @@
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "editor/canvas.h"
-#include "KIRAJZOL.H"
 #include "lgr.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "pic8.h"
 #include "platform/implementation.h"
+#include "renderer/render.h"
 
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 600;

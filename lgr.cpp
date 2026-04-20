@@ -7,7 +7,7 @@
 #include "eol_settings.h"
 #include "fs_utils.h"
 #include "grass.h"
-#include "KIRAJZOL.H"
+#include "renderer/render.h"
 #include "level.h"
 #include "level_load.h"
 #include "M_PIC.H"

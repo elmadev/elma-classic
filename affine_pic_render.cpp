@@ -1,6 +1,6 @@
 #include "affine_pic_render.h"
 #include "affine_pic.h"
-#include "KIRAJZOL.H"
+#include "renderer/render.h"
 #include "pic8.h"
 #include "vect2.h"
 #include <algorithm>

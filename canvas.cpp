@@ -1352,9 +1352,9 @@ void canvas::render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x
     }
 
     // Convert corner frame of reference from meters to pixels
-    int view_top = 0;
+    int view_bottom = 0;
     int view_left = 0;
-    meters_to_pixels(corner, &view_left, &view_top);
+    meters_to_pixels(corner, &view_left, &view_bottom);
     int view_right = view_left + x2 - x1 + 1;
 
     // Calculate the texture graphic offset for the left edge of the screen
@@ -1365,7 +1365,7 @@ void canvas::render(bool player1, pic8* pic, vect2 corner, int x1, int y1, int x
     int background_x = positive_modulo(view_left / PARALLAX, Lgr->background_original_width);
 
     // Draw each row
-    int canvas_y1 = view_top - y1;
+    int canvas_y1 = view_bottom - y1;
     for (int i = y1; i <= y2; i++) {
         int canvas_y = i + canvas_y1;
         // Calculate the texture graphic y-offset for the current row
@@ -1385,13 +1385,13 @@ void canvas::render_minimap(bool player1, pic8* pic, vect2 corner, int x1, int y
     }
 
     // Convert corner frame of reference from meters to pixels
-    int view_top = 0;
+    int view_bottom = 0;
     int view_left = 0;
-    meters_to_pixels(corner, &view_left, &view_top);
+    meters_to_pixels(corner, &view_left, &view_bottom);
     int view_right = view_left + x2 - x1 + 1;
 
     // Draw each row
-    int canvas_y1 = view_top - y1;
+    int canvas_y1 = view_bottom - y1;
     for (int y = y1; y <= y2; y++) {
         int canvas_y = y + canvas_y1;
         render_row(player1, view_left, view_right, pic->get_row(y) + x1, canvas_y);

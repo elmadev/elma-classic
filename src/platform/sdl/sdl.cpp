@@ -530,7 +530,7 @@ int get_mouse_wheel_delta() { return MouseWheelDelta; }
 static SDL_AudioDeviceID SDLAudioDevice;
 static bool SDLSoundInitialized = false;
 
-static void audio_callback(void* udata, Uint8* stream, int len) {
+static void audio_callback(void* /*udata*/, Uint8* stream, int len) {
     sound_mixer((short*)stream, len / 2);
 }
 

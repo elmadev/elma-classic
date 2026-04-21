@@ -1,4 +1,4 @@
-#include "platform_sdl_keyboard.h"
+#include "platform/sdl/keyboard.h"
 
 #include <cstring>
 

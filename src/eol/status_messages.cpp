@@ -2,7 +2,7 @@
 
 #include "abc8.h"
 #include "pic8.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 
 constexpr size_t MAX_STATUS_MESSAGES = 3;
 constexpr long long STATUS_MESSAGE_LIFETIME_MS = 8000;

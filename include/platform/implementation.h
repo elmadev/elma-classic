@@ -1,5 +1,5 @@
-#ifndef PLATFORM_IMPL_H
-#define PLATFORM_IMPL_H
+#ifndef PLATFORM_IMPLEMENTATION_H
+#define PLATFORM_IMPLEMENTATION_H
 
 #include <string>
 #include <utility>

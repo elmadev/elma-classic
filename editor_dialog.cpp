@@ -6,8 +6,8 @@
 #include "main.h"
 #include "menu/pic.h"
 #include "pic8.h"
-#include "platform_impl.h"
-#include "platform_utils.h"
+#include "platform/implementation.h"
+#include "platform/utils.h"
 #include <algorithm>
 #include <cctype>
 #include <cstring>

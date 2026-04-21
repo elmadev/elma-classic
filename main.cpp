@@ -5,7 +5,7 @@
 #include "main.h"
 #include "menu/intro.h"
 #include "menu/pic.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include "util/util.h"
 #include <cstdio>
 #include <cstdlib>

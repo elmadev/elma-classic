@@ -11,7 +11,7 @@
 #include "main.h"
 #include "object.h"
 #include "physics_init.h"
-#include "platform_utils.h"
+#include "platform/utils.h"
 #include "sprite.h"
 #include "util/util.h"
 #include "qopen.h"

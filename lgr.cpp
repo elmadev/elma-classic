@@ -15,8 +15,8 @@
 #include "menu/pic.h"
 #include "pic8.h"
 #include "piclist.h"
-#include "platform_impl.h"
-#include "platform_utils.h"
+#include "platform/implementation.h"
+#include "platform/utils.h"
 #include "sprite.h"
 #include "debug/profiler.h"
 #include <algorithm>

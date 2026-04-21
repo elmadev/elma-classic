@@ -16,8 +16,8 @@
 #include "menu/pic.h"
 #include "object.h"
 #include "pic8.h"
-#include "platform_impl.h"
-#include "platform_utils.h"
+#include "platform/implementation.h"
+#include "platform/utils.h"
 #include "polygon.h"
 #include "sprite.h"
 #include <cstring>

@@ -1,8 +1,8 @@
 #include "M_PIC.H"
 #include "main.h"
 #include "pic8.h"
-#include "platform_impl.h"
-#include "platform_utils.h"
+#include "platform/implementation.h"
+#include "platform/utils.h"
 #include "qopen.h"
 #include <algorithm>
 #include <cstring>

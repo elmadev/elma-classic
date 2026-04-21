@@ -8,7 +8,7 @@
 #include "main.h"
 #include "menu/pic.h"
 #include "physics_init.h"
-#include "platform_utils.h"
+#include "platform/utils.h"
 #include "segments.h"
 #include "debug/profiler.h"
 #include <cstring>

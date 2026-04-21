@@ -6,7 +6,7 @@
 #include "main.h"
 #include "menu/pic.h"
 #include "pic8.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 600;

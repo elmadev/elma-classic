@@ -11,7 +11,7 @@
 #include "menu/player.h"
 #include "physics_init.h"
 #include "pic8.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include "menu/rec_list.h"
 #include "recorder.h"
 #include "state.h"

@@ -13,7 +13,7 @@
 #include "menu/pic.h"
 #include "menu/play.h"
 #include "recorder.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cstdlib>

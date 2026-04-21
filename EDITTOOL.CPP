@@ -3,7 +3,7 @@
 #include "editor_dialog.h"
 #include "editor/window.h"
 #include "EDITUJ.H"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include "polygon.h"
 #include "level.h"
 #include "lgr.h"

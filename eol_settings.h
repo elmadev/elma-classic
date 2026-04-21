@@ -1,7 +1,7 @@
 #ifndef EOL_SETTINGS
 #define EOL_SETTINGS
 
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include <directinput/scancodes.h>
 #include <string>
 

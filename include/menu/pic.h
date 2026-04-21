@@ -1,9 +1,10 @@
 #ifndef MENU_PIC_H
 #define MENU_PIC_H
 
+#include "platform/implementation.h"
+
 #include <string>
 #include <vector>
-#include <platform_impl.h>
 
 constexpr unsigned char BLACK_PALETTE_ID = 254;
 constexpr unsigned char GREEN_PALETTE_ID = 248;

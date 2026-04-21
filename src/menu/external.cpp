@@ -7,7 +7,7 @@
 #include "menu/nav.h"
 #include "menu/pic.h"
 #include "menu/play.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include "state.h"
 #include "directinput/scancodes.h"
 #include <cstring>

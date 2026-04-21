@@ -1,6 +1,6 @@
 #include "wav.h"
 #include "main.h"
-#include "platform_utils.h"
+#include "platform/utils.h"
 #include "qopen.h"
 #include <algorithm>
 #include <cstring>

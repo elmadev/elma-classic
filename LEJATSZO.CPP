@@ -12,7 +12,7 @@
 #include "main.h"
 #include "object.h"
 #include "physics_init.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include "segments.h"
 #include "timer.h"
 #include <algorithm>

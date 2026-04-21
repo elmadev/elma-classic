@@ -4,7 +4,7 @@
 #include "level.h"
 #include "menu/nav.h"
 #include "menu/pic.h"
-#include "platform_utils.h"
+#include "platform/utils.h"
 #include "state.h"
 #include "util/util.h"
 #include <cstring>

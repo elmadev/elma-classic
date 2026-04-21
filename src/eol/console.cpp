@@ -3,8 +3,8 @@
 #include "eol/status_messages.h"
 #include "eol_settings.h"
 #include "keys.h"
-#include "platform_impl.h"
-#include "platform_utils.h"
+#include "platform/implementation.h"
+#include "platform/utils.h"
 #include "util/util.h"
 #include <directinput/scancodes.h>
 #include <format>

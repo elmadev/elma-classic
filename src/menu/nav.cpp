@@ -5,8 +5,8 @@
 #include "keys.h"
 #include "main.h"
 #include "M_PIC.H"
-#include "platform_impl.h"
-#include "platform_utils.h"
+#include "platform/implementation.h"
+#include "platform/utils.h"
 #include <algorithm>
 #include <cstring>
 #include <directinput/scancodes.h>

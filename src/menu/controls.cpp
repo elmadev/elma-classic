@@ -4,7 +4,7 @@
 #include "keys.h"
 #include "main.h"
 #include "menu/nav.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include "state.h"
 #include <cstring>
 #include <format>

@@ -15,7 +15,7 @@
 #include "menu/play.h"
 #include "recorder.h"
 #include "menu/replay.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include "util/util.h"
 #include <string>
 

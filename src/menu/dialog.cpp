@@ -1,7 +1,7 @@
 #include "menu/dialog.h"
 #include "main.h"
 #include "menu/pic.h"
-#include "platform_impl.h"
+#include "platform/implementation.h"
 #include <directinput/scancodes.h>
 
 // Display the menu with the provided text, then return the key pressed by the user.

@@ -27,7 +27,6 @@ class eol {
     void exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
                     bool dead);
 
-    enum class TableType { None, PlayersOnline };
     void set_table(TableType);
     void render_table(pic8& dest, abc8& title_font, abc8& data_font) const;
 

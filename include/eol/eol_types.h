@@ -9,4 +9,6 @@ struct kuski {
     char level[MAX_FILENAME_LEN + 1];
 };
 
+enum class TableType { None, PlayersOnline };
+
 #endif

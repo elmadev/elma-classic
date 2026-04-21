@@ -670,7 +670,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         }
 
         if (was_game_key_just_pressed(DIK_F5)) {
-            EolClient->set_table(eol::TableType::PlayersOnline);
+            EolClient->set_table(TableType::PlayersOnline);
         }
 
         // Vizsgalat kilepesre:

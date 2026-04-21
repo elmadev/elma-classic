@@ -39,4 +39,8 @@ struct exit_level {
     bool dead;
 };
 
+struct show_table {
+    TableType table;
+};
+
 #endif

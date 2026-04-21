@@ -23,7 +23,7 @@
 constexpr int TOP_TEN_HEADER = 6754362;
 constexpr int TOP_TEN_FOOTER = 8674642;
 
-static char InternalFilePaths[STATE_LEVEL_COUNT + 2][14] = {
+constexpr char INTERNAL_FILE_PATHS[STATE_LEVEL_COUNT + 2][14] = {
     "nulla.leb",    "a01.leb",     "a02.leb",      "a03.leb",      "a04.leb",     "a05.leb",
     "a06.leb",      "a07.leb",     "ujtag.leb",    "a08.leb",      "a09.leb",     "ujgrav.leb",
     "a10.leb",      "a11.leb",     "a12.leb",      "a13.leb",      "a14.leb",     "a15.leb",
@@ -528,7 +528,7 @@ level::level(const char* filename) {
 
     std::optional<int> internal_index = get_internal_index(filename);
     if (internal_index.has_value()) {
-        from_file(InternalFilePaths[internal_index.value()], true);
+        from_file(INTERNAL_FILE_PATHS[internal_index.value()], true);
         // Override lgr name from lgrlist.txt
         filepath lgrpath;
         const char* lgrname = InternalLevelLgrs[internal_index.value()];

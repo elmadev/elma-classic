@@ -17,7 +17,7 @@
 #include "menu/replay.h"
 #include "recorder.h"
 #include "util/util.h"
-#include "skip.h"
+#include "menu/skip.h"
 #include "timer.h"
 #include "eol_settings.h"
 #include "fs_utils.h"

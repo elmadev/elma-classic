@@ -59,7 +59,7 @@ elma_sources = files(
     'src/menu/replay_cache.cpp',
     'platform_sdl.cpp',
     'platform_sdl_keyboard.cpp',
-    'skip.cpp',
+    'src/menu/skip.cpp',
     'src/eol/status_messages.cpp',
     'state.cpp',
     'segments.cpp',

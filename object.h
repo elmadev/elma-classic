@@ -28,9 +28,9 @@ class object {
     object(double x, double y, Type typ);
     object(FILE* h, int version);
     // Render object in editor.
-    void render();
+    void render() const;
     void save(FILE* h);
-    double checksum();
+    double checksum() const;
 };
 
 #endif

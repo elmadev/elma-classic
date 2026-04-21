@@ -12,7 +12,7 @@ object::object(double x, double y, Type typ) {
     animation = 0;
 }
 
-void object::render() {
+void object::render() const {
     // Draw a circle approximated by 16 slices
     int slices = 16;
     double radius = 0.4;
@@ -114,7 +114,7 @@ void object::save(FILE* h) {
     }
 }
 
-double object::checksum() {
+double object::checksum() const {
     double sum = 0;
     sum += r.x;
     sum += r.y;

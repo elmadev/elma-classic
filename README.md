@@ -1,15 +1,18 @@
-# Game release
-This is NOT a playable release of Elasto Mania. If you're looking to play any of the Elasto Mania games, visit https://elastomania.com.
+# Public EOL Source Code (Elma OnLine)
 
-# Elasto Mania (2000) Source Code
-This repository was uploaded in good faith for the purpose of exploring the original source code of this classic game. Non-source-code game assets (sounds, graphics, tools, etc.) are not part of this open source release.
+This repository contains the source code for EOL, an online-enabled version of Elasto Mania featuring online battles, hosted on https://elma.online/.
 
-See LICENSE.md for license information.
+This repository is a fork of the [Elasto Mania source code](https://github.com/elastomania/elma-classic) published and [licensed](./LICENSE.md) by the Elasto Mania Team. Game assets such as elma.res and default.lgr are not open-source, and are only available from [purchasing](https://elastomania.com/) the game.
 
-If you'd like to use this source code in ways other than permitted by the license and this document, contact us at info@elastomania.com.
+The server-side code as well as the communication protocol between EOL and the server is closed-source.
 
-If you'd like to support continued development of the Elasto Mania franchise, you can do so by buying our games on any store front linked on our website.
+# Getting Started
 
-*The Elasto Mania Team*
+We welcome everyone that would like to contribute and help improve EOL.
 
-https://elastomania.com
+To get started:
+
+- Join us on the Elasto Mania Discord https://discord.gg/j5WMFC6 in #elma-developers!
+- Make sure you are able to build the game: [docs/BUILDING.md](./docs/BUILDING.md)
+- Look through open issues or design your own improvement
+- Prepare and submit a pull request [CONTRIBUTING.md](./CONTRIBUTING.md)

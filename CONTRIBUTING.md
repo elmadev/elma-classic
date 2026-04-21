@@ -1,5 +1,7 @@
 # Contributing
 
+Join us on the Elasto Mania Discord https://discord.gg/j5WMFC6 in #elma-developers!
+
 ## Building
 
 See [docs/BUILDING.md](./docs/BUILDING.md)
@@ -48,7 +50,7 @@ refactor(editplay): extract toolbar rendering into helper
 chore(meson): bump SDL2 to 2.32.8
 ```
 
-The subject line should be self-explanatory. Use the body to explain *why*, not *what*, when the motivation isn't obvious from the diff.
+The subject line should be self-explanatory. Use the body to explain _why_, not _what_, when the motivation isn't obvious from the diff.
 
 ## Branches
 

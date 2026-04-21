@@ -1,5 +1,5 @@
-#include "ball_collision.h"
-#include "ball.h"
+#include "menu/ball_collision.h"
+#include "menu/ball.h"
 #include "main.h"
 #include "M_PIC.H"
 #include <cmath>

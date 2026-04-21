@@ -1,6 +1,6 @@
 #include "menu/intro.h"
 #include "abc8.h"
-#include "ball_collision.h"
+#include "menu/ball_collision.h"
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "KIRAJZOL.H"

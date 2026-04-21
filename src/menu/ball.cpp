@@ -1,5 +1,5 @@
-#include "ball.h"
-#include "ball_handler.h"
+#include "menu/ball.h"
+#include "menu/ball_handler.h"
 #include "main.h"
 #include "M_PIC.H"
 #include "util/util.h"

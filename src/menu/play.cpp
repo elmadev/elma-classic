@@ -1,7 +1,7 @@
 #include "menu/play.h"
 #include "M_PIC.H"
 #include "abc8.h"
-#include "best_times.h"
+#include "menu/best_times.h"
 #include "EDITUJ.H"
 #include "flagtag.h"
 #include "keys.h"

@@ -1,6 +1,6 @@
 #include "menu/replay.h"
 
-#include "best_times.h"
+#include "menu/best_times.h"
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "fs_utils.h"

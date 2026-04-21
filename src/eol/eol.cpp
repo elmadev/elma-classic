@@ -77,13 +77,20 @@ void eol::set_table(TableType table) {
     switch (table) {
     case TableType::None:
         cur_table = nullptr;
-        return;
+        break;
     case TableType::PlayersOnline:
         new_table = &players_online_table;
         break;
     }
 
-    cur_table = cur_table == new_table ? nullptr : new_table;
+    if (cur_table != new_table) {
+        cur_table = new_table;
+    } else {
+        cur_table = nullptr;
+        table = TableType::None;
+    }
+
+    proto.send(show_table{.table = table});
 }
 
 void eol::render_table(pic8& dest, abc8& title_font, abc8& data_font) const {

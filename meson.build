@@ -10,6 +10,10 @@ if get_option('profile_performance') == true
     add_project_arguments('-DPROFILE_PERFORMANCE', language: 'cpp')
 endif
 
+if get_option('shareware') == true
+    add_project_arguments('-DELMA_SHAREWARE', language: 'cpp')
+endif
+
 elma_sources = files(
     'abc8.cpp',
     'physics_init.cpp',

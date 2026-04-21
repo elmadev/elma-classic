@@ -6,8 +6,13 @@
 struct res_file {
     char filename[16];
     // In Shareware the order of these two fields is reversed.
+    #ifdef ELMA_SHAREWARE
+    int offset;
+    int length;
+    #else
     int length;
     int offset;
+    #endif
 };
 
 constexpr char RES_FILENAME[] = "elma.res";
@@ -23,7 +28,11 @@ static int FileCount = 0;
 static void decrypt() {
     short a = 23;
     // In Shareware, b is 9882
+    #ifdef ELMA_SHAREWARE
+    short b = 9882;
+    #else
     short b = 9982;
+    #endif
     short c = 3391;
 
     if (!ResFiles) {

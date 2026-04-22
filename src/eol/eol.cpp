@@ -2,6 +2,8 @@
 #include "eol/status_messages.h"
 #include "eol/console.h"
 #include "eol_settings.h"
+#include "log.h"
+#include "platform/implementation.h"
 #include <cstring>
 #include <chrono>
 #include <format>
@@ -52,6 +54,41 @@ void eol::process(const kuski_set_level& l) {
 
     strncpy(k->level, (const char*)l.level, MAX_FILENAME_LEN);
     sync_players_online_table();
+}
+
+void eol::process(const battle_started& bs) {
+    current_battle = bs.bat;
+
+    if (current_battle->in_countdown) {
+        StatusMessages->add("battle countdown started");
+    } else {
+        StatusMessages->add("battle running");
+    }
+}
+
+void eol::process(const battle_countdown_ended&) {
+    if (!current_battle) {
+        LOG_ERROR("Received battle_countdown_ended message, but no battle is active");
+        return;
+    }
+
+    current_battle->in_countdown = false;
+    current_battle->local_start_ms = get_milliseconds();
+    StatusMessages->add("battle running");
+}
+
+void eol::process(const battle_ended& be) {
+    current_battle.reset();
+    StatusMessages->add(be.aborted ? "battle aborted" : "battle over");
+}
+
+void eol::process(const battle_time_sync& bts) {
+    if (!current_battle) {
+        LOG_ERROR("Received battle_time_sync message, but no battle is active");
+        return;
+    }
+
+    current_battle->local_start_ms = bts.local_start_ms;
 }
 
 void eol::sync_players_online_table() {

@@ -552,12 +552,8 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
     }
 
     // Draw head
-    double head_rotation = 0.0;
-    if (mot->flipped_bike) {
-        head_rotation = 0.0 - head_rotation;
-    }
-    render_rigidbody(mot->head_r - bottomleft_corner, HeadRadius,
-                     mot->bike.rotation + head_rotation, pic, bike->head, mot->flipped_bike);
+    render_rigidbody(mot->head_r - bottomleft_corner, HeadRadius, mot->bike.rotation, pic,
+                     bike->head, mot->flipped_bike);
 
     // Hand is located on the handlebars, unless we are volting
     vect2 hand_r = susp1_r;

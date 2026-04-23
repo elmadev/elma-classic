@@ -57,4 +57,18 @@ struct chat_message {
     char message[MAX_MESSAGE_LEN + 1];
 };
 
+struct battle_started {
+    battle bat;
+};
+
+struct battle_countdown_ended {};
+
+struct battle_ended {
+    bool aborted;
+};
+
+struct battle_time_sync {
+    long long local_start_ms;
+};
+
 #endif

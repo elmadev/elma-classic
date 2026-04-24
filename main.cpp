@@ -1,13 +1,13 @@
 #include "editor/canvas.h"
 #include "eol/eol.h"
 #include "eol_settings.h"
+#include "log.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu/intro.h"
 #include "menu/pic.h"
 #include "platform/implementation.h"
 #include "util/util.h"
-#include <cstdio>
 #include <cstdlib>
 #include <directinput/scancodes.h>
 #include <string>
@@ -51,24 +51,13 @@ void quit() { exit(0); }
 
 bool ErrorGraphicsLoaded = false;
 
-[[noreturn]] static void handle_error(const std::string& prefix, const std::string& message) {
+[[noreturn]] static void handle_error(const std::string& prefix, const std::string& message,
+                                      std::source_location loc) {
     static bool InError = false;
-    static FILE* ErrorHandle;
-    if (!InError) {
-        ErrorHandle = fopen("error.txt", "w");
-    }
-    if (ErrorHandle) {
-        if (InError) {
-            fprintf(ErrorHandle, "\nTwo errors while processing!\n");
-        }
-        fprintf(ErrorHandle, "%s\n%s\n", prefix.c_str(), message.c_str());
-    }
+    logger::instance().write(LogLevel::Fatal, loc, std::format("{} {}", prefix, message));
 
     if (InError) {
-        if (ErrorHandle) {
-            fclose(ErrorHandle);
-        }
-        message_box("A fatal error occurred. Details written to error.txt.");
+        message_box("A fatal error occurred. Details written to eol.log.");
         quit();
     }
     InError = true;
@@ -92,16 +81,17 @@ bool ErrorGraphicsLoaded = false;
         message_box(text.c_str());
     }
 
-    fclose(ErrorHandle);
     quit();
 }
 
-void internal_error(const std::string& message) { handle_error("Sorry, internal error.", message); }
+void internal_error(const std::string& message, std::source_location loc) {
+    handle_error("Sorry, internal error.", message, loc);
+}
 
-void external_error(const std::string& message) {
+void external_error(const std::string& message, std::source_location loc) {
     if (message.find("memory") != std::string::npos) {
-        handle_error("Sorry, out of memory!", message);
+        handle_error("Sorry, out of memory!", message, loc);
     } else {
-        handle_error("External error encountered:", message);
+        handle_error("External error encountered:", message, loc);
     }
 }

@@ -52,6 +52,7 @@
 * Mask previews are no longer horizontally truncated in the internal editor
 * Screenshots are now saved into the screenshots folder with a timestamp-name instead of root snp00001
 * Screenshots are now saved as bmp instead of pcx
+* error.txt has been replaced with eol.log
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems

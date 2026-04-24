@@ -66,6 +66,7 @@ elma_sources = files(
     'src/menu/intro.cpp',
     'physics_collision.cpp',
     'level.cpp',
+    'src/log.cpp',
     'src/menu/nav.cpp',
     'vect2.cpp',
     'eol_settings.cpp',
@@ -98,6 +99,9 @@ endif
 
 win_subsystem = 'windows'
 if cpp.get_id() == 'msvc'
+    # Conforming preprocessor required for __VA_OPT__
+    cpp_args += ['/Zc:preprocessor']
+
     if get_option('buildtype') == 'debug' or get_option('buildtype') == 'debugoptimized' or get_option('profile_performance') == true
         # Allows printf when debugging
         win_subsystem = 'console'

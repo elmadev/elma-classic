@@ -6,7 +6,7 @@
 #include "sound_engine.h"
 #include "keys.h"
 #include "platform/sdl/keyboard.h"
-#include "gl_renderer.h"
+#include "platform/sdl/gl_renderer.h"
 #include "main.h"
 #include "M_PIC.H"
 #include "pic8.h"

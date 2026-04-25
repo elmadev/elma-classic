@@ -1,4 +1,4 @@
-#include "gl_renderer.h"
+#include "platform/sdl/gl_renderer.h"
 #include "main.h"
 
 #include <glad/glad.h>

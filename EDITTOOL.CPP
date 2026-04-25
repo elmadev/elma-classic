@@ -1,6 +1,6 @@
 #include "EDITTOOL.H"
-#include "editor_canvas.h"
-#include "editor_dialog.h"
+#include "editor/canvas.h"
+#include "editor/dialog.h"
 #include "editor/window.h"
 #include "EDITUJ.H"
 #include "platform/implementation.h"

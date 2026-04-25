@@ -1,5 +1,5 @@
 #include "object.h"
-#include "editor_canvas.h"
+#include "editor/canvas.h"
 #include "main.h"
 #include "util/util.h"
 #include <cmath>

@@ -1,6 +1,6 @@
 #include "polygon.h"
-#include "editor_canvas.h"
-#include "editor_dialog.h"
+#include "editor/canvas.h"
+#include "editor/dialog.h"
 #include "level.h"
 #include "main.h"
 #include "util/util.h"

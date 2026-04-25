@@ -1,4 +1,4 @@
-#include "editor_canvas.h"
+#include "editor/canvas.h"
 #include "eol/eol.h"
 #include "eol_settings.h"
 #include "M_PIC.H"

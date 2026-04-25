@@ -1,5 +1,5 @@
 #include "sprite.h"
-#include "editor_canvas.h"
+#include "editor/canvas.h"
 #include "fs_utils.h"
 #include "lgr.h"
 #include "main.h"

@@ -1,5 +1,5 @@
 #include "lgr.h"
-#include "editor_dialog.h"
+#include "editor/dialog.h"
 #include "EDITUJ.H"
 #include "affine_pic.h"
 #include "anim.h"

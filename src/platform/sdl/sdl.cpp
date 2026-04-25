@@ -1,5 +1,5 @@
 #include "platform/implementation.h"
-#include "editor_dialog.h"
+#include "editor/dialog.h"
 #include "eol_settings.h"
 #include "eol/eol.h"
 #include "EDITUJ.H"

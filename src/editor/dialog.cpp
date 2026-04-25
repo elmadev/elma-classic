@@ -1,4 +1,4 @@
-#include "editor_dialog.h"
+#include "editor/dialog.h"
 #include "abc8.h"
 #include "EDITUJ.H"
 #include "keys.h"

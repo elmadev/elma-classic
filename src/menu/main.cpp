@@ -1,6 +1,6 @@
 #include "menu/main.h"
 #include "menu/best_times.h"
-#include "editor_dialog.h"
+#include "editor/dialog.h"
 #include "EDITUJ.H"
 #include "eol_settings.h"
 #include "fs_utils.h"

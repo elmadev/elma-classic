@@ -1,5 +1,5 @@
-#include "editor_help.h"
-#include "editor_dialog.h"
+#include "editor/help.h"
+#include "editor/dialog.h"
 
 void editor_help() {
     dialog("GENERAL HELP",

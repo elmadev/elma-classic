@@ -13,32 +13,46 @@ enum class FullscreenMode { Windowed, Fullscreen, FullscreenDesktop };
 
 template <typename T> struct Default {
     T value;
+    T persisted;
     T def;
 
     constexpr Default(T default_value)
         : value(default_value),
+          persisted(default_value),
           def(default_value) {}
 
     operator T() const;
     Default& operator=(T v);
-    void reset();
+    void reset_to_persisted();
+    void reset_to_default();
+
+  private:
+    friend class eol_settings;
+    void mark_persisted();
 };
 
 template <typename T> struct Clamp {
     T value;
     T min;
+    T persisted;
     T def;
     T max;
 
     constexpr Clamp(T min_val, T def_val, T max_val)
         : value(def_val),
           min(min_val),
+          persisted(def_val),
           def(def_val),
           max(max_val) {}
 
     operator T() const;
     Clamp& operator=(T v);
-    void reset();
+    void reset_to_persisted();
+    void reset_to_default();
+
+  private:
+    friend class eol_settings;
+    void mark_persisted();
 };
 
 // Declares/defines getter/setter/default for a field of `eol_settings`.

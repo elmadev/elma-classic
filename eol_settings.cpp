@@ -27,7 +27,14 @@ template <typename T> Default<T>& Default<T>::operator=(T v) {
     return *this;
 }
 
-template <typename T> void Default<T>::reset() { value = def; }
+template <typename T> void Default<T>::mark_persisted() { persisted = value; }
+
+template <typename T> void Default<T>::reset_to_persisted() { value = persisted; }
+
+template <typename T> void Default<T>::reset_to_default() {
+    value = def;
+    persisted = def;
+}
 
 template <typename T> Clamp<T>::operator T() const { return value; }
 
@@ -36,7 +43,14 @@ template <typename T> Clamp<T>& Clamp<T>::operator=(T v) {
     return *this;
 }
 
-template <typename T> void Clamp<T>::reset() { value = def; }
+template <typename T> void Clamp<T>::mark_persisted() { persisted = value; }
+
+template <typename T> void Clamp<T>::reset_to_persisted() { value = persisted; }
+
+template <typename T> void Clamp<T>::reset_to_default() {
+    value = def;
+    persisted = def;
+}
 
 template struct Default<bool>;
 template struct Default<MapAlignment>;

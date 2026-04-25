@@ -215,6 +215,18 @@ void eol_settings::set_cripple_one_turn(bool b) {
     }
 }
 
+void eol_settings::set_hostname(std::string hostname) { hostname_ = std::move(hostname); }
+
+void eol_settings::set_tcp_port(int p) { tcp_port_ = p; }
+
+void eol_settings::set_nick(std::string nick) { nick_ = std::move(nick); }
+
+void eol_settings::set_password(std::string password) { password_ = std::move(password); }
+
+void eol_settings::set_play_offline(bool o) { play_offline_ = o; }
+
+void eol_settings::set_tcp_only(bool t) { tcp_only_ = t; }
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -355,7 +367,13 @@ void from_json(const json& j, FullscreenMode& f) {
     JSON_FIELD(cripple_no_turn)                                                                    \
     JSON_FIELD(cripple_no_volt)                                                                    \
     JSON_FIELD(cripple_one_turn)                                                                   \
-    JSON_FIELD(cripple_drunk)
+    JSON_FIELD(cripple_drunk)                                                                      \
+    JSON_FIELD(hostname)                                                                           \
+    JSON_FIELD(tcp_port)                                                                           \
+    JSON_FIELD(nick)                                                                               \
+    JSON_FIELD(password)                                                                           \
+    JSON_FIELD(play_offline)                                                                       \
+    JSON_FIELD(tcp_only)
 
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }

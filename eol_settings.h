@@ -53,6 +53,12 @@ template <typename T> struct Clamp {
     void set_##name(decltype(eol_settings::name##_.value));                                        \
     decltype(eol_settings::name##_.value) name##_default() const { return name##_.def; }
 
+#ifndef DEBUG
+constexpr int DEFAULT_TCP_PORT = 4460;
+#else
+constexpr int DEFAULT_TCP_PORT = 4470;
+#endif
+
 class eol_settings {
     Clamp<int> screen_width_{640, 800, 10000};
     Clamp<int> screen_height_{480, 600, 10000};
@@ -103,6 +109,12 @@ class eol_settings {
     Default<bool> cripple_no_volt_{false};
     Default<bool> cripple_one_turn_{false};
     Default<bool> cripple_drunk_{false};
+    Default<std::string> hostname_{"eol.elma.online"};
+    Default<int> tcp_port_{DEFAULT_TCP_PORT};
+    Default<std::string> nick_{""};
+    Default<std::string> password_{""};
+    Default<bool> play_offline_{false};
+    Default<bool> tcp_only_{false};
 
   public:
     static void read_settings();
@@ -159,6 +171,12 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(cripple_no_volt);
     DECLARE_FIELD_FUNCS(cripple_one_turn);
     DECLARE_FIELD_FUNCS(cripple_drunk);
+    DECLARE_FIELD_FUNCS(hostname);
+    DECLARE_FIELD_FUNCS(tcp_port);
+    DECLARE_FIELD_FUNCS(nick);
+    DECLARE_FIELD_FUNCS(password);
+    DECLARE_FIELD_FUNCS(play_offline);
+    DECLARE_FIELD_FUNCS(tcp_only);
 };
 
 #undef DECLARE_FIELD_FUNCS

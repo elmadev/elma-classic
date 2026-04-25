@@ -371,6 +371,14 @@ void from_json(const json& j, FullscreenMode& f) {
     JSON_FIELD(cripple_one_turn)                                                                   \
     JSON_FIELD(cripple_drunk)
 
+#define JSON_FIELD(name)                                                                           \
+    void eol_settings::persist_##name(decltype(eol_settings::name##_.value) v) {                   \
+        set_##name(v);                                                                             \
+        name##_.mark_persisted();                                                                  \
+    }
+FIELD_LIST
+#undef JSON_FIELD
+
 #define JSON_FIELD(name) {#name, s.name()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
 #undef JSON_FIELD

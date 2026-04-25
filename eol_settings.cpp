@@ -379,7 +379,7 @@ void from_json(const json& j, FullscreenMode& f) {
 FIELD_LIST
 #undef JSON_FIELD
 
-#define JSON_FIELD(name) {#name, s.name()},
+#define JSON_FIELD(name) {#name, s.name##_persisted()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
 #undef JSON_FIELD
 
@@ -387,8 +387,8 @@ void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
     {                                                                                              \
         try {                                                                                      \
             decltype(s.name()) name;                                                               \
-            name = j.value(#name, s.name());                                                       \
-            s.set_##name(name);                                                                    \
+            name = j.value(#name, s.name##_persisted());                                           \
+            s.persist_##name(name);                                                                \
         } catch (json::exception & e) {                                                            \
             external_error(std::string("Invalid parameter in " SETTINGS_JSON "!\n") + e.what());   \
         } catch (const char* e) {                                                                  \

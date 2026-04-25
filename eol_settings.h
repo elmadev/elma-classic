@@ -62,11 +62,13 @@ template <typename T> struct Clamp {
 //   int foo() const { return foo_; }
 //   void set_foo(int);
 //   void persist_foo(int);
+//   int foo_persisted() const { return foo_.persisted; }
 //   int foo_default() const { return foo_.def; }
 #define DECLARE_FIELD_FUNCS(name)                                                                  \
     decltype(eol_settings::name##_.value) name() const { return name##_; }                         \
     void set_##name(decltype(eol_settings::name##_.value));                                        \
     void persist_##name(decltype(eol_settings::name##_.value));                                    \
+    decltype(eol_settings::name##_.value) name##_persisted() const { return name##_.persisted; }   \
     decltype(eol_settings::name##_.value) name##_default() const { return name##_.def; }
 
 class eol_settings {

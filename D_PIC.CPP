@@ -24,8 +24,8 @@ static void on_resolution_change() {
 }
 
 void update_resolution(int w, int h) {
-    EolSettings->set_screen_width(w);
-    EolSettings->set_screen_height(h);
+    EolSettings->persist_screen_width(w);
+    EolSettings->persist_screen_height(h);
     platform_resize_window(w, h);
     on_resolution_change();
 }

@@ -61,14 +61,14 @@ static void menu_lgr() {
         int len = strlen(filename);
         std::string lgrname = std::string(filename, len - LGR_EXT_LEN);
 
-        nav.add_row(lgrname, NAV_FUNC() { EolSettings->set_default_lgr_name(left); });
+        nav.add_row(lgrname, NAV_FUNC() { EolSettings->persist_default_lgr_name(left); });
 
         done = find_next(filename);
     }
     find_close();
 
     nav.sort_rows();
-    nav.select_row(EolSettings->default_lgr_name());
+    nav.select_row(EolSettings->default_lgr_name_persisted());
 
     nav.navigate();
 }
@@ -86,7 +86,7 @@ static constexpr resolution RESOLUTIONS[] = {
 static void menu_resolution() {
     menu_nav nav("Pick a resolution!");
 
-    if (EolSettings->fullscreen() == FullscreenMode::Fullscreen) {
+    if (EolSettings->fullscreen_persisted() == FullscreenMode::Fullscreen) {
         auto display_modes = platform_get_display_modes();
         for (const auto& [w, h] : display_modes) {
             std::string label = std::format("{}x{}", w, h);
@@ -103,8 +103,8 @@ static void menu_resolution() {
         }
     }
 
-    std::string current =
-        std::format("{}x{}", EolSettings->screen_width(), EolSettings->screen_height());
+    std::string current = std::format("{}x{}", EolSettings->screen_width_persisted(),
+                                      EolSettings->screen_height_persisted());
     nav.select_row(current);
 
     nav.navigate();
@@ -133,18 +133,18 @@ static void menu_fullscreen() {
 
     for (auto mode : MODES) {
         nav.add_row(
-            fullscreen_mode_label(mode), NAV_FUNC(mode) { EolSettings->set_fullscreen(mode); });
+            fullscreen_mode_label(mode), NAV_FUNC(mode) { EolSettings->persist_fullscreen(mode); });
     }
 
-    nav.select_row(fullscreen_mode_label(EolSettings->fullscreen()));
+    nav.select_row(fullscreen_mode_label(EolSettings->fullscreen_persisted()));
 
     nav.navigate();
 }
 
 #define BOOL_OPTION(text, setting)                                                                 \
     nav.add_row(                                                                                   \
-        text, EolSettings->setting() ? "Yes" : "No",                                               \
-        NAV_FUNC() { EolSettings->set_##setting(!EolSettings->setting()); });
+        text, EolSettings->setting##_persisted() ? "Yes" : "No",                                   \
+        NAV_FUNC() { EolSettings->persist_##setting(!EolSettings->setting##_persisted()); });
 
 static void menu_cripples() {
     int choice = 0;
@@ -228,9 +228,10 @@ void menu_options() {
         nav.add_row("Cripples ...", NAV_FUNC() { menu_cripples(); });
 
         nav.add_row(
-            "Pics In Background:", EolSettings->pictures_in_background() ? "Yes" : "No",
+            "Pics In Background:", EolSettings->pictures_in_background_persisted() ? "Yes" : "No",
             NAV_FUNC() {
-                EolSettings->set_pictures_in_background(!EolSettings->pictures_in_background());
+                EolSettings->persist_pictures_in_background(
+                    !EolSettings->pictures_in_background_persisted());
                 invalidate_level();
             });
 
@@ -240,7 +241,7 @@ void menu_options() {
         nav.add_row(
             "Minimap Alignment:",
             [] {
-                switch (EolSettings->map_alignment()) {
+                switch (EolSettings->map_alignment_persisted()) {
                 case MapAlignment::None:
                     return "None";
                 case MapAlignment::Left:
@@ -253,67 +254,70 @@ void menu_options() {
                 return "";
             }(),
             NAV_FUNC() {
-                switch (EolSettings->map_alignment()) {
+                switch (EolSettings->map_alignment_persisted()) {
                 case MapAlignment::None:
-                    EolSettings->set_map_alignment(MapAlignment::Left);
+                    EolSettings->persist_map_alignment(MapAlignment::Left);
                     return;
                 case MapAlignment::Left:
-                    EolSettings->set_map_alignment(MapAlignment::Middle);
+                    EolSettings->persist_map_alignment(MapAlignment::Middle);
                     return;
                 case MapAlignment::Middle:
-                    EolSettings->set_map_alignment(MapAlignment::Right);
+                    EolSettings->persist_map_alignment(MapAlignment::Right);
                     return;
                 case MapAlignment::Right:
-                    EolSettings->set_map_alignment(MapAlignment::None);
+                    EolSettings->persist_map_alignment(MapAlignment::None);
                     return;
                 }
             });
 
         nav.add_row(
             "Minimap Size:",
-            std::format("{}x{}", EolSettings->minimap_width(), EolSettings->minimap_height()),
+            std::format("{}x{}", EolSettings->minimap_width_persisted(),
+                        EolSettings->minimap_height_persisted()),
             NAV_FUNC() {
-                int w = EolSettings->minimap_width();
+                int w = EolSettings->minimap_width_persisted();
                 if (w == 140) {
-                    EolSettings->set_minimap_width(180);
-                    EolSettings->set_minimap_height(90);
+                    EolSettings->persist_minimap_width(180);
+                    EolSettings->persist_minimap_height(90);
                 } else if (w == 180) {
-                    EolSettings->set_minimap_width(220);
-                    EolSettings->set_minimap_height(110);
+                    EolSettings->persist_minimap_width(220);
+                    EolSettings->persist_minimap_height(110);
                 } else if (w == 220) {
-                    EolSettings->set_minimap_width(280);
-                    EolSettings->set_minimap_height(140);
+                    EolSettings->persist_minimap_width(280);
+                    EolSettings->persist_minimap_height(140);
                 } else if (w == 280) {
-                    EolSettings->set_minimap_width(350);
-                    EolSettings->set_minimap_height(175);
+                    EolSettings->persist_minimap_width(350);
+                    EolSettings->persist_minimap_height(175);
                 } else if (w == 350) {
-                    EolSettings->set_minimap_width(420);
-                    EolSettings->set_minimap_height(210);
+                    EolSettings->persist_minimap_width(420);
+                    EolSettings->persist_minimap_height(210);
                 } else {
-                    EolSettings->set_minimap_width(140);
-                    EolSettings->set_minimap_height(70);
+                    EolSettings->persist_minimap_width(140);
+                    EolSettings->persist_minimap_height(70);
                 }
             });
 
         nav.add_row(
-            "Minimap Opacity:", std::format("{}%", EolSettings->minimap_opacity()), NAV_FUNC() {
-                int opacity = EolSettings->minimap_opacity();
+            "Minimap Opacity:", std::format("{}%", EolSettings->minimap_opacity_persisted()),
+            NAV_FUNC() {
+                int opacity = EolSettings->minimap_opacity_persisted();
                 if (opacity == 25) {
-                    EolSettings->set_minimap_opacity(50);
+                    EolSettings->persist_minimap_opacity(50);
                 } else if (opacity == 50) {
-                    EolSettings->set_minimap_opacity(75);
+                    EolSettings->persist_minimap_opacity(75);
                 } else if (opacity == 75) {
-                    EolSettings->set_minimap_opacity(100);
+                    EolSettings->persist_minimap_opacity(100);
                 } else {
-                    EolSettings->set_minimap_opacity(25);
+                    EolSettings->persist_minimap_opacity(25);
                 }
             });
 
         nav.add_row(
             "Resolution:",
-            std::format("{}x{}", EolSettings->screen_width(), EolSettings->screen_height()),
+            std::format("{}x{}", EolSettings->screen_width_persisted(),
+                        EolSettings->screen_height_persisted()),
             NAV_FUNC() {
-                if (EolSettings->fullscreen() == FullscreenMode::FullscreenDesktop) {
+                if (EolSettings->fullscreen_persisted() == FullscreenMode::FullscreenDesktop) {
                     menu_dialog("Resolution is locked to desktop", "in Fullscreen (Desktop) mode.");
                     return;
                 }
@@ -321,20 +325,21 @@ void menu_options() {
             });
 
         nav.add_row(
-            "Zoom:", std::format("{:.2f}", EolSettings->zoom()), NAV_FUNC() {
-                double old_zoom = EolSettings->zoom();
-                EolSettings->set_zoom(old_zoom + 0.25);
-                if (old_zoom == EolSettings->zoom()) {
-                    EolSettings->set_zoom(0.25);
+            "Zoom:", std::format("{:.2f}", EolSettings->zoom_persisted()), NAV_FUNC() {
+                double old_zoom = EolSettings->zoom_persisted();
+                EolSettings->persist_zoom(old_zoom + 0.25);
+                if (old_zoom == EolSettings->zoom_persisted()) {
+                    EolSettings->persist_zoom(0.25);
                 }
             });
 
         nav.add_row(
-            "Minimap Zoom:", std::format("{:.2f}", EolSettings->minimap_zoom()), NAV_FUNC() {
-                double old_zoom = EolSettings->minimap_zoom();
-                EolSettings->set_minimap_zoom(old_zoom + 0.25);
-                if (old_zoom == EolSettings->minimap_zoom()) {
-                    EolSettings->set_minimap_zoom(0.25);
+            "Minimap Zoom:", std::format("{:.2f}", EolSettings->minimap_zoom_persisted()),
+            NAV_FUNC() {
+                double old_zoom = EolSettings->minimap_zoom_persisted();
+                EolSettings->persist_minimap_zoom(old_zoom + 0.25);
+                if (old_zoom == EolSettings->minimap_zoom_persisted()) {
+                    EolSettings->persist_minimap_zoom(0.25);
                 }
             });
 
@@ -345,7 +350,7 @@ void menu_options() {
         nav.add_row(
             "Renderer:",
             [] {
-                switch (EolSettings->renderer()) {
+                switch (EolSettings->renderer_persisted()) {
                 case RendererType::Software:
                     return "Software";
                 case RendererType::OpenGL:
@@ -354,49 +359,51 @@ void menu_options() {
                 return "";
             }(),
             NAV_FUNC() {
-                switch (EolSettings->renderer()) {
+                switch (EolSettings->renderer_persisted()) {
                 case RendererType::Software:
-                    EolSettings->set_renderer(RendererType::OpenGL);
+                    EolSettings->persist_renderer(RendererType::OpenGL);
                     return;
                 case RendererType::OpenGL:
-                    EolSettings->set_renderer(RendererType::Software);
+                    EolSettings->persist_renderer(RendererType::Software);
                     return;
                 }
             });
 
         nav.add_row(
-            "Fullscreen:", fullscreen_mode_label(EolSettings->fullscreen()),
+            "Fullscreen:", fullscreen_mode_label(EolSettings->fullscreen_persisted()),
             NAV_FUNC() { menu_fullscreen(); });
 
         nav.add_row(
             "Turn Time:",
             [] {
-                if (EolSettings->turn_time() == 0.0) {
+                if (EolSettings->turn_time_persisted() == 0.0) {
                     return std::string("Instant");
                 } else {
-                    return std::format("{:.2f}s", EolSettings->turn_time());
+                    return std::format("{:.2f}s", EolSettings->turn_time_persisted());
                 }
             }(),
             NAV_FUNC() {
-                double old_turn_time = EolSettings->turn_time();
+                double old_turn_time = EolSettings->turn_time_persisted();
                 double new_turn_time = std::round((old_turn_time - 0.10) * 100.0) / 100.0;
-                EolSettings->set_turn_time(new_turn_time);
-                if (old_turn_time == EolSettings->turn_time()) {
-                    EolSettings->set_turn_time(0.35);
+                EolSettings->persist_turn_time(new_turn_time);
+                if (old_turn_time == EolSettings->turn_time_persisted()) {
+                    EolSettings->persist_turn_time(0.35);
                 }
             });
 
         BOOL_OPTION("LCtrl search:", lctrl_search);
 
-        nav.add_row("Default LGR:", EolSettings->default_lgr_name(), NAV_FUNC() { menu_lgr(); });
+        nav.add_row(
+            "Default LGR:", EolSettings->default_lgr_name_persisted(), NAV_FUNC() { menu_lgr(); });
 
         BOOL_OPTION("Show Apple Time:", show_last_apple_time);
 
         BOOL_OPTION("Gravity Arrows:", show_gravity_arrows);
 
         nav.add_row(
-            "Record Replay FPS:", std::to_string(EolSettings->recording_fps()), NAV_FUNC() {
-                int old_fps = EolSettings->recording_fps();
+            "Record Replay FPS:", std::to_string(EolSettings->recording_fps_persisted()),
+            NAV_FUNC() {
+                int old_fps = EolSettings->recording_fps_persisted();
                 int new_fps;
                 if (old_fps == 30) {
                     new_fps = 60;
@@ -405,7 +412,7 @@ void menu_options() {
                 } else {
                     new_fps = 30;
                 }
-                EolSettings->set_recording_fps(new_fps);
+                EolSettings->persist_recording_fps(new_fps);
             });
 
         BOOL_OPTION("Show Total Time:", show_total_time);
@@ -414,11 +421,11 @@ void menu_options() {
         BOOL_OPTION("Best Times menu:", show_best_times_menu);
 
         nav.add_row(
-            "Num Chat Lines:", std::format("{}", EolSettings->chat_lines()), NAV_FUNC() {
-                int old_chat_lines = EolSettings->chat_lines();
-                EolSettings->set_chat_lines(old_chat_lines + 1);
-                if (old_chat_lines == EolSettings->chat_lines()) {
-                    EolSettings->set_chat_lines(1);
+            "Num Chat Lines:", std::format("{}", EolSettings->chat_lines_persisted()), NAV_FUNC() {
+                int old_chat_lines = EolSettings->chat_lines_persisted();
+                EolSettings->persist_chat_lines(old_chat_lines + 1);
+                if (old_chat_lines == EolSettings->chat_lines_persisted()) {
+                    EolSettings->persist_chat_lines(1);
                 }
             });
 

@@ -443,18 +443,18 @@ void eol_settings::sync_controls_from_state(state* s) {
         return;
     }
 
-    EolSettings->set_alovolt_key_player_a(s->keys1.alovolt);
-    EolSettings->set_alovolt_key_player_b(s->keys2.alovolt);
-    EolSettings->set_brake_alias_key_player_a(s->keys1.brake_alias);
-    EolSettings->set_brake_alias_key_player_b(s->keys2.brake_alias);
-    EolSettings->set_one_frame_brake_key_player_a(s->keys1.one_frame_brake);
-    EolSettings->set_one_frame_brake_key_player_b(s->keys2.one_frame_brake);
-    EolSettings->set_escape_alias_key(s->key_escape_alias);
-    EolSettings->set_replay_fast_2x_key(s->key_replay_fast_2x);
-    EolSettings->set_replay_fast_4x_key(s->key_replay_fast_4x);
-    EolSettings->set_replay_fast_8x_key(s->key_replay_fast_8x);
-    EolSettings->set_replay_slow_2x_key(s->key_replay_slow_2x);
-    EolSettings->set_replay_slow_4x_key(s->key_replay_slow_4x);
-    EolSettings->set_replay_pause_key(s->key_replay_pause);
-    EolSettings->set_replay_rewind_key(s->key_replay_rewind);
+    EolSettings->persist_alovolt_key_player_a(s->keys1.alovolt);
+    EolSettings->persist_alovolt_key_player_b(s->keys2.alovolt);
+    EolSettings->persist_brake_alias_key_player_a(s->keys1.brake_alias);
+    EolSettings->persist_brake_alias_key_player_b(s->keys2.brake_alias);
+    EolSettings->persist_one_frame_brake_key_player_a(s->keys1.one_frame_brake);
+    EolSettings->persist_one_frame_brake_key_player_b(s->keys2.one_frame_brake);
+    EolSettings->persist_escape_alias_key(s->key_escape_alias);
+    EolSettings->persist_replay_fast_2x_key(s->key_replay_fast_2x);
+    EolSettings->persist_replay_fast_4x_key(s->key_replay_fast_4x);
+    EolSettings->persist_replay_fast_8x_key(s->key_replay_fast_8x);
+    EolSettings->persist_replay_slow_2x_key(s->key_replay_slow_2x);
+    EolSettings->persist_replay_slow_4x_key(s->key_replay_slow_4x);
+    EolSettings->persist_replay_pause_key(s->key_replay_pause);
+    EolSettings->persist_replay_rewind_key(s->key_replay_rewind);
 }

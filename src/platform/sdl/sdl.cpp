@@ -229,8 +229,8 @@ void platform_resize_window(int width, int height) {
             height = closest.h;
             SCREEN_WIDTH = width;
             SCREEN_HEIGHT = height;
-            EolSettings->set_screen_width(width);
-            EolSettings->set_screen_height(height);
+            EolSettings->persist_screen_width(width);
+            EolSettings->persist_screen_height(height);
         }
 
         if (EolSettings->renderer() == RendererType::Software) {

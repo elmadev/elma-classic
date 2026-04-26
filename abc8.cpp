@@ -1,4 +1,5 @@
 #include "abc8.h"
+#include "log.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "pic8.h"
@@ -120,10 +121,8 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
                 text++;
                 continue;
             }
-#ifdef DEBUG
-            printf("Missing codepoint %c (0x%02X) in abc8 text: \"%s\"\n", index, index,
-                   error_text);
-#endif
+            LOG_DEBUG("Missing codepoint {:c} (0x{:02X}) in abc8 text: \"{}\"",
+                      static_cast<char>(index), index, error_text);
             text++;
             continue;
         }
@@ -152,10 +151,8 @@ int abc8::len(const char* text) {
                 text++;
                 continue;
             }
-#ifdef DEBUG
-            printf("Missing codepoint %c (0x%02X) in abc8 text: \"%s\"\n", index, index,
-                   error_text);
-#endif
+            LOG_DEBUG("Missing codepoint {:c} (0x{:02X}) in abc8 text: \"{}\"",
+                      static_cast<char>(index), index, error_text);
             text++;
             continue;
         }

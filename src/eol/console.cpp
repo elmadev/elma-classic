@@ -71,6 +71,17 @@ void console::register_console_commands() {
     register_command("clear", [this](std::string_view) { clear(); });
     register_command("dev", [this](std::string_view) { mode = Mode::Console; });
     register_command("chat", [this](std::string_view) { mode = Mode::Chat; });
+    register_command("log", [this](std::string_view text) {
+        if (text.empty()) {
+            show_log_lines = !show_log_lines;
+        } else if (auto val = parse_bool(text)) {
+            show_log_lines = *val;
+        } else {
+            add_line(std::format("invalid value: {}", text), LineType::System);
+            return;
+        }
+        StatusMessages->add(std::format("log: {}", show_log_lines ? "on" : "off"));
+    });
     REGISTER_SETTINGS_STR(default_lgr_name);
     REGISTER_SETTINGS_BOOL(show_last_apple_time);
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
@@ -259,10 +270,12 @@ void console::submit_input() {
 
 void console::render(pic8& screen, abc8& font) {
     auto filter = [this](const auto& line) {
+        if (line.type == LineType::Log) {
+            return show_log_lines;
+        }
         if (mode == Mode::Chat) {
             return line.type != LineType::System;
         }
-
         return true;
     };
     auto view = lines | std::views::reverse | std::views::filter(filter) |

@@ -14,6 +14,7 @@ class console {
     enum class LineType {
         Chat,
         System,
+        Log,
     };
 
     struct command {
@@ -58,6 +59,7 @@ class console {
     bool input_active = false;
     std::string input_buffer;
     int cursor_pos = 0;
+    bool show_log_lines = false;
 };
 
 extern console* Console;

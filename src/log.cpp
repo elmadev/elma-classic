@@ -1,5 +1,6 @@
 #include "log.h"
 
+#include "eol/console.h"
 #include <chrono>
 #include <cstring>
 #include <filesystem>
@@ -59,4 +60,8 @@ void logger::write(LogLevel lvl, std::source_location loc, std::string_view msg)
     std::fputs(line.c_str(), stdout);
     std::fflush(stdout);
 #endif
+
+    if (Console) {
+        Console->add_line(std::format("[{}] {}", lvl, msg), console::LineType::Log);
+    }
 }

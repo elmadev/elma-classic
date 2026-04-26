@@ -15,11 +15,11 @@ class debug_timer {
 
   public:
     debug_timer();
-    void print_duration(const std::string& title);
+    void log_duration(const std::string& title);
 };
 
 #define START_TIME(VAR) debug_timer VAR;
-#define END_TIME(VAR, TITLE) VAR.print_duration(TITLE);
+#define END_TIME(VAR, TITLE) VAR.log_duration(TITLE);
 
 #else
 

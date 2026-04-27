@@ -91,6 +91,18 @@ static void apply_current_palette() {
     }
 }
 
+static void create_surfaces(int width, int height) {
+    create_palette_surface();
+    initialize_renderer(width, height);
+    apply_current_palette();
+}
+
+static void setup_surfaces(int width, int height) {
+    create_palette_surface();
+    resize_renderer(width, height);
+    apply_current_palette();
+}
+
 static void destroy_window() {
     gl_cleanup();
 
@@ -120,16 +132,8 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
         return;
     }
 
-    create_palette_surface();
-    initialize_renderer(width, height);
-    apply_current_palette();
+    create_surfaces(width, height);
     platform_apply_fullscreen_mode();
-}
-
-static void window_resized(int width, int height) {
-    create_palette_surface();
-    resize_renderer(width, height);
-    apply_current_palette();
 }
 
 bool is_fullscreen() {
@@ -182,9 +186,7 @@ void platform_apply_fullscreen_mode() {
     }
     }
 
-    if (EolSettings->renderer() == RendererType::Software) {
-        SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
-    }
+    resize_renderer(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 void platform_init() {
@@ -253,7 +255,7 @@ void platform_resize_window(int width, int height) {
         SDL_SetWindowSize(SDLWindow, width, height);
     }
 
-    window_resized(width, height);
+    setup_surfaces(width, height);
 }
 
 std::vector<std::pair<int, int>> platform_get_display_modes() {

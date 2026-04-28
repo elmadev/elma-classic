@@ -9,9 +9,6 @@ void tool_move_leftclick(int mouse_x, int mouse_y);
 void tool_move_rightclick(int mouse_x, int mouse_y);
 void tool_move_esc();
 void tool_move_mousemove(int mouse_x, int mouse_y);
-// Kurzor negyzette valtozik:
-// void t_move_space( void );
-// extern int Kurzornegyzet;
 
 extern int CreatingPolygon;
 void tool_create_vertex_leftclick(int mouse_x, int mouse_y);

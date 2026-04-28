@@ -157,30 +157,7 @@ void tool_move_leftclick(int mouse_x, int mouse_y) {
     }
 }
 
-// Gany, mar megfogott ponttal raugrik kozeli pontra:
-void gany_move_jobb(int mouse_x, int mouse_y) {
-    if (!Pgy) {
-        internal_error("uirw");
-    }
-    // Meg van fogva egy pont, melyik van ehhez legkozelebb:
-    double tav;
-    double x = pixel_to_meter_x(mouse_x);
-    double y = pixel_to_meter_y(mouse_y);
-    int ujk = 0;
-    polygon* pujgy = Ptop->get_closest_vertex(x, y, &ujk, &tav, Pgy);
-    if (!pujgy) {
-        return;
-    }
-    Pgy->vertices[K] = pujgy->vertices[ujk];
-    Pgy = NULL;
-    invalidate();
-}
-
 void tool_move_rightclick(int mouse_x, int mouse_y) {
-    /*if( Pgy ) {
-        gany_move_jobb( mouse_x, mouse_y );
-        return;
-    } */
     if (Pgy || Pker || Psp) {
         tool_move_esc();
         return;
@@ -259,11 +236,6 @@ void tool_move_esc() {
         invalidate();
     }
 }
-
-/*void t_move_space( void ) {
-    Kurzornegyzet = !Kurzornegyzet;
-    invalidate();
-} */
 
 void tool_move_mousemove(int mouse_x, int mouse_y) {
     // Ellenorzes:

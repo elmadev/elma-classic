@@ -433,9 +433,9 @@ void tool_delete_vertex_leftclick(int mouse_x, int mouse_y) {
         internal_error("tool_delete_vertex_leftclick poly->vertex_count < 3");
     }
     if (poly->vertex_count == 3) {
-        dialog("You cannot delete this vertex, because every polygon must",
-               "have at least three vertices! If you want to delete the",
-               "whole polygon, please select the DELETE POLYGON tool!");
+        if (!delete_polygon(poly)) {
+            dialog("This is the only polygon, so you cannot delete it.");
+        }
         return;
     }
     poly->delete_vertex(vertex_index);

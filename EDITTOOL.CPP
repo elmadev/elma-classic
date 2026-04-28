@@ -466,7 +466,7 @@ object::Property DefaultFoodProperty = object::Property::None;
 int DefaultFoodAnimation = 0;
 
 void tool_create_food_rightclick() {
-    editor_window_food_properties("Select Create_Food subtype!", &DefaultFoodProperty,
+    editor_window_food_properties("Select the default subtype!", &DefaultFoodProperty,
                                   &DefaultFoodAnimation);
 }
 

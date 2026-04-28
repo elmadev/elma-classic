@@ -658,6 +658,9 @@ void editor() {
     Pker = nullptr;
     Psp = nullptr;
 
+    DefaultFoodProperty = object::Property::None;
+    DefaultFoodAnimation = 0;
+
     Tool = T_MOVE;
     draw_tooltip_help();
 
@@ -919,9 +922,9 @@ void editor() {
                 if (Tool == T_CREATE_FOOD && balnyomva) {
                     tool_create_object_leftclick(ujx, ujy, true);
                 }
-                /* Most nem lehet create food-nal allitani gravitaciot
-                if( Tool == T_CREATE_FOOD && jobbnyomva )
-                    tool_create_food_rightclick(); */
+                if (Tool == T_CREATE_FOOD && jobbnyomva) {
+                    tool_create_food_rightclick();
+                }
                 if (Tool == T_CREATE_KILLER && balnyomva) {
                     tool_create_object_leftclick(ujx, ujy, false);
                 }

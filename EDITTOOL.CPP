@@ -13,6 +13,32 @@
 #include "pic8.h"
 #include "sprite.h"
 
+static bool delete_polygon(polygon* poly) {
+    int poly_count = 0;
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (Ptop->polygons[i]) {
+            poly_count++;
+        }
+    }
+    if (poly_count == 0) {
+        internal_error("delete_polygon poly_count == 0");
+    }
+    if (poly_count == 1) {
+        return false;
+    }
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        if (Ptop->polygons[i] == poly) {
+            delete Ptop->polygons[i];
+            Ptop->polygons[i] = nullptr;
+            K = 0;
+            Valtozott = 1;
+            invalidate();
+            return true;
+        }
+    }
+    internal_error("delete_polygon poly not found!");
+}
+
 void draw_tooltip_help() {
     switch (Tool) {
     case T_MOVE:
@@ -304,27 +330,11 @@ void tool_create_vertex_esc() {
             // If we only have 3 points or less, delete the polygon
             // This should occur only when we are creating a new polygon from scratch,
             // and we've only placed 2 points so far
-            int poly_count = 0;
-            for (int i = 0; i < MAX_POLYGONS; i++) {
-                if (Ptop->polygons[i]) {
-                    poly_count++;
-                }
-            }
-            if (poly_count <= 1) {
+            if (!delete_polygon(Pgy)) {
                 internal_error("tool_create_vertex_esc poly_count <= 1!");
             }
-
-            for (int i = 0; i < MAX_POLYGONS; i++) {
-                if (Ptop->polygons[i] == Pgy) {
-                    delete Pgy;
-                    Pgy = nullptr;
-                    Ptop->polygons[i] = nullptr;
-                    K = 0;
-                    invalidate();
-                    return;
-                }
-            }
-            internal_error("tool_create_vertex_esc polygon not found!");
+            Pgy = nullptr;
+            return;
         }
         // Delete the floating vertex at the mouse position
         Pgy->delete_vertex(K);
@@ -446,29 +456,10 @@ void tool_delete_polygon_leftclick(int mouse_x, int mouse_y) {
     if (!poly) {
         return;
     }
-    int poly_count = 0;
-    for (int i = 0; i < MAX_POLYGONS; i++) {
-        if (Ptop->polygons[i]) {
-            poly_count++;
-        }
-    }
-    if (poly_count == 0) {
-        internal_error("tool_delete_polygon_leftclick poly_count == 0");
-    }
-    if (poly_count == 1) {
+
+    if (!delete_polygon(poly)) {
         dialog("This is the only polygon, so you cannot delete it.");
-        return;
     }
-    for (int i = 0; i < MAX_POLYGONS; i++) {
-        if (Ptop->polygons[i] == poly) {
-            delete Ptop->polygons[i];
-            Ptop->polygons[i] = nullptr;
-            Valtozott = 1;
-            invalidate();
-            return;
-        }
-    }
-    internal_error("tool_delete_polygon_leftclick poly not found!");
 }
 
 object::Property DefaultFoodProperty = object::Property::None;

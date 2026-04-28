@@ -204,10 +204,8 @@ void tool_move_mousemove(int mouse_x, int mouse_y) {
 }
 
 bool CreatingPolygon = false;
-static int FirstVertexX;
-static int FirstVertexY;
-static int MouseVertexX;
-static int MouseVertexY;
+static vect2 FirstVertex;
+static vect2 MouseVertex;
 
 void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
     Valtozott = 1;
@@ -239,8 +237,7 @@ void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
             // coordinate is placed.
             toolhelp("Left click to place the second vertex. ESC or right click cancels.");
             CreatingPolygon = true;
-            FirstVertexX = MouseVertexX = mouse_x;
-            FirstVertexY = MouseVertexY = mouse_y;
+            FirstVertex = MouseVertex = vect2(x, y);
             return;
         }
         // We found the closest vertex
@@ -283,9 +280,8 @@ void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
         if (!Ptop->polygons[i]) {
             Pgy = Ptop->polygons[i] = new polygon;
             Pgy->vertex_count = 3;
-            Pgy->vertices[0] = pixel_to_meter(FirstVertexX, FirstVertexY);
-            Pgy->vertices[1] = pixel_to_meter(mouse_x, mouse_y);
-            Pgy->vertices[2] = pixel_to_meter(mouse_x, mouse_y);
+            Pgy->vertices[0] = FirstVertex;
+            Pgy->vertices[2] = Pgy->vertices[1] = pixel_to_meter(mouse_x, mouse_y);
             K = 2;
             Fel = true;
             CreatingPolygon = false;
@@ -388,27 +384,24 @@ void tool_create_vertex_mousemove(int mouse_x, int mouse_y) {
     push();
     lockfrontbuffer_pic();
     // Erase existing line by drawing over it, then draw new line
+    double x = pixel_to_meter_x(mouse_x);
+    double y = pixel_to_meter_y(mouse_y);
     if (Pgy) {
         Pgy->render_one_line(K, Fel, true);
         Pgy->render_one_line(K, !Fel, false);
-        double x = pixel_to_meter_x(mouse_x);
-        double y = pixel_to_meter_y(mouse_y);
         Pgy->set_vertex(K, x, y);
         Pgy->render_one_line(K, Fel, true);
         Pgy->render_one_line(K, !Fel, false);
-        Moux = mouse_x;
-        Mouy = mouse_y;
     } else {
         if (!CreatingPolygon) {
             internal_error("tool_create_vertex_mousemove !CreatingPolygon");
         }
-        render_line(pixel_to_meter(FirstVertexX, FirstVertexY),
-                    pixel_to_meter(MouseVertexX, MouseVertexY), false);
-        Moux = MouseVertexX = mouse_x;
-        Mouy = MouseVertexY = mouse_y;
-        render_line(pixel_to_meter(FirstVertexX, FirstVertexY),
-                    pixel_to_meter(MouseVertexX, MouseVertexY), false);
+        render_line(FirstVertex, MouseVertex, false);
+        MouseVertex = vect2(x, y);
+        render_line(FirstVertex, MouseVertex, false);
     }
+    Moux = mouse_x;
+    Mouy = mouse_y;
     unlockfrontbuffer_pic();
     pop();
 }

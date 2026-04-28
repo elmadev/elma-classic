@@ -955,13 +955,13 @@ void editor() {
                     tool_delete_polygon_leftclick(ujx, ujy);
                 }
                 if (Tool == T_CREATE_FOOD && balnyomva) {
-                    tool_create_object_leftclick(ujx, ujy, 1);
+                    tool_create_object_leftclick(ujx, ujy, true);
                 }
                 /* Most nem lehet create food-nal allitani gravitaciot
                 if( Tool == T_CREATE_FOOD && jobbnyomva )
                     tool_create_food_rightclick(); */
                 if (Tool == T_CREATE_KILLER && balnyomva) {
-                    tool_create_object_leftclick(ujx, ujy, 0);
+                    tool_create_object_leftclick(ujx, ujy, false);
                 }
                 if (Tool == T_DELETE_KEREK && balnyomva) {
                     tool_delete_object_leftclick(ujx, ujy);

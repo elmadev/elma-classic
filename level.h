@@ -57,6 +57,11 @@ class level {
     object* get_closest_object(double x, double y, double* distance = nullptr);
     // Get closest sprite to (x, y) in editor, if the distance is less than 10 pixels.
     sprite* get_closest_sprite(double x, double y, double* distance = nullptr);
+    // Gets the closest entity between vertices, objects and sprites in editor, if distance is less
+    // than 10 pixels
+    void get_closest_entity(int pixel_x, int pixel_y, polygon** poly, int* vertex_index,
+                            object** obj, sprite** spr);
+
     void save(const char* filename, bool skip_topology = false);
     // Update top ten of an external level
     void save_topten(const char* filename);

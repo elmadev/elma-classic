@@ -340,6 +340,53 @@ sprite* level::get_closest_sprite(double x, double y, double* distance) {
     return spr;
 }
 
+void level::get_closest_entity(int pixel_x, int pixel_y, polygon** poly, int* vertex_index,
+                               object** obj, sprite** spr) {
+    double x = pixel_to_meter_x(pixel_x);
+    double y = pixel_to_meter_y(pixel_y);
+
+    double distance_vertex;
+    double distance_object;
+    double distance_sprite;
+    if (poly) {
+        if (!vertex_index) {
+            internal_error("get_closest_entity missing vertex_index!");
+        }
+        *poly = get_closest_vertex(x, y, vertex_index, &distance_vertex);
+    }
+    if (obj) {
+        *obj = get_closest_object(x, y, &distance_object);
+    }
+    if (spr) {
+        *spr = get_closest_sprite(x, y, &distance_sprite);
+    }
+    if (poly && *poly && obj && *obj) {
+        if (distance_vertex < distance_object) {
+            *obj = nullptr;
+        } else {
+            *poly = nullptr;
+        }
+    }
+    if (poly && *poly && spr && *spr) {
+        if (distance_vertex < distance_sprite) {
+            *spr = nullptr;
+        } else {
+            *poly = nullptr;
+        }
+    }
+    if (obj && *obj && spr && *spr) {
+        if (distance_object < distance_sprite) {
+            *spr = nullptr;
+        } else {
+            *obj = nullptr;
+        }
+    }
+
+    if ((int)(poly && *poly) + (int)(obj && *obj) + (int)(spr && *spr) > 1) {
+        internal_error("get_closest_entity too many entities selected!");
+    }
+}
+
 void level::render() {
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (polygons[i]) {

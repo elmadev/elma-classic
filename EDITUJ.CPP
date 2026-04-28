@@ -138,7 +138,8 @@ static int hanypalyavanmeg() {
 
 static int Egerkint = 0;
 
-int Moux = 0, Mouy = 0, Kozelvan = 0;
+int Moux = 0, Mouy = 0;
+bool Kozelvan = false;
 
 static void elintezegymousepixelt(int x, int y) {
     if (x < 0 || y < 0 || x > (SCREEN_WIDTH - 1) || y > (SCREEN_HEIGHT - 1)) {
@@ -535,62 +536,23 @@ static void beallitkozelvane(int mx, int my) {
         return;
     }
 
-    double x = pixel_to_meter_x(mx);
-    double y = pixel_to_meter_y(my);
+    polygon* poly = nullptr;
+    object* obj = nullptr;
+    sprite* spr = nullptr;
+    bool hover_poly = Tool == T_MOVE || Tool == T_CREATE_VERT || Tool == T_MOVE ||
+                      Tool == T_DELETE_VERT || Tool == T_DELETE_POLY;
+    bool hover_obj = Tool == T_MOVE || Tool == T_DELETE_KEREK;
+    bool hover_spr = Tool == T_MOVE || Tool == T_DELETE_SPRITE;
+    Ptop->get_closest_entity(mx, my, hover_poly ? &poly : nullptr, &K, hover_obj ? &obj : nullptr,
+                             hover_spr ? &spr : nullptr);
 
-    Kozelvan = 0;
-    double tav = 1000000.0;
-    if (Tool == T_MOVE || Tool == T_CREATE_VERT || Tool == T_MOVE || Tool == T_DELETE_VERT ||
-        Tool == T_DELETE_POLY) {
-        if (Ptop->get_closest_vertex(x, y, &K, &tav)) {
-            Kozelvan = 1;
-        }
-    }
-    object* pker = nullptr;
-    if (Tool == T_MOVE || Tool == T_DELETE_KEREK) {
-        double ujtav;
-        pker = Ptop->get_closest_object(x, y, &ujtav);
-        if (pker) {
-            Kozelvan = 1;
-            if (ujtav < tav) {
-                tav = ujtav;
-            } else {
-                pker = nullptr;
-            }
-        }
-    }
-    sprite* ps = nullptr;
-    if (Tool == T_MOVE || Tool == T_DELETE_SPRITE) {
-        double ujtav;
-        ps = Ptop->get_closest_sprite(x, y, &ujtav);
-        if (ps) {
-            Kozelvan = 1;
-            if (ujtav < tav) {
-                pker = nullptr;
-            } else {
-                ps = nullptr;
-            }
-        }
-    }
-
-    /*if( Tool == T_CREATE_SPRITE ) {
-        if( !Lgr )
-            internal_error( "89u5t4" );
-        if( Lgr->aktivindex >= Lgr->picture_count )
-            internal_error( "89045t308u" );
-        kispritenev( Lgr->nevek[Lgr->aktivindex],
-                     Lgr->tavolsagok[Lgr->aktivindex] );
-    } */
-
-    if (ps) {
-        kispritenev(ps->picture_name, ps->texture_name, ps->mask_name, ps->distance, ps->clipping);
-    }
-
-    if (pker) {
-        kikereknev(pker->type, pker->property, pker->animation);
-    }
-
-    if (!ps && !pker) {
+    Kozelvan = poly || obj || spr;
+    if (spr) {
+        kispritenev(spr->picture_name, spr->texture_name, spr->mask_name, spr->distance,
+                    spr->clipping);
+    } else if (obj) {
+        kikereknev(obj->type, obj->property, obj->animation);
+    } else {
         kispritenev("", "", "", 0, Clipping::Unclipped);
     }
 }

@@ -80,42 +80,9 @@ void tool_move_leftclick(int mouse_x, int mouse_y) {
     }
 
     // We aren't holding anything. Grab the closest one within 10 pixels
-    double x = pixel_to_meter_x(mouse_x);
-    double y = pixel_to_meter_y(mouse_y);
-
-    double distance_vertex;
-    double distance_object;
-    double distance_sprite;
-    Pgy = Ptop->get_closest_vertex(x, y, &K, &distance_vertex);
-    Pker = Ptop->get_closest_object(x, y, &distance_object);
-    Psp = Ptop->get_closest_sprite(x, y, &distance_sprite);
+    Ptop->get_closest_entity(mouse_x, mouse_y, &Pgy, &K, &Pker, &Psp);
     if (!Pgy && !Pker && !Psp) {
         return;
-    }
-    if (Pgy && Pker) {
-        if (distance_vertex < distance_object) {
-            Pker = nullptr;
-        } else {
-            Pgy = nullptr;
-        }
-    }
-    if (Pgy && Psp) {
-        if (distance_vertex < distance_sprite) {
-            Psp = nullptr;
-        } else {
-            Pgy = nullptr;
-        }
-    }
-    if (Pker && Psp) {
-        if (distance_object < distance_sprite) {
-            Psp = nullptr;
-        } else {
-            Pker = nullptr;
-        }
-    }
-
-    if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-        internal_error("tool_move_leftclick: (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
     }
     if (Pgy) {
         toolhelp("Move the vertex and left click to place it. Press ESC or right click to cancel.");
@@ -156,46 +123,11 @@ void tool_move_rightclick(int mouse_x, int mouse_y) {
     }
 
     // Otherwise, open the properties dialog for the closest sprite/polygon/object
-    double distance_sprite;
-    double distance_vertex;
-    double distance_object;
-    double x = pixel_to_meter_x(mouse_x);
-    double y = pixel_to_meter_y(mouse_y);
-    sprite* spr = Ptop->get_closest_sprite(x, y, &distance_sprite);
+    sprite* spr;
     int unused;
-    polygon* poly = Ptop->get_closest_vertex(x, y, &unused, &distance_vertex);
-    object* obj = Ptop->get_closest_object(x, y, &distance_object);
-
-    if (!spr && !poly && !obj) {
-        return;
-    }
-
-    if (spr && poly) {
-        if (distance_sprite > distance_vertex) {
-            spr = nullptr;
-        } else {
-            poly = nullptr;
-        }
-    }
-    if (spr && obj) {
-        if (distance_sprite > distance_object) {
-            spr = nullptr;
-        } else {
-            obj = nullptr;
-        }
-    }
-    if (poly && obj) {
-        if (distance_vertex > distance_object) {
-            poly = nullptr;
-        } else {
-            obj = nullptr;
-        }
-    }
-
-    if ((poly && spr) || (poly && obj) || (obj && spr)) {
-        internal_error("tool_move_rightclick (poly && spr) || (poly && obj) || (obj && spr)");
-    }
-
+    polygon* poly;
+    object* obj;
+    Ptop->get_closest_entity(mouse_x, mouse_y, &poly, &unused, &obj, &spr);
     if (spr) {
         editor_window_sprite_properties(spr);
     }

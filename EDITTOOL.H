@@ -3,7 +3,7 @@
 
 #include "object.h"
 
-void draw_tooltip_help(); // O figyeli ki a tool
+void draw_tooltip_help(); // Base tooltip for current tool when tool has not yet been used
 
 void tool_move_leftclick(int mouse_x, int mouse_y);
 void tool_move_rightclick(int mouse_x, int mouse_y);
@@ -20,11 +20,9 @@ void tool_create_vertex_mousemove(int mouse_x, int mouse_y);
 void tool_delete_vertex_leftclick(int mouse_x, int mouse_y);
 void tool_delete_polygon_leftclick(int mouse_x, int mouse_y);
 
-// Legkozelebbi create food 0
 extern object::Property DefaultFoodProperty;
 extern int DefaultFoodAnimation;
 void tool_create_food_rightclick();
-// Food es killer is egyben:
 void tool_create_object_leftclick(int mouse_x, int mouse_y, int is_food);
 void tool_delete_object_leftclick(int mouse_x, int mouse_y);
 
@@ -32,7 +30,7 @@ void tool_create_sprite_leftclick(int mouse_x, int mouse_y);
 void tool_create_sprite_rightclick();
 void tool_delete_sprite_leftclick(int mouse_x, int mouse_y);
 
-extern int SelectingZoomInBox; // Ha ez igaz, akkor nem szabad gombokat nyomkodni
+extern int SelectingZoomInBox; // True if we selected the top-left corner of zoom in box
 void tool_zoom_in_leftclick(int mouse_x, int mouse_y);
 void tool_zoom_in_esc();
 void tool_zoom_in_mousemove(int mouse_x, int mouse_y);

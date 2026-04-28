@@ -1,5 +1,5 @@
-#ifndef EDITTOOL_H
-#define EDITTOOL_H
+#ifndef EDITOR_TOOL_H
+#define EDITOR_TOOL_H
 
 #include "object.h"
 

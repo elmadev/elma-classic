@@ -1,4 +1,4 @@
-#include "EDITTOOL.H"
+#include "editor/tool.h"
 #include "editor/canvas.h"
 #include "editor/dialog.h"
 #include "editor/window.h"

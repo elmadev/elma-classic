@@ -26,7 +26,7 @@ elma_sources = files(
     'canvas.cpp',
     'src/editor/help.cpp',
     'src/editor/window.cpp',
-    'EDITTOOL.CPP',
+    'src/editor/tool.cpp',
     'EDITUJ.CPP',
     'src/editor/topology.cpp',
     'flagtag.cpp',

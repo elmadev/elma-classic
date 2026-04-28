@@ -4,7 +4,7 @@
 #include "editor/canvas.h"
 #include "editor/dialog.h"
 #include "editor/window.h"
-#include "EDITTOOL.H"
+#include "editor/tool.h"
 #include "editor/topology.h"
 #include "keys.h"
 #include "LEJATSZO.H"

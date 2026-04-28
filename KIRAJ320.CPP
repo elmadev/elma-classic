@@ -302,10 +302,6 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
     int corner_x;
     int corner_y;
     CanvasMinimap->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
-    int object_border_left = corner_x;
-    int object_border_bottom = corner_y;
-    int object_border_right = corner_x + MinimapWidth - 1;
-    int object_border_top = corner_y + MinimapHeight - 1;
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Ptop->objects[i];
         if (!obj) {
@@ -327,13 +323,6 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
             palette_id = Lgr->minimap_exit_palette_id;
             break;
         default:
-            continue;
-        }
-
-        if (obj->minimap_canvas_x < object_border_left ||
-            obj->minimap_canvas_y < object_border_bottom ||
-            obj->minimap_canvas_x > object_border_right ||
-            obj->minimap_canvas_y > object_border_top) {
             continue;
         }
 

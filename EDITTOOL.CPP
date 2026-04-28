@@ -15,7 +15,7 @@
 
 // int Kurzornegyzet = 0;
 
-void alaphelp() {
+void draw_tooltip_help() {
     switch (Tool) {
     case T_MOVE:
         toolhelp("Move the cursor near a vertex or an object center you want to move, and click "
@@ -51,7 +51,7 @@ void alaphelp() {
                  "Right chooses.");
         break;
     default:
-        toolhelp("Ehhez a tool-hoz meg nincs alaphelp!");
+        toolhelp("Ehhez a tool-hoz meg nincs draw_tooltip_help!");
     }
 }
 
@@ -62,10 +62,11 @@ void alaphelp() {
 
 static double Moveorigx = 0, Moveorigy = 0;
 
-void t_move_nyomva(int mx, int my) {
+void tool_move_leftclick(int mx, int my) {
     if (Pgy || Pker || Psp) {
         if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-            internal_error("t_move_nyomva-ban (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+            internal_error(
+                "tool_move_leftclick-ban (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
         }
         // Most fogjuk elengedni pontot:
         if (Pgy) {
@@ -84,7 +85,7 @@ void t_move_nyomva(int mx, int my) {
             }
         }
         Valtozott = 1;
-        alaphelp();
+        draw_tooltip_help();
         invalidate();
     } else {
         // Most probalunk megfogni egy pontot:
@@ -123,8 +124,8 @@ void t_move_nyomva(int mx, int my) {
         }
         // Kis ellenorzes:
         if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-            internal_error(
-                "t_move_nyomva-ban legtav utan: (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+            internal_error("tool_move_leftclick-ban legtav utan: (Pgy && Pker) || (Pgy && Psp) || "
+                           "(Pker && Psp)!");
         }
         // Talaltunk egy pontot:
         if (Pgy) {
@@ -178,13 +179,13 @@ void gany_move_jobb(int mx, int my) {
     invalidate();
 }
 
-void t_move_nyomva_jobb(int mx, int my) {
+void tool_move_rightclick(int mx, int my) {
     /*if( Pgy ) {
         gany_move_jobb( mx, my );
         return;
     } */
     if (Pgy || Pker || Psp) {
-        t_move_esc();
+        tool_move_esc();
         return;
     }
     // Nincs megfogva semmi. Ilyenkor attributumot lehet allitani:
@@ -241,7 +242,7 @@ void t_move_nyomva_jobb(int mx, int my) {
     }
 }
 
-void t_move_esc() {
+void tool_move_esc() {
     if (Pgy) {
         Pgy->vertices[K].x = Moveorigx;
         Pgy->vertices[K].y = Moveorigy;
@@ -267,13 +268,13 @@ void t_move_esc() {
     invalidate();
 } */
 
-void t_move_mmove(int mx, int my) {
+void tool_move_mousemove(int mx, int my) {
     // Ellenorzes:
     if (!Pgy && !Pker && !Psp) {
-        internal_error("t_move_mmove-ban !Pgy && !Pker!");
+        internal_error("tool_move_mousemove-ban !Pgy && !Pker!");
     }
     if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-        internal_error("t_move_mmove-ban: (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+        internal_error("tool_move_mousemove-ban: (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
     }
 
     push();
@@ -320,14 +321,14 @@ void t_move_mmove(int mx, int my) {
 // CREATE_VERTEX CREATE_VERTEX CREATE_VERTEX CREATE_VERTEX
 // CREATE_VERTEX CREATE_VERTEX CREATE_VERTEX CREATE_VERTEX
 
-int Egypont = 0;
+int CreatingPolygon = 0;
 static int Epontx = 0, Eponty = 0;
 static int Kpontx = 0, Kponty = 0;
 
 // Bal gomb nyomva:
-void t_create_vert_nyomva(int mx, int my) {
+void tool_create_vertex_leftclick(int mx, int my) {
     Valtozott = 1;
-    if (!Pgy && !Egypont) {
+    if (!Pgy && !CreatingPolygon) {
         // Most probalunk megfogni egy pontot:
         double x = pixel_to_meter_x(mx);
         double y = pixel_to_meter_y(my);
@@ -350,7 +351,7 @@ void t_create_vert_nyomva(int mx, int my) {
 
             toolhelp(
                 "Click the left button to place the second point. ESC or right button cancels.");
-            Egypont = 1;
+            CreatingPolygon = 1;
             Epontx = Kpontx = mx;
             Eponty = Kponty = my;
             return;
@@ -386,8 +387,8 @@ void t_create_vert_nyomva(int mx, int my) {
         // csinalunk belole:
         toolhelp("Click the left button to place point. SPACE and ENTER swaps. ESC or right button "
                  "cancels.");
-        if (!Egypont) {
-            internal_error("!Egypont, pedig annak kene lennie (ffdsgiu)!");
+        if (!CreatingPolygon) {
+            internal_error("!CreatingPolygon, pedig annak kene lennie (ffdsgiu)!");
         }
         for (int i = 0; i < MAX_POLYGONS; i++) {
             if (!Ptop->polygons[i]) {
@@ -398,7 +399,7 @@ void t_create_vert_nyomva(int mx, int my) {
                 Pgy->vertices[2] = pixel_to_meter(mx, my);
                 K = 2;
                 Fel = true;
-                Egypont = 0;
+                CreatingPolygon = 0;
                 invalidate();
                 return;
             }
@@ -410,12 +411,12 @@ void t_create_vert_nyomva(int mx, int my) {
 // Jobb gomb nyomva:
 // Ha nem fogtunk pontot, akkor uj poligonnak veszi fel elso pontjat,
 // Ha fogtuk pontot, akkor torli es elengedi:
-void t_create_vert_esc() {
-    if (!Pgy && !Egypont) {
+void tool_create_vertex_esc() {
+    if (!Pgy && !CreatingPolygon) {
         return; // Nincsen semmi dolgunk
     }
 
-    alaphelp();
+    draw_tooltip_help();
     if (Pgy) {
         // Pgy igaz, tehat egy pont meg van fogva, amit torlunk:
         if (Pgy->vertex_count <= 3) {
@@ -455,23 +456,23 @@ void t_create_vert_esc() {
             invalidate();
         }
     } else {
-        if (!Egypont) {
-            internal_error("!Egypont (jygfeuye)!");
+        if (!CreatingPolygon) {
+            internal_error("!CreatingPolygon (jygfeuye)!");
         }
-        Egypont = 0;
+        CreatingPolygon = 0;
         invalidate();
     }
 }
 
-void t_create_vert_enter() {
+void tool_create_vertex_enter() {
     Fel = !Fel;
-    if (Pgy && !Egypont) {
+    if (Pgy && !CreatingPolygon) {
         invalidate();
     }
 }
 
-void t_create_vert_space() {
-    if (!Pgy || Egypont) {
+void tool_create_vertex_space() {
+    if (!Pgy || CreatingPolygon) {
         return;
     }
     int kkov = K;
@@ -497,8 +498,8 @@ void t_create_vert_space() {
     invalidate();
 }
 
-void t_create_vert_mmove(int mx, int my) {
-    if (!Pgy && !Egypont) {
+void tool_create_vertex_mousemove(int mx, int my) {
+    if (!Pgy && !CreatingPolygon) {
         // Teljesen normalis kurzor mozgatas:
         internal_error("Ezt most edituj.cpp-nek kellene csinalnia!");
     }
@@ -518,8 +519,8 @@ void t_create_vert_mmove(int mx, int my) {
         Moux = mx;
         Mouy = my;
     } else {
-        if (!Egypont) {
-            internal_error("!Egypont (yifeye)");
+        if (!CreatingPolygon) {
+            internal_error("!CreatingPolygon (yifeye)");
         }
         render_line(pixel_to_meter(Epontx, Eponty), pixel_to_meter(Kpontx, Kponty), false);
         Moux = Kpontx = mx;
@@ -535,7 +536,7 @@ void t_create_vert_mmove(int mx, int my) {
 // DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE
 // DELETE DELETE DELETE DELETE DELETE DELETE DELETE DELETE
 
-void t_delete_vert_nyomva(int mx, int my) {
+void tool_delete_vertex_leftclick(int mx, int my) {
     if (Pgy) {
         internal_error("yffwiye");
     }
@@ -564,7 +565,7 @@ void t_delete_vert_nyomva(int mx, int my) {
     invalidate();
 }
 
-void t_delete_poly_nyomva(int mx, int my) {
+void tool_delete_polygon_leftclick(int mx, int my) {
     if (Pgy) {
         internal_error("oiutrgiuot");
     }
@@ -609,16 +610,16 @@ void t_delete_poly_nyomva(int mx, int my) {
 // CREATE_KEREK CREATE_KEREK CREATE_KEREK CREATE_KEREK CREATE_KEREK
 
 // Legkozelebbi create food ezt fogja hasznalni:
-object::Property Food_kajatipus = object::Property::None;
-int Food_foodsorszam = 0;
+object::Property DefaultFoodProperty = object::Property::None;
+int DefaultFoodAnimation = 0;
 
-void t_create_food_nyomva_jobb() {
-    editor_window_food_properties("Select Create_Food subtype!", &Food_kajatipus,
-                                  &Food_foodsorszam);
+void tool_create_food_rightclick() {
+    editor_window_food_properties("Select Create_Food subtype!", &DefaultFoodProperty,
+                                  &DefaultFoodAnimation);
 }
 
 // Food es killer is egyben:
-void t_create_kerek_nyomva(int mx, int my, int food) {
+void tool_create_object_leftclick(int mx, int my, int food) {
     // Megszamoljuk eddigi objektumokat:
     int objszam = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
@@ -641,8 +642,8 @@ void t_create_kerek_nyomva(int mx, int my, int food) {
             }
             Ptop->objects[i] = new object(x, y, tipus);
             if (food) {
-                Ptop->objects[i]->property = Food_kajatipus;
-                Ptop->objects[i]->animation = Food_foodsorszam;
+                Ptop->objects[i]->property = DefaultFoodProperty;
+                Ptop->objects[i]->animation = DefaultFoodAnimation;
             }
             invalidate();
             Valtozott = 1;
@@ -657,7 +658,7 @@ void t_create_kerek_nyomva(int mx, int my, int food) {
 // DELETE_KEREK DELETE_KEREK DELETE_KEREK DELETE_KEREK DELETE_KEREK
 // DELETE_KEREK DELETE_KEREK DELETE_KEREK DELETE_KEREK DELETE_KEREK
 
-void t_delete_kerek_nyomva(int mx, int my) {
+void tool_delete_object_leftclick(int mx, int my) {
     double x = pixel_to_meter_x(mx);
     double y = pixel_to_meter_y(my);
     object* pker = Ptop->get_closest_object(x, y);
@@ -689,43 +690,43 @@ void t_delete_kerek_nyomva(int mx, int my) {
 // ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM
 // ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM ZOOM
 
-int Zoomfogva = 0; // Ha ez igaz, akkor nem szabad gombokat nyomkodni
+int SelectingZoomInBox = 0; // Ha ez igaz, akkor nem szabad gombokat nyomkodni
 static int Zoomx1 = 0, Zoomy1 = 0;
 static int Zoomx2 = 0, Zoomy2 = 0;
 
-void t_zoomin_nyomva(int x, int y) {
-    if (Zoomfogva) {
+void tool_zoom_in_leftclick(int x, int y) {
+    if (SelectingZoomInBox) {
         // Megvan masodik pont is:
-        alaphelp();
+        draw_tooltip_help();
         zoom_in(Zoomx1, Zoomy1, x, y);
-        Zoomfogva = 0;
+        SelectingZoomInBox = 0;
         invalidate();
     } else {
         // Most tesszuk le elso pontot:
         toolhelp("Click left button to place the second corner of zoom window. ESC or right button "
                  "cancels.");
-        Zoomfogva = 1;
+        SelectingZoomInBox = 1;
         Zoomx1 = Zoomx2 = x;
         Zoomy1 = Zoomy2 = y;
     }
 }
 
-void t_zoomin_esc() {
-    if (Zoomfogva) {
-        alaphelp();
-        Zoomfogva = 0;
+void tool_zoom_in_esc() {
+    if (SelectingZoomInBox) {
+        draw_tooltip_help();
+        SelectingZoomInBox = 0;
         invalidate();
     }
 }
 
-static void zoompont(int x, int y) {
+static void draw_zoom_in_rectangle_pixel(int x, int y) {
     unsigned char szin = BufferMain->gpixel(x, y);
     szin += 128;
     BufferMain->ppixel(x, y, szin);
     ppixelfront(x, y, szin);
 }
 
-static void kikeret(int x1, int y1, int x2, int y2) {
+static void draw_zoom_in_rectangle(int x1, int y1, int x2, int y2) {
     if (x2 < x1) {
         int tmp = x1;
         x1 = x2;
@@ -737,25 +738,25 @@ static void kikeret(int x1, int y1, int x2, int y2) {
         y2 = tmp;
     }
     for (int x = x1; x <= x2; x++) {
-        zoompont(x, y1);
-        zoompont(x, y2);
+        draw_zoom_in_rectangle_pixel(x, y1);
+        draw_zoom_in_rectangle_pixel(x, y2);
     }
     for (int y = y1; y <= y2; y++) {
-        zoompont(x1, y);
-        zoompont(x2, y);
+        draw_zoom_in_rectangle_pixel(x1, y);
+        draw_zoom_in_rectangle_pixel(x2, y);
     }
 }
 
-void t_zoomin_mmove(int x, int y) {
+void tool_zoom_in_mousemove(int x, int y) {
     push();
-    if (Zoomfogva) {
+    if (SelectingZoomInBox) {
         lockfrontbuffer_pic();
-        kikeret(Zoomx1, Zoomy1, Zoomx2, Zoomy2);
+        draw_zoom_in_rectangle(Zoomx1, Zoomy1, Zoomx2, Zoomy2);
         Zoomx2 = x;
         Zoomy2 = y;
         Moux = x;
         Mouy = y;
-        kikeret(Zoomx1, Zoomy1, Zoomx2, Zoomy2);
+        draw_zoom_in_rectangle(Zoomx1, Zoomy1, Zoomx2, Zoomy2);
         unlockfrontbuffer_pic();
     } else {
         // Teljesen normalis kurzor mozgatas:
@@ -773,7 +774,7 @@ void t_zoomin_mmove(int x, int y) {
 // SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE SPRITE
 
 // Elougrik dialogus sprite valasztasra:
-void t_create_sprite_nyomva_jobb() {
+void tool_create_sprite_rightclick() {
     // Lgr-en vegzi muveleteit:
     if (!Lgr) {
         internal_error("grtyy");
@@ -790,7 +791,7 @@ void t_create_sprite_nyomva_jobb() {
                  Lgr->hatarolok[Lgr->aktivindex] );*/
 }
 
-void t_create_sprite_nyomva(int mx, int my) {
+void tool_create_sprite_leftclick(int mx, int my) {
     if (!Lgr) {
         internal_error("987g45");
     }
@@ -830,7 +831,7 @@ void t_create_sprite_nyomva(int mx, int my) {
     internal_error("oihhgffc!");
 }
 
-void t_delete_sprite_nyomva(int mx, int my) {
+void tool_delete_sprite_leftclick(int mx, int my) {
     double x = pixel_to_meter_x(mx);
     double y = pixel_to_meter_y(my);
     sprite* psp = Ptop->get_closest_sprite(x, y);

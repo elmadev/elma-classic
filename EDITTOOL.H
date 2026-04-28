@@ -3,41 +3,41 @@
 
 #include "object.h"
 
-void alaphelp(); // O figyeli ki a tool
+void draw_tooltip_help(); // O figyeli ki a tool
 
-void t_move_nyomva(int x, int y);
-void t_move_nyomva_jobb(int x, int y);
-void t_move_esc();
-void t_move_mmove(int x, int y);
+void tool_move_leftclick(int mouse_x, int mouse_y);
+void tool_move_rightclick(int mouse_x, int mouse_y);
+void tool_move_esc();
+void tool_move_mousemove(int mouse_x, int mouse_y);
 // Kurzor negyzette valtozik:
 // void t_move_space( void );
 // extern int Kurzornegyzet;
 
-extern int Egypont;
-void t_create_vert_nyomva(int x, int y);
-void t_create_vert_esc();
-void t_create_vert_space();
-void t_create_vert_enter();
-void t_create_vert_mmove(int x, int y);
+extern int CreatingPolygon;
+void tool_create_vertex_leftclick(int mouse_x, int mouse_y);
+void tool_create_vertex_esc();
+void tool_create_vertex_space();
+void tool_create_vertex_enter();
+void tool_create_vertex_mousemove(int mouse_x, int mouse_y);
 
-void t_delete_vert_nyomva(int x, int y);
-void t_delete_poly_nyomva(int x, int y);
+void tool_delete_vertex_leftclick(int mouse_x, int mouse_y);
+void tool_delete_polygon_leftclick(int mouse_x, int mouse_y);
 
 // Legkozelebbi create food 0
-extern object::Property Food_kajatipus;
-extern int Food_foodsorszam;
-void t_create_food_nyomva_jobb();
+extern object::Property DefaultFoodProperty;
+extern int DefaultFoodAnimation;
+void tool_create_food_rightclick();
 // Food es killer is egyben:
-void t_create_kerek_nyomva(int x, int y, int food);
-void t_delete_kerek_nyomva(int x, int y);
+void tool_create_object_leftclick(int mouse_x, int mouse_y, int is_food);
+void tool_delete_object_leftclick(int mouse_x, int mouse_y);
 
-void t_create_sprite_nyomva(int x, int y);
-void t_create_sprite_nyomva_jobb();
-void t_delete_sprite_nyomva(int x, int y);
+void tool_create_sprite_leftclick(int mouse_x, int mouse_y);
+void tool_create_sprite_rightclick();
+void tool_delete_sprite_leftclick(int mouse_x, int mouse_y);
 
-extern int Zoomfogva; // Ha ez igaz, akkor nem szabad gombokat nyomkodni
-void t_zoomin_nyomva(int x, int y);
-void t_zoomin_esc();
-void t_zoomin_mmove(int x, int y);
+extern int SelectingZoomInBox; // Ha ez igaz, akkor nem szabad gombokat nyomkodni
+void tool_zoom_in_leftclick(int mouse_x, int mouse_y);
+void tool_zoom_in_esc();
+void tool_zoom_in_mousemove(int mouse_x, int mouse_y);
 
 #endif

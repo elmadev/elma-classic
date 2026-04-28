@@ -523,7 +523,7 @@ static void ujrarajzol(int egesz) {
 
 static void beallitkozelvane(int mx, int my) {
     if (Tool == T_CREATE_FOOD) {
-        kikereknev(object::Type::Food, Food_kajatipus, Food_foodsorszam);
+        kikereknev(object::Type::Food, DefaultFoodProperty, DefaultFoodAnimation);
         return;
     }
     if (Tool == T_CREATE_SPRITE) {
@@ -600,7 +600,7 @@ static void toolvaltas(int t) {
         return;
     }
     Tool = t;
-    alaphelp();
+    draw_tooltip_help();
     // kibalmenu();
     invalidateegesz();
 }
@@ -697,7 +697,7 @@ void editor() {
     Psp = nullptr;
 
     Tool = T_MOVE;
-    alaphelp();
+    draw_tooltip_help();
 
     zoom_fill();
     ujrarajzol(1);
@@ -707,29 +707,29 @@ void editor() {
         // Control keys
         if (was_key_just_pressed(DIK_ESCAPE)) {
             if (Tool == T_MOVE) {
-                t_move_esc();
+                tool_move_esc();
             }
             if (Tool == T_ZOOMIN) {
-                t_zoomin_esc();
+                tool_zoom_in_esc();
             }
             if (Tool == T_CREATE_VERT) {
-                t_create_vert_esc();
+                tool_create_vertex_esc();
             }
         }
         if (was_key_just_pressed(DIK_SPACE)) {
             if (Tool == T_CREATE_VERT) {
-                t_create_vert_space();
+                tool_create_vertex_space();
             }
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             if (Tool == T_CREATE_VERT) {
-                t_create_vert_enter();
+                tool_create_vertex_enter();
             }
         }
         // Character shortcuts from text buffer
         while (has_text_input()) {
             char c = pop_text_input();
-            if (!(Pgy || Pker || Psp || Zoomfogva || Egypont)) {
+            if (!(Pgy || Pker || Psp || SelectingZoomInBox || CreatingPolygon)) {
                 if (c == 'p') {
                     editor_play(is_key_down(DIK_F1));
                 }
@@ -781,7 +781,8 @@ void editor() {
             if (ujy < EDITOR_MENU_Y) {
                 ujy = EDITOR_MENU_Y;
             }
-            if ((Pgy || Pker || Psp || Zoomfogva || Egypont) && ujx < EDITOR_MENU_X) {
+            if ((Pgy || Pker || Psp || SelectingZoomInBox || CreatingPolygon) &&
+                ujx < EDITOR_MENU_X) {
                 // Ha meg van valami fogva, nem mehetunk gombok fole:
                 ujx = EDITOR_MENU_X;
                 set_mouse_position(ujx, ujy);
@@ -929,50 +930,50 @@ void editor() {
                 }
             } else {
                 if (Tool == T_MOVE && balnyomva) {
-                    t_move_nyomva(ujx, ujy);
+                    tool_move_leftclick(ujx, ujy);
                 }
                 if (Tool == T_MOVE && jobbnyomva) {
-                    // Altalaban t_move_esc-et hivja:
-                    t_move_nyomva_jobb(ujx, ujy);
+                    // Altalaban tool_move_esc-et hivja:
+                    tool_move_rightclick(ujx, ujy);
                 }
                 if (Tool == T_ZOOMIN && balnyomva) {
-                    t_zoomin_nyomva(ujx, ujy);
+                    tool_zoom_in_leftclick(ujx, ujy);
                 }
                 if (Tool == T_ZOOMIN && jobbnyomva) {
-                    t_zoomin_esc();
+                    tool_zoom_in_esc();
                 }
                 if (Tool == T_CREATE_VERT && balnyomva) {
-                    t_create_vert_nyomva(ujx, ujy);
+                    tool_create_vertex_leftclick(ujx, ujy);
                 }
                 if (Tool == T_CREATE_VERT && jobbnyomva) {
-                    t_create_vert_esc();
+                    tool_create_vertex_esc();
                 }
                 if (Tool == T_DELETE_VERT && balnyomva) {
-                    t_delete_vert_nyomva(ujx, ujy);
+                    tool_delete_vertex_leftclick(ujx, ujy);
                 }
                 if (Tool == T_DELETE_POLY && balnyomva) {
-                    t_delete_poly_nyomva(ujx, ujy);
+                    tool_delete_polygon_leftclick(ujx, ujy);
                 }
                 if (Tool == T_CREATE_FOOD && balnyomva) {
-                    t_create_kerek_nyomva(ujx, ujy, 1);
+                    tool_create_object_leftclick(ujx, ujy, 1);
                 }
                 /* Most nem lehet create food-nal allitani gravitaciot
                 if( Tool == T_CREATE_FOOD && jobbnyomva )
-                    t_create_food_nyomva_jobb(); */
+                    tool_create_food_rightclick(); */
                 if (Tool == T_CREATE_KILLER && balnyomva) {
-                    t_create_kerek_nyomva(ujx, ujy, 0);
+                    tool_create_object_leftclick(ujx, ujy, 0);
                 }
                 if (Tool == T_DELETE_KEREK && balnyomva) {
-                    t_delete_kerek_nyomva(ujx, ujy);
+                    tool_delete_object_leftclick(ujx, ujy);
                 }
                 if (Tool == T_CREATE_SPRITE && balnyomva) {
-                    t_create_sprite_nyomva(ujx, ujy);
+                    tool_create_sprite_leftclick(ujx, ujy);
                 }
                 if (Tool == T_CREATE_SPRITE && jobbnyomva) {
-                    t_create_sprite_nyomva_jobb();
+                    tool_create_sprite_rightclick();
                 }
                 if (Tool == T_DELETE_SPRITE && balnyomva) {
-                    t_delete_sprite_nyomva(ujx, ujy);
+                    tool_delete_sprite_leftclick(ujx, ujy);
                 }
             }
         }
@@ -993,7 +994,7 @@ void editor() {
         if (ujy < EDITOR_MENU_Y) {
             ujy = EDITOR_MENU_Y;
         }
-        if ((Pgy || Pker || Psp || Zoomfogva || Egypont) && ujx < EDITOR_MENU_X) {
+        if ((Pgy || Pker || Psp || SelectingZoomInBox || CreatingPolygon) && ujx < EDITOR_MENU_X) {
             // Ha meg van valami fogva, nem mehetunk gombok fole:
             ujx = EDITOR_MENU_X;
             set_mouse_position(ujx, ujy);
@@ -1003,11 +1004,11 @@ void editor() {
         }
         // Eger mozdult:
         if (Tool == T_ZOOMIN) {
-            t_zoomin_mmove(ujx, ujy);
+            tool_zoom_in_mousemove(ujx, ujy);
             continue;
         }
-        if (Tool == T_CREATE_VERT && (Pgy || Egypont)) {
-            t_create_vert_mmove(ujx, ujy);
+        if (Tool == T_CREATE_VERT && (Pgy || CreatingPolygon)) {
+            tool_create_vertex_mousemove(ujx, ujy);
             continue;
         }
         if (!Pgy && !Pker && !Psp) {
@@ -1020,7 +1021,7 @@ void editor() {
         } else {
             // Ha meg van valami fogva, akkor tool rajzolja kurzort:
             if (Tool == T_MOVE) {
-                t_move_mmove(ujx, ujy);
+                tool_move_mousemove(ujx, ujy);
             }
         }
     }

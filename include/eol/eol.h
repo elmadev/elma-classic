@@ -3,10 +3,8 @@
 
 #include "eol/eol_events.h"
 #include "eol/eol_table.h"
-#include "eol/null_protocol.h"
+#include "eol/protocol.h"
 #include <vector>
-
-using protocol = null_protocol;
 
 class abc8;
 class pic8;

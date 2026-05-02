@@ -18,7 +18,6 @@
 #include "object.h"
 #include "pic8.h"
 #include "platform/implementation.h"
-#include "platform/utils.h"
 #include "physics_init.h"
 #include "renderer/object_overlay.h"
 #include "timer.h"
@@ -173,7 +172,7 @@ static void calculate_viewpoints(bool splitscreen) {
 // Along the axis of the vector b->a, displace coordinate a by `a_stretch` meters
 // Along the axis of the vector a->b, displace coordinate b by `b_stretch` meters
 // height represents the vertical length of the affine_pic (thickness of the limb)
-static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, affine_pic* affine,
+static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, const affine_pic* affine,
                               double a_stretch, double b_stretch, bool flip) {
     vect2 i = unit_vector(b - a);
     b = b + i * b_stretch;
@@ -389,8 +388,9 @@ static void render_background(pic8* pic) {
 }
 
 // Render an entire bike + kuski
-static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_corner, motorst* mot,
-                        valtozok* metadata, bike_pics* bike, affine_pic* shirt) {
+static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_corner,
+                        const motorst* mot, const valtozok* metadata, const bike_pics* bike,
+                        const affine_pic* shirt) {
     double arm_position = metadata->ugrasnagysag;
     double turn_phase = metadata->baljobbv_f.forgas;
 
@@ -579,7 +579,7 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
     // Draw the whole kuski (excluding head)
     render_affine_pic(knee_r, hip_r, pic, 0.14, bike->thigh, 0.03, 0.1, mot->flipped_bike);
     render_affine_pic(foot_r, knee_r, pic, 0.21, bike->leg, 0.03, 0.03, mot->flipped_bike);
-    affine_pic* body = shirt ? shirt : bike->body;
+    const affine_pic* body = shirt ? shirt : bike->body;
     render_affine_pic(hip_r, neck_r, pic, 0.2, body, 0.1, 0.05, mot->flipped_bike);
     render_affine_pic(elbow_r, shoulder_r, pic, 0.11, bike->up_arm, 0.08, 0.1, !mot->flipped_bike);
     render_affine_pic(hand_r, elbow_r, pic, 0.076, bike->forarm, 0.08, 0.1, mot->flipped_bike);

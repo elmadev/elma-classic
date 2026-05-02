@@ -48,7 +48,7 @@ void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
     StretchMetersToPixels = meters_to_pixels;
 }
 
-void draw_affine_pic(pic8* dest, affine_pic* aff, vect2 u, vect2 v, vect2 r) {
+void draw_affine_pic(pic8* dest, const affine_pic* aff, vect2 u, vect2 v, vect2 r) {
     unsigned char transparency = aff->transparency;
 
     // Bike is turning! Let's stretch the bike

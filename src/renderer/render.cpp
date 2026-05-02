@@ -343,6 +343,20 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         bike2_id = Lgr->minimap_bike1_palette_id;
     }
 
+    if (EolSettings->show_others()) {
+        for (const kuski& ku : EolClient->kuskis()) {
+            const spy_data* k = ku.spy_data();
+            if (!k) {
+                continue;
+            }
+
+            vect2 k_pos = k->mot.bike.r - bottomleft_corner;
+            int k_x = (int)(k_pos.x * MetersToMinimapPixels);
+            int k_y = (int)(k_pos.y * MetersToMinimapPixels);
+            render_minimap_icon(&minimap_view, k_x, k_y, bike2_id);
+        }
+    }
+
     // Draw the other bike
     if (other_motor) {
         vect2 other_pos = other_motor->bike.r - bottomleft_corner;
@@ -710,6 +724,20 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
     if ((State->player1_bike1 && !player1) || (!State->player1_bike1 && player1)) {
         bike1 = &Lgr->bike2;
         bike2 = &Lgr->bike1;
+    }
+
+    if (EolSettings->show_others()) {
+        for (const kuski& ku : EolClient->kuskis()) {
+            const spy_data* k = ku.spy_data();
+            if (!k) {
+                continue;
+            }
+
+            if (bike_in_view(&k->mot, center)) {
+                render_bike(false, pic, time, bottomleft_corner, &k->mot, &k->metadata, bike2,
+                            nullptr);
+            }
+        }
     }
 
     if (current_camera.mode == CameraMode::Normal) {

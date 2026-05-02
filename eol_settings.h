@@ -133,6 +133,7 @@ class eol_settings {
     Default<std::string> password_{""};
     Default<bool> play_offline_{false};
     Default<bool> tcp_only_{false};
+    Default<bool> show_others_{true};
 
   public:
     static void read_settings();
@@ -195,6 +196,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(password);
     DECLARE_FIELD_FUNCS(play_offline);
     DECLARE_FIELD_FUNCS(tcp_only);
+    DECLARE_FIELD_FUNCS(show_others);
 };
 
 #undef DECLARE_FIELD_FUNCS

@@ -2,6 +2,7 @@
 #include "EDITUJ.H"
 #include "eol/console.h"
 #include "eol/eol.h"
+#include "eol/status_messages.h"
 #include "eol_settings.h"
 #include "flagtag.h"
 #include "sound_engine.h"
@@ -665,6 +666,12 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         // Snap nyomas elintezese:
         if (was_game_key_just_pressed(State->key_screenshot)) {
             Legkozment = 1;
+        }
+
+        if (was_game_key_just_pressed(DIK_F1)) {
+            EolSettings->set_show_others(!EolSettings->show_others());
+            StatusMessages->add(EolSettings->show_others() ? "other players shown"
+                                                           : "other players hidden");
         }
 
         if (was_game_key_just_pressed(DIK_F5)) {

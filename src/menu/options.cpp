@@ -429,6 +429,8 @@ void menu_options() {
                 }
             });
 
+        BOOL_OPTION("Show others:", show_others);
+
         choice = nav.navigate();
 
         if (choice < 0) {

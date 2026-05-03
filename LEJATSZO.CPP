@@ -22,11 +22,8 @@
 #include <directinput/scancodes.h>
 #include <filesystem>
 
-// Jatek modja ket fele lehet:
 int Single = 1;
-// Van-e fogocska:
 int FlagTag = 0;
-// int Multi = 0;
 bool OutOfBounds = false;
 
 int ScreenshotRequested = 0;
@@ -36,6 +33,8 @@ std::string VideoOutputDirectory;
 
 static int TotalApples;
 
+// Returns whether console was active at the beginning of this frame,
+// to prevent key presses from affecting the gameplay.
 static bool handle_console_input() {
     bool was_active = Console->is_input_active();
     if (was_key_just_pressed(DIK_F9)) {
@@ -96,7 +95,6 @@ static void sound_init() {
     }
 }
 
-// Player 1 es 2-re:
 static hud_visibility HudVisibility1 = {1, 0, 1, 0};
 static hud_visibility HudVisibility2 = {1, 0, 1, 0};
 
@@ -143,6 +141,7 @@ static BikeState handle_object_interaction(int object_id, int* apple_count, moto
     return BikeState::Normal;
 }
 
+// Return camera phase (position) from 1.0 (facing left) to 0.0 (facing right)
 static double calculate_camera_phase(double elapsed_time, int flipped) {
     elapsed_time = std::max<double>(elapsed_time, 0);
 
@@ -160,12 +159,10 @@ static double calculate_camera_phase(double elapsed_time, int flipped) {
     }
 }
 
-// static int Marvoltgaz = 0;
-
-// Ide csak *pmeghalt == 0-val erkezhet
+// Subframe physics calculation. Contains all the physics calculations except for bike turning
 static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* metadata,
                              recorder* rec, long* finish_time, int* dead, double time, double dt) {
-    // Ugras elintezese:
+    // Adjust key inputs to only allow valid inputs, accounting for volt delay and cripples
     int right_volt = 0, left_volt = 0;
 
     bool is_gas_down = is_game_key_down(keys->gas);
@@ -194,8 +191,6 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
         }
     }
 
-    // LEPTET!!!!!!!:
-    // 0-meghalt, 1-megnyerte, 2-semmi kulonos
     if (EolSettings->cripple_no_brake()) {
         is_brake_down = false;
     }
@@ -206,25 +201,25 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
         is_gas_down = true;
         is_brake_down = false;
     }
+
+    // Simulate bike physics given validated inputs
     simulate_bike_physics(mot, time, dt, is_gas_down, is_brake_down, right_volt, left_volt);
 
+    // Check for head death and record object interactions
     BikeState head_state = check_object_collision(mot);
     if (head_state == BikeState::Dead) {
-        // Beteszunk egy 0 hangot:
         metadata->sound.friction_volume = 0;
         metadata->sound.motor_frequency = -1;
         metadata->sound.gas = 0;
         rec->store_frames(mot, time, &metadata->sound);
         if (!Single && FlagTag && !OutOfBounds) {
-            // Flag Tag modban nem allnak meg, hanem visszamennek starthelyre:
+            // Flag Tag respawn
             init_motor(mot);
-            // Kezdetihelydiff-et setallaktiv allitja be:
             mot->bike.r = mot->bike.r + BikeStartOffset;
             mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
             mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;
             mot->body_r = mot->body_r + BikeStartOffset;
 
-            // Valtozok inicializalasa:
             int draw_view = metadata->draw_view;
             memset(metadata, 0, sizeof(bike_metadata));
             metadata->bike_turning.camera_turn_time = -1000.0;
@@ -235,7 +230,7 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
             metadata->draw_view = draw_view;
 
             if ((mot == Motor1 && FlagTagAHasFlag) || (mot == Motor2 && !FlagTagAHasFlag)) {
-                // Nala volt zaszlo
+                // Give flag to other player
                 FlagTagAHasFlag = !FlagTagAHasFlag;
             }
         } else {
@@ -244,8 +239,7 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
         }
     }
 
-    // eddig += dt; // Ezt meg kell ismetelni eggyel feljebb is
-    //  Berreges es nyikorgas:
+    // Update sound
     metadata->sound.friction_volume = get_bike_friction_volume();
 
     if (mot->flipped_bike) {
@@ -253,16 +247,16 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
     } else {
         metadata->sound.motor_frequency = fabs(mot->right_wheel.angular_velocity) * 0.025;
     }
-    // Frekvenciat betesszuk 1.0-2.0 tartomanyba:
     if (metadata->sound.motor_frequency > 30.0) {
         metadata->sound.motor_frequency = 30.0;
     }
     metadata->sound.motor_frequency = 2.0 - exp(-metadata->sound.motor_frequency);
-
     metadata->sound.gas = (char)is_gas_down;
+
+    // Update replay
     rec->store_frames(mot, time, &metadata->sound);
 
-    // Egyedi hangok:
+    // Handle object ineractions
     WavEvent wav_id;
     double volume;
     int object_id;
@@ -290,23 +284,22 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
 
 static void update_view_settings(player_keys* keys, bike_metadata* metadata, int* minimap,
                                  int* timer, int* other_draw_view) {
-    // Showkep:
+    // Visibility of player viewpoint
     if (was_game_key_just_pressed(keys->toggle_visibility)) {
         reset_game_background();
         if (!*other_draw_view) {
-            // Ha masik jatekos ablaka nem latszott, mindegyik fog latszani:
+            // You cannot have 0 players visible, so make both players visible instead
             *other_draw_view = 1;
             metadata->draw_view = 1;
         } else {
             metadata->draw_view = !metadata->draw_view;
         }
     }
-    // View ablak:
+
     if (was_game_key_just_pressed(keys->toggle_minimap)) {
         *minimap = !*minimap;
     }
 
-    // Ido kint legyen vagy ne:
     if (was_game_key_just_pressed(keys->toggle_timer)) {
         *timer = !*timer;
     }
@@ -314,43 +307,48 @@ static void update_view_settings(player_keys* keys, bike_metadata* metadata, int
 
 static void update_turning_data(turning_data* data, recorder* rec, double time, int flipped) {
     if (data->flipped != flipped) {
+        // New flip this frame
         data->bike_turn_time = time;
         double elapsed_time = time - data->camera_turn_time;
         double camera_flip_time = EolSettings->turn_time() + 0.15;
         if (camera_flip_time > 0.0 && elapsed_time < camera_flip_time) {
+            // If camera is mid-turn, calculate camera start time so it seamlessly continues from
+            // the mid-turn position
             data->camera_turn_time = time + elapsed_time - camera_flip_time;
         } else {
+            // Camera is not mid-turn, so just set the camera turn time normally
             data->camera_turn_time = time;
         }
         data->flipped = flipped;
-        // Hang adas:
         if (rec) {
-            // Most kihagyjuk wavgyujtot:
             start_wav(WavEvent::Turn, 0.99);
             rec->store_event(time, WavEvent::Turn, 0.99, -1);
         }
     }
 
-    // Kirajzolashoz kellenek:
+    // Update bike turn phase
     double turn_time = EolSettings->turn_time();
     if (turn_time == 0.0) {
         // Instant turn
         data->bike_turn_phase = 1.0;
     } else {
         data->bike_turn_phase = (time - data->bike_turn_time) / turn_time;
-
         data->bike_turn_phase = std::clamp(data->bike_turn_phase, 0.0, 1.0);
     }
 
+    // Update camera turn phase
     data->camera_turn_phase = calculate_camera_phase(time - data->camera_turn_time, flipped);
 }
 
+// The only physics-relevant part of this function is turning the bike. The rest is "cosmetic" for
+// rendering the frame.
 static void physics_frame_end(motorst* mot, player_keys* keys, bike_metadata* metadata,
                               recorder* rec, hud_visibility* hud, double time, int* other_draw_view,
                               int dead) {
+    // Update the hud and player visibility
     update_view_settings(keys, metadata, &hud->game_minimap, &hud->game_timer, other_draw_view);
 
-    // Hatra fordulas elintezes:
+    // Check for bike turn and update turn graphics
     if (!dead) {
         bool is_turn_down = is_game_key_down(keys->turn);
         if (EolSettings->cripple_no_turn()) {
@@ -368,7 +366,7 @@ static void physics_frame_end(motorst* mot, player_keys* keys, bike_metadata* me
     }
     update_turning_data(&metadata->bike_turning, rec, time, mot->flipped_bike);
 
-    // Hatra elintezes:
+    // Update camera position
     if (mot->gravity_direction == MotorGravity::Up) {
         mot->flipped_camera = !mot->flipped_bike;
     } else {
@@ -376,7 +374,7 @@ static void physics_frame_end(motorst* mot, player_keys* keys, bike_metadata* me
     }
     update_turning_data(&metadata->camera_turning, nullptr, time, mot->flipped_camera);
 
-    // Kirajzolashoz kell:
+    // Update arm position
     metadata->arm_position = 1.0 - (time - metadata->volt_time) / VoltDelay;
     if (metadata->arm_position < 0) {
         metadata->arm_position = 0;
@@ -393,16 +391,16 @@ static void setup_gameloop(const char* filename) {
     load_best_time(filename, Single);
 
     init_physics_data();
+
     if (!Ptop) {
         internal_error("setup_gameloop() !Ptop!");
     }
     Ptop->flip_objects();
     Ptop->sort_objects();
-    // setallaktiv allitja be motor kezdeti helyzetet is!:
+
     TotalApples = Ptop->initialize_objects(Motor1);
     Ptop->initialize_objects(Motor2);
 
-    // Eloszor keretet tobbszor is kirakja kirajzol320:
     reset_game_background();
 
     flagtag_reset();
@@ -415,28 +413,15 @@ static void setup_gameloop(const char* filename) {
     Lgr->pal->set();
 }
 
-// lejatszo ezt beallitja: 0 -> nem kell kiirni, 1 -> A eloszor, 2 -> B
-// csak akkor A vagy B eloszor, ha mindketten meghaltak, tehat
-// menu_level menu-nek ezt mar feldolgozta elore:
 int WhoDiedFirst = 0;
-
-// Ha sikeres szint, ide teszi be hogy ki ment ki:
 int Player1Finished = 0;
 
 int Masodikmenet = 0;
 
-// Idot adja vissza szazadmasodpercben:
 long game_loop(const char* filename, CameraMode camera_mode) {
-    // internal_error( "Ezegyhosszusor,szetkellvagnibiztosanhibaEzegy hosszu sor, szet kell vagni
-    // biztosan!",
-    //	"Ez egy masik hosszu sor, szet kell vagni biztosan!" );
-
-    // Azert allitom 1-be, hogy mindenkeppen eszrevegyem, ha nem allitom
-    // meg kilepes elott be rendesen:
     WhoDiedFirst = 1;
     Player1Finished = 0;
 
-    // Jatekmod eldontese:
     Single = State->single;
     FlagTag = !Single && State->flag_tag;
     Rec1->set_flagtag(FlagTag);
@@ -459,8 +444,7 @@ long game_loop(const char* filename, CameraMode camera_mode) {
 
     stopwatch_reset();
 
-    // Valtozok inicializalasa:
-    bike_metadata metadata1; // Inicializalni kell !!!!!!!!!!!!
+    bike_metadata metadata1;
     memset(&metadata1, 0, sizeof(metadata1));
     bike_metadata metadata2;
     memset(&metadata2, 0, sizeof(metadata2));
@@ -487,7 +471,7 @@ long game_loop(const char* filename, CameraMode camera_mode) {
     double level_max_y;
     Ptop->get_boundaries(&current_camera.min_x, &level_min_y, &current_camera.max_x, &level_max_y,
                          false);
-    // convert level y-coordinates to camera y-coordinates
+    // Convert level y-coordinates to camera y-coordinates
     current_camera.min_y = -level_max_y;
     current_camera.max_y = -level_min_y;
 
@@ -504,38 +488,19 @@ long game_loop(const char* filename, CameraMode camera_mode) {
     long l = 0;
     int both_bikes_alive = 1;
     while (1) {
-        // Kiszamolja mennyit kell leptetni:
+        // Get timestep
         double target_time = stopwatch() * 0.0024;
         if (target_time < 0.000001) {
             target_time = 0.000001;
         }
 
-        // Ha tul sok kimaradt, akkor nem kell annyit behozni:
-        // Ezt most elvileg stopper vegzi:
-        // if( eddig < cel-1.0 )
-        //	eddig = cel-1.0;
-
-        /* Most nincs idoellenorzes:
-        if( cel - eddig > 2.0*0.432 && idoszerint ) // Maximum 2 sec a turelem!
-            external_error( "System not fast enough!" );
-        */
-
-        handle_events(); // Billentyut itt olvassuk be
+        handle_events();
 
         bool console_was_active = handle_console_input();
 
         while (time <= target_time - 0.000001) {
-            // char tmp[10];
-            // sprintf( tmp, "Gaz kodja: %d", (int)State->keys1.gas );
-            // external_error( tmp );
-            // double dt = 0.003; // Ez it 1.2-es verzionak megfelelo
-            // double dt = 0.006; // Ez itt uj lepeskoz (jol mukodik regen)
-
-            // Ez ELASTO MANIA 1.0 lepeskoze:
-            // double dt = 0.0055; // Ez leeseskor sem rezonal
-
-            double dt = 0.0055; // 0.0065
-
+            // Cap slowest frame to 0.0055 (approximately 12.6 milliseconds or 79.4 fps)
+            double dt = 0.0055;
             if (time + dt > target_time) {
                 dt = target_time - time;
             }
@@ -550,14 +515,12 @@ long game_loop(const char* filename, CameraMode camera_mode) {
                 physics_subframe(Motor1, &State->keys1, &metadata1, Rec1, &finish_time1, &dead1,
                                  time, dt);
             }
-
             if (!Single && !dead2) {
                 physics_subframe(Motor2, &State->keys2, &metadata2, Rec2, &finish_time2, &dead2,
                                  time, dt);
             }
 
             if (!(dead1 && dead2)) {
-                // Ha meg nem halt meg mindketto:
                 if (dead1) {
                     WhoDiedFirst = 1;
                 }
@@ -568,8 +531,6 @@ long game_loop(const char* filename, CameraMode camera_mode) {
 
             if (!Single && both_bikes_alive) {
                 if (dead1 || dead2) {
-                    // Ha meg mindket motor jar,
-                    // de mar egyik meghalt:
                     if (dead1) {
                         stop_motor_sound(true);
                     } else {
@@ -581,14 +542,12 @@ long game_loop(const char* filename, CameraMode camera_mode) {
 
             if ((Single && (finish_time1 || dead1)) ||
                 (!Single && (finish_time1 || finish_time2 || (dead1 && dead2)))) {
-                // Vege jateknak:
                 long finish_time = finish_time1;
                 if (finish_time2) {
                     finish_time = finish_time2;
                 }
 
                 if (!(dead1 && dead2) || Single) {
-                    // Ha nem halt meg mindketto, akkor ne irjon semmit:
                     WhoDiedFirst = 0;
                 }
                 if (finish_time1) {
@@ -612,10 +571,12 @@ long game_loop(const char* filename, CameraMode camera_mode) {
                 stop_motor_sound(false);
 
                 Mute = true;
+
                 if (Single) {
                     EolClient->exit_level(filename, time * TimeToCentiseconds, Motor1->apple_count,
                                           TotalApples, finish_time ? false : true);
                 }
+
                 if (finish_time) {
                     Ptop->unflip_objects();
                     Rec1->encode_frame_count();
@@ -628,11 +589,9 @@ long game_loop(const char* filename, CameraMode camera_mode) {
                     return -1;
                 }
             }
-
             time += dt;
         }
 
-        // Fogocska elintezes:
         if (!Single && FlagTag) {
             flagtag(time);
         }
@@ -648,7 +607,6 @@ long game_loop(const char* filename, CameraMode camera_mode) {
 
         physics_frame_end(Motor1, &State->keys1, &metadata1, Rec1, &HudVisibility1, time,
                           &metadata2.draw_view, dead1);
-
         if (!Single) {
             physics_frame_end(Motor2, &State->keys2, &metadata2, Rec2, &HudVisibility2, time,
                               &metadata1.draw_view, dead2);
@@ -658,16 +616,13 @@ long game_loop(const char* filename, CameraMode camera_mode) {
                     HudVisibility1.game_timer, HudVisibility2.game_minimap,
                     HudVisibility2.game_timer, current_camera);
 
-        // Egy par kozos toggle:
-        // Plusz elintezes:
+        // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
             increase_view_size();
         }
-        // Minusz elintezes:
         if (was_game_key_just_pressed(State->key_decrease_screen_size)) {
             decrease_view_size();
         }
-        // Snap nyomas elintezese:
         if (was_game_key_just_pressed(State->key_screenshot)) {
             ScreenshotRequested = 1;
         }
@@ -682,23 +637,20 @@ long game_loop(const char* filename, CameraMode camera_mode) {
             EolClient->set_table(TableType::PlayersOnline);
         }
 
-        // Vizsgalat kilepesre:
         if (!console_was_active &&
             (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {
             WhoDiedFirst = 0;
+
             double eltelido = stopwatch();
-            // Motor hangjat kikapcsolja:
+
             stop_motor_sound(true);
             stop_motor_sound(false);
-
             Mute = true;
 
-            // Kiirja framerate-et:
             double tpl = double(l) / eltelido;
             tpl *= STOPWATCH_MULTIPLIER * 1000.0;
             int framerate = (int)(tpl);
             if (std::filesystem::exists("f_rate.inf")) {
-                // igyhagyni fopen-t!:
                 FILE* h = fopen("f_rate.inf", "w");
                 if (!h) {
                     internal_error("framerate nem nyilik!");
@@ -717,69 +669,8 @@ long game_loop(const char* filename, CameraMode camera_mode) {
             return -1;
         }
         l++;
-        /*vect2 tomba[100], tombb[100];
-        double dtomb[100];
-        for( int i = 0; i < 100; i++ ) {
-            tomba[i] = vect2( i+2, i+3 );
-            tombb[i] = vect2( i-23, i-70 );
-        }
-        for( i = 0; i < 200000; i++ ) {
-            for( int j = 0; j < 100; j++ )
-                dtomb[j] = tomba[j] % tombb[j];
-        } */
     }
 }
-
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-// REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY REPLAY
-
-// char Ccc[] = "Cs1_2";
 
 static void reverse_events(motorst* mot, recorder* rec, double time) {
     WavEvent wav;
@@ -818,16 +709,17 @@ static void rewind_override_animations(bike_metadata* metadata, motorst* mot, re
     metadata->arm_position = std::max<double>(metadata->arm_position, 0);
 }
 
-// Hamissal ter vissza, ha nincsen mar tobb:
+// Load replay data (instead of simulating bike physics)
 static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadata, recorder* rec,
                          double time, hud_visibility* hud, int* other_draw_view) {
-
+    // Update the hud and player visibility
     update_view_settings(keys, metadata, &hud->replay_minimap, &hud->replay_timer, other_draw_view);
 
-    // recall koordokat es Hatra-t is beallitja:
+    // Load replay data
     bool alive = rec->recall_frame(mot, time, &metadata->sound);
-    set_head_position(mot); // mivel nincs leptet ami kiszamolna
-    // HANG ELINTEZES:
+    set_head_position(mot);
+
+    // Play events
     WavEvent wav_id;
     double volume;
     int object_id;
@@ -851,9 +743,10 @@ static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadat
         }
     }
 
-    // Hatra elintezes:
+    // Update turn graphics
     update_turning_data(&metadata->bike_turning, nullptr, time, mot->flipped_bike);
 
+    // Update camera position
     if (mot->gravity_direction == MotorGravity::Up) {
         mot->flipped_camera = !mot->flipped_bike;
     } else {
@@ -861,7 +754,7 @@ static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadat
     }
     update_turning_data(&metadata->camera_turning, nullptr, time, mot->flipped_camera);
 
-    // Kirajzolashoz kellenek:
+    // Update arm position
     metadata->arm_position = 1.0 - (time - metadata->volt_time) / VoltDelay;
     metadata->arm_position = std::max<double>(metadata->arm_position, 0);
 
@@ -870,7 +763,6 @@ static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadat
 
 static int PreviousReplayDrawView1 = 1, PreviousReplayDrawView2 = 1;
 
-// Termeszetes befejezes eseten 0-t ad vissza:
 long replay_loop(const char* filename, int restore_player_visibility) {
     // Refuse to play zero-length replays (from map-viewer mode)
     if (Rec1->is_empty()) {
@@ -885,13 +777,13 @@ long replay_loop(const char* filename, int restore_player_visibility) {
 
     Single = !MultiplayerRec;
     FlagTag = Rec1->flagtag();
+
     setup_gameloop(filename);
 
     reset_event_buffer();
     stopwatch_reset();
 
-    // Valtozok inicializalasa:
-    bike_metadata metadata1; // Inicializalni kell !!!!!!!!!!!!
+    bike_metadata metadata1;
     memset(&metadata1, 0, sizeof(metadata1));
     bike_metadata metadata2;
     memset(&metadata2, 0, sizeof(metadata2));
@@ -930,16 +822,16 @@ long replay_loop(const char* filename, int restore_player_visibility) {
     double last_stopwatch = stopwatch();
 
     while (1) {
-        handle_events(); // Billentyut itt olvassuk be
+        handle_events();
 
         bool console_was_active = handle_console_input();
 
+        // Get timestep
         double now = stopwatch();
         double dt = (now - last_stopwatch) * 0.0024;
         last_stopwatch = now;
 
         double speed = 1.0;
-
         if (is_game_key_down(State->key_replay_fast_2x)) {
             speed *= 2.0;
         }
@@ -949,7 +841,6 @@ long replay_loop(const char* filename, int restore_player_visibility) {
         if (is_game_key_down(State->key_replay_fast_8x)) {
             speed *= 8.0;
         }
-
         if (is_game_key_down(State->key_replay_slow_2x)) {
             speed *= 0.5;
         }
@@ -958,7 +849,6 @@ long replay_loop(const char* filename, int restore_player_visibility) {
         }
 
         bool rewinding = is_game_key_down(State->key_replay_rewind);
-
         bool paused = is_game_key_down(State->key_replay_pause);
 
         if (!paused) {
@@ -970,19 +860,18 @@ long replay_loop(const char* filename, int restore_player_visibility) {
             }
         }
 
-        // Kiszamolja mennyit kell leptetni:
         double time = current_replay_time;
 
-        // recall koordokat es Hatra-t is beallitja:
+        // Load replay data
         int dead1 = !replay_frame(Motor1, &State->keys1, &metadata1, Rec1, time, &HudVisibility1,
                                   &metadata2.draw_view);
-
         int dead2 = 0;
         if (!Single) {
             dead2 = !replay_frame(Motor2, &State->keys2, &metadata2, Rec2, time, &HudVisibility2,
                                   &metadata1.draw_view);
         }
 
+        // Reverse events if rewinding
         if (rewinding) {
             reverse_events(Motor1, Rec1, time);
             rewind_override_animations(&metadata1, Motor1, Rec1, time);
@@ -992,8 +881,8 @@ long replay_loop(const char* filename, int restore_player_visibility) {
             }
         }
 
+        // End of replay
         if ((Single && dead1) || (!Single && dead1 && dead2)) {
-            // Motor hangjat kikapcsolja:
             set_motor_frequency(true, 1.0, 0);
             set_motor_frequency(false, 1.0, 0);
             stop_motor_sound(true);
@@ -1011,6 +900,7 @@ long replay_loop(const char* filename, int restore_player_visibility) {
             return 0;
         }
 
+        // Death (or finish)
         if (!Single) {
             if (alive1 && dead1) {
                 stop_motor_sound(true);
@@ -1021,15 +911,12 @@ long replay_loop(const char* filename, int restore_player_visibility) {
                 alive2 = 0;
             }
 
-            // Fogocska:
+            // Update flagtag time
             flagtag_replay(time);
         }
 
-        // HANG ELINTEZES:
         if (Single) {
             set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
-            // if( valt1.sound.motor_frequency > 1.5 )
-            //	internal_error( "> 1.5!" );
             set_friction_volume(metadata1.sound.friction_volume);
         } else {
             set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
@@ -1041,32 +928,23 @@ long replay_loop(const char* filename, int restore_player_visibility) {
                     HudVisibility1.replay_timer, HudVisibility2.replay_minimap,
                     HudVisibility2.replay_timer, current_camera);
 
-        // Egy par kozos toggle:
-        // Plusz elintezes:
+        // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
             increase_view_size();
-
-            // extern int Mostirdki;
-            // Mostirdki = 1;
         }
-        // Minusz elintezes:
         if (was_game_key_just_pressed(State->key_decrease_screen_size)) {
             decrease_view_size();
         }
-        // Snap nyomas elintezese:
         if (was_game_key_just_pressed(State->key_screenshot)) {
             ScreenshotRequested = 1;
         }
 
-        // Vizsgalat kilepesre:
         if (!console_was_active && was_key_just_pressed(DIK_ESCAPE)) {
             double eltelido = stopwatch();
-            // Kiirja framerate-et:
             double tpl = double(l) / eltelido;
             tpl *= STOPWATCH_MULTIPLIER * 1000.0;
             int framerate = (int)(tpl);
             if (std::filesystem::exists("f_rate.inf")) {
-                // igyhagyni fopen-t!:
                 FILE* h = fopen("f_rate.inf", "w");
                 if (!h) {
                     internal_error("framerate nem nyilik!");
@@ -1074,7 +952,7 @@ long replay_loop(const char* filename, int restore_player_visibility) {
                 fprintf(h, "%d", framerate);
                 fclose(h);
             }
-            // Hang kikapcsolas:
+
             set_motor_frequency(true, 1.0, 0);
             set_motor_frequency(false, 1.0, 0);
             stop_motor_sound(true);
@@ -1119,7 +997,6 @@ void render_replay(const char* level_filename) {
     memset(&metadata1, 0, sizeof(metadata1));
     bike_metadata metadata2;
     memset(&metadata2, 0, sizeof(metadata2));
-
     metadata1.bike_turning.camera_turn_time = metadata2.bike_turning.camera_turn_time = -1000.0;
     metadata1.bike_turning.bike_turn_time = metadata2.bike_turning.bike_turn_time = -1000.0;
     metadata1.camera_turning.camera_turn_time = metadata2.camera_turning.camera_turn_time = -1000.0;

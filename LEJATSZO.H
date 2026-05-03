@@ -4,13 +4,11 @@
 #include "recorder.h"
 #include <string>
 
-// Jatek modja ket fele lehet:
 extern int Single;
-extern int FlagTag; // Van-e fogocska
+extern int FlagTag;
 extern bool OutOfBounds;
-// extern int Coop;
 
-extern int ScreenshotRequested; // kiraj320 ebbol tudja, hogy snapshot-ot keszitsen
+extern int ScreenshotRequested;
 extern bool VideoRecordingMode;
 extern int VideoFrameIndex;
 extern std::string VideoOutputDirectory;
@@ -27,8 +25,6 @@ struct camera {
     double max_y;
 };
 
-// Azt a nevet kerik, amit topol::topol kap:
-// BestTime beallitasahoz kell nekik:
 long game_loop(const char* filename, CameraMode camera_mode);
 long replay_loop(const char* filename, int restore_player_visibility);
 
@@ -39,7 +35,7 @@ struct turning_data {
     int flipped;
     double bike_turn_time;
     double camera_turn_time;
-    double camera_turn_phase; // kulsoresz szamolja tobbibol
+    double camera_turn_phase;
     double bike_turn_phase;
 };
 
@@ -60,12 +56,7 @@ struct bike_metadata {
     turning_data bike_turning, camera_turning;
 };
 
-// lejatszo ezt beallitja: 0 -> nem kell kiirni, 1 -> A eloszor, 2 -> B
-// csak akkor A vagy B eloszor, ha mindketten meghaltak, tehat
-// menu_level menu-nek ezt mar feldolgozta elore:
 extern int WhoDiedFirst;
-
-// Ha sikeres szint, ide teszi be hogy ki ment ki:
 extern int Player1Finished;
 
 #endif

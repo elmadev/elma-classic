@@ -602,6 +602,11 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
     }
 }
 
+static bool bike_in_view(const motorst* mot, vect2 center) {
+    double distance = (mot->bike.r - center).length();
+    return distance < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters;
+}
+
 // Render the view for one player
 static void render_view(bool player1, pic8* pic, double time, motorst* mot, valtozok* metadata,
                         bool show_minimap, bool show_timer, motorst* other_mot,
@@ -614,6 +619,8 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
 
     vect2 bottomleft_corner(bike_center.x - (CameraX + metadata->baljobbv_h.baljobb * CameraDx),
                             bike_center.y - CameraY);
+    vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
+                 bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
 
     // Draw the background
     CanvasBack->render(player1, pic, bottomleft_corner, 0, 0, GameViewWidth - 1,
@@ -708,10 +715,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
     if (current_camera.mode == CameraMode::Normal) {
         if (!Single) {
             // Draw the other bike if it's on-screen
-            vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
-                         bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
-            double distance = (other_mot->bike.r - center).length();
-            if (distance < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters) {
+            if (bike_in_view(other_mot, center)) {
                 render_bike(!player1, pic, time, bottomleft_corner, other_mot, other_metadata,
                             bike2, nullptr);
             }

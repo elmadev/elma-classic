@@ -102,7 +102,7 @@ int get_touching_object(vect2 r, double radius) {
         }
 
         // Skip Exit in flagtag mode
-        if (obj->type == object::Type::Exit && !Single && Tag) {
+        if (obj->type == object::Type::Exit && !Single && FlagTag) {
             continue;
         }
 

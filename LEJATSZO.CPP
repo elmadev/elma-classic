@@ -25,11 +25,11 @@
 // Jatek modja ket fele lehet:
 int Single = 1;
 // Van-e fogocska:
-int Tag = 0;
+int FlagTag = 0;
 // int Multi = 0;
 bool OutOfBounds = false;
 
-int Legkozment = 0;
+int ScreenshotRequested = 0;
 bool VideoRecordingMode = false;
 int VideoFrameIndex = 0;
 std::string VideoOutputDirectory;
@@ -163,7 +163,7 @@ static double baljobbszamol(double eltelt, int hatra) {
 // static int Marvoltgaz = 0;
 
 // Ide csak *pmeghalt == 0-val erkezhet
-static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, recorder* prec,
+static void belsoresz(motorst* pmot, player_keys* popciok, bike_metadata* pvalt, recorder* prec,
                       long* pmegvanido, int* pmeghalt, double eddig, double dt) {
     // Ugras elintezese:
     int ugrik1 = 0, ugrik2 = 0;
@@ -180,17 +180,17 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
         std::swap(is_right_volt_down, is_left_volt_down);
     }
 
-    if (eddig > pvalt->utolsougras + VoltDelay && !EolSettings->cripple_no_volt()) {
+    if (eddig > pvalt->volt_time + VoltDelay && !EolSettings->cripple_no_volt()) {
         if (is_right_volt_down || is_game_key_down(popciok->alovolt)) {
             ugrik1 = 1;
-            pvalt->utolsougras = eddig;
-            pvalt->ugras1volt = 1;
+            pvalt->volt_time = eddig;
+            pvalt->volt_is_right = 1;
             add_event_buffer(WavEvent::RightVolt, 0.99, -1);
         }
         if (is_left_volt_down || is_game_key_down(popciok->alovolt)) {
             ugrik2 = 1;
-            pvalt->utolsougras = eddig;
-            pvalt->ugras1volt = 0;
+            pvalt->volt_time = eddig;
+            pvalt->volt_is_right = 0;
             add_event_buffer(WavEvent::LeftVolt, 0.99, -1);
         }
     }
@@ -212,11 +212,11 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     BikeState eredmeny = check_object_collision(pmot);
     if (eredmeny == BikeState::Dead) {
         // Beteszunk egy 0 hangot:
-        pvalt->inf.friction_volume = 0;
-        pvalt->inf.motor_frequency = -1;
-        pvalt->inf.gas = 0;
-        prec->store_frames(pmot, eddig, &pvalt->inf);
-        if (!Single && Tag && !OutOfBounds) {
+        pvalt->sound.friction_volume = 0;
+        pvalt->sound.motor_frequency = -1;
+        pvalt->sound.gas = 0;
+        prec->store_frames(pmot, eddig, &pvalt->sound);
+        if (!Single && FlagTag && !OutOfBounds) {
             // Flag Tag modban nem allnak meg, hanem visszamennek starthelyre:
             init_motor(pmot);
             // Kezdetihelydiff-et setallaktiv allitja be:
@@ -226,14 +226,14 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
             pmot->body_r = pmot->body_r + BikeStartOffset;
 
             // Valtozok inicializalasa:
-            int showkep = pvalt->showkep;
-            memset(pvalt, 0, sizeof(valtozok));
-            pvalt->baljobbv_f.ucsoford = -1000.0;
-            pvalt->baljobbv_f.ucsoforgas = -1000.0;
-            pvalt->baljobbv_h.ucsoford = -1000.0;
-            pvalt->baljobbv_h.ucsoforgas = -1000.0;
-            pvalt->utolsougras = -100.0;
-            pvalt->showkep = showkep;
+            int showkep = pvalt->draw_view;
+            memset(pvalt, 0, sizeof(bike_metadata));
+            pvalt->bike_turning.camera_turn_time = -1000.0;
+            pvalt->bike_turning.bike_turn_time = -1000.0;
+            pvalt->camera_turning.camera_turn_time = -1000.0;
+            pvalt->camera_turning.bike_turn_time = -1000.0;
+            pvalt->volt_time = -100.0;
+            pvalt->draw_view = showkep;
 
             if ((pmot == Motor1 && FlagTagAHasFlag) || (pmot == Motor2 && !FlagTagAHasFlag)) {
                 // Nala volt zaszlo
@@ -247,21 +247,21 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 
     // eddig += dt; // Ezt meg kell ismetelni eggyel feljebb is
     //  Berreges es nyikorgas:
-    pvalt->inf.friction_volume = get_bike_friction_volume();
+    pvalt->sound.friction_volume = get_bike_friction_volume();
 
     if (pmot->flipped_bike) {
-        pvalt->inf.motor_frequency = fabs(pmot->left_wheel.angular_velocity) * 0.025;
+        pvalt->sound.motor_frequency = fabs(pmot->left_wheel.angular_velocity) * 0.025;
     } else {
-        pvalt->inf.motor_frequency = fabs(pmot->right_wheel.angular_velocity) * 0.025;
+        pvalt->sound.motor_frequency = fabs(pmot->right_wheel.angular_velocity) * 0.025;
     }
     // Frekvenciat betesszuk 1.0-2.0 tartomanyba:
-    if (pvalt->inf.motor_frequency > 30.0) {
-        pvalt->inf.motor_frequency = 30.0;
+    if (pvalt->sound.motor_frequency > 30.0) {
+        pvalt->sound.motor_frequency = 30.0;
     }
-    pvalt->inf.motor_frequency = 2.0 - exp(-pvalt->inf.motor_frequency);
+    pvalt->sound.motor_frequency = 2.0 - exp(-pvalt->sound.motor_frequency);
 
-    pvalt->inf.gas = (char)is_gas_down;
-    prec->store_frames(pmot, eddig, &pvalt->inf);
+    pvalt->sound.gas = (char)is_gas_down;
+    prec->store_frames(pmot, eddig, &pvalt->sound);
 
     // Egyedi hangok:
     WavEvent wavazonosito;
@@ -289,7 +289,7 @@ static void belsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     }
 }
 
-static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int* ptimekin,
+static void toggleresz(player_keys* popciok, bike_metadata* pvalt, int* pviewkin, int* ptimekin,
                        int* pmasikshow) {
     // Showkep:
     if (was_game_key_just_pressed(popciok->toggle_visibility)) {
@@ -297,9 +297,9 @@ static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int
         if (!*pmasikshow) {
             // Ha masik jatekos ablaka nem latszott, mindegyik fog latszani:
             *pmasikshow = 1;
-            pvalt->showkep = 1;
+            pvalt->draw_view = 1;
         } else {
-            pvalt->showkep = !pvalt->showkep;
+            pvalt->draw_view = !pvalt->draw_view;
         }
     }
     // View ablak:
@@ -313,17 +313,17 @@ static void toggleresz(player_keys* popciok, valtozok* pvalt, int* pviewkin, int
     }
 }
 
-static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig, int hatra) {
-    if (pvalt->eddighatra != hatra) {
-        pvalt->ucsoforgas = eddig;
-        double eltelt = eddig - pvalt->ucsoford;
+static void baljobbelintez(turning_data* pvalt, recorder* prec, double eddig, int hatra) {
+    if (pvalt->flipped != hatra) {
+        pvalt->bike_turn_time = eddig;
+        double eltelt = eddig - pvalt->camera_turn_time;
         double camera_flip_time = EolSettings->turn_time() + 0.15;
         if (camera_flip_time > 0.0 && eltelt < camera_flip_time) {
-            pvalt->ucsoford = eddig + eltelt - camera_flip_time;
+            pvalt->camera_turn_time = eddig + eltelt - camera_flip_time;
         } else {
-            pvalt->ucsoford = eddig;
+            pvalt->camera_turn_time = eddig;
         }
-        pvalt->eddighatra = hatra;
+        pvalt->flipped = hatra;
         // Hang adas:
         if (prec) {
             // Most kihagyjuk wavgyujtot:
@@ -336,17 +336,17 @@ static void baljobbelintez(baljobbvaltozok* pvalt, recorder* prec, double eddig,
     double turn_time = EolSettings->turn_time();
     if (turn_time == 0.0) {
         // Instant turn
-        pvalt->forgas = 1.0;
+        pvalt->bike_turn_phase = 1.0;
     } else {
-        pvalt->forgas = (eddig - pvalt->ucsoforgas) / turn_time;
+        pvalt->bike_turn_phase = (eddig - pvalt->bike_turn_time) / turn_time;
 
-        pvalt->forgas = std::clamp(pvalt->forgas, 0.0, 1.0);
+        pvalt->bike_turn_phase = std::clamp(pvalt->bike_turn_phase, 0.0, 1.0);
     }
 
-    pvalt->baljobb = baljobbszamol(eddig - pvalt->ucsoford, hatra);
+    pvalt->camera_turn_phase = baljobbszamol(eddig - pvalt->camera_turn_time, hatra);
 }
 
-static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, recorder* prec,
+static void kulsoresz(motorst* pmot, player_keys* popciok, bike_metadata* pvalt, recorder* prec,
                       viewtimest* pvt, double eddig, int* pmasikshow, int meghalt) {
     toggleresz(popciok, pvalt, &pvt->viewkinplay, &pvt->timekinplay, pmasikshow);
 
@@ -359,14 +359,14 @@ static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
         if (EolSettings->cripple_one_turn() && pvalt->one_turn_used) {
             is_turn_down = false;
         }
-        if (!pvalt->hatranyomva && is_turn_down) {
+        if (!pvalt->turn_key_previous && is_turn_down) {
             pmot->flipped_bike = !pmot->flipped_bike;
             set_head_position(pmot);
             pvalt->one_turn_used = true;
         }
-        pvalt->hatranyomva = is_turn_down;
+        pvalt->turn_key_previous = is_turn_down;
     }
-    baljobbelintez(&pvalt->baljobbv_f, prec, eddig, pmot->flipped_bike);
+    baljobbelintez(&pvalt->bike_turning, prec, eddig, pmot->flipped_bike);
 
     // Hatra elintezes:
     if (pmot->gravity_direction == MotorGravity::Up) {
@@ -374,16 +374,16 @@ static void kulsoresz(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
     } else {
         pmot->flipped_camera = pmot->flipped_bike;
     }
-    baljobbelintez(&pvalt->baljobbv_h, nullptr, eddig, pmot->flipped_camera);
+    baljobbelintez(&pvalt->camera_turning, nullptr, eddig, pmot->flipped_camera);
 
     // Kirajzolashoz kell:
-    pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / VoltDelay;
-    if (pvalt->ugrasnagysag < 0) {
-        pvalt->ugrasnagysag = 0;
+    pvalt->arm_position = 1.0 - (eddig - pvalt->volt_time) / VoltDelay;
+    if (pvalt->arm_position < 0) {
+        pvalt->arm_position = 0;
     }
 #ifdef DEBUG
-    if (pvalt->ugrasnagysag > 1.00001) {
-        internal_error("pvalt->ugrasnagysag > 1.00001!");
+    if (pvalt->arm_position > 1.00001) {
+        internal_error("pvalt->arm_position > 1.00001!");
     }
 #endif
 }
@@ -418,29 +418,29 @@ static void setup_gameloop(const char* filenev) {
 // lejatszo ezt beallitja: 0 -> nem kell kiirni, 1 -> A eloszor, 2 -> B
 // csak akkor A vagy B eloszor, ha mindketten meghaltak, tehat
 // menu_level menu-nek ezt mar feldolgozta elore:
-int MeghalteloszorAB = 0;
+int WhoDiedFirst = 0;
 
 // Ha sikeres szint, ide teszi be hogy ki ment ki:
-int Aerintetteviragot = 0;
+int Player1Finished = 0;
 
 int Masodikmenet = 0;
 
 // Idot adja vissza szazadmasodpercben:
-long lejatszo(const char* filenev, CameraMode cameramode) {
+long game_loop(const char* filename, CameraMode camera_mode) {
     // internal_error( "Ezegyhosszusor,szetkellvagnibiztosanhibaEzegy hosszu sor, szet kell vagni
     // biztosan!",
     //	"Ez egy masik hosszu sor, szet kell vagni biztosan!" );
 
     // Azert allitom 1-be, hogy mindenkeppen eszrevegyem, ha nem allitom
     // meg kilepes elott be rendesen:
-    MeghalteloszorAB = 1;
-    Aerintetteviragot = 0;
+    WhoDiedFirst = 1;
+    Player1Finished = 0;
 
     // Jatekmod eldontese:
     Single = State->single;
-    Tag = !Single && State->flag_tag;
-    Rec1->set_flagtag(Tag);
-    Rec2->set_flagtag(Tag);
+    FlagTag = !Single && State->flag_tag;
+    Rec1->set_flagtag(FlagTag);
+    Rec2->set_flagtag(FlagTag);
 
     if (Single) {
         MultiplayerRec = 0;
@@ -448,28 +448,28 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         MultiplayerRec = 1;
     }
 
-    setup_gameloop(filenev);
+    setup_gameloop(filename);
 
     double eddig = 0.0;
     reset_event_buffer();
 
     if (Single) {
-        EolClient->enter_level(filenev, Ptop);
+        EolClient->enter_level(filename, Ptop);
     }
 
     stopwatch_reset();
 
     // Valtozok inicializalasa:
-    valtozok valt1; // Inicializalni kell !!!!!!!!!!!!
+    bike_metadata valt1; // Inicializalni kell !!!!!!!!!!!!
     memset(&valt1, 0, sizeof(valt1));
-    valtozok valt2;
+    bike_metadata valt2;
     memset(&valt2, 0, sizeof(valt2));
-    valt1.baljobbv_f.ucsoford = valt2.baljobbv_f.ucsoford = -1000.0;
-    valt1.baljobbv_f.ucsoforgas = valt2.baljobbv_f.ucsoforgas = -1000.0;
-    valt1.baljobbv_h.ucsoford = valt2.baljobbv_h.ucsoford = -1000.0;
-    valt1.baljobbv_h.ucsoforgas = valt2.baljobbv_h.ucsoforgas = -1000.0;
-    valt1.utolsougras = valt2.utolsougras = -100.0;
-    valt1.showkep = valt2.showkep = 1;
+    valt1.bike_turning.camera_turn_time = valt2.bike_turning.camera_turn_time = -1000.0;
+    valt1.bike_turning.bike_turn_time = valt2.bike_turning.bike_turn_time = -1000.0;
+    valt1.camera_turning.camera_turn_time = valt2.camera_turning.camera_turn_time = -1000.0;
+    valt1.camera_turning.bike_turn_time = valt2.camera_turning.bike_turn_time = -1000.0;
+    valt1.volt_time = valt2.volt_time = -100.0;
+    valt1.draw_view = valt2.draw_view = 1;
 
     int meghalt1 = 0;
     int meghalt2 = 0;
@@ -479,7 +479,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
     reset_motor_forces(Motor2);
 
     camera current_camera;
-    current_camera.mode = cameramode;
+    current_camera.mode = camera_mode;
     current_camera.x = Motor1->bike.r.x;
     current_camera.y = Motor1->bike.r.y;
 
@@ -557,10 +557,10 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
             if (!(meghalt1 && meghalt2)) {
                 // Ha meg nem halt meg mindketto:
                 if (meghalt1) {
-                    MeghalteloszorAB = 1;
+                    WhoDiedFirst = 1;
                 }
                 if (meghalt2) {
-                    MeghalteloszorAB = 2;
+                    WhoDiedFirst = 2;
                 }
             }
 
@@ -587,12 +587,12 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
 
                 if (!(meghalt1 && meghalt2) || Single) {
                     // Ha nem halt meg mindketto, akkor ne irjon semmit:
-                    MeghalteloszorAB = 0;
+                    WhoDiedFirst = 0;
                 }
                 if (megvanido1) {
-                    Aerintetteviragot = 1;
+                    Player1Finished = 1;
                 } else {
-                    Aerintetteviragot = 0;
+                    Player1Finished = 0;
                 }
 
                 set_motor_frequency(true, 1.0, 0);
@@ -611,7 +611,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
 
                 Mute = true;
                 if (Single) {
-                    EolClient->exit_level(filenev, eddig * TimeToCentiseconds, Motor1->apple_count,
+                    EolClient->exit_level(filename, eddig * TimeToCentiseconds, Motor1->apple_count,
                                           Kajakell, megvanido ? false : true);
                 }
                 if (megvanido) {
@@ -631,23 +631,24 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         }
 
         // Fogocska elintezes:
-        if (!Single && Tag) {
+        if (!Single && FlagTag) {
             flagtag(eddig);
         }
 
         if (Single) {
-            set_friction_volume(valt1.inf.friction_volume);
-            set_motor_frequency(true, valt1.inf.motor_frequency, valt1.inf.gas);
+            set_friction_volume(valt1.sound.friction_volume);
+            set_motor_frequency(true, valt1.sound.motor_frequency, valt1.sound.gas);
         } else {
-            set_friction_volume(valt1.inf.friction_volume + valt2.inf.friction_volume);
-            set_motor_frequency(true, valt1.inf.motor_frequency, valt1.inf.gas);
-            set_motor_frequency(false, valt2.inf.motor_frequency, valt2.inf.gas);
+            set_friction_volume(valt1.sound.friction_volume + valt2.sound.friction_volume);
+            set_motor_frequency(true, valt1.sound.motor_frequency, valt1.sound.gas);
+            set_motor_frequency(false, valt2.sound.motor_frequency, valt2.sound.gas);
         }
 
-        kulsoresz(Motor1, &State->keys1, &valt1, Rec1, &Viewtime1, eddig, &valt2.showkep, meghalt1);
+        kulsoresz(Motor1, &State->keys1, &valt1, Rec1, &Viewtime1, eddig, &valt2.draw_view,
+                  meghalt1);
 
         if (!Single) {
-            kulsoresz(Motor2, &State->keys2, &valt2, Rec2, &Viewtime2, eddig, &valt1.showkep,
+            kulsoresz(Motor2, &State->keys2, &valt2, Rec2, &Viewtime2, eddig, &valt1.draw_view,
                       meghalt2);
         }
 
@@ -665,7 +666,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         }
         // Snap nyomas elintezese:
         if (was_game_key_just_pressed(State->key_screenshot)) {
-            Legkozment = 1;
+            ScreenshotRequested = 1;
         }
 
         if (was_game_key_just_pressed(DIK_F1)) {
@@ -681,7 +682,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
         // Vizsgalat kilepesre:
         if (!console_was_active &&
             (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {
-            MeghalteloszorAB = 0;
+            WhoDiedFirst = 0;
             double eltelido = stopwatch();
             // Motor hangjat kikapcsolja:
             stop_motor_sound(true);
@@ -707,7 +708,7 @@ long lejatszo(const char* filenev, CameraMode cameramode) {
             Rec2->encode_frame_count();
             Masodikmenet = 1;
             if (Single) {
-                EolClient->exit_level(filenev, eddig * TimeToCentiseconds, Motor1->apple_count,
+                EolClient->exit_level(filename, eddig * TimeToCentiseconds, Motor1->apple_count,
                                       Kajakell, true);
             }
             return -1;
@@ -791,37 +792,37 @@ static void reverse_events(motorst* pmot, recorder* prec, double time) {
 
 // During rewind, compute animation state from the recorder's event list
 // instead of relying on the forward-only state machine.
-static void rewind_override_animations(valtozok* pvalt, motorst* pmot, recorder* prec,
+static void rewind_override_animations(bike_metadata* pvalt, motorst* pmot, recorder* prec,
                                        double eddig) {
     double turn_time = prec->find_last_turn_frame_time(eddig);
 
-    pvalt->baljobbv_f.eddighatra = pmot->flipped_bike;
-    pvalt->baljobbv_f.ucsoforgas = turn_time;
-    pvalt->baljobbv_f.ucsoford = turn_time;
-    baljobbelintez(&pvalt->baljobbv_f, nullptr, eddig, pmot->flipped_bike);
+    pvalt->bike_turning.flipped = pmot->flipped_bike;
+    pvalt->bike_turning.bike_turn_time = turn_time;
+    pvalt->bike_turning.camera_turn_time = turn_time;
+    baljobbelintez(&pvalt->bike_turning, nullptr, eddig, pmot->flipped_bike);
 
-    pvalt->baljobbv_h.eddighatra = pmot->flipped_camera;
-    pvalt->baljobbv_h.ucsoforgas = eddig - 1000.0;
-    pvalt->baljobbv_h.ucsoford = eddig - 1000.0;
-    pvalt->baljobbv_h.forgas = 1.0;
-    pvalt->baljobbv_h.baljobb = pmot->flipped_camera ? 0.0 : 1.0;
+    pvalt->camera_turning.flipped = pmot->flipped_camera;
+    pvalt->camera_turning.bike_turn_time = eddig - 1000.0;
+    pvalt->camera_turning.camera_turn_time = eddig - 1000.0;
+    pvalt->camera_turning.bike_turn_phase = 1.0;
+    pvalt->camera_turning.camera_turn_phase = pmot->flipped_camera ? 0.0 : 1.0;
 
     bool is_right_volt = true;
     double volt_time = prec->find_last_volt_time(eddig, &is_right_volt);
-    pvalt->utolsougras = volt_time;
-    pvalt->ugras1volt = is_right_volt ? 1 : 0;
-    pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / VoltDelay;
-    pvalt->ugrasnagysag = std::max<double>(pvalt->ugrasnagysag, 0);
+    pvalt->volt_time = volt_time;
+    pvalt->volt_is_right = is_right_volt ? 1 : 0;
+    pvalt->arm_position = 1.0 - (eddig - pvalt->volt_time) / VoltDelay;
+    pvalt->arm_position = std::max<double>(pvalt->arm_position, 0);
 }
 
 // Hamissal ter vissza, ha nincsen mar tobb:
-static bool replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, recorder* prec,
+static bool replaymag(motorst* pmot, player_keys* popciok, bike_metadata* pvalt, recorder* prec,
                       double eddig, viewtimest* pvt, int* pmasikshow) {
 
     toggleresz(popciok, pvalt, &pvt->viewkinreplay, &pvt->timekinreplay, pmasikshow);
 
     // recall koordokat es Hatra-t is beallitja:
-    bool visszaad = prec->recall_frame(pmot, eddig, &pvalt->inf);
+    bool visszaad = prec->recall_frame(pmot, eddig, &pvalt->sound);
     set_head_position(pmot); // mivel nincs leptet ami kiszamolna
     // HANG ELINTEZES:
     WavEvent wavindex;
@@ -837,29 +838,29 @@ static bool replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
         } else {
             start_wav(wavindex, hangero);
             if (wavindex == WavEvent::RightVolt) {
-                pvalt->ugras1volt = 1;
-                pvalt->utolsougras = eddig;
+                pvalt->volt_is_right = 1;
+                pvalt->volt_time = eddig;
             }
             if (wavindex == WavEvent::LeftVolt) {
-                pvalt->ugras1volt = 0;
-                pvalt->utolsougras = eddig;
+                pvalt->volt_is_right = 0;
+                pvalt->volt_time = eddig;
             }
         }
     }
 
     // Hatra elintezes:
-    baljobbelintez(&pvalt->baljobbv_f, nullptr, eddig, pmot->flipped_bike);
+    baljobbelintez(&pvalt->bike_turning, nullptr, eddig, pmot->flipped_bike);
 
     if (pmot->gravity_direction == MotorGravity::Up) {
         pmot->flipped_camera = !pmot->flipped_bike;
     } else {
         pmot->flipped_camera = pmot->flipped_bike;
     }
-    baljobbelintez(&pvalt->baljobbv_h, nullptr, eddig, pmot->flipped_camera);
+    baljobbelintez(&pvalt->camera_turning, nullptr, eddig, pmot->flipped_camera);
 
     // Kirajzolashoz kellenek:
-    pvalt->ugrasnagysag = 1.0 - (eddig - pvalt->utolsougras) / VoltDelay;
-    pvalt->ugrasnagysag = std::max<double>(pvalt->ugrasnagysag, 0);
+    pvalt->arm_position = 1.0 - (eddig - pvalt->volt_time) / VoltDelay;
+    pvalt->arm_position = std::max<double>(pvalt->arm_position, 0);
 
     return visszaad;
 }
@@ -867,7 +868,7 @@ static bool replaymag(motorst* pmot, player_keys* popciok, valtozok* pvalt, reco
 static int Elozoshowkep1 = 1, Elozoshowkep2 = 1;
 
 // Termeszetes befejezes eseten 0-t ad vissza:
-long lejatszo_r(const char* filenev, int showkepmarad) {
+long replay_loop(const char* filename, int restore_player_visibility) {
     // Refuse to play zero-length replays (from map-viewer mode)
     if (Rec1->is_empty()) {
         return -2;
@@ -877,31 +878,31 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
     }
 
     int saved_single = Single;
-    int saved_tag = Tag;
+    int saved_tag = FlagTag;
 
     Single = !MultiplayerRec;
-    Tag = Rec1->flagtag();
-    setup_gameloop(filenev);
+    FlagTag = Rec1->flagtag();
+    setup_gameloop(filename);
 
     reset_event_buffer();
     stopwatch_reset();
 
     // Valtozok inicializalasa:
-    valtozok valt1; // Inicializalni kell !!!!!!!!!!!!
+    bike_metadata valt1; // Inicializalni kell !!!!!!!!!!!!
     memset(&valt1, 0, sizeof(valt1));
-    valtozok valt2;
+    bike_metadata valt2;
     memset(&valt2, 0, sizeof(valt2));
-    valt1.baljobbv_f.ucsoford = valt2.baljobbv_f.ucsoford = -1000.0;
-    valt1.baljobbv_f.ucsoforgas = valt2.baljobbv_f.ucsoforgas = -1000.0;
-    valt1.baljobbv_h.ucsoford = valt2.baljobbv_h.ucsoford = -1000.0;
-    valt1.baljobbv_h.ucsoforgas = valt2.baljobbv_h.ucsoforgas = -1000.0;
-    valt1.utolsougras = valt2.utolsougras = -100.0;
-    if (showkepmarad) {
-        valt1.showkep = Elozoshowkep1;
-        valt2.showkep = Elozoshowkep2;
+    valt1.bike_turning.camera_turn_time = valt2.bike_turning.camera_turn_time = -1000.0;
+    valt1.bike_turning.bike_turn_time = valt2.bike_turning.bike_turn_time = -1000.0;
+    valt1.camera_turning.camera_turn_time = valt2.camera_turning.camera_turn_time = -1000.0;
+    valt1.camera_turning.bike_turn_time = valt2.camera_turning.bike_turn_time = -1000.0;
+    valt1.volt_time = valt2.volt_time = -100.0;
+    if (restore_player_visibility) {
+        valt1.draw_view = Elozoshowkep1;
+        valt2.draw_view = Elozoshowkep2;
     } else {
-        valt1.showkep = 1;
-        valt2.showkep = 1;
+        valt1.draw_view = 1;
+        valt2.draw_view = 1;
     }
 
     reset_motor_forces(Motor1);
@@ -971,12 +972,12 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         // recall koordokat es Hatra-t is beallitja:
         int befejezte1 =
-            !replaymag(Motor1, &State->keys1, &valt1, Rec1, eddig, &Viewtime1, &valt2.showkep);
+            !replaymag(Motor1, &State->keys1, &valt1, Rec1, eddig, &Viewtime1, &valt2.draw_view);
 
         int befejezte2 = 0;
         if (!Single) {
-            befejezte2 =
-                !replaymag(Motor2, &State->keys2, &valt2, Rec2, eddig, &Viewtime2, &valt1.showkep);
+            befejezte2 = !replaymag(Motor2, &State->keys2, &valt2, Rec2, eddig, &Viewtime2,
+                                    &valt1.draw_view);
         }
 
         if (rewinding) {
@@ -1000,10 +1001,10 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
             Mute = true;
             Ptop->unflip_objects();
 
-            Elozoshowkep1 = valt1.showkep;
-            Elozoshowkep2 = valt2.showkep;
+            Elozoshowkep1 = valt1.draw_view;
+            Elozoshowkep2 = valt2.draw_view;
             Single = saved_single;
-            Tag = saved_tag;
+            FlagTag = saved_tag;
             return 0;
         }
 
@@ -1023,14 +1024,14 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
         // HANG ELINTEZES:
         if (Single) {
-            set_motor_frequency(true, valt1.inf.motor_frequency, valt1.inf.gas);
-            // if( valt1.inf.motor_frequency > 1.5 )
+            set_motor_frequency(true, valt1.sound.motor_frequency, valt1.sound.gas);
+            // if( valt1.sound.motor_frequency > 1.5 )
             //	internal_error( "> 1.5!" );
-            set_friction_volume(valt1.inf.friction_volume);
+            set_friction_volume(valt1.sound.friction_volume);
         } else {
-            set_motor_frequency(true, valt1.inf.motor_frequency, valt1.inf.gas);
-            set_motor_frequency(false, valt2.inf.motor_frequency, valt2.inf.gas);
-            set_friction_volume(valt1.inf.friction_volume + valt2.inf.friction_volume);
+            set_motor_frequency(true, valt1.sound.motor_frequency, valt1.sound.gas);
+            set_motor_frequency(false, valt2.sound.motor_frequency, valt2.sound.gas);
+            set_friction_volume(valt1.sound.friction_volume + valt2.sound.friction_volume);
         }
 
         render_game(eddig, &valt1, &valt2, Viewtime1.viewkinreplay, Viewtime1.timekinreplay,
@@ -1050,7 +1051,7 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
         }
         // Snap nyomas elintezese:
         if (was_game_key_just_pressed(State->key_screenshot)) {
-            Legkozment = 1;
+            ScreenshotRequested = 1;
         }
 
         // Vizsgalat kilepesre:
@@ -1081,10 +1082,10 @@ long lejatszo_r(const char* filenev, int showkepmarad) {
 
             Ptop->unflip_objects();
 
-            Elozoshowkep1 = valt1.showkep;
-            Elozoshowkep2 = valt2.showkep;
+            Elozoshowkep1 = valt1.draw_view;
+            Elozoshowkep2 = valt2.draw_view;
             Single = saved_single;
-            Tag = saved_tag;
+            FlagTag = saved_tag;
             return -1;
         }
         l++;
@@ -1107,21 +1108,21 @@ void setup_render_directory(const std::string& replay_filename) {
 
 void render_replay(const char* level_filename) {
     Single = !MultiplayerRec;
-    Tag = Rec1->flagtag();
+    FlagTag = Rec1->flagtag();
     setup_gameloop(level_filename);
 
-    valtozok valt1;
+    bike_metadata valt1;
     memset(&valt1, 0, sizeof(valt1));
-    valtozok valt2;
+    bike_metadata valt2;
     memset(&valt2, 0, sizeof(valt2));
 
-    valt1.baljobbv_f.ucsoford = valt2.baljobbv_f.ucsoford = -1000.0;
-    valt1.baljobbv_f.ucsoforgas = valt2.baljobbv_f.ucsoforgas = -1000.0;
-    valt1.baljobbv_h.ucsoford = valt2.baljobbv_h.ucsoford = -1000.0;
-    valt1.baljobbv_h.ucsoforgas = valt2.baljobbv_h.ucsoforgas = -1000.0;
-    valt1.utolsougras = valt2.utolsougras = -100.0;
-    valt1.showkep = 1;
-    valt2.showkep = 1;
+    valt1.bike_turning.camera_turn_time = valt2.bike_turning.camera_turn_time = -1000.0;
+    valt1.bike_turning.bike_turn_time = valt2.bike_turning.bike_turn_time = -1000.0;
+    valt1.camera_turning.camera_turn_time = valt2.camera_turning.camera_turn_time = -1000.0;
+    valt1.camera_turning.bike_turn_time = valt2.camera_turning.bike_turn_time = -1000.0;
+    valt1.volt_time = valt2.volt_time = -100.0;
+    valt1.draw_view = 1;
+    valt2.draw_view = 1;
 
     camera current_camera;
     current_camera.mode = CameraMode::Normal;
@@ -1139,11 +1140,11 @@ void render_replay(const char* level_filename) {
                        EolSettings->recording_fps();
 
         int befejezte1 =
-            !replaymag(Motor1, &State->keys1, &valt1, Rec1, eddig, &Viewtime1, &valt2.showkep);
+            !replaymag(Motor1, &State->keys1, &valt1, Rec1, eddig, &Viewtime1, &valt2.draw_view);
         int befejezte2 = 0;
         if (!Single) {
-            befejezte2 =
-                !replaymag(Motor2, &State->keys2, &valt2, Rec2, eddig, &Viewtime2, &valt1.showkep);
+            befejezte2 = !replaymag(Motor2, &State->keys2, &valt2, Rec2, eddig, &Viewtime2,
+                                    &valt1.draw_view);
         }
 
         if ((Single && befejezte1) || (!Single && befejezte1 && befejezte2)) {

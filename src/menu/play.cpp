@@ -103,10 +103,10 @@ void update_top_ten(int time, char* time_message, int internal_index,
     // Dead
     if (time <= 0) {
         strcpy(time_message, "You Failed to Finish!");
-        if (MeghalteloszorAB == 1) {
+        if (WhoDiedFirst == 1) {
             strcat(time_message, "    (A died first)");
         }
-        if (MeghalteloszorAB == 2) {
+        if (WhoDiedFirst == 2) {
             strcat(time_message, "    (B died first)");
         }
         return;
@@ -122,7 +122,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
     if (Single) {
         sprintf(time_message, "%s", tmp);
     } else {
-        if (Aerintetteviragot) {
+        if (Player1Finished) {
             sprintf(time_message, "A:   %s", tmp);
         } else {
             sprintf(time_message, "B:   %s", tmp);
@@ -213,7 +213,7 @@ void replay_previous_run() {
     while (true) {
         Rec1->rewind();
         Rec2->rewind();
-        if (lejatszo_r(Rec1->level_filename, !reset_player_visibility)) {
+        if (replay_loop(Rec1->level_filename, !reset_player_visibility)) {
             if (Ptop->objects_flipped) {
                 internal_error("replay_previous_run flipped!");
             }
@@ -228,7 +228,7 @@ void replay_from_file(const char* filename) {
     while (true) {
         Rec1->rewind();
         Rec2->rewind();
-        if (lejatszo_r(filename, !reset_play_visibility)) {
+        if (replay_loop(filename, !reset_play_visibility)) {
             if (Ptop->objects_flipped) {
                 internal_error("replay_from_file flipped!");
             }
@@ -298,7 +298,7 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
 
         // Show either the time_message from update_top_ten or FlagTag info
         std::string overlay_text;
-        if (!Single && Tag && !OutOfBounds) {
+        if (!Single && FlagTag && !OutOfBounds) {
             std::string letter = FlagTagAStarts ? "A" : "B";
             overlay_text = letter + " start with the flag next.";
         } else {
@@ -308,7 +308,7 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
 
         if (!Single) {
             // Show extra multiplayer information
-            bool is_flagtag = Tag;
+            bool is_flagtag = FlagTag;
 
             int dx = 0;
             if (!is_flagtag) {
@@ -445,7 +445,7 @@ static void play_internal(int internal_index, bool map_viewer) {
         Rec1->erase(filename);
         Rec2->erase(filename);
 
-        int time = lejatszo(filename, map_viewer ? CameraMode::MapViewer : CameraMode::Normal);
+        int time = game_loop(filename, map_viewer ? CameraMode::MapViewer : CameraMode::Normal);
 
         MenuPalette->set();
         if (Ptop->objects_flipped) {

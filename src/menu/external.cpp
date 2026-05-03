@@ -27,7 +27,7 @@ static void play_external(const std::string& filename, bool map_viewer) {
         }
         Rec1->erase(filename_str);
         Rec2->erase(filename_str);
-        int time = lejatszo(filename_str, map_viewer ? CameraMode::MapViewer : CameraMode::Normal);
+        int time = game_loop(filename_str, map_viewer ? CameraMode::MapViewer : CameraMode::Normal);
         MenuPalette->set();
         char finish_msg[100] = "";
         update_top_ten(time, finish_msg, 0, filename_str);

@@ -321,7 +321,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
             palette_id = Lgr->minimap_food_palette_id;
             break;
         case object::Type::Exit:
-            if (!Single && Tag) {
+            if (!Single && FlagTag) {
                 continue;
             }
             palette_id = Lgr->minimap_exit_palette_id;
@@ -385,8 +385,8 @@ static void handle_screenshot(pic8* pic) {
         return;
     }
 
-    if (Legkozment) {
-        Legkozment = 0;
+    if (ScreenshotRequested) {
+        ScreenshotRequested = 0;
         platform_save_screenshot();
     }
 }
@@ -402,10 +402,10 @@ static void render_background(pic8* pic) {
 
 // Render an entire bike + kuski
 static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_corner,
-                        const motorst* mot, const valtozok* metadata, const bike_pics* bike,
+                        const motorst* mot, const bike_metadata* metadata, const bike_pics* bike,
                         const pic8* shirt) {
-    double arm_position = metadata->ugrasnagysag;
-    double turn_phase = metadata->baljobbv_f.forgas;
+    double arm_position = metadata->arm_position;
+    double turn_phase = metadata->bike_turning.bike_turn_phase;
 
     // Check to see if bike is turning, and calculate the progress from -1.0 to 1.0 using cos
     bool is_turning = false;
@@ -489,7 +489,7 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
 
     // Draw flagtag flag
     bool draw_flag = false;
-    if (!Single && Tag) {
+    if (!Single && FlagTag) {
         if ((player1 && FlagTagAHasFlag) || (!player1 && !FlagTagAHasFlag)) {
             // Current player has flag
             draw_flag = true;
@@ -546,8 +546,8 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
         arm_position = 1.0 - arm_position;
         // Left volt + facing left OR right volt + facing left -> Arm goes up
         bool arm_goes_up = true;
-        if ((metadata->ugras1volt && !mot->flipped_bike) ||
-            (!metadata->ugras1volt && mot->flipped_bike)) {
+        if ((metadata->volt_is_right && !mot->flipped_bike) ||
+            (!metadata->volt_is_right && mot->flipped_bike)) {
             // Right volt + facing left OR left volt + facing right -> arm goes down
             arm_goes_up = false;
         }
@@ -622,16 +622,17 @@ static bool bike_in_view(const motorst* mot, vect2 center) {
 }
 
 // Render the view for one player
-static void render_view(bool player1, pic8* pic, double time, motorst* mot, valtozok* metadata,
+static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike_metadata* metadata,
                         bool show_minimap, bool show_timer, motorst* other_mot,
-                        valtozok* other_metadata, camera& current_camera) {
+                        bike_metadata* other_metadata, camera& current_camera) {
     // Calculate frame of reference
     vect2 bike_center = mot->bike.r;
     if (current_camera.mode == CameraMode::MapViewer) {
         bike_center = vect2(current_camera.x, current_camera.y);
     }
 
-    vect2 bottomleft_corner(bike_center.x - (CameraX + metadata->baljobbv_h.baljobb * CameraDx),
+    vect2 bottomleft_corner(bike_center.x -
+                                (CameraX + metadata->camera_turning.camera_turn_phase * CameraDx),
                             bike_center.y - CameraY);
     vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
                  bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
@@ -660,7 +661,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
         if (obj->type == object::Type::Food && !obj->active) {
             continue;
         }
-        if (obj->type == object::Type::Exit && !Single && Tag) {
+        if (obj->type == object::Type::Exit && !Single && FlagTag) {
             continue;
         }
 
@@ -762,16 +763,18 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
     // Draw the minimap
     if (show_minimap) {
         if (Single) {
-            render_minimap(player1, pic, metadata->baljobbv_h.baljobb, bike_center, nullptr);
+            render_minimap(player1, pic, metadata->camera_turning.camera_turn_phase, bike_center,
+                           nullptr);
         } else {
-            render_minimap(player1, pic, metadata->baljobbv_h.baljobb, bike_center, other_mot);
+            render_minimap(player1, pic, metadata->camera_turning.camera_turn_phase, bike_center,
+                           other_mot);
         }
     }
 
     // Draw the timers
     if (show_timer) {
         double flagtag_time = -1.0;
-        if (!Single && Tag) {
+        if (!Single && FlagTag) {
             flagtag_time = player1 ? FlagTimeA : FlagTimeB;
         }
         draw_timers(BestTime, flagtag_time, time, pic, GameViewWidth, GameViewHeight);
@@ -791,11 +794,12 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, valt
     }
 }
 
-void render_game(double time, valtozok* metadata1, valtozok* metadata2, bool show_minimap1,
-                 bool show_timer1, bool show_minimap2, bool show_timer2, camera& current_camera) {
+void render_game(double time, bike_metadata* metadata1, bike_metadata* metadata2,
+                 bool show_minimap1, bool show_timer1, bool show_minimap2, bool show_timer2,
+                 camera& current_camera) {
     // Determine who we are going to draw (player 1, player 2 or both)
-    bool draw_player1 = metadata1->showkep;
-    bool draw_player2 = metadata2->showkep;
+    bool draw_player1 = metadata1->draw_view;
+    bool draw_player2 = metadata2->draw_view;
     if (Single || current_camera.mode == CameraMode::MapViewer) {
         draw_player1 = true;
         draw_player2 = false;

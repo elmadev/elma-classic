@@ -585,7 +585,7 @@ static void editor_play(bool view_map) {
 
     Rec1->erase(State->editor_filename);
     Rec2->erase(State->editor_filename);
-    lejatszo(State->editor_filename, view_map ? CameraMode::MapViewer : CameraMode::Normal);
+    game_loop(State->editor_filename, view_map ? CameraMode::MapViewer : CameraMode::Normal);
 
     empty_keypress_buffer();
 

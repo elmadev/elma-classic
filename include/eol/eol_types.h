@@ -11,7 +11,7 @@ struct spy_data {
     unsigned int kuski_id;
     uint32_t time;
     motorst mot;
-    valtozok metadata;
+    bike_metadata metadata;
 };
 
 struct kuski {

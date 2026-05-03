@@ -35,17 +35,17 @@ void eol::process(const login& l) {
 }
 
 void eol::process(const new_kuski& nk) {
-    kuskis.push_back(nk.k);
+    kuskis_.push_back(nk.k);
     sync_players_online_table();
 }
 
 void eol::process(const kuski_logout& kl) {
-    std::erase_if(kuskis, [&kl](const kuski& k) { return k.id == kl.id || k.id == kl.id2; });
+    std::erase_if(kuskis_, [&kl](const kuski& k) { return k.id == kl.id || k.id == kl.id2; });
     sync_players_online_table();
 }
 
 void eol::process(const kuski_set_level& l) {
-    kuski* k = get_kuski(kuskis, l.id);
+    kuski* k = get_kuski(kuskis_, l.id);
     if (!k) {
         return;
     }
@@ -56,7 +56,7 @@ void eol::process(const kuski_set_level& l) {
 
 void eol::sync_players_online_table() {
     players_online_table.clear_rows();
-    for (const kuski& k : kuskis) {
+    for (const kuski& k : kuskis_) {
         players_online_table.add_row({k.nick, k.level});
     }
 }
@@ -66,7 +66,7 @@ void eol::process(const chat_message& msg) {
     if (msg.kuski_id == id) {
         nick = EolSettings->nick();
     } else {
-        kuski* k = get_kuski(kuskis, msg.kuski_id);
+        kuski* k = get_kuski(kuskis_, msg.kuski_id);
         if (!k) {
             return;
         }

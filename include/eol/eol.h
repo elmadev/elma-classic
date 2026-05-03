@@ -29,13 +29,15 @@ class eol {
     void set_table(TableType);
     void render_table(pic8& dest, abc8& title_font, abc8& data_font) const;
 
+    const std::vector<kuski>& kuskis() { return kuskis_; }
+
   private:
     void sync_players_online_table();
 
     protocol proto;
     unsigned int id;
     unsigned int id2;
-    std::vector<kuski> kuskis;
+    std::vector<kuski> kuskis_;
     eol_table* cur_table;
     eol_table players_online_table;
 };

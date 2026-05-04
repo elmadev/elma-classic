@@ -3,6 +3,7 @@
 #include "eol/settings.h"
 #include "eol/status_messages.h"
 #include "log.h"
+#include "physics/pacer.h"
 #include "pic/abc8.h"
 #include "platform/implementation.h"
 #include "platform/scancode.h"
@@ -92,6 +93,31 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
 
     REGISTER_SETTINGS_BOOL(show_fps);
+
+    // eol-client !fps aggregate:
+    //   fps         -> toggle show_fps
+    //   fps on/off  -> queue limit on/off
+    //   fps <N>     -> queue numeric limit on
+    register_command("fps", [](std::string_view text) {
+        if (text.empty()) {
+            EolSettings->set_show_fps(!EolSettings->show_fps());
+            StatusMessages->add(EolSettings->show_fps() ? "FPS info shown" : "FPS info hidden");
+            return;
+        }
+        std::string s(text);
+        if (strcmpi(s.c_str(), "on") == 0) {
+            pacer::request_fps_limit(true, EolSettings->fps_limit());
+        } else if (strcmpi(s.c_str(), "off") == 0) {
+            pacer::request_fps_limit(false, EolSettings->fps_limit());
+        } else {
+            char* end = nullptr;
+            int fps = (int)std::strtol(s.c_str(), &end, 10);
+            if (end != s.c_str() && fps >= 30 && fps <= 1000) {
+                pacer::request_fps_limit(true, fps);
+            }
+        }
+    });
+
     REGISTER_SETTINGS_BOOL(show_ups);
     REGISTER_SETTINGS_BOOL(show_gpu);
     register_alias("ups", "show_ups");

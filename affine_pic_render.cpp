@@ -1,5 +1,4 @@
 #include "affine_pic_render.h"
-#include "affine_pic.h"
 #include "renderer/render.h"
 #include "pic8.h"
 #include "vect2.h"
@@ -22,13 +21,12 @@ static double StretchMetersToPixels = 1.0;
 // `source_x` / `source_y` is the starting position within the affine_pic's pixels.
 // `source_dx` / `source_dy` is the delta to the next pixel to grab from the affine_pic.
 void draw_affine_pic_row(unsigned char transparency, int length, unsigned char* dest,
-                         unsigned char* source, double source_x, double source_y, double source_dx,
+                         const pic8* source, double source_x, double source_y, double source_dx,
                          double source_dy) {
     // Draw the horizontal row of pixels
     for (int x = 0; x < length; x++) {
         // Grab the pixel from the affine_pic
-        int source_offset = ((int)(source_y) << 8) + (int)(source_x);
-        unsigned char c = source[source_offset];
+        unsigned char c = source->get_row((int)(source_y))[(int)(source_x)];
         if (c != transparency) {
             dest[x] = c;
         }
@@ -48,9 +46,8 @@ void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
     StretchMetersToPixels = meters_to_pixels;
 }
 
-void draw_affine_pic(pic8* dest, const affine_pic* aff, vect2 u, vect2 v, vect2 r) {
-    unsigned char transparency = aff->transparency;
-
+void draw_affine_pic(pic8* dest, const pic8* aff, unsigned char transparency, vect2 u, vect2 v,
+                     vect2 r) {
     // Bike is turning! Let's stretch the bike
     if (StretchEnabled) {
         // Convert the coordinates from pixels to meters, since the StretchEnabled vars are in
@@ -171,8 +168,8 @@ void draw_affine_pic(pic8* dest, const affine_pic* aff, vect2 u, vect2 v, vect2 
     // Calculate inverse transformation matrix.
     // u and v describe the render box of the entire image.
     // u_pixel and b_pixel describe the render box of a single pixel.
-    vect2 u_pixel = u * (1.0 / (aff->width - 1));
-    vect2 v_pixel = v * (1.0 / (aff->height - 1));
+    vect2 u_pixel = u * (1.0 / (aff->get_width() - 1));
+    vect2 v_pixel = v * (1.0 / (aff->get_height() - 1));
 
     // Matrix:
     // u_pixel.x v_pixel.x    i.e.   a b
@@ -303,8 +300,8 @@ void draw_affine_pic(pic8* dest, const affine_pic* aff, vect2 u, vect2 v, vect2 
                 }
                 unsigned char* dest_target = dest->get_row(y);
                 dest_target += x_left;
-                draw_affine_pic_row(transparency, x2 - x1 + 1, dest_target, aff->pixels, affine_x,
-                                    affine_y, inverse_i.x, inverse_i.y);
+                draw_affine_pic_row(transparency, x2 - x1 + 1, dest_target, aff, affine_x, affine_y,
+                                    inverse_i.x, inverse_i.y);
             } else {
                 if (x1_plane > x2_plane + 1) {
                     return;
@@ -346,8 +343,8 @@ void draw_affine_pic(pic8* dest, const affine_pic* aff, vect2 u, vect2 v, vect2 
                 // draw!
                 unsigned char* dest_target = dest->get_row(y);
                 dest_target += x_left;
-                draw_affine_pic_row(transparency, x2 - x1 + 1, dest_target, aff->pixels, affine_x,
-                                    affine_y, inverse_i.x, inverse_i.y);
+                draw_affine_pic_row(transparency, x2 - x1 + 1, dest_target, aff, affine_x, affine_y,
+                                    inverse_i.x, inverse_i.y);
             } else {
                 // If the draw width is 0 pixels, we continue (for very thin images)
                 // If the draw width <= -1, then we are completely done rendering and we stop here

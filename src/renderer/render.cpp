@@ -1,6 +1,5 @@
 #include "renderer/render.h"
 #include "abc8.h"
-#include "affine_pic.h"
 #include "anim.h"
 #include "affine_pic_render.h"
 #include "canvas.h"
@@ -83,7 +82,7 @@ static int MinimapHeight;
 static int MinimapX;
 static int MinimapDx;
 
-affine_pic* shirt = nullptr;
+pic8* shirt = nullptr;
 
 static void init_shirt() {
     constexpr int SHIRT_BMP_WIDTH = 149;
@@ -92,7 +91,7 @@ static void init_shirt() {
     pic8* pic_shirt = pic8::from_bmp("bmp/shirt.bmp");
     if (pic_shirt && pic_shirt->get_width() == SHIRT_BMP_WIDTH &&
         pic_shirt->get_height() == SHIRT_BMP_HEIGHT) {
-        shirt = new affine_pic(nullptr, pic_shirt);
+        shirt = pic_shirt;
         return;
     }
 
@@ -172,7 +171,7 @@ static void calculate_viewpoints(bool splitscreen) {
 // Along the axis of the vector b->a, displace coordinate a by `a_stretch` meters
 // Along the axis of the vector a->b, displace coordinate b by `b_stretch` meters
 // height represents the vertical length of the affine_pic (thickness of the limb)
-static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, const affine_pic* affine,
+static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, const pic8* affine,
                               double a_stretch, double b_stretch, bool flip) {
     vect2 i = unit_vector(b - a);
     b = b + i * b_stretch;
@@ -192,12 +191,12 @@ static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, const
     u.y *= MetersToPixels;
     v.x *= MetersToPixels;
     v.y *= MetersToPixels;
-    draw_affine_pic(dest, affine, u, v * 2.0, a);
+    draw_affine_pic(dest, affine, affine->gpixel(0, 0), u, v * 2.0, a);
 }
 
 // Render a wheel or head affine_pic
-static void render_rigidbody(vect2 r, double radius, double rotation, pic8* dest,
-                             affine_pic* affine, bool flip) {
+static void render_rigidbody(vect2 r, double radius, double rotation, pic8* dest, pic8* affine,
+                             bool flip) {
     vect2 direction(cos(rotation) * radius, sin(rotation) * radius);
     if (flip) {
         render_affine_pic(r + direction, r - direction, dest, radius, affine, 0.0, 0.0, flip);
@@ -216,13 +215,13 @@ static vect2 BikeFrameJPixels;
 static vect2 BikeFrameRPixels;
 
 // Render a bike frame fragment
-static void render_bike_part(pic8* dest, affine_pic* part, bike_box* box) {
+static void render_bike_part(pic8* dest, pic8* part, unsigned char transparency, bike_box* box) {
     vect2 r = BikeFrameIPixels * (box->x1 + 260 - BikeFrameX) +
               BikeFrameJPixels * (BikeFrameY - (box->y1 + 260)) + BikeFrameRPixels;
     vect2 u = BikeFrameIPixels * (box->x2 - box->x1);
     vect2 v = BikeFrameJPixels * (box->y1 - box->y2);
 
-    draw_affine_pic(dest, part, u, v, r);
+    draw_affine_pic(dest, part, transparency, u, v, r);
 }
 
 // Render a 3x3 square onto the minimap
@@ -404,7 +403,7 @@ static void render_background(pic8* pic) {
 // Render an entire bike + kuski
 static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_corner,
                         const motorst* mot, const valtozok* metadata, const bike_pics* bike,
-                        const affine_pic* shirt) {
+                        const pic8* shirt) {
     double arm_position = metadata->ugrasnagysag;
     double turn_phase = metadata->baljobbv_f.forgas;
 
@@ -512,10 +511,11 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
     }
 
     // Draw bike frame
-    render_bike_part(pic, bike->bike_part1, &BikeBox1);
-    render_bike_part(pic, bike->bike_part2, &BikeBox2);
-    render_bike_part(pic, bike->bike_part3, &BikeBox3);
-    render_bike_part(pic, bike->bike_part4, &BikeBox4);
+    unsigned char bike_part_transparency = bike->bike_part1->gpixel(0, 0);
+    render_bike_part(pic, bike->bike_part1, bike_part_transparency, &BikeBox1);
+    render_bike_part(pic, bike->bike_part2, bike_part_transparency, &BikeBox2);
+    render_bike_part(pic, bike->bike_part3, bike_part_transparency, &BikeBox3);
+    render_bike_part(pic, bike->bike_part4, bike_part_transparency, &BikeBox4);
 
     // Calculations to draw the kuski
     vect2 body_r = (mot->body_r - bottomleft_corner);
@@ -593,7 +593,7 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
     // Draw the whole kuski (excluding head)
     render_affine_pic(knee_r, hip_r, pic, 0.14, bike->thigh, 0.03, 0.1, mot->flipped_bike);
     render_affine_pic(foot_r, knee_r, pic, 0.21, bike->leg, 0.03, 0.03, mot->flipped_bike);
-    const affine_pic* body = shirt ? shirt : bike->body;
+    const pic8* body = shirt ? shirt : bike->body;
     render_affine_pic(hip_r, neck_r, pic, 0.2, body, 0.1, 0.05, mot->flipped_bike);
     render_affine_pic(elbow_r, shoulder_r, pic, 0.11, bike->up_arm, 0.08, 0.1, !mot->flipped_bike);
     render_affine_pic(hand_r, elbow_r, pic, 0.076, bike->forarm, 0.08, 0.1, mot->flipped_bike);

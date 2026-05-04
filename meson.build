@@ -37,7 +37,6 @@ elma_sources = files(
     'wav.cpp',
     'src/menu/player.cpp',
     'src/renderer/render.cpp',
-    'affine_pic.cpp',
     'grass.cpp',
     'src/platform/utils.cpp',
     'LEJATSZO.CPP',

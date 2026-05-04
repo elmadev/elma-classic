@@ -5,7 +5,6 @@
 
 class anim;
 class grass;
-class affine_pic;
 class palette;
 class pic8;
 class piclist;
@@ -49,19 +48,19 @@ struct texture {
 };
 
 struct bike_pics {
-    affine_pic* bike_part1;
-    affine_pic* bike_part2;
-    affine_pic* bike_part3;
-    affine_pic* bike_part4;
-    affine_pic* body;
-    affine_pic* thigh;
-    affine_pic* leg;
-    affine_pic* wheel;
-    affine_pic* susp1;
-    affine_pic* susp2;
-    affine_pic* forarm;
-    affine_pic* up_arm;
-    affine_pic* head;
+    pic8* bike_part1;
+    pic8* bike_part2;
+    pic8* bike_part3;
+    pic8* bike_part4;
+    pic8* body;
+    pic8* thigh;
+    pic8* leg;
+    pic8* wheel;
+    pic8* susp1;
+    pic8* susp2;
+    pic8* forarm;
+    pic8* up_arm;
+    pic8* head;
 };
 
 constexpr int MAX_PICTURES = 1000;
@@ -104,7 +103,7 @@ class lgrfile {
 
     bike_pics bike1;
     bike_pics bike2;
-    affine_pic* flag;
+    pic8* flag;
 
     anim* killer;
     anim* exit;

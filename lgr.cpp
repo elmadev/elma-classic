@@ -1,7 +1,6 @@
 #include "lgr.h"
 #include "editor/dialog.h"
 #include "EDITUJ.H"
-#include "affine_pic.h"
 #include "anim.h"
 #include "canvas.h"
 #include "eol_settings.h"
@@ -142,10 +141,10 @@ void lgrfile::load_lgr_file(const char* lgr_name) {
     external_error("Could not open file lgr/default.lgr!");
 }
 
-static void bike_slice(pic8* bike, affine_pic** ret, bike_box* bbox) {
+static void bike_slice(pic8* bike, pic8** ret, bike_box* bbox) {
     pic8* slice = new pic8(bbox->x2 - bbox->x1 + 1, bbox->y2 - bbox->y1 + 1);
     blit8(slice, bike, -bbox->x1, -bbox->y1);
-    *ret = new affine_pic(nullptr, slice);
+    *ret = slice;
 }
 
 // Slice the bike into 4 sub-components
@@ -154,11 +153,6 @@ void lgrfile::chop_bike(pic8* bike, bike_pics* bp) {
     bike_slice(bike, &bp->bike_part2, &BikeBox2);
     bike_slice(bike, &bp->bike_part3, &BikeBox3);
     bike_slice(bike, &bp->bike_part4, &BikeBox4);
-
-    // Transparency taken from topleft corner of BikeBox1
-    bp->bike_part2->transparency = bp->bike_part1->transparency;
-    bp->bike_part3->transparency = bp->bike_part1->transparency;
-    bp->bike_part4->transparency = bp->bike_part1->transparency;
 }
 
 // Tile a texture horizontally to fit SCREEN_WIDTH.
@@ -668,7 +662,7 @@ lgrfile::lgrfile(const char* lgrname) {
 
 #define LOAD_AFFINE(name, destination)                                                             \
     if (strcmpi(asset_filename, (name)) == 0) {                                                    \
-        (destination) = new affine_pic(nullptr, asset_pic);                                        \
+        (destination) = asset_pic;                                                                 \
         continue;                                                                                  \
     }
 

@@ -1,7 +1,6 @@
 #ifndef AFFINE_PIC_RENDER_H
 #define AFFINE_PIC_RENDER_H
 
-class affine_pic;
 class pic8;
 class vect2;
 
@@ -13,7 +12,8 @@ class vect2;
 //   StretchEnabled if bike is turning (properties set via func set_stretch_parameters)
 //
 //   See docs/affine_pic_render.png
-void draw_affine_pic(pic8* dest, const affine_pic* aff, vect2 u, vect2 v, vect2 r);
+void draw_affine_pic(pic8* dest, const pic8* aff, unsigned char transparency, vect2 u, vect2 v,
+                     vect2 r);
 
 extern bool StretchEnabled;
 

@@ -134,6 +134,8 @@ class eol_settings {
     Default<bool> show_fps_{false};
     Default<bool> show_ups_{false};
     Default<bool> show_gpu_{false};
+    Default<bool> fps_limit_enabled_{false};
+    Clamp<int> fps_limit_{30, 100, 1000};
     Clamp<int> recording_fps_{30, 30, 120};
 
     Default<bool> show_demo_menu_{true};
@@ -228,6 +230,8 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(show_fps);
     DECLARE_FIELD_FUNCS(show_ups);
     DECLARE_FIELD_FUNCS(show_gpu);
+    DECLARE_FIELD_FUNCS(fps_limit_enabled);
+    DECLARE_FIELD_FUNCS(fps_limit);
     DECLARE_FIELD_FUNCS(recording_fps);
 
     DECLARE_FIELD_FUNCS(show_demo_menu);

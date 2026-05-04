@@ -8,7 +8,7 @@ extern int Single;
 extern int FlagTag;
 extern bool OutOfBounds;
 
-extern int ScreenshotRequested;
+extern bool ScreenshotRequested;
 extern bool VideoRecordingMode;
 extern int VideoFrameIndex;
 extern std::string VideoOutputDirectory;
@@ -25,8 +25,8 @@ struct camera {
     double max_y;
 };
 
-long game_loop(const char* filename, CameraMode camera_mode);
-long replay_loop(const char* filename, int restore_player_visibility);
+int game_loop(const char* filename, CameraMode camera_mode);
+int replay_loop(const char* filename, int restore_player_visibility);
 
 void setup_render_directory(const std::string& replay_filename);
 void render_replay(const char* level_filename);
@@ -44,19 +44,20 @@ struct bike_metadata {
     double surlero;
     double frekvencia;
     double volt_time;
-    int volt_is_right;
+    bool volt_is_right;
 
-    int draw_view;
+    bool draw_view;
 
-    int turn_key_previous;
+    bool turn_key_previous;
     bool one_turn_used;
 
     double arm_position;
 
-    turning_data bike_turning, camera_turning;
+    turning_data bike_turning;
+    turning_data camera_turning;
 };
 
 extern int WhoDiedFirst;
-extern int Player1Finished;
+extern bool Player1Finished;
 
 #endif

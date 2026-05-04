@@ -386,7 +386,7 @@ static void handle_screenshot(pic8* pic) {
     }
 
     if (ScreenshotRequested) {
-        ScreenshotRequested = 0;
+        ScreenshotRequested = false;
         platform_save_screenshot();
     }
 }

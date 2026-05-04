@@ -148,17 +148,11 @@ static double calculate_camera_phase(double elapsed_time, int flipped) {
     elapsed_time = std::max(elapsed_time, 0.0);
 
     double camera_flip_time = EolSettings->turn_time() + 0.15;
+    double phase = std::min(1.0, elapsed_time / camera_flip_time);
     if (flipped) {
-        if (elapsed_time > camera_flip_time) {
-            return 0.0;
-        }
-        return 1.0 - elapsed_time / camera_flip_time;
-    } else {
-        if (elapsed_time > camera_flip_time) {
-            return 1.0;
-        }
-        return elapsed_time / camera_flip_time;
+        phase = 1.0 - phase;
     }
+    return phase;
 }
 
 // Subframe physics calculation. Contains all the physics calculations except for bike turning
@@ -213,43 +207,38 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
         metadata->sound.motor_frequency = -1;
         metadata->sound.gas = 0;
         rec->store_frames(mot, time, &metadata->sound);
-        if (!Single && FlagTag && !OutOfBounds) {
-            // Flag Tag respawn
-            init_motor(mot);
-            mot->bike.r = mot->bike.r + BikeStartOffset;
-            mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
-            mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;
-            mot->body_r = mot->body_r + BikeStartOffset;
 
-            bool draw_view = metadata->draw_view;
-            memset(metadata, 0, sizeof(bike_metadata));
-            metadata->bike_turning.camera_turn_time = -1000.0;
-            metadata->bike_turning.bike_turn_time = -1000.0;
-            metadata->camera_turning.camera_turn_time = -1000.0;
-            metadata->camera_turning.bike_turn_time = -1000.0;
-            metadata->volt_time = -100.0;
-            metadata->draw_view = draw_view;
-
-            if ((mot == Motor1 && FlagTagAHasFlag) || (mot == Motor2 && !FlagTagAHasFlag)) {
-                // Give flag to other player
-                FlagTagAHasFlag = !FlagTagAHasFlag;
-            }
-        } else {
+        if (Single || !FlagTag || OutOfBounds) {
             *dead = true;
             return;
         }
+
+        // Flag Tag respawn
+        init_motor(mot);
+        mot->bike.r = mot->bike.r + BikeStartOffset;
+        mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
+        mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;
+        mot->body_r = mot->body_r + BikeStartOffset;
+
+        bool draw_view = metadata->draw_view;
+        memset(metadata, 0, sizeof(bike_metadata));
+        metadata->bike_turning.camera_turn_time = -1000.0;
+        metadata->bike_turning.bike_turn_time = -1000.0;
+        metadata->camera_turning.camera_turn_time = -1000.0;
+        metadata->camera_turning.bike_turn_time = -1000.0;
+        metadata->volt_time = -100.0;
+        metadata->draw_view = draw_view;
+
+        // Give flag to other player
+        FlagTagAHasFlag = mot == Motor2;
     }
 
     // Update sound
     metadata->sound.friction_volume = get_bike_friction_volume();
-
-    if (mot->flipped_bike) {
-        metadata->sound.motor_frequency = fabs(mot->left_wheel.angular_velocity) * 0.025;
-    } else {
-        metadata->sound.motor_frequency = fabs(mot->right_wheel.angular_velocity) * 0.025;
-    }
-    metadata->sound.motor_frequency = std::min(30.0, metadata->sound.motor_frequency);
-    metadata->sound.motor_frequency = 2.0 - exp(-metadata->sound.motor_frequency);
+    double wheel_vel =
+        mot->flipped_bike ? mot->left_wheel.angular_velocity : mot->right_wheel.angular_velocity;
+    wheel_vel = std::min(30.0, fabs(wheel_vel) * 0.025);
+    metadata->sound.motor_frequency = 2.0 - exp(-wheel_vel);
     metadata->sound.gas = (char)is_gas_down;
 
     // Update replay
@@ -263,14 +252,12 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
         if (object_id >= 0) {
             int prev_apple_count = mot->apple_count;
             BikeState bike_state = handle_object_interaction(object_id, &mot->apple_count, mot);
-            if (bike_state == BikeState::Dead || bike_state == BikeState::Finish) {
-                if (bike_state == BikeState::Dead) {
-                    *dead = true;
-                } else {
-                    *finish_time = time * TimeToCentiseconds;
-                }
+            if (bike_state == BikeState::Dead) {
+                *dead = true;
             }
-
+            if (bike_state == BikeState::Finish) {
+                *finish_time = time * TimeToCentiseconds;
+            }
             if (prev_apple_count < mot->apple_count) {
                 mot->last_apple_time = time * TimeToCentiseconds;
             }
@@ -366,10 +353,9 @@ static void physics_frame_end(motorst* mot, player_keys* keys, bike_metadata* me
     update_turning_data(&metadata->bike_turning, rec, time, mot->flipped_bike);
 
     // Update camera position
+    mot->flipped_camera = mot->flipped_bike;
     if (mot->gravity_direction == MotorGravity::Up) {
-        mot->flipped_camera = !mot->flipped_bike;
-    } else {
-        mot->flipped_camera = mot->flipped_bike;
+        mot->flipped_camera = !mot->flipped_camera;
     }
     update_turning_data(&metadata->camera_turning, nullptr, time, mot->flipped_camera);
 
@@ -423,11 +409,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     Rec1->set_flagtag(FlagTag);
     Rec2->set_flagtag(FlagTag);
 
-    if (Single) {
-        MultiplayerRec = 0;
-    } else {
-        MultiplayerRec = 1;
-    }
+    MultiplayerRec = Single ? 0 : 1;
 
     setup_gameloop(filename);
 
@@ -474,10 +456,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     sound_init();
     // Stay muted if no bike is visible.
     Mute = !(current_camera.mode != CameraMode::MapViewer);
-    if (Single) {
-        start_motor_sound(true);
-    } else {
-        start_motor_sound(true);
+    start_motor_sound(true);
+    if (!Single) {
         start_motor_sound(false);
     }
 
@@ -485,9 +465,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     while (true) {
         // Get timestep
         double target_time = stopwatch() * 0.0024;
-        if (target_time < 0.000001) {
-            target_time = 0.000001;
-        }
+        target_time = std::max(0.000001, target_time);
 
         handle_events();
 
@@ -515,41 +493,32 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                                  time, dt);
             }
 
-            if (!(dead1 && dead2)) {
-                if (dead1) {
-                    WhoDiedFirst = 1;
-                }
-                if (dead2) {
-                    WhoDiedFirst = 2;
-                }
-            }
-
             if (!Single && both_bikes_alive) {
-                if (dead1 || dead2) {
-                    if (dead1) {
-                        stop_motor_sound(true);
-                    } else {
-                        stop_motor_sound(false);
-                    }
+                if (dead1) {
+                    stop_motor_sound(true);
+                    WhoDiedFirst = 1;
                     both_bikes_alive = false;
                 }
+                if (dead2) {
+                    stop_motor_sound(false);
+                    WhoDiedFirst = 2;
+                    both_bikes_alive = false;
+                }
+                if (dead1 && dead2) {
+                    WhoDiedFirst = 0;
+                }
             }
 
-            if ((Single && (finish_time1 || dead1)) ||
-                (!Single && (finish_time1 || finish_time2 || (dead1 && dead2)))) {
+            if (finish_time1 || finish_time2 || (dead1 && (Single || dead2))) {
                 int finish_time = finish_time1;
                 if (finish_time2) {
                     finish_time = finish_time2;
                 }
 
-                if (!(dead1 && dead2) || Single) {
+                if (finish_time) {
                     WhoDiedFirst = 0;
                 }
-                if (finish_time1) {
-                    Player1Finished = true;
-                } else {
-                    Player1Finished = false;
-                }
+                Player1Finished = (bool)finish_time1;
 
                 set_motor_frequency(true, 1.0, 0);
                 set_motor_frequency(false, 1.0, 0);
@@ -564,7 +533,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
                 stop_motor_sound(true);
                 stop_motor_sound(false);
-
                 Mute = true;
 
                 if (Single) {
@@ -588,12 +556,11 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             flagtag(time);
         }
 
+        set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
         if (Single) {
             set_friction_volume(metadata1.sound.friction_volume);
-            set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
         } else {
             set_friction_volume(metadata1.sound.friction_volume + metadata2.sound.friction_volume);
-            set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
             set_motor_frequency(false, metadata2.sound.motor_frequency, metadata2.sound.gas);
         }
 
@@ -725,10 +692,9 @@ static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadat
     update_turning_data(&metadata->bike_turning, nullptr, time, mot->flipped_bike);
 
     // Update camera position
+    mot->flipped_camera = mot->flipped_bike;
     if (mot->gravity_direction == MotorGravity::Up) {
-        mot->flipped_camera = !mot->flipped_bike;
-    } else {
-        mot->flipped_camera = mot->flipped_bike;
+        mot->flipped_camera = !mot->flipped_camera;
     }
     update_turning_data(&metadata->camera_turning, nullptr, time, mot->flipped_camera);
 
@@ -770,12 +736,12 @@ int replay_loop(const char* filename, int restore_player_visibility) {
     metadata1.camera_turning.camera_turn_time = metadata2.camera_turning.camera_turn_time = -1000.0;
     metadata1.camera_turning.bike_turn_time = metadata2.camera_turning.bike_turn_time = -1000.0;
     metadata1.volt_time = metadata2.volt_time = -100.0;
+
+    metadata1.draw_view = true;
+    metadata2.draw_view = true;
     if (restore_player_visibility) {
         metadata1.draw_view = PreviousReplayDrawView1;
         metadata2.draw_view = PreviousReplayDrawView2;
-    } else {
-        metadata1.draw_view = true;
-        metadata2.draw_view = true;
     }
 
     reset_motor_forces(Motor1);
@@ -786,10 +752,8 @@ int replay_loop(const char* filename, int restore_player_visibility) {
 
     sound_init();
     Mute = false;
-    if (Single) {
-        start_motor_sound(true);
-    } else {
-        start_motor_sound(true);
+    start_motor_sound(true);
+    if (!Single) {
         start_motor_sound(false);
     }
 
@@ -893,11 +857,10 @@ int replay_loop(const char* filename, int restore_player_visibility) {
             flagtag_replay(time);
         }
 
+        set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
         if (Single) {
-            set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
             set_friction_volume(metadata1.sound.friction_volume);
         } else {
-            set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
             set_motor_frequency(false, metadata2.sound.motor_frequency, metadata2.sound.gas);
             set_friction_volume(metadata1.sound.friction_volume + metadata2.sound.friction_volume);
         }

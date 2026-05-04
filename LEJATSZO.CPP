@@ -165,9 +165,6 @@ static double calculate_camera_phase(double elapsed_time, int flipped) {
 static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* metadata,
                              recorder* rec, int* finish_time, bool* dead, double time, double dt) {
     // Adjust key inputs to only allow valid inputs, accounting for volt delay and cripples
-    bool right_volt = false;
-    bool left_volt = false;
-
     bool is_gas_down = is_game_key_down(keys->gas);
     bool is_brake_down = is_game_key_down(keys->brake) || is_game_key_down(keys->brake_alias) ||
                          was_game_key_just_pressed(keys->one_frame_brake);
@@ -178,7 +175,19 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
         std::swap(is_gas_down, is_brake_down);
         std::swap(is_right_volt_down, is_left_volt_down);
     }
+    if (EolSettings->cripple_no_brake()) {
+        is_brake_down = false;
+    }
+    if (EolSettings->cripple_no_throttle()) {
+        is_gas_down = false;
+    }
+    if (EolSettings->cripple_always_throttle()) {
+        is_gas_down = true;
+        is_brake_down = false;
+    }
 
+    bool right_volt = false;
+    bool left_volt = false;
     if (time > metadata->volt_time + VoltDelay && !EolSettings->cripple_no_volt()) {
         if (is_right_volt_down || is_game_key_down(keys->alovolt)) {
             right_volt = true;
@@ -192,17 +201,6 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
             metadata->volt_is_right = false;
             add_event_buffer(WavEvent::LeftVolt, 0.99, -1);
         }
-    }
-
-    if (EolSettings->cripple_no_brake()) {
-        is_brake_down = false;
-    }
-    if (EolSettings->cripple_no_throttle()) {
-        is_gas_down = false;
-    }
-    if (EolSettings->cripple_always_throttle()) {
-        is_gas_down = true;
-        is_brake_down = false;
     }
 
     // Simulate bike physics given validated inputs

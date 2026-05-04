@@ -41,8 +41,6 @@ struct turning_data {
 
 struct bike_metadata {
     bike_sound sound;
-    double surlero;
-    double frekvencia;
     double volt_time;
     bool volt_is_right;
 

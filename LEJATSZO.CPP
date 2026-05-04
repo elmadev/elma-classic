@@ -483,7 +483,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         start_motor_sound(false);
     }
 
-    long l = 0;
     bool both_bikes_alive = true;
     while (true) {
         // Get timestep
@@ -640,23 +639,10 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {
             WhoDiedFirst = 0;
 
-            double eltelido = stopwatch();
-
             stop_motor_sound(true);
             stop_motor_sound(false);
             Mute = true;
 
-            double tpl = double(l) / eltelido;
-            tpl *= STOPWATCH_MULTIPLIER * 1000.0;
-            int framerate = (int)(tpl);
-            if (std::filesystem::exists("f_rate.inf")) {
-                FILE* h = fopen("f_rate.inf", "w");
-                if (!h) {
-                    internal_error("framerate nem nyilik!");
-                }
-                fprintf(h, "%d", framerate);
-                fclose(h);
-            }
             Ptop->unflip_objects();
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
@@ -666,7 +652,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             }
             return -1;
         }
-        l++;
     }
 }
 
@@ -810,7 +795,6 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         start_motor_sound(false);
     }
 
-    long l = 0;
     bool alive1 = true;
     bool alive2 = true;
 
@@ -936,19 +920,6 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         }
 
         if (!console_was_active && was_key_just_pressed(DIK_ESCAPE)) {
-            double eltelido = stopwatch();
-            double tpl = double(l) / eltelido;
-            tpl *= STOPWATCH_MULTIPLIER * 1000.0;
-            int framerate = (int)(tpl);
-            if (std::filesystem::exists("f_rate.inf")) {
-                FILE* h = fopen("f_rate.inf", "w");
-                if (!h) {
-                    internal_error("framerate nem nyilik!");
-                }
-                fprintf(h, "%d", framerate);
-                fclose(h);
-            }
-
             set_motor_frequency(true, 1.0, 0);
             set_motor_frequency(false, 1.0, 0);
             stop_motor_sound(true);
@@ -966,7 +937,6 @@ int replay_loop(const char* filename, int restore_player_visibility) {
             FlagTag = saved_tag;
             return -1;
         }
-        l++;
     }
 }
 

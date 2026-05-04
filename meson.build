@@ -64,6 +64,7 @@ elma_sources = files(
     'src/physics/forces.cpp',
     'src/physics/init.cpp',
     'src/physics/move.cpp',
+    'src/physics/pacer.cpp',
     'src/pic/abc8.cpp',
     'src/pic/anim.cpp',
     'src/pic/lgr.cpp',

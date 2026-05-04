@@ -13,6 +13,7 @@
 #include "physics/flagtag.h"
 #include "physics/forces.h"
 #include "physics/init.h"
+#include "physics/pacer.h"
 #include "pic/lgr.h"
 #include "platform/implementation.h"
 #include "platform/scancode.h"
@@ -511,6 +512,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     }
 
     stopwatch_reset();
+    pacer::reset();
 
     driver driv1(Motor1, Rec1, &State->keys1, &HudGame1);
     driver driv2(Motor2, Rec2, &State->keys2, &HudGame2);
@@ -543,24 +545,17 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                             EolClient->bike_frozen_by_countdown();
         if (frozen) {
             stopwatch_reset();
+            pacer::reset();
         }
 
-        // Get timestep
-        double target_time = stopwatch() * 0.0024;
-        target_time = std::max(0.000001, target_time);
-
         handle_events();
-
         bool console_was_active = handle_console_input();
 
         if (!frozen) {
-            while (time <= target_time - 0.000001) {
-                // Cap slowest frame to 0.0055 (approximately 12.6 milliseconds or 79.4 fps)
-                double dt = 0.0055;
-                if (time + dt > target_time) {
-                    dt = target_time - time;
-                }
+            pacer::new_frame();
 
+            double dt = 0.0;
+            while (pacer::subframe(&dt)) {
                 if (current_camera.mode == CameraMode::MapViewer) {
                     update_freecam(dt, current_camera);
                     time += dt;

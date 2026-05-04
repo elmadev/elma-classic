@@ -416,8 +416,6 @@ static void setup_gameloop(const char* filename) {
 int WhoDiedFirst = 0;
 bool Player1Finished = false;
 
-int Masodikmenet = 0;
-
 int game_loop(const char* filename, CameraMode camera_mode) {
     WhoDiedFirst = 1;
     Player1Finished = false;
@@ -662,7 +660,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             Ptop->unflip_objects();
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
-            Masodikmenet = 1;
             if (Single) {
                 EolClient->exit_level(filename, time * TimeToCentiseconds, Motor1->apple_count,
                                       TotalApples, true);

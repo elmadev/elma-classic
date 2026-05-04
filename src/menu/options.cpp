@@ -447,6 +447,29 @@ void menu_options() {
         BOOL_OPTION("Show UPS:", show_ups);
 
         nav.add_row(
+            "FPS Limit:",
+            EolSettings->fps_limit_enabled_persisted()
+                ? std::to_string(EolSettings->fps_limit_persisted())
+                : std::string("Off"),
+            NAV_FUNC() {
+                static constexpr int steps[] = {60, 100, 144, 240, 500};
+                if (!EolSettings->fps_limit_enabled_persisted()) {
+                    EolSettings->persist_fps_limit_enabled(true);
+                    EolSettings->persist_fps_limit(steps[0]);
+                    return;
+                }
+                int cur = EolSettings->fps_limit_persisted();
+                for (size_t i = 0; i < std::size(steps); ++i) {
+                    if (steps[i] == cur && i + 1 < std::size(steps)) {
+                        EolSettings->persist_fps_limit(steps[i + 1]);
+                        return;
+                    }
+                }
+                EolSettings->persist_fps_limit_enabled(false);
+                EolSettings->persist_fps_limit(steps[0]);
+            });
+
+        nav.add_row(
             "Record Replay FPS:", std::to_string(EolSettings->recording_fps_persisted()),
             NAV_FUNC() {
                 int old_fps = EolSettings->recording_fps_persisted();

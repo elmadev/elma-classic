@@ -4,6 +4,7 @@
 #include "level.h"
 #include "log.h"
 #include "pic8.h"
+#include <algorithm>
 #include <format>
 
 std::string eol::format_level(std::string_view level) {
@@ -18,6 +19,7 @@ std::string eol::format_level(std::string_view level) {
 
 void eol::process(const battle_started& bs) {
     current_battle = bs.bat;
+    battle_leaderboard_.clear();
 
     if (current_battle->in_countdown) {
         StatusMessages->add("battle countdown started");
@@ -40,6 +42,22 @@ void eol::process(const battle_countdown_ended&) {
 void eol::process(const battle_ended& be) {
     current_battle.reset();
     StatusMessages->add(be.aborted ? "battle aborted" : "battle over");
+}
+
+void eol::upsert_leaderboard_entry(const battle_leaderboard_entry& entry, uint16_t rank) {
+    std::erase_if(battle_leaderboard_, [&](const battle_leaderboard_entry& e) {
+        return e.kuski_id == entry.kuski_id && e.kuski_id2 == entry.kuski_id2;
+    });
+    size_t idx = std::min<size_t>(rank, battle_leaderboard_.size());
+    battle_leaderboard_.insert(battle_leaderboard_.begin() + idx, entry);
+}
+
+void eol::process(const battle_line_update& e) {
+    upsert_leaderboard_entry({.kuski_id = e.kuski_id,
+                              .kuski_id2 = e.kuski_id2,
+                              .score = e.score,
+                              .apple_count = e.apple_count},
+                             e.rank);
 }
 
 void eol::process(const battle_time_sync& bts) {

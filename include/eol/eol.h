@@ -33,6 +33,7 @@ class eol {
     void process(const battle_countdown_ended&);
     void process(const battle_ended&);
     void process(const battle_time_sync&);
+    void process(const battle_line_update&);
 
     void enter_level(const char* level_name, const level* lev);
     void exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
@@ -65,11 +66,20 @@ class eol {
 
     static std::string format_level(std::string_view level);
 
+    struct battle_leaderboard_entry {
+        unsigned int kuski_id;
+        unsigned int kuski_id2;
+        uint32_t score;
+        uint16_t apple_count;
+    };
+    void upsert_leaderboard_entry(const battle_leaderboard_entry& entry, uint16_t rank);
+
     protocol proto;
     unsigned int id;
     unsigned int id2;
     std::vector<kuski> kuskis_;
     std::optional<battle> current_battle;
+    std::vector<battle_leaderboard_entry> battle_leaderboard_;
     eol_table* cur_table;
     eol_table players_online_table;
     std::optional<unsigned int> spy_kuski_id;

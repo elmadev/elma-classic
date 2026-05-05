@@ -18,6 +18,8 @@ struct kuski {
     unsigned int id;
     char nick[16];
     char level[MAX_FILENAME_LEN + 1];
+    bool is_player = true;
+    bool is_online = true;
     const struct spy_data* spy_data() const;
     void add_spy_data(const struct spy_data& sd);
     void clear_spy_data();

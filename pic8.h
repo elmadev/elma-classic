@@ -36,13 +36,15 @@ class pic8 {
     void vertical_flip();
     bool save(const char* filename, unsigned char* pal = nullptr, FILE* h = nullptr);
     void ppixel(int x, int y, unsigned char index);
-    unsigned char gpixel(int x, int y);
-    int get_width() { return width; }
-    int get_height() { return height; }
+    unsigned char gpixel(int x, int y) const;
+    int get_width() const { return width; }
+    int get_height() const { return height; }
 #ifdef DEBUG
     unsigned char* get_row(int y);
+    const unsigned char* get_row(int y) const;
 #else
     unsigned char* get_row(int y) { return rows[y]; }
+    const unsigned char* get_row(int y) const { return rows[y]; }
 #endif
     void fill_box(int x1, int y1, int x2, int y2, unsigned char index);
     void fill_box(unsigned char index);

@@ -167,7 +167,7 @@ void pic8::ppixel(int x, int y, unsigned char index) {
     rows[y][x] = index;
 }
 
-unsigned char pic8::gpixel(int x, int y) {
+unsigned char pic8::gpixel(int x, int y) const {
     if (x < 0 || x >= width || y < 0 || y >= height) {
         return 0;
     }
@@ -176,6 +176,13 @@ unsigned char pic8::gpixel(int x, int y) {
 
 #ifdef DEBUG
 unsigned char* pic8::get_row(int y) {
+    if (y < 0 || y >= height) {
+        internal_error("pic8::get_row y out of bounds!");
+    }
+    return rows[y];
+}
+
+const unsigned char* pic8::get_row(int y) const {
     if (y < 0 || y >= height) {
         internal_error("pic8::get_row y out of bounds!");
     }

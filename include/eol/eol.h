@@ -6,6 +6,7 @@
 #include "eol/protocol.h"
 #include <optional>
 #include <ranges>
+#include <string_view>
 #include <vector>
 
 class abc8;
@@ -44,6 +45,9 @@ class eol {
 
   private:
     void sync_players_online_table();
+
+    const std::vector<kuski>& all_kuskis() const { return kuskis_; }
+    std::string_view lookup_nick(unsigned int kuski_id) const;
 
     protocol proto;
     unsigned int id;

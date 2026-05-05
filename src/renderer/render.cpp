@@ -844,6 +844,7 @@ void render_game(double time, bike_metadata* metadata1, bike_metadata* metadata2
     Console->render(*pic, *SmallFont);
     StatusMessages->render(*pic, *SmallFont);
     EolClient->render_table(*pic, *MediumFont, *SmallFont);
+    EolClient->render_battle_status(*pic, *SmallFont);
 
     // Conditionally save screenshot
     handle_screenshot(pic);

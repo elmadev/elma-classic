@@ -4,6 +4,7 @@
 #include "eol/eol_events.h"
 #include "eol/eol_table.h"
 #include "eol/protocol.h"
+#include "eol_settings.h"
 #include <optional>
 #include <ranges>
 #include <string_view>
@@ -42,6 +43,10 @@ class eol {
         return kuskis_ |
                std::views::filter([](const kuski& k) { return k.is_online && k.is_player; });
     }
+    void toggle_battle_status() {
+        EolSettings->set_show_battle_status(!EolSettings->show_battle_status());
+    }
+    void render_battle_status(pic8& dest, abc8& font) const;
 
   private:
     void sync_players_online_table();

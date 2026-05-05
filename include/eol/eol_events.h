@@ -90,4 +90,12 @@ struct battle_time_sync {
     long long local_start_ms;
 };
 
+struct battle_line_update {
+    unsigned int kuski_id;
+    unsigned int kuski_id2;
+    uint32_t score; // Best time, speed, or finish count depending on battle type
+    uint16_t apple_count;
+    uint16_t rank;
+};
+
 #endif

@@ -50,6 +50,7 @@ class eol {
     void toggle_battle_status() const;
     void toggle_show_battle_leader() const;
     void render_battle_status(pic8& dest, abc8& font) const;
+    void toggle_battle_results() { set_table(TableType::BattleResults); }
 
     const kuski* spy_kuski();
     void spy_next_kuski();
@@ -59,6 +60,7 @@ class eol {
 
   private:
     void sync_players_online_table();
+    void sync_battle_results_table();
 
     const std::vector<kuski>& all_kuskis() const { return kuskis_; }
     std::string_view lookup_nick(unsigned int kuski_id) const;
@@ -81,6 +83,7 @@ class eol {
     std::vector<battle_leaderboard_entry> battle_leaderboard_;
     eol_table* cur_table;
     eol_table players_online_table;
+    eol_table battle_results_table;
     std::optional<unsigned int> spy_kuski_id;
 };
 

@@ -40,6 +40,9 @@ std::string eol::format_level(std::string_view level) {
 void eol::process(const battle_started& bs) {
     current_battle = bs.bat;
     battle_leaderboard_.clear();
+    battle_results_table.set_title(
+        std::format("Battle standings in {}", format_level(current_battle->level_filename)));
+    sync_battle_results_table();
 
     if (current_battle->in_countdown) {
         StatusMessages->add("battle countdown started");
@@ -60,6 +63,8 @@ void eol::process(const battle_countdown_ended&) {
 }
 
 void eol::process(const battle_ended& be) {
+    battle_results_table.set_title(
+        std::format("Battle results in {}", format_level(current_battle->level_filename)));
     current_battle.reset();
     StatusMessages->add(be.aborted ? "battle aborted" : "battle over");
 }
@@ -82,6 +87,25 @@ void eol::upsert_leaderboard_entry(const battle_leaderboard_entry& entry, uint16
     });
     size_t idx = std::min<size_t>(rank, battle_leaderboard_.size());
     battle_leaderboard_.insert(battle_leaderboard_.begin() + idx, entry);
+    sync_battle_results_table();
+}
+
+void eol::sync_battle_results_table() {
+    battle_results_table.clear_rows();
+    if (!current_battle) {
+        return;
+    }
+
+    for (size_t i = 0; i < battle_leaderboard_.size(); i++) {
+        const battle_leaderboard_entry& entry = battle_leaderboard_[i];
+        std::string nick = entry.kuski_id2 != 0
+                               ? std::format("{}. {} & {}", i + 1, lookup_nick(entry.kuski_id),
+                                             lookup_nick(entry.kuski_id2))
+                               : std::format("{}. {}", i + 1, lookup_nick(entry.kuski_id));
+        std::string result =
+            format_battle_result(current_battle->type, entry.score, entry.apple_count);
+        battle_results_table.add_row({std::move(nick), std::move(result)});
+    }
 }
 
 void eol::process(const battle_line_update& e) {

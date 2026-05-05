@@ -35,12 +35,20 @@ void eol::process(const login& l) {
 }
 
 void eol::process(const new_kuski& nk) {
-    kuskis_.push_back(nk.k);
+    if (kuski* existing = get_kuski(kuskis_, nk.k.id)) {
+        *existing = nk.k;
+    } else {
+        kuskis_.push_back(nk.k);
+    }
     sync_players_online_table();
 }
 
 void eol::process(const kuski_logout& kl) {
-    std::erase_if(kuskis_, [&kl](const kuski& k) { return k.id == kl.id || k.id == kl.id2; });
+    for (kuski& k : kuskis_) {
+        if (k.id == kl.id || k.id == kl.id2) {
+            k.is_online = false;
+        }
+    }
     sync_players_online_table();
 }
 

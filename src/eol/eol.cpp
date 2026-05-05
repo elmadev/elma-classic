@@ -42,7 +42,11 @@ void eol::process(const new_kuski& nk) {
 }
 
 void eol::process(const kuski_logout& kl) {
-    std::erase_if(kuskis_, [&kl](const kuski& k) { return k.id == kl.id || k.id == kl.id2; });
+    for (kuski& k : kuskis_) {
+        if (k.id == kl.id || k.id == kl.id2) {
+            k.is_online = false;
+        }
+    }
     sync_players_online_table();
 }
 

@@ -34,6 +34,19 @@ void eol::process(const login& l) {
             StatusMessages->add("login successful");
             id = l.id;
             id2 = l.id2;
+
+            kuski self{};
+            self.id = id;
+            strncpy(self.nick, EolSettings->nick().c_str(), sizeof(self.nick) - 1);
+            self.is_player = true;
+            self.is_online = true;
+            process(new_kuski{self});
+
+            if (id2 != 0 && id2 != id) {
+                self.id = id2;
+                self.is_player = false;
+                process(new_kuski{self});
+            }
         }
     } else {
         StatusMessages->add("login unsuccessful");

@@ -4,8 +4,28 @@
 #include "level.h"
 #include "log.h"
 #include "pic8.h"
+#include "util/util.h"
 #include <algorithm>
 #include <format>
+
+static std::string format_battle_result(BattleType type, uint32_t time, uint16_t apples) {
+    using enum BattleType;
+    if (type == FlagTag && time == 0 && apples == 0) {
+        return "0:00";
+    }
+    if (type == Speed) {
+        return std::format("{}.{:02}", time / 100, time % 100);
+    }
+    if (type == FinishCount) {
+        return std::format("{} finish{}", time, time == 1 ? "" : "es");
+    }
+    if (time > 0) {
+        char buf[32] = "";
+        util::text::centiseconds_to_string(int(time), buf, true, true);
+        return std::string(buf);
+    }
+    return std::format("{} apple{}", apples, apples == 1 ? "" : "s");
+}
 
 std::string eol::format_level(std::string_view level) {
     std::string with_ext = std::format("{}.lev", level);
@@ -176,4 +196,22 @@ void eol::render_battle_status(pic8& dest, abc8& font) const {
 
     const int y = 15 + font.line_height() * (1 + EolSettings->chat_lines());
     font.write_centered(&dest, dest.get_width() / 2, y, out.c_str());
+
+    if (!EolSettings->show_battle_leader() || battle_leaderboard_.empty()) {
+        return;
+    }
+    const battle_leaderboard_entry& leader = battle_leaderboard_.front();
+    if (leader.score == 0 && leader.apple_count == 0) {
+        return;
+    }
+
+    const std::string result =
+        format_battle_result(current_battle->type, leader.score, leader.apple_count);
+    const std::string leader_line =
+        leader.kuski_id2 != 0
+            ? std::format("Battle leaders: {} & {} {}", lookup_nick(leader.kuski_id),
+                          lookup_nick(leader.kuski_id2), result)
+            : std::format("Battle leader: {} {}", lookup_nick(leader.kuski_id), result);
+
+    font.write_centered(&dest, dest.get_width() / 2, y - font.line_height(), leader_line.c_str());
 }

@@ -137,11 +137,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgl1-mesa-dev
 
-      - name: Visual Studio 17
+      - name: Visual Studio
         if: runner.os == 'windows'
         uses: microsoft/setup-msbuild@v3
         with:
-          vs-version: "[17.1,18.0)"
+          vs-version: "[17.1,19.0)"
 
       - name: Configure
         if: runner.os == 'windows'

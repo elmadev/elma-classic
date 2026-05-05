@@ -4,6 +4,7 @@
 #include "eol/eol_events.h"
 #include "eol/eol_table.h"
 #include "eol/protocol.h"
+#include <ranges>
 #include <vector>
 
 class abc8;
@@ -31,7 +32,10 @@ class eol {
     void set_table(TableType);
     void render_table(pic8& dest, abc8& title_font, abc8& data_font) const;
 
-    const std::vector<kuski>& kuskis() { return kuskis_; }
+    auto kuskis() const {
+        return kuskis_ |
+               std::views::filter([](const kuski& k) { return k.is_online && k.is_player; });
+    }
 
   private:
     void sync_players_online_table();

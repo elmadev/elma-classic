@@ -56,7 +56,7 @@ void eol::process(const kuski_set_level& l) {
 
 void eol::sync_players_online_table() {
     players_online_table.clear_rows();
-    for (const kuski& k : kuskis_) {
+    for (const kuski& k : kuskis()) {
         players_online_table.add_row({k.nick, k.level});
     }
 }

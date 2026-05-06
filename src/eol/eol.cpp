@@ -93,8 +93,15 @@ void eol::process(const battle_time_sync& bts) {
 
 void eol::sync_players_online_table() {
     players_online_table.clear_rows();
-    for (const kuski& k : kuskis_) {
-        players_online_table.add_row({k.nick, k.level});
+    std::vector<const kuski*> by_id;
+    by_id.reserve(kuskis_.size());
+    for (const kuski& k : kuskis()) {
+        by_id.push_back(&k);
+    }
+    // "players online" table is ordered by login time, so sort by id
+    std::ranges::sort(by_id, {}, &kuski::id);
+    for (const kuski* k : by_id) {
+        players_online_table.add_row({k->nick, k->level});
     }
 }
 

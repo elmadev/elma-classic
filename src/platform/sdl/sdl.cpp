@@ -43,33 +43,37 @@ void message_box(const char* text) {
 
 long long get_milliseconds() { return SDL_GetTicks64(); }
 
-static void initialize_renderer() {
-    if (EolSettings->renderer() == RendererType::OpenGL) {
-        if (gl_init(SDLWindow, SCREEN_WIDTH, SCREEN_HEIGHT, SDLSurfacePaletted->pitch) != 0) {
-            internal_error("Failed to initialize OpenGL renderer");
-        }
-
-        SDLSurfaceMain = nullptr; // Not used in GL mode
-    } else {
-        SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
-        if (!SDLSurfaceMain) {
-            internal_error(SDL_GetError());
-        }
+static void refresh_software_surface() {
+    SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
+    if (!SDLSurfaceMain) {
+        internal_error(SDL_GetError());
     }
+}
+
+static void initialize_renderer(int width, int height) {
+    if (EolSettings->renderer() == RendererType::OpenGL) {
+        gl_init(SDLWindow, width, height, SDLSurfacePaletted->pitch);
+    } else {
+        refresh_software_surface();
+    }
+#ifdef DEBUG
+    if (EolSettings->renderer() != RendererType::Software && SDLSurfaceMain) {
+        internal_error("SDLSurfaceMain can only exist with software renderer!");
+    }
+#endif
 }
 
 static void resize_renderer(int width, int height) {
     if (EolSettings->renderer() == RendererType::OpenGL) {
-        if (gl_resize(width, height, SDLSurfacePaletted->pitch) != 0) {
-            internal_error("Failed to resize OpenGL renderer");
-        }
-        SDLSurfaceMain = nullptr; // Not used in GL mode
+        gl_resize(width, height, SDLSurfacePaletted->pitch);
     } else {
-        SDLSurfaceMain = SDL_GetWindowSurface(SDLWindow);
-        if (!SDLSurfaceMain) {
-            internal_error(SDL_GetError());
-        }
+        refresh_software_surface();
     }
+#ifdef DEBUG
+    if (EolSettings->renderer() != RendererType::Software && SDLSurfaceMain) {
+        internal_error("SDLSurfaceMain can only exist with software renderer!");
+    }
+#endif
 }
 
 static void create_palette_surface() {
@@ -117,7 +121,7 @@ static void create_window(int window_pos_x, int window_pos_y, int width, int hei
     }
 
     create_palette_surface();
-    initialize_renderer();
+    initialize_renderer(width, height);
     apply_current_palette();
     platform_apply_fullscreen_mode();
 }

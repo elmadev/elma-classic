@@ -150,7 +150,7 @@ static void setup_vertex_data() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-int gl_init(SDL_Window* sdl_window, int width, int height, int pitch) {
+void gl_init(SDL_Window* sdl_window, int width, int height, int pitch) {
     FrameWidth = width;
     FrameHeight = height;
 
@@ -184,8 +184,6 @@ int gl_init(SDL_Window* sdl_window, int width, int height, int pitch) {
     setup_PBO(pitch, height);
 
     setup_render_state();
-
-    return 0;
 }
 
 void gl_upload_frame(const unsigned char* indices, int pitch) {
@@ -217,7 +215,7 @@ void gl_update_palette(const void* palette) {
 
 void gl_present() { glDrawArrays(GL_TRIANGLES, 0, 6); }
 
-int gl_resize(int width, int height, int pitch) {
+void gl_resize(int width, int height, int pitch) {
     FrameWidth = width;
     FrameHeight = height;
     glViewport(0, 0, width, height);
@@ -231,8 +229,6 @@ int gl_resize(int width, int height, int pitch) {
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PBO);
     glBufferData(GL_PIXEL_UNPACK_BUFFER, pitch * height, nullptr, GL_STREAM_DRAW);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-
-    return 0;
 }
 
 void gl_cleanup() {

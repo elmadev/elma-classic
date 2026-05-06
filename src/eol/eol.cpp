@@ -4,6 +4,8 @@
 #include "eol_settings.h"
 #include "log.h"
 #include "platform/implementation.h"
+#include "platform/utils.h"
+#include <algorithm>
 #include <cstring>
 #include <chrono>
 #include <format>
@@ -37,7 +39,10 @@ void eol::process(const login& l) {
 }
 
 void eol::process(const new_kuski& nk) {
-    kuskis_.push_back(nk.k);
+    auto pos = std::ranges::lower_bound(
+        kuskis_, nk.k.nick, [](const char* a, const char* b) { return strcmpi(a, b) < 0; },
+        [](const kuski& k) { return k.nick; });
+    kuskis_.insert(pos, nk.k);
     sync_players_online_table();
 }
 

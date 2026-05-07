@@ -20,13 +20,14 @@ struct segment;
 // coordinate when iterating towards the right.
 class node_finder {
     canvas* source;
-    int current_x;
+    int current_x_;
     int current_y;
     canvas_chunk_node* current_node;
 
   public:
     node_finder(canvas* src);
     canvas_chunk_node* get_chunk(int x, int y);
+    int current_x() const { return current_x_; };
 };
 
 class canvas_pixels {

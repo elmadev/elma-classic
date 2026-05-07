@@ -1589,17 +1589,17 @@ void canvas::create_canvases() {
 }
 
 node_finder::node_finder(canvas* src) {
-    current_x = -1;
+    current_x_ = -1;
     current_y = -1;
     current_node = nullptr;
     source = src;
 }
 
 canvas_chunk_node* node_finder::get_chunk(int x, int y) {
-    if (y == current_y && x >= current_x) {
+    if (y == current_y && x >= current_x_) {
         // Shortcut to iterate to the right of our last node
-        while (x >= current_x + current_node->width) {
-            current_x += current_node->width;
+        while (x >= current_x_ + current_node->width) {
+            current_x_ += current_node->width;
             current_node = current_node->next;
         }
     } else {
@@ -1609,15 +1609,15 @@ canvas_chunk_node* node_finder::get_chunk(int x, int y) {
         }
         current_y = y;
         current_node = source->rows_linked[y];
-        current_x = source->rows_x1[y];
+        current_x_ = source->rows_x1[y];
 
         // Make sure canvas is unused so far
-        if (current_x > 10) {
-            internal_error("node_finder current_x > 10");
+        if (current_x_ > 10) {
+            internal_error("node_finder current_x_ > 10");
         }
 
-        while (x >= current_x + current_node->width) {
-            current_x += current_node->width;
+        while (x >= current_x_ + current_node->width) {
+            current_x_ += current_node->width;
             current_node = current_node->next;
         }
     }

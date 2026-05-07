@@ -55,10 +55,11 @@
 * error.txt has been replaced with eol.log
 * You can select a default gravity and animation via right click when using the Create Food tool in the editor
 * You can delete polygons using the Delete Vertex tool in the editor
+* Front grass in front of the bike is properly zoomed
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems
-* Foreground grass was accidentally inefficiently calculated, causing increased load time
+* Front grass in front of the bike was accidentally inefficiently calculated, causing increased load time
 * Internal editor's Save As dialog box could cause buffer overflows
 * Internal editor's Save As would sometimes overwrite old files without giving a warning
 * Level description in internal editor is properly centered

@@ -202,6 +202,7 @@ class canvas {
     // Render
     void render_row(bool player1, int view_left, int view_right, unsigned char* dest, int y);
 
+    void thicken_front_grass(int thickness, int x1, int x2, int y);
     void create_front_grass();
 
     // Create blank canvas from Segments

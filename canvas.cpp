@@ -1446,15 +1446,70 @@ static int consecutive_front(int x1, int x2, int y, node_finder* finder) {
     return count;
 }
 
-void canvas::create_front_grass() {
-    node_finder* finder = new node_finder(this);
+void canvas::thicken_front_grass(int thickness, int x1, int x2, int y) {
+    // Skip the top row of front grass (handled in create_front_grass())
+    for (int i = y - 1; i > y - thickness; i--) {
+        // Find the starting chunk
+        canvas_chunk_node* prev_node = nullptr;
+        canvas_chunk_node* cur_node = rows_linked[i];
+        int j = rows_x1[i];
 
+#ifdef DEBUG
+        if (i < 0 || i >= pixel_height) {
+            internal_error("canvas::thicken_front_grass invalid y");
+        }
+        if (j > 10) {
+            internal_error("canvas::thicken_front_grass j > 10");
+        }
+#endif
+
+        while (x1 >= j + cur_node->width) {
+            j += cur_node->width;
+            prev_node = cur_node;
+            cur_node = cur_node->next;
+            if (!cur_node) {
+                internal_error("canvas::thicken_front_grass !cur_node!");
+            }
+        }
+
+        // Iterate one chunk at a time, converting to front grass if back grass
+        while (j <= x2) {
+            if (!cur_node) {
+                internal_error("canvas::thicken_front_grass !cur_node!");
+            }
+
+            int j_next = j + cur_node->width;
+            canvas_chunk_node* next_node = cur_node->next;
+            if (cur_node->pixels == *QgrassTextureId && cur_node->distance > 500) {
+                bool prev_can_merge = false;
+                int j1 = std::max(x1, j);
+                int j2 = std::min(x2, j_next - 1);
+                prev_node = draw_one_chunk(cur_node, *QgrassTextureId, j, j1, j2, 200, prev_node,
+                                           &prev_can_merge, Clipping::Unclipped);
+            } else {
+                prev_node = cur_node;
+            }
+            j = j_next;
+            cur_node = next_node;
+        }
+    }
+}
+
+void canvas::create_front_grass() {
     // A crutch that we use to avoid keeping proper track of our linked lists,
     // by making sure our chunks don't get merged together.
     bool alternate_distance = false;
 
+    const int thickness = (int)std::round(EolSettings->zoom());
+    const int margin = 10 * thickness;
+    if (thickness <= 0) {
+        return;
+    }
+
+    node_finder finder(this);
+
     // For each row
-    for (int i = 10; i < pixel_height - 10; i++) {
+    for (int i = margin; i < pixel_height - margin; i++) {
         canvas_chunk_node* cur_node = rows_linked[i];
         int xpos = rows_x1[i];
 
@@ -1482,18 +1537,17 @@ void canvas::create_front_grass() {
                     int x1 = xpos;
                     int x2 = xpos + cur_node->width;
                     while (x1 < x2) {
-                        int skip = consecutive_back(x1, x2, i, finder);
+                        int skip = consecutive_back(x1, x2, i, &finder);
                         x1 += skip;
-                        int count = consecutive_front(x1, x2, i, finder);
+                        int count = consecutive_front(x1, x2, i, &finder);
                         if (count > 0) {
                             // Move qgrass to front
                             alternate_distance = !alternate_distance;
-                            if (alternate_distance) {
-                                draw_pixels(cur_node->pixels, 223, x1, x1 + count - 1, i,
-                                            Clipping::Unclipped);
-                            } else {
-                                draw_pixels(cur_node->pixels, 224, x1, x1 + count - 1, i,
-                                            Clipping::Unclipped);
+                            const int distance = alternate_distance ? 223 : 224;
+                            draw_pixels(cur_node->pixels, distance, x1, x1 + count - 1, i,
+                                        Clipping::Unclipped);
+                            if (thickness > 1) {
+                                thicken_front_grass(thickness, x1, x1 + count - 1, i);
                             }
                         }
                         x1 += count;
@@ -1504,8 +1558,6 @@ void canvas::create_front_grass() {
             cur_node = next_node;
         }
     }
-    delete finder;
-    finder = nullptr;
 }
 
 void canvas::create_canvases() {

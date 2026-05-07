@@ -637,6 +637,10 @@ long game_loop(const char* filename, CameraMode camera_mode) {
             EolClient->set_table(TableType::PlayersOnline);
         }
 
+        if (was_game_key_just_pressed(DIK_F10)) {
+            EolClient->toggle_battle_status();
+        }
+
         if (!console_was_active &&
             (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {
             WhoDiedFirst = 0;

@@ -85,6 +85,7 @@
 * Warning instead of crash if you reach max number of players in state.dat
 * You can open level and replay files with multiple dots e.g. pack.01.lev
 * Minimap icons no longer disappear 1 pixel too early at the edge of the minimap
+* Changing an apples animation number is now correctly saved by Save and Play
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

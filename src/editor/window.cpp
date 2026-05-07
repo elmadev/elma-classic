@@ -1343,6 +1343,7 @@ void editor_window_food_properties(const char* title, object::Property* property
                     char c = pop_text_input();
                     if (c >= '1' && c <= '9') {
                         *animation = c - '1';
+                        Valtozott = 1;
                         pop();
                         return;
                     }

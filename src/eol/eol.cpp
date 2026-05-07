@@ -30,9 +30,11 @@ eol::eol()
 
 void eol::process(const login& l) {
     if (l.success) {
-        StatusMessages->add("login successful");
-        id = l.id;
-        id2 = l.id2;
+        if (id != l.id || id2 != l.id2) {
+            StatusMessages->add("login successful");
+            id = l.id;
+            id2 = l.id2;
+        }
     } else {
         StatusMessages->add("login unsuccessful");
     }

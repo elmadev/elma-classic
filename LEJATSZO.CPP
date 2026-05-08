@@ -33,12 +33,18 @@ std::string VideoOutputDirectory;
 
 static int TotalApples;
 
+static bool is_game_key_down(DikScancode code);
+
 // Returns whether console was active at the beginning of this frame,
 // to prevent key presses from affecting the gameplay.
 static bool handle_console_input() {
     bool was_active = Console->is_input_active();
     if (was_key_just_pressed(DIK_F9)) {
-        Console->toggle_active();
+        if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
+            EolSettings->set_show_chat(!EolSettings->show_chat());
+        } else if (EolSettings->show_chat()) {
+            Console->toggle_active();
+        }
     } else if (Console->is_input_active()) {
         Console->handle_input();
     }

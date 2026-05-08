@@ -883,21 +883,13 @@ lgrfile::lgrfile(const char* lgrname) {
         text->pic = tiled;
     }
 
-    // Sort pictures, masks and textures alphabetically (qgrass at the end)
+    // Sort pictures, masks and textures alphabetically
     std::sort(pictures, pictures + picture_count,
               [](const picture& a, const picture& b) { return strcmpi(a.name, b.name) < 0; });
     std::sort(masks, masks + mask_count,
               [](const mask& a, const mask& b) { return strcmpi(a.name, b.name) < 0; });
-    std::sort(textures, textures + texture_count, [](const texture& a, const texture& b) {
-        // QGRASS should always be last
-        if (strcmpi(a.name, "qgrass") == 0) {
-            return false;
-        }
-        if (strcmpi(b.name, "qgrass") == 0) {
-            return true;
-        }
-        return strcmpi(a.name, b.name) < 0;
-    });
+    std::sort(textures, textures + texture_count,
+              [](const texture& a, const texture& b) { return strcmpi(a.name, b.name) < 0; });
 
     // Check for duplicate names in pictures, masks and textures
     for (int i = 0; i < picture_count - 1; i++) {

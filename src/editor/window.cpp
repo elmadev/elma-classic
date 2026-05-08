@@ -144,6 +144,60 @@ static void adjust_list_view(int& selected_index, int& view_index, int length,
     view_index = std::max(view_index, selected_index - max_visible_entries + 1);
 }
 
+template <typename NameAt>
+static bool process_list_search(std::string& search_input, int& selected_index, int& view_index,
+                                int list_length, int max_visible_entries, NameAt name_at) {
+    bool changed = false;
+    while (has_text_input()) {
+        char c = pop_text_input();
+        if (Pabc2->has_char(c) && search_input.size() < MAX_FILENAME_LEN) {
+            search_input.push_back(c);
+            changed = true;
+        }
+    }
+    if (was_key_down(DIK_BACK) && !search_input.empty()) {
+        search_input.pop_back();
+        changed = true;
+    }
+    if (!changed) {
+        return false;
+    }
+    if (!search_input.empty() && list_length > 0) {
+        const char* query = search_input.c_str();
+        // Binary search for the first entry sorting >= query.
+        int lo = 0;
+        int hi = list_length;
+        while (lo < hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (strcmpi(name_at(mid), query) < 0) {
+                lo = mid + 1;
+            } else {
+                hi = mid;
+            }
+        }
+        selected_index = std::min(lo, list_length - 1);
+        // If the landing slot doesn't have the prefix, the previous entry
+        // may share a longer common prefix with the query.
+        if (selected_index > 0 &&
+            strnicmp(name_at(selected_index), query, search_input.size()) != 0) {
+            size_t a = util::text::common_prefix_len(query, name_at(selected_index));
+            size_t b = util::text::common_prefix_len(query, name_at(selected_index - 1));
+            if (b >= a) {
+                selected_index -= 1;
+            }
+        }
+    }
+    view_index = std::min(view_index, selected_index);
+    view_index = std::max(view_index, selected_index - max_visible_entries + 1);
+    return true;
+}
+
+static void render_list_search(pic8* pic, box bx, const std::string& search_input) {
+    std::string text = search_input.empty() ? "Type to Search" : "Search: " + search_input;
+
+    Pabc2->write_centered(pic, (bx.x1 + bx.x2) / 2, (bx.y1 + bx.y2) / 2 + 5, text.c_str());
+}
+
 // Draw a borderless box with background color and centered text
 // Optionally add '_' to the end of the string for input prompt
 static void draw_textbox_centered(pic8* pic, box bx, unsigned char fill_id, const char* text,
@@ -216,27 +270,38 @@ static std::string editor_window_list_levels(bool show_new_button) {
     int x1 = 200;
     int y1 = 100;
     int x2 = 401;
-    int y2 = 174 + max_visible_entries * dy;
+    int top_margin = 20;
+    int y2 = 174 + top_margin + max_visible_entries * dy;
     int lx1 = x1 + 10;
-    int ly1 = y1 + 37;
+    int ly1 = y1 + top_margin + 37;
     int lx2 = lx1 + 100;
     int ly2 = ly1 + max_visible_entries * dy;
 
     box box_list = {lx1, ly1, lx2, ly2};
-    box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
+    box box_up = {x1 + 10, y1 + top_margin + 11, x1 + 110, y1 + top_margin + 31};
     box box_down = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
     box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
     box box_new = {x1 + 121, (y2 + y1) / 2 - 40, x1 + 121 + 70, (y2 + y1) / 2 - 20};
+    box box_search = {x1, y1, x2, box_up.y1};
 
     int view_index = 0;
     bool rerender = true;
+    std::string search_input;
     empty_keypress_buffer();
     while (true) {
         handle_events();
         update_and_draw_cursor();
         adjust_list_view(selected_index, view_index, list_length, max_visible_entries, rerender,
                          box_up, box_down, box_list);
-        if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
+        if (process_list_search(search_input, selected_index, view_index, list_length,
+                                max_visible_entries,
+                                [](int i) { return ListEntries[i].c_str(); })) {
+            rerender = true;
+        }
+        if (was_key_just_pressed(DIK_ESCAPE) && !search_input.empty()) {
+            search_input.clear();
+            rerender = true;
+        } else if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return "";
         } else if (show_new_button && clicked_box(box_new)) {
             return "";
@@ -278,6 +343,7 @@ static std::string editor_window_list_levels(bool show_new_button) {
                 Pabc2->write_centered(BufferMain, (box_new.x1 + box_new.x2) / 2, box_new.y1 + 15,
                                       "NEW");
             }
+            render_list_search(BufferMain, box_search, search_input);
 
             bltfront(BufferMain, x1, y1, x2, y2);
             pop();

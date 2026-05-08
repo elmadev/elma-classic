@@ -134,6 +134,7 @@ class eol_settings {
     Default<bool> play_offline_{false};
     Default<bool> tcp_only_{false};
     Default<bool> show_others_{true};
+    Default<bool> show_battle_status_{true};
 
   public:
     static void read_settings();
@@ -197,6 +198,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(play_offline);
     DECLARE_FIELD_FUNCS(tcp_only);
     DECLARE_FIELD_FUNCS(show_others);
+    DECLARE_FIELD_FUNCS(show_battle_status);
 };
 
 #undef DECLARE_FIELD_FUNCS

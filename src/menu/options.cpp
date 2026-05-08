@@ -430,6 +430,7 @@ void menu_options() {
             });
 
         BOOL_OPTION("Show others:", show_others);
+        BOOL_OPTION("Show battle status:", show_battle_status);
 
         choice = nav.navigate();
 

@@ -243,6 +243,8 @@ void eol_settings::set_tcp_only(bool t) { tcp_only_ = t; }
 
 void eol_settings::set_show_others(bool s) { show_others_ = s; }
 
+void eol_settings::set_show_battle_status(bool s) { show_battle_status_ = s; }
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -390,7 +392,8 @@ void from_json(const json& j, FullscreenMode& f) {
     JSON_FIELD(password)                                                                           \
     JSON_FIELD(play_offline)                                                                       \
     JSON_FIELD(tcp_only)                                                                           \
-    JSON_FIELD(show_others)
+    JSON_FIELD(show_others)                                                                        \
+    JSON_FIELD(show_battle_status)
 
 #define JSON_FIELD(name)                                                                           \
     void eol_settings::persist_##name(decltype(eol_settings::name##_.value) v) {                   \

@@ -678,27 +678,13 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
 
     int selected_index = 0;
     for (int i = 0; i < list_length; i++) {
-        if (sprite_type == SpriteType::Picture && strcmpi(Lgr->pictures[i].name, name) == 0) {
-            selected_index = i;
-        }
-        if (sprite_type == SpriteType::Texture && strcmpi(Lgr->textures[i].name, name) == 0) {
-            selected_index = i;
-        }
-        if (sprite_type == SpriteType::Mask && strcmpi(Lgr->masks[i].name, name) == 0) {
+        if (strcmpi(name_at(i), name) == 0) {
             selected_index = i;
         }
     }
 
     if (selected_index == 0) {
-        if (sprite_type == SpriteType::Picture) {
-            strcpy(name, Lgr->pictures[0].name);
-        }
-        if (sprite_type == SpriteType::Texture) {
-            strcpy(name, Lgr->textures[0].name);
-        }
-        if (sprite_type == SpriteType::Mask) {
-            strcpy(name, Lgr->masks[0].name);
-        }
+        strcpy(name, name_at(0));
     }
 
     int max_visible_entries = 10;
@@ -747,30 +733,14 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             strcpy(name, original_name);
             return;
         } else if (was_key_just_pressed(DIK_RETURN)) {
-            if (sprite_type == SpriteType::Picture) {
-                strcpy(name, Lgr->pictures[selected_index].name);
-            }
-            if (sprite_type == SpriteType::Texture) {
-                strcpy(name, Lgr->textures[selected_index].name);
-            }
-            if (sprite_type == SpriteType::Mask) {
-                strcpy(name, Lgr->masks[selected_index].name);
-            }
+            strcpy(name, name_at(selected_index));
             return;
         } else if (clicked_box(box_list)) {
             if (Mouy < ly1 + dy * max_visible_entries) {
                 int index = (Mouy - ly1) / dy;
                 index += view_index;
                 if (index < list_length) {
-                    if (sprite_type == SpriteType::Picture) {
-                        strcpy(name, Lgr->pictures[index].name);
-                    }
-                    if (sprite_type == SpriteType::Texture) {
-                        strcpy(name, Lgr->textures[index].name);
-                    }
-                    if (sprite_type == SpriteType::Mask) {
-                        strcpy(name, Lgr->masks[index].name);
-                    }
+                    strcpy(name, name_at(index));
                     return;
                 }
             }
@@ -778,15 +748,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
         if (rerender) {
             rerender = false;
 
-            if (sprite_type == SpriteType::Picture) {
-                strcpy(name, Lgr->pictures[selected_index].name);
-            }
-            if (sprite_type == SpriteType::Texture) {
-                strcpy(name, Lgr->textures[selected_index].name);
-            }
-            if (sprite_type == SpriteType::Mask) {
-                strcpy(name, Lgr->masks[selected_index].name);
-            }
+            strcpy(name, name_at(selected_index));
 
             // Restore background image
             push();
@@ -833,18 +795,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
                                          EditorPalette_ListSelected);
                 }
-                if (sprite_type == SpriteType::Picture) {
-                    Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                                 Lgr->pictures[i + view_index].name);
-                }
-                if (sprite_type == SpriteType::Texture) {
-                    Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                                 Lgr->textures[i + view_index].name);
-                }
-                if (sprite_type == SpriteType::Mask) {
-                    Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                                 Lgr->masks[i + view_index].name);
-                }
+                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy, name_at(i + view_index));
 
                 if (picture_name[0] || texture_name[0]) {
                     int default_distance = 0;

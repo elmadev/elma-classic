@@ -991,27 +991,38 @@ bool editor_window_choose_lgr(char* lgrname) {
     int x1 = 200;
     int y1 = 100;
     int x2 = 401;
-    int bottom_margin = 40;
-    int y2 = 174 + max_visible_entries * dy + bottom_margin;
+    int top_margin = 20;
+    int bottom_margin = 60;
+    int y2 = 174 + top_margin + max_visible_entries * dy + bottom_margin;
     int lx1 = x1 + 10;
-    int ly1 = y1 + 37;
+    int ly1 = y1 + top_margin + 37;
     int lx2 = lx1 + 100;
     int ly2 = ly1 + max_visible_entries * dy;
 
     box box_list = {lx1, ly1, lx2, ly2};
-    box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
+    box box_up = {x1 + 10, y1 + top_margin + 11, x1 + 110, y1 + top_margin + 31};
     box box_down = {x1 + 10, y2 - 30 - bottom_margin, x1 + 110, y2 - 10 - bottom_margin};
     box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
+    box box_search = {x1, y1, x2, box_up.y1};
 
     int view_index = 0;
     bool rerender = true;
+    std::string search_input;
     empty_keypress_buffer();
     while (true) {
         handle_events();
         update_and_draw_cursor();
         adjust_list_view(selected_index, view_index, list_length, max_visible_entries, rerender,
                          box_up, box_down, box_list);
-        if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
+        if (process_list_search(search_input, selected_index, view_index, list_length,
+                                max_visible_entries,
+                                [](int i) { return ListEntries[i].c_str(); })) {
+            rerender = true;
+        }
+        if (was_key_just_pressed(DIK_ESCAPE) && !search_input.empty()) {
+            search_input.clear();
+            rerender = true;
+        } else if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return false;
         } else if (was_key_just_pressed(DIK_RETURN)) {
             strcpy(lgrname, ListEntries[selected_index].c_str());
@@ -1048,6 +1059,8 @@ bool editor_window_choose_lgr(char* lgrname) {
             render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                   box_cancel.y1 + 15, "CANCEL");
+
+            render_list_search(BufferMain, box_search, search_input);
 
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y2 - 36, "Original LGR file:");
             Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y2 - 18, lgrname);

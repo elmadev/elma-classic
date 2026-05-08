@@ -210,22 +210,31 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
         internal_error("Lgr must have at least 2 textures!");
     }
 
-    // If we have missing/invalid texture name, replace the name with a texture from the list
-    // We grab the lowest index texture where foreground_name != background_name
-    if (!foreground_name[0]) {
-        if (strcmpi(background_name, Lgr->textures[0].name) != 0) {
-            strcpy(foreground_name, Lgr->textures[0].name);
-        } else {
-            strcpy(foreground_name, Lgr->textures[1].name);
+    // If we have missing/invalid texture name, replace the name with a texture from the list.
+    // Skip qgrass since it isn't a typical foreground/background texture; fall back to it only
+    // when no other texture is available.
+    auto pick_default_texture = [&](const char* exclude_name) -> const char* {
+        const char* qgrass_fallback = nullptr;
+        for (int i = 0; i < Lgr->texture_count; i++) {
+            const char* name = Lgr->textures[i].name;
+            if (strcmpi(name, exclude_name) == 0) {
+                continue;
+            }
+            if (Lgr->textures[i].is_qgrass) {
+                qgrass_fallback = name;
+                continue;
+            }
+            return name;
         }
+        return qgrass_fallback;
+    };
+
+    if (!foreground_name[0]) {
+        strcpy(foreground_name, pick_default_texture(background_name));
     }
 
     if (!background_name[0]) {
-        if (strcmpi(foreground_name, Lgr->textures[0].name) != 0) {
-            strcpy(background_name, Lgr->textures[0].name);
-        } else {
-            strcpy(background_name, Lgr->textures[1].name);
-        }
+        strcpy(background_name, pick_default_texture(foreground_name));
     }
 
     return sprites_deleted;

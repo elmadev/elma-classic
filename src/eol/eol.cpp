@@ -140,7 +140,7 @@ void eol::sync_players_online_table() {
     // "players online" table is ordered by login time, so sort by id
     std::ranges::sort(by_id, {}, &kuski::id);
     for (const kuski* k : by_id) {
-        players_online_table.add_row({k->nick, k->level});
+        players_online_table.add_row({k->nick, strlen(k->level) > 0 ? format_level(k->level) : ""});
     }
 }
 

@@ -29,6 +29,9 @@ bool is_filename_char(unsigned char c);
 // If `compact` is true, formats as: x:xx or x:xx:xx.
 void centiseconds_to_string(int time, char* text, bool show_hours = false, bool compact = false);
 
+// Length of the common case-insensitive prefix of two C strings.
+size_t common_prefix_len(const char* a, const char* b);
+
 } // namespace util::text
 
 #endif

@@ -1,5 +1,6 @@
 #include "util/util.h"
 #include <cassert>
+#include <cctype>
 #include <cstdlib>
 #include <ctime>
 #include <format>
@@ -89,6 +90,17 @@ void centiseconds_to_string(int time, char* text, bool show_hours, bool compact)
     }
 
     *it = '\0';
+}
+
+size_t common_prefix_len(const char* a, const char* b) {
+    size_t n = 0;
+    for (;; ++a, ++b, ++n) {
+        unsigned char ca = std::tolower((unsigned char)*a);
+        unsigned char cb = std::tolower((unsigned char)*b);
+        if (ca != cb || ca == 0) {
+            return n;
+        }
+    }
 }
 
 } // namespace util::text

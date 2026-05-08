@@ -10,6 +10,7 @@ class state;
 enum class MapAlignment { None, Left, Middle, Right };
 enum class RendererType { Software, OpenGL };
 enum class FullscreenMode { Windowed, Fullscreen, FullscreenDesktop };
+enum class ChatVisibility { Shown, PublicHidden, Hidden };
 
 template <typename T> struct Default {
     T value;
@@ -170,6 +171,7 @@ class eol_settings {
     Default<bool> show_battle_status_{true};
     Default<bool> show_battle_leader_{true};
     Default<eol_table::Align> table_alignment_{eol_table::Align::Center};
+    Default<ChatVisibility> chat_visibility_{ChatVisibility::Shown};
 
   public:
     static void read_settings();
@@ -269,6 +271,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(show_battle_status);
     DECLARE_FIELD_FUNCS(show_battle_leader);
     DECLARE_FIELD_FUNCS(table_alignment);
+    DECLARE_FIELD_FUNCS(chat_visibility);
 };
 
 #undef DECLARE_FIELD_FUNCS

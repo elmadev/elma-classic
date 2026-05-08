@@ -57,6 +57,7 @@ template struct Default<bool>;
 template struct Default<MapAlignment>;
 template struct Default<RendererType>;
 template struct Default<FullscreenMode>;
+template struct Default<ChatVisibility>;
 template struct Default<DikScancode>;
 template struct Default<combo_scancode>;
 template struct Default<std::string>;
@@ -284,6 +285,8 @@ void eol_settings::set_show_battle_leader(bool s) { show_battle_leader_ = s; }
 
 void eol_settings::set_table_alignment(eol_table::Align a) { table_alignment_ = a; }
 
+void eol_settings::set_chat_visibility(ChatVisibility c) { chat_visibility_ = c; }
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -399,6 +402,32 @@ void from_json(const json& j, FullscreenMode& f) {
     }
 }
 
+void to_json(json& j, const ChatVisibility& c) {
+    switch (c) {
+    case ChatVisibility::Shown:
+        j = "shown";
+        break;
+    case ChatVisibility::PublicHidden:
+        j = "public_hidden";
+        break;
+    case ChatVisibility::Hidden:
+        j = "hidden";
+        break;
+    }
+}
+
+void from_json(const json& j, ChatVisibility& c) {
+    if (j == "shown") {
+        c = ChatVisibility::Shown;
+    } else if (j == "public_hidden") {
+        c = ChatVisibility::PublicHidden;
+    } else if (j == "hidden") {
+        c = ChatVisibility::Hidden;
+    } else {
+        throw("[json.exception.type_error.302] (/chat_visibility) invalid value");
+    }
+}
+
 void to_json(json& j, const combo_scancode& r) { j = (unsigned long long)(r); }
 
 void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned long long)(j)); }
@@ -495,7 +524,8 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(show_others)                                                                        \
     JSON_FIELD(show_battle_status)                                                                 \
     JSON_FIELD(show_battle_leader)                                                                 \
-    JSON_FIELD(table_alignment)
+    JSON_FIELD(table_alignment)                                                                    \
+    JSON_FIELD(chat_visibility)
 
 #define JSON_FIELD(name)                                                                           \
     void eol_settings::persist_##name(decltype(eol_settings::name##_.value) v) {                   \

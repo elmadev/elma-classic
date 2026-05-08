@@ -467,6 +467,33 @@ void menu_options() {
         BOOL_OPTION("Skip Intro:", skip_intro);
 
         nav.add_row(
+            "Show chat:",
+            [] {
+                switch (EolSettings->chat_visibility_persisted()) {
+                case ChatVisibility::Shown:
+                    return "Yes";
+                case ChatVisibility::PublicHidden:
+                    return "Public hidden";
+                case ChatVisibility::Hidden:
+                    return "No";
+                }
+                return "";
+            }(),
+            NAV_FUNC() {
+                switch (EolSettings->chat_visibility_persisted()) {
+                case ChatVisibility::Shown:
+                    EolSettings->persist_chat_visibility(ChatVisibility::PublicHidden);
+                    return;
+                case ChatVisibility::PublicHidden:
+                    EolSettings->persist_chat_visibility(ChatVisibility::Hidden);
+                    return;
+                case ChatVisibility::Hidden:
+                    EolSettings->persist_chat_visibility(ChatVisibility::Shown);
+                    return;
+                }
+            });
+
+        nav.add_row(
             "Num Chat Lines:", std::format("{}", EolSettings->chat_lines_persisted()), NAV_FUNC() {
                 int old_chat_lines = EolSettings->chat_lines_persisted();
                 EolSettings->persist_chat_lines(old_chat_lines + 1);

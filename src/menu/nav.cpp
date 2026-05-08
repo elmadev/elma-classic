@@ -7,6 +7,7 @@
 #include "M_PIC.H"
 #include "platform/implementation.h"
 #include "platform/utils.h"
+#include "util/util.h"
 #include <algorithm>
 #include <cstring>
 #include <directinput/scancodes.h>
@@ -243,18 +244,6 @@ static bool contains_ci(const std::string& haystack, const std::string& needle) 
                        }) != haystack.end();
 }
 
-static size_t common_prefix_len(const char* a, const char* b) {
-    size_t n = 0;
-    for (;; ++a, ++b, ++n) {
-        unsigned char ca = std::tolower((unsigned char)*a);
-        unsigned char cb = std::tolower((unsigned char)*b);
-
-        if (ca != cb || ca == 0) {
-            return n;
-        }
-    }
-}
-
 bool menu_nav::search_handler_text(char c) {
     if (search_pattern == SearchPattern::None) {
         return false;
@@ -308,10 +297,10 @@ void menu_nav::update_search() {
 
         if (selected_index != row_count() && selected_index > 0 &&
             strnicmp(match->text_left.c_str(), search_input.c_str(), search_input.length()) != 0) {
-            size_t a =
-                common_prefix_len(search_input.c_str(), entries[selected_index].text_left.c_str());
-            size_t b = common_prefix_len(search_input.c_str(),
-                                         entries[selected_index - 1].text_left.c_str());
+            size_t a = util::text::common_prefix_len(search_input.c_str(),
+                                                     entries[selected_index].text_left.c_str());
+            size_t b = util::text::common_prefix_len(search_input.c_str(),
+                                                     entries[selected_index - 1].text_left.c_str());
             // Use the previous entry if it has a longer common prefix
             if (b >= a) {
                 selected_index -= 1;

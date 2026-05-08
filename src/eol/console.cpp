@@ -269,6 +269,9 @@ void console::submit_input() {
 }
 
 void console::render(pic8& screen, abc8& font) {
+    if (!EolSettings->show_chat()) {
+        return;
+    }
     auto filter = [this](const auto& line) {
         if (line.type == LineType::Log) {
             return show_log_lines;

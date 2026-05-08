@@ -664,6 +664,18 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
     }
     strcpy(original_name, name);
 
+    auto name_at = [sprite_type](int i) -> const char* {
+        switch (sprite_type) {
+        case SpriteType::Picture:
+            return Lgr->pictures[i].name;
+        case SpriteType::Texture:
+            return Lgr->textures[i].name;
+        case SpriteType::Mask:
+            return Lgr->masks[i].name;
+        }
+        return "";
+    };
+
     int selected_index = 0;
     for (int i = 0; i < list_length; i++) {
         if (sprite_type == SpriteType::Picture && strcmpi(Lgr->pictures[i].name, name) == 0) {
@@ -694,19 +706,22 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
     int x1 = 200;
     int y1 = 100;
     int x2 = 401;
-    int y2 = 174 + max_visible_entries * dy;
+    int top_margin = 20;
+    int y2 = 174 + top_margin + max_visible_entries * dy;
     int lx1 = x1 + 10;
-    int ly1 = y1 + 37;
+    int ly1 = y1 + top_margin + 37;
     int lx2 = lx1 + 100;
     int ly2 = ly1 + max_visible_entries * dy;
 
     box box_list = {lx1, ly1, lx2, ly2};
-    box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
+    box box_up = {x1 + 10, y1 + top_margin + 11, x1 + 110, y1 + top_margin + 31};
     box box_down = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
     box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
+    box box_search = {x1, y1, x2, box_up.y1};
 
     int view_index = 0;
     bool rerender = true;
+    std::string search_input;
     empty_keypress_buffer();
 
     // Keep track of the box where we are drawing, so we can restore the background later
@@ -721,7 +736,14 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
         update_and_draw_cursor();
         adjust_list_view(selected_index, view_index, list_length, max_visible_entries, rerender,
                          box_up, box_down, box_list);
-        if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
+        if (process_list_search(search_input, selected_index, view_index, list_length,
+                                max_visible_entries, name_at)) {
+            rerender = true;
+        }
+        if (was_key_just_pressed(DIK_ESCAPE) && !search_input.empty()) {
+            search_input.clear();
+            rerender = true;
+        } else if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             strcpy(name, original_name);
             return;
         } else if (was_key_just_pressed(DIK_RETURN)) {
@@ -861,6 +883,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
             Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                   box_cancel.y1 + 15, "CANCEL");
+            render_list_search(BufferMain, box_search, search_input);
 
             bltfront(BufferMain);
             pop();

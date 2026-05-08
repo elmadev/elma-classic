@@ -420,6 +420,7 @@ void menu_options() {
         BOOL_OPTION("Help menu:", show_help_menu);
         BOOL_OPTION("Best Times menu:", show_best_times_menu);
 
+        BOOL_OPTION("Show chat:", show_chat);
         nav.add_row(
             "Num Chat Lines:", std::format("{}", EolSettings->chat_lines_persisted()), NAV_FUNC() {
                 int old_chat_lines = EolSettings->chat_lines_persisted();

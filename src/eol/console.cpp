@@ -1,5 +1,6 @@
 #include "eol/console.h"
 #include "abc8.h"
+#include "eol/eol.h"
 #include "eol/status_messages.h"
 #include "eol_settings.h"
 #include "keys.h"
@@ -264,7 +265,7 @@ void console::submit_input() {
             add_line("Unknown command: !" + cmd_name, LineType::System);
         }
     } else {
-        add_line(input_buffer, LineType::Chat);
+        EolClient->send_chat(input_buffer);
     }
 }
 

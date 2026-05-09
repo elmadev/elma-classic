@@ -617,6 +617,11 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike
         bike_center = vect2(current_camera.x, current_camera.y);
     }
 
+    const kuski* spy_kuski = EolClient->spy_kuski();
+    if (spy_kuski) {
+        bike_center = spy_kuski->spy_data()->mot.bike.r;
+    }
+
     vect2 bottomleft_corner(bike_center.x -
                                 (CameraX + metadata->camera_turning.camera_turn_phase * CameraDx),
                             bike_center.y - CameraY);

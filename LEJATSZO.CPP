@@ -515,7 +515,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                     finish_time = finish_time2;
                 }
 
-                if (finish_time) {
+                if (finish_time || Single) {
                     WhoDiedFirst = 0;
                 }
                 Player1Finished = (bool)finish_time1;

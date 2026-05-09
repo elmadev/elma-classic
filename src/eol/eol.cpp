@@ -222,6 +222,29 @@ void eol::exit_level(const char* level_name, double time, int apple_count, int l
     proto.send(fl);
 }
 
+void eol::send_chat(std::string_view message) {
+    constexpr size_t MAX_LEN = MAX_MESSAGE_LEN;
+    constexpr size_t MAX_INPUT_LEN = MAX_LEN * 3;
+    constexpr size_t SPLIT_MARGIN = 20;
+    if (message.empty() || message.size() > MAX_INPUT_LEN) {
+        return;
+    }
+    while (message.size() > MAX_LEN) {
+        size_t split = message.rfind(' ', MAX_LEN);
+        if (split == std::string_view::npos || split < MAX_LEN - SPLIT_MARGIN) {
+            split = MAX_LEN;
+        }
+        struct send_chat sc{.kuski_id = id, .message = message.substr(0, split)};
+        proto.send(sc);
+        message.remove_prefix(split);
+        if (!message.empty() && message.front() == ' ') {
+            message.remove_prefix(1);
+        }
+    }
+    struct send_chat sc{.kuski_id = id, .message = message};
+    proto.send(sc);
+}
+
 void eol::set_table(TableType table) {
     eol_table* new_table = nullptr;
     switch (table) {

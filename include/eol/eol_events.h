@@ -5,6 +5,7 @@
 #include "fs_utils.h"
 
 #include <cstdint>
+#include <string_view>
 
 class level;
 
@@ -55,6 +56,11 @@ struct chat_message {
     unsigned int kuski_id;
     uint64_t unix_timestamp;
     char message[MAX_MESSAGE_LEN + 1];
+};
+
+struct send_chat {
+    unsigned int kuski_id;
+    std::string_view message;
 };
 
 struct battle_started {

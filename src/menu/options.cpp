@@ -430,6 +430,7 @@ void menu_options() {
 
         BOOL_OPTION("Show others:", show_others);
         BOOL_OPTION("Show battle status:", show_battle_status);
+        BOOL_OPTION("Show battle leader:", show_battle_leader);
 
         choice = nav.navigate();
 

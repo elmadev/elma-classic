@@ -135,6 +135,7 @@ class eol_settings {
     Default<bool> tcp_only_{false};
     Default<bool> show_others_{true};
     Default<bool> show_battle_status_{true};
+    Default<bool> show_battle_leader_{true};
 
   public:
     static void read_settings();
@@ -199,6 +200,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(tcp_only);
     DECLARE_FIELD_FUNCS(show_others);
     DECLARE_FIELD_FUNCS(show_battle_status);
+    DECLARE_FIELD_FUNCS(show_battle_leader);
 };
 
 #undef DECLARE_FIELD_FUNCS

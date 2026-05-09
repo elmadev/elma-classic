@@ -722,7 +722,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike
 
             if (bike_in_view(&k->mot, center)) {
                 render_bike(false, pic, time, bottomleft_corner, &k->mot, &k->metadata, bike2,
-                            nullptr);
+                            ku.shirt);
             }
         }
     }

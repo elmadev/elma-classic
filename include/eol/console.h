@@ -13,6 +13,8 @@ class console {
   public:
     enum class LineType {
         Chat,
+        Pm,
+        Team,
         System,
         Log,
     };

@@ -26,6 +26,7 @@ class eol {
     void process(const kuski_set_level&);
     void process(const chat_message&);
     void process(const private_message&);
+    void process(const team_message&);
     void process(const spy_data&);
     void process(const clear_spy_data&);
     void process(const battle_started&);

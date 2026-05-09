@@ -70,6 +70,12 @@ struct private_message {
     char message[MAX_MESSAGE_LEN + 1];
 };
 
+struct team_message {
+    unsigned int from_kuski_id;
+    uint64_t unix_timestamp;
+    char message[MAX_MESSAGE_LEN + 1];
+};
+
 struct battle_started {
     battle bat;
 };

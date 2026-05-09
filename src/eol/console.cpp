@@ -113,6 +113,8 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(cripple_drunk);
     register_alias("drunk", "cripple_drunk");
     register_alias("dr", "cripple_drunk");
+    register_command("download", [](std::string_view text) { EolClient->download_level(text); });
+    register_alias("dl", "download");
 }
 
 void console::add_line(std::string text, LineType type) {

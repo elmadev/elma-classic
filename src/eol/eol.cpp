@@ -88,7 +88,11 @@ void eol::process(const new_kuski& nk) {
     auto pos = std::ranges::lower_bound(
         kuskis_, nk.k.nick, [](const char* a, const char* b) { return strcmpi(a, b) < 0; },
         [](const kuski& k) { return k.nick; });
-    kuskis_.insert(pos, nk.k);
+    kuski k = nk.k;
+    if (k.is_player && k.is_online) {
+        k.shirt = load_shirt(k.nick);
+    }
+    kuskis_.insert(pos, k);
     sync_players_online_table();
 }
 

@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <optional>
 
+class pic8;
+
 struct spy_data {
     unsigned int kuski_id;
     uint32_t time;
@@ -20,6 +22,7 @@ struct kuski {
     char level[MAX_FILENAME_LEN + 1];
     bool is_player = true;
     bool is_online = true;
+    pic8* shirt;
     const struct spy_data* spy_data() const;
     void add_spy_data(const struct spy_data& sd);
     void clear_spy_data();

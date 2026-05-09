@@ -63,6 +63,8 @@ class eol {
     const std::vector<kuski>& all_kuskis() const { return kuskis_; }
     std::string_view lookup_nick(unsigned int kuski_id) const;
 
+    static std::string format_level(std::string_view level);
+
     protocol proto;
     unsigned int id;
     unsigned int id2;

@@ -23,7 +23,7 @@ using json = nlohmann::ordered_json;
 template <typename T> Default<T>::operator T() const { return value; }
 
 template <typename T> Default<T>& Default<T>::operator=(T v) {
-    value = v;
+    value = std::move(v);
     return *this;
 }
 

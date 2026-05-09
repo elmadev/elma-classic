@@ -177,6 +177,16 @@ void eol::process(const chat_message& msg) {
     Console->add_line(line, console::LineType::Chat);
 }
 
+void eol::process(const private_message& msg) {
+    std::string_view from_nick = lookup_nick(msg.from_kuski_id);
+    std::string_view to_nick = lookup_nick(msg.to_kuski_id);
+    auto timestamp = std::chrono::floor<std::chrono::seconds>(
+        std::chrono::system_clock::from_time_t(static_cast<std::time_t>(msg.unix_timestamp)));
+    std::string line =
+        std::format("{:%H:%M:%S} <{}>-><{}> {}", timestamp, from_nick, to_nick, msg.message);
+    Console->add_line(line, console::LineType::Pm);
+}
+
 void eol::process(const spy_data& sd) {
     kuski* k = get_kuski(kuskis_, sd.kuski_id);
     if (k) {

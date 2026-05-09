@@ -63,6 +63,13 @@ struct send_chat {
     std::string_view message;
 };
 
+struct private_message {
+    unsigned int from_kuski_id;
+    unsigned int to_kuski_id;
+    uint64_t unix_timestamp;
+    char message[MAX_MESSAGE_LEN + 1];
+};
+
 struct battle_started {
     battle bat;
 };

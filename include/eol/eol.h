@@ -48,6 +48,10 @@ class eol {
     }
     void render_battle_status(pic8& dest, abc8& font) const;
 
+    const kuski* spy_kuski();
+    void spy_next_kuski();
+    void spy_prev_kuski();
+
     static pic8* load_shirt(std::string_view nick);
 
   private:
@@ -63,6 +67,7 @@ class eol {
     std::optional<battle> current_battle;
     eol_table* cur_table;
     eol_table players_online_table;
+    std::optional<unsigned int> spy_kuski_id;
 };
 
 extern eol* EolClient;

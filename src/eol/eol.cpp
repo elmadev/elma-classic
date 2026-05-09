@@ -213,6 +213,7 @@ void eol::enter_level(const char* level_name, const level* lev) {
 
 void eol::exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
                      bool dead) {
+    spy_kuski_id.reset();
     struct exit_level fl{.name = level_name,
                          .time = time,
                          .apple_count = apple_count,
@@ -250,11 +251,49 @@ void eol::render_table(pic8& dest, abc8& title_font, abc8& data_font) const {
     cur_table->render(dest, title_font, data_font, eol_table::Align::Center);
 }
 
+const kuski* eol::spy_kuski() {
+    if (!spy_kuski_id) {
+        return nullptr;
+    }
+
+    const kuski* k = get_kuski(kuskis_, *spy_kuski_id);
+    return k->spy_data() ? k : nullptr;
+}
+
+template <typename Range>
+static void set_spy_kuski(std::optional<unsigned int>& spy_kuski_id, Range&& range) {
+    bool found_current = !spy_kuski_id;
+
+    for (const kuski& k : range) {
+        if (spy_kuski_id && *spy_kuski_id == k.id) {
+            found_current = true;
+            continue;
+        }
+
+        if (!k.spy_data()) {
+            continue;
+        }
+
+        if (found_current) {
+            spy_kuski_id = k.id;
+            StatusMessages->add(std::format("now observing {}", k.nick));
+            return;
+        }
+    }
+
+    spy_kuski_id.reset();
+    StatusMessages->add("not observing anyone anymore");
+}
+
+void eol::spy_next_kuski() { set_spy_kuski(spy_kuski_id, kuskis()); }
+
+void eol::spy_prev_kuski() { set_spy_kuski(spy_kuski_id, std::views::reverse(kuskis())); }
+
 const struct spy_data* kuski::spy_data() const { return data ? &*data : nullptr; }
 
 void kuski::add_spy_data(const struct spy_data& sd) { data = sd; }
 
-void kuski::clear_spy_data() { data = std::nullopt; }
+void kuski::clear_spy_data() { data.reset(); }
 
 static std::string format_hms(int seconds) {
     seconds = std::max(seconds, 0);

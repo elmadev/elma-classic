@@ -410,9 +410,8 @@ void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
 #define JSON_FIELD(name)                                                                           \
     {                                                                                              \
         try {                                                                                      \
-            decltype(s.name()) name;                                                               \
-            name = j.value(#name, s.name##_persisted());                                           \
-            s.persist_##name(name);                                                                \
+            auto value = j.value(#name, s.name##_persisted());                                     \
+            s.persist_##name(std::move(value));                                                    \
         } catch (json::exception & e) {                                                            \
             external_error(std::string("Invalid parameter in " SETTINGS_JSON "!\n") + e.what());   \
         } catch (const char* e) {                                                                  \

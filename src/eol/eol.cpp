@@ -170,18 +170,7 @@ std::string_view eol::lookup_nick(unsigned int kuski_id) const {
 }
 
 void eol::process(const chat_message& msg) {
-    std::string nick;
-    if (msg.kuski_id == id) {
-        nick = EolSettings->nick();
-    } else {
-        kuski* k = get_kuski(kuskis_, msg.kuski_id);
-        if (!k) {
-            return;
-        }
-
-        nick = k->nick;
-    }
-
+    std::string_view nick = lookup_nick(msg.kuski_id);
     auto timestamp = std::chrono::floor<std::chrono::seconds>(
         std::chrono::system_clock::from_time_t(static_cast<std::time_t>(msg.unix_timestamp)));
     std::string line = std::format("{:%H:%M:%S} <{}> {}", timestamp, nick, msg.message);

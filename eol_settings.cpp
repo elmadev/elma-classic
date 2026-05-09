@@ -397,7 +397,7 @@ void from_json(const json& j, FullscreenMode& f) {
 
 #define JSON_FIELD(name)                                                                           \
     void eol_settings::persist_##name(decltype(eol_settings::name##_.value) v) {                   \
-        set_##name(v);                                                                             \
+        set_##name(std::move(v));                                                                  \
         name##_.mark_persisted();                                                                  \
     }
 FIELD_LIST

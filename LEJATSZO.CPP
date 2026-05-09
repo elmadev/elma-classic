@@ -601,6 +601,10 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             EolClient->set_table(TableType::PlayersOnline);
         }
 
+        if (was_game_key_just_pressed(DIK_F6)) {
+            EolClient->toggle_battle_results();
+        }
+
         if (was_game_key_just_pressed(DIK_F10)) {
             if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
                 EolClient->toggle_show_battle_leader();

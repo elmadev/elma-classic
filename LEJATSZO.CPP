@@ -401,7 +401,7 @@ int WhoDiedFirst = 0;
 bool Player1Finished = false;
 
 int game_loop(const char* filename, CameraMode camera_mode) {
-    WhoDiedFirst = 1;
+    WhoDiedFirst = 0;
     Player1Finished = false;
 
     Single = State->single;
@@ -494,18 +494,15 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             }
 
             if (!Single && both_bikes_alive) {
+                // If both die at same time, player 1 is considered to have died first
                 if (dead1) {
                     stop_motor_sound(true);
                     WhoDiedFirst = 1;
                     both_bikes_alive = false;
-                }
-                if (dead2) {
+                } else if (dead2) {
                     stop_motor_sound(false);
                     WhoDiedFirst = 2;
                     both_bikes_alive = false;
-                }
-                if (dead1 && dead2) {
-                    WhoDiedFirst = 0;
                 }
             }
 

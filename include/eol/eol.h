@@ -48,6 +48,8 @@ class eol {
     }
     void render_battle_status(pic8& dest, abc8& font) const;
 
+    static pic8* load_shirt(std::string_view nick);
+
   private:
     void sync_players_online_table();
 

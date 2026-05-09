@@ -84,22 +84,8 @@ static int MinimapDx;
 
 pic8* shirt = nullptr;
 
-static void init_shirt() {
-    constexpr int SHIRT_BMP_WIDTH = 149;
-    constexpr int SHIRT_BMP_HEIGHT = 101;
-
-    pic8* pic_shirt = pic8::from_bmp("bmp/shirt.bmp");
-    if (pic_shirt && pic_shirt->get_width() == SHIRT_BMP_WIDTH &&
-        pic_shirt->get_height() == SHIRT_BMP_HEIGHT) {
-        shirt = pic_shirt;
-        return;
-    }
-
-    delete pic_shirt;
-}
-
 void init_renderer() {
-    init_shirt();
+    shirt = eol::load_shirt(EolSettings->nick());
     init_gravity_arrows();
 
     SmallFont = new abc8("small.abc");

@@ -68,6 +68,22 @@ void eol::process(const login& l) {
     }
 }
 
+pic8* eol::load_shirt(std::string_view nick) {
+    constexpr int SHIRT_BMP_WIDTH = 149;
+    constexpr int SHIRT_BMP_HEIGHT = 101;
+
+    char path[4 + sizeof(kuski::nick) + 4 + 1] = {};
+    std::format_to_n(path, sizeof(path) - 1, "bmp/{}.bmp", nick);
+
+    pic8* pic_shirt = pic8::from_bmp(path);
+    if (pic_shirt && pic_shirt->get_width() == SHIRT_BMP_WIDTH &&
+        pic_shirt->get_height() == SHIRT_BMP_HEIGHT) {
+        return pic_shirt;
+    }
+
+    return nullptr;
+}
+
 void eol::process(const new_kuski& nk) {
     auto pos = std::ranges::lower_bound(
         kuskis_, nk.k.nick, [](const char* a, const char* b) { return strcmpi(a, b) < 0; },

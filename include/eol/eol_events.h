@@ -5,6 +5,7 @@
 #include "fs_utils.h"
 
 #include <cstdint>
+#include <span>
 #include <string_view>
 #include <vector>
 
@@ -30,6 +31,22 @@ struct kuski_logout {
 struct kuski_set_level {
     unsigned int id;
     char level[MAX_FILENAME_LEN + 1];
+};
+
+enum class DownloadResult {
+    Success,
+    Fail,
+    NotFound,
+};
+
+struct level_download_request {
+    char level[MAX_FILENAME_LEN + 1];
+};
+
+struct level_download {
+    char level[MAX_FILENAME_LEN + 1];
+    std::span<const uint8_t> data;
+    DownloadResult result;
 };
 
 struct enter_level {

@@ -3,13 +3,16 @@
 #include "eol/console.h"
 #include "eol_settings.h"
 #include "level.h"
+#include "menu/external.h"
 #include "pic8.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
+#include "util/util.h"
 #include <algorithm>
 #include <cstring>
 #include <ctime>
 #include <format>
+#include <fstream>
 #include <string>
 #include <string_view>
 
@@ -177,6 +180,39 @@ void eol::process(const clear_spy_data& sd) {
     if (k) {
         k->clear_spy_data();
     }
+}
+
+void eol::process(const level_download& ld) {
+    const char* level_name = (const char*)ld.level;
+    switch (ld.result) {
+    case DownloadResult::Success: {
+        for (char c : ld.level) {
+            if (c && !util::text::is_filename_char(c)) {
+                StatusMessages->add(std::format("error: level {}.lev failed download", level_name));
+                return;
+            }
+        }
+        std::string path = std::format("lev/{}.lev", level_name);
+        std::ofstream file(path, std::ios::binary);
+        file.write((const char*)ld.data.data(), ld.data.size());
+        invalidate_external_levels();
+        StatusMessages->add(std::format("level {}.lev downloaded", level_name));
+        break;
+    }
+    case DownloadResult::Fail:
+        StatusMessages->add(std::format("error: level {}.lev failed download", level_name));
+        break;
+    case DownloadResult::NotFound:
+        StatusMessages->add(std::format("level {}.lev not saved in the database", level_name));
+        break;
+    }
+}
+
+void eol::download_level(std::string_view name) {
+    level_download_request req{};
+    int size = std::min(name.size(), sizeof(req.level) - 1);
+    strncpy((char*)req.level, name.data(), size);
+    proto.send(req);
 }
 
 void eol::enter_level(const char* level_name, const level* lev) {

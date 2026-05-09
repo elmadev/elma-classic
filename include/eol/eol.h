@@ -35,7 +35,9 @@ class eol {
     void process(const battle_time_sync&);
     void process(const battle_line_update&);
     void process(const battle_queue_update&);
+    void process(const level_download&);
 
+    void download_level(std::string_view name);
     void enter_level(const char* level_name, const level* lev);
     void exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
                     bool dead);

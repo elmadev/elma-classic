@@ -22,6 +22,8 @@ class eol_table {
 
     void render(pic8& dest, abc8& title_font, abc8& data_font, Align alignment) const;
 
+    void set_title(std::string title_) { title = std::move(title_); }
+
   private:
     struct column {
         int width;

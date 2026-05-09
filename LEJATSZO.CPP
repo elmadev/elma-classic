@@ -589,6 +589,14 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                                                            : "other players hidden");
         }
 
+        if (was_game_key_just_pressed(DIK_F2)) {
+            if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
+                EolClient->spy_prev_kuski();
+            } else {
+                EolClient->spy_next_kuski();
+            }
+        }
+
         if (was_game_key_just_pressed(DIK_F5)) {
             EolClient->set_table(TableType::PlayersOnline);
         }

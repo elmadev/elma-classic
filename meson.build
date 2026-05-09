@@ -79,6 +79,7 @@ elma_sources = files(
     'src/debug/profiler.cpp',
     'src/eol/console.cpp',
     'src/eol/eol.cpp',
+    'src/eol/battle.cpp',
     'src/eol/eol_table.cpp',
     'src/util/util.cpp',
     'src/glad/glad.c',

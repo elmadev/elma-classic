@@ -18,6 +18,7 @@
 #include <climits>
 #include <cmath>
 #include <cstring>
+#include <memory>
 
 canvas* CanvasBack = nullptr;
 canvas* CanvasFront = nullptr;
@@ -970,7 +971,7 @@ void canvas::draw_grass_polygons() {
 
     constexpr int HEIGHTMAP_LENGTH = 10000;
     int max_heightmap_length = zoom * HEIGHTMAP_LENGTH;
-    int* heightmap = new int[max_heightmap_length];
+    auto heightmap = std::make_unique<int[]>(max_heightmap_length);
 
     for (int i = 0; i < MAX_POLYGONS; i++) {
         // Make sure we are drawing a grass polygon onto the ground
@@ -987,7 +988,7 @@ void canvas::draw_grass_polygons() {
         // Calculate the grass heightmap
         int heightmap_length = 0;
         int x0 = 0;
-        if (!create_grass_polygon_heightmap(poly, heightmap, &heightmap_length, &x0,
+        if (!create_grass_polygon_heightmap(poly, heightmap.get(), &heightmap_length, &x0,
                                             max_heightmap_length, &origin)) {
             continue;
         }
@@ -996,10 +997,9 @@ void canvas::draw_grass_polygons() {
         }
 
         // Draw the grass polygon
-        draw_grass_polygon(gr, heightmap, heightmap_length, x0, qupdown_margin, qgrass_margin);
+        draw_grass_polygon(gr, heightmap.get(), heightmap_length, x0, qupdown_margin,
+                           qgrass_margin);
     }
-
-    delete[] heightmap;
 }
 
 void canvas::draw_killers() {

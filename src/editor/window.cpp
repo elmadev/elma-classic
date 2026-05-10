@@ -193,10 +193,7 @@ static bool process_list_search(std::string& search_input, int& selected_index, 
 }
 
 static void render_list_search(pic8* pic, box bx, const std::string& search_input) {
-    if (search_input.empty()) {
-        return;
-    }
-    std::string text = "Search: " + search_input;
+    std::string text = search_input.empty() ? "Type to Search" : "Search: " + search_input;
     Pabc2->write_centered(pic, (bx.x1 + bx.x2) / 2, (bx.y1 + bx.y2) / 2 + 5, text.c_str());
 }
 
@@ -272,19 +269,19 @@ static std::string editor_window_list_levels(bool show_new_button) {
     int x1 = 200;
     int y1 = 100;
     int x2 = 401;
-    int bottom_margin = 22;
-    int y2 = 174 + max_visible_entries * dy + bottom_margin;
+    int top_margin = 20;
+    int y2 = 174 + top_margin + max_visible_entries * dy;
     int lx1 = x1 + 10;
-    int ly1 = y1 + 37;
+    int ly1 = y1 + top_margin + 37;
     int lx2 = lx1 + 100;
     int ly2 = ly1 + max_visible_entries * dy;
 
     box box_list = {lx1, ly1, lx2, ly2};
-    box box_up = {x1 + 10, y1 + 11, x1 + 110, y1 + 31};
-    box box_down = {x1 + 10, y2 - 30 - bottom_margin, x1 + 110, y2 - 10 - bottom_margin};
+    box box_up = {x1 + 10, y1 + top_margin + 11, x1 + 110, y1 + top_margin + 31};
+    box box_down = {x1 + 10, y2 - 30, x1 + 110, y2 - 10};
     box box_cancel = {x1 + 121, (y2 + y1) / 2 - 10, x1 + 121 + 70, (y2 + y1) / 2 + 10};
     box box_new = {x1 + 121, (y2 + y1) / 2 - 40, x1 + 121 + 70, (y2 + y1) / 2 - 20};
-    box box_search = {lx1, y2 - bottom_margin + 2, x2 - 10, y2 - 2};
+    box box_search = {x1, y1, x2, box_up.y1};
 
     int view_index = 0;
     bool rerender = true;

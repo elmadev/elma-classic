@@ -597,6 +597,13 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             }
         }
 
+        if (was_game_key_just_pressed(DIK_F4)) {
+            if (is_game_key_down(DIK_LCONTROL) || is_game_key_down(DIK_RCONTROL)) {
+                Console->label_mode("[Download] ", "!download ", true, false);
+                Console->toggle_active();
+            }
+        }
+
         if (was_game_key_just_pressed(DIK_F5)) {
             EolClient->set_table(TableType::PlayersOnline);
         }

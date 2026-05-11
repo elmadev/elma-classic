@@ -37,6 +37,10 @@ class console {
                           std::function<void(std::string_view args)> callback);
     void register_alias(std::string_view alias, const std::string& cmd);
 
+    void label_mode(std::string label, std::string label_alias, bool clear_label,
+                    bool allow_commands);
+    void clear_label_mode();
+
   private:
     static constexpr size_t MAX_LINES = 1000;
     static constexpr int LINE_HEIGHT = 12;
@@ -66,6 +70,10 @@ class console {
     bool input_active = false;
     bool rendering = false;
     std::string input_buffer;
+    std::string input_label;
+    std::string input_label_alias;
+    bool clear_label_on_submit = false;
+    bool label_allow_commands = false;
     int cursor_pos = 0;
     int scroll_offset = 0;
     bool show_log_lines = false;

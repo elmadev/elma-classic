@@ -161,6 +161,9 @@ void console::deactivate_input() {
     input_buffer.clear();
     cursor_pos = 0;
     scroll_offset = 0;
+    if (clear_label_on_submit) {
+        clear_label_mode();
+    }
 }
 
 void console::toggle_active() {
@@ -307,6 +310,15 @@ void console::submit_input() {
         return;
     }
 
+    if (!input_label_alias.empty()) {
+        if (!label_allow_commands || input_buffer[0] != '!') {
+            input_buffer = input_label_alias + input_buffer;
+        }
+        if (clear_label_on_submit) {
+            clear_label_mode();
+        }
+    }
+
     bool commands_need_prefix = mode == Mode::Chat;
     if (input_buffer[0] == '!' || !commands_need_prefix) {
         add_line(input_buffer, LineType::System);
@@ -335,6 +347,21 @@ void console::submit_input() {
     }
 }
 
+void console::label_mode(std::string label, std::string label_alias, bool clear_label,
+                         bool allow_commands) {
+    input_label = std::move(label);
+    input_label_alias = std::move(label_alias);
+    clear_label_on_submit = clear_label;
+    label_allow_commands = allow_commands;
+}
+
+void console::clear_label_mode() {
+    input_label = "";
+    input_label_alias = "";
+    clear_label_on_submit = false;
+    label_allow_commands = false;
+}
+
 void console::render(pic8& screen) {
     if (!font) {
         LOG_ERROR("Cannot render console: font not set");
@@ -354,12 +381,17 @@ void console::render(pic8& screen) {
     }
 
     if (input_active) {
-        font->write(&screen, MARGIN_X, MARGIN_Y, input_buffer.c_str());
+        int input_x = MARGIN_X;
+        if (!input_label.empty()) {
+            font->write(&screen, input_x, MARGIN_Y, input_label.c_str());
+            input_x += font->len(input_label.c_str());
+        }
+        font->write(&screen, input_x, MARGIN_Y, input_buffer.c_str());
 
         bool cursor_visible = (get_milliseconds() / 500) % 2 == 0;
         if (cursor_visible) {
             std::string before_cursor = input_buffer.substr(0, cursor_pos);
-            int cursor_x = MARGIN_X + font->len(before_cursor.c_str());
+            int cursor_x = input_x + font->len(before_cursor.c_str());
             font->write(&screen, cursor_x, MARGIN_Y, "_");
         }
     }

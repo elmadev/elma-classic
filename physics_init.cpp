@@ -25,10 +25,6 @@ double HeadRadius;
 
 double ObjectRadius = 0.4;
 
-// Render size of the wheel when not turning, in meters, to avoid the wheel appearing to be inside
-// the ground
-double WheelBackgroundRenderRadius = 0.395;
-
 double LeftWheelDX;
 double LeftWheelDY;
 double RightWheelDX;

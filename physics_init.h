@@ -20,8 +20,6 @@ extern double HeadRadius;
 
 extern double ObjectRadius;
 
-extern double WheelBackgroundRenderRadius;
-
 extern double MetersToPixels, PixelsToMeters;
 
 extern double LeftWheelDX, LeftWheelDY, RightWheelDX, RightWheelDY, BodyDY;

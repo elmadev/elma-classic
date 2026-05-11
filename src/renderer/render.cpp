@@ -419,12 +419,13 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
     }
 
     // Render background wheels
+    constexpr double WHEEL_RENDER_RADIUS = 0.395;
     if (left_wheel_in_back) {
-        render_rigidbody(left_wheel_r, WheelBackgroundRenderRadius, mot->left_wheel.rotation, pic,
+        render_rigidbody(left_wheel_r, WHEEL_RENDER_RADIUS, mot->left_wheel.rotation, pic,
                          bike->wheel, false);
     }
     if (right_wheel_in_back) {
-        render_rigidbody(right_wheel_r, WheelBackgroundRenderRadius, mot->right_wheel.rotation, pic,
+        render_rigidbody(right_wheel_r, WHEEL_RENDER_RADIUS, mot->right_wheel.rotation, pic,
                          bike->wheel, false);
     }
 

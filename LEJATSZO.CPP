@@ -144,18 +144,6 @@ static BikeState handle_object_interaction(int object_id, int* apple_count, moto
     return BikeState::Normal;
 }
 
-// Return camera phase (position) from 1.0 (facing left) to 0.0 (facing right)
-static double calculate_camera_phase(double elapsed_time, int flipped) {
-    elapsed_time = std::max(elapsed_time, 0.0);
-
-    double camera_flip_time = EolSettings->turn_time() + 0.15;
-    double phase = std::min(1.0, elapsed_time / camera_flip_time);
-    if (flipped) {
-        phase = 1.0 - phase;
-    }
-    return phase;
-}
-
 // Subframe physics calculation. Contains all the physics calculations except for bike turning
 static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* metadata,
                              recorder* rec, int* finish_time, bool* dead, double time, double dt) {
@@ -326,7 +314,12 @@ static void update_bike_turn_phase(turning_data* data, double time, int flipped)
 }
 
 static void update_camera_turn_phase(turning_data* data, double time, int flipped) {
-    data->camera_turn_phase = calculate_camera_phase(time - data->camera_turn_time, flipped);
+    double camera_flip_time = EolSettings->turn_time() + 0.15;
+    double elapsed_time = std::max(0.0, time - data->camera_turn_time);
+    data->camera_turn_phase = std::min(1.0, elapsed_time / camera_flip_time);
+    if (flipped) {
+        data->camera_turn_phase = 1.0 - data->camera_turn_phase;
+    }
 }
 
 static void update_turning_data(turning_data* data, recorder* rec, double time, int flipped) {

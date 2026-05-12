@@ -33,10 +33,8 @@ void render_replay(const char* level_filename);
 
 struct turning_data {
     int flipped;
-    double bike_turn_time;
-    double camera_turn_time;
-    double camera_turn_phase;
-    double bike_turn_phase;
+    double turn_time;
+    double turn_phase;
 };
 
 struct bike_metadata {

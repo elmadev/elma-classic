@@ -392,7 +392,7 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
                         const motorst* mot, const bike_metadata* metadata, const bike_pics* bike,
                         const pic8* shirt) {
     double arm_position = metadata->arm_position;
-    double turn_phase = metadata->bike_turning.bike_turn_phase;
+    double turn_phase = metadata->bike_turning.turn_phase;
 
     // Check to see if bike is turning, and calculate the progress from -1.0 to 1.0 using cos
     bool is_turning = false;
@@ -624,7 +624,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike
     }
 
     vect2 bottomleft_corner(bike_center.x -
-                                (CameraX + metadata->camera_turning.camera_turn_phase * CameraDx),
+                                (CameraX + metadata->camera_turning.turn_phase * CameraDx),
                             bike_center.y - CameraY);
     vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
                  bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
@@ -766,10 +766,9 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike
     // Draw the minimap
     if (show_minimap) {
         if (Single) {
-            render_minimap(player1, pic, metadata->camera_turning.camera_turn_phase, bike_center,
-                           nullptr);
+            render_minimap(player1, pic, metadata->camera_turning.turn_phase, bike_center, nullptr);
         } else {
-            render_minimap(player1, pic, metadata->camera_turning.camera_turn_phase, bike_center,
+            render_minimap(player1, pic, metadata->camera_turning.turn_phase, bike_center,
                            other_mot);
         }
     }

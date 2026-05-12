@@ -211,10 +211,8 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
 
         bool draw_view = metadata->draw_view;
         memset(metadata, 0, sizeof(bike_metadata));
-        metadata->bike_turning.camera_turn_time = -1000.0;
-        metadata->bike_turning.bike_turn_time = -1000.0;
-        metadata->camera_turning.camera_turn_time = -1000.0;
-        metadata->camera_turning.bike_turn_time = -1000.0;
+        metadata->bike_turning.turn_time = -1000.0;
+        metadata->camera_turning.turn_time = -1000.0;
         metadata->volt_time = -100.0;
         metadata->draw_view = draw_view;
 
@@ -285,7 +283,7 @@ static void update_bike_turn_phase(turning_data* data, recorder* rec, double tim
     if (data->flipped != flipped) {
         // New flip this frame
         data->flipped = flipped;
-        data->bike_turn_time = time;
+        data->turn_time = time;
         if (rec) {
             start_wav(WavEvent::Turn, 0.99);
             rec->store_event(time, WavEvent::Turn, 0.99, -1);
@@ -295,10 +293,10 @@ static void update_bike_turn_phase(turning_data* data, recorder* rec, double tim
     double turn_time = EolSettings->turn_time();
     if (turn_time == 0.0) {
         // Instant turn
-        data->bike_turn_phase = 1.0;
+        data->turn_phase = 1.0;
     } else {
-        data->bike_turn_phase = (time - data->bike_turn_time) / turn_time;
-        data->bike_turn_phase = std::clamp(data->bike_turn_phase, 0.0, 1.0);
+        data->turn_phase = (time - data->turn_time) / turn_time;
+        data->turn_phase = std::clamp(data->turn_phase, 0.0, 1.0);
     }
 }
 
@@ -307,21 +305,21 @@ static void update_camera_turn_phase(turning_data* data, double time, int flippe
     if (data->flipped != flipped) {
         // New flip this frame
         data->flipped = flipped;
-        double time_since_prev_turn = time - data->camera_turn_time;
+        double time_since_prev_turn = time - data->turn_time;
         if (camera_flip_time > 0.0 && time_since_prev_turn < camera_flip_time) {
             // If camera is mid-turn, calculate camera start time so it seamlessly continues from
             // the mid-turn position
-            data->camera_turn_time = time + time_since_prev_turn - camera_flip_time;
+            data->turn_time = time + time_since_prev_turn - camera_flip_time;
         } else {
             // Camera is not mid-turn, so just set the camera turn time normally
-            data->camera_turn_time = time;
+            data->turn_time = time;
         }
     }
 
-    double elapsed_time = std::max(0.0, time - data->camera_turn_time);
-    data->camera_turn_phase = std::min(1.0, elapsed_time / camera_flip_time);
+    double elapsed_time = std::max(0.0, time - data->turn_time);
+    data->turn_phase = std::min(1.0, elapsed_time / camera_flip_time);
     if (flipped) {
-        data->camera_turn_phase = 1.0 - data->camera_turn_phase;
+        data->turn_phase = 1.0 - data->turn_phase;
     }
 }
 
@@ -483,10 +481,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     memset(&metadata1, 0, sizeof(metadata1));
     bike_metadata metadata2;
     memset(&metadata2, 0, sizeof(metadata2));
-    metadata1.bike_turning.camera_turn_time = metadata2.bike_turning.camera_turn_time = -1000.0;
-    metadata1.bike_turning.bike_turn_time = metadata2.bike_turning.bike_turn_time = -1000.0;
-    metadata1.camera_turning.camera_turn_time = metadata2.camera_turning.camera_turn_time = -1000.0;
-    metadata1.camera_turning.bike_turn_time = metadata2.camera_turning.bike_turn_time = -1000.0;
+    metadata1.bike_turning.turn_time = metadata2.bike_turning.turn_time = -1000.0;
+    metadata1.camera_turning.turn_time = metadata2.camera_turning.turn_time = -1000.0;
     metadata1.volt_time = metadata2.volt_time = -100.0;
     metadata1.draw_view = metadata2.draw_view = true;
 
@@ -680,15 +676,11 @@ static void rewind_override_animations(bike_metadata* metadata, motorst* mot, re
     double turn_time = rec->find_last_turn_frame_time(time);
 
     metadata->bike_turning.flipped = mot->flipped_bike;
-    metadata->bike_turning.bike_turn_time = turn_time;
-    metadata->bike_turning.camera_turn_time = turn_time;
+    metadata->bike_turning.turn_time = turn_time;
     update_bike_turn_phase(&metadata->bike_turning, nullptr, time, mot->flipped_bike);
 
-    metadata->camera_turning.flipped = mot->flipped_camera;
-    metadata->camera_turning.bike_turn_time = time - 1000.0;
-    metadata->camera_turning.camera_turn_time = time - 1000.0;
-    metadata->camera_turning.bike_turn_phase = 1.0;
-    metadata->camera_turning.camera_turn_phase = mot->flipped_camera ? 0.0 : 1.0;
+    metadata->camera_turning.turn_time = time - 1000.0;
+    metadata->camera_turning.turn_phase = metadata->camera_turning.flipped ? 0.0 : 1.0;
 
     metadata->volt_time = rec->find_last_volt_time(time, &metadata->volt_is_right);
     metadata->arm_position = 1.0 - (time - metadata->volt_time) / VoltDelay;
@@ -765,10 +757,8 @@ int replay_loop(const char* filename, int restore_player_visibility) {
     memset(&metadata1, 0, sizeof(metadata1));
     bike_metadata metadata2;
     memset(&metadata2, 0, sizeof(metadata2));
-    metadata1.bike_turning.camera_turn_time = metadata2.bike_turning.camera_turn_time = -1000.0;
-    metadata1.bike_turning.bike_turn_time = metadata2.bike_turning.bike_turn_time = -1000.0;
-    metadata1.camera_turning.camera_turn_time = metadata2.camera_turning.camera_turn_time = -1000.0;
-    metadata1.camera_turning.bike_turn_time = metadata2.camera_turning.bike_turn_time = -1000.0;
+    metadata1.bike_turning.turn_time = metadata2.bike_turning.turn_time = -1000.0;
+    metadata1.camera_turning.turn_time = metadata2.camera_turning.turn_time = -1000.0;
     metadata1.volt_time = metadata2.volt_time = -100.0;
 
     metadata1.draw_view = true;
@@ -960,10 +950,8 @@ void render_replay(const char* level_filename) {
     memset(&metadata1, 0, sizeof(metadata1));
     bike_metadata metadata2;
     memset(&metadata2, 0, sizeof(metadata2));
-    metadata1.bike_turning.camera_turn_time = metadata2.bike_turning.camera_turn_time = -1000.0;
-    metadata1.bike_turning.bike_turn_time = metadata2.bike_turning.bike_turn_time = -1000.0;
-    metadata1.camera_turning.camera_turn_time = metadata2.camera_turning.camera_turn_time = -1000.0;
-    metadata1.camera_turning.bike_turn_time = metadata2.camera_turning.bike_turn_time = -1000.0;
+    metadata1.bike_turning.turn_time = metadata2.bike_turning.turn_time = -1000.0;
+    metadata1.camera_turning.turn_time = metadata2.camera_turning.turn_time = -1000.0;
     metadata1.volt_time = metadata2.volt_time = -100.0;
     metadata1.draw_view = true;
     metadata2.draw_view = true;

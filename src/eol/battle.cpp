@@ -64,6 +64,12 @@ void eol::process(const battle_ended& be) {
     StatusMessages->add(be.aborted ? "battle aborted" : "battle over");
 }
 
+void eol::toggle_battle_status() const {
+    EolSettings->set_show_battle_status(!EolSettings->show_battle_status());
+    StatusMessages->add(EolSettings->show_battle_status() ? "battle status line shown"
+                                                          : "battle status line hidden");
+}
+
 void eol::toggle_show_battle_leader() const {
     EolSettings->set_show_battle_leader(!EolSettings->show_battle_leader());
     StatusMessages->add(EolSettings->show_battle_leader() ? "leader from battle status shown"

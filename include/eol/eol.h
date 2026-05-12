@@ -47,9 +47,7 @@ class eol {
         return kuskis_ |
                std::views::filter([](const kuski& k) { return k.is_online && k.is_player; });
     }
-    void toggle_battle_status() {
-        EolSettings->set_show_battle_status(!EolSettings->show_battle_status());
-    }
+    void toggle_battle_status() const;
     void toggle_show_battle_leader() const;
     void render_battle_status(pic8& dest, abc8& font) const;
 

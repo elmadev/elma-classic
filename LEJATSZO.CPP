@@ -292,7 +292,7 @@ static void update_view_settings(player_keys* keys, bike_metadata* metadata, boo
     }
 }
 
-static void update_turning_data(turning_data* data, recorder* rec, double time, int flipped) {
+static void update_turn_time(turning_data* data, recorder* rec, double time, int flipped) {
     if (data->flipped != flipped) {
         // New flip this frame
         data->bike_turn_time = time;
@@ -312,8 +312,9 @@ static void update_turning_data(turning_data* data, recorder* rec, double time, 
             rec->store_event(time, WavEvent::Turn, 0.99, -1);
         }
     }
+}
 
-    // Update bike turn phase
+static void update_bike_turn_phase(turning_data* data, double time, int flipped) {
     double turn_time = EolSettings->turn_time();
     if (turn_time == 0.0) {
         // Instant turn
@@ -322,9 +323,16 @@ static void update_turning_data(turning_data* data, recorder* rec, double time, 
         data->bike_turn_phase = (time - data->bike_turn_time) / turn_time;
         data->bike_turn_phase = std::clamp(data->bike_turn_phase, 0.0, 1.0);
     }
+}
 
-    // Update camera turn phase
+static void update_camera_turn_phase(turning_data* data, double time, int flipped) {
     data->camera_turn_phase = calculate_camera_phase(time - data->camera_turn_time, flipped);
+}
+
+static void update_turning_data(turning_data* data, recorder* rec, double time, int flipped) {
+    update_turn_time(data, rec, time, flipped);
+    update_bike_turn_phase(data, time, flipped);
+    update_camera_turn_phase(data, time, flipped);
 }
 
 // The only physics-relevant part of this function is turning the bike. The rest is "cosmetic" for

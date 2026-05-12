@@ -849,7 +849,10 @@ void editor_window_choose_sprite() {
 
     invalidateegesz();
 
-    char picture_name[10], texture_name[10], mask_name[10], null_name[10] = "";
+    char picture_name[10];
+    char texture_name[10];
+    char mask_name[10];
+    char null_name[10] = "";
     strcpy(picture_name, Lgr->editor_picture_name);
     strcpy(texture_name, Lgr->editor_texture_name);
     strcpy(mask_name, Lgr->editor_mask_name);

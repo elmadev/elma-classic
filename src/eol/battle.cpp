@@ -168,6 +168,12 @@ static std::string_view battle_type_prefix(BattleType t) {
     return "";
 }
 
+static std::string format_battle_type(BattleType t) {
+    std::string out = std::format("{}battle", battle_type_prefix(t));
+    out.front() = static_cast<char>(std::toupper(static_cast<unsigned char>(out.front())));
+    return out;
+}
+
 static std::string format_type_with_cripples(BattleType t, BattleAttributes::Kind attrs) {
     using namespace BattleAttributes;
 
@@ -250,4 +256,20 @@ void eol::render_battle_status(pic8& dest, abc8& font) const {
             : std::format("Battle leader: {} {}", lookup_nick(leader.kuski_id), result);
 
     font.write_centered(&dest, dest.get_width() / 2, y - font.line_height(), leader_line.c_str());
+}
+
+void eol::process(const battle_queue_update& e) {
+    battle_queue_ = e.entries;
+    sync_battle_queue_table();
+}
+
+void eol::sync_battle_queue_table() {
+    battle_queue_table.clear_rows();
+    for (const battle_queue_entry& entry : battle_queue_) {
+        std::string_view nick = lookup_nick(entry.designer_id);
+        std::string duration =
+            std::format("{} min{}", entry.duration_minutes, entry.duration_minutes == 1 ? "" : "s");
+        battle_queue_table.add_row(
+            {std::string(nick), std::move(duration), format_battle_type(entry.battle_type)});
+    }
 }

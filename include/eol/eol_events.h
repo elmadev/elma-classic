@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <string_view>
+#include <vector>
 
 class level;
 
@@ -96,6 +97,16 @@ struct battle_line_update {
     uint32_t score; // Best time, speed, or finish count depending on battle type
     uint16_t apple_count;
     uint16_t rank;
+};
+
+struct battle_queue_entry {
+    unsigned int designer_id;
+    BattleType battle_type;
+    uint8_t duration_minutes;
+};
+
+struct battle_queue_update {
+    std::vector<battle_queue_entry> entries;
 };
 
 #endif

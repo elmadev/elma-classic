@@ -38,11 +38,15 @@ eol::eol()
     : proto(*this),
       cur_table(nullptr),
       players_online_table("Players online"),
-      battle_results_table("Battle results") {
+      battle_results_table("Battle results"),
+      battle_queue_table("Battle queue") {
     players_online_table.add_column(100, eol_table::Align::Left);
     players_online_table.add_column(100, eol_table::Align::Right);
     battle_results_table.add_column(100, eol_table::Align::Left);
     battle_results_table.add_column(100, eol_table::Align::Right);
+    battle_queue_table.add_column(100, eol_table::Align::Left);
+    battle_queue_table.add_column(60, eol_table::Align::Right);
+    battle_queue_table.add_column(130, eol_table::Align::Right);
 }
 
 void eol::process(const login& l) {
@@ -229,6 +233,9 @@ void eol::set_table(TableType table) {
         break;
     case TableType::BattleResults:
         new_table = &battle_results_table;
+        break;
+    case TableType::BattleQueue:
+        new_table = &battle_queue_table;
         break;
     }
 

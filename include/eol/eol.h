@@ -34,6 +34,7 @@ class eol {
     void process(const battle_ended&);
     void process(const battle_time_sync&);
     void process(const battle_line_update&);
+    void process(const battle_queue_update&);
 
     void enter_level(const char* level_name, const level* lev);
     void exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
@@ -51,6 +52,7 @@ class eol {
     void toggle_show_battle_leader() const;
     void render_battle_status(pic8& dest, abc8& font) const;
     void toggle_battle_results() { set_table(TableType::BattleResults); }
+    void toggle_battle_queue() { set_table(TableType::BattleQueue); }
 
     const kuski* spy_kuski();
     void spy_next_kuski();
@@ -61,6 +63,7 @@ class eol {
   private:
     void sync_players_online_table();
     void sync_battle_results_table();
+    void sync_battle_queue_table();
 
     const std::vector<kuski>& all_kuskis() const { return kuskis_; }
     std::string_view lookup_nick(unsigned int kuski_id) const;
@@ -81,9 +84,11 @@ class eol {
     std::vector<kuski> kuskis_;
     std::optional<battle> current_battle;
     std::vector<battle_leaderboard_entry> battle_leaderboard_;
+    std::vector<battle_queue_entry> battle_queue_;
     eol_table* cur_table;
     eol_table players_online_table;
     eol_table battle_results_table;
+    eol_table battle_queue_table;
     std::optional<unsigned int> spy_kuski_id;
 };
 

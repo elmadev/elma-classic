@@ -674,17 +674,13 @@ static void reverse_events(motorst* mot, recorder* rec, double time) {
 static void rewind_override_animations(bike_metadata* metadata, motorst* mot, recorder* rec,
                                        double time) {
     double turn_time = rec->find_last_turn_frame_time(time);
-
     metadata->bike_turning.flipped = mot->flipped_bike;
     metadata->bike_turning.turn_time = turn_time;
-    update_bike_turn_phase(&metadata->bike_turning, nullptr, time, mot->flipped_bike);
 
-    metadata->camera_turning.turn_time = time - 1000.0;
+    metadata->camera_turning.turn_time = -1000.0;
     metadata->camera_turning.turn_phase = metadata->camera_turning.flipped ? 0.0 : 1.0;
 
     metadata->volt_time = rec->find_last_volt_time(time, &metadata->volt_is_right);
-    metadata->arm_position = 1.0 - (time - metadata->volt_time) / VoltDelay;
-    metadata->arm_position = std::max(metadata->arm_position, 0.0);
 }
 
 // Load replay data (instead of simulating bike physics)
@@ -720,9 +716,6 @@ static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadat
             }
         }
     }
-
-    update_graphical_metadata(*mot, *metadata, nullptr, time);
-
     return alive;
 }
 
@@ -845,6 +838,11 @@ int replay_loop(const char* filename, int restore_player_visibility) {
                 reverse_events(Motor2, Rec2, time);
                 rewind_override_animations(&metadata2, Motor2, Rec2, time);
             }
+        }
+
+        update_graphical_metadata(*Motor1, metadata1, nullptr, time);
+        if (!Single) {
+            update_graphical_metadata(*Motor2, metadata2, nullptr, time);
         }
 
         // End of replay
@@ -977,6 +975,11 @@ void render_replay(const char* level_filename) {
         if (!Single) {
             dead2 = !replay_frame(Motor2, &State->keys2, &metadata2, Rec2, time, &HudVisibility2,
                                   &metadata1.draw_view);
+        }
+
+        update_graphical_metadata(*Motor1, metadata1, nullptr, time);
+        if (!Single) {
+            update_graphical_metadata(*Motor2, metadata2, nullptr, time);
         }
 
         if ((Single && dead1) || (!Single && dead1 && dead2)) {

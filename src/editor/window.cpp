@@ -360,7 +360,7 @@ void editor_window_welcome() {
         internal_error("editor_window_welcome strlen(selected_filename) > MAX_FILENAME_LEN");
     }
 
-    if (filename.length() == 0) {
+    if (filename.empty()) {
         State->editor_filename[0] = 0;
     } else {
         strcpy(State->editor_filename, (filename + ".lev").c_str());
@@ -380,12 +380,12 @@ void editor_window_open() {
 
     std::string filename = editor_window_list_levels(false);
 
-    if (ListEntries.size() < 1) {
+    if (ListEntries.empty()) {
         dialog("There are no level files (*.lev) in the LEV directory!");
         return;
     }
 
-    if (filename.length() == 0) {
+    if (filename.empty()) {
         return;
     }
 

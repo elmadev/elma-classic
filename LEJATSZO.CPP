@@ -322,10 +322,25 @@ static void update_camera_turn_phase(turning_data* data, double time, int flippe
     }
 }
 
-static void update_turning_data(turning_data* data, recorder* rec, double time, int flipped) {
-    update_turn_time(data, rec, time, flipped);
-    update_bike_turn_phase(data, time, flipped);
-    update_camera_turn_phase(data, time, flipped);
+static void update_graphical_metadata(motorst& mot, bike_metadata& metadata, recorder* rec,
+                                      double time) {
+    // Update bike turn data
+    update_turn_time(&metadata.bike_turning, rec, time, mot.flipped_bike);
+    update_bike_turn_phase(&metadata.bike_turning, time, mot.flipped_bike);
+    update_camera_turn_phase(&metadata.bike_turning, time, mot.flipped_bike);
+
+    // Update camera position
+    mot.flipped_camera = mot.flipped_bike;
+    if (mot.gravity_direction == MotorGravity::Up) {
+        mot.flipped_camera = !mot.flipped_camera;
+    }
+
+    update_turn_time(&metadata.camera_turning, nullptr, time, mot.flipped_camera);
+    update_bike_turn_phase(&metadata.camera_turning, time, mot.flipped_camera);
+    update_camera_turn_phase(&metadata.camera_turning, time, mot.flipped_camera);
+
+    // Update arm position
+    metadata.arm_position = std::max(0.0, 1.0 - (time - metadata.volt_time) / VoltDelay);
 }
 
 // The only physics-relevant part of this function is turning the bike. The rest is "cosmetic" for
@@ -352,22 +367,8 @@ static void physics_frame_end(motorst* mot, player_keys* keys, bike_metadata* me
         }
         metadata->turn_key_previous = is_turn_down;
     }
-    update_turning_data(&metadata->bike_turning, rec, time, mot->flipped_bike);
 
-    // Update camera position
-    mot->flipped_camera = mot->flipped_bike;
-    if (mot->gravity_direction == MotorGravity::Up) {
-        mot->flipped_camera = !mot->flipped_camera;
-    }
-    update_turning_data(&metadata->camera_turning, nullptr, time, mot->flipped_camera);
-
-    // Update arm position
-    metadata->arm_position = std::max(0.0, 1.0 - (time - metadata->volt_time) / VoltDelay);
-#ifdef DEBUG
-    if (metadata->arm_position > 1.00001) {
-        internal_error("metadata->arm_position > 1.00001!");
-    }
-#endif
+    update_graphical_metadata(*mot, *metadata, rec, time);
 }
 
 static void handle_eol_inputs() {
@@ -683,7 +684,9 @@ static void rewind_override_animations(bike_metadata* metadata, motorst* mot, re
     metadata->bike_turning.flipped = mot->flipped_bike;
     metadata->bike_turning.bike_turn_time = turn_time;
     metadata->bike_turning.camera_turn_time = turn_time;
-    update_turning_data(&metadata->bike_turning, nullptr, time, mot->flipped_bike);
+    update_turn_time(&metadata->bike_turning, nullptr, time, mot->flipped_bike);
+    update_bike_turn_phase(&metadata->bike_turning, time, mot->flipped_bike);
+    update_camera_turn_phase(&metadata->bike_turning, time, mot->flipped_bike);
 
     metadata->camera_turning.flipped = mot->flipped_camera;
     metadata->camera_turning.bike_turn_time = time - 1000.0;
@@ -730,18 +733,7 @@ static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadat
         }
     }
 
-    // Update turn graphics
-    update_turning_data(&metadata->bike_turning, nullptr, time, mot->flipped_bike);
-
-    // Update camera position
-    mot->flipped_camera = mot->flipped_bike;
-    if (mot->gravity_direction == MotorGravity::Up) {
-        mot->flipped_camera = !mot->flipped_camera;
-    }
-    update_turning_data(&metadata->camera_turning, nullptr, time, mot->flipped_camera);
-
-    // Update arm position
-    metadata->arm_position = std::max(0.0, 1.0 - (time - metadata->volt_time) / VoltDelay);
+    update_graphical_metadata(*mot, *metadata, nullptr, time);
 
     return alive;
 }

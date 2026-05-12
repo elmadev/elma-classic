@@ -602,7 +602,11 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         }
 
         if (was_game_key_just_pressed(DIK_F10)) {
-            EolClient->toggle_battle_status();
+            if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
+                EolClient->toggle_show_battle_leader();
+            } else {
+                EolClient->toggle_battle_status();
+            }
         }
 
         if (!console_was_active &&

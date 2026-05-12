@@ -225,6 +225,14 @@ void console::handle_input() {
         }
     }
 
+    if (was_key_down(DIK_HOME)) {
+        cursor_pos = 0;
+    }
+
+    if (was_key_down(DIK_END)) {
+        cursor_pos = (int)input_buffer.size();
+    }
+
     // Drain text input buffer for printable characters
     char c;
     while ((c = pop_text_input()) != 0) {

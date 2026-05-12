@@ -176,7 +176,7 @@ void balls_resolution_change() {
 
     // Teleport balls out of the walls
     for (int i = 0; i < BallCount; i++) {
-        clamp_ball_position(Balls[i], ElapsedTimeSinceKeyframe);
+        clamp_ball_position(Balls[i]);
     }
 
     // Reset the predicted collision time for all balls

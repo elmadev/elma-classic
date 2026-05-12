@@ -240,7 +240,7 @@ void simulate_ball_wall_collision(ball* ball, WallId wall, double time) {
     }
 }
 
-void clamp_ball_position(ball& ball, double time) {
+void clamp_ball_position(ball& ball) {
     ball.keyframe_r.y = std::max(ball.keyframe_r.y, wall_top() + ball.radius + 0.5);
     ball.keyframe_r.y = std::min(ball.keyframe_r.y, wall_bottom() - ball.radius - 0.5);
     ball.keyframe_r.x = std::max(ball.keyframe_r.x, wall_left() + ball.radius + 0.5);

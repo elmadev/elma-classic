@@ -50,6 +50,7 @@ class eol {
     void toggle_battle_status() {
         EolSettings->set_show_battle_status(!EolSettings->show_battle_status());
     }
+    void toggle_show_battle_leader() const;
     void render_battle_status(pic8& dest, abc8& font) const;
 
     const kuski* spy_kuski();

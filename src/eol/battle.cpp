@@ -64,6 +64,12 @@ void eol::process(const battle_ended& be) {
     StatusMessages->add(be.aborted ? "battle aborted" : "battle over");
 }
 
+void eol::toggle_show_battle_leader() const {
+    EolSettings->set_show_battle_leader(!EolSettings->show_battle_leader());
+    StatusMessages->add(EolSettings->show_battle_leader() ? "leader from battle status shown"
+                                                          : "leader from battle status hidden");
+}
+
 void eol::upsert_leaderboard_entry(const battle_leaderboard_entry& entry, uint16_t rank) {
     std::erase_if(battle_leaderboard_, [&](const battle_leaderboard_entry& e) {
         return e.kuski_id == entry.kuski_id && e.kuski_id2 == entry.kuski_id2;

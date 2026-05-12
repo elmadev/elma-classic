@@ -58,7 +58,7 @@ void polygon::render_one_line(int v, bool forward, bool dotted) const {
     }
 }
 
-void polygon::render_outline() {
+void polygon::render_outline() const {
     if (vertex_count < 3 || vertex_count > MAX_VERTICES) {
         internal_error("polygon::render_outline vertex_count < 3 || vertex_count > MAX_VERTICES!");
     }

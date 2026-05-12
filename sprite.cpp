@@ -63,7 +63,7 @@ sprite::sprite(double x, double y, const char* pic_name, const char* text_name,
     }
 }
 
-void sprite::render() {
+void sprite::render() const {
     render_line(r, r + vect2(wireframe_width, 0.0), false);
     render_line(r, r + vect2(0.0, wireframe_height), false);
     vect2 r2(wireframe_width + r.x, wireframe_height + r.y);
@@ -123,7 +123,7 @@ void sprite::save(FILE* h) {
     }
 }
 
-double sprite::checksum() {
+double sprite::checksum() const {
     double sum = 0.0;
     sum += r.x;
     sum += r.y;

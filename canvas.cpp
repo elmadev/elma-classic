@@ -430,7 +430,7 @@ void canvas::linked_list_to_array() {
     }
 }
 
-void canvas::calculate_object_positions() {
+void canvas::calculate_object_positions() const {
     const double offset = ANIM_WIDTH / 2.0 * EolSettings->zoom();
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Ptop->objects[i];

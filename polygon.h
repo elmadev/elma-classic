@@ -22,7 +22,7 @@ class polygon {
     void save(FILE* h, level* lev);
     void set_vertex(int v, double x, double y) const;
     void render_one_line(int v, bool forward, bool dotted) const;
-    void render_outline();
+    void render_outline() const;
     // Inserts a new vertex at `v`, duplicating the vertex at `v`.
     // Returns true if successful.
     bool insert_vertex(int v);

@@ -29,9 +29,9 @@ class sprite {
     sprite(double x, double y, const char* pic_name, const char* text_name, const char* mask_nam);
     sprite(FILE* h);
     // Render sprite in editor.
-    void render();
+    void render() const;
     void save(FILE* h);
-    double checksum();
+    double checksum() const;
 };
 
 #endif

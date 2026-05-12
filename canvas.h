@@ -178,7 +178,7 @@ class canvas {
     void merge_redundant_chunks();
     void textures_to_pointers();
     void linked_list_to_array();
-    void calculate_object_positions();
+    void calculate_object_positions() const;
     void adjust_background_distance();
 
     // Drawing

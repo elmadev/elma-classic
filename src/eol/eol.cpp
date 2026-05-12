@@ -9,11 +9,22 @@
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include <algorithm>
-#include <chrono>
 #include <cstring>
+#include <ctime>
 #include <format>
 #include <string>
 #include <string_view>
+
+static tm local_tm(uint64_t unix_timestamp) {
+    time_t t = static_cast<time_t>(unix_timestamp);
+    tm tm{};
+#ifdef _WIN32
+    localtime_s(&tm, &t);
+#else
+    localtime_r(&t, &tm);
+#endif
+    return tm;
+}
 
 static kuski* get_kuski(std::vector<kuski>& kuskis, unsigned int id) {
     for (kuski& k : kuskis) {
@@ -171,27 +182,26 @@ std::string_view eol::lookup_nick(unsigned int kuski_id) const {
 
 void eol::process(const chat_message& msg) {
     std::string_view nick = lookup_nick(msg.kuski_id);
-    auto timestamp = std::chrono::floor<std::chrono::seconds>(
-        std::chrono::system_clock::from_time_t(static_cast<std::time_t>(msg.unix_timestamp)));
-    std::string line = std::format("{:%H:%M:%S} <{}> {}", timestamp, nick, msg.message);
+    tm tm = local_tm(msg.unix_timestamp);
+    std::string line = std::format("{:02}:{:02}:{:02} <{}> {}", tm.tm_hour, tm.tm_min, tm.tm_sec,
+                                   nick, msg.message);
     Console->add_line(line, console::LineType::Chat);
 }
 
 void eol::process(const private_message& msg) {
     std::string_view from_nick = lookup_nick(msg.from_kuski_id);
     std::string_view to_nick = lookup_nick(msg.to_kuski_id);
-    auto timestamp = std::chrono::floor<std::chrono::seconds>(
-        std::chrono::system_clock::from_time_t(static_cast<std::time_t>(msg.unix_timestamp)));
-    std::string line =
-        std::format("{:%H:%M:%S} <{}>-><{}> {}", timestamp, from_nick, to_nick, msg.message);
+    tm tm = local_tm(msg.unix_timestamp);
+    std::string line = std::format("{:02}:{:02}:{:02} <{}>-><{}> {}", tm.tm_hour, tm.tm_min,
+                                   tm.tm_sec, from_nick, to_nick, msg.message);
     Console->add_line(line, console::LineType::Pm);
 }
 
 void eol::process(const team_message& msg) {
     std::string_view nick = lookup_nick(msg.from_kuski_id);
-    auto timestamp = std::chrono::floor<std::chrono::seconds>(
-        std::chrono::system_clock::from_time_t(static_cast<std::time_t>(msg.unix_timestamp)));
-    std::string line = std::format("{:%H:%M:%S} [Team] <{}> {}", timestamp, nick, msg.message);
+    tm tm = local_tm(msg.unix_timestamp);
+    std::string line = std::format("{:02}:{:02}:{:02} [Team] <{}> {}", tm.tm_hour, tm.tm_min,
+                                   tm.tm_sec, nick, msg.message);
     Console->add_line(line, console::LineType::Team);
 }
 

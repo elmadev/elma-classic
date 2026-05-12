@@ -970,7 +970,7 @@ void canvas::draw_grass_polygons() {
     int qgrass_margin = (int)(QGRASS_MARGIN * zoom) - qupdown_margin;
 
     constexpr int HEIGHTMAP_LENGTH = 10000;
-    int max_heightmap_length = zoom * HEIGHTMAP_LENGTH;
+    int max_heightmap_length = (int)(zoom * HEIGHTMAP_LENGTH);
     auto heightmap = std::make_unique<int[]>(max_heightmap_length);
 
     for (int i = 0; i < MAX_POLYGONS; i++) {

@@ -338,11 +338,11 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
 
             // Flag time
             if (is_flagtag) {
-                int time1 = FlagTimeA * TimeToCentiseconds;
+                int time1 = (int)(FlagTimeA * TimeToCentiseconds);
                 char time_text1[20];
                 util::text::centiseconds_to_string(time1, time_text1);
                 nav.add_overlay(std::string(time_text1), 440 + dx, y1);
-                int time2 = FlagTimeB * TimeToCentiseconds;
+                int time2 = (int)(FlagTimeB * TimeToCentiseconds);
                 char time_text2[20];
                 util::text::centiseconds_to_string(time2, time_text2);
                 nav.add_overlay(std::string(time_text2), 440 + dx, y2);

@@ -256,10 +256,10 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
                 *dead = true;
             }
             if (bike_state == BikeState::Finish) {
-                *finish_time = time * TimeToCentiseconds;
+                *finish_time = (int)(time * TimeToCentiseconds);
             }
             if (prev_apple_count < mot->apple_count) {
-                mot->last_apple_time = time * TimeToCentiseconds;
+                mot->last_apple_time = (int)(time * TimeToCentiseconds);
             }
         } else {
             start_wav(wav_id, volume);
@@ -678,7 +678,7 @@ static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadat
             int prev_apple_count = mot->apple_count;
             handle_object_interaction(object_id, &mot->apple_count, mot);
             if (prev_apple_count < mot->apple_count) {
-                mot->last_apple_time = time * TimeToCentiseconds;
+                mot->last_apple_time = (int)(time * TimeToCentiseconds);
             }
         } else {
             start_wav(wav_id, volume);

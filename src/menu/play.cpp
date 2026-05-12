@@ -531,8 +531,7 @@ void menu_play() {
             } else {
                 total_text = std::format("Finished: {}/{}", finished, level_count);
             }
-            int text_x = SCREEN_WIDTH / 2 + 320 - 10 - MenuFont->len(total_text.c_str());
-            nav.add_overlay(total_text, text_x, 30);
+            nav.add_overlay(total_text, 630, 30, OverlayAlignment::Right, ScreenAnchor::RightEdge);
         }
 
         nav.add_row(

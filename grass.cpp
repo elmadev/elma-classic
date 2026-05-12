@@ -68,8 +68,7 @@ void grass::add(pic8* pic, bool up, int target_height, double qupdown_zoom, doub
     constexpr int SLOPE_PADDING = 2 * QUPDOWN_MARGIN + 1;
     int slope = target_height - SLOPE_PADDING;
     if (slope < 0) {
-        external_error(
-            std::format("QUP/QDOWN picture's height is less than {}!", SLOPE_PADDING).c_str());
+        external_error(std::format("QUP/QDOWN picture's height is less than {}!", SLOPE_PADDING));
     }
     if (!up) {
         slope *= -1;

@@ -601,6 +601,10 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             EolClient->set_table(TableType::PlayersOnline);
         }
 
+        if (was_game_key_just_pressed(DIK_F3)) {
+            EolClient->toggle_battle_queue();
+        }
+
         if (was_game_key_just_pressed(DIK_F6)) {
             EolClient->toggle_battle_results();
         }

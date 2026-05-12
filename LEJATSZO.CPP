@@ -284,6 +284,7 @@ static void update_view_settings(player_keys* keys, bike_metadata* metadata, boo
 static void update_bike_turn_phase(turning_data* data, recorder* rec, double time, int flipped) {
     if (data->flipped != flipped) {
         // New flip this frame
+        data->flipped = flipped;
         data->bike_turn_time = time;
         if (rec) {
             start_wav(WavEvent::Turn, 0.99);
@@ -305,6 +306,7 @@ static void update_camera_turn_phase(turning_data* data, double time, int flippe
     double camera_flip_time = EolSettings->turn_time() + 0.15;
     if (data->flipped != flipped) {
         // New flip this frame
+        data->flipped = flipped;
         double time_since_prev_turn = time - data->camera_turn_time;
         if (camera_flip_time > 0.0 && time_since_prev_turn < camera_flip_time) {
             // If camera is mid-turn, calculate camera start time so it seamlessly continues from
@@ -327,18 +329,13 @@ static void update_graphical_metadata(motorst& mot, bike_metadata& metadata, rec
                                       double time) {
     // Update bike turn data
     update_bike_turn_phase(&metadata.bike_turning, rec, time, mot.flipped_bike);
-    update_camera_turn_phase(&metadata.bike_turning, time, mot.flipped_bike);
-    metadata.bike_turning.flipped = mot.flipped_bike;
 
     // Update camera position
     mot.flipped_camera = mot.flipped_bike;
     if (mot.gravity_direction == MotorGravity::Up) {
         mot.flipped_camera = !mot.flipped_camera;
     }
-
-    update_bike_turn_phase(&metadata.camera_turning, nullptr, time, mot.flipped_camera);
     update_camera_turn_phase(&metadata.camera_turning, time, mot.flipped_camera);
-    metadata.camera_turning.flipped = mot.flipped_camera;
 
     // Update arm position
     metadata.arm_position = std::max(0.0, 1.0 - (time - metadata.volt_time) / VoltDelay);
@@ -686,7 +683,6 @@ static void rewind_override_animations(bike_metadata* metadata, motorst* mot, re
     metadata->bike_turning.bike_turn_time = turn_time;
     metadata->bike_turning.camera_turn_time = turn_time;
     update_bike_turn_phase(&metadata->bike_turning, nullptr, time, mot->flipped_bike);
-    update_camera_turn_phase(&metadata->bike_turning, time, mot->flipped_bike);
 
     metadata->camera_turning.flipped = mot->flipped_camera;
     metadata->camera_turning.bike_turn_time = time - 1000.0;

@@ -807,8 +807,8 @@ lgrfile::lgrfile(const char* lgrname) {
     }
 
 #define ASSERT_EXISTS(var, name)                                                                   \
-    if (!var) {                                                                                    \
-        external_error(std::string("Picture not found in LGR file!: ") + name + " " + path);       \
+    if (!(var)) {                                                                                  \
+        external_error(std::string("Picture not found in LGR file!: ") + (name) + " " + path);     \
     }
 
     ASSERT_EXISTS(bike1.body, "q1body.pcx");

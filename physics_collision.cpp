@@ -23,10 +23,9 @@ static bool get_anchor_point(vect2 r, double radius, segment* seg, vect2* point)
             // Return the very start of the segment
             *point = seg->r;
             return true;
-        } else {
-            // Too far, no collision
-            return false;
         }
+        // Too far, no collision
+        return false;
     }
     if (position_along_line > seg->length) {
         // We are in front of the segment
@@ -34,10 +33,9 @@ static bool get_anchor_point(vect2 r, double radius, segment* seg, vect2* point)
             // Return the very end of the segment
             *point = seg->r + seg->unit_vector * seg->length;
             return true;
-        } else {
-            // Too far, no collision
-            return false;
         }
+        // Too far, no collision
+        return false;
     }
     // We are neither behind nor in front of the segment, so we will collide somewhere in the middle
     // First, make sure we aren't too far away from the line to touch

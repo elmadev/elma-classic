@@ -309,15 +309,14 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                     SoundMotorGas2->reset(WAV_FADE_LENGTH);
                 }
                 mot->frequency_prev = 1.0;
-            } else {
-                // We're not finished with the start-of-gas sound, but the buffer is full
-                mix_into_buffer(&buffer[copied_counter],
-                                &SoundMotorGasStart->samples[mot->playback_index_gas_start],
-                                source_length);
-                mot->playback_index_gas_start += source_length;
-                return;
+                break;
             }
-            break;
+            // We're not finished with the start-of-gas sound, but the buffer is full
+            mix_into_buffer(&buffer[copied_counter],
+                            &SoundMotorGasStart->samples[mot->playback_index_gas_start],
+                            source_length);
+            mot->playback_index_gas_start += source_length;
+            return;
         case MotorState::Gassing:
             // Gassing sound effect - variable playback speed based on wheel spin speed
             // We interpolate the playback speed over the buffer length,
@@ -345,26 +344,24 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
                 }
                 copied_counter += WAV_FADE_LENGTH;
                 break;
-            } else {
-                // Buffer is full
-                double dt = mot->frequency_prev;
-                double next_dt = mot->frequency_next;
-                double ddt = 0;
-                if (source_length > 30) {
-                    ddt = (next_dt - dt) / source_length;
-                }
-                for (int i = 0; i < source_length; i++) {
-                    if (is_motor1) {
-                        buffer[copied_counter + i] += SoundMotorGas1->get_next_sample(dt);
-                    } else {
-                        buffer[copied_counter + i] += SoundMotorGas2->get_next_sample(dt);
-                    }
-                    dt += ddt;
-                }
-                mot->frequency_prev = dt;
-                return;
             }
-            break;
+            // Buffer is full
+            double dt = mot->frequency_prev;
+            double next_dt = mot->frequency_next;
+            double ddt = 0;
+            if (source_length > 30) {
+                ddt = (next_dt - dt) / source_length;
+            }
+            for (int i = 0; i < source_length; i++) {
+                if (is_motor1) {
+                    buffer[copied_counter + i] += SoundMotorGas1->get_next_sample(dt);
+                } else {
+                    buffer[copied_counter + i] += SoundMotorGas2->get_next_sample(dt);
+                }
+                dt += ddt;
+            }
+            mot->frequency_prev = dt;
+            return;
         }
     }
 }

@@ -545,24 +545,23 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, canvas_pixels
 
             *prev_can_merge = false;
             return dest;
-        } else {
-            // Split the chunk in two
-            canvas_chunk_node* node = new_node();
-            dest_prev->next = node;
-
-            node->width = source_x_right - source_x_left + 1;
-            node->pixels = source;
-            node->distance = source_dist;
-            node->next = dest;
-
-            dest->width -= node->width;
-            if (dest->pixels.is_pointer()) {
-                dest->pixels += node->width;
-            }
-
-            *prev_can_merge = false;
-            return dest;
         }
+        // Otherwise, split the chunk in two
+        canvas_chunk_node* node = new_node();
+        dest_prev->next = node;
+
+        node->width = source_x_right - source_x_left + 1;
+        node->pixels = source;
+        node->distance = source_dist;
+        node->next = dest;
+
+        dest->width -= node->width;
+        if (dest->pixels.is_pointer()) {
+            dest->pixels += node->width;
+        }
+
+        *prev_can_merge = false;
+        return dest;
     }
 
     // Case 3: Left- and right-aligned
@@ -585,14 +584,13 @@ canvas_chunk_node* canvas::draw_one_chunk(canvas_chunk_node* dest, canvas_pixels
 
             *prev_can_merge = true;
             return dest_prev;
-        } else {
-            // Overwrite chunk with new data
-            dest->pixels = source;
-            dest->distance = source_dist;
-
-            *prev_can_merge = true;
-            return dest;
         }
+        // Otherwise, overwrite chunk with new data
+        dest->pixels = source;
+        dest->distance = source_dist;
+
+        *prev_can_merge = true;
+        return dest;
     }
 
     // Case 4: Neither left- nor right-aligned

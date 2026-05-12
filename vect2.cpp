@@ -66,9 +66,8 @@ vect2 intersection(const vect2& r1, vect2 v1, vect2 r2, vect2 v2) {
         }
         if ((r2 - r1) * v1 > 0) {
             return r2;
-        } else {
-            return r1;
         }
+        return r1;
     }
     v1.normalize();
     v2.normalize();

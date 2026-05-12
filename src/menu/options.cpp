@@ -378,9 +378,8 @@ void menu_options() {
             [] {
                 if (EolSettings->turn_time_persisted() == 0.0) {
                     return std::string("Instant");
-                } else {
-                    return std::format("{:.2f}s", EolSettings->turn_time_persisted());
                 }
+                return std::format("{:.2f}s", EolSettings->turn_time_persisted());
             }(),
             NAV_FUNC() {
                 double old_turn_time = EolSettings->turn_time_persisted();

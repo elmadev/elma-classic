@@ -132,11 +132,18 @@ void console::add_line(std::string text, LineType type) {
     if (lines.size() > MAX_LINES) {
         lines.erase(lines.begin());
     }
+    if (scroll_offset > 0 && should_show(lines.back())) {
+        // Maintain scroll offset when new lines are added so the chat doesn't scroll
+        scroll_offset = std::min(scroll_offset + 1, max_scroll_offset());
+    }
 }
 
 void console::set_font(abc8* new_font) { font = new_font; }
 
-void console::clear() { lines.clear(); }
+void console::clear() {
+    lines.clear();
+    scroll_offset = 0;
+}
 
 bool console::is_input_active() const { return input_active; }
 
@@ -144,12 +151,14 @@ void console::activate_input() {
     input_active = true;
     input_buffer.clear();
     cursor_pos = 0;
+    scroll_offset = 0;
 }
 
 void console::deactivate_input() {
     input_active = false;
     input_buffer.clear();
     cursor_pos = 0;
+    scroll_offset = 0;
 }
 
 void console::toggle_active() {
@@ -172,6 +181,21 @@ void console::paste_text(std::string_view text) {
             cursor_pos++;
         }
     }
+}
+
+bool console::should_show(const console_line& line) const {
+    if (line.type == LineType::Log) {
+        return show_log_lines;
+    }
+    if (mode == Mode::Chat) {
+        return line.type != LineType::System;
+    }
+    return true;
+}
+
+int console::max_scroll_offset() const {
+    auto filtered = lines | std::views::filter([this](const auto& l) { return should_show(l); });
+    return std::max(0, (int)std::ranges::distance(filtered) - EolSettings->chat_lines());
 }
 
 void console::handle_input() {
@@ -231,6 +255,23 @@ void console::handle_input() {
 
     if (was_key_down(DIK_END)) {
         cursor_pos = (int)input_buffer.size();
+    }
+
+    if (was_key_down(DIK_UP)) {
+        scroll_offset = std::min(scroll_offset + 1, max_scroll_offset());
+    }
+
+    if (was_key_down(DIK_DOWN)) {
+        scroll_offset = std::max(scroll_offset - 1, 0);
+    }
+
+    if (was_key_down(DIK_PRIOR)) {
+        scroll_offset =
+            std::min(scroll_offset + EolSettings->chat_lines() - 1, max_scroll_offset());
+    }
+
+    if (was_key_down(DIK_NEXT)) {
+        scroll_offset = std::max(scroll_offset - EolSettings->chat_lines() + 1, 0);
     }
 
     // Drain text input buffer for printable characters
@@ -299,17 +340,9 @@ void console::render(pic8& screen) {
     }
     rendering = true;
 
-    auto filter = [this](const auto& line) {
-        if (line.type == LineType::Log) {
-            return show_log_lines;
-        }
-        if (mode == Mode::Chat) {
-            return line.type != LineType::System;
-        }
-        return true;
-    };
-    auto view = lines | std::views::reverse | std::views::filter(filter) |
-                std::views::take(EolSettings->chat_lines());
+    auto view = lines | std::views::reverse |
+                std::views::filter([this](const auto& l) { return should_show(l); }) |
+                std::views::drop(scroll_offset) | std::views::take(EolSettings->chat_lines());
 
     int line_height = font->line_height();
     int y = MARGIN_Y + line_height + 8;

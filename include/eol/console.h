@@ -55,6 +55,8 @@ class console {
     void activate_input();
     void submit_input();
     void paste_text(std::string_view text);
+    bool should_show(const console_line& line) const;
+    int max_scroll_offset() const;
 
     Mode mode = Mode::Chat;
     std::vector<console_line> lines;
@@ -65,6 +67,7 @@ class console {
     bool rendering = false;
     std::string input_buffer;
     int cursor_pos = 0;
+    int scroll_offset = 0;
     bool show_log_lines = false;
 };
 

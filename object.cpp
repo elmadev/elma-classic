@@ -121,3 +121,22 @@ double object::checksum() const {
     sum += (int)type;
     return sum;
 }
+
+std::optional<MotorGravity> object::gravity() const {
+    if (type != object::Type::Food) {
+        return std::nullopt;
+    }
+
+    switch (property) {
+    case object::Property::None:
+        return std::nullopt;
+    case object::Property::GravityUp:
+        return MotorGravity::Up;
+    case object::Property::GravityDown:
+        return MotorGravity::Down;
+    case object::Property::GravityLeft:
+        return MotorGravity::Left;
+    case object::Property::GravityRight:
+        return MotorGravity::Right;
+    }
+}

@@ -2,11 +2,14 @@
 #define RECORDER_H
 
 #include "sound_engine.h"
+#include "physics_init.h"
 #include "vect2.h"
 #include <cstdio>
 #include <optional>
 #include <string>
 #include <vector>
+
+class level;
 
 constexpr const char LAST_REC_FILENAME[] = "!last.rec";
 
@@ -107,6 +110,8 @@ class recorder {
     bool recall_event(double time, WavEvent* event_id, double* volume, int* object_id);
     // Walk events backward: returns true for each event whose time > `time`
     bool recall_event_reverse(double time, WavEvent* event_id, double* volume, int* object_id);
+    // Returns the currently applicable gravity by iterating backwards through events
+    MotorGravity gravity(const level& lev) const;
 
     // Find frame time of the last direction change at or before `time`,
     // detected from the flipped_bike flag in frame data.

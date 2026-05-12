@@ -4,6 +4,7 @@
 #include "level.h"
 #include "main.h"
 #include "menu/rec_list.h"
+#include "object.h"
 #include "physics_init.h"
 #include "qopen.h"
 #include "util/util.h"
@@ -372,6 +373,21 @@ double recorder::find_last_volt_time(double time, bool* is_right_volt) const {
         }
     }
     return -1000.0;
+}
+
+MotorGravity recorder::gravity(const level& lev) const {
+    for (int event_id = current_event_index; event_id > 0; event_id--) {
+        int obj_id = events[event_id - 1].object_id;
+        if (obj_id < 0) {
+            continue;
+        }
+        std::optional<MotorGravity> gravity = lev.objects[obj_id]->gravity();
+        if (gravity.has_value()) {
+            return gravity.value();
+        }
+    }
+    // Start of replay - return initial bike state
+    return MotorGravity::Down;
 }
 
 bool recorder::recall_event_reverse(double time, WavEvent* event_id, double* volume,

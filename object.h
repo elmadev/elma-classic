@@ -1,8 +1,10 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include "physics_init.h"
 #include "vect2.h"
 #include <cstdio>
+#include <optional>
 
 class object {
   public:
@@ -31,6 +33,8 @@ class object {
     void render() const;
     void save(FILE* h);
     double checksum() const;
+
+    std::optional<MotorGravity> gravity() const;
 };
 
 #endif

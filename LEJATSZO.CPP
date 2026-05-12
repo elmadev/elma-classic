@@ -118,21 +118,9 @@ static BikeState handle_object_interaction(int object_id, int* apple_count, moto
         Level->objects[object_id]->active = false;
         (*apple_count)++;
         add_event_buffer(WavEvent::Food, 0.99, -1);
-        switch (Level->objects[object_id]->property) {
-        case object::Property::None:
-            break;
-        case object::Property::GravityUp:
-            mot->gravity_direction = MotorGravity::Up;
-            break;
-        case object::Property::GravityDown:
-            mot->gravity_direction = MotorGravity::Down;
-            break;
-        case object::Property::GravityLeft:
-            mot->gravity_direction = MotorGravity::Left;
-            break;
-        case object::Property::GravityRight:
-            mot->gravity_direction = MotorGravity::Right;
-            break;
+        std::optional<MotorGravity> gravity = Level->objects[object_id]->gravity();
+        if (gravity.has_value()) {
+            mot->gravity_direction = gravity.value();
         }
         return BikeState::Normal;
     }
@@ -660,11 +648,19 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 static void reverse_events(motorst* mot, recorder* rec, double time) {
     WavEvent wav;
     double vol;
-    int obj;
-    while (rec->recall_event_reverse(time, &wav, &vol, &obj)) {
-        if (obj >= 0 && Level->objects[obj] && Level->objects[obj]->type == object::Type::Food) {
-            Level->objects[obj]->active = true;
+    int obj_id;
+    while (rec->recall_event_reverse(time, &wav, &vol, &obj_id)) {
+        if (obj_id < 0) {
+            continue;
+        }
+        object* obj = Level->objects[obj_id];
+        if (obj && obj->type == object::Type::Food) {
+            obj->active = true;
             mot->apple_count--;
+
+            if (obj->gravity()) {
+                mot->gravity_direction = rec->gravity(*Level);
+            }
         }
     }
 }
@@ -678,7 +674,11 @@ static void rewind_override_animations(bike_metadata* metadata, motorst* mot, re
     metadata->bike_turning.turn_time = turn_time;
 
     metadata->camera_turning.turn_time = -1000.0;
-    metadata->camera_turning.turn_phase = metadata->camera_turning.flipped ? 0.0 : 1.0;
+    int flipped_camera = mot->flipped_bike;
+    if (mot->gravity_direction == MotorGravity::Up) {
+        flipped_camera = !flipped_camera;
+    }
+    metadata->camera_turning.flipped = flipped_camera;
 
     metadata->volt_time = rec->find_last_volt_time(time, &metadata->volt_is_right);
 }

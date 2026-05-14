@@ -4,6 +4,7 @@
 #include "eol/status_messages.h"
 #include "eol_settings.h"
 #include "keys.h"
+#include "log.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include "util/util.h"
@@ -115,11 +116,18 @@ void console::register_console_commands() {
 }
 
 void console::add_line(std::string text, LineType type) {
+    // Drop glyphs the font can't render
+    if (font) {
+        std::erase_if(text, [this](char c) { return !font->has_char((unsigned char)c); });
+    }
+
     lines.emplace_back(std::move(text), type);
     if (lines.size() > MAX_LINES) {
         lines.erase(lines.begin());
     }
 }
+
+void console::set_font(abc8* new_font) { font = new_font; }
 
 void console::clear() { lines.clear(); }
 
@@ -269,7 +277,12 @@ void console::submit_input() {
     }
 }
 
-void console::render(pic8& screen, abc8& font) {
+void console::render(pic8& screen) {
+    if (!font) {
+        LOG_ERROR("Cannot render console: font not set");
+        return;
+    }
+
     auto filter = [this](const auto& line) {
         if (line.type == LineType::Log) {
             return show_log_lines;
@@ -282,21 +295,21 @@ void console::render(pic8& screen, abc8& font) {
     auto view = lines | std::views::reverse | std::views::filter(filter) |
                 std::views::take(EolSettings->chat_lines());
 
-    int line_height = font.line_height();
+    int line_height = font->line_height();
     int y = MARGIN_Y + line_height + 8;
     for (const console_line& line : view) {
-        font.write(&screen, MARGIN_X, y, line.text.c_str());
+        font->write(&screen, MARGIN_X, y, line.text.c_str());
         y += line_height;
     }
 
     if (input_active) {
-        font.write(&screen, MARGIN_X, MARGIN_Y, input_buffer.c_str());
+        font->write(&screen, MARGIN_X, MARGIN_Y, input_buffer.c_str());
 
         bool cursor_visible = (get_milliseconds() / 500) % 2 == 0;
         if (cursor_visible) {
             std::string before_cursor = input_buffer.substr(0, cursor_pos);
-            int cursor_x = MARGIN_X + font.len(before_cursor.c_str());
-            font.write(&screen, cursor_x, MARGIN_Y, "_");
+            int cursor_x = MARGIN_X + font->len(before_cursor.c_str());
+            font->write(&screen, cursor_x, MARGIN_Y, "_");
         }
     }
 }

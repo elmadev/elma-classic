@@ -97,6 +97,7 @@ void init_renderer() {
 
     Console = new console();
     Console->register_console_commands();
+    Console->set_font(SmallFont);
 
     StatusMessages = new status_messages();
 }
@@ -832,7 +833,7 @@ void render_game(double time, bike_metadata* metadata1, bike_metadata* metadata2
     }
 
     // Draw EOL overlays
-    Console->render(*pic, *SmallFont);
+    Console->render(*pic);
     StatusMessages->render(*pic, *SmallFont);
     EolClient->render_table(*pic, *MediumFont, *SmallFont);
     EolClient->render_battle_status(*pic, *SmallFont);

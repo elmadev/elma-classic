@@ -25,7 +25,8 @@ class console {
 
     void register_console_commands();
     void add_line(std::string text, LineType type);
-    void render(pic8& screen, abc8& font);
+    void render(pic8& screen);
+    void set_font(abc8* font);
 
     bool is_input_active() const;
     void toggle_active();
@@ -58,6 +59,7 @@ class console {
     Mode mode = Mode::Chat;
     std::vector<console_line> lines;
     std::unordered_map<std::string, command> commands;
+    abc8* font = nullptr;
     bool input_active = false;
     std::string input_buffer;
     int cursor_pos = 0;

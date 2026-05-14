@@ -121,6 +121,13 @@ void console::add_line(std::string text, LineType type) {
         std::erase_if(text, [this](char c) { return !font->has_char((unsigned char)c); });
     }
 
+    // If we're currently rendering, defer adding the line until after rendering is done to avoid
+    // modifying the lines vector while it's being iterated over.
+    if (rendering) {
+        deferred_lines.emplace_back(std::move(text), type);
+        return;
+    }
+
     lines.emplace_back(std::move(text), type);
     if (lines.size() > MAX_LINES) {
         lines.erase(lines.begin());
@@ -282,6 +289,7 @@ void console::render(pic8& screen) {
         LOG_ERROR("Cannot render console: font not set");
         return;
     }
+    rendering = true;
 
     auto filter = [this](const auto& line) {
         if (line.type == LineType::Log) {
@@ -312,4 +320,12 @@ void console::render(pic8& screen) {
             font->write(&screen, cursor_x, MARGIN_Y, "_");
         }
     }
+
+    rendering = false;
+
+    for (auto& line : deferred_lines) {
+        add_line(std::move(line.text), line.type);
+    }
+
+    deferred_lines.clear();
 }

@@ -58,9 +58,11 @@ class console {
 
     Mode mode = Mode::Chat;
     std::vector<console_line> lines;
+    std::vector<console_line> deferred_lines;
     std::unordered_map<std::string, command> commands;
     abc8* font = nullptr;
     bool input_active = false;
+    bool rendering = false;
     std::string input_buffer;
     int cursor_pos = 0;
     bool show_log_lines = false;

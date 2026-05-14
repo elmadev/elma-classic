@@ -720,6 +720,9 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike
 
     if (EolSettings->show_others()) {
         for (const kuski& ku : EolClient->kuskis()) {
+            if (&ku == spy_kuski) {
+                continue;
+            }
             const spy_data* k = ku.spy_data();
             if (!k) {
                 continue;
@@ -729,6 +732,14 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike
                 render_bike(false, pic, time, bottomleft_corner, &k->mot, &k->metadata, bike2,
                             ku.shirt);
             }
+        }
+    }
+
+    if (spy_kuski) {
+        const spy_data* k = spy_kuski->spy_data();
+        if (k && bike_in_view(&k->mot, center)) {
+            render_bike(false, pic, time, bottomleft_corner, &k->mot, &k->metadata, bike2,
+                        spy_kuski->shirt);
         }
     }
 

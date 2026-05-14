@@ -280,8 +280,10 @@ static void set_spy_kuski(std::optional<unsigned int>& spy_kuski_id, Range&& ran
         }
     }
 
-    spy_kuski_id.reset();
-    StatusMessages->add("not observing anyone anymore");
+    if (spy_kuski_id) {
+        spy_kuski_id.reset();
+        StatusMessages->add("not observing anyone anymore");
+    }
 }
 
 void eol::spy_next_kuski() { set_spy_kuski(spy_kuski_id, kuskis()); }

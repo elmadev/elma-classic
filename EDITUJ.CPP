@@ -245,7 +245,7 @@ constexpr char MENU_TEXT[23][15] = {"Exit",
                                     "Create Picture",
                                     "Delete Picture"};
 
-int SelectedTool = Tool_Move;
+Tool SelectedTool = Tool::Move;
 
 static void draw_editor_gui() {
     // Entire screen blue
@@ -264,12 +264,13 @@ static void draw_editor_gui() {
     BufferMain->line(EDITOR_MENU_X - 1, EDITOR_MENU_Y, EDITOR_MENU_X - 1, SCREEN_HEIGHT - 1,
                      EditorPaletteId_MenuBorder);
     // Menu entries
+    int tool_index = static_cast<int>(SelectedTool);
     for (int i = 0; i < MENU_LENGTH; i++) {
         int x1 = 1;
         int y1 = EDITOR_MENU_Y + i * MENU_ENTRY_HEIGHT + 1;
         int x2 = EDITOR_MENU_X - 2;
         int y2 = EDITOR_MENU_Y + (i + 1) * MENU_ENTRY_HEIGHT - 1;
-        if (i == COMMANDS_LENGTH + SelectedTool) {
+        if (i == COMMANDS_LENGTH + tool_index) {
             BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId_MenuSelected);
         }
         BufferMain->line(x1, y2 + 1, x2, y2 + 1, EditorPaletteId_MenuBorder);
@@ -465,7 +466,7 @@ static void draw_editor() {
 
     draw_cursor();
 
-    if (SelectedTool == Tool_CreateSprite) {
+    if (SelectedTool == Tool::CreateSprite) {
         if (!Lgr) {
             internal_error("draw_editor !Lgr");
         }
@@ -478,13 +479,13 @@ static void draw_editor() {
 // Change the tooltip to provide info about what is being hovered
 static void draw_mouse_tooltip(int mouse_x, int mouse_y) {
     // Food tooltip
-    if (SelectedTool == Tool_CreateFood) {
+    if (SelectedTool == Tool::CreateFood) {
         draw_object_tooltip(object::Type::Food, DefaultFoodProperty, DefaultFoodAnimation);
         return;
     }
 
     // Sprite tooltip
-    if (SelectedTool == Tool_CreateSprite) {
+    if (SelectedTool == Tool::CreateSprite) {
         if (!Lgr) {
             internal_error("draw_mouse_tooltip !Lgr");
         }
@@ -497,10 +498,10 @@ static void draw_mouse_tooltip(int mouse_x, int mouse_y) {
     polygon* poly = nullptr;
     object* obj = nullptr;
     sprite* spr = nullptr;
-    bool hover_poly = SelectedTool == Tool_Move || SelectedTool == Tool_CreateVertex ||
-                      SelectedTool == Tool_DeleteVertex || SelectedTool == Tool_DeletePolygon;
-    bool hover_obj = SelectedTool == Tool_Move || SelectedTool == Tool_DeleteObject;
-    bool hover_spr = SelectedTool == Tool_Move || SelectedTool == Tool_DeleteSprite;
+    bool hover_poly = SelectedTool == Tool::Move || SelectedTool == Tool::CreateVertex ||
+                      SelectedTool == Tool::DeleteVertex || SelectedTool == Tool::DeletePolygon;
+    bool hover_obj = SelectedTool == Tool::Move || SelectedTool == Tool::DeleteObject;
+    bool hover_spr = SelectedTool == Tool::Move || SelectedTool == Tool::DeleteSprite;
     Level->get_closest_entity(mouse_x, mouse_y, hover_poly ? &poly : nullptr, &SelectedVertexIndex,
                               hover_obj ? &obj : nullptr, hover_spr ? &spr : nullptr);
 
@@ -517,10 +518,11 @@ static void draw_mouse_tooltip(int mouse_x, int mouse_y) {
 }
 
 static void select_tool(int tool) {
-    if (tool == SelectedTool) {
+    Tool new_tool = static_cast<Tool>(tool);
+    if (new_tool == SelectedTool) {
         return;
     }
-    SelectedTool = tool;
+    SelectedTool = new_tool;
     draw_tooltip_help();
     invalidate_editor_gui();
 }
@@ -611,7 +613,7 @@ void editor() {
     DefaultFoodProperty = object::Property::None;
     DefaultFoodAnimation = 0;
 
-    SelectedTool = Tool_Move;
+    SelectedTool = Tool::Move;
     draw_tooltip_help();
 
     zoom_fill();
@@ -622,23 +624,23 @@ void editor() {
         handle_events();
         // Control keys
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            if (SelectedTool == Tool_Move) {
+            if (SelectedTool == Tool::Move) {
                 tool_move_esc();
             }
-            if (SelectedTool == Tool_ZoomIn) {
+            if (SelectedTool == Tool::ZoomIn) {
                 tool_zoom_in_esc();
             }
-            if (SelectedTool == Tool_CreateVertex) {
+            if (SelectedTool == Tool::CreateVertex) {
                 tool_create_vertex_esc();
             }
         }
         if (was_key_just_pressed(DIK_SPACE)) {
-            if (SelectedTool == Tool_CreateVertex) {
+            if (SelectedTool == Tool::CreateVertex) {
                 tool_create_vertex_space();
             }
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            if (SelectedTool == Tool_CreateVertex) {
+            if (SelectedTool == Tool::CreateVertex) {
                 tool_create_vertex_enter();
             }
         }
@@ -735,7 +737,7 @@ void editor() {
                         }
                         if (i == 5 && left_click) {
                             editor_play(is_key_down(DIK_F1));
-                            SelectedTool = Tool_Move;
+                            SelectedTool = Tool::Move;
                         }
                         if (i == 5 && right_click) {
                             editor_help_save_and_play();
@@ -816,49 +818,49 @@ void editor() {
                 }
             } else {
                 // Canvas clicks
-                if (SelectedTool == Tool_Move && left_click) {
+                if (SelectedTool == Tool::Move && left_click) {
                     tool_move_leftclick(click_x, click_y);
                 }
-                if (SelectedTool == Tool_Move && right_click) {
+                if (SelectedTool == Tool::Move && right_click) {
                     tool_move_rightclick(click_x, click_y);
                 }
-                if (SelectedTool == Tool_ZoomIn && left_click) {
+                if (SelectedTool == Tool::ZoomIn && left_click) {
                     tool_zoom_in_leftclick(click_x, click_y);
                 }
-                if (SelectedTool == Tool_ZoomIn && right_click) {
+                if (SelectedTool == Tool::ZoomIn && right_click) {
                     tool_zoom_in_esc();
                 }
-                if (SelectedTool == Tool_CreateVertex && left_click) {
+                if (SelectedTool == Tool::CreateVertex && left_click) {
                     tool_create_vertex_leftclick(click_x, click_y);
                 }
-                if (SelectedTool == Tool_CreateVertex && right_click) {
+                if (SelectedTool == Tool::CreateVertex && right_click) {
                     tool_create_vertex_esc();
                 }
-                if (SelectedTool == Tool_DeleteVertex && left_click) {
+                if (SelectedTool == Tool::DeleteVertex && left_click) {
                     tool_delete_vertex_leftclick(click_x, click_y);
                 }
-                if (SelectedTool == Tool_DeletePolygon && left_click) {
+                if (SelectedTool == Tool::DeletePolygon && left_click) {
                     tool_delete_polygon_leftclick(click_x, click_y);
                 }
-                if (SelectedTool == Tool_CreateFood && left_click) {
+                if (SelectedTool == Tool::CreateFood && left_click) {
                     tool_create_object_leftclick(click_x, click_y, true);
                 }
-                if (SelectedTool == Tool_CreateFood && right_click) {
+                if (SelectedTool == Tool::CreateFood && right_click) {
                     tool_create_food_rightclick();
                 }
-                if (SelectedTool == Tool_CreateKiller && left_click) {
+                if (SelectedTool == Tool::CreateKiller && left_click) {
                     tool_create_object_leftclick(click_x, click_y, false);
                 }
-                if (SelectedTool == Tool_DeleteObject && left_click) {
+                if (SelectedTool == Tool::DeleteObject && left_click) {
                     tool_delete_object_leftclick(click_x, click_y);
                 }
-                if (SelectedTool == Tool_CreateSprite && left_click) {
+                if (SelectedTool == Tool::CreateSprite && left_click) {
                     tool_create_sprite_leftclick(click_x, click_y);
                 }
-                if (SelectedTool == Tool_CreateSprite && right_click) {
+                if (SelectedTool == Tool::CreateSprite && right_click) {
                     tool_create_sprite_rightclick();
                 }
-                if (SelectedTool == Tool_DeleteSprite && left_click) {
+                if (SelectedTool == Tool::DeleteSprite && left_click) {
                     tool_delete_sprite_leftclick(click_x, click_y);
                 }
             }
@@ -887,11 +889,11 @@ void editor() {
         if (mouse_x == MouseX && mouse_y == MouseY) {
             continue;
         }
-        if (SelectedTool == Tool_ZoomIn) {
+        if (SelectedTool == Tool::ZoomIn) {
             tool_zoom_in_mousemove(mouse_x, mouse_y);
             continue;
         }
-        if (SelectedTool == Tool_CreateVertex && (SelectedPolygon || CreatingPolygon)) {
+        if (SelectedTool == Tool::CreateVertex && (SelectedPolygon || CreatingPolygon)) {
             tool_create_vertex_mousemove(mouse_x, mouse_y);
             continue;
         }
@@ -902,7 +904,7 @@ void editor() {
             MouseY = mouse_y;
             draw_cursor();
         } else {
-            if (SelectedTool == Tool_Move) {
+            if (SelectedTool == Tool::Move) {
                 tool_move_mousemove(mouse_x, mouse_y);
             }
         }

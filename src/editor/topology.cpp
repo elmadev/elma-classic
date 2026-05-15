@@ -41,7 +41,7 @@ bool check_topology(bool show_dialog) {
             sprintf(tmp1, "Error: The number of vertices must be less than %d!", MAX_VERTICES);
             sprintf(tmp2, "There are %d vertices now in the level.", vertex_count);
             dialog(tmp1, tmp2, "Please delete some vertices or polygons from this level!");
-            invalidateegesz();
+            invalidate_editor_gui();
         }
         return true;
     }
@@ -81,7 +81,7 @@ bool check_topology(bool show_dialog) {
                         dialog("Error: Two lines are intersecting each others!",
                                "After this dialog you will see the intersection.",
                                "Use Zoomout to see where it is located!");
-                        invalidateegesz();
+                        invalidate_editor_gui();
                     }
                     return true;
                 }
@@ -108,7 +108,7 @@ bool check_topology(bool show_dialog) {
                     dialog("Error: An object is outside the level borders!",
                            "After this dialog you will see the object.",
                            "Use Zoomout to see where it is located!");
-                    invalidateegesz();
+                    invalidate_editor_gui();
                 }
                 return true;
             }

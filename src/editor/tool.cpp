@@ -30,9 +30,9 @@ static bool delete_polygon(polygon* poly) {
         if (Level->polygons[i] == poly) {
             delete Level->polygons[i];
             Level->polygons[i] = nullptr;
-            K = 0;
-            Valtozott = 1;
-            invalidate();
+            SelectedVertexIndex = 0;
+            LevelChanged = 1;
+            invalidate_editor_level();
             return true;
         }
     }
@@ -40,41 +40,42 @@ static bool delete_polygon(polygon* poly) {
 }
 
 void draw_tooltip_help() {
-    switch (Tool) {
-    case T_MOVE:
-        toolhelp(
+    switch (SelectedTool) {
+    case Tool_Move:
+        draw_tooltip(
             "Move the cursor near a vertex or an object center you want to move, and left click.");
         break;
-    case T_ZOOMIN:
-        toolhelp("Left click to place the first corner of the zoom in window.");
+    case Tool_ZoomIn:
+        draw_tooltip("Left click to place the first corner of the zoom in window.");
         break;
-    case T_CREATE_VERT:
-        toolhelp("If you left click near a vertex you will add to a polygon, otherwise you will "
-                 "create a new polygon.");
+    case Tool_CreateVertex:
+        draw_tooltip(
+            "If you left click near a vertex you will add to a polygon, otherwise you will "
+            "create a new polygon.");
         break;
-    case T_DELETE_VERT:
-        toolhelp("Left click near the vertex you want to delete.");
+    case Tool_DeleteVertex:
+        draw_tooltip("Left click near the vertex you want to delete.");
         break;
-    case T_DELETE_POLY:
-        toolhelp("Left click near any vertex of the polygon you want to delete.");
+    case Tool_DeletePolygon:
+        draw_tooltip("Left click near any vertex of the polygon you want to delete.");
         break;
-    case T_CREATE_FOOD:
-        toolhelp("Left click to place a new Food object.");
+    case Tool_CreateFood:
+        draw_tooltip("Left click to place a new Food object.");
         break;
-    case T_CREATE_KILLER:
-        toolhelp("Left click to place a new Killer object.");
+    case Tool_CreateKiller:
+        draw_tooltip("Left click to place a new Killer object.");
         break;
-    case T_DELETE_KEREK:
-        toolhelp("Left click near the center of the object you want to delete.");
+    case Tool_DeleteObject:
+        draw_tooltip("Left click near the center of the object you want to delete.");
         break;
-    case T_CREATE_SPRITE:
-        toolhelp("Left click to place a new Picture. Right click chooses the picture.");
+    case Tool_CreateSprite:
+        draw_tooltip("Left click to place a new Picture. Right click chooses the picture.");
         break;
-    case T_DELETE_SPRITE:
-        toolhelp("Left click near the top-left corner of the picture you want to delete.");
+    case Tool_DeleteSprite:
+        draw_tooltip("Left click near the top-left corner of the picture you want to delete.");
         break;
     default:
-        toolhelp("draw_tooltip_help unknown tool!");
+        draw_tooltip("draw_tooltip_help unknown tool!");
     }
 }
 
@@ -82,67 +83,72 @@ static double ToolMoveOriginalX;
 static double ToolMoveOriginalY;
 
 void tool_move_leftclick(int mouse_x, int mouse_y) {
-    if (Pgy || Pker || Psp) {
+    if (SelectedPolygon || SelectedObject || SelectedSprite) {
         // We already are holding something in cursor - place it
-        if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-            internal_error("tool_move_leftclick (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+        if ((SelectedPolygon && SelectedObject) || (SelectedPolygon && SelectedSprite) ||
+            (SelectedObject && SelectedSprite)) {
+            internal_error(
+                "tool_move_leftclick (SelectedPolygon && SelectedObject) || (SelectedPolygon && "
+                "SelectedSprite) || (SelectedObject && SelectedSprite)!");
         }
-        if (Pgy) {
-            Pgy->vertices[K] = pixel_to_meter(mouse_x, mouse_y);
-            Pgy = nullptr;
+        if (SelectedPolygon) {
+            SelectedPolygon->vertices[SelectedVertexIndex] = pixel_to_meter(mouse_x, mouse_y);
+            SelectedPolygon = nullptr;
         }
-        if (Pker) {
-            Pker->r = pixel_to_meter(mouse_x, mouse_y);
-            Pker = nullptr;
+        if (SelectedObject) {
+            SelectedObject->r = pixel_to_meter(mouse_x, mouse_y);
+            SelectedObject = nullptr;
         }
-        if (Psp) {
-            Psp->r = pixel_to_meter(mouse_x, mouse_y);
-            Psp = nullptr;
+        if (SelectedSprite) {
+            SelectedSprite->r = pixel_to_meter(mouse_x, mouse_y);
+            SelectedSprite = nullptr;
         }
-        Valtozott = 1;
+        LevelChanged = 1;
         draw_tooltip_help();
-        invalidate();
+        invalidate_editor_level();
         return;
     }
 
     // We aren't holding anything. Grab the closest one within 10 pixels
-    Level->get_closest_entity(mouse_x, mouse_y, &Pgy, &K, &Pker, &Psp);
-    if (!Pgy && !Pker && !Psp) {
+    Level->get_closest_entity(mouse_x, mouse_y, &SelectedPolygon, &SelectedVertexIndex,
+                              &SelectedObject, &SelectedSprite);
+    if (!SelectedPolygon && !SelectedObject && !SelectedSprite) {
         return;
     }
-    if (Pgy) {
-        toolhelp("Move the vertex and left click to place it. Press ESC or right click to cancel.");
-        ToolMoveOriginalX = Pgy->vertices[K].x;
-        ToolMoveOriginalY = Pgy->vertices[K].y;
+    if (SelectedPolygon) {
+        draw_tooltip(
+            "Move the vertex and left click to place it. Press ESC or right click to cancel.");
+        ToolMoveOriginalX = SelectedPolygon->vertices[SelectedVertexIndex].x;
+        ToolMoveOriginalY = SelectedPolygon->vertices[SelectedVertexIndex].y;
         mouse_x = meter_to_pixel_x(ToolMoveOriginalX);
         mouse_y = meter_to_pixel_y(ToolMoveOriginalY);
     }
-    if (Pker) {
-        toolhelp("Move the object and left click to place it. Press ESC or right click to "
-                 "cancel.");
-        ToolMoveOriginalX = Pker->r.x;
-        ToolMoveOriginalY = Pker->r.y;
+    if (SelectedObject) {
+        draw_tooltip("Move the object and left click to place it. Press ESC or right click to "
+                     "cancel.");
+        ToolMoveOriginalX = SelectedObject->r.x;
+        ToolMoveOriginalY = SelectedObject->r.y;
         mouse_x = meter_to_pixel_x(ToolMoveOriginalX);
         mouse_y = meter_to_pixel_y(ToolMoveOriginalY);
     }
-    if (Psp) {
-        toolhelp("Move the picture and left click to place it. Press ESC or right click to "
-                 "cancel.");
-        ToolMoveOriginalX = Psp->r.x;
-        ToolMoveOriginalY = Psp->r.y;
+    if (SelectedSprite) {
+        draw_tooltip("Move the picture and left click to place it. Press ESC or right click to "
+                     "cancel.");
+        ToolMoveOriginalX = SelectedSprite->r.x;
+        ToolMoveOriginalY = SelectedSprite->r.y;
         mouse_x = meter_to_pixel_x(ToolMoveOriginalX);
         mouse_y = meter_to_pixel_y(ToolMoveOriginalY);
     }
 
     set_mouse_position(mouse_x, mouse_y);
-    push();
-    Moux = mouse_x;
-    Mouy = mouse_y;
-    pop();
+    erase_cursor();
+    MouseX = mouse_x;
+    MouseY = mouse_y;
+    draw_cursor();
 }
 
 void tool_move_rightclick(int mouse_x, int mouse_y) {
-    if (Pgy || Pker || Psp) {
+    if (SelectedPolygon || SelectedObject || SelectedSprite) {
         // Drop what we are holding
         tool_move_esc();
         return;
@@ -167,66 +173,70 @@ void tool_move_rightclick(int mouse_x, int mouse_y) {
 
 void tool_move_esc() {
     // Drop what we are holding
-    if (Pgy) {
-        Pgy->vertices[K].x = ToolMoveOriginalX;
-        Pgy->vertices[K].y = ToolMoveOriginalY;
-        Pgy = nullptr;
-        invalidate();
+    if (SelectedPolygon) {
+        SelectedPolygon->vertices[SelectedVertexIndex].x = ToolMoveOriginalX;
+        SelectedPolygon->vertices[SelectedVertexIndex].y = ToolMoveOriginalY;
+        SelectedPolygon = nullptr;
+        invalidate_editor_level();
     }
-    if (Pker) {
-        Pker->r.x = ToolMoveOriginalX;
-        Pker->r.y = ToolMoveOriginalY;
-        Pker = nullptr;
-        invalidate();
+    if (SelectedObject) {
+        SelectedObject->r.x = ToolMoveOriginalX;
+        SelectedObject->r.y = ToolMoveOriginalY;
+        SelectedObject = nullptr;
+        invalidate_editor_level();
     }
-    if (Psp) {
-        Psp->r.x = ToolMoveOriginalX;
-        Psp->r.y = ToolMoveOriginalY;
-        Psp = nullptr;
-        invalidate();
+    if (SelectedSprite) {
+        SelectedSprite->r.x = ToolMoveOriginalX;
+        SelectedSprite->r.y = ToolMoveOriginalY;
+        SelectedSprite = nullptr;
+        invalidate_editor_level();
     }
 }
 
 void tool_move_mousemove(int mouse_x, int mouse_y) {
-    if (!Pgy && !Pker && !Psp) {
-        internal_error("tool_move_mousemove !Pgy && !Pker && !Psp");
+    if (!SelectedPolygon && !SelectedObject && !SelectedSprite) {
+        internal_error(
+            "tool_move_mousemove !SelectedPolygon && !SelectedObject && !SelectedSprite");
     }
-    if ((Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)) {
-        internal_error("tool_move_mousemove: (Pgy && Pker) || (Pgy && Psp) || (Pker && Psp)!");
+    if ((SelectedPolygon && SelectedObject) || (SelectedPolygon && SelectedSprite) ||
+        (SelectedObject && SelectedSprite)) {
+        internal_error("tool_move_mousemove: (SelectedPolygon && SelectedObject) || "
+                       "(SelectedPolygon && SelectedSprite) "
+                       "|| (SelectedObject && SelectedSprite)!");
     }
 
-    push();
+    erase_cursor();
     lockfrontbuffer_pic();
 
     // Update the position of the item by redrawing it at the old position to erase,
     // then drawing it at the new position
-    if (Pgy) {
-        Pgy->render_one_line(K, Fel, false);
-        Pgy->render_one_line(K, !Fel, false);
+    if (SelectedPolygon) {
+        SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, false);
+        SelectedPolygon->render_one_line(SelectedVertexIndex, !CreateVertexDirection, false);
         double x = pixel_to_meter_x(mouse_x);
         double y = pixel_to_meter_y(mouse_y);
-        Pgy->set_vertex(K, x, y);
-        Pgy->render_one_line(K, Fel, false);
-        Pgy->render_one_line(K, !Fel, false);
+        SelectedPolygon->set_vertex(SelectedVertexIndex, x, y);
+        SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, false);
+        SelectedPolygon->render_one_line(SelectedVertexIndex, !CreateVertexDirection, false);
     }
-    if (Pker) {
-        Pker->render();
-        Pker->r.x = pixel_to_meter_x(mouse_x);
-        Pker->r.y = pixel_to_meter_y(mouse_y);
-        Pker->render();
+    if (SelectedObject) {
+        SelectedObject->render();
+        SelectedObject->r.x = pixel_to_meter_x(mouse_x);
+        SelectedObject->r.y = pixel_to_meter_y(mouse_y);
+        SelectedObject->render();
     }
-    if (Psp) {
-        Psp->render();
-        Psp->r.x = pixel_to_meter_x(mouse_x);
-        Psp->r.y = pixel_to_meter_y(mouse_y);
-        Psp->render();
+    if (SelectedSprite) {
+        SelectedSprite->render();
+        SelectedSprite->r.x = pixel_to_meter_x(mouse_x);
+        SelectedSprite->r.y = pixel_to_meter_y(mouse_y);
+        SelectedSprite->render();
     }
     unlockfrontbuffer_pic();
 
-    Moux = mouse_x;
-    Mouy = mouse_y;
+    MouseX = mouse_x;
+    MouseY = mouse_y;
 
-    pop();
+    draw_cursor();
 }
 
 bool CreatingPolygon = false;
@@ -234,13 +244,13 @@ static vect2 FirstVertex;
 static vect2 MouseVertex;
 
 void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
-    Valtozott = 1;
-    if (!Pgy && !CreatingPolygon) {
+    LevelChanged = 1;
+    if (!SelectedPolygon && !CreatingPolygon) {
         // We aren't holding anything - find the closest vertex
         double x = pixel_to_meter_x(mouse_x);
         double y = pixel_to_meter_y(mouse_y);
-        Pgy = Level->get_closest_vertex(x, y, &K);
-        if (!Pgy) {
+        SelectedPolygon = Level->get_closest_vertex(x, y, &SelectedVertexIndex);
+        if (!SelectedPolygon) {
             // We didn't find a closest vertex. Create a new polygon
             int poly_count = 0;
             for (int i = 0; i < MAX_POLYGONS; i++) {
@@ -261,57 +271,58 @@ void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
             // what we have is simply a line between 2 coordinates
             // Store this information temporarily and only create a real polygon once the 2nd
             // coordinate is placed.
-            toolhelp("Left click to place the second vertex. ESC or right click cancels.");
+            draw_tooltip("Left click to place the second vertex. ESC or right click cancels.");
             CreatingPolygon = true;
             FirstVertex = MouseVertex = vect2(x, y);
             return;
         }
         // We found the closest vertex
-        toolhelp("Left click to place vertex. SPACE and ENTER swaps. ESC or right "
-                 "click cancels.");
-        push();
-        Moux = meter_to_pixel_x(Pgy->vertices[K].x);
-        Mouy = meter_to_pixel_y(Pgy->vertices[K].y);
-        pop();
+        draw_tooltip("Left click to place vertex. SPACE and ENTER swaps. ESC or right "
+                     "click cancels.");
+        erase_cursor();
+        MouseX = meter_to_pixel_x(SelectedPolygon->vertices[SelectedVertexIndex].x);
+        MouseY = meter_to_pixel_y(SelectedPolygon->vertices[SelectedVertexIndex].y);
+        draw_cursor();
     }
 
     // We are holding a vertex
-    if (Pgy) {
+    if (SelectedPolygon) {
         // Create a new vertex
-        if (Pgy->vertex_count >= MAX_VERTICES) {
+        if (SelectedPolygon->vertex_count >= MAX_VERTICES) {
             char tmp[100];
             sprintf(tmp, "already reached the maximum number of vertices in this level! (%d)",
                     MAX_VERTICES);
             dialog("You cannot create a new vertex, because you have", tmp);
             return;
         }
-        toolhelp("Left click to place vertex. SPACE and ENTER swaps. ESC or right click "
-                 "cancels.");
-        Pgy->insert_vertex(K);
-        invalidate();
-        if (Fel) {
-            K++;
+        draw_tooltip("Left click to place vertex. SPACE and ENTER swaps. ESC or right click "
+                     "cancels.");
+        SelectedPolygon->insert_vertex(SelectedVertexIndex);
+        invalidate_editor_level();
+        if (CreateVertexDirection) {
+            SelectedVertexIndex++;
         }
         return;
     }
 
     // We are creating a new polygon and this is the second point, so let's convert from
     // temporary coordinates to a real polygon
-    toolhelp("Left click to place point. SPACE and ENTER swaps. ESC or right click "
-             "cancels.");
+    draw_tooltip("Left click to place point. SPACE and ENTER swaps. ESC or right click "
+                 "cancels.");
     if (!CreatingPolygon) {
-        internal_error("tool_create_vertex_leftclick !Pgy !CreatingPolygon");
+        internal_error("tool_create_vertex_leftclick !SelectedPolygon !CreatingPolygon");
     }
     for (int i = 0; i < MAX_POLYGONS; i++) {
         if (!Level->polygons[i]) {
-            Pgy = Level->polygons[i] = new polygon;
-            Pgy->vertex_count = 3;
-            Pgy->vertices[0] = FirstVertex;
-            Pgy->vertices[2] = Pgy->vertices[1] = pixel_to_meter(mouse_x, mouse_y);
-            K = 2;
-            Fel = true;
+            SelectedPolygon = Level->polygons[i] = new polygon;
+            SelectedPolygon->vertex_count = 3;
+            SelectedPolygon->vertices[0] = FirstVertex;
+            SelectedPolygon->vertices[2] = SelectedPolygon->vertices[1] =
+                pixel_to_meter(mouse_x, mouse_y);
+            SelectedVertexIndex = 2;
+            CreateVertexDirection = true;
             CreatingPolygon = false;
-            invalidate();
+            invalidate_editor_level();
             return;
         }
     };
@@ -319,28 +330,28 @@ void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
 }
 
 void tool_create_vertex_esc() {
-    if (!Pgy && !CreatingPolygon) {
+    if (!SelectedPolygon && !CreatingPolygon) {
         return;
     }
 
     draw_tooltip_help();
-    if (Pgy) {
+    if (SelectedPolygon) {
         // If we have a polygon
-        if (Pgy->vertex_count <= 3) {
+        if (SelectedPolygon->vertex_count <= 3) {
             // If we only have 3 points or less, delete the polygon
             // This should occur only when we are creating a new polygon from scratch,
             // and we've only placed 2 points so far
-            if (!delete_polygon(Pgy)) {
+            if (!delete_polygon(SelectedPolygon)) {
                 internal_error("tool_create_vertex_esc poly_count <= 1!");
             }
-            Pgy = nullptr;
+            SelectedPolygon = nullptr;
             return;
         }
         // Delete the floating vertex at the mouse position
-        Pgy->delete_vertex(K);
-        Pgy = nullptr;
-        K = 0;
-        invalidate();
+        SelectedPolygon->delete_vertex(SelectedVertexIndex);
+        SelectedPolygon = nullptr;
+        SelectedVertexIndex = 0;
+        invalidate_editor_level();
         return;
     }
 
@@ -350,58 +361,58 @@ void tool_create_vertex_esc() {
         internal_error("tool_create_vertex_esc !CreatingPolygon!");
     }
     CreatingPolygon = false;
-    invalidate();
+    invalidate_editor_level();
 }
 
 void tool_create_vertex_enter() {
     // Swap the direction of vertex creation
-    Fel = !Fel;
-    if (Pgy && !CreatingPolygon) {
-        invalidate();
+    CreateVertexDirection = !CreateVertexDirection;
+    if (SelectedPolygon && !CreatingPolygon) {
+        invalidate_editor_level();
     }
 }
 
 void tool_create_vertex_space() {
     // Move the floating vertex over by 1 to a new place in the polygon
-    if (!Pgy || CreatingPolygon) {
+    if (!SelectedPolygon || CreatingPolygon) {
         return;
     }
-    int next_index = K;
-    if (Fel) {
+    int next_index = SelectedVertexIndex;
+    if (CreateVertexDirection) {
         next_index--;
         if (next_index < 0) {
-            next_index = Pgy->vertex_count - 1;
+            next_index = SelectedPolygon->vertex_count - 1;
         }
     } else {
         next_index++;
-        if (next_index >= Pgy->vertex_count) {
+        if (next_index >= SelectedPolygon->vertex_count) {
             next_index = 0;
         }
     }
-    Pgy->vertices[K] = Pgy->vertices[next_index];
-    K = next_index;
-    Moux = meter_to_pixel_x(Pgy->vertices[K].x);
-    Mouy = meter_to_pixel_y(Pgy->vertices[K].y);
-    set_mouse_position(Moux, Mouy);
-    Fel = !Fel;
-    invalidate();
+    SelectedPolygon->vertices[SelectedVertexIndex] = SelectedPolygon->vertices[next_index];
+    SelectedVertexIndex = next_index;
+    MouseX = meter_to_pixel_x(SelectedPolygon->vertices[SelectedVertexIndex].x);
+    MouseY = meter_to_pixel_y(SelectedPolygon->vertices[SelectedVertexIndex].y);
+    set_mouse_position(MouseX, MouseY);
+    CreateVertexDirection = !CreateVertexDirection;
+    invalidate_editor_level();
 }
 
 void tool_create_vertex_mousemove(int mouse_x, int mouse_y) {
-    if (!Pgy && !CreatingPolygon) {
+    if (!SelectedPolygon && !CreatingPolygon) {
         internal_error("tool_create_vertex_mousemove invalid call!");
     }
-    push();
+    erase_cursor();
     lockfrontbuffer_pic();
     // Erase existing line by drawing over it, then draw new line
     double x = pixel_to_meter_x(mouse_x);
     double y = pixel_to_meter_y(mouse_y);
-    if (Pgy) {
-        Pgy->render_one_line(K, Fel, true);
-        Pgy->render_one_line(K, !Fel, false);
-        Pgy->set_vertex(K, x, y);
-        Pgy->render_one_line(K, Fel, true);
-        Pgy->render_one_line(K, !Fel, false);
+    if (SelectedPolygon) {
+        SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, true);
+        SelectedPolygon->render_one_line(SelectedVertexIndex, !CreateVertexDirection, false);
+        SelectedPolygon->set_vertex(SelectedVertexIndex, x, y);
+        SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, true);
+        SelectedPolygon->render_one_line(SelectedVertexIndex, !CreateVertexDirection, false);
     } else {
         if (!CreatingPolygon) {
             internal_error("tool_create_vertex_mousemove !CreatingPolygon");
@@ -410,15 +421,15 @@ void tool_create_vertex_mousemove(int mouse_x, int mouse_y) {
         MouseVertex = vect2(x, y);
         render_line(FirstVertex, MouseVertex, false);
     }
-    Moux = mouse_x;
-    Mouy = mouse_y;
+    MouseX = mouse_x;
+    MouseY = mouse_y;
     unlockfrontbuffer_pic();
-    pop();
+    draw_cursor();
 }
 
 void tool_delete_vertex_leftclick(int mouse_x, int mouse_y) {
-    if (Pgy) {
-        internal_error("tool_delete_vertex_leftclick Pgy");
+    if (SelectedPolygon) {
+        internal_error("tool_delete_vertex_leftclick SelectedPolygon");
     }
 
     double x = pixel_to_meter_x(mouse_x);
@@ -439,13 +450,13 @@ void tool_delete_vertex_leftclick(int mouse_x, int mouse_y) {
         return;
     }
     poly->delete_vertex(vertex_index);
-    Valtozott = 1;
-    invalidate();
+    LevelChanged = 1;
+    invalidate_editor_level();
 }
 
 void tool_delete_polygon_leftclick(int mouse_x, int mouse_y) {
-    if (Pgy) {
-        internal_error("tool_delete_polygon_leftclick Pgy");
+    if (SelectedPolygon) {
+        internal_error("tool_delete_polygon_leftclick SelectedPolygon");
     }
 
     double x = pixel_to_meter_x(mouse_x);
@@ -498,8 +509,8 @@ void tool_create_object_leftclick(int mouse_x, int mouse_y, bool is_food) {
                 Level->objects[i]->property = DefaultFoodProperty;
                 Level->objects[i]->animation = DefaultFoodAnimation;
             }
-            invalidate();
-            Valtozott = 1;
+            invalidate_editor_level();
+            LevelChanged = 1;
             return;
         }
     }
@@ -525,8 +536,8 @@ void tool_delete_object_leftclick(int mouse_x, int mouse_y) {
             }
             delete obj;
             Level->objects[i] = nullptr;
-            Valtozott = 1;
-            invalidate();
+            LevelChanged = 1;
+            invalidate_editor_level();
             return;
         }
     }
@@ -545,11 +556,11 @@ void tool_zoom_in_leftclick(int mouse_x, int mouse_y) {
         draw_tooltip_help();
         zoom_in(ZoomInX1, ZoomInY1, mouse_x, mouse_y);
         SelectingZoomInBox = false;
-        invalidate();
+        invalidate_editor_level();
     } else {
         // First click
-        toolhelp("Left click to place the second corner of the zoom window. ESC or right click "
-                 "cancels.");
+        draw_tooltip("Left click to place the second corner of the zoom window. ESC or right click "
+                     "cancels.");
         SelectingZoomInBox = true;
         ZoomInX1 = ZoomInX2 = mouse_x;
         ZoomInY1 = ZoomInY2 = mouse_y;
@@ -560,7 +571,7 @@ void tool_zoom_in_esc() {
     if (SelectingZoomInBox) {
         draw_tooltip_help();
         SelectingZoomInBox = false;
-        invalidate();
+        invalidate_editor_level();
     }
 }
 
@@ -591,22 +602,22 @@ static void draw_zoom_in_rectangle(int x1, int y1, int x2, int y2) {
 }
 
 void tool_zoom_in_mousemove(int mouse_x, int mouse_y) {
-    push();
+    erase_cursor();
     if (SelectingZoomInBox) {
         // Draw the zoom in box only if we clicked to select the topleft corner
         lockfrontbuffer_pic();
         draw_zoom_in_rectangle(ZoomInX1, ZoomInY1, ZoomInX2, ZoomInY2);
         ZoomInX2 = mouse_x;
         ZoomInY2 = mouse_y;
-        Moux = mouse_x;
-        Mouy = mouse_y;
+        MouseX = mouse_x;
+        MouseY = mouse_y;
         draw_zoom_in_rectangle(ZoomInX1, ZoomInY1, ZoomInX2, ZoomInY2);
         unlockfrontbuffer_pic();
     } else {
-        Moux = mouse_x;
-        Mouy = mouse_y;
+        MouseX = mouse_x;
+        MouseY = mouse_y;
     }
-    pop();
+    draw_cursor();
 }
 
 void tool_create_sprite_rightclick() {
@@ -654,8 +665,8 @@ void tool_create_sprite_leftclick(int mouse_x, int mouse_y) {
             double y = pixel_to_meter_y(mouse_y);
             Level->sprites[i] = new sprite(x, y, Lgr->editor_picture_name, Lgr->editor_texture_name,
                                            Lgr->editor_mask_name);
-            invalidate();
-            Valtozott = 1;
+            invalidate_editor_level();
+            LevelChanged = 1;
             return;
         }
     }
@@ -673,8 +684,8 @@ void tool_delete_sprite_leftclick(int mouse_x, int mouse_y) {
         if (Level->sprites[i] == spr) {
             delete spr;
             Level->sprites[i] = nullptr;
-            Valtozott = 1;
-            invalidate();
+            LevelChanged = 1;
+            invalidate_editor_level();
             return;
         }
     }

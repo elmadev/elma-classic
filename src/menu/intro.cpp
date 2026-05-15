@@ -57,17 +57,17 @@ void menu_intro() {
     init_sound();
 
     // Load globals
-    Pabc1 = new abc8("kisbetu1.abc"); // "small letter 1"
-    Pabc1->set_spacing(1);
-    Pabc2 = new abc8("kisbetu2.abc"); // "small letter 2"
-    Pabc2->set_spacing(1);
+    EditorWhiteFont = new abc8("kisbetu1.abc"); // "small letter 1"
+    EditorWhiteFont->set_spacing(1);
+    EditorBlackFont = new abc8("kisbetu2.abc"); // "small letter 2"
+    EditorBlackFont->set_spacing(1);
 
     init_renderer();
 
     Rec1 = new recorder;
     Rec2 = new recorder;
 
-    seteditorpal();
+    create_editor_palette();
 
     // Initialize stopwatch, just in case
     stopwatch_reset();

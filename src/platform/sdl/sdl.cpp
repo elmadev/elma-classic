@@ -393,7 +393,7 @@ void handle_events() {
         switch (event.type) {
         case SDL_QUIT:
             // Exit request probably sent by user to terminate program
-            if (InEditor && Valtozott) {
+            if (InEditor && LevelChanged) {
                 // Disallow exiting if unsaved changes in editor
                 break;
             }
@@ -403,10 +403,10 @@ void handle_events() {
             // Force editor redraw if focus gained/lost to fix editor sometimes blanking
             switch (event.window.event) {
             case SDL_WINDOWEVENT_FOCUS_GAINED:
-                invalidateegesz();
+                invalidate_editor_gui();
                 break;
             case SDL_WINDOWEVENT_FOCUS_LOST:
-                invalidateegesz();
+                invalidate_editor_gui();
                 break;
             case SDL_WINDOWEVENT_RESIZED:
                 window_resize_event(event.window.data1, event.window.data2);

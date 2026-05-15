@@ -16,62 +16,62 @@ extern level* Level;
 // extern pic8* Editbuffer; Ezentul ez BufferMain
 // extern pic8* Editbuffer2;  Ezentul ez BufferBall
 
-extern palette* Pal_editor;
-void seteditorpal(); // Pal_editor-t hozza letre es allitja be
+extern palette* EditorPalette;
+void create_editor_palette(); // EditorPalette-t hozza letre es allitja be
 
-extern abc8 *Pabc1, *Pabc2;
+extern abc8 *EditorWhiteFont, *EditorBlackFont;
 
-extern polygon* Pgy;
-extern int K;
-extern bool Fel;
+extern polygon* SelectedPolygon;
+extern int SelectedVertexIndex;
+extern bool CreateVertexDirection;
 
-extern object* Pker;
+extern object* SelectedObject;
 
-extern sprite* Psp;
+extern sprite* SelectedSprite;
 
-extern int Valtozott;
+extern int LevelChanged;
 
 enum {
-    T_MOVE = 0,
-    T_ZOOMIN,
-    T_CREATE_VERT,
-    T_DELETE_VERT,
-    T_DELETE_POLY,
-    T_CREATE_FOOD,
-    T_CREATE_KILLER,
-    T_DELETE_KEREK,
-    T_CREATE_SPRITE,
-    T_DELETE_SPRITE
+    Tool_Move = 0,
+    Tool_ZoomIn,
+    Tool_CreateVertex,
+    Tool_DeleteVertex,
+    Tool_DeletePolygon,
+    Tool_CreateFood,
+    Tool_CreateKiller,
+    Tool_DeleteObject,
+    Tool_CreateSprite,
+    Tool_DeleteSprite
 };
 
-extern int Tool;
+extern int SelectedTool;
 
 // extern char Editfilenev[20]; // "nincsnev.lev" eseten meg nincs neve
 
-constexpr unsigned char Menulineszin = 0;
-constexpr unsigned char DIALOG_BORDER_PALETTE_ID = 0;
-constexpr unsigned char Menuszin = 1;
-constexpr unsigned char Menu_nyomottszin = 2;
-constexpr unsigned char Hatterindex = 3;
-constexpr unsigned char DIALOG_PALETTE_ID = 4;
-constexpr unsigned char EditorPalette_LevelNameDialog = 4;
-constexpr unsigned char EditorPalette_LevelNameDialogBorder = 5;
-constexpr unsigned char EditorPalette_List = 6;
-constexpr unsigned char EditorPalette_ListSelected = 7;
-constexpr unsigned char BUTTON_PALETTE_ID = 8;
-constexpr unsigned char Feherszin = 9;
+constexpr unsigned char EditorPaletteId_MenuBorder = 0;
+constexpr unsigned char EditorPaletteId_WindowBorder = 0;
+constexpr unsigned char EditorPaletteId_Menu = 1;
+constexpr unsigned char EditorPaletteId_MenuSelected = 2;
+constexpr unsigned char EditorPaletteId_Background = 3;
+constexpr unsigned char EditorPaletteId_Window = 4;
+constexpr unsigned char EditorPaletteId_LevelNameWindow = 4;
+constexpr unsigned char EditorPaletteId_LevelNameWindowBorder = 5;
+constexpr unsigned char EditorPaletteId_WindowList = 6;
+constexpr unsigned char EditorPaletteId_WindowListSelected = 7;
+constexpr unsigned char EditorPaletteId_WindowButton = 8;
+constexpr unsigned char EditorPaletteId_WindowInput = 9;
 
-extern int Moux, Mouy;
-void push(); // levesz
-void pop();  // feltesz
+extern int MouseX, MouseY;
+void erase_cursor(); // levesz
+void draw_cursor();  // feltesz
 void update_and_draw_cursor();
 
-void invalidate();
-void invalidateegesz();
+void invalidate_editor_level();
+void invalidate_editor_gui();
 
 void editor();
 
-void toolhelp(const char* text = nullptr);
+void draw_tooltip(const char* text = nullptr);
 
 #define SZ_ZOOMVONAL (90)
 

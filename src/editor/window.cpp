@@ -105,7 +105,7 @@ static void open_level(const char* filename) {
     strcpy(State->editor_filename, tmp);
 
     // Load level
-    LevelChanged = 0;
+    LevelChanged = false;
     invalidate_level();
     if (!load_level_editor(tmp)) {
         State->editor_filename[0] = 0;
@@ -407,7 +407,7 @@ void editor_new() {
         }
     }
 
-    LevelChanged = 0;
+    LevelChanged = false;
     load_level_editor(DEFAULT_LEVEL_FILENAME);
     State->editor_filename[0] = 0;
     zoom_fill();
@@ -419,7 +419,7 @@ bool editor_window_save() {
         return editor_window_save_as();
     }
     Level->save(State->editor_filename);
-    LevelChanged = 0;
+    LevelChanged = false;
     return true;
 }
 
@@ -480,7 +480,7 @@ bool editor_window_save_as() {
                 }
                 Level->save(filename_input);
                 strcpy(State->editor_filename, filename_input);
-                LevelChanged = 0;
+                LevelChanged = false;
                 return true;
             }
         }
@@ -1166,7 +1166,7 @@ void editor_window_sprite_properties(sprite* spr) {
             return;
         } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (spr->distance != distance || spr->clipping != clipping) {
-                LevelChanged = 1;
+                LevelChanged = true;
             }
             spr->distance = distance;
             spr->clipping = clipping;
@@ -1304,7 +1304,7 @@ void editor_window_polygon_properties(polygon* poly) {
             return;
         } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (poly->is_grass != is_grass) {
-                LevelChanged = 1;
+                LevelChanged = true;
             }
             poly->is_grass = is_grass;
             return;
@@ -1441,7 +1441,7 @@ void editor_window_food_properties(const char* title, object::Property* property
                     char c = pop_text_input();
                     if (c >= '1' && c <= '9') {
                         *animation = c - '1';
-                        LevelChanged = 1;
+                        LevelChanged = true;
                         draw_cursor();
                         return;
                     }
@@ -1452,7 +1452,7 @@ void editor_window_food_properties(const char* title, object::Property* property
             if (index >= list_length) {
                 index = list_length - 1;
             }
-            LevelChanged = 1;
+            LevelChanged = true;
             switch (index) {
             case 0:
                 *property = object::Property::None;
@@ -1612,14 +1612,14 @@ void editor_window_level_properties() {
             if (strcmpi(Level->foreground_name, foreground_name) != 0 ||
                 strcmpi(Level->background_name, background_name) != 0 ||
                 strcmp(Level->level_name, level_name) != 0) {
-                LevelChanged = 1;
+                LevelChanged = true;
             }
             strcpy(Level->foreground_name, foreground_name);
             strcpy(Level->background_name, background_name);
             strcpy(Level->level_name, level_name);
 
             if (strcmpi(lgr_name, Level->lgr_name) != 0) {
-                LevelChanged = 1;
+                LevelChanged = true;
                 strcpy(Level->lgr_name, lgr_name);
                 lgrfile::load_lgr_file(Level->lgr_name);
                 if (Level->discard_missing_lgr_assets(Lgr)) {

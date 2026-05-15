@@ -1,5 +1,5 @@
 #include "physics_collision.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "LEJATSZO.H"
 #include "level.h"
 #include "main.h"

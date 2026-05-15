@@ -2,7 +2,7 @@
 #include "editor/dialog.h"
 #include "eol_settings.h"
 #include "eol/eol.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "sound_engine.h"
 #include "keys.h"
 #include "platform/sdl/keyboard.h"

@@ -1,5 +1,5 @@
 #include "editor/canvas.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "level.h"
 #include "M_PIC.H"
 #include "main.h"

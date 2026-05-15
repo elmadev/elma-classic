@@ -2,7 +2,7 @@
 #include "editor/canvas.h"
 #include "editor/dialog.h"
 #include "editor/window.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "platform/implementation.h"
 #include "polygon.h"
 #include "level.h"

@@ -1,6 +1,6 @@
 #include "editor/dialog.h"
 #include "abc8.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "keys.h"
 #include "M_PIC.H"
 #include "main.h"

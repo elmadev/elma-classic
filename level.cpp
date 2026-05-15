@@ -4,7 +4,7 @@
 #include "editor/canvas.h"
 #include "editor/dialog.h"
 #include "editor/window.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "polygon.h"
 #include "lgr.h"
 #include "level_load.h"

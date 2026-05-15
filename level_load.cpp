@@ -1,7 +1,7 @@
 #include "level_load.h"
 #include "canvas.h"
 #include "editor/dialog.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "fs_utils.h"
 #include "level.h"
 #include "lgr.h"

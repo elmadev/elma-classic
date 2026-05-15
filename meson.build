@@ -27,7 +27,7 @@ elma_sources = files(
     'src/editor/help.cpp',
     'src/editor/window.cpp',
     'src/editor/tool.cpp',
-    'EDITUJ.CPP',
+    'src/editor/editor.cpp',
     'src/editor/topology.cpp',
     'flagtag.cpp',
     'src/menu/ball_handler.cpp',

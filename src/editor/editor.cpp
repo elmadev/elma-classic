@@ -1,4 +1,4 @@
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "abc8.h"
 #include "editor/help.h"
 #include "editor/canvas.h"

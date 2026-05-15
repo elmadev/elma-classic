@@ -1,5 +1,5 @@
 #include "LEJATSZO.H"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "eol/console.h"
 #include "eol/eol.h"
 #include "eol/status_messages.h"

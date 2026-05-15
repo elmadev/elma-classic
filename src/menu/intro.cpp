@@ -1,7 +1,7 @@
 #include "menu/intro.h"
 #include "abc8.h"
 #include "menu/ball_collision.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "eol_settings.h"
 #include "renderer/render.h"
 #include "M_PIC.H"

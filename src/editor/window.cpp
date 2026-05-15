@@ -2,7 +2,7 @@
 #include "abc8.h"
 #include "editor/canvas.h"
 #include "editor/dialog.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "fs_utils.h"
 #include "keys.h"
 #include "level.h"

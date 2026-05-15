@@ -1,6 +1,6 @@
 #include "lgr.h"
 #include "editor/dialog.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "anim.h"
 #include "canvas.h"
 #include "eol_settings.h"

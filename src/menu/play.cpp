@@ -2,7 +2,7 @@
 #include "M_PIC.H"
 #include "abc8.h"
 #include "menu/best_times.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "flagtag.h"
 #include "keys.h"
 #include "LEJATSZO.H"

@@ -1,7 +1,7 @@
 #include "editor/topology.h"
 #include "editor/canvas.h"
 #include "editor/dialog.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "level.h"
 #include "object.h"
 #include "polygon.h"

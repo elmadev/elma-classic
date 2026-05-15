@@ -1,5 +1,5 @@
-#ifndef EDITUJ_H
-#define EDITUJ_H
+#ifndef EDITOR_H
+#define EDITOR_H
 
 class abc8;
 class object;

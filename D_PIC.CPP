@@ -1,6 +1,6 @@
 #include "M_PIC.H"
 #include "menu/ball.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "eol_settings.h"
 #include "editor/canvas.h"
 #include "lgr.h"

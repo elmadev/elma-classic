@@ -1,6 +1,6 @@
 #include "physics_forces.h"
 #include "canvas.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "LEJATSZO.H"
 #include "level.h"
 #include "object.h"

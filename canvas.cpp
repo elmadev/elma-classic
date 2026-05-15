@@ -1,6 +1,6 @@
 #include "canvas.h"
 #include "anim.h"
-#include "EDITUJ.H"
+#include "editor/editor.h"
 #include "eol_settings.h"
 #include "grass.h"
 #include "polygon.h"

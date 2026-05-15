@@ -321,31 +321,31 @@ static std::string editor_window_list_levels(bool show_new_button) {
             rerender = false;
 
             erase_cursor();
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
-                       EditorPaletteId_WindowBorder);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId_WindowList,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+                       EditorPaletteId::WINDOW_BORDER);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId::WINDOW_LIST,
+                       EditorPaletteId::WINDOW_BORDER);
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPaletteId_WindowListSelected);
+                                         EditorPaletteId::WINDOW_LIST_SELECTED);
                 }
                 EditorBlackFont->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
                                        ListEntries[i + view_index].c_str());
             }
-            render_box(BufferMain, box_up, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
-            draw_arrow(BufferMain, box_up, EditorPaletteId_WindowBorder, true);
-            render_box(BufferMain, box_down, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
-            draw_arrow(BufferMain, box_down, EditorPaletteId_WindowBorder, false);
-            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_up, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_arrow(BufferMain, box_up, EditorPaletteId::WINDOW_BORDER, true);
+            render_box(BufferMain, box_down, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_arrow(BufferMain, box_down, EditorPaletteId::WINDOW_BORDER, false);
+            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
             if (show_new_button) {
-                render_box(BufferMain, box_new, EditorPaletteId_WindowButton,
-                           EditorPaletteId_WindowBorder);
+                render_box(BufferMain, box_new, EditorPaletteId::WINDOW_BUTTON,
+                           EditorPaletteId::WINDOW_BORDER);
                 EditorBlackFont->write_centered(BufferMain, (box_new.x1 + box_new.x2) / 2,
                                                 box_new.y1 + 15, "NEW");
             }
@@ -430,8 +430,9 @@ bool editor_window_save_as() {
     box box_save = {320 - 30, 273, 320 + 30, 290};
 
     erase_cursor();
-    render_box(BufferMain, box_window, EditorPaletteId_Window, EditorPaletteId_WindowBorder);
-    render_box(BufferMain, box_save, EditorPaletteId_WindowButton, EditorPaletteId_WindowBorder);
+    render_box(BufferMain, box_window, EditorPaletteId::WINDOW, EditorPaletteId::WINDOW_BORDER);
+    render_box(BufferMain, box_save, EditorPaletteId::WINDOW_BUTTON,
+               EditorPaletteId::WINDOW_BORDER);
     EditorBlackFont->write_centered(
         BufferMain, (box_window.x2 + box_window.x1) / 2, 220,
         "Type in the file name and press ENTER or click on SAVE, or press ESC to cancel!");
@@ -455,7 +456,7 @@ bool editor_window_save_as() {
             int ey1 = box_window.y1 + 30;
             int ex2 = box_window.x2 - 100;
             int ey2 = box_window.y1 + 55;
-            BufferMain->fill_box(ex1, ey1, ex2, ey2, EditorPaletteId_Window);
+            BufferMain->fill_box(ex1, ey1, ex2, ey2, EditorPaletteId::WINDOW);
             EditorBlackFont->write(BufferMain, 290, 250, filename_input);
             char tmp[40];
             strcpy(tmp, filename_input);
@@ -794,14 +795,14 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             }
 
             // Draw the list of sprites
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
-                       EditorPaletteId_WindowBorder);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId_WindowList,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+                       EditorPaletteId::WINDOW_BORDER);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId::WINDOW_LIST,
+                       EditorPaletteId::WINDOW_BORDER);
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPaletteId_WindowListSelected);
+                                         EditorPaletteId::WINDOW_LIST_SELECTED);
                 }
                 EditorBlackFont->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
                                        name_at(i + view_index));
@@ -836,14 +837,14 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             }
 
             // Draw other buttons
-            render_box(BufferMain, box_up, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
-            draw_arrow(BufferMain, box_up, EditorPaletteId_WindowBorder, true);
-            render_box(BufferMain, box_down, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
-            draw_arrow(BufferMain, box_down, EditorPaletteId_WindowBorder, false);
-            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_up, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_arrow(BufferMain, box_up, EditorPaletteId::WINDOW_BORDER, true);
+            render_box(BufferMain, box_down, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_arrow(BufferMain, box_down, EditorPaletteId::WINDOW_BORDER, false);
+            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
             render_list_search(BufferMain, box_search, search_input);
@@ -932,15 +933,15 @@ void editor_window_choose_sprite() {
 
             erase_cursor();
 
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+                       EditorPaletteId::WINDOW_BORDER);
 
             EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, "Choose picture");
 
-            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
-            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
+            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
                                             "OK");
             EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
@@ -948,19 +949,19 @@ void editor_window_choose_sprite() {
 
             int label_x1 = x1 + 8;
             EditorBlackFont->write(BufferMain, label_x1, box_picture.y1 + 15, "Normal Picture:");
-            render_box(BufferMain, box_picture, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
-            draw_textbox_left(BufferMain, box_picture, EditorPaletteId_WindowInput, picture_name);
+            render_box(BufferMain, box_picture, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_textbox_left(BufferMain, box_picture, EditorPaletteId::WINDOW_INPUT, picture_name);
 
             EditorBlackFont->write(BufferMain, label_x1, box_texture.y1 + 15, "Texture:");
-            render_box(BufferMain, box_texture, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
-            draw_textbox_left(BufferMain, box_texture, EditorPaletteId_WindowInput, texture_name);
+            render_box(BufferMain, box_texture, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_textbox_left(BufferMain, box_texture, EditorPaletteId::WINDOW_INPUT, texture_name);
 
             EditorBlackFont->write(BufferMain, label_x1, box_mask.y1 + 15, "Mask:");
-            render_box(BufferMain, box_mask, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
-            draw_textbox_left(BufferMain, box_mask, EditorPaletteId_WindowInput, mask_name);
+            render_box(BufferMain, box_mask, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_textbox_left(BufferMain, box_mask, EditorPaletteId::WINDOW_INPUT, mask_name);
 
             bltfront(BufferMain);
             draw_cursor();
@@ -1037,26 +1038,26 @@ bool editor_window_choose_lgr(char* lgrname) {
             rerender = false;
 
             erase_cursor();
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
-                       EditorPaletteId_WindowBorder);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId_WindowList,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+                       EditorPaletteId::WINDOW_BORDER);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId::WINDOW_LIST,
+                       EditorPaletteId::WINDOW_BORDER);
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPaletteId_WindowListSelected);
+                                         EditorPaletteId::WINDOW_LIST_SELECTED);
                 }
                 EditorBlackFont->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
                                        ListEntries[i + view_index].c_str());
             }
-            render_box(BufferMain, box_up, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
-            draw_arrow(BufferMain, box_up, EditorPaletteId_WindowBorder, true);
-            render_box(BufferMain, box_down, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
-            draw_arrow(BufferMain, box_down, EditorPaletteId_WindowBorder, false);
-            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_up, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_arrow(BufferMain, box_up, EditorPaletteId::WINDOW_BORDER, true);
+            render_box(BufferMain, box_down, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_arrow(BufferMain, box_down, EditorPaletteId::WINDOW_BORDER, false);
+            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
 
@@ -1084,7 +1085,7 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
             rerender = false;
             char tmp[10];
             sprintf(tmp, "%d", distance);
-            draw_textbox_centered(pic, bx, EditorPaletteId_WindowInput, tmp, true);
+            draw_textbox_centered(pic, bx, EditorPaletteId::WINDOW_INPUT, tmp, true);
             bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
         }
         if (was_key_just_pressed(DIK_ESCAPE)) {
@@ -1116,7 +1117,7 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
 
 static Clipping prompt_clipping(pic8* pic, box bx, Clipping clipping) {
     erase_cursor();
-    draw_textbox_centered(pic, bx, EditorPaletteId_WindowInput, "", true);
+    draw_textbox_centered(pic, bx, EditorPaletteId::WINDOW_INPUT, "", true);
     bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
     empty_keypress_buffer();
     while (true) {
@@ -1181,12 +1182,12 @@ void editor_window_sprite_properties(sprite* spr) {
         if (rerender) {
             rerender = false;
             erase_cursor();
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
-                       EditorPaletteId_WindowBorder);
-            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
-            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+                       EditorPaletteId::WINDOW_BORDER);
+            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
+            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
                                             "OK");
             EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
@@ -1251,14 +1252,14 @@ void editor_window_sprite_properties(sprite* spr) {
             // Actual values
             EditorBlackFont->write(BufferMain, x1 + 12, y1 + 130, "Current:");
 
-            render_box(BufferMain, box_distance, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_distance, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
             sprintf(tmp, "%d", distance);
-            draw_textbox_centered(BufferMain, box_distance, EditorPaletteId_WindowInput, tmp);
+            draw_textbox_centered(BufferMain, box_distance, EditorPaletteId::WINDOW_INPUT, tmp);
             EditorBlackFont->write_centered(BufferMain, x1 + 119, box_distance.y2 + 14, "(1-999)");
 
-            render_box(BufferMain, box_clipping, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_clipping, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
             if (clipping == Clipping::Unclipped) {
                 strcpy(tmp, "U");
             }
@@ -1268,7 +1269,7 @@ void editor_window_sprite_properties(sprite* spr) {
             if (clipping == Clipping::Sky) {
                 strcpy(tmp, "S");
             }
-            draw_textbox_centered(BufferMain, box_clipping, EditorPaletteId_WindowInput, tmp);
+            draw_textbox_centered(BufferMain, box_clipping, EditorPaletteId::WINDOW_INPUT, tmp);
             EditorBlackFont->write_centered(BufferMain, x1 + 198, box_clipping.y2 + 14,
                                             "(U, S, G)");
 
@@ -1316,16 +1317,16 @@ void editor_window_polygon_properties(polygon* poly) {
             rerender = false;
 
             erase_cursor();
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+                       EditorPaletteId::WINDOW_BORDER);
 
             EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15,
                                             "Set Polygon Properties");
 
             int label_x1 = x1 + 18;
             EditorBlackFont->write(BufferMain, label_x1, box_grass.y1 + 15, "Grass polygon:");
-            render_box(BufferMain, box_grass, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_grass, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
             if (is_grass) {
                 EditorBlackFont->write_centered(BufferMain, (box_grass.x1 + box_grass.x2) / 2,
                                                 box_grass.y1 + 15, "YES");
@@ -1334,10 +1335,10 @@ void editor_window_polygon_properties(polygon* poly) {
                                                 box_grass.y1 + 15, "NO");
             }
 
-            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
-            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
+            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
                                             "OK");
             EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
@@ -1368,9 +1369,10 @@ void editor_window_food_properties(const char* title, object::Property* property
     box box_list = {(x1 + x2) / 2 - 70, ly1, (x1 + x2) / 2 + 70, ly1 + dy};
 
     erase_cursor();
-    render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window, EditorPaletteId_WindowBorder);
+    render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW, EditorPaletteId::WINDOW_BORDER);
     EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, title);
-    render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton, EditorPaletteId_WindowBorder);
+    render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+               EditorPaletteId::WINDOW_BORDER);
     EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                     box_cancel.y1 + 15, "Cancel");
 
@@ -1378,13 +1380,14 @@ void editor_window_food_properties(const char* title, object::Property* property
                            "Food anim number (1-9):");
     char tmp[20];
     sprintf(tmp, "%d", (int)(*animation + 1));
-    render_box(BufferMain, box_animation, EditorPaletteId_WindowInput,
-               EditorPaletteId_WindowBorder);
+    render_box(BufferMain, box_animation, EditorPaletteId::WINDOW_INPUT,
+               EditorPaletteId::WINDOW_BORDER);
     EditorBlackFont->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
                                     box_animation.y1 + 15, tmp);
 
     for (int i = 0; i < list_length; i++) {
-        render_box(BufferMain, box_list, EditorPaletteId_WindowList, EditorPaletteId_WindowBorder);
+        render_box(BufferMain, box_list, EditorPaletteId::WINDOW_LIST,
+                   EditorPaletteId::WINDOW_BORDER);
         int lx = (box_list.x1 + box_list.x2) / 2;
         int ly = box_list.y1 + 15;
         switch (i) {
@@ -1424,8 +1427,8 @@ void editor_window_food_properties(const char* title, object::Property* property
             return;
         } else if (clicked_box(box_animation)) {
             erase_cursor();
-            render_box(BufferMain, box_animation, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_animation, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
                                             box_animation.y1 + 18, "-");
             bltfront(BufferMain, x1, y1, x2, y2);
@@ -1497,11 +1500,11 @@ static void editor_window_level_name(char* level_name) {
     while (true) {
         handle_events();
 
-        BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId_LevelNameWindow);
-        BufferMain->line(x1, y1, x2, y1, EditorPaletteId_LevelNameWindowBorder);
-        BufferMain->line(x1, y2, x2, y2, EditorPaletteId_LevelNameWindowBorder);
-        BufferMain->line(x1, y1, x1, y2, EditorPaletteId_LevelNameWindowBorder);
-        BufferMain->line(x2, y1, x2, y2, EditorPaletteId_LevelNameWindowBorder);
+        BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId::LEVEL_NAME_WINDOW);
+        BufferMain->line(x1, y1, x2, y1, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
+        BufferMain->line(x1, y2, x2, y2, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
+        BufferMain->line(x1, y1, x1, y2, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
+        BufferMain->line(x2, y1, x2, y2, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
         EditorBlackFont->write_centered(
             BufferMain, (x2 + x1) / 2, 220,
             "Type in the name of the level and the designer and press ENTER (ESC to cancel)!");
@@ -1674,43 +1677,43 @@ void editor_window_level_properties() {
 
             erase_cursor();
 
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+                       EditorPaletteId::WINDOW_BORDER);
 
             EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 22, "Level properties");
 
-            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
                                             "OK");
 
-            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
 
             int label_x1 = x1 + 10;
             EditorBlackFont->write(BufferMain, label_x1, box_foreground.y1 + 15, "Foreground:");
-            render_box(BufferMain, box_foreground, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
-            draw_textbox_left(BufferMain, box_foreground, EditorPaletteId_WindowInput,
+            render_box(BufferMain, box_foreground, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_textbox_left(BufferMain, box_foreground, EditorPaletteId::WINDOW_INPUT,
                               foreground_name);
 
             EditorBlackFont->write(BufferMain, label_x1, box_background.y1 + 15, "Background:");
-            render_box(BufferMain, box_background, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
-            draw_textbox_left(BufferMain, box_background, EditorPaletteId_WindowInput,
+            render_box(BufferMain, box_background, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_textbox_left(BufferMain, box_background, EditorPaletteId::WINDOW_INPUT,
                               background_name);
 
             EditorBlackFont->write(BufferMain, label_x1, box_levelname.y1 + 15, "Level name:");
-            render_box(BufferMain, box_levelname, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
-            draw_textbox_left(BufferMain, box_levelname, EditorPaletteId_WindowInput, level_name);
+            render_box(BufferMain, box_levelname, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_textbox_left(BufferMain, box_levelname, EditorPaletteId::WINDOW_INPUT, level_name);
 
             EditorBlackFont->write(BufferMain, label_x1, box_lgr.y1 + 15, "LGR file:");
-            render_box(BufferMain, box_lgr, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
-            draw_textbox_left(BufferMain, box_lgr, EditorPaletteId_WindowInput, lgr_name);
+            render_box(BufferMain, box_lgr, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
+            draw_textbox_left(BufferMain, box_lgr, EditorPaletteId::WINDOW_INPUT, lgr_name);
 
             bltfront(BufferMain, x1, y1, x2, y2);
             draw_cursor();
@@ -1759,39 +1762,42 @@ void editor_window_view_options() {
             rerender = false;
             erase_cursor();
 
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+                       EditorPaletteId::WINDOW_BORDER);
 
-            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+                       EditorPaletteId::WINDOW_BORDER);
             EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
                                             "OK");
 
             EditorBlackFont->write(BufferMain, label_x1, box_polygons.y1 + 15, "View Polygons");
-            render_box(BufferMain, box_polygons, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_polygons, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
             if (ShowPolygons) {
-                draw_textbox_centered(BufferMain, box_polygons, EditorPaletteId_WindowInput, "Yes");
+                draw_textbox_centered(BufferMain, box_polygons, EditorPaletteId::WINDOW_INPUT,
+                                      "Yes");
             } else {
-                draw_textbox_centered(BufferMain, box_polygons, EditorPaletteId_WindowInput, "No");
+                draw_textbox_centered(BufferMain, box_polygons, EditorPaletteId::WINDOW_INPUT,
+                                      "No");
             }
 
             EditorBlackFont->write(BufferMain, label_x1, box_grass.y1 + 15, "View Grass");
-            render_box(BufferMain, box_grass, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_grass, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
             if (ShowGrassPolygons) {
-                draw_textbox_centered(BufferMain, box_grass, EditorPaletteId_WindowInput, "Yes");
+                draw_textbox_centered(BufferMain, box_grass, EditorPaletteId::WINDOW_INPUT, "Yes");
             } else {
-                draw_textbox_centered(BufferMain, box_grass, EditorPaletteId_WindowInput, "No");
+                draw_textbox_centered(BufferMain, box_grass, EditorPaletteId::WINDOW_INPUT, "No");
             }
 
             EditorBlackFont->write(BufferMain, label_x1, box_objects.y1 + 15, "View Pictures");
-            render_box(BufferMain, box_objects, EditorPaletteId_WindowInput,
-                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_objects, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
             if (ShowObjects) {
-                draw_textbox_centered(BufferMain, box_objects, EditorPaletteId_WindowInput, "Yes");
+                draw_textbox_centered(BufferMain, box_objects, EditorPaletteId::WINDOW_INPUT,
+                                      "Yes");
             } else {
-                draw_textbox_centered(BufferMain, box_objects, EditorPaletteId_WindowInput, "No");
+                draw_textbox_centered(BufferMain, box_objects, EditorPaletteId::WINDOW_INPUT, "No");
             }
 
             bltfront(BufferMain, x1, y1, x2, y2);

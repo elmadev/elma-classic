@@ -249,7 +249,7 @@ void draw_tooltip(const char* text) {
     int y1 = 18;
     int x2 = SCREEN_WIDTH - 2;
     int y2 = EDITOR_MENU_Y - 2;
-    BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId_Background);
+    BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId::BACKGROUND);
     EditorWhiteFont->write(BufferMain, 10, y1 + 12, TooltipText);
     bltfront(BufferMain, x1, y1, x2, y2);
 }
@@ -302,20 +302,20 @@ void invalidate_editor_gui() { RedrawEditorGui = true; }
 
 static void draw_editor_gui() {
     // Entire screen blue
-    BufferMain->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, EditorPaletteId_Menu);
+    BufferMain->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, EditorPaletteId::MENU);
     // Entire screen border
-    BufferMain->line(0, 0, SCREEN_WIDTH - 1, 0, EditorPaletteId_MenuBorder);
+    BufferMain->line(0, 0, SCREEN_WIDTH - 1, 0, EditorPaletteId::MENU_BORDER);
     BufferMain->line(0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1,
-                     EditorPaletteId_MenuBorder);
-    BufferMain->line(0, 0, 0, SCREEN_HEIGHT - 1, EditorPaletteId_MenuBorder);
+                     EditorPaletteId::MENU_BORDER);
+    BufferMain->line(0, 0, 0, SCREEN_HEIGHT - 1, EditorPaletteId::MENU_BORDER);
     BufferMain->line(SCREEN_WIDTH - 1, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1,
-                     EditorPaletteId_MenuBorder);
+                     EditorPaletteId::MENU_BORDER);
     // Tooltip section line (top)
     BufferMain->line(0, EDITOR_MENU_Y - 1, SCREEN_WIDTH - 1, EDITOR_MENU_Y - 1,
-                     EditorPaletteId_MenuBorder);
+                     EditorPaletteId::MENU_BORDER);
     // Menu section line (left)
     BufferMain->line(EDITOR_MENU_X - 1, EDITOR_MENU_Y, EDITOR_MENU_X - 1, SCREEN_HEIGHT - 1,
-                     EditorPaletteId_MenuBorder);
+                     EditorPaletteId::MENU_BORDER);
     // Menu entries
     int tool_index = static_cast<int>(SelectedTool);
     for (int i = 0; i < MENU_LENGTH; i++) {
@@ -324,9 +324,9 @@ static void draw_editor_gui() {
         int x2 = EDITOR_MENU_X - 2;
         int y2 = EDITOR_MENU_Y + (i + 1) * MENU_ENTRY_HEIGHT - 1;
         if (i == COMMANDS_LENGTH + tool_index) {
-            BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId_MenuSelected);
+            BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId::MENU_SELECTED);
         }
-        BufferMain->line(x1, y2 + 1, x2, y2 + 1, EditorPaletteId_MenuBorder);
+        BufferMain->line(x1, y2 + 1, x2, y2 + 1, EditorPaletteId::MENU_BORDER);
         EditorWhiteFont->write(BufferMain, 5, EDITOR_MENU_Y + i * MENU_ENTRY_HEIGHT + 14,
                                MENU_TEXT[i]);
     }
@@ -369,7 +369,7 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
     strcpy(TooltipTextureName, texture_name);
     strcpy(TooltipMaskName, mask_name);
 
-    TooltipBuffer.fill_box(EditorPaletteId_Background);
+    TooltipBuffer.fill_box(EditorPaletteId::BACKGROUND);
 
     if (picture_name[0] && (texture_name[0] || mask_name[0])) {
         internal_error("draw_sprite_tooltip too many params!");
@@ -416,7 +416,7 @@ void draw_object_tooltip(object::Type type, object::Property property, int anima
     // Impossible name (9 characters long) to invalidate cache
     strcpy(TooltipPictureName, "aaccbbdde");
 
-    TooltipBuffer.fill_box(EditorPaletteId_Background);
+    TooltipBuffer.fill_box(EditorPaletteId::BACKGROUND);
     EditorWhiteFont->write(&TooltipBuffer, 0, 14, "Object:");
     char tmp[50];
     if (type == object::Type::Exit) {
@@ -468,9 +468,9 @@ static void draw_editor() {
 
     // Background of level canvas
     BufferMain->fill_box(EDITOR_MENU_X, EDITOR_MENU_Y, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2,
-                         EditorPaletteId_Background);
+                         EditorPaletteId::BACKGROUND);
     // Background of tooltip section (top)
-    BufferMain->fill_box(1, 1, SCREEN_WIDTH - 2, EDITOR_MENU_Y - 2, EditorPaletteId_Background);
+    BufferMain->fill_box(1, 1, SCREEN_WIDTH - 2, EDITOR_MENU_Y - 2, EditorPaletteId::BACKGROUND);
 
     // Tooltip section
     EditorWhiteFont->write(BufferMain, 6, 15, "File:");

@@ -59,7 +59,7 @@ static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
     strcpy(filename, lgr_name);
     strcat(filename, ".lgr");
     blit8(BufferBall, BufferMain);
-    BufferMain->fill_box(EditorPaletteId_Background);
+    BufferMain->fill_box(EditorPaletteId::BACKGROUND);
     bltfront(BufferMain);
     if (!InEditor) {
         EditorPalette->set();

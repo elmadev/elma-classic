@@ -38,7 +38,6 @@ sprite* SelectedSprite = nullptr;
 bool LevelChanged = false;
 
 palette* EditorPalette = nullptr;
-static unsigned char Pal_editor_byteok[768];
 
 constexpr int COMMANDS_LENGTH = 13;
 constexpr int TOOLS_LENGTH = 10;
@@ -85,61 +84,60 @@ enum class Tool {
 static Tool SelectedTool = Tool::Move;
 
 void create_editor_palette() {
-    unsigned char* pal = Pal_editor_byteok;
-
-    for (int i = 0; i < 768; i++) {
-        pal[i] = 128;
-    }
+    unsigned char pal[768];
+    std::memset(pal, 128, sizeof(pal));
 
     // 0-63: Hardcoded colours
-    pal[0 + 0] = 0;
-    pal[0 + 1] = 0;
-    pal[0 + 2] = 0;
-    pal[3 + 0] = 122;
-    pal[3 + 1] = 131;
-    pal[3 + 2] = 181;
-    pal[6 + 0] = 48;
-    pal[6 + 1] = 56;
-    pal[6 + 2] = 107;
-    pal[9 + 0] = 171;
-    pal[9 + 1] = 146;
-    pal[9 + 2] = 142;
-    pal[12 + 0] = 252;
-    pal[12 + 1] = 218;
-    pal[12 + 2] = 213;
-    pal[15 + 0] = 0;
-    pal[15 + 1] = 0;
-    pal[15 + 2] = 0;
-    pal[18 + 0] = 213;
-    pal[18 + 1] = 148;
-    pal[18 + 2] = 139;
-    pal[21 + 0] = 223;
-    pal[21 + 1] = 209;
-    pal[21 + 2] = 206;
-    pal[24 + 0] = 198;
-    pal[24 + 1] = 202;
-    pal[24 + 2] = 231;
-    pal[27 + 0] = 255;
-    pal[27 + 1] = 255;
-    pal[27 + 2] = 255;
-    pal[30 + 0] = 180;
-    pal[30 + 1] = 120;
-    pal[30 + 2] = 110;
+    pal[EditorPaletteId::MENU_BORDER * 3 + 0] = 0;
+    pal[EditorPaletteId::MENU_BORDER * 3 + 1] = 0;
+    pal[EditorPaletteId::MENU_BORDER * 3 + 2] = 0;
+    pal[EditorPaletteId::MENU * 3 + 0] = 122;
+    pal[EditorPaletteId::MENU * 3 + 1] = 131;
+    pal[EditorPaletteId::MENU * 3 + 2] = 181;
+    pal[EditorPaletteId::MENU_SELECTED * 3 + 0] = 48;
+    pal[EditorPaletteId::MENU_SELECTED * 3 + 1] = 56;
+    pal[EditorPaletteId::MENU_SELECTED * 3 + 2] = 107;
+    pal[EditorPaletteId::BACKGROUND * 3 + 0] = 171;
+    pal[EditorPaletteId::BACKGROUND * 3 + 1] = 146;
+    pal[EditorPaletteId::BACKGROUND * 3 + 2] = 142;
+    pal[EditorPaletteId::WINDOW * 3 + 0] = 252;
+    pal[EditorPaletteId::WINDOW * 3 + 1] = 218;
+    pal[EditorPaletteId::WINDOW * 3 + 2] = 213;
+    pal[EditorPaletteId::LEVEL_NAME_WINDOW_BORDER * 3 + 0] = 0;
+    pal[EditorPaletteId::LEVEL_NAME_WINDOW_BORDER * 3 + 1] = 0;
+    pal[EditorPaletteId::LEVEL_NAME_WINDOW_BORDER * 3 + 2] = 0;
+    pal[EditorPaletteId::WINDOW_LIST * 3 + 0] = 213;
+    pal[EditorPaletteId::WINDOW_LIST * 3 + 1] = 148;
+    pal[EditorPaletteId::WINDOW_LIST * 3 + 2] = 139;
+    pal[EditorPaletteId::WINDOW_LIST_SELECTED * 3 + 0] = 223;
+    pal[EditorPaletteId::WINDOW_LIST_SELECTED * 3 + 1] = 209;
+    pal[EditorPaletteId::WINDOW_LIST_SELECTED * 3 + 2] = 206;
+    pal[EditorPaletteId::WINDOW_BUTTON * 3 + 0] = 198;
+    pal[EditorPaletteId::WINDOW_BUTTON * 3 + 1] = 202;
+    pal[EditorPaletteId::WINDOW_BUTTON * 3 + 2] = 231;
+    pal[EditorPaletteId::WINDOW_INPUT * 3 + 0] = 255;
+    pal[EditorPaletteId::WINDOW_INPUT * 3 + 1] = 255;
+    pal[EditorPaletteId::WINDOW_INPUT * 3 + 2] = 255;
+    // Unused
+    pal[10 * 3 + 0] = 180;
+    pal[10 * 3 + 1] = 120;
+    pal[10 * 3 + 2] = 110;
+    // Unused
     pal[39 * 3 + 0] = 0;
     pal[39 * 3 + 1] = 0;
     pal[39 * 3 + 2] = 0;
-    pal[59 * 3 + 0] = 0;
-    pal[59 * 3 + 1] = 0;
-    pal[59 * 3 + 2] = 0;
-    pal[62 * 3 + 0] = 255;
-    pal[62 * 3 + 1] = 255;
-    pal[62 * 3 + 2] = 255;
+    pal[EditorPaletteId::BLACK_FONT * 3 + 0] = 0;
+    pal[EditorPaletteId::BLACK_FONT * 3 + 1] = 0;
+    pal[EditorPaletteId::BLACK_FONT * 3 + 2] = 0;
+    pal[EditorPaletteId::WHITE_FONT * 3 + 0] = 255;
+    pal[EditorPaletteId::WHITE_FONT * 3 + 1] = 255;
+    pal[EditorPaletteId::WHITE_FONT * 3 + 2] = 255;
 
     // 64-127: True colour RGB222 (i -> 0x00RRGGBB)
     for (int i = 0; i < 64; i++) {
-        int r = i >> 4;
-        int g = (i >> 2) & 3;
-        int b = i & 3;
+        int r = (i >> 4) & 0b00000011;
+        int g = (i >> 2) & 0b00000011;
+        int b = (i >> 0) & 0b00000011;
         pal[(64 + i) * 3 + 0] = (unsigned char)(r * 64 + 8);
         pal[(64 + i) * 3 + 1] = (unsigned char)(g * 64 + 8);
         pal[(64 + i) * 3 + 2] = (unsigned char)(b * 64 + 8);
@@ -147,10 +145,17 @@ void create_editor_palette() {
 
     // 128-255: inverse colours of 0-127, when mousing over or drawing over
     for (int i = 0; i < 128; i++) {
-        if (pal[3 * i] + pal[3 * i + 1] + pal[3 * i + 2] >= 384) {
-            pal[3 * (i + 128)] = pal[3 * (i + 128) + 1] = pal[3 * (i + 128) + 2] = 0;
+        int source = i * 3;
+        int inverted = (i + 128) * 3;
+        int sum = pal[source + 0] + pal[source + 1] + pal[source + 2];
+        if (sum >= 128 * 3) {
+            pal[inverted + 0] = 0;
+            pal[inverted + 1] = 0;
+            pal[inverted + 2] = 0;
         } else {
-            pal[3 * (i + 128)] = pal[3 * (i + 128) + 1] = pal[3 * (i + 128) + 2] = 255;
+            pal[inverted + 0] = 255;
+            pal[inverted + 1] = 255;
+            pal[inverted + 2] = 255;
         }
     }
 

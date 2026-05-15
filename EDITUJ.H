@@ -37,6 +37,8 @@ constexpr unsigned char WINDOW_LIST = 6;
 constexpr unsigned char WINDOW_LIST_SELECTED = 7;
 constexpr unsigned char WINDOW_BUTTON = 8;
 constexpr unsigned char WINDOW_INPUT = 9;
+constexpr unsigned char BLACK_FONT = 59;
+constexpr unsigned char WHITE_FONT = 62;
 } // namespace EditorPaletteId
 
 extern int MouseX;

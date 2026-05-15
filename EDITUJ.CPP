@@ -295,7 +295,7 @@ void draw_tooltip_help() {
         draw_tooltip("Left click near the top-left corner of the picture you want to delete.");
         break;
     default:
-        draw_tooltip("draw_tooltip_help unknown tool!");
+        internal_error("draw_tooltip_help unknown tool!");
     }
 }
 

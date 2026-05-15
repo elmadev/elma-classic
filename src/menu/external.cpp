@@ -40,6 +40,10 @@ static void play_external(const std::string& filename, bool map_viewer) {
     }
 }
 
+static bool ExternalLevelsInvalidated = false;
+
+void invalidate_external_levels() { ExternalLevelsInvalidated = true; }
+
 static bool menu_external_levels_inner() {
     menu_nav nav("Select External File!");
     nav.search_pattern = SearchPattern::Sorted;
@@ -58,16 +62,22 @@ static bool menu_external_levels_inner() {
 
     nav.sort_rows();
     nav.select_row(State->external_filename);
+    ExternalLevelsInvalidated = false;
 
     while (true) {
         int choice = nav.navigate();
         if (choice < 0) {
             return false;
         }
+
+        if (ExternalLevelsInvalidated) {
+            return true;
+        }
     }
 }
 
 void menu_external_levels() {
     while (menu_external_levels_inner()) {
+        /* wait for exit condition */
     }
 }

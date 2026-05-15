@@ -75,7 +75,7 @@ void draw_tooltip(const char* text = nullptr);
 
 #define SZ_ZOOMVONAL (90)
 
-void kispritenev(const char* kepnev, const char* texturanev, const char* maszknev, int tav,
-                 Clipping hatarol);
+void draw_sprite_tooltip(const char* kepnev, const char* texturanev, const char* maszknev, int tav,
+                         Clipping hatarol);
 
 #endif

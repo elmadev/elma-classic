@@ -10,15 +10,10 @@ class polygon;
 class sprite;
 class level;
 
-// Uj integralt editor h-ja:
-
 extern level* Level;
-// extern pic8* Editbuffer; Ezentul ez BufferMain
-// extern pic8* Editbuffer2;  Ezentul ez BufferBall
 
 extern palette* EditorPalette;
-void create_editor_palette(); // EditorPalette-t hozza letre es allitja be
-
+void create_editor_palette();
 extern abc8 *EditorWhiteFont, *EditorBlackFont;
 
 extern polygon* SelectedPolygon;
@@ -26,7 +21,6 @@ extern int SelectedVertexIndex;
 extern bool CreateVertexDirection;
 
 extern object* SelectedObject;
-
 extern sprite* SelectedSprite;
 
 extern int LevelChanged;
@@ -46,8 +40,6 @@ enum {
 
 extern int SelectedTool;
 
-// extern char Editfilenev[20]; // "nincsnev.lev" eseten meg nincs neve
-
 constexpr unsigned char EditorPaletteId_MenuBorder = 0;
 constexpr unsigned char EditorPaletteId_WindowBorder = 0;
 constexpr unsigned char EditorPaletteId_Menu = 1;
@@ -62,8 +54,8 @@ constexpr unsigned char EditorPaletteId_WindowButton = 8;
 constexpr unsigned char EditorPaletteId_WindowInput = 9;
 
 extern int MouseX, MouseY;
-void erase_cursor(); // levesz
-void draw_cursor();  // feltesz
+void erase_cursor();
+void draw_cursor();
 void update_and_draw_cursor();
 
 void invalidate_editor_level();

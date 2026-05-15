@@ -32,7 +32,6 @@ int SelectedVertexIndex = 0;
 bool CreateVertexDirection = false;
 
 object* SelectedObject = nullptr;
-
 sprite* SelectedSprite = nullptr;
 
 int LevelChanged = 0;
@@ -42,59 +41,56 @@ static unsigned char Pal_editor_byteok[768];
 
 void create_editor_palette() {
     unsigned char* pal = Pal_editor_byteok;
-    // Paletta elso 64 szine menu szinek,
-    // Masodik 64 szin truecolor tabla
-    // Masodik 128 szin eger szine:
 
-    // Lenullazzuk:
     for (int i = 0; i < 768; i++) {
         pal[i] = 128;
     }
 
+    // 0-63: Hardcoded colours
     pal[0 + 0] = 0;
     pal[0 + 1] = 0;
-    pal[0 + 2] = 0; //  0.
+    pal[0 + 2] = 0;
     pal[3 + 0] = 122;
     pal[3 + 1] = 131;
-    pal[3 + 2] = 181; //  1.
+    pal[3 + 2] = 181;
     pal[6 + 0] = 48;
     pal[6 + 1] = 56;
-    pal[6 + 2] = 107; //  2.
+    pal[6 + 2] = 107;
     pal[9 + 0] = 171;
     pal[9 + 1] = 146;
-    pal[9 + 2] = 142; //  3.
+    pal[9 + 2] = 142;
     pal[12 + 0] = 252;
     pal[12 + 1] = 218;
-    pal[12 + 2] = 213; //  4.
+    pal[12 + 2] = 213;
     pal[15 + 0] = 0;
     pal[15 + 1] = 0;
-    pal[15 + 2] = 0; //  5.
+    pal[15 + 2] = 0;
     pal[18 + 0] = 213;
     pal[18 + 1] = 148;
-    pal[18 + 2] = 139; //  6.
+    pal[18 + 2] = 139;
     pal[21 + 0] = 223;
     pal[21 + 1] = 209;
-    pal[21 + 2] = 206; //  7.
+    pal[21 + 2] = 206;
     pal[24 + 0] = 198;
     pal[24 + 1] = 202;
-    pal[24 + 2] = 231; //  8.
+    pal[24 + 2] = 231;
     pal[27 + 0] = 255;
     pal[27 + 1] = 255;
-    pal[27 + 2] = 255; //  9.
+    pal[27 + 2] = 255;
     pal[30 + 0] = 180;
     pal[30 + 1] = 120;
-    pal[30 + 2] = 110; //  10.
+    pal[30 + 2] = 110;
     pal[39 * 3 + 0] = 0;
     pal[39 * 3 + 1] = 0;
-    pal[39 * 3 + 2] = 0; //  39.
+    pal[39 * 3 + 2] = 0;
     pal[59 * 3 + 0] = 0;
     pal[59 * 3 + 1] = 0;
-    pal[59 * 3 + 2] = 0; //  59. Kisabc
+    pal[59 * 3 + 2] = 0;
     pal[62 * 3 + 0] = 255;
     pal[62 * 3 + 1] = 255;
-    pal[62 * 3 + 2] = 255; //  62. Kisabc
+    pal[62 * 3 + 2] = 255;
 
-    // Kitoltjuk trucolor paletta szineit:
+    // 64-127: True colour RGB222 (i -> 0x00RRGGBB)
     for (int i = 0; i < 64; i++) {
         int r = i >> 4;
         int g = (i >> 2) & 3;
@@ -104,7 +100,7 @@ void create_editor_palette() {
         pal[(64 + i) * 3 + 2] = (unsigned char)(b * 64 + 8);
     }
 
-    // Kitoltjuk eger szineket:
+    // 128-255: inverse colours of 0-127, when mousing over or drawing over
     for (int i = 0; i < 128; i++) {
         if (pal[3 * i] + pal[3 * i + 1] + pal[3 * i + 2] >= 384) {
             pal[3 * (i + 128)] = pal[3 * (i + 128) + 1] = pal[3 * (i + 128) + 2] = 0;
@@ -130,12 +126,6 @@ static int completed_levels() {
     return cur_player->levels_completed - skips;
 }
 
-// EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER
-// EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER
-// EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER
-// EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER
-// EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER EGER
-
 static int CursorDrawn = 0;
 
 int MouseX = 0, MouseY = 0;
@@ -152,31 +142,17 @@ static void draw_cursor_pixel(int x, int y) {
 }
 
 static void draw_cursor_shape() {
-    /*if( SelectedTool == Tool_Move && !SelectedPolygon && !SelectedObject && !SelectedSprite &&
-    Kurzornegyzet ) {
-        //internal_error( "Most itt van benn!" );
-        vect2 r = pixel_to_meter( MouseX, MouseY );
-        double x1 = r.x;
-        double y1 = r.y;
-        double x2 = x1+640.0/MetersToPixels;
-        double y2 = y1+480.0/MetersToPixels;
-        render_line( vect2( x1, y1 ), vect2( x1, y2 ), false );
-        render_line( vect2( x1, y2 ), vect2( x2, y2 ), false );
-        render_line( vect2( x2, y2 ), vect2( x2, y1 ), false );
-        render_line( vect2( x2, y1 ), vect2( x1, y1 ), false );
-        return;
-    } */
-
-    // Lockolunk is:
     lockfrontbuffer_pic();
     int radius = 4;
     for (int i = -radius; i <= radius; i++) {
         if (CursorShapeIsX) {
+            // Draw "x"
             draw_cursor_pixel(MouseX + i, MouseY + i);
             if (i != 0) {
                 draw_cursor_pixel(MouseX + i, MouseY - i);
             }
         } else {
+            // Draw "+"
             draw_cursor_pixel(MouseX + i, MouseY);
             if (i != 0) {
                 draw_cursor_pixel(MouseX, MouseY + i);
@@ -186,23 +162,19 @@ static void draw_cursor_shape() {
     unlockfrontbuffer_pic();
 }
 
-// Egeret leveszi kepernyorol:
 void erase_cursor() {
     if (!CursorDrawn) {
         internal_error("erase_cursor-ban !CursorDrawn!");
     }
     CursorDrawn = 0;
-
     draw_cursor_shape();
 }
 
-// Egeret felteszi kepernyore:
 void draw_cursor() {
     if (CursorDrawn) {
         internal_error("draw_cursor-ban CursorDrawn!");
     }
     CursorDrawn = 1;
-
     draw_cursor_shape();
 }
 
@@ -217,11 +189,6 @@ void update_and_draw_cursor() {
     MouseY = mouse_y;
     draw_cursor();
 }
-
-// TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP
-// TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP
-// TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP
-// TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP
 
 static char TooltipText[110] = "";
 
@@ -238,11 +205,6 @@ void draw_tooltip(const char* text) {
     bltfront(BufferMain, x1, y1, x2, y2);
 }
 
-// KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK
-// KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK
-// KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK
-// KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK
-
 static int RedrawEditorCanvas = 0;
 void invalidate_editor_level() { RedrawEditorCanvas = 1; }
 
@@ -252,49 +214,50 @@ void invalidate_editor_gui() { RedrawEditorGui = 1; }
 static int CommandsLength = 13, ToolsLength = 10;
 static int MenuLength = CommandsLength + ToolsLength, MenuEntryHeight = 19;
 
-static char MenuText[23][15] = { // Masodik egy string hossza
-    "Exit",
-    "New",
-    "Open",
-    "Save As",
-    "Save",
-    "Save and Play",
-    "Check Topology",
-    "Properties",
-    "Zoom Out",
-    "Zoom Fill",
-    "View Options",
-    "Help",
-    "",
-    "Move",
-    "Zoom In",
-    "Create Vertex",
-    "Delete Vertex",
-    "Delete Polygon",
-    "Create Food",
-    "Create Killer",
-    "Delete Object",
-    "Create Picture",
-    "Delete Picture"};
+static char MenuText[23][15] = {"Exit",
+                                "New",
+                                "Open",
+                                "Save As",
+                                "Save",
+                                "Save and Play",
+                                "Check Topology",
+                                "Properties",
+                                "Zoom Out",
+                                "Zoom Fill",
+                                "View Options",
+                                "Help",
+                                "",
+                                "Move",
+                                "Zoom In",
+                                "Create Vertex",
+                                "Delete Vertex",
+                                "Delete Polygon",
+                                "Create Food",
+                                "Create Killer",
+                                "Delete Object",
+                                "Create Picture",
+                                "Delete Picture"};
 
 int SelectedTool = Tool_Move;
 
 static void draw_editor_gui() {
+    // Entire screen blue
     BufferMain->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, EditorPaletteId_Menu);
-    // Eloszor is egy nagy keret:
+    // Entire screen border
     BufferMain->line(0, 0, SCREEN_WIDTH - 1, 0, EditorPaletteId_MenuBorder);
     BufferMain->line(0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1,
                      EditorPaletteId_MenuBorder);
     BufferMain->line(0, 0, 0, SCREEN_HEIGHT - 1, EditorPaletteId_MenuBorder);
     BufferMain->line(SCREEN_WIDTH - 1, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1,
                      EditorPaletteId_MenuBorder);
-    // Meg ket belso vonal:
+    // Tooltip section line (top)
     BufferMain->line(0, EDITOR_MENU_Y - 1, SCREEN_WIDTH - 1, EDITOR_MENU_Y - 1,
                      EditorPaletteId_MenuBorder);
+    // Menu section line (left)
     BufferMain->line(EDITOR_MENU_X - 1, EDITOR_MENU_Y, EDITOR_MENU_X - 1, SCREEN_HEIGHT - 1,
                      EditorPaletteId_MenuBorder);
+    // Menu entries
     for (int i = 0; i < MenuLength; i++) {
-        // x1... stb a belso reszt jelenti:
         int x1 = 1;
         int y1 = EDITOR_MENU_Y + i * MenuEntryHeight + 1;
         int x2 = EDITOR_MENU_X - 2;
@@ -306,35 +269,34 @@ static void draw_editor_gui() {
         EditorWhiteFont->write(BufferMain, 5, EDITOR_MENU_Y + i * MenuEntryHeight + 14,
                                MenuText[i]);
     }
-    // Meg benyomunk par felirat ala vonalakat:
-    // Save and Play felirat P-je ala:
+    // Underline Save and *P*lay
     int x = 66;
     int y = EDITOR_MENU_Y + 5 * MenuEntryHeight + 15;
     BufferMain->line(x, y, x + 6, y, 247);
-    // Exit felirat x-e ala:
+    // Underline *E*xit
     x = 13;
     y = EDITOR_MENU_Y + 0 * MenuEntryHeight + 15;
     BufferMain->line(x, y, x + 7, y, 247);
-    // Open felirat o-ja ala:
+    // Underline *O*pen
     x = 5;
     y = EDITOR_MENU_Y + 2 * MenuEntryHeight + 15;
     BufferMain->line(x, y, x + 6, y, 247);
-    // Zoom Out felirat z-je ala:
+    // Underline *Z*oom Out
     x = 5;
     y = EDITOR_MENU_Y + 8 * MenuEntryHeight + 15;
     BufferMain->line(x, y, x + 7, y, 247);
-    // Save felirat s-e ala:
+    // Underline *S*ave
     x = 4;
     y = EDITOR_MENU_Y + 4 * MenuEntryHeight + 15;
     BufferMain->line(x, y, x + 7, y, 247);
 }
 
 static pic8* TooltipBuffer = nullptr;
-// Ezekbe kikereknev() is neha beleir (gany):
 static char TooltipPictureName[10] = "", TooltipTextureName[10] = "", TooltipMaskName[10] = "";
 
 void draw_sprite_tooltip(const char* picture_name, const char* texture_name, const char* mask_name,
                          int distance, Clipping clipping) {
+    // Skip if no change
     if (strcmp(picture_name, TooltipPictureName) == 0 &&
         strcmp(texture_name, TooltipTextureName) == 0 && strcmp(mask_name, TooltipMaskName) == 0) {
         return;
@@ -349,7 +311,6 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
     }
 
     TooltipBuffer->fill_box(EditorPaletteId_Background);
-    // TooltipBuffer->fill_box( 70 );
 
     if (picture_name[0] && (texture_name[0] || mask_name[0])) {
         internal_error("draw_sprite_tooltip too many params!");
@@ -393,7 +354,7 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
 }
 
 void draw_object_tooltip(object::Type type, object::Property property, int animation) {
-    // Belevaltoztatunk draw_sprite_tooltip() valtozojaba, hogy majd toroljon:
+    // Impossible name (9 characters long) to invalidate cache
     strcpy(TooltipPictureName, "aaccbbdde");
 
     if (!TooltipBuffer) {
@@ -401,20 +362,14 @@ void draw_object_tooltip(object::Type type, object::Property property, int anima
     }
 
     TooltipBuffer->fill_box(EditorPaletteId_Background);
-    // TooltipBuffer->fill_box( 70 );
-
     EditorWhiteFont->write(TooltipBuffer, 0, 14, "Object:");
     char tmp[50];
-    //	object::Type::Exit = 1, object::Type::Food, object::Type::Killer, object::Type::Start };
-    // enum { object::Property::NONE, object::Property::GRAVITY_UP, object::Property::GRAVITY_DOWN,
-    // object::Property::GRAVITY_LEFT, object::Property::GRAVITY_RIGHT };
     if (type == object::Type::Exit) {
         sprintf(tmp, "Exit");
     }
     if (type == object::Type::Start) {
         sprintf(tmp, "Start");
     }
-
     if (type == object::Type::Food) {
         if (property == object::Property::None) {
             sprintf(tmp, "Food");
@@ -431,17 +386,14 @@ void draw_object_tooltip(object::Type type, object::Property property, int anima
         if (property == object::Property::GravityRight) {
             sprintf(tmp, "Grav. Right");
         }
-
         EditorWhiteFont->write(TooltipBuffer, 130, 14, "Anim num:");
         char tmp2[10];
         sprintf(tmp2, "%d", (int)(animation + 1));
         EditorBlackFont->write(TooltipBuffer, 193, 14, tmp2);
     }
-
     if (type == object::Type::Killer) {
         sprintf(tmp, "Killer");
     }
-
     EditorBlackFont->write(TooltipBuffer, 50, 14, tmp);
 
     blit8(BufferMain, TooltipBuffer, 226, 2);
@@ -451,16 +403,19 @@ void draw_object_tooltip(object::Type type, object::Property property, int anima
 static void draw_editor(int draw_gui) {
     erase_cursor();
 
+    // Make sure the sprite tooltip will be immediately updated
     TooltipPictureName[0] = TooltipTextureName[0] = TooltipMaskName[0] = 0;
-
     if (draw_gui) {
         draw_editor_gui();
     }
 
+    // Background of level canvas
     BufferMain->fill_box(EDITOR_MENU_X, EDITOR_MENU_Y, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2,
                          EditorPaletteId_Background);
+    // Background of tooltip section (top)
     BufferMain->fill_box(1, 1, SCREEN_WIDTH - 2, EDITOR_MENU_Y - 2, EditorPaletteId_Background);
-    // Kiirjuk file nevet:
+
+    // Tooltip section
     EditorWhiteFont->write(BufferMain, 6, 15, "File:");
     strupr(State->editor_filename);
     int len = 0;
@@ -478,36 +433,27 @@ static void draw_editor(int draw_gui) {
         EditorWhiteFont->write(BufferMain, filename_x + len + 3, 15, "(Unchanged)");
     }
 
-    // Kiirjuk sprite allando szoveget ha olyan tool:
-    // if( SelectedTool == Tool_Move || SelectedTool == Tool_CreateSprite || SelectedTool ==
-    // Tool_DeleteSprite )
-    //	EditorWhiteFont->write( BufferMain, 392, 15, "Picture:" );
-
-    // Kiirjuk tool szoveget:
     draw_tooltip();
-    // Kiirjuk zoomot:
+
     EditorWhiteFont->write(BufferMain, 543, 15, "Zoom:");
     char text[30];
     sprintf(text, "%lf", get_zoom());
-    // Tizedespont utani jegyek szamat maximaljuk 2-re:
     if (*strstr(text, ".")) {
-        *(strstr(text, ".") + 5) = 0; // + 3
+        // Four digits after decimal point
+        *(strstr(text, ".") + 5) = 0;
     }
     if (strlen(text) < 7) {
-        EditorBlackFont->write(BufferMain, 584, 15, text); // 1234.5
+        EditorBlackFont->write(BufferMain, 584, 15, text); // 1.0000 to 9.9999
     } else {
-        EditorBlackFont->write(BufferMain, 580, 15, text); // 10000.0
+        EditorBlackFont->write(BufferMain, 580, 15, text); // 10.0000 to 10000.0000
     }
 
-    RedrawingEditor = 1; // Csak edit bufferbe rajzoljon kirajzol
-
+    RedrawingEditor = 1;
     Level->render();
     if (SelectedPolygon) {
-        // Atalakitjuk szaggatotta amit kell:
         SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, false);
         SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, true);
     }
-
     RedrawingEditor = 0;
 
     bltfront(BufferMain);
@@ -528,11 +474,16 @@ static void draw_editor(int draw_gui) {
     }
 }
 
+// Update the mouse shape from + to x if hovering over something
+// Change the tooltip to provide info about what is being hovered
 static void draw_mouse_tooltip(int mouse_x, int mouse_y) {
+    // Food tooltip
     if (SelectedTool == Tool_CreateFood) {
         draw_object_tooltip(object::Type::Food, DefaultFoodProperty, DefaultFoodAnimation);
         return;
     }
+
+    // Sprite tooltip
     if (SelectedTool == Tool_CreateSprite) {
         if (!Lgr) {
             internal_error("draw_mouse_tooltip !Lgr");
@@ -542,6 +493,7 @@ static void draw_mouse_tooltip(int mouse_x, int mouse_y) {
         return;
     }
 
+    // Hovered tooltip
     polygon* poly = nullptr;
     object* obj = nullptr;
     sprite* spr = nullptr;
@@ -560,6 +512,7 @@ static void draw_mouse_tooltip(int mouse_x, int mouse_y) {
     } else if (obj) {
         draw_object_tooltip(obj->type, obj->property, obj->animation);
     } else {
+        // Vertex or no tooltip
         draw_sprite_tooltip("", "", "", 0, Clipping::Unclipped);
     }
 }
@@ -570,11 +523,8 @@ static void select_tool(int tool) {
     }
     SelectedTool = tool;
     draw_tooltip_help();
-    // kibalmenu();
     invalidate_editor_gui();
 }
-
-// static int Mouseinited = 0;
 
 static void editor_play(bool view_map) {
     invalidate_editor_gui();
@@ -627,13 +577,11 @@ void editor() {
     draw_editor_gui();
     bltfront(BufferMain);
 
-    // Egeret eloszor helyezzuk ki:
     CursorDrawn = 0;
     draw_cursor();
 
     LevelChanged = 0;
 
-    // Most megnezzuk, hogy megvannak-e palyai fazonnak:
     if (completed_levels() < 5) {
         char tmp[50];
         if (completed_levels() > 1) {
@@ -645,9 +593,7 @@ void editor() {
         return;
     }
 
-    // Beolvassuk file-t:
     editor_window_welcome();
-
     LevelChanged = 0;
     if (State->editor_filename[0] == 0) {
         load_level_editor(DEFAULT_LEVEL_FILENAME);
@@ -657,7 +603,6 @@ void editor() {
         }
     }
 
-    // Alaphelyzetbe allitunk egy-ket valtozot:
     SelectedPolygon = nullptr;
     SelectedVertexIndex = 0;
     CreateVertexDirection = false;
@@ -721,43 +666,25 @@ void editor() {
                 if (c == 'z') {
                     editor_zoom_out();
                 }
-
+                // Undocumented screenshot button
                 if (c == 'i') {
                     platform_save_screenshot();
                 }
             }
-            // Csak debuggolashoz kellettek:
-            /*void saveallapot( void );
-            void loadallapot( void );
-            if( c == 's' ) {
-                saveallapot();
-            }
-            if( c == 'l' ) {
-                loadallapot();
-                invalidate_editor_gui();
-            } */
         }
-        // Megnezzuk eger gombok lemenetelet:
         bool left_click = was_left_mouse_just_clicked();
         bool right_click = was_right_mouse_just_clicked();
         if (left_click || right_click) {
-
-            /*lockfrontbuffer_pic();
-            ppixelfront( 300, magassag, 0 );
-            unlockfrontbuffer_pic();
-            magassag += 2;
-            if( magassag > 460 )
-                magassag = 460;	*/
-
             int click_x = 0, click_y = 0;
             get_mouse_position(&click_x, &click_y);
             if (click_y < EDITOR_MENU_Y) {
+                // Mouse is not allowed in tooltip section
                 click_y = EDITOR_MENU_Y;
             }
             if ((SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
                  CreatingPolygon) &&
                 click_x < EDITOR_MENU_X) {
-                // Ha meg van valami fogva, nem mehetunk gombok fole:
+                // If holding something, mouse is not allowed in menu section
                 click_x = EDITOR_MENU_X;
                 set_mouse_position(click_x, click_y);
             }
@@ -768,11 +695,11 @@ void editor() {
                 draw_cursor();
             }
             if (click_x < EDITOR_MENU_X) {
-                // Billentyuk folott tortent lenyomas:
+                // Menu clicks
                 for (int i = 0; i < MenuLength; i++) {
                     if (EDITOR_MENU_Y + i * MenuEntryHeight <= click_y &&
                         click_y < EDITOR_MENU_Y + (i + 1) * MenuEntryHeight) {
-                        // i-edik gombot lenyomtak menuben:
+                        // Commands
                         if (i == 0 && left_click) {
                             if (editor_dialog_exit()) {
                                 erase_cursor();
@@ -782,36 +709,30 @@ void editor() {
                         if (i == 0 && right_click) {
                             editor_help_exit();
                         }
-
                         if (i == 1 && left_click) {
                             editor_new();
                         }
                         if (i == 1 && right_click) {
                             editor_help_new();
                         }
-
                         if (i == 2 && left_click) {
                             editor_window_open();
                         }
-
                         if (i == 2 && right_click) {
                             editor_help_open();
                         }
-
                         if (i == 3 && left_click) {
                             editor_window_save_as();
                         }
                         if (i == 3 && right_click) {
                             editor_help_save_as();
                         }
-
                         if (i == 4 && left_click) {
                             editor_window_save();
                         }
                         if (i == 4 && right_click) {
                             editor_help_save();
                         }
-
                         if (i == 5 && left_click) {
                             editor_play(is_key_down(DIK_F1));
                             SelectedTool = Tool_Move;
@@ -819,56 +740,47 @@ void editor() {
                         if (i == 5 && right_click) {
                             editor_help_save_and_play();
                         }
-
                         if (i == 6 && left_click) {
                             check_topology(true);
                         }
                         if (i == 6 && right_click) {
                             editor_help_check_topology();
                         }
-
                         if (i == 7 && left_click) {
                             editor_window_level_properties();
                         }
                         if (i == 7 && right_click) {
                             editor_help_properties();
                         }
-
                         if (i == 8 && left_click) {
                             editor_zoom_out();
                         }
                         if (i == 8 && right_click) {
                             editor_help_zoom_out();
                         }
-
                         if (i == 9 && left_click) {
-                            // Zoom Fill:
                             zoom_fill();
                             invalidate_editor_level();
                         }
                         if (i == 9 && right_click) {
                             editor_help_zoom_fill();
                         }
-
                         if (i == 10 && left_click) {
                             editor_window_view_options();
                         }
-                        // menu_set_lgr_file();
                         if (i == 10 && right_click) {
                             editor_help_view_options();
                         }
-
                         if (i == 11) {
                             editor_help();
                         }
 
-                        // Toolok:
+                        // Tools
                         if (left_click) {
                             if (i >= CommandsLength && i < CommandsLength + ToolsLength) {
                                 select_tool(i - CommandsLength);
                             }
                         } else {
-                            // Jobb gomb nyomva:
                             if (i == CommandsLength + 0) {
                                 editor_help_move();
                             }
@@ -903,11 +815,11 @@ void editor() {
                     }
                 }
             } else {
+                // Canvas clicks
                 if (SelectedTool == Tool_Move && left_click) {
                     tool_move_leftclick(click_x, click_y);
                 }
                 if (SelectedTool == Tool_Move && right_click) {
-                    // Altalaban tool_move_esc-et hivja:
                     tool_move_rightclick(click_x, click_y);
                 }
                 if (SelectedTool == Tool_ZoomIn && left_click) {
@@ -958,27 +870,26 @@ void editor() {
             } else {
                 draw_editor(0);
             }
-            // continue;
         }
-
-        // INNENTOL MAR CSAK EGER MOZGATASA AZ ESEMENY:
 
         int mouse_x = 0, mouse_y = 0;
         get_mouse_position(&mouse_x, &mouse_y);
         if (mouse_y < EDITOR_MENU_Y) {
+            // Mouse is not allowed in tooltip section
             mouse_y = EDITOR_MENU_Y;
         }
         if ((SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
              CreatingPolygon) &&
             mouse_x < EDITOR_MENU_X) {
-            // Ha meg van valami fogva, nem mehetunk gombok fole:
+            // If holding something, mouse is not allowed in menu section
             mouse_x = EDITOR_MENU_X;
             set_mouse_position(mouse_x, mouse_y);
         }
+
+        // Mouse movement
         if (mouse_x == MouseX && mouse_y == MouseY) {
             continue;
         }
-        // Eger mozdult:
         if (SelectedTool == Tool_ZoomIn) {
             tool_zoom_in_mousemove(mouse_x, mouse_y);
             continue;
@@ -988,28 +899,15 @@ void editor() {
             continue;
         }
         if (!SelectedPolygon && !SelectedObject && !SelectedSprite) {
-            // Ha nincsen megfogva semmi, akkor itt rajzoljuk kurzort:
             erase_cursor();
             draw_mouse_tooltip(mouse_x, mouse_y);
             MouseX = mouse_x;
             MouseY = mouse_y;
             draw_cursor();
         } else {
-            // Ha meg van valami fogva, akkor tool rajzolja kurzort:
             if (SelectedTool == Tool_Move) {
                 tool_move_mousemove(mouse_x, mouse_y);
             }
         }
     }
 }
-
-/*static int Mmagassag = 10;
-
-void pottyrajz( void ) {
-    lockfrontbuffer_pic();
-    ppixelfront( 400, Mmagassag, 0 );
-    unlockfrontbuffer_pic();
-    Mmagassag += 2;
-    if( Mmagassag > 460 )
-        Mmagassag = 460;
-} */

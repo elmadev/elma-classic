@@ -165,17 +165,6 @@ void create_editor_palette() {
     EditorPalette = new palette(pal);
 }
 
-static int completed_levels() {
-    player* cur_player = State->get_player(State->player1);
-    int skips = 0;
-    for (int i = 0; i < cur_player->levels_completed; i++) {
-        if (cur_player->skipped[i]) {
-            skips++;
-        }
-    }
-    return cur_player->levels_completed - skips;
-}
-
 int MouseX = 0;
 int MouseY = 0;
 static bool CursorShapeIsX = false;
@@ -636,18 +625,6 @@ void editor() {
     draw_cursor();
 
     LevelChanged = false;
-
-    if (completed_levels() < 5) {
-        char tmp[50];
-        if (completed_levels() > 1) {
-            sprintf(tmp, "You have completed %d levels so far.", completed_levels());
-        } else {
-            sprintf(tmp, "You have completed %d level so far.", completed_levels());
-        }
-        dialog("You must complete at least 5 levels before you can use the editor!", tmp);
-        return;
-    }
-
     editor_window_welcome();
     if (State->editor_filename[0] == 0) {
         load_level_editor(DEFAULT_LEVEL_FILENAME);

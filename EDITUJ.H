@@ -24,20 +24,20 @@ extern sprite* SelectedSprite;
 
 extern bool LevelChanged;
 
-enum {
-    Tool_Move = 0,
-    Tool_ZoomIn,
-    Tool_CreateVertex,
-    Tool_DeleteVertex,
-    Tool_DeletePolygon,
-    Tool_CreateFood,
-    Tool_CreateKiller,
-    Tool_DeleteObject,
-    Tool_CreateSprite,
-    Tool_DeleteSprite
+enum class Tool {
+    Move = 0,
+    ZoomIn,
+    CreateVertex,
+    DeleteVertex,
+    DeletePolygon,
+    CreateFood,
+    CreateKiller,
+    DeleteObject,
+    CreateSprite,
+    DeleteSprite
 };
 
-extern int SelectedTool;
+extern Tool SelectedTool;
 
 constexpr unsigned char EditorPaletteId_MenuBorder = 0;
 constexpr unsigned char EditorPaletteId_WindowBorder = 0;

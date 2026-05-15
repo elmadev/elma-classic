@@ -6,6 +6,21 @@
 #include "physics_init.h"
 #include <cstring>
 
+const char* clipping_to_string(Clipping clipping) {
+    switch (clipping) {
+    case Clipping::Unknown:
+        return "-";
+    case Clipping::Unclipped:
+        return "U";
+    case Clipping::Ground:
+        return "G";
+    case Clipping::Sky:
+        return "S";
+    default:
+        internal_error("clipping_to_string unknown!");
+    }
+}
+
 sprite::sprite(double x, double y, const char* pic_name, const char* text_name,
                const char* mask_nam) {
     if (!Lgr) {

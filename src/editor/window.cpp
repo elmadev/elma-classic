@@ -825,13 +825,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                         default_clipping = Lgr->textures[i + view_index].default_clipping;
                     }
 
-                    strcpy(details, "U");
-                    if (default_clipping == Clipping::Ground) {
-                        strcpy(details, "G");
-                    }
-                    if (default_clipping == Clipping::Sky) {
-                        strcpy(details, "S");
-                    }
+                    strcpy(details, clipping_to_string(default_clipping));
                     EditorBlackFont->write(BufferMain, lx1 + 92, ly1 + 15 + i * dy, details);
                 }
             }
@@ -1235,18 +1229,7 @@ void editor_window_sprite_properties(sprite* spr) {
             }
             EditorBlackFont->write_centered(BufferMain, x1 + 119, y1 + 100, tmp);
 
-            if (default_clipping == Clipping::Unknown) {
-                strcpy(tmp, "-");
-            }
-            if (default_clipping == Clipping::Unclipped) {
-                strcpy(tmp, "U");
-            }
-            if (default_clipping == Clipping::Ground) {
-                strcpy(tmp, "G");
-            }
-            if (default_clipping == Clipping::Sky) {
-                strcpy(tmp, "S");
-            }
+            strcpy(tmp, clipping_to_string(default_clipping));
             EditorBlackFont->write_centered(BufferMain, x1 + 198, y1 + 100, tmp);
 
             // Actual values
@@ -1260,15 +1243,7 @@ void editor_window_sprite_properties(sprite* spr) {
 
             render_box(BufferMain, box_clipping, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            if (clipping == Clipping::Unclipped) {
-                strcpy(tmp, "U");
-            }
-            if (clipping == Clipping::Ground) {
-                strcpy(tmp, "G");
-            }
-            if (clipping == Clipping::Sky) {
-                strcpy(tmp, "S");
-            }
+            strcpy(tmp, clipping_to_string(default_clipping));
             draw_textbox_centered(BufferMain, box_clipping, EditorPaletteId::WINDOW_INPUT, tmp);
             EditorBlackFont->write_centered(BufferMain, x1 + 198, box_clipping.y2 + 14,
                                             "(U, S, G)");

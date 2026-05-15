@@ -376,15 +376,7 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
         EditorWhiteFont->write(&TooltipBuffer, 0, 14, "PICTURE:");
         char tmp[30];
         sprintf(tmp, "%s (%d)  ", picture_name, distance);
-        if (clipping == Clipping::Unclipped) {
-            strcat(tmp, "U");
-        }
-        if (clipping == Clipping::Ground) {
-            strcat(tmp, "G");
-        }
-        if (clipping == Clipping::Sky) {
-            strcat(tmp, "S");
-        }
+        strcat(tmp, clipping_to_string(clipping));
         EditorBlackFont->write(&TooltipBuffer, 60, 14, tmp);
     }
     if (texture_name[0] || mask_name[0]) {
@@ -393,15 +385,7 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
         EditorWhiteFont->write(&TooltipBuffer, 126, 14, "MASK:");
         char tmp[30];
         sprintf(tmp, "%s (%d)  ", mask_name, distance);
-        if (clipping == Clipping::Unclipped) {
-            strcat(tmp, "U");
-        }
-        if (clipping == Clipping::Ground) {
-            strcat(tmp, "G");
-        }
-        if (clipping == Clipping::Sky) {
-            strcat(tmp, "S");
-        }
+        strcat(tmp, clipping_to_string(clipping));
         EditorBlackFont->write(&TooltipBuffer, 164, 14, tmp);
     }
 

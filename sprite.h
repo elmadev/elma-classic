@@ -3,6 +3,7 @@
 
 #include "vect2.h"
 #include <cstdio>
+#include <string>
 
 constexpr int DEFAULT_SPRITE_WIREFRAME = 20;
 
@@ -14,6 +15,8 @@ enum class Clipping {
     // only used by canvas
     Transparent = 3,
 };
+
+const char* clipping_to_string(Clipping clipping);
 
 class sprite {
   public:

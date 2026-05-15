@@ -24,18 +24,20 @@ extern sprite* SelectedSprite;
 
 extern bool LevelChanged;
 
-constexpr unsigned char EditorPaletteId_MenuBorder = 0;
-constexpr unsigned char EditorPaletteId_WindowBorder = 0;
-constexpr unsigned char EditorPaletteId_Menu = 1;
-constexpr unsigned char EditorPaletteId_MenuSelected = 2;
-constexpr unsigned char EditorPaletteId_Background = 3;
-constexpr unsigned char EditorPaletteId_Window = 4;
-constexpr unsigned char EditorPaletteId_LevelNameWindow = 4;
-constexpr unsigned char EditorPaletteId_LevelNameWindowBorder = 5;
-constexpr unsigned char EditorPaletteId_WindowList = 6;
-constexpr unsigned char EditorPaletteId_WindowListSelected = 7;
-constexpr unsigned char EditorPaletteId_WindowButton = 8;
-constexpr unsigned char EditorPaletteId_WindowInput = 9;
+namespace EditorPaletteId {
+constexpr unsigned char MenuBorder = 0;
+constexpr unsigned char WindowBorder = 0;
+constexpr unsigned char Menu = 1;
+constexpr unsigned char MenuSelected = 2;
+constexpr unsigned char Background = 3;
+constexpr unsigned char Window = 4;
+constexpr unsigned char LevelNameWindow = 4;
+constexpr unsigned char LevelNameWindowBorder = 5;
+constexpr unsigned char WindowList = 6;
+constexpr unsigned char WindowListSelected = 7;
+constexpr unsigned char WindowButton = 8;
+constexpr unsigned char WindowInput = 9;
+} // namespace EditorPaletteId
 
 extern int MouseX;
 extern int MouseY;

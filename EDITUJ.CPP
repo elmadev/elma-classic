@@ -22,6 +22,7 @@
 #include "sprite.h"
 #include <cstring>
 #include <directinput/scancodes.h>
+#include <format>
 
 level* Level = nullptr;
 
@@ -352,6 +353,13 @@ static char TooltipTextureName[10] = "";
 static char TooltipMaskName[10] = "";
 static Clipping TooltipClipping = Clipping::Unknown;
 
+static std::string format_sprite_tooltip(const char* name, int distance, Clipping clipping) {
+    if (clipping != Clipping::Unknown) {
+        return std::format("{} ({}) {}", name, distance, clipping_to_string(clipping));
+    }
+    return name;
+}
+
 void draw_sprite_tooltip(const char* picture_name, const char* texture_name, const char* mask_name,
                          int distance, Clipping clipping) {
     // Skip if no change
@@ -372,21 +380,37 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
         internal_error("draw_sprite_tooltip too many params!");
     }
 
+    if (clipping == Clipping::Unknown) {
+        // Grab default properties
+        if (picture_name[0]) {
+            int index = Lgr->get_picture_index(picture_name);
+            if (index >= 0) {
+                picture* pict = &Lgr->pictures[index];
+                distance = pict->default_distance;
+                clipping = pict->default_clipping;
+            }
+        }
+        if (texture_name[0]) {
+            int index = Lgr->get_texture_index(texture_name);
+            if (index >= 0) {
+                texture* text = &Lgr->textures[index];
+                distance = text->default_distance;
+                clipping = text->default_clipping;
+            }
+        }
+    }
+
     if (picture_name[0]) {
         EditorWhiteFont->write(&TooltipBuffer, 0, 14, "PICTURE:");
-        char tmp[30];
-        sprintf(tmp, "%s (%d)  ", picture_name, distance);
-        strcat(tmp, clipping_to_string(clipping));
-        EditorBlackFont->write(&TooltipBuffer, 60, 14, tmp);
+        EditorBlackFont->write(&TooltipBuffer, 60, 14,
+                               format_sprite_tooltip(picture_name, distance, clipping).c_str());
     }
     if (texture_name[0] || mask_name[0]) {
         EditorWhiteFont->write(&TooltipBuffer, 0, 14, "TEXTURE:");
         EditorBlackFont->write(&TooltipBuffer, 60, 14, texture_name);
         EditorWhiteFont->write(&TooltipBuffer, 126, 14, "MASK:");
-        char tmp[30];
-        sprintf(tmp, "%s (%d)  ", mask_name, distance);
-        strcat(tmp, clipping_to_string(clipping));
-        EditorBlackFont->write(&TooltipBuffer, 164, 14, tmp);
+        EditorBlackFont->write(&TooltipBuffer, 164, 14,
+                               format_sprite_tooltip(mask_name, distance, clipping).c_str());
     }
 
     blit8(BufferMain, &TooltipBuffer, 226, 2);
@@ -502,7 +526,7 @@ static void draw_editor() {
             internal_error("draw_editor !Lgr");
         }
         draw_sprite_tooltip(Lgr->editor_picture_name, Lgr->editor_texture_name,
-                            Lgr->editor_mask_name, 0, Clipping::Unclipped);
+                            Lgr->editor_mask_name, 0, Clipping::Unknown);
     }
 }
 
@@ -521,7 +545,7 @@ static void draw_mouse_tooltip(int mouse_x, int mouse_y) {
             internal_error("draw_mouse_tooltip !Lgr");
         }
         draw_sprite_tooltip(Lgr->editor_picture_name, Lgr->editor_texture_name,
-                            Lgr->editor_mask_name, 0, Clipping::Unclipped);
+                            Lgr->editor_mask_name, 0, Clipping::Unknown);
         return;
     }
 

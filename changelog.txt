@@ -91,6 +91,7 @@
 * Incorrect texture distance/clipping data no longer erroneously appears when selecting a mask in Create Picture
 * Zoom number in top tooltip of editor no longer shifts when zooming out
 * Mouse behaviour in internal editor when trying to go off screen is standardized between the top and left edges
+* When mousing over pictures, sometimes the clipping would not be updated in the tooltip
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

@@ -350,18 +350,21 @@ static pic8 TooltipBuffer(400, 17);
 static char TooltipPictureName[10] = "";
 static char TooltipTextureName[10] = "";
 static char TooltipMaskName[10] = "";
+static Clipping TooltipClipping = Clipping::Unknown;
 
 void draw_sprite_tooltip(const char* picture_name, const char* texture_name, const char* mask_name,
                          int distance, Clipping clipping) {
     // Skip if no change
     if (strcmp(picture_name, TooltipPictureName) == 0 &&
-        strcmp(texture_name, TooltipTextureName) == 0 && strcmp(mask_name, TooltipMaskName) == 0) {
+        strcmp(texture_name, TooltipTextureName) == 0 && strcmp(mask_name, TooltipMaskName) == 0 &&
+        TooltipClipping == clipping) {
         return;
     }
 
     strcpy(TooltipPictureName, picture_name);
     strcpy(TooltipTextureName, texture_name);
     strcpy(TooltipMaskName, mask_name);
+    TooltipClipping = clipping;
 
     TooltipBuffer.fill_box(EditorPaletteId::BACKGROUND);
 
@@ -456,6 +459,7 @@ static void draw_editor() {
     TooltipPictureName[0] = 0;
     TooltipTextureName[0] = 0;
     TooltipMaskName[0] = 0;
+    TooltipClipping = Clipping::Unknown;
     if (RedrawEditorGui) {
         draw_editor_gui();
     }
@@ -556,7 +560,7 @@ static void draw_mouse_tooltip(int mouse_x, int mouse_y) {
         draw_object_tooltip(obj->type, obj->property, obj->animation);
     } else {
         // Vertex or no tooltip
-        draw_sprite_tooltip("", "", "", 0, Clipping::Unclipped);
+        draw_sprite_tooltip("", "", "", 0, Clipping::Unknown);
     }
 }
 

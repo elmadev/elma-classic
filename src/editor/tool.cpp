@@ -39,46 +39,6 @@ static bool delete_polygon(polygon* poly) {
     internal_error("delete_polygon poly not found!");
 }
 
-void draw_tooltip_help() {
-    switch (SelectedTool) {
-    case Tool::Move:
-        draw_tooltip(
-            "Move the cursor near a vertex or an object center you want to move, and left click.");
-        break;
-    case Tool::ZoomIn:
-        draw_tooltip("Left click to place the first corner of the zoom in window.");
-        break;
-    case Tool::CreateVertex:
-        draw_tooltip(
-            "If you left click near a vertex you will add to a polygon, otherwise you will "
-            "create a new polygon.");
-        break;
-    case Tool::DeleteVertex:
-        draw_tooltip("Left click near the vertex you want to delete.");
-        break;
-    case Tool::DeletePolygon:
-        draw_tooltip("Left click near any vertex of the polygon you want to delete.");
-        break;
-    case Tool::CreateFood:
-        draw_tooltip("Left click to place a new Food object.");
-        break;
-    case Tool::CreateKiller:
-        draw_tooltip("Left click to place a new Killer object.");
-        break;
-    case Tool::DeleteObject:
-        draw_tooltip("Left click near the center of the object you want to delete.");
-        break;
-    case Tool::CreateSprite:
-        draw_tooltip("Left click to place a new Picture. Right click chooses the picture.");
-        break;
-    case Tool::DeleteSprite:
-        draw_tooltip("Left click near the top-left corner of the picture you want to delete.");
-        break;
-    default:
-        draw_tooltip("draw_tooltip_help unknown tool!");
-    }
-}
-
 static double ToolMoveOriginalX;
 static double ToolMoveOriginalY;
 

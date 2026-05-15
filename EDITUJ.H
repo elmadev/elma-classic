@@ -24,21 +24,6 @@ extern sprite* SelectedSprite;
 
 extern bool LevelChanged;
 
-enum class Tool {
-    Move = 0,
-    ZoomIn,
-    CreateVertex,
-    DeleteVertex,
-    DeletePolygon,
-    CreateFood,
-    CreateKiller,
-    DeleteObject,
-    CreateSprite,
-    DeleteSprite
-};
-
-extern Tool SelectedTool;
-
 constexpr unsigned char EditorPaletteId_MenuBorder = 0;
 constexpr unsigned char EditorPaletteId_WindowBorder = 0;
 constexpr unsigned char EditorPaletteId_Menu = 1;
@@ -64,5 +49,6 @@ void invalidate_editor_gui();
 void editor();
 
 void draw_tooltip(const char* text = nullptr);
+void draw_tooltip_help(); // Base tooltip for current tool when tool has not yet been used
 
 #endif

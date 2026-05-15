@@ -40,6 +40,50 @@ bool LevelChanged = false;
 palette* EditorPalette = nullptr;
 static unsigned char Pal_editor_byteok[768];
 
+constexpr int COMMANDS_LENGTH = 13;
+constexpr int TOOLS_LENGTH = 10;
+constexpr int MENU_LENGTH = COMMANDS_LENGTH + TOOLS_LENGTH;
+constexpr int MENU_ENTRY_HEIGHT = 19;
+
+constexpr char MENU_TEXT[23][15] = {"Exit",
+                                    "New",
+                                    "Open",
+                                    "Save As",
+                                    "Save",
+                                    "Save and Play",
+                                    "Check Topology",
+                                    "Properties",
+                                    "Zoom Out",
+                                    "Zoom Fill",
+                                    "View Options",
+                                    "Help",
+                                    "",
+                                    "Move",
+                                    "Zoom In",
+                                    "Create Vertex",
+                                    "Delete Vertex",
+                                    "Delete Polygon",
+                                    "Create Food",
+                                    "Create Killer",
+                                    "Delete Object",
+                                    "Create Picture",
+                                    "Delete Picture"};
+
+enum class Tool {
+    Move = 0,
+    ZoomIn,
+    CreateVertex,
+    DeleteVertex,
+    DeletePolygon,
+    CreateFood,
+    CreateKiller,
+    DeleteObject,
+    CreateSprite,
+    DeleteSprite
+};
+
+static Tool SelectedTool = Tool::Move;
+
 void create_editor_palette() {
     unsigned char* pal = Pal_editor_byteok;
 
@@ -210,42 +254,51 @@ void draw_tooltip(const char* text) {
     bltfront(BufferMain, x1, y1, x2, y2);
 }
 
+void draw_tooltip_help() {
+    switch (SelectedTool) {
+    case Tool::Move:
+        draw_tooltip(
+            "Move the cursor near a vertex or an object center you want to move, and left click.");
+        break;
+    case Tool::ZoomIn:
+        draw_tooltip("Left click to place the first corner of the zoom in window.");
+        break;
+    case Tool::CreateVertex:
+        draw_tooltip(
+            "If you left click near a vertex you will add to a polygon, otherwise you will "
+            "create a new polygon.");
+        break;
+    case Tool::DeleteVertex:
+        draw_tooltip("Left click near the vertex you want to delete.");
+        break;
+    case Tool::DeletePolygon:
+        draw_tooltip("Left click near any vertex of the polygon you want to delete.");
+        break;
+    case Tool::CreateFood:
+        draw_tooltip("Left click to place a new Food object.");
+        break;
+    case Tool::CreateKiller:
+        draw_tooltip("Left click to place a new Killer object.");
+        break;
+    case Tool::DeleteObject:
+        draw_tooltip("Left click near the center of the object you want to delete.");
+        break;
+    case Tool::CreateSprite:
+        draw_tooltip("Left click to place a new Picture. Right click chooses the picture.");
+        break;
+    case Tool::DeleteSprite:
+        draw_tooltip("Left click near the top-left corner of the picture you want to delete.");
+        break;
+    default:
+        draw_tooltip("draw_tooltip_help unknown tool!");
+    }
+}
+
 static bool RedrawEditorCanvas = false;
 void invalidate_editor_level() { RedrawEditorCanvas = true; }
 
 static bool RedrawEditorGui = false;
 void invalidate_editor_gui() { RedrawEditorGui = true; }
-
-constexpr int COMMANDS_LENGTH = 13;
-constexpr int TOOLS_LENGTH = 10;
-constexpr int MENU_LENGTH = COMMANDS_LENGTH + TOOLS_LENGTH;
-constexpr int MENU_ENTRY_HEIGHT = 19;
-
-constexpr char MENU_TEXT[23][15] = {"Exit",
-                                    "New",
-                                    "Open",
-                                    "Save As",
-                                    "Save",
-                                    "Save and Play",
-                                    "Check Topology",
-                                    "Properties",
-                                    "Zoom Out",
-                                    "Zoom Fill",
-                                    "View Options",
-                                    "Help",
-                                    "",
-                                    "Move",
-                                    "Zoom In",
-                                    "Create Vertex",
-                                    "Delete Vertex",
-                                    "Delete Polygon",
-                                    "Create Food",
-                                    "Create Killer",
-                                    "Delete Object",
-                                    "Create Picture",
-                                    "Delete Picture"};
-
-Tool SelectedTool = Tool::Move;
 
 static void draw_editor_gui() {
     // Entire screen blue

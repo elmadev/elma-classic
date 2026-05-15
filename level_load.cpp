@@ -18,7 +18,7 @@ static finame CurrentLevelName = "";
 
 void invalidate_level() { ReloadLevel = true; }
 
-// return true if Ptop is reloaded, false if Ptop is unchanged
+// return true if Level is reloaded, false if Level is unchanged
 static bool load_level(const char* levelname) {
     if (!levelname) {
         internal_error("load_level_play !levelname!");
@@ -28,19 +28,19 @@ static bool load_level(const char* levelname) {
         internal_error(std::string("load_level_play levelname length invalid! ") + levelname);
     }
 
-    if (!ReloadLevel && Ptop && strcmpi(levelname, CurrentLevelName) == 0) {
+    if (!ReloadLevel && Level && strcmpi(levelname, CurrentLevelName) == 0) {
         return false;
     }
 
     ReloadLevel = false;
     strcpy(CurrentLevelName, levelname);
 
-    delete Ptop;
+    delete Level;
     if (strcmpi(levelname, DEFAULT_LEVEL_FILENAME) == 0) {
-        Ptop = new level;
+        Level = new level;
         CurrentLevelName[0] = 0;
     } else {
-        Ptop = new level(levelname);
+        Level = new level(levelname);
     }
 
     return true;
@@ -51,22 +51,22 @@ bool load_level_play(const char* levelname) {
         invalidate_level();
     }
     if (load_level(levelname)) {
-        if (Ptop->topology_errors) {
+        if (Level->topology_errors) {
             menu_pic menu;
             menu.add_line_centered("Level file has some topology errors!", 320, 190);
             menu.add_line_centered("Use the editor to fix them!", 320, 240);
             menu.loop();
-            delete Ptop;
-            Ptop = nullptr;
+            delete Level;
+            Level = nullptr;
             return false;
         }
 
-        lgrfile::load_lgr_file(Ptop->lgr_name);
-        Ptop->discard_missing_lgr_assets(Lgr);
+        lgrfile::load_lgr_file(Level->lgr_name);
+        Level->discard_missing_lgr_assets(Lgr);
 
         START_TIME(segments_timer);
         delete Segments;
-        Segments = new segments(Ptop);
+        Segments = new segments(Level);
         if (HeadRadius > Motor1->left_wheel.radius) {
             Segments->setup_collision_grid(HeadRadius);
         } else {
@@ -81,8 +81,8 @@ bool load_level_play(const char* levelname) {
 
 bool load_level_editor(const char* levelname) {
     if (load_level(levelname)) {
-        lgrfile::load_lgr_file(Ptop->lgr_name);
-        if (Ptop->discard_missing_lgr_assets(Lgr)) {
+        lgrfile::load_lgr_file(Level->lgr_name);
+        if (Level->discard_missing_lgr_assets(Lgr)) {
             dialog_warn_lgr_assets_deleted();
         }
     }
@@ -91,7 +91,7 @@ bool load_level_editor(const char* levelname) {
     delete Segments;
     Segments = nullptr;
 
-    if (Ptop->toptens.single.times_count > 0 || Ptop->toptens.multi.times_count > 0) {
+    if (Level->toptens.single.times_count > 0 || Level->toptens.multi.times_count > 0) {
         dialog("Warning!", "The level file you are opening has some best times.",
                "If you save this level file, these times will be erased!");
     }

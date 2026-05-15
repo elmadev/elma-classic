@@ -12,7 +12,7 @@ bool check_topology(bool show_dialog) {
     // Enforce a minimum distance between all points in a polygon.
     // Randomly nudge them further apart
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        polygon* poly = Ptop->polygons[i];
+        polygon* poly = Level->polygons[i];
         if (poly) {
             poly->separate_stacked_vertices();
         }
@@ -20,7 +20,7 @@ bool check_topology(bool show_dialog) {
 
     // Enforce a minimum angle for all vertices. Nudge them apart if needed
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        polygon* poly = Ptop->polygons[i];
+        polygon* poly = Level->polygons[i];
         if (poly && !poly->is_grass) {
             poly->is_clockwise();
         }
@@ -29,7 +29,7 @@ bool check_topology(bool show_dialog) {
     // Limit the maximum number of vertices
     int vertex_count = 0;
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        polygon* poly = Ptop->polygons[i];
+        polygon* poly = Level->polygons[i];
         if (poly) {
             vertex_count += poly->vertex_count;
         }
@@ -48,7 +48,7 @@ bool check_topology(bool show_dialog) {
 
     // Check for intersecting lines
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        polygon* poly1 = Ptop->polygons[i];
+        polygon* poly1 = Level->polygons[i];
         if (!poly1 || poly1->is_grass) {
             continue;
         }
@@ -63,7 +63,7 @@ bool check_topology(bool show_dialog) {
             }
             // Check for intersection against every other line in the level
             for (int k = 0; k < MAX_POLYGONS; k++) {
-                polygon* poly2 = Ptop->polygons[k];
+                polygon* poly2 = Level->polygons[k];
                 if (!poly2 || poly2->is_grass) {
                     continue;
                 }
@@ -94,13 +94,13 @@ bool check_topology(bool show_dialog) {
     double y1;
     double x2;
     double y2;
-    Ptop->get_boundaries(&x1, &y1, &x2, &y2, false);
+    Level->get_boundaries(&x1, &y1, &x2, &y2, false);
     x1 -= 1.0;
     y1 -= 1.0;
     x2 += 1.0;
     y2 += 1.0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = Level->objects[i];
         if (obj) {
             if (obj->r.x < x1 || obj->r.x > x2 || obj->r.y < y1 || obj->r.y > y2) {
                 if (show_dialog) {

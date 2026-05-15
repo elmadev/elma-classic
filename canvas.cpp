@@ -433,7 +433,7 @@ void canvas::linked_list_to_array() {
 void canvas::calculate_object_positions() const {
     const double offset = ANIM_WIDTH / 2.0 * EolSettings->zoom();
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = Level->objects[i];
         if (!obj) {
             continue;
         }
@@ -717,7 +717,7 @@ void canvas::draw_texture(sprite* spr, int texture_index, int mask_index, Clippi
 
 void canvas::draw_sprites(Clipping clipping) {
     for (int sprite_index = 0; sprite_index < MAX_SPRITES; sprite_index++) {
-        sprite* spr = Ptop->sprites[sprite_index];
+        sprite* spr = Level->sprites[sprite_index];
         if (!spr) {
             return;
         }
@@ -973,7 +973,7 @@ void canvas::draw_grass_polygons() {
 
     for (int i = 0; i < MAX_POLYGONS; i++) {
         // Make sure we are drawing a grass polygon onto the ground
-        polygon* poly = Ptop->polygons[i];
+        polygon* poly = Level->polygons[i];
         if (!poly) {
             return;
         }
@@ -1006,7 +1006,7 @@ void canvas::draw_killers() {
     }
 
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = Level->objects[i];
         if (!obj) {
             return;
         }
@@ -1057,8 +1057,8 @@ canvas::canvas(bool minimap) {
     pixel_width = 0;
     pixel_height = 0;
 
-    if (!Ptop || !Segments) {
-        internal_error("canvas::canvas !Ptop || !Segments!");
+    if (!Level || !Segments) {
+        internal_error("canvas::canvas !Level || !Segments!");
     }
 
     // Initialize node memory
@@ -1139,8 +1139,8 @@ canvas::canvas(canvas* reference) {
     pixel_width = 0;
     pixel_height = 0;
 
-    if (!Ptop || !Segments) {
-        internal_error("canvas::canvas !Ptop || !Segments!");
+    if (!Level || !Segments) {
+        internal_error("canvas::canvas !Level || !Segments!");
     }
 
     // Initialize node memory

@@ -50,8 +50,8 @@ static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
     }
 
     // LGR not found
-    if (!Ptop) {
-        internal_error("load_lgr_file !Ptop!");
+    if (!Level) {
+        internal_error("load_lgr_file !Level!");
     }
 
     // Display warning
@@ -119,13 +119,13 @@ void lgrfile::load_lgr_file(const char* lgr_name) {
             return;
         }
 
-        if (!Ptop) {
-            internal_error("load_lgr_file !Ptop!");
+        if (!Level) {
+            internal_error("load_lgr_file !Level!");
         }
 
         Valtozott = 1;
-        strcpy(Ptop->lgr_name, "default");
-        Ptop->lgr_not_found = true;
+        strcpy(Level->lgr_name, "default");
+        Level->lgr_not_found = true;
     }
 
     if (!override_is_default) {
@@ -1044,13 +1044,13 @@ lgrfile::~lgrfile() {
 }
 
 void lgrfile::reload_default_textures(bool force) {
-    if (!Ptop->foreground_name[0] || !Ptop->background_name[0]) {
-        internal_error("!Ptop->foreground_name[0] || !Ptop->background_name[0]");
+    if (!Level->foreground_name[0] || !Level->background_name[0]) {
+        internal_error("!Level->foreground_name[0] || !Level->background_name[0]");
     }
 
     // Recreate background texture
-    if (force || strcmpi(background_name, Ptop->background_name) != 0) {
-        strcpy(background_name, Ptop->background_name);
+    if (force || strcmpi(background_name, Level->background_name) != 0) {
+        strcpy(background_name, Level->background_name);
         delete background;
         background = nullptr;
 
@@ -1064,8 +1064,8 @@ void lgrfile::reload_default_textures(bool force) {
     }
 
     // Recreate foreground texture
-    if (force || strcmpi(foreground_name, Ptop->foreground_name) != 0) {
-        strcpy(foreground_name, Ptop->foreground_name);
+    if (force || strcmpi(foreground_name, Level->foreground_name) != 0) {
+        strcpy(foreground_name, Level->foreground_name);
         delete foreground;
         foreground = nullptr;
 

@@ -54,7 +54,7 @@ static LoadReplayResult validate_replay_level(int level_id, const std::string& f
     }
     load_level_play(Rec1->level_filename);
 
-    if (Ptop->level_id != level_id) {
+    if (Level->level_id != level_id) {
         DikScancode key =
             menu_dialog("The level file has changed since the", "saving of the record file!",
                         filename.c_str(), Rec1->level_filename);

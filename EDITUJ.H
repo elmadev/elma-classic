@@ -12,7 +12,7 @@ class level;
 
 // Uj integralt editor h-ja:
 
-extern level* Ptop;
+extern level* Level;
 // extern pic8* Editbuffer; Ezentul ez BufferMain
 // extern pic8* Editbuffer2;  Ezentul ez BufferBall
 

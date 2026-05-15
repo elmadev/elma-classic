@@ -43,6 +43,8 @@ struct level_download_request {
     char level[MAX_FILENAME_LEN + 1];
 };
 
+struct battle_level_download_request {};
+
 struct level_download {
     char level[MAX_FILENAME_LEN + 1];
     std::span<const uint8_t> data;

@@ -215,6 +215,18 @@ void eol::download_level(std::string_view name) {
     proto.send(req);
 }
 
+void eol::download_battle_level() {
+    if (!current_battle) {
+        return;
+    }
+    // Internal battles, 1H TT, etc don't have level files.
+    if (!(current_battle->attributes & BattleAttributes::Uploaded)) {
+        return;
+    }
+
+    proto.send(battle_level_download_request{});
+}
+
 void eol::enter_level(const char* level_name, const level* lev) {
     for (kuski& k : kuskis_) {
         k.clear_spy_data();

@@ -611,6 +611,29 @@ static void editor_zoom_out() {
     invalidate_editor_level();
 }
 
+// Get the mouse position, while also disallowing the cursor to be in the
+// tooltip area. Disallow the menu area if we are holding something.
+static void get_mouse_position_editor(int* mouse_x, int* mouse_y) {
+    get_mouse_position(mouse_x, mouse_y);
+
+    bool moved = false;
+    if (*mouse_y < EDITOR_MENU_Y) {
+        // Mouse is not allowed in tooltip section
+        *mouse_y = EDITOR_MENU_Y;
+        moved = true;
+    }
+    if ((SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
+         CreatingPolygon) &&
+        *mouse_x < EDITOR_MENU_X) {
+        // If holding something, mouse is not allowed in menu section
+        *mouse_x = EDITOR_MENU_X;
+        moved = true;
+    }
+    if (moved && is_fullscreen()) {
+        set_mouse_position(*mouse_x, *mouse_y);
+    }
+}
+
 void editor() {
     if (!BufferMain) {
         internal_error("editor !BufferMain!");
@@ -709,18 +732,7 @@ void editor() {
         if (left_click || right_click) {
             int click_x = 0;
             int click_y = 0;
-            get_mouse_position(&click_x, &click_y);
-            if (click_y < EDITOR_MENU_Y) {
-                // Mouse is not allowed in tooltip section
-                click_y = EDITOR_MENU_Y;
-            }
-            if ((SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
-                 CreatingPolygon) &&
-                click_x < EDITOR_MENU_X) {
-                // If holding something, mouse is not allowed in menu section
-                click_x = EDITOR_MENU_X;
-                set_mouse_position(click_x, click_y);
-            }
+            get_mouse_position_editor(&click_x, &click_y);
             if (click_x != MouseX || click_y != MouseY) {
                 erase_cursor();
                 MouseX = click_x;
@@ -901,22 +913,10 @@ void editor() {
             draw_editor();
         }
 
+        // Mouse movement
         int mouse_x = 0;
         int mouse_y = 0;
-        get_mouse_position(&mouse_x, &mouse_y);
-        if (mouse_y < EDITOR_MENU_Y) {
-            // Mouse is not allowed in tooltip section
-            mouse_y = EDITOR_MENU_Y;
-        }
-        if ((SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
-             CreatingPolygon) &&
-            mouse_x < EDITOR_MENU_X) {
-            // If holding something, mouse is not allowed in menu section
-            mouse_x = EDITOR_MENU_X;
-            set_mouse_position(mouse_x, mouse_y);
-        }
-
-        // Mouse movement
+        get_mouse_position_editor(&mouse_x, &mouse_y);
         if (mouse_x == MouseX && mouse_y == MouseY) {
             continue;
         }

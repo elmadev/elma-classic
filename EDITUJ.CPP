@@ -503,11 +503,7 @@ static void draw_editor() {
         // Four digits after decimal point
         *(strstr(text, ".") + 5) = 0;
     }
-    if (strlen(text) < 7) {
-        EditorBlackFont->write(BufferMain, 584, 15, text); // 1.0000 to 9.9999
-    } else {
-        EditorBlackFont->write(BufferMain, 580, 15, text); // 10.0000 to 10000.0000
-    }
+    EditorBlackFont->write(BufferMain, 580, 15, text);
 
     RedrawingEditor = true;
     Level->render();

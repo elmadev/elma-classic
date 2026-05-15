@@ -89,6 +89,7 @@
 * Minimap icons no longer disappear 1 pixel too early at the edge of the minimap
 * Changing an apples animation number is now correctly saved by Save and Play
 * Incorrect texture distance/clipping data no longer erroneously appears when selecting a mask in Create Picture
+* Zoom number in top tooltip of editor no longer shifts when zooming out
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

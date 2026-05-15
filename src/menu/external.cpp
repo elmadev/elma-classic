@@ -40,7 +40,7 @@ static void play_external(const std::string& filename, bool map_viewer) {
     }
 }
 
-void menu_external_levels() {
+static bool menu_external_levels_inner() {
     menu_nav nav("Select External File!");
     nav.search_pattern = SearchPattern::Sorted;
 
@@ -53,7 +53,7 @@ void menu_external_levels() {
     find_close();
 
     if (nav.row_count() <= 0) {
-        return;
+        return false;
     }
 
     nav.sort_rows();
@@ -62,7 +62,12 @@ void menu_external_levels() {
     while (true) {
         int choice = nav.navigate();
         if (choice < 0) {
-            return;
+            return false;
         }
+    }
+}
+
+void menu_external_levels() {
+    while (menu_external_levels_inner()) {
     }
 }

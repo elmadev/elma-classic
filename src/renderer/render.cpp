@@ -294,7 +294,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
     int corner_y;
     CanvasMinimap->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = Level->objects[i];
         if (!obj) {
             break;
         }
@@ -642,7 +642,7 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike
     int object_border_right = corner_x + SCREEN_WIDTH;
     int object_border_top = corner_y + SCREEN_HEIGHT;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = Level->objects[i];
         if (!obj) {
             break;
         }

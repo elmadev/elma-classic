@@ -23,7 +23,7 @@
 #include <cstring>
 #include <directinput/scancodes.h>
 
-level* Ptop = nullptr;
+level* Level = nullptr;
 
 abc8 *Pabc1 = nullptr, *Pabc2 = nullptr;
 
@@ -495,7 +495,7 @@ static void ujrarajzol(int egesz) {
 
     RedrawingEditor = 1; // Csak edit bufferbe rajzoljon kirajzol
 
-    Ptop->render();
+    Level->render();
     if (Pgy) {
         // Atalakitjuk szaggatotta amit kell:
         Pgy->render_one_line(K, Fel, false);
@@ -543,8 +543,8 @@ static void beallitkozelvane(int mx, int my) {
                       Tool == T_DELETE_VERT || Tool == T_DELETE_POLY;
     bool hover_obj = Tool == T_MOVE || Tool == T_DELETE_KEREK;
     bool hover_spr = Tool == T_MOVE || Tool == T_DELETE_SPRITE;
-    Ptop->get_closest_entity(mx, my, hover_poly ? &poly : nullptr, &K, hover_obj ? &obj : nullptr,
-                             hover_spr ? &spr : nullptr);
+    Level->get_closest_entity(mx, my, hover_poly ? &poly : nullptr, &K, hover_obj ? &obj : nullptr,
+                              hover_spr ? &spr : nullptr);
 
     Kozelvan = poly || obj || spr;
     if (spr) {
@@ -571,13 +571,13 @@ static void toolvaltas(int t) {
 
 static void editor_play(bool view_map) {
     invalidateegesz();
-    if (Valtozott || State->editor_filename[0] == 0 || Ptop->topology_errors) {
+    if (Valtozott || State->editor_filename[0] == 0 || Level->topology_errors) {
         if (!editor_window_save()) {
             return;
         }
     }
 
-    if (Ptop->topology_errors) {
+    if (Level->topology_errors) {
         return;
     }
 

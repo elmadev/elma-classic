@@ -132,7 +132,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
     // Grab top ten table
     topten_set* tten_set;
     if (external_level) {
-        tten_set = &Ptop->toptens;
+        tten_set = &Level->toptens;
     } else {
         tten_set = &State->toptens[internal_index];
     }
@@ -154,7 +154,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
         strcpy(tten->names2[0], State->player2);
         strcat(time_message, "     Best Time!");
         if (external_level) {
-            Ptop->save_topten(external_filename);
+            Level->save_topten(external_filename);
         }
         return;
     }
@@ -203,7 +203,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
 
     // Save external levels (state.dat is not saved)
     if (external_level) {
-        Ptop->save_topten(external_filename);
+        Level->save_topten(external_filename);
     }
 }
 
@@ -214,7 +214,7 @@ void replay_previous_run() {
         Rec1->rewind();
         Rec2->rewind();
         if (replay_loop(Rec1->level_filename, !reset_player_visibility)) {
-            if (Ptop->objects_flipped) {
+            if (Level->objects_flipped) {
                 internal_error("replay_previous_run flipped!");
             }
             return;
@@ -229,12 +229,12 @@ void replay_from_file(const char* filename) {
         Rec1->rewind();
         Rec2->rewind();
         if (replay_loop(filename, !reset_play_visibility)) {
-            if (Ptop->objects_flipped) {
+            if (Level->objects_flipped) {
                 internal_error("replay_from_file flipped!");
             }
             return;
         }
-        if (Ptop->objects_flipped) {
+        if (Level->objects_flipped) {
             internal_error("replay_from_file flipped!");
         }
         reset_play_visibility = false;
@@ -248,7 +248,7 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
     bool external_level = external_filename != nullptr;
 
     if (!Rec1->is_empty()) {
-        recorder::save_rec_file(LAST_REC_FILENAME, Ptop->level_id);
+        recorder::save_rec_file(LAST_REC_FILENAME, Level->level_id);
     }
 
     player* player1 = State->get_player(State->player1);
@@ -282,12 +282,12 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
         // Title: Level 1: Warm Up or External: Unnamed
         std::string title;
         if (external_level) {
-            if (strlen(Ptop->level_name) > LEVEL_NAME_LENGTH) {
+            if (strlen(Level->level_name) > LEVEL_NAME_LENGTH) {
                 internal_error("menu_level level_name too long!");
             }
-            title = std::format("External: {}", Ptop->level_name);
+            title = std::format("External: {}", Level->level_name);
             if (MenuFont->len(title.c_str()) > 630) {
-                title = std::format("Ext: {}", Ptop->level_name);
+                title = std::format("Ext: {}", Level->level_name);
             }
         } else {
             title = std::format("Level {}: {}", internal_index + 1,
@@ -376,14 +376,14 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
                 MenuPalette->set();
             });
 
-        nav.add_row("Save play", NAV_FUNC() { menu_save_play(Ptop->level_id); });
+        nav.add_row("Save play", NAV_FUNC() { menu_save_play(Level->level_id); });
 
         nav.add_row(
             "Level replays", NAV_FUNC() {
                 recorder saved_rec1 = *Rec1;
                 recorder saved_rec2 = *Rec2;
                 int saved_multi = MultiplayerRec;
-                menu_replay_level(Ptop->level_id);
+                menu_replay_level(Level->level_id);
                 *Rec1 = saved_rec1;
                 *Rec2 = saved_rec2;
                 MultiplayerRec = saved_multi;
@@ -395,7 +395,7 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
                 recorder saved_rec1 = *Rec1;
                 recorder saved_rec2 = *Rec2;
                 int saved_multi = MultiplayerRec;
-                menu_merge_level(Ptop->level_id, LAST_REC_FILENAME);
+                menu_merge_level(Level->level_id, LAST_REC_FILENAME);
                 *Rec1 = saved_rec1;
                 *Rec2 = saved_rec2;
                 MultiplayerRec = saved_multi;
@@ -405,7 +405,7 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
         nav.add_row(
             "Best times", NAV_FUNC(&external_level, &internal_index) {
                 if (external_level) {
-                    menu_external_topten(Ptop, Single);
+                    menu_external_topten(Level, Single);
                 } else {
                     menu_internal_topten(internal_index, Single);
                 }
@@ -448,7 +448,7 @@ static void play_internal(int internal_index, bool map_viewer) {
         int time = game_loop(filename, map_viewer ? CameraMode::MapViewer : CameraMode::Normal);
 
         MenuPalette->set();
-        if (Ptop->objects_flipped) {
+        if (Level->objects_flipped) {
             internal_error("play_internal objects_flipped!");
         }
 

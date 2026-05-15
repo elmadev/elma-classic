@@ -496,11 +496,11 @@ void load_best_time(const char* filename, int single) {
     if (internal_index.has_value()) {
         tten_set = &State->toptens[internal_index.value() - 1];
     } else {
-        if (!Ptop) {
+        if (!Level) {
             internal_error(
                 "load_best_time external level must be loaded before getting best time!");
         }
-        tten_set = &Ptop->toptens;
+        tten_set = &Level->toptens;
     }
     topten* tten = nullptr;
     if (single) {

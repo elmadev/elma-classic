@@ -104,20 +104,20 @@ static BikeState handle_object_interaction(int object_id, int* apple_count, moto
     if (object_id < 0 || object_id >= MAX_OBJECTS) {
         internal_error("handle_object_interaction object_id < 0 || object_id >= MAX_OBJECTS!");
     }
-    if (!Ptop->objects[object_id]) {
-        internal_error("handle_object_interaction !Ptop->objects[object_id]!");
+    if (!Level->objects[object_id]) {
+        internal_error("handle_object_interaction !Level->objects[object_id]!");
     }
 
-    object::Type type = Ptop->objects[object_id]->type;
+    object::Type type = Level->objects[object_id]->type;
 
     if (type == object::Type::Killer) {
         return BikeState::Dead;
     }
     if (type == object::Type::Food) {
-        Ptop->objects[object_id]->active = false;
+        Level->objects[object_id]->active = false;
         (*apple_count)++;
         add_event_buffer(WavEvent::Food, 0.99, -1);
-        switch (Ptop->objects[object_id]->property) {
+        switch (Level->objects[object_id]->property) {
         case object::Property::None:
             break;
         case object::Property::GravityUp:
@@ -374,14 +374,14 @@ static void setup_gameloop(const char* filename) {
 
     init_physics_data();
 
-    if (!Ptop) {
-        internal_error("setup_gameloop() !Ptop!");
+    if (!Level) {
+        internal_error("setup_gameloop() !Level!");
     }
-    Ptop->flip_objects();
-    Ptop->sort_objects();
+    Level->flip_objects();
+    Level->sort_objects();
 
-    TotalApples = Ptop->initialize_objects(Motor1);
-    Ptop->initialize_objects(Motor2);
+    TotalApples = Level->initialize_objects(Motor1);
+    Level->initialize_objects(Motor2);
 
     reset_game_background();
 
@@ -417,7 +417,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     reset_event_buffer();
 
     if (Single) {
-        EolClient->enter_level(filename, Ptop);
+        EolClient->enter_level(filename, Level);
     }
 
     stopwatch_reset();
@@ -447,8 +447,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     double level_min_y;
     double level_max_y;
-    Ptop->get_boundaries(&current_camera.min_x, &level_min_y, &current_camera.max_x, &level_max_y,
-                         false);
+    Level->get_boundaries(&current_camera.min_x, &level_min_y, &current_camera.max_x, &level_max_y,
+                          false);
     // Convert level y-coordinates to camera y-coordinates
     current_camera.min_y = -level_max_y;
     current_camera.max_y = -level_min_y;
@@ -537,7 +537,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                                           TotalApples, finish_time ? false : true);
                 }
 
-                Ptop->unflip_objects();
+                Level->unflip_objects();
                 Rec1->encode_frame_count();
                 Rec2->encode_frame_count();
                 if (finish_time) {
@@ -621,7 +621,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             stop_motor_sound(false);
             Mute = true;
 
-            Ptop->unflip_objects();
+            Level->unflip_objects();
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
             if (Single) {
@@ -638,8 +638,8 @@ static void reverse_events(motorst* mot, recorder* rec, double time) {
     double vol;
     int obj;
     while (rec->recall_event_reverse(time, &wav, &vol, &obj)) {
-        if (obj >= 0 && Ptop->objects[obj] && Ptop->objects[obj]->type == object::Type::Food) {
-            Ptop->objects[obj]->active = true;
+        if (obj >= 0 && Level->objects[obj] && Level->objects[obj]->type == object::Type::Food) {
+            Level->objects[obj]->active = true;
             mot->apple_count--;
         }
     }
@@ -846,7 +846,7 @@ int replay_loop(const char* filename, int restore_player_visibility) {
             delay((int)(LevelEndDelay * 400.0));
 
             Mute = true;
-            Ptop->unflip_objects();
+            Level->unflip_objects();
 
             PreviousReplayDrawView1 = metadata1.draw_view;
             PreviousReplayDrawView2 = metadata2.draw_view;
@@ -903,7 +903,7 @@ int replay_loop(const char* filename, int restore_player_visibility) {
 
             Mute = true;
 
-            Ptop->unflip_objects();
+            Level->unflip_objects();
 
             PreviousReplayDrawView1 = metadata1.draw_view;
             PreviousReplayDrawView2 = metadata2.draw_view;
@@ -984,5 +984,5 @@ void render_replay(const char* level_filename) {
     }
 
     VideoRecordingMode = false;
-    Ptop->unflip_objects();
+    Level->unflip_objects();
 }

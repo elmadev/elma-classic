@@ -16,7 +16,7 @@
 static bool delete_polygon(polygon* poly) {
     int poly_count = 0;
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        if (Ptop->polygons[i]) {
+        if (Level->polygons[i]) {
             poly_count++;
         }
     }
@@ -27,9 +27,9 @@ static bool delete_polygon(polygon* poly) {
         return false;
     }
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        if (Ptop->polygons[i] == poly) {
-            delete Ptop->polygons[i];
-            Ptop->polygons[i] = nullptr;
+        if (Level->polygons[i] == poly) {
+            delete Level->polygons[i];
+            Level->polygons[i] = nullptr;
             K = 0;
             Valtozott = 1;
             invalidate();
@@ -106,7 +106,7 @@ void tool_move_leftclick(int mouse_x, int mouse_y) {
     }
 
     // We aren't holding anything. Grab the closest one within 10 pixels
-    Ptop->get_closest_entity(mouse_x, mouse_y, &Pgy, &K, &Pker, &Psp);
+    Level->get_closest_entity(mouse_x, mouse_y, &Pgy, &K, &Pker, &Psp);
     if (!Pgy && !Pker && !Psp) {
         return;
     }
@@ -153,7 +153,7 @@ void tool_move_rightclick(int mouse_x, int mouse_y) {
     int unused;
     polygon* poly;
     object* obj;
-    Ptop->get_closest_entity(mouse_x, mouse_y, &poly, &unused, &obj, &spr);
+    Level->get_closest_entity(mouse_x, mouse_y, &poly, &unused, &obj, &spr);
     if (spr) {
         editor_window_sprite_properties(spr);
     }
@@ -239,12 +239,12 @@ void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
         // We aren't holding anything - find the closest vertex
         double x = pixel_to_meter_x(mouse_x);
         double y = pixel_to_meter_y(mouse_y);
-        Pgy = Ptop->get_closest_vertex(x, y, &K);
+        Pgy = Level->get_closest_vertex(x, y, &K);
         if (!Pgy) {
             // We didn't find a closest vertex. Create a new polygon
             int poly_count = 0;
             for (int i = 0; i < MAX_POLYGONS; i++) {
-                if (Ptop->polygons[i]) {
+                if (Level->polygons[i]) {
                     poly_count++;
                 }
             }
@@ -303,8 +303,8 @@ void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
         internal_error("tool_create_vertex_leftclick !Pgy !CreatingPolygon");
     }
     for (int i = 0; i < MAX_POLYGONS; i++) {
-        if (!Ptop->polygons[i]) {
-            Pgy = Ptop->polygons[i] = new polygon;
+        if (!Level->polygons[i]) {
+            Pgy = Level->polygons[i] = new polygon;
             Pgy->vertex_count = 3;
             Pgy->vertices[0] = FirstVertex;
             Pgy->vertices[2] = Pgy->vertices[1] = pixel_to_meter(mouse_x, mouse_y);
@@ -424,7 +424,7 @@ void tool_delete_vertex_leftclick(int mouse_x, int mouse_y) {
     double x = pixel_to_meter_x(mouse_x);
     double y = pixel_to_meter_y(mouse_y);
     int vertex_index = 0;
-    polygon* poly = Ptop->get_closest_vertex(x, y, &vertex_index);
+    polygon* poly = Level->get_closest_vertex(x, y, &vertex_index);
 
     if (!poly) {
         return;
@@ -451,7 +451,7 @@ void tool_delete_polygon_leftclick(int mouse_x, int mouse_y) {
     double x = pixel_to_meter_x(mouse_x);
     double y = pixel_to_meter_y(mouse_y);
     int vertex_index = 0;
-    polygon* poly = Ptop->get_closest_vertex(x, y, &vertex_index);
+    polygon* poly = Level->get_closest_vertex(x, y, &vertex_index);
 
     if (!poly) {
         return;
@@ -473,7 +473,7 @@ void tool_create_food_rightclick() {
 void tool_create_object_leftclick(int mouse_x, int mouse_y, bool is_food) {
     int object_count = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        if (Ptop->objects[i]) {
+        if (Level->objects[i]) {
             object_count++;
         }
     }
@@ -486,17 +486,17 @@ void tool_create_object_leftclick(int mouse_x, int mouse_y, bool is_food) {
     }
 
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        if (!Ptop->objects[i]) {
+        if (!Level->objects[i]) {
             double x = pixel_to_meter_x(mouse_x);
             double y = pixel_to_meter_y(mouse_y);
             object::Type type = object::Type::Food;
             if (!is_food) {
                 type = object::Type::Killer;
             }
-            Ptop->objects[i] = new object(x, y, type);
+            Level->objects[i] = new object(x, y, type);
             if (is_food) {
-                Ptop->objects[i]->property = DefaultFoodProperty;
-                Ptop->objects[i]->animation = DefaultFoodAnimation;
+                Level->objects[i]->property = DefaultFoodProperty;
+                Level->objects[i]->animation = DefaultFoodAnimation;
             }
             invalidate();
             Valtozott = 1;
@@ -509,12 +509,12 @@ void tool_create_object_leftclick(int mouse_x, int mouse_y, bool is_food) {
 void tool_delete_object_leftclick(int mouse_x, int mouse_y) {
     double x = pixel_to_meter_x(mouse_x);
     double y = pixel_to_meter_y(mouse_y);
-    object* obj = Ptop->get_closest_object(x, y);
+    object* obj = Level->get_closest_object(x, y);
     if (!obj) {
         return;
     }
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        if (Ptop->objects[i] == obj) {
+        if (Level->objects[i] == obj) {
             if (obj->type == object::Type::Exit) {
                 dialog("You cannot delete the Exit object!");
                 return;
@@ -524,7 +524,7 @@ void tool_delete_object_leftclick(int mouse_x, int mouse_y) {
                 return;
             }
             delete obj;
-            Ptop->objects[i] = nullptr;
+            Level->objects[i] = nullptr;
             Valtozott = 1;
             invalidate();
             return;
@@ -631,7 +631,7 @@ void tool_create_sprite_leftclick(int mouse_x, int mouse_y) {
 
     int sprite_count = 0;
     for (int i = 0; i < MAX_SPRITES; i++) {
-        if (Ptop->sprites[i]) {
+        if (Level->sprites[i]) {
             sprite_count++;
         }
     }
@@ -649,11 +649,11 @@ void tool_create_sprite_leftclick(int mouse_x, int mouse_y) {
     }
 
     for (int i = 0; i < MAX_SPRITES; i++) {
-        if (!Ptop->sprites[i]) {
+        if (!Level->sprites[i]) {
             double x = pixel_to_meter_x(mouse_x);
             double y = pixel_to_meter_y(mouse_y);
-            Ptop->sprites[i] = new sprite(x, y, Lgr->editor_picture_name, Lgr->editor_texture_name,
-                                          Lgr->editor_mask_name);
+            Level->sprites[i] = new sprite(x, y, Lgr->editor_picture_name, Lgr->editor_texture_name,
+                                           Lgr->editor_mask_name);
             invalidate();
             Valtozott = 1;
             return;
@@ -665,14 +665,14 @@ void tool_create_sprite_leftclick(int mouse_x, int mouse_y) {
 void tool_delete_sprite_leftclick(int mouse_x, int mouse_y) {
     double x = pixel_to_meter_x(mouse_x);
     double y = pixel_to_meter_y(mouse_y);
-    sprite* spr = Ptop->get_closest_sprite(x, y);
+    sprite* spr = Level->get_closest_sprite(x, y);
     if (!spr) {
         return;
     }
     for (int i = 0; i < MAX_SPRITES; i++) {
-        if (Ptop->sprites[i] == spr) {
+        if (Level->sprites[i] == spr) {
             delete spr;
-            Ptop->sprites[i] = nullptr;
+            Level->sprites[i] = nullptr;
             Valtozott = 1;
             invalidate();
             return;

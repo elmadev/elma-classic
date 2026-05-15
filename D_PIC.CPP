@@ -20,7 +20,7 @@ static int Backpiclocked = 0, Frontpiclocked = 0;
 void on_resolution_change() {
     editor_canvas_update_resolution();
     reinit_menu_pictures();
-    if (Ptop && Lgr) {
+    if (Level && Lgr) {
         Lgr->reload_default_textures(true);
     }
     invalidateegesz();

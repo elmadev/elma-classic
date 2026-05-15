@@ -89,7 +89,7 @@ int get_two_anchor_points(vect2 r, double radius, vect2* point1, vect2* point2) 
 
 int get_touching_object(vect2 r, double radius) {
     for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Ptop->objects[i];
+        object* obj = Level->objects[i];
         if (!obj) {
             break;
         }

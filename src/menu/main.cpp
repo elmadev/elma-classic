@@ -39,7 +39,7 @@ static void menu_demo() {
                            Rec1->level_filename);
         }
         load_level_play(Rec1->level_filename);
-        if (Ptop->level_id != level_id) {
+        if (Level->level_id != level_id) {
             internal_error(
                 std::string("menu_demo: level file changed since demo replay was made: ") +
                 Rec1->level_filename);

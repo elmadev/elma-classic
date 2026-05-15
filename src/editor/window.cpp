@@ -87,8 +87,8 @@ static int list_index(const std::string& target) {
 
 static void open_level(const char* filename) {
     // Sanity checks
-    if (!Ptop) {
-        internal_error("open_level !Ptop");
+    if (!Level) {
+        internal_error("open_level !Level");
     }
     if (!*filename) {
         internal_error("open_level !*filename");
@@ -412,7 +412,7 @@ bool editor_window_save() {
     if (State->editor_filename[0] == 0) {
         return editor_window_save_as();
     }
-    Ptop->save(State->editor_filename);
+    Level->save(State->editor_filename);
     Valtozott = 0;
     return true;
 }
@@ -471,7 +471,7 @@ bool editor_window_save_as() {
                         return false;
                     }
                 }
-                Ptop->save(filename_input);
+                Level->save(filename_input);
                 strcpy(State->editor_filename, filename_input);
                 Valtozott = 0;
                 return true;
@@ -1534,12 +1534,12 @@ void editor_window_level_properties() {
     char foreground_name[10];
     char background_name[10];
     char level_name[LEVEL_NAME_LENGTH + 20];
-    strcpy(foreground_name, Ptop->foreground_name);
-    strcpy(background_name, Ptop->background_name);
-    strcpy(level_name, Ptop->level_name);
+    strcpy(foreground_name, Level->foreground_name);
+    strcpy(background_name, Level->background_name);
+    strcpy(level_name, Level->level_name);
 
     finame lgr_name = "";
-    strcpy(lgr_name, Ptop->lgr_name);
+    strcpy(lgr_name, Level->lgr_name);
 
     int x1 = 130;
     int y1 = 100;
@@ -1567,20 +1567,20 @@ void editor_window_level_properties() {
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
         } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
-            if (strcmpi(Ptop->foreground_name, foreground_name) != 0 ||
-                strcmpi(Ptop->background_name, background_name) != 0 ||
-                strcmp(Ptop->level_name, level_name) != 0) {
+            if (strcmpi(Level->foreground_name, foreground_name) != 0 ||
+                strcmpi(Level->background_name, background_name) != 0 ||
+                strcmp(Level->level_name, level_name) != 0) {
                 Valtozott = 1;
             }
-            strcpy(Ptop->foreground_name, foreground_name);
-            strcpy(Ptop->background_name, background_name);
-            strcpy(Ptop->level_name, level_name);
+            strcpy(Level->foreground_name, foreground_name);
+            strcpy(Level->background_name, background_name);
+            strcpy(Level->level_name, level_name);
 
-            if (strcmpi(lgr_name, Ptop->lgr_name) != 0) {
+            if (strcmpi(lgr_name, Level->lgr_name) != 0) {
                 Valtozott = 1;
-                strcpy(Ptop->lgr_name, lgr_name);
-                lgrfile::load_lgr_file(Ptop->lgr_name);
-                if (Ptop->discard_missing_lgr_assets(Lgr)) {
+                strcpy(Level->lgr_name, lgr_name);
+                lgrfile::load_lgr_file(Level->lgr_name);
+                if (Level->discard_missing_lgr_assets(Lgr)) {
                     dialog_warn_lgr_assets_deleted();
                 }
             }

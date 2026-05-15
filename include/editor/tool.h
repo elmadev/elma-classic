@@ -3,8 +3,6 @@
 
 #include "object.h"
 
-void draw_tooltip_help(); // Base tooltip for current tool when tool has not yet been used
-
 void tool_move_leftclick(int mouse_x, int mouse_y);
 void tool_move_rightclick(int mouse_x, int mouse_y);
 void tool_move_esc();

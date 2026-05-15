@@ -25,7 +25,8 @@
 
 level* Level = nullptr;
 
-abc8 *EditorWhiteFont = nullptr, *EditorBlackFont = nullptr;
+abc8* EditorWhiteFont = nullptr;
+abc8* EditorBlackFont = nullptr;
 
 polygon* SelectedPolygon = nullptr;
 int SelectedVertexIndex = 0;
@@ -34,7 +35,7 @@ bool CreateVertexDirection = false;
 object* SelectedObject = nullptr;
 sprite* SelectedSprite = nullptr;
 
-int LevelChanged = 0;
+bool LevelChanged = false;
 
 palette* EditorPalette = nullptr;
 static unsigned char Pal_editor_byteok[768];
@@ -126,10 +127,9 @@ static int completed_levels() {
     return cur_player->levels_completed - skips;
 }
 
-static int CursorDrawn = 0;
-
-int MouseX = 0, MouseY = 0;
-bool CursorShapeIsX = false;
+int MouseX = 0;
+int MouseY = 0;
+static bool CursorShapeIsX = false;
 
 static void draw_cursor_pixel(int x, int y) {
     if (x < 0 || y < 0 || x > (SCREEN_WIDTH - 1) || y > (SCREEN_HEIGHT - 1)) {
@@ -162,11 +162,13 @@ static void draw_cursor_shape() {
     unlockfrontbuffer_pic();
 }
 
+static bool CursorDrawn = false;
+
 void erase_cursor() {
     if (!CursorDrawn) {
         internal_error("erase_cursor-ban !CursorDrawn!");
     }
-    CursorDrawn = 0;
+    CursorDrawn = false;
     draw_cursor_shape();
 }
 
@@ -174,12 +176,13 @@ void draw_cursor() {
     if (CursorDrawn) {
         internal_error("draw_cursor-ban CursorDrawn!");
     }
-    CursorDrawn = 1;
+    CursorDrawn = true;
     draw_cursor_shape();
 }
 
 void update_and_draw_cursor() {
-    int mouse_x, mouse_y;
+    int mouse_x = 0;
+    int mouse_y = 0;
     get_mouse_position(&mouse_x, &mouse_y);
     if (mouse_x == MouseX && mouse_y == MouseY) {
         return;
@@ -190,53 +193,57 @@ void update_and_draw_cursor() {
     draw_cursor();
 }
 
-static char TooltipText[110] = "";
-
 void draw_tooltip(const char* text) {
+    static char TooltipText[110] = "";
     if (text) {
         if (strlen(text) > 100) {
             internal_error(std::string("draw_tooltip strlen( text ) > 100!\n") + text);
         }
         strcpy(TooltipText, text);
     }
-    int x1 = 1, y1 = 18, x2 = SCREEN_WIDTH - 2, y2 = EDITOR_MENU_Y - 2;
+    int x1 = 1;
+    int y1 = 18;
+    int x2 = SCREEN_WIDTH - 2;
+    int y2 = EDITOR_MENU_Y - 2;
     BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId_Background);
     EditorWhiteFont->write(BufferMain, 10, y1 + 12, TooltipText);
     bltfront(BufferMain, x1, y1, x2, y2);
 }
 
-static int RedrawEditorCanvas = 0;
-void invalidate_editor_level() { RedrawEditorCanvas = 1; }
+static bool RedrawEditorCanvas = false;
+void invalidate_editor_level() { RedrawEditorCanvas = true; }
 
-static int RedrawEditorGui = 0;
-void invalidate_editor_gui() { RedrawEditorGui = 1; }
+static bool RedrawEditorGui = false;
+void invalidate_editor_gui() { RedrawEditorGui = true; }
 
-static int CommandsLength = 13, ToolsLength = 10;
-static int MenuLength = CommandsLength + ToolsLength, MenuEntryHeight = 19;
+constexpr int COMMANDS_LENGTH = 13;
+constexpr int TOOLS_LENGTH = 10;
+constexpr int MENU_LENGTH = COMMANDS_LENGTH + TOOLS_LENGTH;
+constexpr int MENU_ENTRY_HEIGHT = 19;
 
-static char MenuText[23][15] = {"Exit",
-                                "New",
-                                "Open",
-                                "Save As",
-                                "Save",
-                                "Save and Play",
-                                "Check Topology",
-                                "Properties",
-                                "Zoom Out",
-                                "Zoom Fill",
-                                "View Options",
-                                "Help",
-                                "",
-                                "Move",
-                                "Zoom In",
-                                "Create Vertex",
-                                "Delete Vertex",
-                                "Delete Polygon",
-                                "Create Food",
-                                "Create Killer",
-                                "Delete Object",
-                                "Create Picture",
-                                "Delete Picture"};
+constexpr char MENU_TEXT[23][15] = {"Exit",
+                                    "New",
+                                    "Open",
+                                    "Save As",
+                                    "Save",
+                                    "Save and Play",
+                                    "Check Topology",
+                                    "Properties",
+                                    "Zoom Out",
+                                    "Zoom Fill",
+                                    "View Options",
+                                    "Help",
+                                    "",
+                                    "Move",
+                                    "Zoom In",
+                                    "Create Vertex",
+                                    "Delete Vertex",
+                                    "Delete Polygon",
+                                    "Create Food",
+                                    "Create Killer",
+                                    "Delete Object",
+                                    "Create Picture",
+                                    "Delete Picture"};
 
 int SelectedTool = Tool_Move;
 
@@ -257,42 +264,44 @@ static void draw_editor_gui() {
     BufferMain->line(EDITOR_MENU_X - 1, EDITOR_MENU_Y, EDITOR_MENU_X - 1, SCREEN_HEIGHT - 1,
                      EditorPaletteId_MenuBorder);
     // Menu entries
-    for (int i = 0; i < MenuLength; i++) {
+    for (int i = 0; i < MENU_LENGTH; i++) {
         int x1 = 1;
-        int y1 = EDITOR_MENU_Y + i * MenuEntryHeight + 1;
+        int y1 = EDITOR_MENU_Y + i * MENU_ENTRY_HEIGHT + 1;
         int x2 = EDITOR_MENU_X - 2;
-        int y2 = EDITOR_MENU_Y + (i + 1) * MenuEntryHeight - 1;
-        if (i == CommandsLength + SelectedTool) {
+        int y2 = EDITOR_MENU_Y + (i + 1) * MENU_ENTRY_HEIGHT - 1;
+        if (i == COMMANDS_LENGTH + SelectedTool) {
             BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId_MenuSelected);
         }
         BufferMain->line(x1, y2 + 1, x2, y2 + 1, EditorPaletteId_MenuBorder);
-        EditorWhiteFont->write(BufferMain, 5, EDITOR_MENU_Y + i * MenuEntryHeight + 14,
-                               MenuText[i]);
+        EditorWhiteFont->write(BufferMain, 5, EDITOR_MENU_Y + i * MENU_ENTRY_HEIGHT + 14,
+                               MENU_TEXT[i]);
     }
     // Underline Save and *P*lay
     int x = 66;
-    int y = EDITOR_MENU_Y + 5 * MenuEntryHeight + 15;
+    int y = EDITOR_MENU_Y + 5 * MENU_ENTRY_HEIGHT + 15;
     BufferMain->line(x, y, x + 6, y, 247);
     // Underline *E*xit
     x = 13;
-    y = EDITOR_MENU_Y + 0 * MenuEntryHeight + 15;
+    y = EDITOR_MENU_Y + 0 * MENU_ENTRY_HEIGHT + 15;
     BufferMain->line(x, y, x + 7, y, 247);
     // Underline *O*pen
     x = 5;
-    y = EDITOR_MENU_Y + 2 * MenuEntryHeight + 15;
+    y = EDITOR_MENU_Y + 2 * MENU_ENTRY_HEIGHT + 15;
     BufferMain->line(x, y, x + 6, y, 247);
     // Underline *Z*oom Out
     x = 5;
-    y = EDITOR_MENU_Y + 8 * MenuEntryHeight + 15;
+    y = EDITOR_MENU_Y + 8 * MENU_ENTRY_HEIGHT + 15;
     BufferMain->line(x, y, x + 7, y, 247);
     // Underline *S*ave
     x = 4;
-    y = EDITOR_MENU_Y + 4 * MenuEntryHeight + 15;
+    y = EDITOR_MENU_Y + 4 * MENU_ENTRY_HEIGHT + 15;
     BufferMain->line(x, y, x + 7, y, 247);
 }
 
-static pic8* TooltipBuffer = nullptr;
-static char TooltipPictureName[10] = "", TooltipTextureName[10] = "", TooltipMaskName[10] = "";
+static pic8 TooltipBuffer(400, 17);
+static char TooltipPictureName[10] = "";
+static char TooltipTextureName[10] = "";
+static char TooltipMaskName[10] = "";
 
 void draw_sprite_tooltip(const char* picture_name, const char* texture_name, const char* mask_name,
                          int distance, Clipping clipping) {
@@ -306,18 +315,14 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
     strcpy(TooltipTextureName, texture_name);
     strcpy(TooltipMaskName, mask_name);
 
-    if (!TooltipBuffer) {
-        TooltipBuffer = new pic8(400, 17);
-    }
-
-    TooltipBuffer->fill_box(EditorPaletteId_Background);
+    TooltipBuffer.fill_box(EditorPaletteId_Background);
 
     if (picture_name[0] && (texture_name[0] || mask_name[0])) {
         internal_error("draw_sprite_tooltip too many params!");
     }
 
     if (picture_name[0]) {
-        EditorWhiteFont->write(TooltipBuffer, 0, 14, "PICTURE:");
+        EditorWhiteFont->write(&TooltipBuffer, 0, 14, "PICTURE:");
         char tmp[30];
         sprintf(tmp, "%s (%d)  ", picture_name, distance);
         if (clipping == Clipping::Unclipped) {
@@ -329,12 +334,12 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
         if (clipping == Clipping::Sky) {
             strcat(tmp, "S");
         }
-        EditorBlackFont->write(TooltipBuffer, 60, 14, tmp);
+        EditorBlackFont->write(&TooltipBuffer, 60, 14, tmp);
     }
     if (texture_name[0] || mask_name[0]) {
-        EditorWhiteFont->write(TooltipBuffer, 0, 14, "TEXTURE:");
-        EditorBlackFont->write(TooltipBuffer, 60, 14, texture_name);
-        EditorWhiteFont->write(TooltipBuffer, 126, 14, "MASK:");
+        EditorWhiteFont->write(&TooltipBuffer, 0, 14, "TEXTURE:");
+        EditorBlackFont->write(&TooltipBuffer, 60, 14, texture_name);
+        EditorWhiteFont->write(&TooltipBuffer, 126, 14, "MASK:");
         char tmp[30];
         sprintf(tmp, "%s (%d)  ", mask_name, distance);
         if (clipping == Clipping::Unclipped) {
@@ -346,10 +351,10 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
         if (clipping == Clipping::Sky) {
             strcat(tmp, "S");
         }
-        EditorBlackFont->write(TooltipBuffer, 164, 14, tmp);
+        EditorBlackFont->write(&TooltipBuffer, 164, 14, tmp);
     }
 
-    blit8(BufferMain, TooltipBuffer, 226, 2);
+    blit8(BufferMain, &TooltipBuffer, 226, 2);
     bltfront(BufferMain, 226, 2, 540, 30);
 }
 
@@ -357,12 +362,8 @@ void draw_object_tooltip(object::Type type, object::Property property, int anima
     // Impossible name (9 characters long) to invalidate cache
     strcpy(TooltipPictureName, "aaccbbdde");
 
-    if (!TooltipBuffer) {
-        TooltipBuffer = new pic8(400, 17);
-    }
-
-    TooltipBuffer->fill_box(EditorPaletteId_Background);
-    EditorWhiteFont->write(TooltipBuffer, 0, 14, "Object:");
+    TooltipBuffer.fill_box(EditorPaletteId_Background);
+    EditorWhiteFont->write(&TooltipBuffer, 0, 14, "Object:");
     char tmp[50];
     if (type == object::Type::Exit) {
         sprintf(tmp, "Exit");
@@ -386,26 +387,28 @@ void draw_object_tooltip(object::Type type, object::Property property, int anima
         if (property == object::Property::GravityRight) {
             sprintf(tmp, "Grav. Right");
         }
-        EditorWhiteFont->write(TooltipBuffer, 130, 14, "Anim num:");
+        EditorWhiteFont->write(&TooltipBuffer, 130, 14, "Anim num:");
         char tmp2[10];
         sprintf(tmp2, "%d", (int)(animation + 1));
-        EditorBlackFont->write(TooltipBuffer, 193, 14, tmp2);
+        EditorBlackFont->write(&TooltipBuffer, 193, 14, tmp2);
     }
     if (type == object::Type::Killer) {
         sprintf(tmp, "Killer");
     }
-    EditorBlackFont->write(TooltipBuffer, 50, 14, tmp);
+    EditorBlackFont->write(&TooltipBuffer, 50, 14, tmp);
 
-    blit8(BufferMain, TooltipBuffer, 226, 2);
+    blit8(BufferMain, &TooltipBuffer, 226, 2);
     bltfront(BufferMain, 226, 2, 540, 30);
 }
 
-static void draw_editor(int draw_gui) {
+static void draw_editor() {
     erase_cursor();
 
     // Make sure the sprite tooltip will be immediately updated
-    TooltipPictureName[0] = TooltipTextureName[0] = TooltipMaskName[0] = 0;
-    if (draw_gui) {
+    TooltipPictureName[0] = 0;
+    TooltipTextureName[0] = 0;
+    TooltipMaskName[0] = 0;
+    if (RedrawEditorGui) {
         draw_editor_gui();
     }
 
@@ -418,19 +421,18 @@ static void draw_editor(int draw_gui) {
     // Tooltip section
     EditorWhiteFont->write(BufferMain, 6, 15, "File:");
     strupr(State->editor_filename);
-    int len = 0;
     int filename_x = 41;
     if (State->editor_filename[0] == 0) {
         EditorBlackFont->write(BufferMain, filename_x, 15, "UNNAMED");
-        len = EditorBlackFont->len("UNNAMED");
+        filename_x += EditorBlackFont->len("UNNAMED");
     } else {
         EditorBlackFont->write(BufferMain, filename_x, 15, State->editor_filename);
-        len = EditorBlackFont->len(State->editor_filename);
+        filename_x += EditorBlackFont->len(State->editor_filename);
     }
     if (LevelChanged) {
-        EditorWhiteFont->write(BufferMain, filename_x + len + 3, 15, "(Changed)");
+        EditorWhiteFont->write(BufferMain, filename_x + 3, 15, "(Changed)");
     } else {
-        EditorWhiteFont->write(BufferMain, filename_x + len + 3, 15, "(Unchanged)");
+        EditorWhiteFont->write(BufferMain, filename_x + 3, 15, "(Unchanged)");
     }
 
     draw_tooltip();
@@ -448,20 +450,18 @@ static void draw_editor(int draw_gui) {
         EditorBlackFont->write(BufferMain, 580, 15, text); // 10.0000 to 10000.0000
     }
 
-    RedrawingEditor = 1;
+    RedrawingEditor = true;
     Level->render();
     if (SelectedPolygon) {
         SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, false);
         SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, true);
     }
-    RedrawingEditor = 0;
+    RedrawingEditor = false;
 
     bltfront(BufferMain);
 
-    RedrawEditorCanvas = 0;
-    if (draw_gui) {
-        RedrawEditorGui = 0;
-    }
+    RedrawEditorCanvas = false;
+    RedrawEditorGui = false;
 
     draw_cursor();
 
@@ -498,8 +498,7 @@ static void draw_mouse_tooltip(int mouse_x, int mouse_y) {
     object* obj = nullptr;
     sprite* spr = nullptr;
     bool hover_poly = SelectedTool == Tool_Move || SelectedTool == Tool_CreateVertex ||
-                      SelectedTool == Tool_Move || SelectedTool == Tool_DeleteVertex ||
-                      SelectedTool == Tool_DeletePolygon;
+                      SelectedTool == Tool_DeleteVertex || SelectedTool == Tool_DeletePolygon;
     bool hover_obj = SelectedTool == Tool_Move || SelectedTool == Tool_DeleteObject;
     bool hover_spr = SelectedTool == Tool_Move || SelectedTool == Tool_DeleteSprite;
     Level->get_closest_entity(mouse_x, mouse_y, hover_poly ? &poly : nullptr, &SelectedVertexIndex,
@@ -577,10 +576,10 @@ void editor() {
     draw_editor_gui();
     bltfront(BufferMain);
 
-    CursorDrawn = 0;
+    CursorDrawn = false;
     draw_cursor();
 
-    LevelChanged = 0;
+    LevelChanged = false;
 
     if (completed_levels() < 5) {
         char tmp[50];
@@ -594,7 +593,6 @@ void editor() {
     }
 
     editor_window_welcome();
-    LevelChanged = 0;
     if (State->editor_filename[0] == 0) {
         load_level_editor(DEFAULT_LEVEL_FILENAME);
     } else {
@@ -617,9 +615,10 @@ void editor() {
     draw_tooltip_help();
 
     zoom_fill();
-    draw_editor(1);
+    invalidate_editor_gui();
+    draw_editor();
 
-    while (1) {
+    while (true) {
         handle_events();
         // Control keys
         if (was_key_just_pressed(DIK_ESCAPE)) {
@@ -675,7 +674,8 @@ void editor() {
         bool left_click = was_left_mouse_just_clicked();
         bool right_click = was_right_mouse_just_clicked();
         if (left_click || right_click) {
-            int click_x = 0, click_y = 0;
+            int click_x = 0;
+            int click_y = 0;
             get_mouse_position(&click_x, &click_y);
             if (click_y < EDITOR_MENU_Y) {
                 // Mouse is not allowed in tooltip section
@@ -696,9 +696,9 @@ void editor() {
             }
             if (click_x < EDITOR_MENU_X) {
                 // Menu clicks
-                for (int i = 0; i < MenuLength; i++) {
-                    if (EDITOR_MENU_Y + i * MenuEntryHeight <= click_y &&
-                        click_y < EDITOR_MENU_Y + (i + 1) * MenuEntryHeight) {
+                for (int i = 0; i < MENU_LENGTH; i++) {
+                    if (EDITOR_MENU_Y + i * MENU_ENTRY_HEIGHT <= click_y &&
+                        click_y < EDITOR_MENU_Y + (i + 1) * MENU_ENTRY_HEIGHT) {
                         // Commands
                         if (i == 0 && left_click) {
                             if (editor_dialog_exit()) {
@@ -777,38 +777,38 @@ void editor() {
 
                         // Tools
                         if (left_click) {
-                            if (i >= CommandsLength && i < CommandsLength + ToolsLength) {
-                                select_tool(i - CommandsLength);
+                            if (i >= COMMANDS_LENGTH && i < COMMANDS_LENGTH + TOOLS_LENGTH) {
+                                select_tool(i - COMMANDS_LENGTH);
                             }
                         } else {
-                            if (i == CommandsLength + 0) {
+                            if (i == COMMANDS_LENGTH + 0) {
                                 editor_help_move();
                             }
-                            if (i == CommandsLength + 1) {
+                            if (i == COMMANDS_LENGTH + 1) {
                                 editor_help_zoom_in();
                             }
-                            if (i == CommandsLength + 2) {
+                            if (i == COMMANDS_LENGTH + 2) {
                                 editor_help_create_vertex();
                             }
-                            if (i == CommandsLength + 3) {
+                            if (i == COMMANDS_LENGTH + 3) {
                                 editor_help_delete_vertex();
                             }
-                            if (i == CommandsLength + 4) {
+                            if (i == COMMANDS_LENGTH + 4) {
                                 editor_help_delete_polygon();
                             }
-                            if (i == CommandsLength + 5) {
+                            if (i == COMMANDS_LENGTH + 5) {
                                 editor_help_create_food();
                             }
-                            if (i == CommandsLength + 6) {
+                            if (i == COMMANDS_LENGTH + 6) {
                                 editor_help_create_killer();
                             }
-                            if (i == CommandsLength + 7) {
+                            if (i == COMMANDS_LENGTH + 7) {
                                 editor_help_delete_object();
                             }
-                            if (i == CommandsLength + 8) {
+                            if (i == COMMANDS_LENGTH + 8) {
                                 editor_help_create_sprite();
                             }
-                            if (i == CommandsLength + 9) {
+                            if (i == COMMANDS_LENGTH + 9) {
                                 editor_help_delete_sprite();
                             }
                         }
@@ -865,14 +865,11 @@ void editor() {
         }
 
         if (RedrawEditorGui || RedrawEditorCanvas) {
-            if (RedrawEditorGui) {
-                draw_editor(1);
-            } else {
-                draw_editor(0);
-            }
+            draw_editor();
         }
 
-        int mouse_x = 0, mouse_y = 0;
+        int mouse_x = 0;
+        int mouse_y = 0;
         get_mouse_position(&mouse_x, &mouse_y);
         if (mouse_y < EDITOR_MENU_Y) {
             // Mouse is not allowed in tooltip section

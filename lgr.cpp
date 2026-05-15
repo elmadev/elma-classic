@@ -123,7 +123,7 @@ void lgrfile::load_lgr_file(const char* lgr_name) {
             internal_error("load_lgr_file !Level!");
         }
 
-        LevelChanged = 1;
+        LevelChanged = true;
         strcpy(Level->lgr_name, "default");
         Level->lgr_not_found = true;
     }

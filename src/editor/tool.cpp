@@ -31,7 +31,7 @@ static bool delete_polygon(polygon* poly) {
             delete Level->polygons[i];
             Level->polygons[i] = nullptr;
             SelectedVertexIndex = 0;
-            LevelChanged = 1;
+            LevelChanged = true;
             invalidate_editor_level();
             return true;
         }
@@ -103,7 +103,7 @@ void tool_move_leftclick(int mouse_x, int mouse_y) {
             SelectedSprite->r = pixel_to_meter(mouse_x, mouse_y);
             SelectedSprite = nullptr;
         }
-        LevelChanged = 1;
+        LevelChanged = true;
         draw_tooltip_help();
         invalidate_editor_level();
         return;
@@ -244,7 +244,7 @@ static vect2 FirstVertex;
 static vect2 MouseVertex;
 
 void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
-    LevelChanged = 1;
+    LevelChanged = true;
     if (!SelectedPolygon && !CreatingPolygon) {
         // We aren't holding anything - find the closest vertex
         double x = pixel_to_meter_x(mouse_x);
@@ -450,7 +450,7 @@ void tool_delete_vertex_leftclick(int mouse_x, int mouse_y) {
         return;
     }
     poly->delete_vertex(vertex_index);
-    LevelChanged = 1;
+    LevelChanged = true;
     invalidate_editor_level();
 }
 
@@ -510,7 +510,7 @@ void tool_create_object_leftclick(int mouse_x, int mouse_y, bool is_food) {
                 Level->objects[i]->animation = DefaultFoodAnimation;
             }
             invalidate_editor_level();
-            LevelChanged = 1;
+            LevelChanged = true;
             return;
         }
     }
@@ -536,7 +536,7 @@ void tool_delete_object_leftclick(int mouse_x, int mouse_y) {
             }
             delete obj;
             Level->objects[i] = nullptr;
-            LevelChanged = 1;
+            LevelChanged = true;
             invalidate_editor_level();
             return;
         }
@@ -666,7 +666,7 @@ void tool_create_sprite_leftclick(int mouse_x, int mouse_y) {
             Level->sprites[i] = new sprite(x, y, Lgr->editor_picture_name, Lgr->editor_texture_name,
                                            Lgr->editor_mask_name);
             invalidate_editor_level();
-            LevelChanged = 1;
+            LevelChanged = true;
             return;
         }
     }
@@ -684,7 +684,7 @@ void tool_delete_sprite_leftclick(int mouse_x, int mouse_y) {
         if (Level->sprites[i] == spr) {
             delete spr;
             Level->sprites[i] = nullptr;
-            LevelChanged = 1;
+            LevelChanged = true;
             invalidate_editor_level();
             return;
         }

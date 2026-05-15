@@ -25,22 +25,22 @@
 
 level* Level = nullptr;
 
-abc8 *Pabc1 = nullptr, *Pabc2 = nullptr;
+abc8 *EditorWhiteFont = nullptr, *EditorBlackFont = nullptr;
 
-polygon* Pgy = nullptr;
-int K = 0;
-bool Fel = false;
+polygon* SelectedPolygon = nullptr;
+int SelectedVertexIndex = 0;
+bool CreateVertexDirection = false;
 
-object* Pker = nullptr;
+object* SelectedObject = nullptr;
 
-sprite* Psp = nullptr;
+sprite* SelectedSprite = nullptr;
 
-int Valtozott = 0;
+int LevelChanged = 0;
 
-palette* Pal_editor = nullptr;
+palette* EditorPalette = nullptr;
 static unsigned char Pal_editor_byteok[768];
 
-void seteditorpal() {
+void create_editor_palette() {
     unsigned char* pal = Pal_editor_byteok;
     // Paletta elso 64 szine menu szinek,
     // Masodik 64 szin truecolor tabla
@@ -113,10 +113,10 @@ void seteditorpal() {
         }
     }
 
-    if (Pal_editor) {
+    if (EditorPalette) {
         internal_error("uvcguyew");
     }
-    Pal_editor = new palette(pal);
+    EditorPalette = new palette(pal);
 }
 
 static int hanypalyavanmeg() {
@@ -138,7 +138,7 @@ static int hanypalyavanmeg() {
 
 static int Egerkint = 0;
 
-int Moux = 0, Mouy = 0;
+int MouseX = 0, MouseY = 0;
 bool Kozelvan = false;
 
 static void elintezegymousepixelt(int x, int y) {
@@ -152,9 +152,10 @@ static void elintezegymousepixelt(int x, int y) {
 }
 
 static void egeretrajzolja() {
-    /*if( Tool == T_MOVE && !Pgy && !Pker && !Psp && Kurzornegyzet ) {
+    /*if( SelectedTool == Tool_Move && !SelectedPolygon && !SelectedObject && !SelectedSprite &&
+    Kurzornegyzet ) {
         //internal_error( "Most itt van benn!" );
-        vect2 r = pixel_to_meter( Moux, Mouy );
+        vect2 r = pixel_to_meter( MouseX, MouseY );
         double x1 = r.x;
         double y1 = r.y;
         double x2 = x1+640.0/MetersToPixels;
@@ -171,14 +172,14 @@ static void egeretrajzolja() {
     int sugar = 4;
     for (int i = -sugar; i <= sugar; i++) {
         if (Kozelvan) {
-            elintezegymousepixelt(Moux + i, Mouy + i);
+            elintezegymousepixelt(MouseX + i, MouseY + i);
             if (i != 0) {
-                elintezegymousepixelt(Moux + i, Mouy - i);
+                elintezegymousepixelt(MouseX + i, MouseY - i);
             }
         } else {
-            elintezegymousepixelt(Moux + i, Mouy);
+            elintezegymousepixelt(MouseX + i, MouseY);
             if (i != 0) {
-                elintezegymousepixelt(Moux, Mouy + i);
+                elintezegymousepixelt(MouseX, MouseY + i);
             }
         }
     }
@@ -186,9 +187,9 @@ static void egeretrajzolja() {
 }
 
 // Egeret leveszi kepernyorol:
-void push() {
+void erase_cursor() {
     if (!Egerkint) {
-        internal_error("push-ban !Egerkint!");
+        internal_error("erase_cursor-ban !Egerkint!");
     }
     Egerkint = 0;
 
@@ -196,9 +197,9 @@ void push() {
 }
 
 // Egeret felteszi kepernyore:
-void pop() {
+void draw_cursor() {
     if (Egerkint) {
-        internal_error("pop-ban Egerkint!");
+        internal_error("draw_cursor-ban Egerkint!");
     }
     Egerkint = 1;
 
@@ -208,13 +209,13 @@ void pop() {
 void update_and_draw_cursor() {
     int x, y;
     get_mouse_position(&x, &y);
-    if (x == Moux && y == Mouy) {
+    if (x == MouseX && y == MouseY) {
         return;
     }
-    push();
-    Moux = x;
-    Mouy = y;
-    pop();
+    erase_cursor();
+    MouseX = x;
+    MouseY = y;
+    draw_cursor();
 }
 
 // TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP TOOLHELP
@@ -224,16 +225,16 @@ void update_and_draw_cursor() {
 
 static char Toolhelpszoveg[110] = "";
 
-void toolhelp(const char* text) {
+void draw_tooltip(const char* text) {
     if (text) {
         if (strlen(text) > 100) {
-            internal_error(std::string("toolhelp-ben strlen( text ) > 100!\n") + text);
+            internal_error(std::string("draw_tooltip-ben strlen( text ) > 100!\n") + text);
         }
         strcpy(Toolhelpszoveg, text);
     }
     int x1 = 1, y1 = 18, x2 = SCREEN_WIDTH - 2, y2 = EDITOR_MENU_Y - 2;
-    BufferMain->fill_box(x1, y1, x2, y2, Hatterindex);
-    Pabc1->write(BufferMain, 10, y1 + 12, Toolhelpszoveg);
+    BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId_Background);
+    EditorWhiteFont->write(BufferMain, 10, y1 + 12, Toolhelpszoveg);
     bltfront(BufferMain, x1, y1, x2, y2);
 }
 
@@ -243,10 +244,10 @@ void toolhelp(const char* text) {
 // KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK KIRAJZOLASOK
 
 static int Kellredraw = 0;
-void invalidate() { Kellredraw = 1; }
+void invalidate_editor_level() { Kellredraw = 1; }
 
 static int Kellredrawegesz = 0;
-void invalidateegesz() { Kellredrawegesz = 1; }
+void invalidate_editor_gui() { Kellredrawegesz = 1; }
 
 static int Elsotool = 13, Toolszam = 10;
 static int Menuszam = Elsotool + Toolszam, Menudy = 19;
@@ -276,30 +277,33 @@ static char Menuszovegek[23][15] = { // Masodik egy string hossza
     "Create Picture",
     "Delete Picture"};
 
-int Tool = T_MOVE;
+int SelectedTool = Tool_Move;
 
 static void editbe_balmenu() {
-    BufferMain->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menuszin);
+    BufferMain->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, EditorPaletteId_Menu);
     // Eloszor is egy nagy keret:
-    BufferMain->line(0, 0, SCREEN_WIDTH - 1, 0, Menulineszin);
-    BufferMain->line(0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
-    BufferMain->line(0, 0, 0, SCREEN_HEIGHT - 1, Menulineszin);
-    BufferMain->line(SCREEN_WIDTH - 1, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, Menulineszin);
+    BufferMain->line(0, 0, SCREEN_WIDTH - 1, 0, EditorPaletteId_MenuBorder);
+    BufferMain->line(0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1,
+                     EditorPaletteId_MenuBorder);
+    BufferMain->line(0, 0, 0, SCREEN_HEIGHT - 1, EditorPaletteId_MenuBorder);
+    BufferMain->line(SCREEN_WIDTH - 1, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1,
+                     EditorPaletteId_MenuBorder);
     // Meg ket belso vonal:
-    BufferMain->line(0, EDITOR_MENU_Y - 1, SCREEN_WIDTH - 1, EDITOR_MENU_Y - 1, Menulineszin);
+    BufferMain->line(0, EDITOR_MENU_Y - 1, SCREEN_WIDTH - 1, EDITOR_MENU_Y - 1,
+                     EditorPaletteId_MenuBorder);
     BufferMain->line(EDITOR_MENU_X - 1, EDITOR_MENU_Y, EDITOR_MENU_X - 1, SCREEN_HEIGHT - 1,
-                     Menulineszin);
+                     EditorPaletteId_MenuBorder);
     for (int i = 0; i < Menuszam; i++) {
         // x1... stb a belso reszt jelenti:
         int x1 = 1;
         int y1 = EDITOR_MENU_Y + i * Menudy + 1;
         int x2 = EDITOR_MENU_X - 2;
         int y2 = EDITOR_MENU_Y + (i + 1) * Menudy - 1;
-        if (i == Elsotool + Tool) {
-            BufferMain->fill_box(x1, y1, x2, y2, Menu_nyomottszin);
+        if (i == Elsotool + SelectedTool) {
+            BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId_MenuSelected);
         }
-        BufferMain->line(x1, y2 + 1, x2, y2 + 1, Menulineszin);
-        Pabc1->write(BufferMain, 5, EDITOR_MENU_Y + i * Menudy + 14, Menuszovegek[i]);
+        BufferMain->line(x1, y2 + 1, x2, y2 + 1, EditorPaletteId_MenuBorder);
+        EditorWhiteFont->write(BufferMain, 5, EDITOR_MENU_Y + i * Menudy + 14, Menuszovegek[i]);
     }
     // Meg benyomunk par felirat ala vonalakat:
     // Save and Play felirat P-je ala:
@@ -343,7 +347,7 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
         Pspritenevbuffer = new pic8(400, 17);
     }
 
-    Pspritenevbuffer->fill_box(Hatterindex);
+    Pspritenevbuffer->fill_box(EditorPaletteId_Background);
     // Pspritenevbuffer->fill_box( 70 );
 
     if (kepnev[0] && (texturanev[0] || maszknev[0])) {
@@ -351,7 +355,7 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
     }
 
     if (kepnev[0]) {
-        Pabc1->write(Pspritenevbuffer, 0, 14, "PICTURE:");
+        EditorWhiteFont->write(Pspritenevbuffer, 0, 14, "PICTURE:");
         char tmp[30];
         sprintf(tmp, "%s (%d)  ", kepnev, tav);
         if (hatarol == Clipping::Unclipped) {
@@ -363,12 +367,12 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
         if (hatarol == Clipping::Sky) {
             strcat(tmp, "S");
         }
-        Pabc2->write(Pspritenevbuffer, 60, 14, tmp);
+        EditorBlackFont->write(Pspritenevbuffer, 60, 14, tmp);
     }
     if (texturanev[0] || maszknev[0]) {
-        Pabc1->write(Pspritenevbuffer, 0, 14, "TEXTURE:");
-        Pabc2->write(Pspritenevbuffer, 60, 14, texturanev);
-        Pabc1->write(Pspritenevbuffer, 126, 14, "MASK:");
+        EditorWhiteFont->write(Pspritenevbuffer, 0, 14, "TEXTURE:");
+        EditorBlackFont->write(Pspritenevbuffer, 60, 14, texturanev);
+        EditorWhiteFont->write(Pspritenevbuffer, 126, 14, "MASK:");
         char tmp[30];
         sprintf(tmp, "%s (%d)  ", maszknev, tav);
         if (hatarol == Clipping::Unclipped) {
@@ -380,7 +384,7 @@ void kispritenev(const char* kepnev, const char* texturanev, const char* maszkne
         if (hatarol == Clipping::Sky) {
             strcat(tmp, "S");
         }
-        Pabc2->write(Pspritenevbuffer, 164, 14, tmp);
+        EditorBlackFont->write(Pspritenevbuffer, 164, 14, tmp);
     }
 
     blit8(BufferMain, Pspritenevbuffer, 226, 2);
@@ -395,10 +399,10 @@ void kikereknev(object::Type tipus, object::Property kajatipus, int foodsorszam)
         Pspritenevbuffer = new pic8(400, 17);
     }
 
-    Pspritenevbuffer->fill_box(Hatterindex);
+    Pspritenevbuffer->fill_box(EditorPaletteId_Background);
     // Pspritenevbuffer->fill_box( 70 );
 
-    Pabc1->write(Pspritenevbuffer, 0, 14, "Object:");
+    EditorWhiteFont->write(Pspritenevbuffer, 0, 14, "Object:");
     char tmp[50];
     //	object::Type::Exit = 1, object::Type::Food, object::Type::Killer, object::Type::Start };
     // enum { object::Property::NONE, object::Property::GRAVITY_UP, object::Property::GRAVITY_DOWN,
@@ -427,24 +431,24 @@ void kikereknev(object::Type tipus, object::Property kajatipus, int foodsorszam)
             sprintf(tmp, "Grav. Right");
         }
 
-        Pabc1->write(Pspritenevbuffer, 130, 14, "Anim num:");
+        EditorWhiteFont->write(Pspritenevbuffer, 130, 14, "Anim num:");
         char tmp2[10];
         sprintf(tmp2, "%d", (int)(foodsorszam + 1));
-        Pabc2->write(Pspritenevbuffer, 193, 14, tmp2);
+        EditorBlackFont->write(Pspritenevbuffer, 193, 14, tmp2);
     }
 
     if (tipus == object::Type::Killer) {
         sprintf(tmp, "Killer");
     }
 
-    Pabc2->write(Pspritenevbuffer, 50, 14, tmp);
+    EditorBlackFont->write(Pspritenevbuffer, 50, 14, tmp);
 
     blit8(BufferMain, Pspritenevbuffer, 226, 2);
     bltfront(BufferMain, 226, 2, 540, 30);
 }
 
 static void ujrarajzol(int egesz) {
-    push();
+    erase_cursor();
 
     Kepnevkint[0] = Texturanevkint[0] = Maszknevkint[0] = 0;
 
@@ -453,34 +457,35 @@ static void ujrarajzol(int egesz) {
     }
 
     BufferMain->fill_box(EDITOR_MENU_X, EDITOR_MENU_Y, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2,
-                         Hatterindex);
-    BufferMain->fill_box(1, 1, SCREEN_WIDTH - 2, EDITOR_MENU_Y - 2, Hatterindex);
+                         EditorPaletteId_Background);
+    BufferMain->fill_box(1, 1, SCREEN_WIDTH - 2, EDITOR_MENU_Y - 2, EditorPaletteId_Background);
     // Kiirjuk file nevet:
-    Pabc1->write(BufferMain, 6, 15, "File:");
+    EditorWhiteFont->write(BufferMain, 6, 15, "File:");
     strupr(State->editor_filename);
     int len = 0;
     int xfile = 41;
     if (State->editor_filename[0] == 0) {
-        Pabc2->write(BufferMain, xfile, 15, "UNNAMED");
-        len = Pabc2->len("UNNAMED");
+        EditorBlackFont->write(BufferMain, xfile, 15, "UNNAMED");
+        len = EditorBlackFont->len("UNNAMED");
     } else {
-        Pabc2->write(BufferMain, xfile, 15, State->editor_filename);
-        len = Pabc2->len(State->editor_filename);
+        EditorBlackFont->write(BufferMain, xfile, 15, State->editor_filename);
+        len = EditorBlackFont->len(State->editor_filename);
     }
-    if (Valtozott) {
-        Pabc1->write(BufferMain, xfile + len + 3, 15, "(Changed)");
+    if (LevelChanged) {
+        EditorWhiteFont->write(BufferMain, xfile + len + 3, 15, "(Changed)");
     } else {
-        Pabc1->write(BufferMain, xfile + len + 3, 15, "(Unchanged)");
+        EditorWhiteFont->write(BufferMain, xfile + len + 3, 15, "(Unchanged)");
     }
 
     // Kiirjuk sprite allando szoveget ha olyan tool:
-    // if( Tool == T_MOVE || Tool == T_CREATE_SPRITE || Tool == T_DELETE_SPRITE )
-    //	Pabc1->write( BufferMain, 392, 15, "Picture:" );
+    // if( SelectedTool == Tool_Move || SelectedTool == Tool_CreateSprite || SelectedTool ==
+    // Tool_DeleteSprite )
+    //	EditorWhiteFont->write( BufferMain, 392, 15, "Picture:" );
 
     // Kiirjuk tool szoveget:
-    toolhelp();
+    draw_tooltip();
     // Kiirjuk zoomot:
-    Pabc1->write(BufferMain, 543, 15, "Zoom:");
+    EditorWhiteFont->write(BufferMain, 543, 15, "Zoom:");
     char text[30];
     sprintf(text, "%lf", get_zoom());
     // Tizedespont utani jegyek szamat maximaljuk 2-re:
@@ -488,18 +493,18 @@ static void ujrarajzol(int egesz) {
         *(strstr(text, ".") + 5) = 0; // + 3
     }
     if (strlen(text) < 7) {
-        Pabc2->write(BufferMain, 584, 15, text); // 1234.5
+        EditorBlackFont->write(BufferMain, 584, 15, text); // 1234.5
     } else {
-        Pabc2->write(BufferMain, 580, 15, text); // 10000.0
+        EditorBlackFont->write(BufferMain, 580, 15, text); // 10000.0
     }
 
     RedrawingEditor = 1; // Csak edit bufferbe rajzoljon kirajzol
 
     Level->render();
-    if (Pgy) {
+    if (SelectedPolygon) {
         // Atalakitjuk szaggatotta amit kell:
-        Pgy->render_one_line(K, Fel, false);
-        Pgy->render_one_line(K, Fel, true);
+        SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, false);
+        SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, true);
     }
 
     RedrawingEditor = 0;
@@ -511,9 +516,9 @@ static void ujrarajzol(int egesz) {
         Kellredrawegesz = 0;
     }
 
-    pop();
+    draw_cursor();
 
-    if (Tool == T_CREATE_SPRITE) {
+    if (SelectedTool == Tool_CreateSprite) {
         if (!Lgr) {
             internal_error("89u5t4");
         }
@@ -523,11 +528,11 @@ static void ujrarajzol(int egesz) {
 }
 
 static void beallitkozelvane(int mx, int my) {
-    if (Tool == T_CREATE_FOOD) {
+    if (SelectedTool == Tool_CreateFood) {
         kikereknev(object::Type::Food, DefaultFoodProperty, DefaultFoodAnimation);
         return;
     }
-    if (Tool == T_CREATE_SPRITE) {
+    if (SelectedTool == Tool_CreateSprite) {
         if (!Lgr) {
             internal_error("7896675");
         }
@@ -539,12 +544,13 @@ static void beallitkozelvane(int mx, int my) {
     polygon* poly = nullptr;
     object* obj = nullptr;
     sprite* spr = nullptr;
-    bool hover_poly = Tool == T_MOVE || Tool == T_CREATE_VERT || Tool == T_MOVE ||
-                      Tool == T_DELETE_VERT || Tool == T_DELETE_POLY;
-    bool hover_obj = Tool == T_MOVE || Tool == T_DELETE_KEREK;
-    bool hover_spr = Tool == T_MOVE || Tool == T_DELETE_SPRITE;
-    Level->get_closest_entity(mx, my, hover_poly ? &poly : nullptr, &K, hover_obj ? &obj : nullptr,
-                              hover_spr ? &spr : nullptr);
+    bool hover_poly = SelectedTool == Tool_Move || SelectedTool == Tool_CreateVertex ||
+                      SelectedTool == Tool_Move || SelectedTool == Tool_DeleteVertex ||
+                      SelectedTool == Tool_DeletePolygon;
+    bool hover_obj = SelectedTool == Tool_Move || SelectedTool == Tool_DeleteObject;
+    bool hover_spr = SelectedTool == Tool_Move || SelectedTool == Tool_DeleteSprite;
+    Level->get_closest_entity(mx, my, hover_poly ? &poly : nullptr, &SelectedVertexIndex,
+                              hover_obj ? &obj : nullptr, hover_spr ? &spr : nullptr);
 
     Kozelvan = poly || obj || spr;
     if (spr) {
@@ -558,20 +564,20 @@ static void beallitkozelvane(int mx, int my) {
 }
 
 static void toolvaltas(int t) {
-    if (t == Tool) {
+    if (t == SelectedTool) {
         return;
     }
-    Tool = t;
+    SelectedTool = t;
     draw_tooltip_help();
     // kibalmenu();
-    invalidateegesz();
+    invalidate_editor_gui();
 }
 
 // static int Mouseinited = 0;
 
 static void editor_play(bool view_map) {
-    invalidateegesz();
-    if (Valtozott || State->editor_filename[0] == 0 || Level->topology_errors) {
+    invalidate_editor_gui();
+    if (LevelChanged || State->editor_filename[0] == 0 || Level->topology_errors) {
         if (!editor_window_save()) {
             return;
         }
@@ -589,12 +595,12 @@ static void editor_play(bool view_map) {
 
     empty_keypress_buffer();
 
-    Pal_editor->set();
+    EditorPalette->set();
 }
 
 static bool editor_dialog_exit() {
-    invalidateegesz();
-    if (Valtozott) {
+    invalidate_editor_gui();
+    if (LevelChanged) {
         if (dialog("There are unsaved changes in the level file.",
                    "If you exit now, you will lose these changes.", "Do you still want to exit?",
                    DIALOG_BUTTONS, "Yes", "No") == 1) {
@@ -607,7 +613,7 @@ static bool editor_dialog_exit() {
 
 static void editor_zoom_out() {
     zoom_out();
-    invalidate();
+    invalidate_editor_level();
 }
 
 void editor() {
@@ -615,16 +621,16 @@ void editor() {
         internal_error("editor-ban !BufferMain!");
     }
 
-    Pal_editor->set();
+    EditorPalette->set();
 
     editbe_balmenu();
     bltfront(BufferMain);
 
     // Egeret eloszor helyezzuk ki:
     Egerkint = 0;
-    pop();
+    draw_cursor();
 
-    Valtozott = 0;
+    LevelChanged = 0;
 
     // Most megnezzuk, hogy megvannak-e palyai fazonnak:
     if (hanypalyavanmeg() < 5) {
@@ -641,7 +647,7 @@ void editor() {
     // Beolvassuk file-t:
     editor_window_welcome();
 
-    Valtozott = 0;
+    LevelChanged = 0;
     if (State->editor_filename[0] == 0) {
         load_level_editor(DEFAULT_LEVEL_FILENAME);
     } else {
@@ -651,17 +657,17 @@ void editor() {
     }
 
     // Alaphelyzetbe allitunk egy-ket valtozot:
-    Pgy = nullptr;
-    K = 0;
-    Fel = false;
+    SelectedPolygon = nullptr;
+    SelectedVertexIndex = 0;
+    CreateVertexDirection = false;
 
-    Pker = nullptr;
-    Psp = nullptr;
+    SelectedObject = nullptr;
+    SelectedSprite = nullptr;
 
     DefaultFoodProperty = object::Property::None;
     DefaultFoodAnimation = 0;
 
-    Tool = T_MOVE;
+    SelectedTool = Tool_Move;
     draw_tooltip_help();
 
     zoom_fill();
@@ -671,36 +677,37 @@ void editor() {
         handle_events();
         // Control keys
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            if (Tool == T_MOVE) {
+            if (SelectedTool == Tool_Move) {
                 tool_move_esc();
             }
-            if (Tool == T_ZOOMIN) {
+            if (SelectedTool == Tool_ZoomIn) {
                 tool_zoom_in_esc();
             }
-            if (Tool == T_CREATE_VERT) {
+            if (SelectedTool == Tool_CreateVertex) {
                 tool_create_vertex_esc();
             }
         }
         if (was_key_just_pressed(DIK_SPACE)) {
-            if (Tool == T_CREATE_VERT) {
+            if (SelectedTool == Tool_CreateVertex) {
                 tool_create_vertex_space();
             }
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            if (Tool == T_CREATE_VERT) {
+            if (SelectedTool == Tool_CreateVertex) {
                 tool_create_vertex_enter();
             }
         }
         // Character shortcuts from text buffer
         while (has_text_input()) {
             char c = pop_text_input();
-            if (!(Pgy || Pker || Psp || SelectingZoomInBox || CreatingPolygon)) {
+            if (!(SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
+                  CreatingPolygon)) {
                 if (c == 'p') {
                     editor_play(is_key_down(DIK_F1));
                 }
                 if (c == 'x') {
                     if (editor_dialog_exit()) {
-                        push();
+                        erase_cursor();
                         return;
                     }
                 }
@@ -726,7 +733,7 @@ void editor() {
             }
             if( c == 'l' ) {
                 loadallapot();
-                invalidateegesz();
+                invalidate_editor_gui();
             } */
         }
         // Megnezzuk eger gombok lemenetelet:
@@ -746,17 +753,18 @@ void editor() {
             if (ujy < EDITOR_MENU_Y) {
                 ujy = EDITOR_MENU_Y;
             }
-            if ((Pgy || Pker || Psp || SelectingZoomInBox || CreatingPolygon) &&
+            if ((SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
+                 CreatingPolygon) &&
                 ujx < EDITOR_MENU_X) {
                 // Ha meg van valami fogva, nem mehetunk gombok fole:
                 ujx = EDITOR_MENU_X;
                 set_mouse_position(ujx, ujy);
             }
-            if (ujx != Moux || ujy != Mouy) {
-                push();
-                Moux = ujx;
-                Mouy = ujy;
-                pop();
+            if (ujx != MouseX || ujy != MouseY) {
+                erase_cursor();
+                MouseX = ujx;
+                MouseY = ujy;
+                draw_cursor();
             }
             if (ujx < EDITOR_MENU_X) {
                 // Billentyuk folott tortent lenyomas:
@@ -766,7 +774,7 @@ void editor() {
                         // i-edik gombot lenyomtak menuben:
                         if (i == 0 && balnyomva) {
                             if (editor_dialog_exit()) {
-                                push();
+                                erase_cursor();
                                 return;
                             }
                         }
@@ -805,7 +813,7 @@ void editor() {
 
                         if (i == 5 && balnyomva) {
                             editor_play(is_key_down(DIK_F1));
-                            Tool = T_MOVE;
+                            SelectedTool = Tool_Move;
                         }
                         if (i == 5 && jobbnyomva) {
                             editor_help_save_and_play();
@@ -835,7 +843,7 @@ void editor() {
                         if (i == 9 && balnyomva) {
                             // Zoom Fill:
                             zoom_fill();
-                            invalidate();
+                            invalidate_editor_level();
                         }
                         if (i == 9 && jobbnyomva) {
                             editor_help_zoom_fill();
@@ -894,50 +902,50 @@ void editor() {
                     }
                 }
             } else {
-                if (Tool == T_MOVE && balnyomva) {
+                if (SelectedTool == Tool_Move && balnyomva) {
                     tool_move_leftclick(ujx, ujy);
                 }
-                if (Tool == T_MOVE && jobbnyomva) {
+                if (SelectedTool == Tool_Move && jobbnyomva) {
                     // Altalaban tool_move_esc-et hivja:
                     tool_move_rightclick(ujx, ujy);
                 }
-                if (Tool == T_ZOOMIN && balnyomva) {
+                if (SelectedTool == Tool_ZoomIn && balnyomva) {
                     tool_zoom_in_leftclick(ujx, ujy);
                 }
-                if (Tool == T_ZOOMIN && jobbnyomva) {
+                if (SelectedTool == Tool_ZoomIn && jobbnyomva) {
                     tool_zoom_in_esc();
                 }
-                if (Tool == T_CREATE_VERT && balnyomva) {
+                if (SelectedTool == Tool_CreateVertex && balnyomva) {
                     tool_create_vertex_leftclick(ujx, ujy);
                 }
-                if (Tool == T_CREATE_VERT && jobbnyomva) {
+                if (SelectedTool == Tool_CreateVertex && jobbnyomva) {
                     tool_create_vertex_esc();
                 }
-                if (Tool == T_DELETE_VERT && balnyomva) {
+                if (SelectedTool == Tool_DeleteVertex && balnyomva) {
                     tool_delete_vertex_leftclick(ujx, ujy);
                 }
-                if (Tool == T_DELETE_POLY && balnyomva) {
+                if (SelectedTool == Tool_DeletePolygon && balnyomva) {
                     tool_delete_polygon_leftclick(ujx, ujy);
                 }
-                if (Tool == T_CREATE_FOOD && balnyomva) {
+                if (SelectedTool == Tool_CreateFood && balnyomva) {
                     tool_create_object_leftclick(ujx, ujy, true);
                 }
-                if (Tool == T_CREATE_FOOD && jobbnyomva) {
+                if (SelectedTool == Tool_CreateFood && jobbnyomva) {
                     tool_create_food_rightclick();
                 }
-                if (Tool == T_CREATE_KILLER && balnyomva) {
+                if (SelectedTool == Tool_CreateKiller && balnyomva) {
                     tool_create_object_leftclick(ujx, ujy, false);
                 }
-                if (Tool == T_DELETE_KEREK && balnyomva) {
+                if (SelectedTool == Tool_DeleteObject && balnyomva) {
                     tool_delete_object_leftclick(ujx, ujy);
                 }
-                if (Tool == T_CREATE_SPRITE && balnyomva) {
+                if (SelectedTool == Tool_CreateSprite && balnyomva) {
                     tool_create_sprite_leftclick(ujx, ujy);
                 }
-                if (Tool == T_CREATE_SPRITE && jobbnyomva) {
+                if (SelectedTool == Tool_CreateSprite && jobbnyomva) {
                     tool_create_sprite_rightclick();
                 }
-                if (Tool == T_DELETE_SPRITE && balnyomva) {
+                if (SelectedTool == Tool_DeleteSprite && balnyomva) {
                     tool_delete_sprite_leftclick(ujx, ujy);
                 }
             }
@@ -959,33 +967,35 @@ void editor() {
         if (ujy < EDITOR_MENU_Y) {
             ujy = EDITOR_MENU_Y;
         }
-        if ((Pgy || Pker || Psp || SelectingZoomInBox || CreatingPolygon) && ujx < EDITOR_MENU_X) {
+        if ((SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
+             CreatingPolygon) &&
+            ujx < EDITOR_MENU_X) {
             // Ha meg van valami fogva, nem mehetunk gombok fole:
             ujx = EDITOR_MENU_X;
             set_mouse_position(ujx, ujy);
         }
-        if (ujx == Moux && ujy == Mouy) {
+        if (ujx == MouseX && ujy == MouseY) {
             continue;
         }
         // Eger mozdult:
-        if (Tool == T_ZOOMIN) {
+        if (SelectedTool == Tool_ZoomIn) {
             tool_zoom_in_mousemove(ujx, ujy);
             continue;
         }
-        if (Tool == T_CREATE_VERT && (Pgy || CreatingPolygon)) {
+        if (SelectedTool == Tool_CreateVertex && (SelectedPolygon || CreatingPolygon)) {
             tool_create_vertex_mousemove(ujx, ujy);
             continue;
         }
-        if (!Pgy && !Pker && !Psp) {
+        if (!SelectedPolygon && !SelectedObject && !SelectedSprite) {
             // Ha nincsen megfogva semmi, akkor itt rajzoljuk kurzort:
-            push();
+            erase_cursor();
             beallitkozelvane(ujx, ujy);
-            Moux = ujx;
-            Mouy = ujy;
-            pop();
+            MouseX = ujx;
+            MouseY = ujy;
+            draw_cursor();
         } else {
             // Ha meg van valami fogva, akkor tool rajzolja kurzort:
-            if (Tool == T_MOVE) {
+            if (SelectedTool == Tool_Move) {
                 tool_move_mousemove(ujx, ujy);
             }
         }

@@ -59,10 +59,10 @@ static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
     strcpy(filename, lgr_name);
     strcat(filename, ".lgr");
     blit8(BufferBall, BufferMain);
-    BufferMain->fill_box(Hatterindex);
+    BufferMain->fill_box(EditorPaletteId_Background);
     bltfront(BufferMain);
     if (!InEditor) {
-        Pal_editor->set();
+        EditorPalette->set();
     }
     char backup_text[100];
     sprintf(backup_text, "This file doesn't exist in the LGR directory, so %s will be loaded.",
@@ -123,7 +123,7 @@ void lgrfile::load_lgr_file(const char* lgr_name) {
             internal_error("load_lgr_file !Level!");
         }
 
-        Valtozott = 1;
+        LevelChanged = 1;
         strcpy(Level->lgr_name, "default");
         Level->lgr_not_found = true;
     }

@@ -23,7 +23,7 @@ void on_resolution_change() {
     if (Level && Lgr) {
         Lgr->reload_default_textures(true);
     }
-    invalidateegesz();
+    invalidate_editor_gui();
     reset_game_background();
     balls_resolution_change();
 }

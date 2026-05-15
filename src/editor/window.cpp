@@ -105,7 +105,7 @@ static void open_level(const char* filename) {
     strcpy(State->editor_filename, tmp);
 
     // Load level
-    Valtozott = 0;
+    LevelChanged = 0;
     invalidate_level();
     if (!load_level_editor(tmp)) {
         State->editor_filename[0] = 0;
@@ -133,7 +133,7 @@ static void adjust_list_view(int& selected_index, int& view_index, int length,
         rerender = true;
     }
     int wheel = get_mouse_wheel_delta();
-    if (wheel != 0 && is_in_box(Moux, Mouy, box_list)) {
+    if (wheel != 0 && is_in_box(MouseX, MouseY, box_list)) {
         selected_index -= wheel;
         rerender = true;
     }
@@ -150,7 +150,7 @@ static bool process_list_search(std::string& search_input, int& selected_index, 
     bool changed = false;
     while (has_text_input()) {
         char c = pop_text_input();
-        if (Pabc2->has_char(c) && search_input.size() < MAX_FILENAME_LEN) {
+        if (EditorBlackFont->has_char(c) && search_input.size() < MAX_FILENAME_LEN) {
             search_input.push_back(c);
             changed = true;
         }
@@ -195,7 +195,8 @@ static bool process_list_search(std::string& search_input, int& selected_index, 
 static void render_list_search(pic8* pic, box bx, const std::string& search_input) {
     std::string text = search_input.empty() ? "Type to Search" : "Search: " + search_input;
 
-    Pabc2->write_centered(pic, (bx.x1 + bx.x2) / 2, (bx.y1 + bx.y2) / 2 + 5, text.c_str());
+    EditorBlackFont->write_centered(pic, (bx.x1 + bx.x2) / 2, (bx.y1 + bx.y2) / 2 + 5,
+                                    text.c_str());
 }
 
 // Draw a borderless box with background color and centered text
@@ -204,21 +205,21 @@ static void draw_textbox_centered(pic8* pic, box bx, unsigned char fill_id, cons
                                   bool add_underline = false) {
     pic->fill_box(bx.x1 + 1, bx.y1 + 1, bx.x2 - 1, bx.y2 - 1, fill_id);
     if (add_underline) {
-        int length = Pabc2->len(text);
+        int length = EditorBlackFont->len(text);
         int x = (bx.x1 + bx.x2) / 2 - length / 2 - 3;
-        Pabc2->write(pic, x, (bx.y1 + bx.y2) / 2 + 5, text);
+        EditorBlackFont->write(pic, x, (bx.y1 + bx.y2) / 2 + 5, text);
         for (int i = 0; i < 6; i++) {
             pic->ppixel(x + length + i + 1, (bx.y1 + bx.y2) / 2 + 4, 0);
         }
     } else {
-        Pabc2->write_centered(pic, (bx.x1 + bx.x2) / 2, (bx.y1 + bx.y2) / 2 + 5, text);
+        EditorBlackFont->write_centered(pic, (bx.x1 + bx.x2) / 2, (bx.y1 + bx.y2) / 2 + 5, text);
     }
 }
 
 // Draw a borderless box with background color and left-justified text
 static void draw_textbox_left(pic8* pic, box bx, unsigned char fill_id, const char* text) {
     pic->fill_box(bx.x1 + 1, bx.y1 + 1, bx.x2 - 1, bx.y2 - 1, fill_id);
-    Pabc2->write(pic, bx.x1 + 2, (bx.y1 + bx.y2) / 2 + 5, text);
+    EditorBlackFont->write(pic, bx.x1 + 2, (bx.y1 + bx.y2) / 2 + 5, text);
 }
 
 // Draw an up or down arrow (no background box)
@@ -308,8 +309,8 @@ static std::string editor_window_list_levels(bool show_new_button) {
         } else if (was_key_just_pressed(DIK_RETURN)) {
             return ListEntries[selected_index];
         } else if (clicked_box(box_list)) {
-            if (Mouy < ly1 + dy * max_visible_entries) {
-                int index = (Mouy - ly1) / dy;
+            if (MouseY < ly1 + dy * max_visible_entries) {
+                int index = (MouseY - ly1) / dy;
                 index += view_index;
                 if (index < list_length) {
                     return ListEntries[index];
@@ -319,40 +320,45 @@ static std::string editor_window_list_levels(bool show_new_button) {
         if (rerender) {
             rerender = false;
 
-            push();
-            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
-                       DIALOG_BORDER_PALETTE_ID);
+            erase_cursor();
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
+                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId_WindowList,
+                       EditorPaletteId_WindowBorder);
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPalette_ListSelected);
+                                         EditorPaletteId_WindowListSelected);
                 }
-                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                             ListEntries[i + view_index].c_str());
+                EditorBlackFont->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
+                                       ListEntries[i + view_index].c_str());
             }
-            render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
-            render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, false);
-            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
-                                  box_cancel.y1 + 15, "CANCEL");
+            render_box(BufferMain, box_up, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            draw_arrow(BufferMain, box_up, EditorPaletteId_WindowBorder, true);
+            render_box(BufferMain, box_down, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            draw_arrow(BufferMain, box_down, EditorPaletteId_WindowBorder, false);
+            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                            box_cancel.y1 + 15, "CANCEL");
             if (show_new_button) {
-                render_box(BufferMain, box_new, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-                Pabc2->write_centered(BufferMain, (box_new.x1 + box_new.x2) / 2, box_new.y1 + 15,
-                                      "NEW");
+                render_box(BufferMain, box_new, EditorPaletteId_WindowButton,
+                           EditorPaletteId_WindowBorder);
+                EditorBlackFont->write_centered(BufferMain, (box_new.x1 + box_new.x2) / 2,
+                                                box_new.y1 + 15, "NEW");
             }
             render_list_search(BufferMain, box_search, search_input);
 
             bltfront(BufferMain, x1, y1, x2, y2);
-            pop();
+            draw_cursor();
         }
     }
 }
 
 void editor_window_welcome() {
-    invalidateegesz();
+    invalidate_editor_gui();
 
     std::string filename = editor_window_list_levels(true);
 
@@ -368,9 +374,9 @@ void editor_window_welcome() {
 }
 
 void editor_window_open() {
-    invalidateegesz();
+    invalidate_editor_gui();
 
-    if (Valtozott) {
+    if (LevelChanged) {
         if (dialog("There are unsaved changes in the level file.",
                    "If you open another file, you will loose these changes.",
                    "Do you still want to continue?", DIALOG_BUTTONS, "Yes", "No") == 1) {
@@ -393,46 +399,47 @@ void editor_window_open() {
 }
 
 void editor_new() {
-    invalidateegesz();
-    if (Valtozott) {
+    invalidate_editor_gui();
+    if (LevelChanged) {
         if (dialog("There are unsaved changes in the level file.", "Do you still want to continue?",
                    DIALOG_BUTTONS, "Yes", "No") == 1) {
             return;
         }
     }
 
-    Valtozott = 0;
+    LevelChanged = 0;
     load_level_editor(DEFAULT_LEVEL_FILENAME);
     State->editor_filename[0] = 0;
     zoom_fill();
 }
 
 bool editor_window_save() {
-    invalidateegesz();
+    invalidate_editor_gui();
     if (State->editor_filename[0] == 0) {
         return editor_window_save_as();
     }
     Level->save(State->editor_filename);
-    Valtozott = 0;
+    LevelChanged = 0;
     return true;
 }
 
 bool editor_window_save_as() {
-    invalidateegesz();
+    invalidate_editor_gui();
 
     box box_window = {20, 200, 600, 300};
     box box_save = {320 - 30, 273, 320 + 30, 290};
 
-    push();
-    render_box(BufferMain, box_window, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    render_box(BufferMain, box_save, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    Pabc2->write_centered(
+    erase_cursor();
+    render_box(BufferMain, box_window, EditorPaletteId_Window, EditorPaletteId_WindowBorder);
+    render_box(BufferMain, box_save, EditorPaletteId_WindowButton, EditorPaletteId_WindowBorder);
+    EditorBlackFont->write_centered(
         BufferMain, (box_window.x2 + box_window.x1) / 2, 220,
         "Type in the file name and press ENTER or click on SAVE, or press ESC to cancel!");
-    Pabc2->write_centered(BufferMain, (box_save.x2 + box_save.x1) / 2, box_save.y1 + 13, "SAVE");
+    EditorBlackFont->write_centered(BufferMain, (box_save.x2 + box_save.x1) / 2, box_save.y1 + 13,
+                                    "SAVE");
 
     bltfront(BufferMain, box_window.x1, box_window.y1, box_window.x2, box_window.y2);
-    pop();
+    draw_cursor();
 
     empty_keypress_buffer();
     finame filename_input = "";
@@ -448,12 +455,12 @@ bool editor_window_save_as() {
             int ey1 = box_window.y1 + 30;
             int ex2 = box_window.x2 - 100;
             int ey2 = box_window.y1 + 55;
-            BufferMain->fill_box(ex1, ey1, ex2, ey2, DIALOG_PALETTE_ID);
-            Pabc2->write(BufferMain, 290, 250, filename_input);
+            BufferMain->fill_box(ex1, ey1, ex2, ey2, EditorPaletteId_Window);
+            EditorBlackFont->write(BufferMain, 290, 250, filename_input);
             char tmp[40];
             strcpy(tmp, filename_input);
             tmp[i] = 0;
-            Pabc2->write(BufferMain, 290 + Pabc1->len(tmp), 255, "-");
+            EditorBlackFont->write(BufferMain, 290 + EditorWhiteFont->len(tmp), 255, "-");
             bltfront(BufferMain, ex1, ey1, ex2, ey2);
         }
         if (was_key_just_pressed(DIK_ESCAPE) || was_right_mouse_just_clicked()) {
@@ -473,7 +480,7 @@ bool editor_window_save_as() {
                 }
                 Level->save(filename_input);
                 strcpy(State->editor_filename, filename_input);
-                Valtozott = 0;
+                LevelChanged = 0;
                 return true;
             }
         }
@@ -508,7 +515,7 @@ bool editor_window_save_as() {
         }
         while (has_text_input()) {
             char c = pop_text_input();
-            if (Pabc2->has_char(c) && util::text::is_filename_char(c)) {
+            if (EditorBlackFont->has_char(c) && util::text::is_filename_char(c)) {
                 if (strlen(filename_input) < MAX_FILENAME_LEN) {
                     int filename_input_length = strlen(filename_input);
                     for (int j = filename_input_length; j >= i; j--) {
@@ -713,9 +720,9 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
     // Keep track of the box where we are drawing, so we can restore the background later
     int preview_x2 = 0;
     int preview_y2 = 0;
-    push();
+    erase_cursor();
     blit8(BufferBall, BufferMain);
-    pop();
+    draw_cursor();
 
     while (true) {
         handle_events();
@@ -736,8 +743,8 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             strcpy(name, name_at(selected_index));
             return;
         } else if (clicked_box(box_list)) {
-            if (Mouy < ly1 + dy * max_visible_entries) {
-                int index = (Mouy - ly1) / dy;
+            if (MouseY < ly1 + dy * max_visible_entries) {
+                int index = (MouseY - ly1) / dy;
                 index += view_index;
                 if (index < list_length) {
                     strcpy(name, name_at(index));
@@ -751,7 +758,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             strcpy(name, name_at(selected_index));
 
             // Restore background image
-            push();
+            erase_cursor();
             blit8(BufferMain, BufferBall, 0, 0, 0, 0, preview_x2, preview_y2);
 
             // Draw new sprite
@@ -787,15 +794,17 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             }
 
             // Draw the list of sprites
-            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
-                       DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
+                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId_WindowList,
+                       EditorPaletteId_WindowBorder);
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPalette_ListSelected);
+                                         EditorPaletteId_WindowListSelected);
                 }
-                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy, name_at(i + view_index));
+                EditorBlackFont->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
+                                       name_at(i + view_index));
 
                 if (sprite_type == SpriteType::Picture || sprite_type == SpriteType::Texture) {
                     int default_distance = 0;
@@ -807,7 +816,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
 
                     char details[20];
                     sprintf(details, "%d", default_distance);
-                    Pabc2->write(BufferMain, lx1 + 67, ly1 + 15 + i * dy, details);
+                    EditorBlackFont->write(BufferMain, lx1 + 67, ly1 + 15 + i * dy, details);
                     Clipping default_clipping = Clipping::Unclipped;
                     if (sprite_type == SpriteType::Picture) {
                         default_clipping = Lgr->pictures[i + view_index].default_clipping;
@@ -822,22 +831,25 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                     if (default_clipping == Clipping::Sky) {
                         strcpy(details, "S");
                     }
-                    Pabc2->write(BufferMain, lx1 + 92, ly1 + 15 + i * dy, details);
+                    EditorBlackFont->write(BufferMain, lx1 + 92, ly1 + 15 + i * dy, details);
                 }
             }
 
             // Draw other buttons
-            render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
-            render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, false);
-            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
-                                  box_cancel.y1 + 15, "CANCEL");
+            render_box(BufferMain, box_up, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            draw_arrow(BufferMain, box_up, EditorPaletteId_WindowBorder, true);
+            render_box(BufferMain, box_down, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            draw_arrow(BufferMain, box_down, EditorPaletteId_WindowBorder, false);
+            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                            box_cancel.y1 + 15, "CANCEL");
             render_list_search(BufferMain, box_search, search_input);
 
             bltfront(BufferMain);
-            pop();
+            draw_cursor();
         }
     }
 }
@@ -847,7 +859,7 @@ void editor_window_choose_sprite() {
         internal_error("editor_window_choose_sprite !Lgr!");
     }
 
-    invalidateegesz();
+    invalidate_editor_gui();
 
     char picture_name[10];
     char texture_name[10];
@@ -885,10 +897,10 @@ void editor_window_choose_sprite() {
         } else if (clicked_box(box_picture)) {
             editor_window_select_sprite_name(picture_name, null_name, null_name,
                                              SpriteType::Picture);
-            push();
+            erase_cursor();
             blit8(BufferMain, BufferBall);
             bltfront(BufferMain);
-            pop();
+            draw_cursor();
             if (picture_name[0]) {
                 texture_name[0] = mask_name[0] = 0;
             }
@@ -896,20 +908,20 @@ void editor_window_choose_sprite() {
         } else if (clicked_box(box_texture)) {
             editor_window_select_sprite_name(null_name, texture_name, mask_name,
                                              SpriteType::Texture);
-            push();
+            erase_cursor();
             blit8(BufferMain, BufferBall);
             bltfront(BufferMain);
-            pop();
+            draw_cursor();
             if (texture_name[0]) {
                 picture_name[0] = 0;
             }
             rerender = true;
         } else if (clicked_box(box_mask)) {
             editor_window_select_sprite_name(null_name, texture_name, mask_name, SpriteType::Mask);
-            push();
+            erase_cursor();
             blit8(BufferMain, BufferBall);
             bltfront(BufferMain);
-            pop();
+            draw_cursor();
             if (mask_name[0]) {
                 picture_name[0] = 0;
             }
@@ -918,39 +930,46 @@ void editor_window_choose_sprite() {
         if (rerender) {
             rerender = false;
 
-            push();
+            erase_cursor();
 
-            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
+                       EditorPaletteId_WindowBorder);
 
-            Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, "Choose picture");
+            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, "Choose picture");
 
-            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
-            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
-                                  box_cancel.y1 + 15, "CANCEL");
+            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
+                                            "OK");
+            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                            box_cancel.y1 + 15, "CANCEL");
 
             int label_x1 = x1 + 8;
-            Pabc2->write(BufferMain, label_x1, box_picture.y1 + 15, "Normal Picture:");
-            render_box(BufferMain, box_picture, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            draw_textbox_left(BufferMain, box_picture, Feherszin, picture_name);
+            EditorBlackFont->write(BufferMain, label_x1, box_picture.y1 + 15, "Normal Picture:");
+            render_box(BufferMain, box_picture, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
+            draw_textbox_left(BufferMain, box_picture, EditorPaletteId_WindowInput, picture_name);
 
-            Pabc2->write(BufferMain, label_x1, box_texture.y1 + 15, "Texture:");
-            render_box(BufferMain, box_texture, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            draw_textbox_left(BufferMain, box_texture, Feherszin, texture_name);
+            EditorBlackFont->write(BufferMain, label_x1, box_texture.y1 + 15, "Texture:");
+            render_box(BufferMain, box_texture, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
+            draw_textbox_left(BufferMain, box_texture, EditorPaletteId_WindowInput, texture_name);
 
-            Pabc2->write(BufferMain, label_x1, box_mask.y1 + 15, "Mask:");
-            render_box(BufferMain, box_mask, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            draw_textbox_left(BufferMain, box_mask, Feherszin, mask_name);
+            EditorBlackFont->write(BufferMain, label_x1, box_mask.y1 + 15, "Mask:");
+            render_box(BufferMain, box_mask, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
+            draw_textbox_left(BufferMain, box_mask, EditorPaletteId_WindowInput, mask_name);
 
             bltfront(BufferMain);
-            pop();
+            draw_cursor();
         }
     }
 }
 
 bool editor_window_choose_lgr(char* lgrname) {
-    invalidateegesz();
+    invalidate_editor_gui();
 
     blit8(BufferBall, BufferMain);
 
@@ -1005,8 +1024,8 @@ bool editor_window_choose_lgr(char* lgrname) {
             strcpy(lgrname, ListEntries[selected_index].c_str());
             return true;
         } else if (clicked_box(box_list)) {
-            if (Mouy < ly1 + dy * max_visible_entries) {
-                int index = (Mouy - ly1) / dy;
+            if (MouseY < ly1 + dy * max_visible_entries) {
+                int index = (MouseY - ly1) / dy;
                 index += view_index;
                 if (index < list_length) {
                     strcpy(lgrname, ListEntries[index].c_str());
@@ -1017,39 +1036,44 @@ bool editor_window_choose_lgr(char* lgrname) {
         if (rerender) {
             rerender = false;
 
-            push();
-            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPalette_List,
-                       DIALOG_BORDER_PALETTE_ID);
+            erase_cursor();
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
+                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId_WindowList,
+                       EditorPaletteId_WindowBorder);
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
                     BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPalette_ListSelected);
+                                         EditorPaletteId_WindowListSelected);
                 }
-                Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
-                             ListEntries[i + view_index].c_str());
+                EditorBlackFont->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
+                                       ListEntries[i + view_index].c_str());
             }
-            render_box(BufferMain, box_up, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_up, DIALOG_BORDER_PALETTE_ID, true);
-            render_box(BufferMain, box_down, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            draw_arrow(BufferMain, box_down, DIALOG_BORDER_PALETTE_ID, false);
-            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
-                                  box_cancel.y1 + 15, "CANCEL");
+            render_box(BufferMain, box_up, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            draw_arrow(BufferMain, box_up, EditorPaletteId_WindowBorder, true);
+            render_box(BufferMain, box_down, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            draw_arrow(BufferMain, box_down, EditorPaletteId_WindowBorder, false);
+            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                            box_cancel.y1 + 15, "CANCEL");
 
             render_list_search(BufferMain, box_search, search_input);
 
-            Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y2 - 36, "Original LGR file:");
-            Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y2 - 18, lgrname);
+            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y2 - 36,
+                                            "Original LGR file:");
+            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y2 - 18, lgrname);
 
             bltfront(BufferMain, x1, y1, x2, y2);
-            pop();
+            draw_cursor();
         }
     }
 }
 
 static int prompt_distance(pic8* pic, box bx, int distance) {
-    push();
+    erase_cursor();
 
     empty_keypress_buffer();
     bool rerender = true;
@@ -1060,15 +1084,15 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
             rerender = false;
             char tmp[10];
             sprintf(tmp, "%d", distance);
-            draw_textbox_centered(pic, bx, Feherszin, tmp, true);
+            draw_textbox_centered(pic, bx, EditorPaletteId_WindowInput, tmp, true);
             bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
         }
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            pop();
+            draw_cursor();
             return distance_prev;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            pop();
+            draw_cursor();
             return distance;
         }
         if (was_key_down(DIK_BACK)) {
@@ -1091,28 +1115,28 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
 }
 
 static Clipping prompt_clipping(pic8* pic, box bx, Clipping clipping) {
-    push();
-    draw_textbox_centered(pic, bx, Feherszin, "", true);
+    erase_cursor();
+    draw_textbox_centered(pic, bx, EditorPaletteId_WindowInput, "", true);
     bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
     empty_keypress_buffer();
     while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            pop();
+            draw_cursor();
             return clipping;
         }
         while (has_text_input()) {
             char c = pop_text_input();
             if (c == 'u' || c == 'U') {
-                pop();
+                draw_cursor();
                 return Clipping::Unclipped;
             }
             if (c == 'g' || c == 'G') {
-                pop();
+                draw_cursor();
                 return Clipping::Ground;
             }
             if (c == 's' || c == 'S') {
-                pop();
+                draw_cursor();
                 return Clipping::Sky;
             }
         }
@@ -1120,7 +1144,7 @@ static Clipping prompt_clipping(pic8* pic, box bx, Clipping clipping) {
 }
 
 void editor_window_sprite_properties(sprite* spr) {
-    invalidateegesz();
+    invalidate_editor_gui();
 
     int x1 = 200;
     int y1 = 100;
@@ -1142,7 +1166,7 @@ void editor_window_sprite_properties(sprite* spr) {
             return;
         } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (spr->distance != distance || spr->clipping != clipping) {
-                Valtozott = 1;
+                LevelChanged = 1;
             }
             spr->distance = distance;
             spr->clipping = clipping;
@@ -1156,26 +1180,33 @@ void editor_window_sprite_properties(sprite* spr) {
         }
         if (rerender) {
             rerender = false;
-            push();
-            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
-            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
-                                  box_cancel.y1 + 15, "CANCEL");
+            erase_cursor();
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
+                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
+                                            "OK");
+            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                            box_cancel.y1 + 15, "CANCEL");
 
-            Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15, "Set Picture Properties");
+            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15,
+                                            "Set Picture Properties");
             if (spr->picture_name[0]) {
-                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 45, spr->picture_name);
+                EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 45,
+                                                spr->picture_name);
             } else {
-                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 34, spr->texture_name);
-                Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 56, spr->mask_name);
+                EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 34,
+                                                spr->texture_name);
+                EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 56, spr->mask_name);
             }
-            Pabc2->write(BufferMain, x1 + 92, y1 + 76, "Distance");
-            Pabc2->write(BufferMain, x1 + 172, y1 + 76, "Clipping");
+            EditorBlackFont->write(BufferMain, x1 + 92, y1 + 76, "Distance");
+            EditorBlackFont->write(BufferMain, x1 + 172, y1 + 76, "Clipping");
 
             // Default values
-            Pabc2->write(BufferMain, x1 + 12, y1 + 100, "Default:");
+            EditorBlackFont->write(BufferMain, x1 + 12, y1 + 100, "Default:");
             int default_distance = -1;
             Clipping default_clipping = Clipping::Unknown;
             if (spr->picture_name[0]) {
@@ -1201,7 +1232,7 @@ void editor_window_sprite_properties(sprite* spr) {
             } else {
                 sprintf(tmp, "-");
             }
-            Pabc2->write_centered(BufferMain, x1 + 119, y1 + 100, tmp);
+            EditorBlackFont->write_centered(BufferMain, x1 + 119, y1 + 100, tmp);
 
             if (default_clipping == Clipping::Unknown) {
                 strcpy(tmp, "-");
@@ -1215,17 +1246,19 @@ void editor_window_sprite_properties(sprite* spr) {
             if (default_clipping == Clipping::Sky) {
                 strcpy(tmp, "S");
             }
-            Pabc2->write_centered(BufferMain, x1 + 198, y1 + 100, tmp);
+            EditorBlackFont->write_centered(BufferMain, x1 + 198, y1 + 100, tmp);
 
             // Actual values
-            Pabc2->write(BufferMain, x1 + 12, y1 + 130, "Current:");
+            EditorBlackFont->write(BufferMain, x1 + 12, y1 + 130, "Current:");
 
-            render_box(BufferMain, box_distance, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, box_distance, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
             sprintf(tmp, "%d", distance);
-            draw_textbox_centered(BufferMain, box_distance, Feherszin, tmp);
-            Pabc2->write_centered(BufferMain, x1 + 119, box_distance.y2 + 14, "(1-999)");
+            draw_textbox_centered(BufferMain, box_distance, EditorPaletteId_WindowInput, tmp);
+            EditorBlackFont->write_centered(BufferMain, x1 + 119, box_distance.y2 + 14, "(1-999)");
 
-            render_box(BufferMain, box_clipping, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, box_clipping, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
             if (clipping == Clipping::Unclipped) {
                 strcpy(tmp, "U");
             }
@@ -1235,17 +1268,18 @@ void editor_window_sprite_properties(sprite* spr) {
             if (clipping == Clipping::Sky) {
                 strcpy(tmp, "S");
             }
-            draw_textbox_centered(BufferMain, box_clipping, Feherszin, tmp);
-            Pabc2->write_centered(BufferMain, x1 + 198, box_clipping.y2 + 14, "(U, S, G)");
+            draw_textbox_centered(BufferMain, box_clipping, EditorPaletteId_WindowInput, tmp);
+            EditorBlackFont->write_centered(BufferMain, x1 + 198, box_clipping.y2 + 14,
+                                            "(U, S, G)");
 
             bltfront(BufferMain, x1, y1, x2, y2);
-            pop();
+            draw_cursor();
         }
     }
 }
 
 void editor_window_polygon_properties(polygon* poly) {
-    invalidateegesz();
+    invalidate_editor_gui();
 
     int x1 = 200;
     int y1 = 100;
@@ -1270,7 +1304,7 @@ void editor_window_polygon_properties(polygon* poly) {
             return;
         } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (poly->is_grass != is_grass) {
-                Valtozott = 1;
+                LevelChanged = 1;
             }
             poly->is_grass = is_grass;
             return;
@@ -1281,36 +1315,42 @@ void editor_window_polygon_properties(polygon* poly) {
         if (rerender) {
             rerender = false;
 
-            push();
-            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            erase_cursor();
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
+                       EditorPaletteId_WindowBorder);
 
-            Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15, "Set Polygon Properties");
+            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15,
+                                            "Set Polygon Properties");
 
             int label_x1 = x1 + 18;
-            Pabc2->write(BufferMain, label_x1, box_grass.y1 + 15, "Grass polygon:");
-            render_box(BufferMain, box_grass, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            EditorBlackFont->write(BufferMain, label_x1, box_grass.y1 + 15, "Grass polygon:");
+            render_box(BufferMain, box_grass, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
             if (is_grass) {
-                Pabc2->write_centered(BufferMain, (box_grass.x1 + box_grass.x2) / 2,
-                                      box_grass.y1 + 15, "YES");
+                EditorBlackFont->write_centered(BufferMain, (box_grass.x1 + box_grass.x2) / 2,
+                                                box_grass.y1 + 15, "YES");
             } else {
-                Pabc2->write_centered(BufferMain, (box_grass.x1 + box_grass.x2) / 2,
-                                      box_grass.y1 + 15, "NO");
+                EditorBlackFont->write_centered(BufferMain, (box_grass.x1 + box_grass.x2) / 2,
+                                                box_grass.y1 + 15, "NO");
             }
 
-            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
-            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
-                                  box_cancel.y1 + 15, "CANCEL");
+            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
+                                            "OK");
+            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                            box_cancel.y1 + 15, "CANCEL");
 
             bltfront(BufferMain, x1, y1, x2, y2);
-            pop();
+            draw_cursor();
         }
     }
 }
 
 void editor_window_food_properties(const char* title, object::Property* property, int* animation) {
-    invalidateegesz();
+    invalidate_editor_gui();
 
     int list_length = 5;
     int dy = 20;
@@ -1327,40 +1367,41 @@ void editor_window_food_properties(const char* title, object::Property* property
     // Position of the first box only:
     box box_list = {(x1 + x2) / 2 - 70, ly1, (x1 + x2) / 2 + 70, ly1 + dy};
 
-    push();
-    render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, title);
-    render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-    Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2, box_cancel.y1 + 15,
-                          "Cancel");
+    erase_cursor();
+    render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window, EditorPaletteId_WindowBorder);
+    EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, title);
+    render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton, EditorPaletteId_WindowBorder);
+    EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                    box_cancel.y1 + 15, "Cancel");
 
-    Pabc2->write(BufferMain, box_animation.x1 - 162, box_animation.y1 + 15,
-                 "Food anim number (1-9):");
+    EditorBlackFont->write(BufferMain, box_animation.x1 - 162, box_animation.y1 + 15,
+                           "Food anim number (1-9):");
     char tmp[20];
     sprintf(tmp, "%d", (int)(*animation + 1));
-    render_box(BufferMain, box_animation, Feherszin, DIALOG_BORDER_PALETTE_ID);
-    Pabc2->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
-                          box_animation.y1 + 15, tmp);
+    render_box(BufferMain, box_animation, EditorPaletteId_WindowInput,
+               EditorPaletteId_WindowBorder);
+    EditorBlackFont->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
+                                    box_animation.y1 + 15, tmp);
 
     for (int i = 0; i < list_length; i++) {
-        render_box(BufferMain, box_list, EditorPalette_List, DIALOG_BORDER_PALETTE_ID);
+        render_box(BufferMain, box_list, EditorPaletteId_WindowList, EditorPaletteId_WindowBorder);
         int lx = (box_list.x1 + box_list.x2) / 2;
         int ly = box_list.y1 + 15;
         switch (i) {
         case 0:
-            Pabc2->write_centered(BufferMain, lx, ly, "Normal Food");
+            EditorBlackFont->write_centered(BufferMain, lx, ly, "Normal Food");
             break;
         case 1:
-            Pabc2->write_centered(BufferMain, lx, ly, "Gravity Up");
+            EditorBlackFont->write_centered(BufferMain, lx, ly, "Gravity Up");
             break;
         case 2:
-            Pabc2->write_centered(BufferMain, lx, ly, "Gravity Down");
+            EditorBlackFont->write_centered(BufferMain, lx, ly, "Gravity Down");
             break;
         case 3:
-            Pabc2->write_centered(BufferMain, lx, ly, "Gravity Left");
+            EditorBlackFont->write_centered(BufferMain, lx, ly, "Gravity Left");
             break;
         case 4:
-            Pabc2->write_centered(BufferMain, lx, ly, "Gravity Right");
+            EditorBlackFont->write_centered(BufferMain, lx, ly, "Gravity Right");
             break;
         default:
             internal_error("yuiwegfyjkweg");
@@ -1374,7 +1415,7 @@ void editor_window_food_properties(const char* title, object::Property* property
     box_list.y2 = ly2;
 
     bltfront(BufferMain, x1, y1, x2, y2);
-    pop();
+    draw_cursor();
 
     while (true) {
         handle_events();
@@ -1382,35 +1423,36 @@ void editor_window_food_properties(const char* title, object::Property* property
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
         } else if (clicked_box(box_animation)) {
-            push();
-            render_box(BufferMain, box_animation, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
-                                  box_animation.y1 + 18, "-");
+            erase_cursor();
+            render_box(BufferMain, box_animation, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
+                                            box_animation.y1 + 18, "-");
             bltfront(BufferMain, x1, y1, x2, y2);
 
             empty_keypress_buffer();
             while (true) {
                 handle_events();
                 if (was_key_just_pressed(DIK_ESCAPE)) {
-                    pop();
+                    draw_cursor();
                     return;
                 }
                 while (has_text_input()) {
                     char c = pop_text_input();
                     if (c >= '1' && c <= '9') {
                         *animation = c - '1';
-                        Valtozott = 1;
-                        pop();
+                        LevelChanged = 1;
+                        draw_cursor();
                         return;
                     }
                 }
             }
         } else if (clicked_box(box_list)) {
-            int index = (Mouy - box_list.y1) / dy;
+            int index = (MouseY - box_list.y1) / dy;
             if (index >= list_length) {
                 index = list_length - 1;
             }
-            Valtozott = 1;
+            LevelChanged = 1;
             switch (index) {
             case 0:
                 *property = object::Property::None;
@@ -1439,11 +1481,11 @@ static void editor_window_level_name(char* level_name) {
     char orig_level_name[LEVEL_NAME_LENGTH + 10];
     strcpy(orig_level_name, level_name);
 
-    push();
+    erase_cursor();
 
     blit8(BufferBall, BufferMain);
 
-    invalidateegesz();
+    invalidate_editor_gui();
 
     int x1 = 50;
     int y1 = 200;
@@ -1455,30 +1497,30 @@ static void editor_window_level_name(char* level_name) {
     while (true) {
         handle_events();
 
-        BufferMain->fill_box(x1, y1, x2, y2, EditorPalette_LevelNameDialog);
-        BufferMain->line(x1, y1, x2, y1, EditorPalette_LevelNameDialogBorder);
-        BufferMain->line(x1, y2, x2, y2, EditorPalette_LevelNameDialogBorder);
-        BufferMain->line(x1, y1, x1, y2, EditorPalette_LevelNameDialogBorder);
-        BufferMain->line(x2, y1, x2, y2, EditorPalette_LevelNameDialogBorder);
-        Pabc2->write_centered(
+        BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId_LevelNameWindow);
+        BufferMain->line(x1, y1, x2, y1, EditorPaletteId_LevelNameWindowBorder);
+        BufferMain->line(x1, y2, x2, y2, EditorPaletteId_LevelNameWindowBorder);
+        BufferMain->line(x1, y1, x1, y2, EditorPaletteId_LevelNameWindowBorder);
+        BufferMain->line(x2, y1, x2, y2, EditorPaletteId_LevelNameWindowBorder);
+        EditorBlackFont->write_centered(
             BufferMain, (x2 + x1) / 2, 220,
             "Type in the name of the level and the designer and press ENTER (ESC to cancel)!");
-        int x = (x2 + x1) / 2 - Pabc1->len(level_name) / 2;
-        Pabc2->write(BufferMain, x, 250, level_name);
+        int x = (x2 + x1) / 2 - EditorWhiteFont->len(level_name) / 2;
+        EditorBlackFont->write(BufferMain, x, 250, level_name);
         char tmp[LEVEL_NAME_LENGTH + 10];
         strcpy(tmp, level_name);
         tmp[i] = 0;
-        Pabc2->write(BufferMain, x + Pabc1->len(tmp), 255, "-");
+        EditorBlackFont->write(BufferMain, x + EditorWhiteFont->len(tmp), 255, "-");
         bltfront(BufferMain, x1, y1, x2, y2);
 
         if (was_key_just_pressed(DIK_ESCAPE)) {
             strcpy(level_name, orig_level_name);
-            pop();
+            draw_cursor();
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             if (level_name[0] != 0) {
-                pop();
+                draw_cursor();
                 return;
             }
         }
@@ -1511,7 +1553,7 @@ static void editor_window_level_name(char* level_name) {
         }
         while (has_text_input()) {
             char c = pop_text_input();
-            if (Pabc2->has_char(c) && util::text::is_filename_char(c)) {
+            if (EditorBlackFont->has_char(c) && util::text::is_filename_char(c)) {
                 char tmp[LEVEL_NAME_LENGTH + 10];
                 sprintf(tmp, "Ext: %s", level_name);
 
@@ -1529,7 +1571,7 @@ static void editor_window_level_name(char* level_name) {
 }
 
 void editor_window_level_properties() {
-    invalidateegesz();
+    invalidate_editor_gui();
 
     char foreground_name[10];
     char background_name[10];
@@ -1570,14 +1612,14 @@ void editor_window_level_properties() {
             if (strcmpi(Level->foreground_name, foreground_name) != 0 ||
                 strcmpi(Level->background_name, background_name) != 0 ||
                 strcmp(Level->level_name, level_name) != 0) {
-                Valtozott = 1;
+                LevelChanged = 1;
             }
             strcpy(Level->foreground_name, foreground_name);
             strcpy(Level->background_name, background_name);
             strcpy(Level->level_name, level_name);
 
             if (strcmpi(lgr_name, Level->lgr_name) != 0) {
-                Valtozott = 1;
+                LevelChanged = 1;
                 strcpy(Level->lgr_name, lgr_name);
                 lgrfile::load_lgr_file(Level->lgr_name);
                 if (Level->discard_missing_lgr_assets(Lgr)) {
@@ -1593,10 +1635,10 @@ void editor_window_level_properties() {
             }
             editor_window_select_sprite_name(null_name, foreground_name, mask_name,
                                              SpriteType::Texture);
-            push();
+            erase_cursor();
             blit8(BufferMain, BufferBall);
             bltfront(BufferMain);
-            pop();
+            draw_cursor();
             rerender = true;
         } else if (clicked_box(box_background)) {
             char null_name[10] = "";
@@ -1606,62 +1648,72 @@ void editor_window_level_properties() {
             }
             editor_window_select_sprite_name(null_name, background_name, mask_name,
                                              SpriteType::Texture);
-            push();
+            erase_cursor();
             blit8(BufferMain, BufferBall);
             bltfront(BufferMain);
-            pop();
+            draw_cursor();
             rerender = true;
         } else if (clicked_box(box_levelname)) {
             editor_window_level_name(level_name);
-            push();
+            erase_cursor();
             blit8(BufferMain, BufferBall);
             bltfront(BufferMain);
-            pop();
+            draw_cursor();
             rerender = true;
         } else if (clicked_box(box_lgr)) {
             editor_window_choose_lgr(lgr_name);
 
-            push();
+            erase_cursor();
             blit8(BufferMain, BufferBall);
             bltfront(BufferMain);
-            pop();
+            draw_cursor();
             rerender = true;
         }
         if (rerender) {
             rerender = false;
 
-            push();
+            erase_cursor();
 
-            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
+                       EditorPaletteId_WindowBorder);
 
-            Pabc2->write_centered(BufferMain, (x1 + x2) / 2, y1 + 22, "Level properties");
+            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 22, "Level properties");
 
-            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
+            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
+                                            "OK");
 
-            render_box(BufferMain, box_cancel, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
-                                  box_cancel.y1 + 15, "CANCEL");
+            render_box(BufferMain, box_cancel, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+                                            box_cancel.y1 + 15, "CANCEL");
 
             int label_x1 = x1 + 10;
-            Pabc2->write(BufferMain, label_x1, box_foreground.y1 + 15, "Foreground:");
-            render_box(BufferMain, box_foreground, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            draw_textbox_left(BufferMain, box_foreground, Feherszin, foreground_name);
+            EditorBlackFont->write(BufferMain, label_x1, box_foreground.y1 + 15, "Foreground:");
+            render_box(BufferMain, box_foreground, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
+            draw_textbox_left(BufferMain, box_foreground, EditorPaletteId_WindowInput,
+                              foreground_name);
 
-            Pabc2->write(BufferMain, label_x1, box_background.y1 + 15, "Background:");
-            render_box(BufferMain, box_background, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            draw_textbox_left(BufferMain, box_background, Feherszin, background_name);
+            EditorBlackFont->write(BufferMain, label_x1, box_background.y1 + 15, "Background:");
+            render_box(BufferMain, box_background, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
+            draw_textbox_left(BufferMain, box_background, EditorPaletteId_WindowInput,
+                              background_name);
 
-            Pabc2->write(BufferMain, label_x1, box_levelname.y1 + 15, "Level name:");
-            render_box(BufferMain, box_levelname, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            draw_textbox_left(BufferMain, box_levelname, Feherszin, level_name);
+            EditorBlackFont->write(BufferMain, label_x1, box_levelname.y1 + 15, "Level name:");
+            render_box(BufferMain, box_levelname, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
+            draw_textbox_left(BufferMain, box_levelname, EditorPaletteId_WindowInput, level_name);
 
-            Pabc2->write(BufferMain, label_x1, box_lgr.y1 + 15, "LGR file:");
-            render_box(BufferMain, box_lgr, Feherszin, DIALOG_BORDER_PALETTE_ID);
-            draw_textbox_left(BufferMain, box_lgr, Feherszin, lgr_name);
+            EditorBlackFont->write(BufferMain, label_x1, box_lgr.y1 + 15, "LGR file:");
+            render_box(BufferMain, box_lgr, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
+            draw_textbox_left(BufferMain, box_lgr, EditorPaletteId_WindowInput, lgr_name);
 
             bltfront(BufferMain, x1, y1, x2, y2);
-            pop();
+            draw_cursor();
         }
     }
 }
@@ -1671,7 +1723,7 @@ bool ShowGrassPolygons = true;
 bool ShowObjects = true;
 
 void editor_window_view_options() {
-    invalidateegesz();
+    invalidate_editor_gui();
 
     int x1 = 200;
     int y1 = 100;
@@ -1705,39 +1757,45 @@ void editor_window_view_options() {
         }
         if (rerender) {
             rerender = false;
-            push();
+            erase_cursor();
 
-            render_box(BufferMain, x1, y1, x2, y2, DIALOG_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
+            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId_Window,
+                       EditorPaletteId_WindowBorder);
 
-            render_box(BufferMain, box_ok, BUTTON_PALETTE_ID, DIALOG_BORDER_PALETTE_ID);
-            Pabc2->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15, "OK");
+            render_box(BufferMain, box_ok, EditorPaletteId_WindowButton,
+                       EditorPaletteId_WindowBorder);
+            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
+                                            "OK");
 
-            Pabc2->write(BufferMain, label_x1, box_polygons.y1 + 15, "View Polygons");
-            render_box(BufferMain, box_polygons, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            EditorBlackFont->write(BufferMain, label_x1, box_polygons.y1 + 15, "View Polygons");
+            render_box(BufferMain, box_polygons, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
             if (ShowPolygons) {
-                draw_textbox_centered(BufferMain, box_polygons, Feherszin, "Yes");
+                draw_textbox_centered(BufferMain, box_polygons, EditorPaletteId_WindowInput, "Yes");
             } else {
-                draw_textbox_centered(BufferMain, box_polygons, Feherszin, "No");
+                draw_textbox_centered(BufferMain, box_polygons, EditorPaletteId_WindowInput, "No");
             }
 
-            Pabc2->write(BufferMain, label_x1, box_grass.y1 + 15, "View Grass");
-            render_box(BufferMain, box_grass, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            EditorBlackFont->write(BufferMain, label_x1, box_grass.y1 + 15, "View Grass");
+            render_box(BufferMain, box_grass, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
             if (ShowGrassPolygons) {
-                draw_textbox_centered(BufferMain, box_grass, Feherszin, "Yes");
+                draw_textbox_centered(BufferMain, box_grass, EditorPaletteId_WindowInput, "Yes");
             } else {
-                draw_textbox_centered(BufferMain, box_grass, Feherszin, "No");
+                draw_textbox_centered(BufferMain, box_grass, EditorPaletteId_WindowInput, "No");
             }
 
-            Pabc2->write(BufferMain, label_x1, box_objects.y1 + 15, "View Pictures");
-            render_box(BufferMain, box_objects, Feherszin, DIALOG_BORDER_PALETTE_ID);
+            EditorBlackFont->write(BufferMain, label_x1, box_objects.y1 + 15, "View Pictures");
+            render_box(BufferMain, box_objects, EditorPaletteId_WindowInput,
+                       EditorPaletteId_WindowBorder);
             if (ShowObjects) {
-                draw_textbox_centered(BufferMain, box_objects, Feherszin, "Yes");
+                draw_textbox_centered(BufferMain, box_objects, EditorPaletteId_WindowInput, "Yes");
             } else {
-                draw_textbox_centered(BufferMain, box_objects, Feherszin, "No");
+                draw_textbox_centered(BufferMain, box_objects, EditorPaletteId_WindowInput, "No");
             }
 
             bltfront(BufferMain, x1, y1, x2, y2);
-            pop();
+            draw_cursor();
         }
     }
 }

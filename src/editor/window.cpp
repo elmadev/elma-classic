@@ -797,9 +797,9 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                 }
                 Pabc2->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy, name_at(i + view_index));
 
-                if (picture_name[0] || texture_name[0]) {
+                if (sprite_type == SpriteType::Picture || sprite_type == SpriteType::Texture) {
                     int default_distance = 0;
-                    if (picture_name[0]) {
+                    if (sprite_type == SpriteType::Picture) {
                         default_distance = Lgr->pictures[i + view_index].default_distance;
                     } else {
                         default_distance = Lgr->textures[i + view_index].default_distance;
@@ -809,7 +809,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                     sprintf(details, "%d", default_distance);
                     Pabc2->write(BufferMain, lx1 + 67, ly1 + 15 + i * dy, details);
                     Clipping default_clipping = Clipping::Unclipped;
-                    if (picture_name[0]) {
+                    if (sprite_type == SpriteType::Picture) {
                         default_clipping = Lgr->pictures[i + view_index].default_clipping;
                     } else {
                         default_clipping = Lgr->textures[i + view_index].default_clipping;

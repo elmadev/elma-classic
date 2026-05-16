@@ -144,7 +144,7 @@ void eol::process(const chat_message& msg) {
     std::string_view nick = lookup_nick(msg.kuski_id);
     tm tm = local_tm(msg.unix_timestamp);
     std::string line = std::format("{:02}:{:02}:{:02} <{}> {}", tm.tm_hour, tm.tm_min, tm.tm_sec,
-                                   nick, msg.message);
+                                   nick, (const char*)msg.message);
     Console->add_line(line, console::LineType::Chat);
 }
 
@@ -153,7 +153,7 @@ void eol::process(const private_message& msg) {
     std::string_view to_nick = lookup_nick(msg.to_kuski_id);
     tm tm = local_tm(msg.unix_timestamp);
     std::string line = std::format("{:02}:{:02}:{:02} <{}>-><{}> {}", tm.tm_hour, tm.tm_min,
-                                   tm.tm_sec, from_nick, to_nick, msg.message);
+                                   tm.tm_sec, from_nick, to_nick, (const char*)msg.message);
     Console->add_line(line, console::LineType::Pm);
 }
 
@@ -161,7 +161,7 @@ void eol::process(const team_message& msg) {
     std::string_view nick = lookup_nick(msg.from_kuski_id);
     tm tm = local_tm(msg.unix_timestamp);
     std::string line = std::format("{:02}:{:02}:{:02} [Team] <{}> {}", tm.tm_hour, tm.tm_min,
-                                   tm.tm_sec, nick, msg.message);
+                                   tm.tm_sec, nick, (const char*)msg.message);
     Console->add_line(line, console::LineType::Team);
 }
 

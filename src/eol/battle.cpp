@@ -239,6 +239,11 @@ void eol::render_battle_status(pic8& dest, abc8& font) const {
                           time_text, duration_text);
     }
 
+    if ((current_battle->attributes & BattleAttributes::Uploaded) &&
+        !current_battle->download_requested) {
+        out += current_battle->level_exists ? " (F4 to rewrite)" : " (F4 to download)";
+    }
+
     const int y = 15 + font.line_height() * (1 + EolSettings->chat_lines());
     font.write_centered(&dest, dest.get_width() / 2, y, out.c_str());
 

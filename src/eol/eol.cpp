@@ -196,6 +196,9 @@ void eol::process(const level_download& ld) {
         std::ofstream file(path, std::ios::binary);
         file.write((const char*)ld.data.data(), ld.data.size());
         invalidate_external_levels();
+        if (current_battle && strcmp(level_name, current_battle->level_filename) == 0) {
+            current_battle->level_exists = true;
+        }
         StatusMessages->add(std::format("level {}.lev downloaded", level_name));
         break;
     }
@@ -223,8 +226,12 @@ void eol::download_battle_level() {
     if (!(current_battle->attributes & BattleAttributes::Uploaded)) {
         return;
     }
+    if (current_battle->download_requested) {
+        return;
+    }
 
     proto.send(battle_level_download_request{});
+    current_battle->download_requested = true;
 }
 
 void eol::enter_level(const char* level_name, const level* lev) {

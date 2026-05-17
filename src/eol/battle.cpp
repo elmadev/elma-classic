@@ -6,6 +6,7 @@
 #include "pic8.h"
 #include "util/util.h"
 #include <algorithm>
+#include <filesystem>
 #include <format>
 
 static std::string format_battle_result(BattleType type, uint32_t time, uint16_t apples) {
@@ -39,6 +40,8 @@ std::string eol::format_level(std::string_view level) {
 
 void eol::process(const battle_started& bs) {
     current_battle = bs.bat;
+    current_battle->level_exists = std::filesystem::exists(
+        std::format("lev/{}.lev", (const char*)current_battle->level_filename));
     battle_leaderboard_.clear();
     battle_results_table.set_title(
         std::format("Battle standings in {}", format_level(current_battle->level_filename)));

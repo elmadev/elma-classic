@@ -77,6 +77,8 @@ struct battle {
     bool in_countdown;
     // Local-clock timestamp at which the battle starts (after countdown, if any).
     long long local_start_ms;
+    bool level_exists = false;
+    bool download_requested = false;
 };
 
 #endif

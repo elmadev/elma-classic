@@ -368,6 +368,49 @@ static void physics_frame_end(motorst* mot, player_keys* keys, bike_metadata* me
 #endif
 }
 
+static void handle_eol_inputs() {
+    if (was_game_key_just_pressed(DIK_F1)) {
+        EolSettings->set_show_others(!EolSettings->show_others());
+        StatusMessages->add(EolSettings->show_others() ? "other players shown"
+                                                       : "other players hidden");
+    }
+
+    if (was_game_key_just_pressed(DIK_F2)) {
+        if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
+            EolClient->spy_prev_kuski();
+        } else {
+            EolClient->spy_next_kuski();
+        }
+    }
+
+    if (was_game_key_just_pressed(DIK_F4)) {
+        if (is_game_key_down(DIK_LCONTROL) || is_game_key_down(DIK_RCONTROL)) {
+            Console->label_mode("[Download] ", "!download ", true, false);
+            Console->toggle_active();
+        }
+    }
+
+    if (was_game_key_just_pressed(DIK_F5)) {
+        EolClient->set_table(TableType::PlayersOnline);
+    }
+
+    if (was_game_key_just_pressed(DIK_F3)) {
+        EolClient->toggle_battle_queue();
+    }
+
+    if (was_game_key_just_pressed(DIK_F6)) {
+        EolClient->toggle_battle_results();
+    }
+
+    if (was_game_key_just_pressed(DIK_F10)) {
+        if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
+            EolClient->toggle_show_battle_leader();
+        } else {
+            EolClient->toggle_battle_status();
+        }
+    }
+}
+
 // Common setup function
 static void setup_gameloop(const char* filename) {
     load_best_time(filename, Single);
@@ -583,46 +626,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             ScreenshotRequested = true;
         }
 
-        if (was_game_key_just_pressed(DIK_F1)) {
-            EolSettings->set_show_others(!EolSettings->show_others());
-            StatusMessages->add(EolSettings->show_others() ? "other players shown"
-                                                           : "other players hidden");
-        }
-
-        if (was_game_key_just_pressed(DIK_F2)) {
-            if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
-                EolClient->spy_prev_kuski();
-            } else {
-                EolClient->spy_next_kuski();
-            }
-        }
-
-        if (was_game_key_just_pressed(DIK_F4)) {
-            if (is_game_key_down(DIK_LCONTROL) || is_game_key_down(DIK_RCONTROL)) {
-                Console->label_mode("[Download] ", "!download ", true, false);
-                Console->toggle_active();
-            }
-        }
-
-        if (was_game_key_just_pressed(DIK_F5)) {
-            EolClient->set_table(TableType::PlayersOnline);
-        }
-
-        if (was_game_key_just_pressed(DIK_F3)) {
-            EolClient->toggle_battle_queue();
-        }
-
-        if (was_game_key_just_pressed(DIK_F6)) {
-            EolClient->toggle_battle_results();
-        }
-
-        if (was_game_key_just_pressed(DIK_F10)) {
-            if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
-                EolClient->toggle_show_battle_leader();
-            } else {
-                EolClient->toggle_battle_status();
-            }
-        }
+        handle_eol_inputs();
 
         if (!console_was_active &&
             (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {
@@ -903,6 +907,8 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         if (was_game_key_just_pressed(State->key_screenshot)) {
             ScreenshotRequested = true;
         }
+
+        handle_eol_inputs();
 
         if (!console_was_active && was_key_just_pressed(DIK_ESCAPE)) {
             set_motor_frequency(true, 1.0, 0);

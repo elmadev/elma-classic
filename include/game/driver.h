@@ -41,6 +41,7 @@ struct driver {
     bool dead = false;
     int finish_time = 0;
     bool draw_view = true;
+    bool one_frame_brake_pending = false;
 
     driver(motorst* mot, recorder* rec, player_keys* keys, hud_visibility* hud);
     void reset_metadata();

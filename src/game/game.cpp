@@ -82,6 +82,12 @@ template <typename Scancode> static bool was_game_key_just_pressed(Scancode code
     return was_key_just_pressed(code);
 }
 
+static void latch_one_frame_brake(driver& driv) {
+    if (was_game_key_just_pressed(driv.keys->one_frame_brake)) {
+        driv.one_frame_brake_pending = true;
+    }
+}
+
 static void update_freecam(double dt, camera& current_camera) {
     double speed = 30.0;
     if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
@@ -161,7 +167,8 @@ static void physics_subframe(driver& driv, double time, double dt) {
     // Adjust key inputs to only allow valid inputs, accounting for volt delay and cripples
     bool is_gas_down = is_game_key_down(keys->gas);
     bool is_brake_down = is_game_key_down(keys->brake) || is_game_key_down(keys->brake_alias) ||
-                         was_game_key_just_pressed(keys->one_frame_brake);
+                         driv.one_frame_brake_pending;
+    driv.one_frame_brake_pending = false;
     bool is_right_volt_down = is_game_key_down(keys->right_volt);
     bool is_left_volt_down = is_game_key_down(keys->left_volt);
 
@@ -551,6 +558,11 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         bool console_was_active = handle_console_input();
 
         if (!frozen) {
+            latch_one_frame_brake(driv1);
+            if (!Single) {
+                latch_one_frame_brake(driv2);
+            }
+
             pacer::new_frame();
 
             double dt = 0.0;

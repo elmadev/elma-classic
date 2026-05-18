@@ -37,6 +37,12 @@ static kuski* get_kuski(std::vector<kuski>& kuskis, unsigned int id) {
     return nullptr;
 }
 
+static kuski* get_kuski(std::vector<kuski>& kuskis, std::string_view nick) {
+    auto it = std::ranges::find_if(
+        kuskis, [&](kuski& k) { return std::string_view{k.nick} == nick && k.is_player; });
+    return it != kuskis.end() ? &*it : nullptr;
+}
+
 eol::eol()
     : proto(*this),
       cur_table(nullptr),

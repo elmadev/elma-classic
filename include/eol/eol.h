@@ -24,6 +24,7 @@ class eol {
     void process(const new_kuski&);
     void process(const kuski_logout&);
     void process(const kuski_set_level&);
+    void process(const kuski_new_shirt& ns);
     void process(const chat_message&);
     void process(const private_message&);
     void process(const team_message&);

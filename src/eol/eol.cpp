@@ -3,6 +3,7 @@
 #include "eol/console.h"
 #include "eol_settings.h"
 #include "level.h"
+#include "log.h"
 #include "menu/external.h"
 #include "pic8.h"
 #include "platform/implementation.h"
@@ -11,6 +12,7 @@
 #include <algorithm>
 #include <cstring>
 #include <ctime>
+#include <filesystem>
 #include <format>
 #include <fstream>
 #include <string>
@@ -84,15 +86,17 @@ void eol::process(const login& l) {
 }
 
 pic8* eol::load_shirt(std::string_view nick) {
-    constexpr int SHIRT_BMP_WIDTH = 149;
+    constexpr int SHIRT_BMP_WIDTH_MIN = 149;
+    constexpr int SHIRT_BMP_WIDTH_MAX = 152;
     constexpr int SHIRT_BMP_HEIGHT = 101;
 
     char path[4 + sizeof(kuski::nick) + 4 + 1] = {};
     std::format_to_n(path, sizeof(path) - 1, "bmp/{}.bmp", nick);
 
     pic8* pic_shirt = pic8::from_bmp(path);
-    if (pic_shirt && pic_shirt->get_width() == SHIRT_BMP_WIDTH &&
-        pic_shirt->get_height() == SHIRT_BMP_HEIGHT) {
+    if (pic_shirt && pic_shirt->get_width() >= SHIRT_BMP_WIDTH_MIN &&
+        pic_shirt->get_width() <= SHIRT_BMP_WIDTH_MAX &&
+        pic_shirt->get_height() <= SHIRT_BMP_HEIGHT) {
         return pic_shirt;
     }
 
@@ -128,6 +132,27 @@ void eol::process(const kuski_set_level& l) {
 
     strncpy(k->level, (const char*)l.level, MAX_FILENAME_LEN);
     sync_players_online_table();
+}
+
+void eol::process(const kuski_new_shirt& ns) {
+    kuski* k = get_kuski(kuskis_, ns.nick);
+    if (!k) {
+        return;
+    }
+
+    std::error_code ec;
+    std::filesystem::create_directory("bmp", ec);
+    if (ec) {
+        LOG_ERROR("Failed to create bmp directory!");
+        return;
+    }
+
+    std::string path = std::format("bmp/{}.bmp", (const char*)k->nick);
+    std::ofstream file(path, std::ios::binary);
+    file.write((const char*)ns.data.data(), ns.data.size());
+    file.flush();
+    delete k->shirt;
+    k->shirt = load_shirt(k->nick);
 }
 
 void eol::sync_players_online_table() {

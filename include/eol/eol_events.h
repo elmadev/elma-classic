@@ -33,6 +33,11 @@ struct kuski_set_level {
     char level[MAX_FILENAME_LEN + 1];
 };
 
+struct kuski_new_shirt {
+    char nick[16];
+    std::span<const uint8_t> data;
+};
+
 enum class DownloadResult {
     Success,
     Fail,

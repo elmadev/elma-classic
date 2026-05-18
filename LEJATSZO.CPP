@@ -387,6 +387,8 @@ static void handle_eol_inputs() {
         if (is_game_key_down(DIK_LCONTROL) || is_game_key_down(DIK_RCONTROL)) {
             Console->label_mode("[Download] ", "!download ", true, false);
             Console->toggle_active();
+        } else {
+            EolClient->download_battle_level();
         }
     }
 

@@ -433,8 +433,9 @@ void handle_events() {
             }
 #endif
 
-            // SDL doesn't generate text input events when Ctrl is held
-            // Resolve layout-specific keycodes to support LCtrl search
+            // On macos, SDL suppresses SDL_TEXTINPUT while Ctrl is held, so
+            // resolve the layout-specific keycode here to support LCtrl search.
+            // Wayland delivers SDL_TEXTINPUT anyway and is de-duplicated below.
             if (EolSettings->lctrl_search()) {
                 bool is_lctrl_pressed = event.key.keysym.mod & KMOD_LCTRL;
                 if (is_lctrl_pressed) {
@@ -447,6 +448,10 @@ void handle_events() {
             break;
         }
         case SDL_TEXTINPUT:
+            // Disallow SDL_TEXTINPUT if lctrl is held
+            if (EolSettings->lctrl_search() && (SDL_GetModState() & KMOD_LCTRL)) {
+                break;
+            }
             add_text_to_buffer(event.text.text);
             break;
         case SDL_MOUSEWHEEL:

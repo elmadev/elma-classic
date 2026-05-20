@@ -15,6 +15,7 @@
 recorder* Rec1 = nullptr;
 recorder* Rec2 = nullptr;
 int MultiplayerRec = 0;
+bool MergedRec = false;
 
 constexpr int MAGIC_NUMBER = 4796277;
 
@@ -417,6 +418,7 @@ int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
     }
     if (is_first_replay) {
         MultiplayerRec = multiplayer_rec;
+        MergedRec = false;
     }
     if (fread(&flagtag_, 1, sizeof(flagtag_), h) != 4) {
         read_error(filename);
@@ -618,6 +620,7 @@ recorder::merge_result recorder::load_merge(const std::string& filename1,
     fclose(h2);
 
     MultiplayerRec = 1;
+    MergedRec = true;
     Rec1->set_flagtag(false);
     Rec2->set_flagtag(false);
 

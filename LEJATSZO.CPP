@@ -755,7 +755,7 @@ int replay_loop(const char* filename, int restore_player_visibility) {
     metadata1.volt_time = metadata2.volt_time = -100.0;
 
     metadata1.draw_view = true;
-    metadata2.draw_view = true;
+    metadata2.draw_view = !MergedRec;
     if (restore_player_visibility) {
         metadata1.draw_view = PreviousReplayDrawView1;
         metadata2.draw_view = PreviousReplayDrawView2;

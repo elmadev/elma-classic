@@ -130,6 +130,7 @@ static_assert(sizeof(recorder::level_filename) == 16);
 extern recorder* Rec1;
 extern recorder* Rec2;
 extern int MultiplayerRec;
+extern bool MergedRec;
 
 void add_event_buffer(WavEvent event_id, double volume, int object_id);
 void reset_event_buffer();

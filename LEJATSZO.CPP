@@ -14,6 +14,7 @@
 #include "object.h"
 #include "physics_init.h"
 #include "platform/implementation.h"
+#include "platform/sdl/keyboard.h"
 #include "segments.h"
 #include "timer.h"
 #include <algorithm>
@@ -400,7 +401,18 @@ static void setup_gameloop(const char* filename) {
 int WhoDiedFirst = 0;
 bool Player1Finished = false;
 
+namespace {
+struct NumpadNavGuard {
+    NumpadNavGuard() { keyboard::set_numpad_nav(false); }
+    ~NumpadNavGuard() { keyboard::set_numpad_nav(true); }
+};
+} // namespace
+
 int game_loop(const char* filename, CameraMode camera_mode) {
+    // Bindings during gameplay must be honored by raw scancode: numpad-6
+    // is right-volt, not "Right Arrow when NumLock is off".
+    NumpadNavGuard numpad_nav_guard;
+
     WhoDiedFirst = 0;
     Player1Finished = false;
 
@@ -725,6 +737,10 @@ static bool PreviousReplayDrawView1 = true;
 static bool PreviousReplayDrawView2 = true;
 
 int replay_loop(const char* filename, int restore_player_visibility) {
+    // Bindings during gameplay must be honored by raw scancode: numpad-6
+    // is right-volt, not "Right Arrow when NumLock is off".
+    NumpadNavGuard numpad_nav_guard;
+
     // Refuse to play zero-length replays (from map-viewer mode)
     if (Rec1->is_empty()) {
         return -2;

@@ -19,6 +19,7 @@ static const Uint8* SdlLive = nullptr;
 static Uint8 Current[SDL_NUM_SCANCODES];
 static Uint8 Previous[SDL_NUM_SCANCODES];
 static bool WasDown[SDL_NUM_SCANCODES];
+static bool NumpadNavEnabled = true;
 
 void init() {
     SdlLive = SDL_GetKeyboardState(nullptr);
@@ -34,13 +35,17 @@ void begin_frame() {
 void end_frame() {
     memcpy(Current, SdlLive, sizeof(Current));
 
-    // Map numpad keys to navigation equivalents when in navigation mode.
-    // On macOS, KMOD_NUM is unreliable (SDL never initializes it from OS state),
-    // so we always map numpad keys to text input — macOS has no NumLock key anyway.
 #ifdef __APPLE__
+    // macos has no numlock key so we always force numpad navigation off
     bool numpad_nav = false;
 #else
-    bool numpad_nav = !(SDL_GetModState() & KMOD_NUM);
+    // Map numpad keys to navigation equivalents when in navigation mode.
+    // On Windows/Linux the behavior depends on the numlock state and global state.
+    // We want gameplay inputs to always fire regardless of numlock state and
+    // other menus fire the respective key. This is because when in the editor
+    // pressing numpad 4 should either write 4 or navigate left, without this
+    // we would fire both inputs
+    bool numpad_nav = NumpadNavEnabled && !(SDL_GetModState() & KMOD_NUM);
 #endif
     for (auto& [numpad, nav] : NUMPAD_NAV_MAP) {
         // KP_ENTER always maps to Return regardless of NumLock
@@ -56,6 +61,8 @@ void end_frame() {
 }
 
 void record_key_down(SDL_Scancode scancode) { WasDown[scancode] = true; }
+
+void set_numpad_nav(bool enabled) { NumpadNavEnabled = enabled; }
 
 bool is_down(SDL_Scancode sdl_code) { return Current[sdl_code] != 0; }
 

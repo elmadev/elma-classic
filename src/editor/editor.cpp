@@ -756,121 +756,118 @@ void editor() {
             }
             if (click_x < EDITOR_MENU_X) {
                 // Menu clicks
-                for (int i = 0; i < MENU_LENGTH; i++) {
-                    if (EDITOR_MENU_Y + i * MENU_ENTRY_HEIGHT <= click_y &&
-                        click_y < EDITOR_MENU_Y + (i + 1) * MENU_ENTRY_HEIGHT) {
-                        // Commands
-                        if (i == 0 && left_click) {
-                            if (editor_dialog_exit()) {
-                                erase_cursor();
-                                return;
-                            }
+                int i = (click_y - EDITOR_MENU_Y) / MENU_ENTRY_HEIGHT;
+                if (i >= 0 && i < MENU_LENGTH) {
+                    if (i == 0 && left_click) {
+                        if (editor_dialog_exit()) {
+                            erase_cursor();
+                            return;
                         }
-                        if (i == 0 && right_click) {
-                            editor_help_exit();
-                        }
-                        if (i == 1 && left_click) {
-                            editor_new();
-                        }
-                        if (i == 1 && right_click) {
-                            editor_help_new();
-                        }
-                        if (i == 2 && left_click) {
-                            editor_window_open();
-                        }
-                        if (i == 2 && right_click) {
-                            editor_help_open();
-                        }
-                        if (i == 3 && left_click) {
-                            editor_window_save_as();
-                        }
-                        if (i == 3 && right_click) {
-                            editor_help_save_as();
-                        }
-                        if (i == 4 && left_click) {
-                            editor_window_save();
-                        }
-                        if (i == 4 && right_click) {
-                            editor_help_save();
-                        }
-                        if (i == 5 && left_click) {
-                            editor_play(is_key_down(DIK_F1));
-                            SelectedTool = Tool::Move;
-                        }
-                        if (i == 5 && right_click) {
-                            editor_help_save_and_play();
-                        }
-                        if (i == 6 && left_click) {
-                            check_topology(true);
-                        }
-                        if (i == 6 && right_click) {
-                            editor_help_check_topology();
-                        }
-                        if (i == 7 && left_click) {
-                            editor_window_level_properties();
-                        }
-                        if (i == 7 && right_click) {
-                            editor_help_properties();
-                        }
-                        if (i == 8 && left_click) {
-                            editor_zoom_out();
-                        }
-                        if (i == 8 && right_click) {
-                            editor_help_zoom_out();
-                        }
-                        if (i == 9 && left_click) {
-                            zoom_fill();
-                            invalidate_editor_level();
-                        }
-                        if (i == 9 && right_click) {
-                            editor_help_zoom_fill();
-                        }
-                        if (i == 10 && left_click) {
-                            editor_window_view_options();
-                        }
-                        if (i == 10 && right_click) {
-                            editor_help_view_options();
-                        }
-                        if (i == 11) {
-                            editor_help();
-                        }
+                    }
+                    if (i == 0 && right_click) {
+                        editor_help_exit();
+                    }
+                    if (i == 1 && left_click) {
+                        editor_new();
+                    }
+                    if (i == 1 && right_click) {
+                        editor_help_new();
+                    }
+                    if (i == 2 && left_click) {
+                        editor_window_open();
+                    }
+                    if (i == 2 && right_click) {
+                        editor_help_open();
+                    }
+                    if (i == 3 && left_click) {
+                        editor_window_save_as();
+                    }
+                    if (i == 3 && right_click) {
+                        editor_help_save_as();
+                    }
+                    if (i == 4 && left_click) {
+                        editor_window_save();
+                    }
+                    if (i == 4 && right_click) {
+                        editor_help_save();
+                    }
+                    if (i == 5 && left_click) {
+                        editor_play(is_key_down(DIK_F1));
+                        SelectedTool = Tool::Move;
+                    }
+                    if (i == 5 && right_click) {
+                        editor_help_save_and_play();
+                    }
+                    if (i == 6 && left_click) {
+                        check_topology(true);
+                    }
+                    if (i == 6 && right_click) {
+                        editor_help_check_topology();
+                    }
+                    if (i == 7 && left_click) {
+                        editor_window_level_properties();
+                    }
+                    if (i == 7 && right_click) {
+                        editor_help_properties();
+                    }
+                    if (i == 8 && left_click) {
+                        editor_zoom_out();
+                    }
+                    if (i == 8 && right_click) {
+                        editor_help_zoom_out();
+                    }
+                    if (i == 9 && left_click) {
+                        zoom_fill();
+                        invalidate_editor_level();
+                    }
+                    if (i == 9 && right_click) {
+                        editor_help_zoom_fill();
+                    }
+                    if (i == 10 && left_click) {
+                        editor_window_view_options();
+                    }
+                    if (i == 10 && right_click) {
+                        editor_help_view_options();
+                    }
+                    if (i == 11) {
+                        editor_help();
+                    }
 
-                        // Tools
-                        if (left_click) {
-                            if (i >= COMMANDS_LENGTH && i < COMMANDS_LENGTH + TOOLS_LENGTH) {
-                                select_tool(i - COMMANDS_LENGTH);
-                            }
-                        } else {
-                            if (i == COMMANDS_LENGTH + 0) {
-                                editor_help_move();
-                            }
-                            if (i == COMMANDS_LENGTH + 1) {
-                                editor_help_zoom_in();
-                            }
-                            if (i == COMMANDS_LENGTH + 2) {
-                                editor_help_create_vertex();
-                            }
-                            if (i == COMMANDS_LENGTH + 3) {
-                                editor_help_delete_vertex();
-                            }
-                            if (i == COMMANDS_LENGTH + 4) {
-                                editor_help_delete_polygon();
-                            }
-                            if (i == COMMANDS_LENGTH + 5) {
-                                editor_help_create_food();
-                            }
-                            if (i == COMMANDS_LENGTH + 6) {
-                                editor_help_create_killer();
-                            }
-                            if (i == COMMANDS_LENGTH + 7) {
-                                editor_help_delete_object();
-                            }
-                            if (i == COMMANDS_LENGTH + 8) {
-                                editor_help_create_sprite();
-                            }
-                            if (i == COMMANDS_LENGTH + 9) {
-                                editor_help_delete_sprite();
-                            }
+                    // Tools
+                    if (left_click) {
+                        if (i >= COMMANDS_LENGTH && i < COMMANDS_LENGTH + TOOLS_LENGTH) {
+                            select_tool(i - COMMANDS_LENGTH);
+                        }
+                    } else {
+                        if (i == COMMANDS_LENGTH + 0) {
+                            editor_help_move();
+                        }
+                        if (i == COMMANDS_LENGTH + 1) {
+                            editor_help_zoom_in();
+                        }
+                        if (i == COMMANDS_LENGTH + 2) {
+                            editor_help_create_vertex();
+                        }
+                        if (i == COMMANDS_LENGTH + 3) {
+                            editor_help_delete_vertex();
+                        }
+                        if (i == COMMANDS_LENGTH + 4) {
+                            editor_help_delete_polygon();
+                        }
+                        if (i == COMMANDS_LENGTH + 5) {
+                            editor_help_create_food();
+                        }
+                        if (i == COMMANDS_LENGTH + 6) {
+                            editor_help_create_killer();
+                        }
+                        if (i == COMMANDS_LENGTH + 7) {
+                            editor_help_delete_object();
+                        }
+                        if (i == COMMANDS_LENGTH + 8) {
+                            editor_help_create_sprite();
+                        }
+                        if (i == COMMANDS_LENGTH + 9) {
+                            editor_help_delete_sprite();
                         }
                     }
                 }

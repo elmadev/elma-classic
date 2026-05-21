@@ -205,7 +205,7 @@ static bool CursorDrawn = false;
 
 void erase_cursor() {
     if (!CursorDrawn) {
-        internal_error("erase_cursor-ban !CursorDrawn!");
+        internal_error("erase_cursor !CursorDrawn!");
     }
     CursorDrawn = false;
     draw_cursor_shape();
@@ -213,7 +213,7 @@ void erase_cursor() {
 
 void draw_cursor() {
     if (CursorDrawn) {
-        internal_error("draw_cursor-ban CursorDrawn!");
+        internal_error("draw_cursor CursorDrawn!");
     }
     CursorDrawn = true;
     draw_cursor_shape();

@@ -630,6 +630,10 @@ static bool editor_menu_enabled() {
              CreatingPolygon);
 }
 
+static bool editor_shortcut(DikScancode key) {
+    return editor_menu_enabled() && was_key_just_pressed(key);
+}
+
 // Get the mouse position, while also disallowing the cursor to be in the
 // tooltip area. Disallow the menu area if we are holding something.
 static void get_mouse_position_editor(int* mouse_x, int* mouse_y) {
@@ -715,34 +719,11 @@ void editor() {
                 tool_create_vertex_enter();
             }
         }
-        // Character shortcuts from text buffer
-        while (has_text_input()) {
-            char c = pop_text_input();
-            if (editor_menu_enabled()) {
-                if (c == 'p') {
-                    editor_play(is_key_down(DIK_F1));
-                }
-                if (c == 'x') {
-                    if (editor_dialog_exit()) {
-                        erase_cursor();
-                        return;
-                    }
-                }
-                if (c == 'o') {
-                    editor_window_open();
-                }
-                if (c == 's') {
-                    editor_window_save();
-                }
-                if (c == 'z') {
-                    editor_zoom_out();
-                }
-                // Undocumented screenshot button
-                if (c == 'i') {
-                    platform_save_screenshot();
-                }
-            }
+        if (was_key_just_pressed(DIK_I)) {
+            // Undocumented screenshot button
+            platform_save_screenshot();
         }
+
         bool left_click = was_left_mouse_just_clicked();
         bool right_click = was_right_mouse_just_clicked();
         int click_x = INT_MAX;
@@ -764,7 +745,7 @@ void editor() {
             i = -1;
         }
         // Menu commands
-        if (i == 0 && left_click) {
+        if ((i == 0 && left_click) || editor_shortcut(DIK_X)) {
             if (editor_dialog_exit()) {
                 erase_cursor();
                 return;
@@ -775,7 +756,7 @@ void editor() {
             editor_new();
         } else if (i == 1 && right_click) {
             editor_help_new();
-        } else if (i == 2 && left_click) {
+        } else if ((i == 2 && left_click) || editor_shortcut(DIK_O)) {
             editor_window_open();
         } else if (i == 2 && right_click) {
             editor_help_open();
@@ -783,11 +764,11 @@ void editor() {
             editor_window_save_as();
         } else if (i == 3 && right_click) {
             editor_help_save_as();
-        } else if (i == 4 && left_click) {
+        } else if ((i == 4 && left_click) || editor_shortcut(DIK_S)) {
             editor_window_save();
         } else if (i == 4 && right_click) {
             editor_help_save();
-        } else if (i == 5 && left_click) {
+        } else if ((i == 5 && left_click) || editor_shortcut(DIK_P)) {
             editor_play(is_key_down(DIK_F1));
             SelectedTool = Tool::Move;
         } else if (i == 5 && right_click) {
@@ -800,7 +781,7 @@ void editor() {
             editor_window_level_properties();
         } else if (i == 7 && right_click) {
             editor_help_properties();
-        } else if (i == 8 && left_click) {
+        } else if (i == 8 && left_click || editor_shortcut(DIK_Z)) {
             editor_zoom_out();
         } else if (i == 8 && right_click) {
             editor_help_zoom_out();

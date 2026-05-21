@@ -23,6 +23,7 @@
 #include <cstring>
 #include <directinput/scancodes.h>
 #include <format>
+#include <climits>
 
 level* Level = nullptr;
 
@@ -744,9 +745,9 @@ void editor() {
         }
         bool left_click = was_left_mouse_just_clicked();
         bool right_click = was_right_mouse_just_clicked();
+        int click_x = INT_MAX;
+        int click_y = INT_MAX;
         if (left_click || right_click) {
-            int click_x = 0;
-            int click_y = 0;
             get_mouse_position_editor(&click_x, &click_y);
             if (click_x != MouseX || click_y != MouseY) {
                 erase_cursor();
@@ -754,170 +755,144 @@ void editor() {
                 MouseY = click_y;
                 draw_cursor();
             }
-            if (click_x < EDITOR_MENU_X) {
-                // Menu clicks
-                int i = (click_y - EDITOR_MENU_Y) / MENU_ENTRY_HEIGHT;
-                if (i >= 0 && i < MENU_LENGTH) {
-                    if (i == 0 && left_click) {
-                        if (editor_dialog_exit()) {
-                            erase_cursor();
-                            return;
-                        }
-                    }
-                    if (i == 0 && right_click) {
-                        editor_help_exit();
-                    }
-                    if (i == 1 && left_click) {
-                        editor_new();
-                    }
-                    if (i == 1 && right_click) {
-                        editor_help_new();
-                    }
-                    if (i == 2 && left_click) {
-                        editor_window_open();
-                    }
-                    if (i == 2 && right_click) {
-                        editor_help_open();
-                    }
-                    if (i == 3 && left_click) {
-                        editor_window_save_as();
-                    }
-                    if (i == 3 && right_click) {
-                        editor_help_save_as();
-                    }
-                    if (i == 4 && left_click) {
-                        editor_window_save();
-                    }
-                    if (i == 4 && right_click) {
-                        editor_help_save();
-                    }
-                    if (i == 5 && left_click) {
-                        editor_play(is_key_down(DIK_F1));
-                        SelectedTool = Tool::Move;
-                    }
-                    if (i == 5 && right_click) {
-                        editor_help_save_and_play();
-                    }
-                    if (i == 6 && left_click) {
-                        check_topology(true);
-                    }
-                    if (i == 6 && right_click) {
-                        editor_help_check_topology();
-                    }
-                    if (i == 7 && left_click) {
-                        editor_window_level_properties();
-                    }
-                    if (i == 7 && right_click) {
-                        editor_help_properties();
-                    }
-                    if (i == 8 && left_click) {
-                        editor_zoom_out();
-                    }
-                    if (i == 8 && right_click) {
-                        editor_help_zoom_out();
-                    }
-                    if (i == 9 && left_click) {
-                        zoom_fill();
-                        invalidate_editor_level();
-                    }
-                    if (i == 9 && right_click) {
-                        editor_help_zoom_fill();
-                    }
-                    if (i == 10 && left_click) {
-                        editor_window_view_options();
-                    }
-                    if (i == 10 && right_click) {
-                        editor_help_view_options();
-                    }
-                    if (i == 11) {
-                        editor_help();
-                    }
+        }
 
-                    // Tools
-                    if (left_click) {
-                        if (i >= COMMANDS_LENGTH && i < COMMANDS_LENGTH + TOOLS_LENGTH) {
-                            select_tool(i - COMMANDS_LENGTH);
-                        }
-                    } else {
-                        if (i == COMMANDS_LENGTH + 0) {
-                            editor_help_move();
-                        }
-                        if (i == COMMANDS_LENGTH + 1) {
-                            editor_help_zoom_in();
-                        }
-                        if (i == COMMANDS_LENGTH + 2) {
-                            editor_help_create_vertex();
-                        }
-                        if (i == COMMANDS_LENGTH + 3) {
-                            editor_help_delete_vertex();
-                        }
-                        if (i == COMMANDS_LENGTH + 4) {
-                            editor_help_delete_polygon();
-                        }
-                        if (i == COMMANDS_LENGTH + 5) {
-                            editor_help_create_food();
-                        }
-                        if (i == COMMANDS_LENGTH + 6) {
-                            editor_help_create_killer();
-                        }
-                        if (i == COMMANDS_LENGTH + 7) {
-                            editor_help_delete_object();
-                        }
-                        if (i == COMMANDS_LENGTH + 8) {
-                            editor_help_create_sprite();
-                        }
-                        if (i == COMMANDS_LENGTH + 9) {
-                            editor_help_delete_sprite();
-                        }
-                    }
+        // Menu clicks
+        int i = (click_y - EDITOR_MENU_Y) / MENU_ENTRY_HEIGHT;
+        if (click_x >= EDITOR_MENU_X || i < 0 || i >= MENU_LENGTH) {
+            // We did not click, or we clicked outside of the menu zone
+            i = -1;
+        }
+        // Menu commands
+        if (i == 0 && left_click) {
+            if (editor_dialog_exit()) {
+                erase_cursor();
+                return;
+            }
+        } else if (i == 0 && right_click) {
+            editor_help_exit();
+        } else if (i == 1 && left_click) {
+            editor_new();
+        } else if (i == 1 && right_click) {
+            editor_help_new();
+        } else if (i == 2 && left_click) {
+            editor_window_open();
+        } else if (i == 2 && right_click) {
+            editor_help_open();
+        } else if (i == 3 && left_click) {
+            editor_window_save_as();
+        } else if (i == 3 && right_click) {
+            editor_help_save_as();
+        } else if (i == 4 && left_click) {
+            editor_window_save();
+        } else if (i == 4 && right_click) {
+            editor_help_save();
+        } else if (i == 5 && left_click) {
+            editor_play(is_key_down(DIK_F1));
+            SelectedTool = Tool::Move;
+        } else if (i == 5 && right_click) {
+            editor_help_save_and_play();
+        } else if (i == 6 && left_click) {
+            check_topology(true);
+        } else if (i == 6 && right_click) {
+            editor_help_check_topology();
+        } else if (i == 7 && left_click) {
+            editor_window_level_properties();
+        } else if (i == 7 && right_click) {
+            editor_help_properties();
+        } else if (i == 8 && left_click) {
+            editor_zoom_out();
+        } else if (i == 8 && right_click) {
+            editor_help_zoom_out();
+        } else if (i == 9 && left_click) {
+            zoom_fill();
+            invalidate_editor_level();
+        } else if (i == 9 && right_click) {
+            editor_help_zoom_fill();
+        } else if (i == 10 && left_click) {
+            editor_window_view_options();
+        } else if (i == 10 && right_click) {
+            editor_help_view_options();
+        } else if (i == 11) {
+            editor_help();
+        } else {
+            // Menu tools
+            i -= COMMANDS_LENGTH;
+            if (left_click) {
+                if (i >= 0 && i < TOOLS_LENGTH) {
+                    select_tool(i);
                 }
-            } else {
-                // Canvas clicks
-                if (SelectedTool == Tool::Move && left_click) {
-                    tool_move_leftclick(click_x, click_y);
+            } else if (right_click) {
+                if (i == 0) {
+                    editor_help_move();
+                } else if (i == 1) {
+                    editor_help_zoom_in();
+                } else if (i == 2) {
+                    editor_help_create_vertex();
+                } else if (i == 3) {
+                    editor_help_delete_vertex();
+                } else if (i == 4) {
+                    editor_help_delete_polygon();
+                } else if (i == 5) {
+                    editor_help_create_food();
+                } else if (i == 6) {
+                    editor_help_create_killer();
+                } else if (i == 7) {
+                    editor_help_delete_object();
+                } else if (i == 8) {
+                    editor_help_create_sprite();
+                } else if (i == 9) {
+                    editor_help_delete_sprite();
                 }
-                if (SelectedTool == Tool::Move && right_click) {
-                    tool_move_rightclick(click_x, click_y);
-                }
-                if (SelectedTool == Tool::ZoomIn && left_click) {
-                    tool_zoom_in_leftclick(click_x, click_y);
-                }
-                if (SelectedTool == Tool::ZoomIn && right_click) {
-                    tool_zoom_in_esc();
-                }
-                if (SelectedTool == Tool::CreateVertex && left_click) {
-                    tool_create_vertex_leftclick(click_x, click_y);
-                }
-                if (SelectedTool == Tool::CreateVertex && right_click) {
-                    tool_create_vertex_esc();
-                }
-                if (SelectedTool == Tool::DeleteVertex && left_click) {
-                    tool_delete_vertex_leftclick(click_x, click_y);
-                }
-                if (SelectedTool == Tool::DeletePolygon && left_click) {
-                    tool_delete_polygon_leftclick(click_x, click_y);
-                }
-                if (SelectedTool == Tool::CreateFood && left_click) {
-                    tool_create_object_leftclick(click_x, click_y, true);
-                }
-                if (SelectedTool == Tool::CreateFood && right_click) {
-                    tool_create_food_rightclick();
-                }
-                if (SelectedTool == Tool::CreateKiller && left_click) {
-                    tool_create_object_leftclick(click_x, click_y, false);
-                }
-                if (SelectedTool == Tool::DeleteObject && left_click) {
-                    tool_delete_object_leftclick(click_x, click_y);
-                }
-                if (SelectedTool == Tool::CreateSprite && left_click) {
-                    tool_create_sprite_leftclick(click_x, click_y);
-                }
-                if (SelectedTool == Tool::CreateSprite && right_click) {
-                    tool_create_sprite_rightclick();
-                }
-                if (SelectedTool == Tool::DeleteSprite && left_click) {
-                    tool_delete_sprite_leftclick(click_x, click_y);
-                }
+            }
+        }
+
+        // Canvas clicks
+        if (click_x >= EDITOR_MENU_X) {
+            if (SelectedTool == Tool::Move && left_click) {
+                tool_move_leftclick(click_x, click_y);
+            }
+            if (SelectedTool == Tool::Move && right_click) {
+                tool_move_rightclick(click_x, click_y);
+            }
+            if (SelectedTool == Tool::ZoomIn && left_click) {
+                tool_zoom_in_leftclick(click_x, click_y);
+            }
+            if (SelectedTool == Tool::ZoomIn && right_click) {
+                tool_zoom_in_esc();
+            }
+            if (SelectedTool == Tool::CreateVertex && left_click) {
+                tool_create_vertex_leftclick(click_x, click_y);
+            }
+            if (SelectedTool == Tool::CreateVertex && right_click) {
+                tool_create_vertex_esc();
+            }
+            if (SelectedTool == Tool::DeleteVertex && left_click) {
+                tool_delete_vertex_leftclick(click_x, click_y);
+            }
+            if (SelectedTool == Tool::DeletePolygon && left_click) {
+                tool_delete_polygon_leftclick(click_x, click_y);
+            }
+            if (SelectedTool == Tool::CreateFood && left_click) {
+                tool_create_object_leftclick(click_x, click_y, true);
+            }
+            if (SelectedTool == Tool::CreateFood && right_click) {
+                tool_create_food_rightclick();
+            }
+            if (SelectedTool == Tool::CreateKiller && left_click) {
+                tool_create_object_leftclick(click_x, click_y, false);
+            }
+            if (SelectedTool == Tool::DeleteObject && left_click) {
+                tool_delete_object_leftclick(click_x, click_y);
+            }
+            if (SelectedTool == Tool::CreateSprite && left_click) {
+                tool_create_sprite_leftclick(click_x, click_y);
+            }
+            if (SelectedTool == Tool::CreateSprite && right_click) {
+                tool_create_sprite_rightclick();
+            }
+            if (SelectedTool == Tool::DeleteSprite && left_click) {
+                tool_delete_sprite_leftclick(click_x, click_y);
             }
         }
 

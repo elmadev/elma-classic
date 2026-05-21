@@ -623,6 +623,12 @@ static void editor_zoom_out() {
     invalidate_editor_level();
 }
 
+// Menu is disabled when the cursor is holding something
+static bool editor_menu_enabled() {
+    return !(SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
+             CreatingPolygon);
+}
+
 // Get the mouse position, while also disallowing the cursor to be in the
 // tooltip area. Disallow the menu area if we are holding something.
 static void get_mouse_position_editor(int* mouse_x, int* mouse_y) {
@@ -634,9 +640,7 @@ static void get_mouse_position_editor(int* mouse_x, int* mouse_y) {
         *mouse_y = EDITOR_MENU_Y;
         moved = true;
     }
-    if ((SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
-         CreatingPolygon) &&
-        *mouse_x < EDITOR_MENU_X) {
+    if (!editor_menu_enabled() && *mouse_x < EDITOR_MENU_X) {
         // If holding something, mouse is not allowed in menu section
         *mouse_x = EDITOR_MENU_X;
         moved = true;
@@ -713,8 +717,7 @@ void editor() {
         // Character shortcuts from text buffer
         while (has_text_input()) {
             char c = pop_text_input();
-            if (!(SelectedPolygon || SelectedObject || SelectedSprite || SelectingZoomInBox ||
-                  CreatingPolygon)) {
+            if (editor_menu_enabled()) {
                 if (c == 'p') {
                     editor_play(is_key_down(DIK_F1));
                 }

@@ -599,9 +599,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                 Rec2->encode_frame_count();
                 if (finish_time) {
                     return finish_time;
-                } else {
-                    return -1;
                 }
+                return -1;
             }
             time += dt;
         }

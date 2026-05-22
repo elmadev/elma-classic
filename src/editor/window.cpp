@@ -884,12 +884,14 @@ void editor_window_choose_sprite() {
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
+        }
+        if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             strcpy(Lgr->editor_picture_name, picture_name);
             strcpy(Lgr->editor_texture_name, texture_name);
             strcpy(Lgr->editor_mask_name, mask_name);
             return;
-        } else if (clicked_box(box_picture)) {
+        }
+        if (clicked_box(box_picture)) {
             editor_window_select_sprite_name(picture_name, null_name, null_name,
                                              SpriteType::Picture);
             erase_cursor();
@@ -1159,14 +1161,16 @@ void editor_window_sprite_properties(sprite* spr) {
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
+        }
+        if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (spr->distance != distance || spr->clipping != clipping) {
                 LevelChanged = true;
             }
             spr->distance = distance;
             spr->clipping = clipping;
             return;
-        } else if (clicked_box(box_distance)) {
+        }
+        if (clicked_box(box_distance)) {
             distance = prompt_distance(BufferMain, box_distance, distance);
             rerender = true;
         } else if (clicked_box(box_clipping)) {
@@ -1278,13 +1282,15 @@ void editor_window_polygon_properties(polygon* poly) {
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
+        }
+        if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (poly->is_grass != is_grass) {
                 LevelChanged = true;
             }
             poly->is_grass = is_grass;
             return;
-        } else if (clicked_box(box_grass)) {
+        }
+        if (clicked_box(box_grass)) {
             is_grass = !is_grass;
             rerender = true;
         }
@@ -1400,7 +1406,8 @@ void editor_window_food_properties(const char* title, object::Property* property
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        } else if (clicked_box(box_animation)) {
+        }
+        if (clicked_box(box_animation)) {
             erase_cursor();
             render_box(BufferMain, box_animation, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
@@ -1586,7 +1593,8 @@ void editor_window_level_properties() {
         update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
-        } else if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
+        }
+        if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
             if (strcmpi(Level->foreground_name, foreground_name) != 0 ||
                 strcmpi(Level->background_name, background_name) != 0 ||
                 strcmp(Level->level_name, level_name) != 0) {
@@ -1605,7 +1613,8 @@ void editor_window_level_properties() {
                 }
             }
             return;
-        } else if (clicked_box(box_foreground)) {
+        }
+        if (clicked_box(box_foreground)) {
             char null_name[10] = "";
             char mask_name[10] = "";
             if (Lgr->get_mask_index("maskbig") >= 0) {
@@ -1723,7 +1732,8 @@ void editor_window_view_options() {
         if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN) ||
             clicked_box(box_ok)) {
             return;
-        } else if (clicked_box(box_polygons)) {
+        }
+        if (clicked_box(box_polygons)) {
             ShowPolygons = !ShowPolygons;
             rerender = true;
         } else if (clicked_box(box_grass)) {

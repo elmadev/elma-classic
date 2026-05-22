@@ -68,6 +68,8 @@ class eol {
     void sync_battle_results_table();
     void sync_battle_queue_table();
 
+    void set_battle_results_title(const char* label);
+
     const std::vector<kuski>& all_kuskis() const { return kuskis_; }
     std::string_view lookup_nick(unsigned int kuski_id) const;
 

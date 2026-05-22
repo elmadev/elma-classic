@@ -38,13 +38,17 @@ std::string eol::format_level(std::string_view level) {
     return with_ext;
 }
 
+void eol::set_battle_results_title(const char* label) {
+    battle_results_table.set_title(
+        std::format("Battle {} in {}", label, format_level(current_battle->level_filename)));
+}
+
 void eol::process(const battle_started& bs) {
     current_battle = bs.bat;
     current_battle->level_exists = std::filesystem::exists(
         std::format("lev/{}.lev", (const char*)current_battle->level_filename));
     battle_leaderboard_.clear();
-    battle_results_table.set_title(
-        std::format("Battle standings in {}", format_level(current_battle->level_filename)));
+    set_battle_results_title("standings");
     sync_battle_results_table();
 
     if (current_battle->in_countdown) {
@@ -66,8 +70,7 @@ void eol::process(const battle_countdown_ended&) {
 }
 
 void eol::process(const battle_ended& be) {
-    battle_results_table.set_title(
-        std::format("Battle results in {}", format_level(current_battle->level_filename)));
+    set_battle_results_title("results");
     current_battle.reset();
     StatusMessages->add(be.aborted ? "battle aborted" : "battle over");
 }

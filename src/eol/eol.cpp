@@ -206,6 +206,23 @@ void eol::process(const spy_data& sd) {
     }
 }
 
+void eol::process(const spy_apple_data& sd) {
+    kuski* k = get_kuski(kuskis_, sd.kuski_id);
+    if (!k) {
+        return;
+    }
+
+    if (sd.reset) {
+        k->clear_apple_data();
+    }
+
+    for (int i = 0; i < MAX_OBJECTS; ++i) {
+        if (sd.apples_taken[i]) {
+            k->apples_taken[i] = true;
+        }
+    }
+}
+
 void eol::process(const clear_spy_data& sd) {
     kuski* k = get_kuski(kuskis_, sd.kuski_id);
     if (k) {
@@ -274,6 +291,7 @@ void eol::exit_level(const char* level_name, double time, int apple_count, int l
                      bool dead) {
     for (kuski& k : kuskis_) {
         k.clear_spy_data();
+        k.clear_apple_data();
     }
 
     spy_kuski_id.reset();
@@ -382,6 +400,12 @@ static void set_spy_kuski(std::optional<unsigned int>& spy_kuski_id, Range&& ran
 void eol::spy_next_kuski() { set_spy_kuski(spy_kuski_id, kuskis()); }
 
 void eol::spy_prev_kuski() { set_spy_kuski(spy_kuski_id, std::views::reverse(kuskis())); }
+
+void kuski::clear_apple_data() {
+    for (bool& taken : apples_taken) {
+        taken = false;
+    }
+}
 
 const struct spy_data* kuski::spy_data() const { return data ? &*data : nullptr; }
 

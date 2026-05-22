@@ -2,6 +2,7 @@
 #define EOL_TYPES_H
 
 #include "LEJATSZO.H"
+#include "level.h"
 #include "fs_utils.h"
 #include "physics_init.h"
 #include <cstdint>
@@ -23,6 +24,8 @@ struct kuski {
     bool is_player = true;
     bool is_online = true;
     pic8* shirt;
+    bool apples_taken[MAX_OBJECTS];
+    void clear_apple_data();
     const struct spy_data* spy_data() const;
     void add_spy_data(const struct spy_data& sd);
     void clear_spy_data();

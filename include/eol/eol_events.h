@@ -3,13 +3,10 @@
 
 #include "eol/eol_types.h"
 #include "fs_utils.h"
-
 #include <cstdint>
 #include <span>
 #include <string_view>
 #include <vector>
-
-class level;
 
 constexpr int MAX_MESSAGE_LEN = 65;
 
@@ -68,6 +65,12 @@ struct exit_level {
     int apple_count;
     int level_apple_count;
     bool dead;
+};
+
+struct spy_apple_data {
+    unsigned int kuski_id;
+    bool reset;
+    bool apples_taken[MAX_OBJECTS];
 };
 
 struct clear_spy_data {

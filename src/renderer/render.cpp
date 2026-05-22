@@ -293,6 +293,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
     int corner_x;
     int corner_y;
     CanvasMinimap->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
+    const kuski* spy_kuski = EolClient->spy_kuski();
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Level->objects[i];
         if (!obj) {
@@ -302,7 +303,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         unsigned char palette_id;
         switch (obj->type) {
         case object::Type::Food:
-            if (!obj->active) {
+            if (!obj->active || (spy_kuski && spy_kuski->apples_taken[i])) {
                 continue;
             }
             palette_id = Lgr->minimap_food_palette_id;
@@ -651,7 +652,8 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike
         if (obj->type == object::Type::Start) {
             continue;
         }
-        if (obj->type == object::Type::Food && !obj->active) {
+        if (obj->type == object::Type::Food &&
+            (!obj->active || (spy_kuski && spy_kuski->apples_taken[i]))) {
             continue;
         }
         if (obj->type == object::Type::Exit && !Single && FlagTag) {

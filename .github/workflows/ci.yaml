@@ -32,7 +32,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: python -m pip install meson==1.10.0 ninja
@@ -57,7 +57,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: python -m pip install meson==1.10.0 ninja
@@ -75,15 +75,15 @@ jobs:
 
           echo "No clang-tidy issues found."
           exit 0
-          fi
+
       - name: Show summary
         if: always()
         run: |
           echo "=== Clang-tidy Summary ==="
-          grep -E "warning:|error:" clang-tidy-output.txt 2>/dev/null
+          grep -E "warning:|error:" clang-tidy-output.txt 2>/dev/null || true
           echo ""
-          echo "Total warnings: $(grep -c "warning:" clang-tidy-output.txt || echo 0)"
-          echo "Total errors: $(grep -c "error:" clang-tidy-output.txt || echo 0)"
+          echo "Total warnings: $(grep -c "warning:" clang-tidy-output.txt || true)"
+          echo "Total errors: $(grep -c "error:" clang-tidy-output.txt || true)"
           echo ""
           echo "Full output available in artifacts"
 
@@ -126,7 +126,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: python -m pip install meson==1.10.0 ninja

@@ -495,7 +495,7 @@ bool editor_window_save_as() {
             }
         }
         if (was_key_down(DIK_DELETE)) {
-            if (!((filename_input[0] == 0) || (i >= (int)strlen(filename_input)))) {
+            if (filename_input[0] != 0 && i < (int)strlen(filename_input)) {
                 int filename_input_length = strlen(filename_input);
                 for (int j = i; j < filename_input_length; j++) {
                     filename_input[j] = filename_input[j + 1];

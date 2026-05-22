@@ -1,17 +1,19 @@
 #ifndef WAV_H
 #define WAV_H
 
+#include <vector>
+
 // 11,025 Hz 16-bit mono audio
 class wav {
-    void allocate();
-
   public:
-    short* samples;
-    unsigned size;
+    std::vector<short> samples;
 
     // Open a wav file. The volume will be scaled based on max_volume (0.0-1.0)
     // You can skip part of the audio file by setting start and end.
     wav(const char* filename, double max_volume, int start = 0, int end = -1);
+
+    // Get the sample length
+    size_t size() const { return samples.size(); }
 
     // Loop an audio file.
     // Cut out the last n samples from the file and fade them into the first n samples.
@@ -26,12 +28,17 @@ class wav {
 
 // Contains 16-bit looping audio played back at variable speed (used for throttle engine sound)
 class wav2 {
-    short *samples, *deltas;
-    double size, playback_index;
+    std::vector<short> samples;
+    std::vector<short> deltas;
+    double playback_index;
 
   public:
     // Create a wav2 by copying the data from a wav
     wav2(wav* source);
+
+    // Get the sample length
+    size_t size() const { return samples.size(); }
+
     // Select the playback index
     void reset(double index = 0.0);
     // Advance time by "dt" samples and return the audio sample at this point in time

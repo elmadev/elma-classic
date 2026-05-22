@@ -217,9 +217,9 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
         switch (mot->motor_state) {
         case MotorState::Ignition:
             // Bike turn on sound at start of level
-            if (mot->playback_index_ignition + buffer_length > SoundMotorIgnition->size) {
+            if (mot->playback_index_ignition + buffer_length > SoundMotorIgnition->size()) {
                 // We're finished with the ignition sound. Transition to idle sound
-                source_length = SoundMotorIgnition->size - mot->playback_index_ignition;
+                source_length = SoundMotorIgnition->size() - mot->playback_index_ignition;
                 mix_into_buffer(&buffer[copied_counter],
                                 &SoundMotorIgnition->samples[mot->playback_index_ignition],
                                 source_length);
@@ -245,9 +245,9 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
             } else {
                 // Otherwise, infinitely loop the idle sound
                 source_length = buffer_length - copied_counter;
-                if (source_length > SoundMotorIdle->size - mot->playback_index_idle) {
+                if (source_length > SoundMotorIdle->size() - mot->playback_index_idle) {
                     // Copy until the end of the sound effect, then loop
-                    source_length = SoundMotorIdle->size - mot->playback_index_idle;
+                    source_length = SoundMotorIdle->size() - mot->playback_index_idle;
                     mix_into_buffer(&buffer[copied_counter],
                                     &SoundMotorIdle->samples[mot->playback_index_idle],
                                     source_length);
@@ -275,7 +275,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
             // Fade the first WAV_FADE_LENGTH samples
             fade_counter = 0;
             for (int i = mot->playback_index_gas_start; i < source_index_end; i++) {
-                if (mot->playback_index_idle >= SoundMotorIdle->size) {
+                if (mot->playback_index_idle >= SoundMotorIdle->size()) {
                     mot->playback_index_idle = 0;
                 }
                 double fade_percentage = i / (double)(WAV_FADE_LENGTH);
@@ -295,9 +295,9 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
         case MotorState::GasStart:
             // start-of-gas sound effect (sound frequency does not yet depend on speed)
             source_length = buffer_length - copied_counter;
-            if (source_length > SoundMotorGasStart->size - mot->playback_index_gas_start) {
+            if (source_length > SoundMotorGasStart->size() - mot->playback_index_gas_start) {
                 // We're finished with the start-of-gas sound. Transition to full gas sound
-                source_length = SoundMotorGasStart->size - mot->playback_index_gas_start;
+                source_length = SoundMotorGasStart->size() - mot->playback_index_gas_start;
                 mix_into_buffer(&buffer[copied_counter],
                                 &SoundMotorGasStart->samples[mot->playback_index_gas_start],
                                 source_length);
@@ -380,7 +380,7 @@ static void mix_friction(short* buffer, int buffer_length) {
     double volume = FrictionVolumePrev;
     double volume_next = FrictionVolumeNext;
     double delta_volume = (volume_next - volume) / buffer_length;
-    int sample_length = SoundFriction->size;
+    int sample_length = SoundFriction->size();
     for (int i = 0; i < buffer_length; i++) {
         short sample = SoundFriction->samples[SoundFrictionIndex];
         SoundFrictionIndex++;
@@ -417,8 +417,8 @@ void sound_mixer(short* buffer, int buffer_length) {
     for (int i = 0; i < MAX_WAV_EVENTS; i++) {
         if (WavEventActive[i]) {
             int length = buffer_length;
-            if (length > WavEventSound[i]->size - WavEventPlaybackIndex[i]) {
-                length = WavEventSound[i]->size - WavEventPlaybackIndex[i];
+            if (length > WavEventSound[i]->size() - WavEventPlaybackIndex[i]) {
+                length = WavEventSound[i]->size() - WavEventPlaybackIndex[i];
                 WavEventActive[i] = 0;
                 ActiveWavEvents--;
                 if (ActiveWavEvents < 0) {

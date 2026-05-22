@@ -5,16 +5,6 @@
 #include <algorithm>
 #include <cstring>
 
-void wav::allocate() {
-    if (size > 1000000) {
-        internal_error("wav::alloc size > 1000000!");
-    }
-    samples = new signed short[size];
-    if (!samples) {
-        external_error("wav::alloc out of memory!");
-    }
-}
-
 static void assert_filename_is_wav(const char* filename) {
     for (int i = strlen(filename) - 1; i > 0; i--) {
         if (filename[i] == '.') {
@@ -53,7 +43,6 @@ struct wav_header {
 static_assert(sizeof(wav_header) == 44);
 
 wav::wav(const char* filename, double max_volume, int start, int end) {
-    samples = nullptr;
     assert_filename_is_wav(filename);
     FILE* h = qopen(filename, "rb");
     if (!h) {
@@ -92,11 +81,14 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
     if (end > source_size) {
         internal_error("wav::wav end is out of range!");
     }
-    size = end - start;
 
-    allocate();
+    int size = end - start;
+    if (size > 1000000) {
+        internal_error("wav::alloc size > 1000000!");
+    }
+    samples.resize(size);
     qseek(h, start * 2, SEEK_CUR);
-    if (fread(samples, 1, size * 2, h) != size * 2) {
+    if (fread(samples.data(), 1, size * sizeof(short), h) != size * sizeof(short)) {
         internal_error(std::string("Failed to read wav file: ") + filename);
     }
 
@@ -119,51 +111,48 @@ wav::wav(const char* filename, double max_volume, int start, int end) {
 }
 
 void wav::loop(int fade_length) {
-    if (fade_length >= size) {
+    if (fade_length >= size()) {
         internal_error("fade_length >= size!");
     }
     for (int i = 0; i < fade_length; i++) {
         double fade = ((double)i) / fade_length;
-        samples[i] = (short)(fade * samples[i] + (1 - fade) * samples[size - fade_length + i]);
+        samples[i] = (short)(fade * samples[i] + (1 - fade) * samples[size() - fade_length + i]);
     }
-    size -= fade_length;
+    samples.resize(size() - fade_length);
 }
 
 void wav::fade(wav* next, int fade_length) {
-    if (fade_length >= size) {
+    if (fade_length >= size()) {
         internal_error("fade_length >= size!");
     }
-    if (fade_length >= next->size) {
+    if (fade_length >= next->size()) {
         internal_error("fade_length >= next->size!");
     }
     for (int i = 0; i < fade_length; i++) {
         double fade = ((double)i) / fade_length;
-        samples[size - fade_length + i] =
+        samples[size() - fade_length + i] =
             (short)((1 - fade) * samples[i] + fade * next->samples[i]);
     }
 }
 
 void wav::volume(double scale) {
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size(); i++) {
         samples[i] = (short)(samples[i] * scale);
     }
 }
 
 wav2::wav2(wav* source) {
-    deltas = nullptr;
-    samples = source->samples;
-    if (source->size > 64000) {
+    if (source->size() > 64000) {
         internal_error("wav2 size > 64000!");
     }
-    deltas = new short[source->size];
-    if (!deltas) {
-        external_error("memory");
-    }
-    for (int i = 0; i < source->size - 1; i++) {
+    samples.resize(source->size());
+    deltas.resize(source->size());
+
+    memcpy(samples.data(), source->samples.data(), size() * sizeof(short));
+    for (int i = 0; i < size() - 1; i++) {
         deltas[i] = samples[i + 1] - samples[i];
     }
-    deltas[source->size - 1] = samples[0] - samples[source->size - 1];
-    size = source->size;
+    deltas[size() - 1] = samples[0] - samples[size() - 1];
     playback_index = 0.0;
 }
 
@@ -178,8 +167,8 @@ void wav2::reset(double index) {
 
 short wav2::get_next_sample(double dt) {
     playback_index += dt;
-    if (playback_index >= size) {
-        playback_index -= size;
+    if (playback_index >= size()) {
+        playback_index -= size();
     }
     int whole = (int)(playback_index);
     double fraction = playback_index - whole;

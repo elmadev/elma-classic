@@ -40,7 +40,7 @@ class eol {
 
     void download_level(std::string_view name);
     void download_battle_level();
-    void enter_level(const char* level_name, const level* lev);
+    void enter_level(const char* level_name, const level* lev, bool spying);
     void exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
                     bool dead);
     void send_chat(std::string_view message);

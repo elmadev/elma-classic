@@ -265,12 +265,12 @@ void eol::download_battle_level() {
     current_battle->download_requested = true;
 }
 
-void eol::enter_level(const char* level_name, const level* lev) {
+void eol::enter_level(const char* level_name, const level* lev, bool spying) {
     for (kuski& k : kuskis_) {
         k.clear_spy_data();
     }
 
-    struct enter_level el{.lev = lev, .name = level_name};
+    struct enter_level el{.lev = lev, .name = level_name, .spying = spying};
     proto.send(el);
 }
 

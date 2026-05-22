@@ -460,7 +460,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     reset_event_buffer();
 
     if (Single) {
-        EolClient->enter_level(filename, Level);
+        EolClient->enter_level(filename, Level, camera_mode == CameraMode::MapViewer);
     }
 
     stopwatch_reset();

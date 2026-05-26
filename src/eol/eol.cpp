@@ -266,16 +266,16 @@ void eol::download_battle_level() {
 }
 
 void eol::enter_level(const char* level_name, const level* lev, bool spying) {
-    for (kuski& k : kuskis_) {
-        k.clear_spy_data();
-    }
-
     struct enter_level el{.lev = lev, .name = level_name, .spying = spying};
     proto.send(el);
 }
 
 void eol::exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
                      bool dead) {
+    for (kuski& k : kuskis_) {
+        k.clear_spy_data();
+    }
+
     spy_kuski_id.reset();
     struct exit_level fl{.name = level_name,
                          .time = time,

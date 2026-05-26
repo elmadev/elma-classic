@@ -68,16 +68,8 @@ jobs:
       - name: Run clang-tidy
         run: |
           ninja -C build clang-tidy > clang-tidy-output.txt 2>&1 || true
-          if grep -qE "error:" clang-tidy-output.txt; then
-            echo "Clang-tidy found issues."
-            exit 1
-          fi
-
-          echo "No clang-tidy issues found."
-          exit 0
 
       - name: Show summary
-        if: always()
         run: |
           echo "=== Clang-tidy Summary ==="
           grep -E "warning:|error:" clang-tidy-output.txt 2>/dev/null || true
@@ -86,6 +78,12 @@ jobs:
           echo "Total errors: $(grep -c "error:" clang-tidy-output.txt || true)"
           echo ""
           echo "Full output available in artifacts"
+
+          if grep -qE "warning:|error:" clang-tidy-output.txt; then
+            echo ""
+            echo "Clang-tidy found issues."
+            exit 1
+          fi
 
       - name: Upload clang-tidy results
         if: always()

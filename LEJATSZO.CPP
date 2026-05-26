@@ -329,11 +329,11 @@ static void update_graphical_metadata(motorst& mot, bike_metadata& metadata, rec
     update_bike_turn_phase(&metadata.bike_turning, rec, time, mot.flipped_bike);
 
     // Update camera position
-    mot.flipped_camera = mot.flipped_bike;
+    int flipped_camera = mot.flipped_bike;
     if (mot.gravity_direction == MotorGravity::Up) {
-        mot.flipped_camera = !mot.flipped_camera;
+        flipped_camera = !flipped_camera;
     }
-    update_camera_turn_phase(&metadata.camera_turning, time, mot.flipped_camera);
+    update_camera_turn_phase(&metadata.camera_turning, time, flipped_camera);
 
     // Update arm position
     metadata.arm_position = std::max(0.0, 1.0 - (time - metadata.volt_time) / VoltDelay);

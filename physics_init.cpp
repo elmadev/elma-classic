@@ -43,7 +43,6 @@ double MetersToMinimapPixels;
 
 void init_motor(motorst* motor) {
     motor->flipped_bike = 0;
-    motor->flipped_camera = 0;
     motor->gravity_direction = MotorGravity::Down;
     motor->prev_brake = false;
 

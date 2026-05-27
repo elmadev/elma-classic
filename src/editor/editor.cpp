@@ -781,7 +781,7 @@ void editor() {
             editor_window_level_properties();
         } else if (i == 7 && right_click) {
             editor_help_properties();
-        } else if (i == 8 && left_click || editor_shortcut(DIK_Z)) {
+        } else if ((i == 8 && left_click) || editor_shortcut(DIK_Z)) {
             editor_zoom_out();
         } else if (i == 8 && right_click) {
             editor_help_zoom_out();

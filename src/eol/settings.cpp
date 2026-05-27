@@ -282,6 +282,8 @@ void eol_settings::set_hostname(std::string hostname) { hostname_ = std::move(ho
 
 void eol_settings::set_tcp_port(int p) { tcp_port_ = p; }
 
+void eol_settings::set_udp_port(int p) { udp_port_ = p; }
+
 void eol_settings::set_nick(std::string nick) { nick_ = std::move(nick); }
 
 void eol_settings::set_password(std::string password) { password_ = std::move(password); }
@@ -537,6 +539,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(show_one_wheel_status)                                                              \
     JSON_FIELD(hostname)                                                                           \
     JSON_FIELD(tcp_port)                                                                           \
+    JSON_FIELD(udp_port)                                                                           \
     JSON_FIELD(nick)                                                                               \
     JSON_FIELD(password)                                                                           \
     JSON_FIELD(play_offline)                                                                       \

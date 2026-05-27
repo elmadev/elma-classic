@@ -74,8 +74,10 @@ template <typename T> struct Clamp {
 
 #ifndef DEBUG
 constexpr int DEFAULT_TCP_PORT = 4460;
+constexpr int DEFAULT_UDP_PORT = 4461;
 #else
 constexpr int DEFAULT_TCP_PORT = 4470;
+constexpr int DEFAULT_UDP_PORT = 4471;
 #endif
 
 class eol_settings {
@@ -170,6 +172,7 @@ class eol_settings {
     Default<bool> show_one_wheel_status_{false};
     Default<std::string> hostname_{"eol.elma.online"};
     Default<int> tcp_port_{DEFAULT_TCP_PORT};
+    Default<int> udp_port_{DEFAULT_UDP_PORT};
     Default<std::string> nick_{""};
     Default<std::string> password_{""};
     Default<bool> play_offline_{false};
@@ -277,6 +280,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(show_one_wheel_status);
     DECLARE_FIELD_FUNCS(hostname);
     DECLARE_FIELD_FUNCS(tcp_port);
+    DECLARE_FIELD_FUNCS(udp_port);
     DECLARE_FIELD_FUNCS(nick);
     DECLARE_FIELD_FUNCS(password);
     DECLARE_FIELD_FUNCS(play_offline);

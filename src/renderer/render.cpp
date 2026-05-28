@@ -594,11 +594,11 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
             std::swap(left_wheel_r, right_wheel_r);
         }
         if (!left_wheel_in_back) {
-            render_rigidbody(left_wheel_r, mot->left_wheel.radius, mot->left_wheel.rotation, pic,
+            render_rigidbody(left_wheel_r, WHEEL_RENDER_RADIUS, mot->left_wheel.rotation, pic,
                              bike->wheel, false);
         }
         if (!right_wheel_in_back) {
-            render_rigidbody(right_wheel_r, mot->right_wheel.radius, mot->right_wheel.rotation, pic,
+            render_rigidbody(right_wheel_r, WHEEL_RENDER_RADIUS, mot->right_wheel.rotation, pic,
                              bike->wheel, false);
         }
     }

@@ -41,7 +41,7 @@ std::string eol::format_level(std::string_view level) {
 
 void eol::set_battle_results_title(const char* label) {
     std::string new_title;
-    if (current_battle->type == BattleType::AppleCollect) {
+    if (current_battle->type == BattleType::Apple) {
         uint32_t apple_count = current_battle->level_apple_count;
         new_title = std::format("Apple battle {} in {} ({} apple{})", label,
                                 format_level(current_battle->level_filename), apple_count,
@@ -176,7 +176,7 @@ static std::string_view battle_type_prefix(BattleType t) {
         return "1 hour TT ";
     case FlagTag:
         return "flag tag ";
-    case AppleCollect:
+    case Apple:
         return "apple ";
     case Speed:
         return "speed ";

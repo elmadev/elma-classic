@@ -46,7 +46,7 @@ enum class BattleType : uint8_t {
     FinishCount,
     HourTT,
     FlagTag,
-    AppleCollect,
+    Apple,
     Speed,
 };
 

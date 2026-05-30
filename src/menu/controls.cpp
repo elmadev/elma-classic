@@ -1,6 +1,6 @@
 #include "menu/controls.h"
 #include <directinput/scancodes.h>
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "keys.h"
 #include "main.h"
 #include "menu/nav.h"

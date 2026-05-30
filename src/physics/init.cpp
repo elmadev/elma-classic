@@ -1,4 +1,4 @@
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "physics/init.h"
 
 static motorst Motorst1;

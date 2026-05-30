@@ -1,5 +1,5 @@
 #include "menu/options.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "fs_utils.h"
 #include "level_load.h"
 #include "M_PIC.H"

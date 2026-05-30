@@ -1,6 +1,6 @@
 #include "editor/canvas.h"
 #include "eol/eol.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "log.h"
 #include "M_PIC.H"
 #include "main.h"

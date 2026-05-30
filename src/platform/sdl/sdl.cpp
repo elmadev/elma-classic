@@ -1,6 +1,6 @@
 #include "platform/implementation.h"
 #include "editor/dialog.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "eol/eol.h"
 #include "editor/editor.h"
 #include "sound/engine.h"

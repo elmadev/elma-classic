@@ -2,7 +2,7 @@
 #include "menu/best_times.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "fs_utils.h"
 #include "LEJATSZO.H"
 #include "level.h"

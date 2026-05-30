@@ -2,7 +2,7 @@
 #include "abc8.h"
 #include "menu/ball_collision.h"
 #include "editor/editor.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "renderer/render.h"
 #include "M_PIC.H"
 #include "main.h"

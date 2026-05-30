@@ -1,6 +1,6 @@
 #include "menu/nav.h"
 #include "abc8.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "fs_utils.h"
 #include "keys.h"
 #include "main.h"

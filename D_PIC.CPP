@@ -1,7 +1,7 @@
 #include "M_PIC.H"
 #include "menu/ball.h"
 #include "editor/editor.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "editor/canvas.h"
 #include "lgr.h"
 #include "main.h"

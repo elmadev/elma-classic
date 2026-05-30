@@ -4,7 +4,7 @@
 #include "eol/eol_events.h"
 #include "eol/eol_table.h"
 #include "eol/protocol.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include <optional>
 #include <ranges>
 #include <string_view>

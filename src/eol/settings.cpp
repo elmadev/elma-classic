@@ -1,4 +1,4 @@
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "level_load.h"
 #include "lgr.h"
 #include "main.h"

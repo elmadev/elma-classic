@@ -7,7 +7,7 @@
 #include "eol/console.h"
 #include "eol/eol.h"
 #include "eol/status_messages.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "flagtag.h"
 #include "LEJATSZO.H"
 #include "level.h"

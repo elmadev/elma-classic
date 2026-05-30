@@ -1,6 +1,6 @@
 #include "renderer/object_overlay.h"
 #include "anim.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "main.h"
 #include "pic8.h"
 

@@ -1,5 +1,5 @@
 #include "state.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "level.h"
 #include "main.h"
 #include "menu/dialog.h"

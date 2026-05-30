@@ -2,7 +2,7 @@
 #include "abc8.h"
 #include "eol/eol.h"
 #include "eol/status_messages.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "keys.h"
 #include "log.h"
 #include "platform/implementation.h"

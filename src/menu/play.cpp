@@ -19,7 +19,7 @@
 #include "util/util.h"
 #include "menu/skip.h"
 #include "renderer/timer.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "fs_utils.h"
 #include "directinput/scancodes.h"
 #include <algorithm>

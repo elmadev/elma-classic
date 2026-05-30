@@ -1,7 +1,7 @@
 #include "eol/eol.h"
 #include "eol/status_messages.h"
 #include "eol/console.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "level.h"
 #include "log.h"
 #include "menu/external.h"

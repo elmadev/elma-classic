@@ -3,7 +3,7 @@
 #include "editor/editor.h"
 #include "anim.h"
 #include "renderer/canvas.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "fs_utils.h"
 #include "grass.h"
 #include "renderer/render.h"

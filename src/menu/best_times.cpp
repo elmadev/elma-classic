@@ -1,6 +1,6 @@
 #include "abc8.h"
 #include "menu/best_times.h"
-#include "eol_settings.h"
+#include "eol/settings.h"
 #include "level.h"
 #include "menu/nav.h"
 #include "menu/pic.h"

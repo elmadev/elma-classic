@@ -1,7 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "physics_init.h"
+#include "physics/init.h"
 #include "vect2.h"
 #include <cstdio>
 #include <optional>

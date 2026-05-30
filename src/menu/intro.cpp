@@ -9,7 +9,7 @@
 #include "menu/main.h"
 #include "menu/pic.h"
 #include "menu/player.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include "pic8.h"
 #include "platform/implementation.h"
 #include "menu/rec_list.h"

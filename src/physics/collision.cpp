@@ -1,10 +1,10 @@
-#include "physics_collision.h"
+#include "physics/collision.h"
 #include "editor/editor.h"
 #include "LEJATSZO.H"
 #include "level.h"
 #include "main.h"
 #include "object.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include "segments.h"
 #include "vect2.h"
 

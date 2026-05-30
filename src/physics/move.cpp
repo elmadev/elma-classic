@@ -1,6 +1,6 @@
-#include "physics_move.h"
-#include "physics_collision.h"
-#include "physics_init.h"
+#include "physics/move.h"
+#include "physics/collision.h"
+#include "physics/init.h"
 #include "recorder.h"
 #include "sound_engine.h"
 #include <algorithm>

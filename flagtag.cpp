@@ -1,5 +1,5 @@
 #include "flagtag.h"
-#include "physics_init.h"
+#include "physics/init.h"
 
 constexpr double WHEEL_DIST_SQUARED = 0.64;
 constexpr double IMMUNITY_DIST_SQUARED = 1.44;

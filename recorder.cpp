@@ -5,7 +5,6 @@
 #include "main.h"
 #include "menu/rec_list.h"
 #include "object.h"
-#include "physics_init.h"
 #include "qopen.h"
 #include "util/util.h"
 #include <algorithm>

@@ -3,7 +3,7 @@
 #include "fs_utils.h"
 #include "lgr.h"
 #include "main.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include <cstring>
 
 const char* clipping_to_string(Clipping clipping) {

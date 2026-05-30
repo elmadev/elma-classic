@@ -13,7 +13,7 @@
 #include "menu/nav.h"
 #include "menu/pic.h"
 #include "platform/implementation.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include "menu/replay.h"
 #include "recorder.h"
 #include "util/util.h"

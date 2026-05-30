@@ -10,7 +10,7 @@
 #include "level_load.h"
 #include "main.h"
 #include "object.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include "platform/utils.h"
 #include "sprite.h"
 #include "util/util.h"

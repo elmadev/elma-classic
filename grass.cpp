@@ -1,7 +1,7 @@
 #include "grass.h"
 #include "main.h"
 #include "polygon.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include "pic8.h"
 #include <algorithm>
 #include <cmath>

@@ -10,7 +10,7 @@
 #include "M_PIC.H"
 #include "menu/pic.h"
 #include "object.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include "pic8.h"
 #include "segments.h"
 #include "debug/profiler.h"

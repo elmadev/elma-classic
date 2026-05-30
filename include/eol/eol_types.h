@@ -3,7 +3,7 @@
 
 #include "LEJATSZO.H"
 #include "fs_utils.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include <cstdint>
 #include <optional>
 

@@ -2,7 +2,7 @@
 #define RECORDER_H
 
 #include "sound_engine.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include "vect2.h"
 #include <cstdio>
 #include <optional>

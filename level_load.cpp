@@ -7,7 +7,7 @@
 #include "lgr.h"
 #include "main.h"
 #include "menu/pic.h"
-#include "physics_init.h"
+#include "physics/init.h"
 #include "platform/utils.h"
 #include "segments.h"
 #include "debug/profiler.h"

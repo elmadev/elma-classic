@@ -3,7 +3,7 @@
 #include "eol_settings.h"
 #include "eol/eol.h"
 #include "editor/editor.h"
-#include "sound_engine.h"
+#include "sound/engine.h"
 #include "keys.h"
 #include "platform/sdl/keyboard.h"
 #include "platform/sdl/gl_renderer.h"

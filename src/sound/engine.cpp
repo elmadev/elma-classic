@@ -1,7 +1,7 @@
-#include "sound_engine.h"
+#include "sound/engine.h"
 #include "main.h"
 #include "state.h"
-#include "wav.h"
+#include "sound/wav.h"
 #include <algorithm>
 #include <cstring>
 

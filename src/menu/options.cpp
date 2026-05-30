@@ -418,6 +418,7 @@ void menu_options() {
         BOOL_OPTION("Demo menu:", show_demo_menu);
         BOOL_OPTION("Help menu:", show_help_menu);
         BOOL_OPTION("Best Times menu:", show_best_times_menu);
+        BOOL_OPTION("Skip Intro:", skip_intro);
 
         nav.add_row(
             "Num Chat Lines:", std::format("{}", EolSettings->chat_lines_persisted()), NAV_FUNC() {

@@ -46,13 +46,17 @@ void menu_intro() {
     // test_player();
 
     // Load intro.pcx and hide the version
-    Intro = new pic8("intro.pcx");
-    Intro->fill_box(0, 410, Intro->get_width(), 450, Intro->gpixel(0, 409));
-    Intro->add_transparency();
+    if (!EolSettings->skip_intro()) {
+        Intro = new pic8("intro.pcx");
+        Intro->fill_box(0, 410, Intro->get_width(), 450, Intro->gpixel(0, 409));
+        Intro->add_transparency();
+    }
 
     // Display intro.pcx
     MenuPalette->set();
-    show_intro_screen();
+    if (!EolSettings->skip_intro()) {
+        show_intro_screen();
+    }
 
     init_sound();
 
@@ -73,12 +77,14 @@ void menu_intro() {
     stopwatch_reset();
 
     // Await for key input before scrolling intro.pcx
-    while (true) {
-        handle_events();
-        if (get_any_key_just_pressed()) {
-            break;
+    if (!EolSettings->skip_intro()) {
+        while (true) {
+            handle_events();
+            if (get_any_key_just_pressed()) {
+                break;
+            }
+            show_intro_screen();
         }
-        show_intro_screen();
     }
 
     if (State->player_count == 0) {
@@ -86,8 +92,10 @@ void menu_intro() {
             menu_exit();
         }
     } else {
-        if (!menu_player_choose(true, false)) {
-            menu_exit();
+        if (!EolSettings->skip_intro()) {
+            if (!menu_player_choose(true, false)) {
+                menu_exit();
+            }
         }
     }
 

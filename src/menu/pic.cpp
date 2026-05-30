@@ -196,7 +196,6 @@ static void render_ball(vect2 r, double radius, pic8* source_pic) {
 
 static double BallsPrevTime = 0.0;
 static double BallsStartTime = 0.0;
-static bool IntroAnimation = true;
 
 static int anchored_x_position(int x, ScreenAnchor anchor) {
     switch (anchor) {
@@ -217,13 +216,8 @@ void menu_pic::render(bool skip_balls_helmet) {
         image_valid = false;
     }
 
-    // Skip the intro if we are missing intro.pcx (should not occur)
-    if (IntroAnimation && !Intro) {
-        IntroAnimation = false;
-    }
-
     // Regenerate the image cache if the menu has changed
-    if (!image_valid && !IntroAnimation) {
+    if (!image_valid && !Intro) {
         image_valid = true;
 
         // Tile the background vertically
@@ -257,9 +251,8 @@ void menu_pic::render(bool skip_balls_helmet) {
     }
 
     double time = stopwatch();
-    if (IntroAnimation) {
+    if (Intro) {
         MenuPalette->set();
-        IntroAnimation = false;
         while (true) {
             handle_events();
             if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {

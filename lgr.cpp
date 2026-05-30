@@ -2,7 +2,7 @@
 #include "editor/dialog.h"
 #include "editor/editor.h"
 #include "anim.h"
-#include "canvas.h"
+#include "renderer/canvas.h"
 #include "eol_settings.h"
 #include "fs_utils.h"
 #include "grass.h"

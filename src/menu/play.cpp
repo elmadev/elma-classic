@@ -18,7 +18,7 @@
 #include "recorder.h"
 #include "util/util.h"
 #include "menu/skip.h"
-#include "timer.h"
+#include "renderer/timer.h"
 #include "eol_settings.h"
 #include "fs_utils.h"
 #include "directinput/scancodes.h"

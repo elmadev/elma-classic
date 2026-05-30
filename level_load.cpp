@@ -1,5 +1,5 @@
 #include "level_load.h"
-#include "canvas.h"
+#include "renderer/canvas.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
 #include "fs_utils.h"

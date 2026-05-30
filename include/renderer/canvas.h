@@ -1,5 +1,5 @@
-#ifndef CANVAS_H
-#define CANVAS_H
+#ifndef RENDERER_CANVAS_H
+#define RENDERER_CANVAS_H
 
 #include "grass.h"
 #include "lgr.h"

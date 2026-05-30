@@ -1,5 +1,5 @@
-#ifndef AFFINE_PIC_RENDER_H
-#define AFFINE_PIC_RENDER_H
+#ifndef AFFINE_H
+#define AFFINE_H
 
 class pic8;
 class vect2;

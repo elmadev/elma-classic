@@ -1,8 +1,8 @@
 #include "renderer/render.h"
 #include "abc8.h"
 #include "anim.h"
-#include "affine_pic_render.h"
-#include "canvas.h"
+#include "renderer/affine.h"
+#include "renderer/canvas.h"
 #include "editor/editor.h"
 #include "eol/console.h"
 #include "eol/eol.h"
@@ -19,7 +19,7 @@
 #include "platform/implementation.h"
 #include "physics/init.h"
 #include "renderer/object_overlay.h"
-#include "timer.h"
+#include "renderer/timer.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cmath>

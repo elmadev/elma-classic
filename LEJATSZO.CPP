@@ -16,7 +16,7 @@
 #include "platform/implementation.h"
 #include "platform/sdl/keyboard.h"
 #include "segments.h"
-#include "timer.h"
+#include "renderer/timer.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>

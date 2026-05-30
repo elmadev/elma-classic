@@ -1,4 +1,4 @@
-#include "canvas.h"
+#include "renderer/canvas.h"
 #include "anim.h"
 #include "editor/editor.h"
 #include "eol_settings.h"

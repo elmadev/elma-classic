@@ -1,5 +1,5 @@
 #include "physics/forces.h"
-#include "canvas.h"
+#include "renderer/canvas.h"
 #include "editor/editor.h"
 #include "LEJATSZO.H"
 #include "level.h"

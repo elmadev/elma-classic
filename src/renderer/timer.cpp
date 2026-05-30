@@ -1,7 +1,7 @@
 #include "lgr.h"
 #include "main.h"
 #include "pic8.h"
-#include "timer.h"
+#include "renderer/timer.h"
 #include "util/util.h"
 
 enum class DigitSegment {

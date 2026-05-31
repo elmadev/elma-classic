@@ -57,6 +57,7 @@
 * You can delete polygons using the Delete Vertex tool in the editor
 * Front grass in front of the bike is properly zoomed
 * About menu updated
+* Editor cursor no longer disappears when inputting a clipping or distance
 * When saving internal replay, internal number and name will be shown instead of QWQUU0XX.lev
 
 ## Minor Bug Fixes

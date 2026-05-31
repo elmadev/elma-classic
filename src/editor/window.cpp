@@ -1043,8 +1043,7 @@ bool editor_window_choose_lgr(char* lgrname) {
 }
 
 static int prompt_distance(pic8* pic, box bx, int distance) {
-    erase_cursor();
-
+    screen_pic screen = screen_pic(pic, screen_pic::Mode::EditorCanvas);
     empty_keypress_buffer();
     bool rerender = true;
     int distance_prev = distance;
@@ -1054,15 +1053,12 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
             rerender = false;
             char tmp[10];
             sprintf(tmp, "%d", distance);
-            draw_textbox_centered(pic, bx, EditorPaletteId::WINDOW_INPUT, tmp, true);
-            bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
+            draw_textbox_centered(screen.pic(), bx, EditorPaletteId::WINDOW_INPUT, tmp, true);
         }
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            draw_cursor();
             return distance_prev;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
-            draw_cursor();
             return distance;
         }
         if (was_key_down(DIK_BACK)) {
@@ -1081,35 +1077,32 @@ static int prompt_distance(pic8* pic, box bx, int distance) {
                 }
             }
         }
+        screen.blit_to_screen();
     }
 }
 
 static Clipping prompt_clipping(pic8* pic, box bx, Clipping clipping) {
-    erase_cursor();
-    draw_textbox_centered(pic, bx, EditorPaletteId::WINDOW_INPUT, "", true);
-    bltfront(pic, bx.x1, bx.y1, bx.x2, bx.y2);
+    screen_pic screen = screen_pic(pic, screen_pic::Mode::EditorCanvas);
+    draw_textbox_centered(screen.pic(), bx, EditorPaletteId::WINDOW_INPUT, "", true);
     empty_keypress_buffer();
     while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {
-            draw_cursor();
             return clipping;
         }
         while (has_text_input()) {
             char c = pop_text_input();
             if (c == 'u' || c == 'U') {
-                draw_cursor();
                 return Clipping::Unclipped;
             }
             if (c == 'g' || c == 'G') {
-                draw_cursor();
                 return Clipping::Ground;
             }
             if (c == 's' || c == 'S') {
-                draw_cursor();
                 return Clipping::Sky;
             }
         }
+        screen.blit_to_screen();
     }
 }
 
@@ -1129,9 +1122,10 @@ void editor_window_sprite_properties(sprite* spr) {
     bool rerender = true;
     int distance = spr->distance;
     Clipping clipping = spr->clipping;
+    screen_pic screen = screen_pic(BufferMain, screen_pic::Mode::EditorCanvas);
+    empty_keypress_buffer();
     while (true) {
         handle_events();
-        update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
         }
@@ -1144,41 +1138,41 @@ void editor_window_sprite_properties(sprite* spr) {
             return;
         }
         if (clicked_box(box_distance)) {
-            distance = prompt_distance(BufferMain, box_distance, distance);
+            distance = prompt_distance(screen.pic(), box_distance, distance);
             rerender = true;
         } else if (clicked_box(box_clipping)) {
-            clipping = prompt_clipping(BufferMain, box_clipping, clipping);
+            clipping = prompt_clipping(screen.pic(), box_clipping, clipping);
             rerender = true;
         }
         if (rerender) {
             rerender = false;
-            erase_cursor();
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+            render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                        EditorPaletteId::WINDOW_BORDER);
-            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_ok, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_cancel, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
-                                            "OK");
-            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+            EditorBlackFont->write_centered(screen.pic(), (box_ok.x1 + box_ok.x2) / 2,
+                                            box_ok.y1 + 15, "OK");
+            EditorBlackFont->write_centered(screen.pic(), (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
 
-            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15,
+            EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y1 + 15,
                                             "Set Picture Properties");
             if (spr->picture_name[0]) {
-                EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 45,
+                EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y1 + 45,
                                                 spr->picture_name);
             } else {
-                EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 34,
+                EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y1 + 34,
                                                 spr->texture_name);
-                EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 56, spr->mask_name);
+                EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y1 + 56,
+                                                spr->mask_name);
             }
-            EditorBlackFont->write(BufferMain, x1 + 92, y1 + 76, "Distance");
-            EditorBlackFont->write(BufferMain, x1 + 172, y1 + 76, "Clipping");
+            EditorBlackFont->write(screen.pic(), x1 + 92, y1 + 76, "Distance");
+            EditorBlackFont->write(screen.pic(), x1 + 172, y1 + 76, "Clipping");
 
             // Default values
-            EditorBlackFont->write(BufferMain, x1 + 12, y1 + 100, "Default:");
+            EditorBlackFont->write(screen.pic(), x1 + 12, y1 + 100, "Default:");
             int default_distance = -1;
             Clipping default_clipping = Clipping::Unknown;
             if (spr->picture_name[0]) {
@@ -1204,30 +1198,30 @@ void editor_window_sprite_properties(sprite* spr) {
             } else {
                 sprintf(tmp, "-");
             }
-            EditorBlackFont->write_centered(BufferMain, x1 + 119, y1 + 100, tmp);
+            EditorBlackFont->write_centered(screen.pic(), x1 + 119, y1 + 100, tmp);
 
             strcpy(tmp, clipping_to_string(default_clipping));
-            EditorBlackFont->write_centered(BufferMain, x1 + 198, y1 + 100, tmp);
+            EditorBlackFont->write_centered(screen.pic(), x1 + 198, y1 + 100, tmp);
 
             // Actual values
-            EditorBlackFont->write(BufferMain, x1 + 12, y1 + 130, "Current:");
+            EditorBlackFont->write(screen.pic(), x1 + 12, y1 + 130, "Current:");
 
-            render_box(BufferMain, box_distance, EditorPaletteId::WINDOW_INPUT,
+            render_box(screen.pic(), box_distance, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
             sprintf(tmp, "%d", distance);
-            draw_textbox_centered(BufferMain, box_distance, EditorPaletteId::WINDOW_INPUT, tmp);
-            EditorBlackFont->write_centered(BufferMain, x1 + 119, box_distance.y2 + 14, "(1-999)");
+            draw_textbox_centered(screen.pic(), box_distance, EditorPaletteId::WINDOW_INPUT, tmp);
+            EditorBlackFont->write_centered(screen.pic(), x1 + 119, box_distance.y2 + 14,
+                                            "(1-999)");
 
-            render_box(BufferMain, box_clipping, EditorPaletteId::WINDOW_INPUT,
+            render_box(screen.pic(), box_clipping, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
             strcpy(tmp, clipping_to_string(default_clipping));
-            draw_textbox_centered(BufferMain, box_clipping, EditorPaletteId::WINDOW_INPUT, tmp);
-            EditorBlackFont->write_centered(BufferMain, x1 + 198, box_clipping.y2 + 14,
+            draw_textbox_centered(screen.pic(), box_clipping, EditorPaletteId::WINDOW_INPUT, tmp);
+            EditorBlackFont->write_centered(screen.pic(), x1 + 198, box_clipping.y2 + 14,
                                             "(U, S, G)");
-
-            bltfront(BufferMain, x1, y1, x2, y2);
-            draw_cursor();
         }
+
+        screen.blit_to_screen();
     }
 }
 

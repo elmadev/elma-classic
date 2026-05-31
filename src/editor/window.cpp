@@ -1240,13 +1240,12 @@ void editor_window_polygon_properties(polygon* poly) {
     int box_left = x1 + 132;
     box box_grass = {box_left, y1 + 35, box_left + 30, y1 + 55};
 
-    bool rerender = true;
-
     int is_grass = poly->is_grass;
 
+    bool rerender = true;
+    screen_pic screen = screen_pic(BufferMain, screen_pic::Mode::EditorCanvas);
     while (true) {
         handle_events();
-        update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
         }
@@ -1264,37 +1263,35 @@ void editor_window_polygon_properties(polygon* poly) {
         if (rerender) {
             rerender = false;
 
-            erase_cursor();
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+            render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                        EditorPaletteId::WINDOW_BORDER);
 
-            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 15,
+            EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y1 + 15,
                                             "Set Polygon Properties");
 
             int label_x1 = x1 + 18;
-            EditorBlackFont->write(BufferMain, label_x1, box_grass.y1 + 15, "Grass polygon:");
-            render_box(BufferMain, box_grass, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_grass.y1 + 15, "Grass polygon:");
+            render_box(screen.pic(), box_grass, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
             if (is_grass) {
-                EditorBlackFont->write_centered(BufferMain, (box_grass.x1 + box_grass.x2) / 2,
+                EditorBlackFont->write_centered(screen.pic(), (box_grass.x1 + box_grass.x2) / 2,
                                                 box_grass.y1 + 15, "YES");
             } else {
-                EditorBlackFont->write_centered(BufferMain, (box_grass.x1 + box_grass.x2) / 2,
+                EditorBlackFont->write_centered(screen.pic(), (box_grass.x1 + box_grass.x2) / 2,
                                                 box_grass.y1 + 15, "NO");
             }
 
-            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_ok, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_cancel, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
-                                            "OK");
-            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+            EditorBlackFont->write_centered(screen.pic(), (box_ok.x1 + box_ok.x2) / 2,
+                                            box_ok.y1 + 15, "OK");
+            EditorBlackFont->write_centered(screen.pic(), (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
-
-            bltfront(BufferMain, x1, y1, x2, y2);
-            draw_cursor();
         }
+
+        screen.blit_to_screen();
     }
 }
 

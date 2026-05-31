@@ -287,6 +287,18 @@ void eol::enter_level(const char* level_name, const level* lev, bool spying) {
     proto.send(el);
 }
 
+void eol::record_apple_taken(int object_index, int num_apples) {
+    if (object_index < 0 || object_index >= MAX_OBJECTS) {
+        LOG_ERROR("Calling record_apple_taken with invalid object index {}", object_index);
+        return;
+    }
+
+    proto.send(apple_taken{
+        .apple_index = static_cast<uint8_t>(object_index),
+        .num_apples = static_cast<uint32_t>(num_apples),
+    });
+}
+
 void eol::exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
                      bool dead) {
     for (kuski& k : kuskis_) {

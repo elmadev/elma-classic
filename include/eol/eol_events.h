@@ -73,6 +73,11 @@ struct spy_apple_data {
     bool apples_taken[MAX_OBJECTS];
 };
 
+struct apple_taken {
+    uint8_t apple_index;
+    uint32_t num_apples;
+};
+
 struct clear_spy_data {
     unsigned int kuski_id;
 };

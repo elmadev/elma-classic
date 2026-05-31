@@ -56,6 +56,9 @@ class eol {
     void toggle_battle_status() const;
     void toggle_show_battle_leader() const;
     void render_battle_status(pic8& dest, abc8& font) const;
+
+    void record_apple_taken(int object_index, int num_apples);
+
     void toggle_battle_results() { set_table(TableType::BattleResults); }
     void toggle_battle_queue() { set_table(TableType::BattleQueue); }
 

@@ -1,5 +1,6 @@
 #include "physics/forces.h"
 #include "editor/editor.h"
+#include "eol/eol.h"
 #include "game/game.h"
 #include "game/recorder.h"
 #include "level/level.h"
@@ -367,6 +368,10 @@ BikeState check_object_collision(motorst* mot) {
         return BikeState::Dead;
     }
 
+    int apple_bugs_this_step = 0;
+    int apples_taken_this_step = 0;
+    int apples_taken_before_this_step = mot->apple_count - mot->apple_bug_count;
+
     // Collect all the object event interactions (but don't parse the interactions just yet)
     bool again = true;
     while (again) {
@@ -379,18 +384,24 @@ BikeState check_object_collision(motorst* mot) {
             if (object_indices[i] >= 0) {
                 object* obj = Level->get_object(object_indices[i]);
 
-                // Count number of apple bug apples taken
-                if (obj->type == object::Type::Food && !obj->active) {
-                    mot->apple_bug_count++;
-                }
-
                 add_event_buffer(WavEvent::None, 0.0, object_indices[i]);
                 if (obj->type == object::Type::Food) {
+                    if (obj->active) {
+                        apples_taken_this_step++;
+                        int num_apples = apples_taken_before_this_step + apples_taken_this_step;
+
+                        EolClient->record_apple_taken(object_indices[i], num_apples);
+                    } else {
+                        apple_bugs_this_step++;
+                    }
                     obj->active = false;
                     again = true;
                 }
             }
         }
     }
+
+    mot->apple_bug_count += apple_bugs_this_step;
+
     return BikeState::Normal;
 }

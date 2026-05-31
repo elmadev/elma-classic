@@ -938,10 +938,8 @@ void editor_window_choose_sprite() {
     }
 }
 
-bool editor_window_choose_lgr(char* lgrname) {
+bool editor_window_choose_lgr(pic8* dest, char* lgrname) {
     invalidate_editor_gui();
-
-    blit8(BufferBall, BufferMain);
 
     int list_length = populate_list("lgr/*.lgr", MAX_FILENAME_LEN);
 
@@ -974,10 +972,10 @@ bool editor_window_choose_lgr(char* lgrname) {
     int view_index = 0;
     bool rerender = true;
     std::string search_input;
+    screen_pic screen = screen_pic(dest, screen_pic::Mode::EditorCanvas);
     empty_keypress_buffer();
     while (true) {
         handle_events();
-        update_and_draw_cursor();
         adjust_list_view(selected_index, view_index, list_length, max_visible_entries, rerender,
                          box_up, box_down, box_list);
         if (process_list_search(search_input, selected_index, view_index, list_length,
@@ -1006,39 +1004,38 @@ bool editor_window_choose_lgr(char* lgrname) {
         if (rerender) {
             rerender = false;
 
-            erase_cursor();
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+            render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                        EditorPaletteId::WINDOW_BORDER);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId::WINDOW_LIST,
+            render_box(screen.pic(), lx1, ly1, lx2, ly2, EditorPaletteId::WINDOW_LIST,
                        EditorPaletteId::WINDOW_BORDER);
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
-                    BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPaletteId::WINDOW_LIST_SELECTED);
+                    screen.pic()->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1,
+                                           ly1 + (i + 1) * dy - 1,
+                                           EditorPaletteId::WINDOW_LIST_SELECTED);
                 }
-                EditorBlackFont->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
+                EditorBlackFont->write(screen.pic(), lx1 + 3, ly1 + 15 + i * dy,
                                        ListEntries[i + view_index].c_str());
             }
-            render_box(BufferMain, box_up, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_up, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_arrow(BufferMain, box_up, EditorPaletteId::WINDOW_BORDER, true);
-            render_box(BufferMain, box_down, EditorPaletteId::WINDOW_BUTTON,
+            draw_arrow(screen.pic(), box_up, EditorPaletteId::WINDOW_BORDER, true);
+            render_box(screen.pic(), box_down, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_arrow(BufferMain, box_down, EditorPaletteId::WINDOW_BORDER, false);
-            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+            draw_arrow(screen.pic(), box_down, EditorPaletteId::WINDOW_BORDER, false);
+            render_box(screen.pic(), box_cancel, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+            EditorBlackFont->write_centered(screen.pic(), (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
 
-            render_list_search(BufferMain, box_search, search_input);
+            render_list_search(screen.pic(), box_search, search_input);
 
-            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y2 - 36,
+            EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y2 - 36,
                                             "Original LGR file:");
-            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y2 - 18, lgrname);
-
-            bltfront(BufferMain, x1, y1, x2, y2);
-            draw_cursor();
+            EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y2 - 18, lgrname);
         }
+
+        screen.blit_to_screen();
     }
 }
 
@@ -1421,13 +1418,9 @@ void editor_window_food_properties(const char* title, object::Property* property
     }
 }
 
-static void editor_window_level_name(char* level_name) {
+static void editor_window_level_name(pic8* dest, char* level_name) {
     char orig_level_name[LEVEL_NAME_LENGTH + 10];
     strcpy(orig_level_name, level_name);
-
-    erase_cursor();
-
-    blit8(BufferBall, BufferMain);
 
     invalidate_editor_gui();
 
@@ -1436,35 +1429,34 @@ static void editor_window_level_name(char* level_name) {
     int x2 = 600;
     int y2 = 280;
 
+    screen_pic screen = screen_pic(dest, screen_pic::Mode::EditorCanvas);
     empty_keypress_buffer();
     int i = 0;
     while (true) {
         handle_events();
 
-        BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId::LEVEL_NAME_WINDOW);
-        BufferMain->line(x1, y1, x2, y1, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
-        BufferMain->line(x1, y2, x2, y2, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
-        BufferMain->line(x1, y1, x1, y2, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
-        BufferMain->line(x2, y1, x2, y2, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
+        screen.pic()->fill_box(x1, y1, x2, y2, EditorPaletteId::LEVEL_NAME_WINDOW);
+        screen.pic()->line(x1, y1, x2, y1, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
+        screen.pic()->line(x1, y2, x2, y2, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
+        screen.pic()->line(x1, y1, x1, y2, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
+        screen.pic()->line(x2, y1, x2, y2, EditorPaletteId::LEVEL_NAME_WINDOW_BORDER);
         EditorBlackFont->write_centered(
-            BufferMain, (x2 + x1) / 2, 220,
+            screen.pic(), (x2 + x1) / 2, 220,
             "Type in the name of the level and the designer and press ENTER (ESC to cancel)!");
         int x = (x2 + x1) / 2 - EditorWhiteFont->len(level_name) / 2;
-        EditorBlackFont->write(BufferMain, x, 250, level_name);
+        EditorBlackFont->write(screen.pic(), x, 250, level_name);
         char tmp[LEVEL_NAME_LENGTH + 10];
         strcpy(tmp, level_name);
         tmp[i] = 0;
-        EditorBlackFont->write(BufferMain, x + EditorWhiteFont->len(tmp), 255, "-");
-        bltfront(BufferMain, x1, y1, x2, y2);
+        EditorBlackFont->write(screen.pic(), x + EditorWhiteFont->len(tmp), 255, "-");
+        screen.blit_to_screen();
 
         if (was_key_just_pressed(DIK_ESCAPE)) {
             strcpy(level_name, orig_level_name);
-            draw_cursor();
             return;
         }
         if (was_key_just_pressed(DIK_RETURN)) {
             if (level_name[0] != 0) {
-                draw_cursor();
                 return;
             }
         }
@@ -1547,9 +1539,9 @@ void editor_window_level_properties() {
     box box_lgr = {box_left, y1 + 110, box_left + 80, y1 + 130};
 
     bool rerender = true;
+    screen_pic screen = screen_pic(BufferMain, screen_pic::Mode::EditorCanvas);
     while (true) {
         handle_events();
-        update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
         }
@@ -1579,12 +1571,8 @@ void editor_window_level_properties() {
             if (Lgr->get_mask_index("maskbig") >= 0) {
                 strcpy(mask_name, "maskbig");
             }
-            editor_window_select_sprite_name(BufferMain, null_name, foreground_name, mask_name,
+            editor_window_select_sprite_name(screen.pic(), null_name, foreground_name, mask_name,
                                              SpriteType::Texture);
-            erase_cursor();
-            blit8(BufferMain, BufferBall);
-            bltfront(BufferMain);
-            draw_cursor();
             rerender = true;
         } else if (clicked_box(box_background)) {
             char null_name[10] = "";
@@ -1592,75 +1580,61 @@ void editor_window_level_properties() {
             if (Lgr->get_mask_index("maskbig") >= 0) {
                 strcpy(mask_name, "maskbig");
             }
-            editor_window_select_sprite_name(BufferMain, null_name, background_name, mask_name,
+            editor_window_select_sprite_name(screen.pic(), null_name, background_name, mask_name,
                                              SpriteType::Texture);
-            erase_cursor();
-            blit8(BufferMain, BufferBall);
-            bltfront(BufferMain);
-            draw_cursor();
             rerender = true;
         } else if (clicked_box(box_levelname)) {
-            editor_window_level_name(level_name);
-            erase_cursor();
-            blit8(BufferMain, BufferBall);
-            bltfront(BufferMain);
-            draw_cursor();
+            editor_window_level_name(screen.pic(), level_name);
             rerender = true;
         } else if (clicked_box(box_lgr)) {
-            editor_window_choose_lgr(lgr_name);
-
-            erase_cursor();
-            blit8(BufferMain, BufferBall);
-            bltfront(BufferMain);
-            draw_cursor();
+            editor_window_choose_lgr(screen.pic(), lgr_name);
             rerender = true;
         }
         if (rerender) {
             rerender = false;
 
-            erase_cursor();
-
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+            render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                        EditorPaletteId::WINDOW_BORDER);
 
-            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 22, "Level properties");
+            EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y1 + 22,
+                                            "Level properties");
 
-            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_ok, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
-                                            "OK");
+            EditorBlackFont->write_centered(screen.pic(), (box_ok.x1 + box_ok.x2) / 2,
+                                            box_ok.y1 + 15, "OK");
 
-            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_cancel, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+            EditorBlackFont->write_centered(screen.pic(), (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
 
             int label_x1 = x1 + 10;
-            EditorBlackFont->write(BufferMain, label_x1, box_foreground.y1 + 15, "Foreground:");
-            render_box(BufferMain, box_foreground, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_foreground.y1 + 15, "Foreground:");
+            render_box(screen.pic(), box_foreground, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_textbox_left(BufferMain, box_foreground, EditorPaletteId::WINDOW_INPUT,
+            draw_textbox_left(screen.pic(), box_foreground, EditorPaletteId::WINDOW_INPUT,
                               foreground_name);
 
-            EditorBlackFont->write(BufferMain, label_x1, box_background.y1 + 15, "Background:");
-            render_box(BufferMain, box_background, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_background.y1 + 15, "Background:");
+            render_box(screen.pic(), box_background, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_textbox_left(BufferMain, box_background, EditorPaletteId::WINDOW_INPUT,
+            draw_textbox_left(screen.pic(), box_background, EditorPaletteId::WINDOW_INPUT,
                               background_name);
 
-            EditorBlackFont->write(BufferMain, label_x1, box_levelname.y1 + 15, "Level name:");
-            render_box(BufferMain, box_levelname, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_levelname.y1 + 15, "Level name:");
+            render_box(screen.pic(), box_levelname, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_textbox_left(BufferMain, box_levelname, EditorPaletteId::WINDOW_INPUT, level_name);
+            draw_textbox_left(screen.pic(), box_levelname, EditorPaletteId::WINDOW_INPUT,
+                              level_name);
 
-            EditorBlackFont->write(BufferMain, label_x1, box_lgr.y1 + 15, "LGR file:");
-            render_box(BufferMain, box_lgr, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_lgr.y1 + 15, "LGR file:");
+            render_box(screen.pic(), box_lgr, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_textbox_left(BufferMain, box_lgr, EditorPaletteId::WINDOW_INPUT, lgr_name);
-
-            bltfront(BufferMain, x1, y1, x2, y2);
-            draw_cursor();
+            draw_textbox_left(screen.pic(), box_lgr, EditorPaletteId::WINDOW_INPUT, lgr_name);
         }
+
+        screen.blit_to_screen();
     }
 }
 

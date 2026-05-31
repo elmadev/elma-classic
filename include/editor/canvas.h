@@ -22,7 +22,6 @@ void zoom_fill();
 double get_zoom();
 double max_grab_distance();
 
-extern bool RedrawingEditor;
 void render_line(vect2 v1, vect2 v2, bool dotted);
 
 #endif

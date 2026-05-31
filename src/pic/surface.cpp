@@ -68,13 +68,6 @@ void unlockfrontbuffer_pic() {
     unlock_frontbuffer();
 }
 
-void ppixelfront(int x, int y, unsigned char szin) {
-    if (!Frontpiclocked) {
-        internal_error("u53e983w");
-    }
-    Lockbuff.ppixel(x, y, szin);
-}
-
 void bltfront(pic8* ppic) {
     lockfrontbuffer_pic();
     blit8(&Lockbuff, ppic);

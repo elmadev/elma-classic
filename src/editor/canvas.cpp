@@ -8,9 +8,6 @@
 #include <algorithm>
 #include <cmath>
 
-// If false, when drawing lines, immediately update the screen
-bool RedrawingEditor = false;
-
 constexpr double ZOOM_IN_LIMIT = 0.017;
 constexpr double ZOOM_OUT_LIMIT = 500.0;
 constexpr double ZOOM_FACTOR = 170.0;
@@ -209,9 +206,6 @@ void render_line(vect2 v1, vect2 v2, bool dotted) {
                 unsigned char pal_index = BufferMain->gpixel(x, y);
                 pal_index += 128;
                 BufferMain->ppixel(x, y, pal_index);
-                if (!RedrawingEditor) {
-                    ppixelfront(x, y, pal_index);
-                }
             }
         }
     } else {
@@ -258,9 +252,6 @@ void render_line(vect2 v1, vect2 v2, bool dotted) {
                 unsigned char pal_index = BufferMain->gpixel(x, y);
                 pal_index += 128;
                 BufferMain->ppixel(x, y, pal_index);
-                if (!RedrawingEditor) {
-                    ppixelfront(x, y, pal_index);
-                }
             }
         }
     }

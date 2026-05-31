@@ -163,8 +163,6 @@ void tool_move_mousemove(int mouse_x, int mouse_y) {
                        "|| (SelectedObject && SelectedSprite)!");
     }
 
-    lockfrontbuffer_pic();
-
     // Update the position of the item by redrawing it at the old position to erase,
     // then drawing it at the new position
     if (SelectedPolygon) {
@@ -188,7 +186,6 @@ void tool_move_mousemove(int mouse_x, int mouse_y) {
         SelectedSprite->r.y = pixel_to_meter_y(mouse_y);
         SelectedSprite->render();
     }
-    unlockfrontbuffer_pic();
 }
 
 bool CreatingPolygon = false;
@@ -350,7 +347,7 @@ void tool_create_vertex_mousemove(int mouse_x, int mouse_y) {
     if (!SelectedPolygon && !CreatingPolygon) {
         internal_error("tool_create_vertex_mousemove invalid call!");
     }
-    lockfrontbuffer_pic();
+
     // Erase existing line by drawing over it, then draw new line
     double x = pixel_to_meter_x(mouse_x);
     double y = pixel_to_meter_y(mouse_y);
@@ -368,7 +365,6 @@ void tool_create_vertex_mousemove(int mouse_x, int mouse_y) {
         MouseVertex = vect2(x, y);
         render_line(FirstVertex, MouseVertex, false);
     }
-    unlockfrontbuffer_pic();
 }
 
 void tool_delete_vertex_leftclick(int mouse_x, int mouse_y) {
@@ -524,7 +520,6 @@ static void draw_zoom_in_rectangle_pixel(int x, int y) {
     unsigned char palette_id = BufferMain->gpixel(x, y);
     palette_id += 128;
     BufferMain->ppixel(x, y, palette_id);
-    ppixelfront(x, y, palette_id);
 }
 
 // Draw the zoom in rectangle
@@ -548,12 +543,10 @@ static void draw_zoom_in_rectangle(int x1, int y1, int x2, int y2) {
 void tool_zoom_in_mousemove(int mouse_x, int mouse_y) {
     if (SelectingZoomInBox) {
         // Draw the zoom in box only if we clicked to select the topleft corner
-        lockfrontbuffer_pic();
         draw_zoom_in_rectangle(ZoomInX1, ZoomInY1, ZoomInX2, ZoomInY2);
         ZoomInX2 = mouse_x;
         ZoomInY2 = mouse_y;
         draw_zoom_in_rectangle(ZoomInX1, ZoomInY1, ZoomInX2, ZoomInY2);
-        unlockfrontbuffer_pic();
     }
 }
 

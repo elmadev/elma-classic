@@ -472,13 +472,11 @@ static void draw_editor() {
     }
     EditorBlackFont->write(BufferMain, 580, 15, text);
 
-    RedrawingEditor = true;
     Level->render();
     if (SelectedPolygon) {
         SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, false);
         SelectedPolygon->render_one_line(SelectedVertexIndex, CreateVertexDirection, true);
     }
-    RedrawingEditor = false;
 
     RedrawEditorCanvas = false;
     RedrawEditorGui = false;

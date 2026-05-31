@@ -710,15 +710,68 @@ void blit8(pic8* dest, pic8* source, int x, int y) {
 // Blit source onto dest at (x, y) with 2x2 Bayer dithering.
 // Supported opacity values: 25, 50, or 75.
 void blit8_dither(pic8* dest, pic8* source, int x, int y, int opacity) {
-    const int src_w = source->get_width();
-    const int src_h = source->get_height();
+#ifdef DEBUG
+    if (!dest || !source) {
+        internal_error("blit8_dither missing dest or source!");
+        return;
+    }
+#endif
 
-    constexpr int SKIP = 0;      // skip row (all source pixels kept by dest)
-    constexpr int MEMCPY = 1;    // memcpy entire row (all source pixels written)
-    constexpr int COPY_EVEN = 2; // copy at even columns
-    constexpr int COPY_ODD = 3;  // copy at odd columns
+    int x1 = 0;
+    int y1 = 0;
+    int x2 = source->width - 1;
+    int y2 = source->height - 1;
 
-    int action[2]; // action[row_parity]
+    // same clipping blit8()
+    if (x1 < 0) {
+        x += -x1;
+        x1 = 0;
+    }
+    if (x2 >= source->width) {
+        x -= x2 - (source->width - 1);
+        x2 = source->width - 1;
+    }
+
+    if (x < 0) {
+        x1 += -x;
+        x = 0;
+    }
+    if (x + (x2 - x1) >= dest->width) {
+        x2 -= x + (x2 - x1) - (dest->width - 1);
+    }
+
+    if (x1 > x2) {
+        return;
+    }
+
+    if (y1 < 0) {
+        y += -y1;
+        y1 = 0;
+    }
+    if (y2 >= source->height) {
+        y -= y2 - (source->height - 1);
+        y2 = source->height - 1;
+    }
+
+    if (y < 0) {
+        y1 += -y;
+        y = 0;
+    }
+    if (y + (y2 - y1) >= dest->height) {
+        y2 -= y + (y2 - y1) - (dest->height - 1);
+    }
+
+    if (y1 > y2) {
+        return;
+    }
+
+    constexpr int SKIP = 0;
+    constexpr int MEMCPY = 1;
+    constexpr int COPY_EVEN = 2;
+    constexpr int COPY_ODD = 3;
+
+    int action[2];
+
     switch (opacity) {
     case 25:
         action[0] = COPY_ODD;
@@ -734,21 +787,75 @@ void blit8_dither(pic8* dest, pic8* source, int x, int y, int opacity) {
         break;
     default:
         internal_error("blit8_dither: unsupported opacity value");
+        return;
     }
 
-    for (int row = 0; row < src_h; row++) {
-        const int act = action[(y + row) & 1];
+    if (source->transparency_data) {
+        unsigned buf = 0;
+        unsigned char* buffer = source->transparency_data;
+        int desty = y - y1;
+        for (int sy = 0; sy < source->height; sy++) {
+            bool y_in_range = !(sy < y1 || sy > y2);
+            int dy = desty;
+            int act = action[(y + (sy - y1)) & 1];
+            int sx = 0;
+            while (sx < source->width) {
+                switch (buffer[buf++]) {
+                case 'K': {
+                    int run = buffer[buf++];
+                    if (y_in_range && act != SKIP) {
+                        int xstart = sx;
+                        int xend = sx + run - 1;
+                        if (!(xstart > x2 || xend < x1)) {
+                            xstart = std::max(xstart, x1);
+                            xend = std::min(xend, x2);
+                            unsigned char* src_row = source->rows[sy];
+                            unsigned char* dst_row = dest->rows[dy];
+                            for (int cx = xstart; cx <= xend; cx++) {
+                                int dx = x + (cx - x1);
+                                if (act == MEMCPY || ((act == COPY_EVEN) && ((dx & 1) == 0)) ||
+                                    ((act == COPY_ODD) && ((dx & 1) == 1))) {
+                                    dst_row[dx] = src_row[cx];
+                                }
+                            }
+                        }
+                    }
+
+                    sx += run;
+                    break;
+                }
+                case 'N':
+                    sx += buffer[buf++];
+                    break;
+                default:
+                    internal_error("Sprite blit8_dither unknown data block!");
+                    return;
+                }
+            }
+
+            desty++;
+        }
+
+        return;
+    }
+
+    for (int sy = y1; sy <= y2; sy++) {
+        int dy = y + (sy - y1);
+        int act = action[dy & 1];
         if (act == SKIP) {
             continue;
         }
-        unsigned char* dst_row = dest->get_row(y + row) + x;
-        unsigned char* src_row = source->get_row(row);
+
+        unsigned char* dst_row = dest->get_row(dy) + x;
+        unsigned char* src_row = source->get_row(sy) + x1;
+        int length = x2 - x1 + 1;
         if (act == MEMCPY) {
-            memcpy(dst_row, src_row, src_w);
+            memcpy(dst_row, src_row, length);
             continue;
         }
-        const int start = (act == COPY_ODD) ? 1 : 0;
-        for (int col = start; col < src_w; col += 2) {
+
+        int start = (act == COPY_ODD) ? 1 : 0;
+        for (int col = start; col < length; col += 2) {
             dst_row[col] = src_row[col];
         }
     }

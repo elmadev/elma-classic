@@ -705,7 +705,8 @@ static void render_view(bool player1, pic8* pic, double time, motorst* mot, bike
             }
         }
 
-        blit8(pic, obj_frame, obj->canvas_x - corner_x, obj->canvas_y - corner_y + phase_y_offset);
+        blit8_dither(pic, obj_frame, obj->canvas_x - corner_x,
+                     obj->canvas_y - corner_y + phase_y_offset, 25);
 
         if (EolSettings->show_gravity_arrows() && obj->type == object::Type::Food &&
             obj->property != object::Property::None) {

@@ -248,19 +248,6 @@ void draw_cursor() {
     draw_cursor_shape();
 }
 
-void update_and_draw_cursor() {
-    int mouse_x = 0;
-    int mouse_y = 0;
-    get_mouse_position(&mouse_x, &mouse_y);
-    if (mouse_x == MouseX && mouse_y == MouseY) {
-        return;
-    }
-    erase_cursor();
-    MouseX = mouse_x;
-    MouseY = mouse_y;
-    draw_cursor();
-}
-
 void draw_tooltip(const char* text) {
     static char TooltipText[110] = "";
     if (text) {
@@ -275,7 +262,6 @@ void draw_tooltip(const char* text) {
     int y2 = EDITOR_MENU_Y - 2;
     BufferMain->fill_box(x1, y1, x2, y2, EditorPaletteId::BACKGROUND);
     EditorWhiteFont->write(BufferMain, 10, y1 + 12, TooltipText);
-    bltfront(BufferMain, x1, y1, x2, y2);
 }
 
 void draw_tooltip_help() {
@@ -447,7 +433,6 @@ void draw_sprite_tooltip(const char* picture_name, const char* texture_name, con
     }
 
     blit8(BufferMain, &TooltipBuffer, 226, 2);
-    bltfront(BufferMain, 226, 2, 540, 30);
 }
 
 void draw_object_tooltip(object::Type type, object::Property property, int animation) {
@@ -490,12 +475,9 @@ void draw_object_tooltip(object::Type type, object::Property property, int anima
     EditorBlackFont->write(&TooltipBuffer, 50, 14, tmp);
 
     blit8(BufferMain, &TooltipBuffer, 226, 2);
-    bltfront(BufferMain, 226, 2, 540, 30);
 }
 
 static void draw_editor() {
-    erase_cursor();
-
     // Make sure the sprite tooltip will be immediately updated
     TooltipPictureName[0] = 0;
     TooltipTextureName[0] = 0;
@@ -547,12 +529,8 @@ static void draw_editor() {
     }
     RedrawingEditor = false;
 
-    bltfront(BufferMain);
-
     RedrawEditorCanvas = false;
     RedrawEditorGui = false;
-
-    draw_cursor();
 
     if (SelectedTool == Tool::CreateSprite) {
         if (!Lgr) {
@@ -687,6 +665,14 @@ static void get_mouse_position_editor(int* mouse_x, int* mouse_y) {
     }
 }
 
+static void editor_to_screen() {
+    pic8* surface = lockbackbuffer_pic(false);
+    blit8(surface, BufferMain);
+    draw_editor_border(*surface);
+    draw_cursor(*surface, CursorShapeIsX);
+    unlockbackbuffer_pic();
+}
+
 void editor() {
     if (!BufferMain) {
         internal_error("editor !BufferMain!");
@@ -695,10 +681,9 @@ void editor() {
     EditorPalette->set();
 
     draw_editor_gui();
-    bltfront(BufferMain);
+    editor_to_screen();
 
-    CursorDrawn = false;
-    draw_cursor();
+    CursorDrawn = true;
 
     LevelChanged = false;
     editor_window_welcome();
@@ -762,12 +747,8 @@ void editor() {
         int click_y = INT_MAX;
         if (left_click || right_click) {
             get_mouse_position_editor(&click_x, &click_y);
-            if (click_x != MouseX || click_y != MouseY) {
-                erase_cursor();
-                MouseX = click_x;
-                MouseY = click_y;
-                draw_cursor();
-            }
+            MouseX = click_x;
+            MouseY = click_y;
         }
 
         // Menu clicks
@@ -779,7 +760,6 @@ void editor() {
         // Menu commands
         if ((i == 0 && left_click) || editor_shortcut(DIK_X)) {
             if (editor_dialog_exit()) {
-                erase_cursor();
                 return;
             }
         } else if (i == 0 && right_click) {
@@ -917,27 +897,19 @@ void editor() {
         int mouse_x = 0;
         int mouse_y = 0;
         get_mouse_position_editor(&mouse_x, &mouse_y);
-        if (mouse_x == MouseX && mouse_y == MouseY) {
-            continue;
-        }
-        if (SelectedTool == Tool::ZoomIn) {
-            tool_zoom_in_mousemove(mouse_x, mouse_y);
-            continue;
-        }
-        if (SelectedTool == Tool::CreateVertex && (SelectedPolygon || CreatingPolygon)) {
-            tool_create_vertex_mousemove(mouse_x, mouse_y);
-            continue;
-        }
-        if (!SelectedPolygon && !SelectedObject && !SelectedSprite) {
-            erase_cursor();
-            draw_mouse_tooltip(mouse_x, mouse_y);
-            MouseX = mouse_x;
-            MouseY = mouse_y;
-            draw_cursor();
-        } else {
-            if (SelectedTool == Tool::Move) {
+        if (mouse_x != MouseX || mouse_y != MouseY) {
+            if (SelectedTool == Tool::ZoomIn) {
+                tool_zoom_in_mousemove(mouse_x, mouse_y);
+            } else if (SelectedTool == Tool::CreateVertex && (SelectedPolygon || CreatingPolygon)) {
+                tool_create_vertex_mousemove(mouse_x, mouse_y);
+            } else if (!SelectedPolygon && !SelectedObject && !SelectedSprite) {
+                draw_mouse_tooltip(mouse_x, mouse_y);
+                MouseX = mouse_x;
+                MouseY = mouse_y;
+            } else if (SelectedTool == Tool::Move) {
                 tool_move_mousemove(mouse_x, mouse_y);
             }
         }
+        editor_to_screen();
     }
 }

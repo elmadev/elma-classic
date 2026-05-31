@@ -12,10 +12,6 @@ void update_resolution(int w, int h);
 pic8* lockbackbuffer_pic(bool flipped = true);
 void unlockbackbuffer_pic();
 
-void lockfrontbuffer_pic(bool flipped = false);
-void unlockfrontbuffer_pic();
-
 void bltfront(pic8* ppic);
-void bltfront(pic8* ppic, int x1, int y1, int x2, int y2);
 
 #endif

@@ -333,21 +333,6 @@ void unlock_backbuffer() {
     }
 }
 
-void lock_frontbuffer(pic8& view, bool flipped) {
-    if (SurfaceLocked) {
-        internal_error("lock_frontbuffer SurfaceLocked!");
-    }
-    lock_backbuffer(view, flipped);
-}
-
-void unlock_frontbuffer() {
-    if (!SurfaceLocked) {
-        internal_error("unlock_frontbuffer !SurfaceLocked!");
-    }
-
-    unlock_backbuffer();
-}
-
 bool platform_render_error(pic8* buffer) {
     if (!SDLWindow || !SDLSurfacePaletted || !buffer) {
         return false;

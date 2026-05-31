@@ -15,7 +15,7 @@ int SCREEN_HEIGHT = 600;
 
 static pic8 Lockbuff = pic8();
 
-static int Backpiclocked = 0, Frontpiclocked = 0;
+static int Backpiclocked = 0;
 
 void on_resolution_change() {
     editor_canvas_update_resolution();
@@ -36,7 +36,7 @@ void update_resolution(int w, int h) {
 }
 
 pic8* lockbackbuffer_pic(bool flipped) {
-    if (Backpiclocked || Frontpiclocked) {
+    if (Backpiclocked) {
         internal_error("lbb_p lock!");
     }
     Backpiclocked = 1;
@@ -45,36 +45,15 @@ pic8* lockbackbuffer_pic(bool flipped) {
 }
 
 void unlockbackbuffer_pic() {
-    if (!Backpiclocked || Frontpiclocked) {
+    if (!Backpiclocked) {
         internal_error("ulbb_p lock!");
     }
     Backpiclocked = 0;
     unlock_backbuffer();
 }
 
-void lockfrontbuffer_pic(bool flipped) {
-    if (Frontpiclocked || Backpiclocked) {
-        internal_error("lfb_pw lock!");
-    }
-    Frontpiclocked = 1;
-    lock_frontbuffer(Lockbuff, flipped);
-}
-
-void unlockfrontbuffer_pic() {
-    if (!Frontpiclocked || Backpiclocked) {
-        internal_error("ulfb_pw lock!");
-    }
-    Frontpiclocked = 0;
-    unlock_frontbuffer();
-}
-
 void bltfront(pic8* ppic) {
-    lockfrontbuffer_pic();
-    blit8(&Lockbuff, ppic);
-    unlockfrontbuffer_pic();
-}
-void bltfront(pic8* ppic, int x1, int y1, int x2, int y2) {
-    lockfrontbuffer_pic();
-    blit8(&Lockbuff, ppic, x1, y1, x1, y1, x2, y2);
-    unlockfrontbuffer_pic();
+    pic8* surface = lockbackbuffer_pic(false);
+    blit8(surface, ppic);
+    unlockbackbuffer_pic();
 }

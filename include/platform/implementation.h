@@ -29,8 +29,6 @@ void init_sound();
 
 void lock_backbuffer(pic8& view, bool flipped);
 void unlock_backbuffer();
-void lock_frontbuffer(pic8& view, bool flipped);
-void unlock_frontbuffer();
 
 void get_mouse_position(int* x, int* y);
 void set_mouse_position(int x, int y);

@@ -29,6 +29,13 @@ static void draw_background(pic8& pic, screen_pic::Mode mode) {
              EditorPaletteId::MENU_BORDER);
 }
 
+static void draw_foreground(pic8& pic, screen_pic::Mode mode) {
+    if (mode == screen_pic::Mode::OutsideEditor) {
+        return;
+    }
+    draw_editor_border(pic);
+}
+
 screen_pic::screen_pic(pic8* initial, Mode mode)
     : initial_(initial),
       mode_(mode) {
@@ -50,6 +57,7 @@ void screen_pic::blit_to_screen() {
     pic8* surface = lockbackbuffer_pic(false);
     draw_background(*surface, mode_);
     blit8(surface, pic());
+    draw_foreground(*surface, mode_);
     draw_cursor(*surface, false);
     unlockbackbuffer_pic();
 }

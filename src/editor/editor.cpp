@@ -324,16 +324,20 @@ void invalidate_editor_level() { RedrawEditorCanvas = true; }
 static bool RedrawEditorGui = false;
 void invalidate_editor_gui() { RedrawEditorGui = true; }
 
+void draw_editor_border(pic8& pic) {
+    int height = pic.get_height() - 1;
+    int width = pic.get_width() - 1;
+    pic.line(0, 0, width, 0, EditorPaletteId::MENU_BORDER);
+    pic.line(0, height, width, height, EditorPaletteId::MENU_BORDER);
+    pic.line(0, 0, 0, height, EditorPaletteId::MENU_BORDER);
+    pic.line(width, 0, width, height, EditorPaletteId::MENU_BORDER);
+}
+
 static void draw_editor_gui() {
     // Entire screen blue
     BufferMain->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, EditorPaletteId::MENU);
     // Entire screen border
-    BufferMain->line(0, 0, SCREEN_WIDTH - 1, 0, EditorPaletteId::MENU_BORDER);
-    BufferMain->line(0, SCREEN_HEIGHT - 1, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1,
-                     EditorPaletteId::MENU_BORDER);
-    BufferMain->line(0, 0, 0, SCREEN_HEIGHT - 1, EditorPaletteId::MENU_BORDER);
-    BufferMain->line(SCREEN_WIDTH - 1, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1,
-                     EditorPaletteId::MENU_BORDER);
+    draw_editor_border(*BufferMain);
     // Tooltip section line (top)
     BufferMain->line(0, EDITOR_MENU_Y - 1, SCREEN_WIDTH - 1, EDITOR_MENU_Y - 1,
                      EditorPaletteId::MENU_BORDER);

@@ -55,6 +55,8 @@ void invalidate_editor_gui();
 
 void editor();
 
+void draw_editor_border(pic8& pic);
+
 void draw_tooltip(const char* text = nullptr);
 void draw_tooltip_help(); // Base tooltip for current tool when tool has not yet been used
 

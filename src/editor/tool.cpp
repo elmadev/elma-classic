@@ -101,10 +101,8 @@ void tool_move_leftclick(int mouse_x, int mouse_y) {
     }
 
     set_mouse_position(mouse_x, mouse_y);
-    erase_cursor();
     MouseX = mouse_x;
     MouseY = mouse_y;
-    draw_cursor();
 }
 
 void tool_move_rightclick(int mouse_x, int mouse_y) {
@@ -165,7 +163,6 @@ void tool_move_mousemove(int mouse_x, int mouse_y) {
                        "|| (SelectedObject && SelectedSprite)!");
     }
 
-    erase_cursor();
     lockfrontbuffer_pic();
 
     // Update the position of the item by redrawing it at the old position to erase,
@@ -192,11 +189,6 @@ void tool_move_mousemove(int mouse_x, int mouse_y) {
         SelectedSprite->render();
     }
     unlockfrontbuffer_pic();
-
-    MouseX = mouse_x;
-    MouseY = mouse_y;
-
-    draw_cursor();
 }
 
 bool CreatingPolygon = false;
@@ -239,10 +231,6 @@ void tool_create_vertex_leftclick(int mouse_x, int mouse_y) {
         // We found the closest vertex
         draw_tooltip("Left click to place vertex. SPACE and ENTER swaps. ESC or right "
                      "click cancels.");
-        erase_cursor();
-        MouseX = meter_to_pixel_x(SelectedPolygon->vertices[SelectedVertexIndex].x);
-        MouseY = meter_to_pixel_y(SelectedPolygon->vertices[SelectedVertexIndex].y);
-        draw_cursor();
     }
 
     // We are holding a vertex
@@ -362,7 +350,6 @@ void tool_create_vertex_mousemove(int mouse_x, int mouse_y) {
     if (!SelectedPolygon && !CreatingPolygon) {
         internal_error("tool_create_vertex_mousemove invalid call!");
     }
-    erase_cursor();
     lockfrontbuffer_pic();
     // Erase existing line by drawing over it, then draw new line
     double x = pixel_to_meter_x(mouse_x);
@@ -381,10 +368,7 @@ void tool_create_vertex_mousemove(int mouse_x, int mouse_y) {
         MouseVertex = vect2(x, y);
         render_line(FirstVertex, MouseVertex, false);
     }
-    MouseX = mouse_x;
-    MouseY = mouse_y;
     unlockfrontbuffer_pic();
-    draw_cursor();
 }
 
 void tool_delete_vertex_leftclick(int mouse_x, int mouse_y) {
@@ -562,22 +546,15 @@ static void draw_zoom_in_rectangle(int x1, int y1, int x2, int y2) {
 }
 
 void tool_zoom_in_mousemove(int mouse_x, int mouse_y) {
-    erase_cursor();
     if (SelectingZoomInBox) {
         // Draw the zoom in box only if we clicked to select the topleft corner
         lockfrontbuffer_pic();
         draw_zoom_in_rectangle(ZoomInX1, ZoomInY1, ZoomInX2, ZoomInY2);
         ZoomInX2 = mouse_x;
         ZoomInY2 = mouse_y;
-        MouseX = mouse_x;
-        MouseY = mouse_y;
         draw_zoom_in_rectangle(ZoomInX1, ZoomInY1, ZoomInX2, ZoomInY2);
         unlockfrontbuffer_pic();
-    } else {
-        MouseX = mouse_x;
-        MouseY = mouse_y;
     }
-    draw_cursor();
 }
 
 void tool_create_sprite_rightclick() {

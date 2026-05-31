@@ -46,8 +46,6 @@ constexpr unsigned char WHITE_FONT = 62;
 extern int MouseX;
 extern int MouseY;
 void draw_cursor(pic8& dest, bool cursor_shape_is_x);
-void erase_cursor();
-void draw_cursor();
 
 void invalidate_editor_level();
 void invalidate_editor_gui();

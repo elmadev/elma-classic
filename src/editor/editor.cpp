@@ -199,55 +199,6 @@ void draw_cursor(pic8& dest, bool cursor_shape_is_x) {
     }
 }
 
-static void draw_cursor_pixel(int x, int y) {
-    if (x < 0 || y < 0 || x > (SCREEN_WIDTH - 1) || y > (SCREEN_HEIGHT - 1)) {
-        return;
-    }
-    unsigned char palette_id = BufferMain->gpixel(x, y);
-    palette_id += 128;
-    BufferMain->ppixel(x, y, palette_id);
-    ppixelfront(x, y, palette_id);
-}
-
-static void draw_cursor_shape() {
-    lockfrontbuffer_pic();
-    int radius = 4;
-    for (int i = -radius; i <= radius; i++) {
-        if (CursorShapeIsX) {
-            // Draw "x"
-            draw_cursor_pixel(MouseX + i, MouseY + i);
-            if (i != 0) {
-                draw_cursor_pixel(MouseX + i, MouseY - i);
-            }
-        } else {
-            // Draw "+"
-            draw_cursor_pixel(MouseX + i, MouseY);
-            if (i != 0) {
-                draw_cursor_pixel(MouseX, MouseY + i);
-            }
-        }
-    }
-    unlockfrontbuffer_pic();
-}
-
-static bool CursorDrawn = false;
-
-void erase_cursor() {
-    if (!CursorDrawn) {
-        internal_error("erase_cursor !CursorDrawn!");
-    }
-    CursorDrawn = false;
-    draw_cursor_shape();
-}
-
-void draw_cursor() {
-    if (CursorDrawn) {
-        internal_error("draw_cursor CursorDrawn!");
-    }
-    CursorDrawn = true;
-    draw_cursor_shape();
-}
-
 void draw_tooltip(const char* text) {
     static char TooltipText[110] = "";
     if (text) {
@@ -683,8 +634,6 @@ void editor() {
     draw_editor_gui();
     editor_to_screen();
 
-    CursorDrawn = true;
-
     LevelChanged = false;
     editor_window_welcome();
     if (State->editor_filename[0] == 0) {
@@ -904,11 +853,11 @@ void editor() {
                 tool_create_vertex_mousemove(mouse_x, mouse_y);
             } else if (!SelectedPolygon && !SelectedObject && !SelectedSprite) {
                 draw_mouse_tooltip(mouse_x, mouse_y);
-                MouseX = mouse_x;
-                MouseY = mouse_y;
             } else if (SelectedTool == Tool::Move) {
                 tool_move_mousemove(mouse_x, mouse_y);
             }
+            MouseX = mouse_x;
+            MouseY = mouse_y;
         }
         editor_to_screen();
     }

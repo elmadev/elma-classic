@@ -2,6 +2,7 @@
 #include "editor/canvas.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
+#include "editor/screen_pic.h"
 #include "game/level_load.h"
 #include "level/level.h"
 #include "level/polygon.h"
@@ -288,10 +289,12 @@ static std::string editor_window_list_levels(bool show_new_button) {
     int view_index = 0;
     bool rerender = true;
     std::string search_input;
+    screen_pic screen = screen_pic(BufferMain, show_new_button ? screen_pic::Mode::EditorGui
+                                                               : screen_pic::Mode::EditorCanvas);
     empty_keypress_buffer();
     while (true) {
         handle_events();
-        update_and_draw_cursor();
+
         adjust_list_view(selected_index, view_index, list_length, max_visible_entries, rerender,
                          box_up, box_down, box_list);
         if (process_list_search(search_input, selected_index, view_index, list_length,
@@ -320,40 +323,39 @@ static std::string editor_window_list_levels(bool show_new_button) {
         if (rerender) {
             rerender = false;
 
-            erase_cursor();
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+            render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                        EditorPaletteId::WINDOW_BORDER);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId::WINDOW_LIST,
+            render_box(screen.pic(), lx1, ly1, lx2, ly2, EditorPaletteId::WINDOW_LIST,
                        EditorPaletteId::WINDOW_BORDER);
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
-                    BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPaletteId::WINDOW_LIST_SELECTED);
+                    screen.pic()->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1,
+                                           ly1 + (i + 1) * dy - 1,
+                                           EditorPaletteId::WINDOW_LIST_SELECTED);
                 }
-                EditorBlackFont->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
+                EditorBlackFont->write(screen.pic(), lx1 + 3, ly1 + 15 + i * dy,
                                        ListEntries[i + view_index].c_str());
             }
-            render_box(BufferMain, box_up, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_up, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_arrow(BufferMain, box_up, EditorPaletteId::WINDOW_BORDER, true);
-            render_box(BufferMain, box_down, EditorPaletteId::WINDOW_BUTTON,
+            draw_arrow(screen.pic(), box_up, EditorPaletteId::WINDOW_BORDER, true);
+            render_box(screen.pic(), box_down, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_arrow(BufferMain, box_down, EditorPaletteId::WINDOW_BORDER, false);
-            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+            draw_arrow(screen.pic(), box_down, EditorPaletteId::WINDOW_BORDER, false);
+            render_box(screen.pic(), box_cancel, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+            EditorBlackFont->write_centered(screen.pic(), (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
             if (show_new_button) {
-                render_box(BufferMain, box_new, EditorPaletteId::WINDOW_BUTTON,
+                render_box(screen.pic(), box_new, EditorPaletteId::WINDOW_BUTTON,
                            EditorPaletteId::WINDOW_BORDER);
-                EditorBlackFont->write_centered(BufferMain, (box_new.x1 + box_new.x2) / 2,
+                EditorBlackFont->write_centered(screen.pic(), (box_new.x1 + box_new.x2) / 2,
                                                 box_new.y1 + 15, "NEW");
             }
-            render_list_search(BufferMain, box_search, search_input);
-
-            bltfront(BufferMain, x1, y1, x2, y2);
-            draw_cursor();
+            render_list_search(screen.pic(), box_search, search_input);
         }
+
+        screen.blit_to_screen();
     }
 }
 

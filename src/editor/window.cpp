@@ -1659,9 +1659,9 @@ void editor_window_view_options() {
     box box_objects = {x1 + 110, y1 + 65, x1 + 140, y1 + 85};
 
     bool rerender = true;
+    screen_pic screen = screen_pic(BufferMain, screen_pic::Mode::EditorCanvas);
     while (true) {
         handle_events();
-        update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN) ||
             clicked_box(box_ok)) {
             return;
@@ -1678,48 +1678,47 @@ void editor_window_view_options() {
         }
         if (rerender) {
             rerender = false;
-            erase_cursor();
 
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+            render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                        EditorPaletteId::WINDOW_BORDER);
 
-            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_ok, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
-                                            "OK");
+            EditorBlackFont->write_centered(screen.pic(), (box_ok.x1 + box_ok.x2) / 2,
+                                            box_ok.y1 + 15, "OK");
 
-            EditorBlackFont->write(BufferMain, label_x1, box_polygons.y1 + 15, "View Polygons");
-            render_box(BufferMain, box_polygons, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_polygons.y1 + 15, "View Polygons");
+            render_box(screen.pic(), box_polygons, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
             if (ShowPolygons) {
-                draw_textbox_centered(BufferMain, box_polygons, EditorPaletteId::WINDOW_INPUT,
+                draw_textbox_centered(screen.pic(), box_polygons, EditorPaletteId::WINDOW_INPUT,
                                       "Yes");
             } else {
-                draw_textbox_centered(BufferMain, box_polygons, EditorPaletteId::WINDOW_INPUT,
+                draw_textbox_centered(screen.pic(), box_polygons, EditorPaletteId::WINDOW_INPUT,
                                       "No");
             }
 
-            EditorBlackFont->write(BufferMain, label_x1, box_grass.y1 + 15, "View Grass");
-            render_box(BufferMain, box_grass, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_grass.y1 + 15, "View Grass");
+            render_box(screen.pic(), box_grass, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
             if (ShowGrassPolygons) {
-                draw_textbox_centered(BufferMain, box_grass, EditorPaletteId::WINDOW_INPUT, "Yes");
-            } else {
-                draw_textbox_centered(BufferMain, box_grass, EditorPaletteId::WINDOW_INPUT, "No");
-            }
-
-            EditorBlackFont->write(BufferMain, label_x1, box_objects.y1 + 15, "View Pictures");
-            render_box(BufferMain, box_objects, EditorPaletteId::WINDOW_INPUT,
-                       EditorPaletteId::WINDOW_BORDER);
-            if (ShowObjects) {
-                draw_textbox_centered(BufferMain, box_objects, EditorPaletteId::WINDOW_INPUT,
+                draw_textbox_centered(screen.pic(), box_grass, EditorPaletteId::WINDOW_INPUT,
                                       "Yes");
             } else {
-                draw_textbox_centered(BufferMain, box_objects, EditorPaletteId::WINDOW_INPUT, "No");
+                draw_textbox_centered(screen.pic(), box_grass, EditorPaletteId::WINDOW_INPUT, "No");
             }
 
-            bltfront(BufferMain, x1, y1, x2, y2);
-            draw_cursor();
+            EditorBlackFont->write(screen.pic(), label_x1, box_objects.y1 + 15, "View Pictures");
+            render_box(screen.pic(), box_objects, EditorPaletteId::WINDOW_INPUT,
+                       EditorPaletteId::WINDOW_BORDER);
+            if (ShowObjects) {
+                draw_textbox_centered(screen.pic(), box_objects, EditorPaletteId::WINDOW_INPUT,
+                                      "Yes");
+            } else {
+                draw_textbox_centered(screen.pic(), box_objects, EditorPaletteId::WINDOW_INPUT,
+                                      "No");
+            }
         }
+        screen.blit_to_screen();
     }
 }

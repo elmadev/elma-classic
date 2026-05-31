@@ -1,5 +1,6 @@
 #include "editor/dialog.h"
 #include "editor/editor.h"
+#include "editor/screen_pic.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "pic/abc8.h"
@@ -106,10 +107,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         internal_error("dialog text_length < 1");
     }
 
-    // If we are in editor, keep the current mouse position, or else center the mouse
-    if (InEditor) {
-        erase_cursor();
-    } else {
+    if (!InEditor) {
         hide_cursor();
         if (is_fullscreen()) {
             MouseX = SCREEN_WIDTH / 2;
@@ -125,6 +123,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         int text_width = EditorBlackFont->len(text_array[i]) + 16;
         width = std::max(width, text_width);
     }
+
     // Draw dialog box
     int dy = 20;
     int height = text_length * dy + 50;
@@ -132,11 +131,13 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     int y1 = SCREEN_HEIGHT / 2 - height / 2;
     int x2 = SCREEN_WIDTH / 2 + width / 2;
     int y2 = SCREEN_HEIGHT / 2 + height / 2;
-    render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW, EditorPaletteId::WINDOW_BORDER);
+    screen_pic screen = screen_pic(BufferMain);
+    render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
+               EditorPaletteId::WINDOW_BORDER);
 
     // Draw text
     for (int i = 0; i < text_length; i++) {
-        EditorBlackFont->write_centered(BufferMain, SCREEN_WIDTH / 2, y1 + 22 + i * dy,
+        EditorBlackFont->write_centered(screen.pic(), SCREEN_WIDTH / 2, y1 + 22 + i * dy,
                                         text_array[i]);
     }
 
@@ -166,20 +167,18 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         int button_width = EditorBlackFont->len(button_array[i]) + 10;
         button_array_x2[i] = button_array_x1[i] + button_width / 2;
         button_array_x1[i] = button_array_x1[i] - button_width / 2;
-        render_box(BufferMain, button_array_x1[i], button_y1, button_array_x2[i], button_y2,
+        render_box(screen.pic(), button_array_x1[i], button_y1, button_array_x2[i], button_y2,
                    EditorPaletteId::WINDOW_BUTTON, EditorPaletteId::WINDOW_BORDER);
-        EditorBlackFont->write_centered(BufferMain, (button_array_x2[i] + button_array_x1[i]) / 2,
+        EditorBlackFont->write_centered(screen.pic(), (button_array_x2[i] + button_array_x1[i]) / 2,
                                         button_y1 + 14, button_array[i]);
     }
-
-    bltfront(BufferMain);
-    draw_cursor();
 
     // Await input
     int choice = 0;
     // Immediate exit if DIALOG_RETURN
     while (!immediately_return) {
         handle_events();
+        screen.blit_to_screen();
         // ESC/ENTER only valid if 1 button exists
         if (button_length == 1) {
             if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN)) {
@@ -204,7 +203,6 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         }
         // Left mouse click a button
         if (was_left_mouse_just_clicked()) {
-            update_and_draw_cursor();
             for (int i = 0; i < button_length; i++) {
                 if (MouseX >= button_array_x1[i] && MouseX <= button_array_x2[i] &&
                     MouseY >= button_y1 && MouseY <= button_y2) {
@@ -214,11 +212,9 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
             }
             continue;
         }
-        update_and_draw_cursor();
     }
 exit:
     if (!InEditor) {
-        erase_cursor();
         show_cursor();
     }
     return choice;

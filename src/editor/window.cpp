@@ -431,18 +431,15 @@ bool editor_window_save_as() {
     box box_window = {20, 200, 600, 300};
     box box_save = {320 - 30, 273, 320 + 30, 290};
 
-    erase_cursor();
-    render_box(BufferMain, box_window, EditorPaletteId::WINDOW, EditorPaletteId::WINDOW_BORDER);
-    render_box(BufferMain, box_save, EditorPaletteId::WINDOW_BUTTON,
+    screen_pic screen = screen_pic(BufferMain, screen_pic::Mode::EditorCanvas);
+    render_box(screen.pic(), box_window, EditorPaletteId::WINDOW, EditorPaletteId::WINDOW_BORDER);
+    render_box(screen.pic(), box_save, EditorPaletteId::WINDOW_BUTTON,
                EditorPaletteId::WINDOW_BORDER);
     EditorBlackFont->write_centered(
-        BufferMain, (box_window.x2 + box_window.x1) / 2, 220,
+        screen.pic(), (box_window.x2 + box_window.x1) / 2, 220,
         "Type in the file name and press ENTER or click on SAVE, or press ESC to cancel!");
-    EditorBlackFont->write_centered(BufferMain, (box_save.x2 + box_save.x1) / 2, box_save.y1 + 13,
+    EditorBlackFont->write_centered(screen.pic(), (box_save.x2 + box_save.x1) / 2, box_save.y1 + 13,
                                     "SAVE");
-
-    bltfront(BufferMain, box_window.x1, box_window.y1, box_window.x2, box_window.y2);
-    draw_cursor();
 
     empty_keypress_buffer();
     finame filename_input = "";
@@ -450,7 +447,7 @@ bool editor_window_save_as() {
     char filename_input_prev[10] = "$%...%^&";
     while (true) {
         handle_events();
-        update_and_draw_cursor();
+        screen.blit_to_screen();
         if (strcmp(filename_input_prev, filename_input) != 0) {
             strcpy(filename_input_prev, filename_input);
 
@@ -458,13 +455,12 @@ bool editor_window_save_as() {
             int ey1 = box_window.y1 + 30;
             int ex2 = box_window.x2 - 100;
             int ey2 = box_window.y1 + 55;
-            BufferMain->fill_box(ex1, ey1, ex2, ey2, EditorPaletteId::WINDOW);
-            EditorBlackFont->write(BufferMain, 290, 250, filename_input);
+            screen.pic()->fill_box(ex1, ey1, ex2, ey2, EditorPaletteId::WINDOW);
+            EditorBlackFont->write(screen.pic(), 290, 250, filename_input);
             char tmp[40];
             strcpy(tmp, filename_input);
             tmp[i] = 0;
-            EditorBlackFont->write(BufferMain, 290 + EditorWhiteFont->len(tmp), 255, "-");
-            bltfront(BufferMain, ex1, ey1, ex2, ey2);
+            EditorBlackFont->write(screen.pic(), 290 + EditorWhiteFont->len(tmp), 255, "-");
         }
         if (was_key_just_pressed(DIK_ESCAPE) || was_right_mouse_just_clicked()) {
             return false;

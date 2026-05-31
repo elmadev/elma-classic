@@ -1313,46 +1313,47 @@ void editor_window_food_properties(const char* title, object::Property* property
     // Position of the first box only:
     box box_list = {(x1 + x2) / 2 - 70, ly1, (x1 + x2) / 2 + 70, ly1 + dy};
 
-    erase_cursor();
-    render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW, EditorPaletteId::WINDOW_BORDER);
-    EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, title);
-    render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+    screen_pic screen = screen_pic(BufferMain, screen_pic::Mode::EditorCanvas);
+    render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                EditorPaletteId::WINDOW_BORDER);
-    EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+    EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y1 + 20, title);
+    render_box(screen.pic(), box_cancel, EditorPaletteId::WINDOW_BUTTON,
+               EditorPaletteId::WINDOW_BORDER);
+    EditorBlackFont->write_centered(screen.pic(), (box_cancel.x1 + box_cancel.x2) / 2,
                                     box_cancel.y1 + 15, "Cancel");
 
-    EditorBlackFont->write(BufferMain, box_animation.x1 - 162, box_animation.y1 + 15,
+    EditorBlackFont->write(screen.pic(), box_animation.x1 - 162, box_animation.y1 + 15,
                            "Food anim number (1-9):");
     char tmp[20];
     sprintf(tmp, "%d", (int)(*animation + 1));
-    render_box(BufferMain, box_animation, EditorPaletteId::WINDOW_INPUT,
+    render_box(screen.pic(), box_animation, EditorPaletteId::WINDOW_INPUT,
                EditorPaletteId::WINDOW_BORDER);
-    EditorBlackFont->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
+    EditorBlackFont->write_centered(screen.pic(), (box_animation.x1 + box_animation.x2) / 2,
                                     box_animation.y1 + 15, tmp);
 
     for (int i = 0; i < list_length; i++) {
-        render_box(BufferMain, box_list, EditorPaletteId::WINDOW_LIST,
+        render_box(screen.pic(), box_list, EditorPaletteId::WINDOW_LIST,
                    EditorPaletteId::WINDOW_BORDER);
         int lx = (box_list.x1 + box_list.x2) / 2;
         int ly = box_list.y1 + 15;
         switch (i) {
         case 0:
-            EditorBlackFont->write_centered(BufferMain, lx, ly, "Normal Food");
+            EditorBlackFont->write_centered(screen.pic(), lx, ly, "Normal Food");
             break;
         case 1:
-            EditorBlackFont->write_centered(BufferMain, lx, ly, "Gravity Up");
+            EditorBlackFont->write_centered(screen.pic(), lx, ly, "Gravity Up");
             break;
         case 2:
-            EditorBlackFont->write_centered(BufferMain, lx, ly, "Gravity Down");
+            EditorBlackFont->write_centered(screen.pic(), lx, ly, "Gravity Down");
             break;
         case 3:
-            EditorBlackFont->write_centered(BufferMain, lx, ly, "Gravity Left");
+            EditorBlackFont->write_centered(screen.pic(), lx, ly, "Gravity Left");
             break;
         case 4:
-            EditorBlackFont->write_centered(BufferMain, lx, ly, "Gravity Right");
+            EditorBlackFont->write_centered(screen.pic(), lx, ly, "Gravity Right");
             break;
         default:
-            internal_error("yuiwegfyjkweg");
+            internal_error("editor_window_food_properties unknown gravity!");
         }
         // Update box position to the next box
         box_list.y1 += dy;
@@ -1362,28 +1363,20 @@ void editor_window_food_properties(const char* title, object::Property* property
     box_list.y1 = ly1;
     box_list.y2 = ly2;
 
-    bltfront(BufferMain, x1, y1, x2, y2);
-    draw_cursor();
-
     while (true) {
         handle_events();
-        update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
         }
         if (clicked_box(box_animation)) {
-            erase_cursor();
-            render_box(BufferMain, box_animation, EditorPaletteId::WINDOW_INPUT,
+            render_box(screen.pic(), box_animation, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_animation.x1 + box_animation.x2) / 2,
+            EditorBlackFont->write_centered(screen.pic(), (box_animation.x1 + box_animation.x2) / 2,
                                             box_animation.y1 + 18, "-");
-            bltfront(BufferMain, x1, y1, x2, y2);
-
             empty_keypress_buffer();
             while (true) {
                 handle_events();
                 if (was_key_just_pressed(DIK_ESCAPE)) {
-                    draw_cursor();
                     return;
                 }
                 while (has_text_input()) {
@@ -1391,10 +1384,10 @@ void editor_window_food_properties(const char* title, object::Property* property
                     if (c >= '1' && c <= '9') {
                         *animation = c - '1';
                         LevelChanged = true;
-                        draw_cursor();
                         return;
                     }
                 }
+                screen.blit_to_screen();
             }
         } else if (clicked_box(box_list)) {
             int index = (MouseY - box_list.y1) / dy;
@@ -1423,6 +1416,8 @@ void editor_window_food_properties(const char* title, object::Property* property
             }
             return;
         }
+
+        screen.blit_to_screen();
     }
 }
 

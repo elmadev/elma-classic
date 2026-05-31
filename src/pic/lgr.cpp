@@ -73,9 +73,9 @@ static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
            "This level file will look now different from that it was designed to look.");
     if (!InEditor) {
         MenuPalette->set();
+        blit8(BufferMain, BufferBall);
+        bltfront(BufferMain);
     }
-    blit8(BufferMain, BufferBall);
-    bltfront(BufferMain);
     return false;
 }
 

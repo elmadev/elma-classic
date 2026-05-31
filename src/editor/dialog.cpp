@@ -127,17 +127,20 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     // Draw dialog box
     int dy = 20;
     int height = text_length * dy + 50;
-    int x1 = SCREEN_WIDTH / 2 - width / 2;
-    int y1 = SCREEN_HEIGHT / 2 - height / 2;
-    int x2 = SCREEN_WIDTH / 2 + width / 2;
-    int y2 = SCREEN_HEIGHT / 2 + height / 2;
+    // Make sure x1/y1 are never negative by adjusting screen_width/screen_height
+    int screen_width = std::max(SCREEN_WIDTH, width);
+    int screen_height = std::max(SCREEN_HEIGHT, height);
+    int x1 = screen_width / 2 - width / 2;
+    int y1 = screen_height / 2 - height / 2;
+    int x2 = screen_width / 2 + width / 2;
+    int y2 = screen_height / 2 + height / 2;
     screen_pic screen = screen_pic(BufferMain);
     render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                EditorPaletteId::WINDOW_BORDER);
 
     // Draw text
     for (int i = 0; i < text_length; i++) {
-        EditorBlackFont->write_centered(screen.pic(), SCREEN_WIDTH / 2, y1 + 22 + i * dy,
+        EditorBlackFont->write_centered(screen.pic(), screen_width / 2, y1 + 22 + i * dy,
                                         text_array[i]);
     }
 
@@ -148,16 +151,16 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     int button_y2 = y2 - 10;
     int button_dx = 80;
     if (button_length == 1) {
-        button_array_x1[0] = SCREEN_WIDTH / 2;
+        button_array_x1[0] = screen_width / 2;
     }
     if (button_length == 2) {
-        button_array_x1[0] = SCREEN_WIDTH / 2 - button_dx / 2;
-        button_array_x1[1] = SCREEN_WIDTH / 2 + button_dx / 2;
+        button_array_x1[0] = screen_width / 2 - button_dx / 2;
+        button_array_x1[1] = screen_width / 2 + button_dx / 2;
     }
     if (button_length == 3) {
-        button_array_x1[0] = SCREEN_WIDTH / 2 - button_dx;
-        button_array_x1[1] = SCREEN_WIDTH / 2;
-        button_array_x1[2] = SCREEN_WIDTH / 2 + button_dx;
+        button_array_x1[0] = screen_width / 2 - button_dx;
+        button_array_x1[1] = screen_width / 2;
+        button_array_x1[2] = screen_width / 2 + button_dx;
     }
     if (button_length > 3) {
         internal_error("dialog button_length > 3");

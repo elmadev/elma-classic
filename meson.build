@@ -16,6 +16,7 @@ elma_sources = files(
     'src/editor/dialog.cpp',
     'src/editor/editor.cpp',
     'src/editor/help.cpp',
+    'src/editor/screen_pic.cpp',
     'src/editor/tool.cpp',
     'src/editor/topology.cpp',
     'src/editor/window.cpp',

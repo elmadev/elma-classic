@@ -1,6 +1,8 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#include "pic/pic8.h"
+
 class abc8;
 class object;
 class palette;
@@ -43,6 +45,7 @@ constexpr unsigned char WHITE_FONT = 62;
 
 extern int MouseX;
 extern int MouseY;
+void draw_cursor(pic8& dest, bool cursor_shape_is_x);
 void erase_cursor();
 void draw_cursor();
 void update_and_draw_cursor();

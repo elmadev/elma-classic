@@ -171,6 +171,34 @@ int MouseX = 0;
 int MouseY = 0;
 static bool CursorShapeIsX = false;
 
+static void draw_cursor_pixel(pic8& dest, int x, int y) {
+    if (x < 0 || y < 0 || x >= dest.get_width() || y >= dest.get_height()) {
+        return;
+    }
+    unsigned char palette_id = dest.gpixel(x, y);
+    palette_id += 128;
+    dest.ppixel(x, y, palette_id);
+}
+
+void draw_cursor(pic8& dest, bool cursor_shape_is_x) {
+    constexpr int CURSOR_RADIUS = 4;
+    for (int i = -CURSOR_RADIUS; i <= CURSOR_RADIUS; i++) {
+        if (cursor_shape_is_x) {
+            // Draw "x"
+            draw_cursor_pixel(dest, MouseX + i, MouseY + i);
+            if (i != 0) {
+                draw_cursor_pixel(dest, MouseX + i, MouseY - i);
+            }
+        } else {
+            // Draw "+"
+            draw_cursor_pixel(dest, MouseX + i, MouseY);
+            if (i != 0) {
+                draw_cursor_pixel(dest, MouseX, MouseY + i);
+            }
+        }
+    }
+}
+
 static void draw_cursor_pixel(int x, int y) {
     if (x < 0 || y < 0 || x > (SCREEN_WIDTH - 1) || y > (SCREEN_HEIGHT - 1)) {
         return;

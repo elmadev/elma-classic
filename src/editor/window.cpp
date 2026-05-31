@@ -637,7 +637,7 @@ static void preview_texture(pic8* dest, texture* text, mask* msk, int x, int y) 
 
 enum class SpriteType { Picture, Texture, Mask };
 
-static void editor_window_select_sprite_name(char* picture_name, char* texture_name,
+static void editor_window_select_sprite_name(pic8* dest, char* picture_name, char* texture_name,
                                              char* mask_name, SpriteType sprite_type) {
     create_lgr_palette_map(Lgr->palette_data);
 
@@ -714,18 +714,10 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
     int view_index = 0;
     bool rerender = true;
     std::string search_input;
+    screen_pic screen = screen_pic(dest, screen_pic::Mode::EditorCanvas);
     empty_keypress_buffer();
-
-    // Keep track of the box where we are drawing, so we can restore the background later
-    int preview_x2 = 0;
-    int preview_y2 = 0;
-    erase_cursor();
-    blit8(BufferBall, BufferMain);
-    draw_cursor();
-
     while (true) {
         handle_events();
-        update_and_draw_cursor();
         adjust_list_view(selected_index, view_index, list_length, max_visible_entries, rerender,
                          box_up, box_down, box_list);
         if (process_list_search(search_input, selected_index, view_index, list_length,
@@ -757,8 +749,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
             strcpy(name, name_at(selected_index));
 
             // Restore background image
-            erase_cursor();
-            blit8(BufferMain, BufferBall, 0, 0, 0, 0, preview_x2, preview_y2);
+            screen.reset();
 
             // Draw new sprite
             if (picture_name[0] && (texture_name[0] || mask_name[0])) {
@@ -770,9 +761,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                     internal_error("editor_window_select_sprite_name picture_index < 0");
                 }
                 picture* pict = &Lgr->pictures[index];
-                preview_picture(BufferMain, pict, 10, 10);
-                preview_x2 = 10 + pict->width - 1;
-                preview_y2 = 10 + pict->height - 1;
+                preview_picture(screen.pic(), pict, 10, 10);
             }
             if (texture_name[0] && mask_name[0]) {
                 int index = Lgr->get_texture_index(texture_name);
@@ -787,22 +776,21 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                 }
                 mask* msk = &Lgr->masks[index];
 
-                preview_texture(BufferMain, text, msk, 10, 10);
-                preview_x2 = 10 + msk->width - 1;
-                preview_y2 = 10 + msk->height - 1;
+                preview_texture(screen.pic(), text, msk, 10, 10);
             }
 
             // Draw the list of sprites
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+            render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                        EditorPaletteId::WINDOW_BORDER);
-            render_box(BufferMain, lx1, ly1, lx2, ly2, EditorPaletteId::WINDOW_LIST,
+            render_box(screen.pic(), lx1, ly1, lx2, ly2, EditorPaletteId::WINDOW_LIST,
                        EditorPaletteId::WINDOW_BORDER);
             for (int i = 0; i < max_visible_entries && i + view_index < list_length; i++) {
                 if (i + view_index == selected_index) {
-                    BufferMain->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1, ly1 + (i + 1) * dy - 1,
-                                         EditorPaletteId::WINDOW_LIST_SELECTED);
+                    screen.pic()->fill_box(lx1 + 1, ly1 + i * dy + 1, lx2 - 1,
+                                           ly1 + (i + 1) * dy - 1,
+                                           EditorPaletteId::WINDOW_LIST_SELECTED);
                 }
-                EditorBlackFont->write(BufferMain, lx1 + 3, ly1 + 15 + i * dy,
+                EditorBlackFont->write(screen.pic(), lx1 + 3, ly1 + 15 + i * dy,
                                        name_at(i + view_index));
 
                 if (sprite_type == SpriteType::Picture || sprite_type == SpriteType::Texture) {
@@ -815,7 +803,7 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
 
                     char details[20];
                     sprintf(details, "%d", default_distance);
-                    EditorBlackFont->write(BufferMain, lx1 + 67, ly1 + 15 + i * dy, details);
+                    EditorBlackFont->write(screen.pic(), lx1 + 67, ly1 + 15 + i * dy, details);
                     Clipping default_clipping = Clipping::Unclipped;
                     if (sprite_type == SpriteType::Picture) {
                         default_clipping = Lgr->pictures[i + view_index].default_clipping;
@@ -824,26 +812,25 @@ static void editor_window_select_sprite_name(char* picture_name, char* texture_n
                     }
 
                     strcpy(details, clipping_to_string(default_clipping));
-                    EditorBlackFont->write(BufferMain, lx1 + 92, ly1 + 15 + i * dy, details);
+                    EditorBlackFont->write(screen.pic(), lx1 + 92, ly1 + 15 + i * dy, details);
                 }
             }
 
             // Draw other buttons
-            render_box(BufferMain, box_up, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_up, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_arrow(BufferMain, box_up, EditorPaletteId::WINDOW_BORDER, true);
-            render_box(BufferMain, box_down, EditorPaletteId::WINDOW_BUTTON,
+            draw_arrow(screen.pic(), box_up, EditorPaletteId::WINDOW_BORDER, true);
+            render_box(screen.pic(), box_down, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_arrow(BufferMain, box_down, EditorPaletteId::WINDOW_BORDER, false);
-            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+            draw_arrow(screen.pic(), box_down, EditorPaletteId::WINDOW_BORDER, false);
+            render_box(screen.pic(), box_cancel, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+            EditorBlackFont->write_centered(screen.pic(), (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
-            render_list_search(BufferMain, box_search, search_input);
-
-            bltfront(BufferMain);
-            draw_cursor();
+            render_list_search(screen.pic(), box_search, search_input);
         }
+
+        screen.blit_to_screen();
     }
 }
 
@@ -890,7 +877,7 @@ void editor_window_choose_sprite() {
             return;
         }
         if (clicked_box(box_picture)) {
-            editor_window_select_sprite_name(picture_name, null_name, null_name,
+            editor_window_select_sprite_name(BufferMain, picture_name, null_name, null_name,
                                              SpriteType::Picture);
             erase_cursor();
             blit8(BufferMain, BufferBall);
@@ -901,7 +888,7 @@ void editor_window_choose_sprite() {
             }
             rerender = true;
         } else if (clicked_box(box_texture)) {
-            editor_window_select_sprite_name(null_name, texture_name, mask_name,
+            editor_window_select_sprite_name(BufferMain, null_name, texture_name, mask_name,
                                              SpriteType::Texture);
             erase_cursor();
             blit8(BufferMain, BufferBall);
@@ -912,7 +899,8 @@ void editor_window_choose_sprite() {
             }
             rerender = true;
         } else if (clicked_box(box_mask)) {
-            editor_window_select_sprite_name(null_name, texture_name, mask_name, SpriteType::Mask);
+            editor_window_select_sprite_name(BufferMain, null_name, texture_name, mask_name,
+                                             SpriteType::Mask);
             erase_cursor();
             blit8(BufferMain, BufferBall);
             bltfront(BufferMain);
@@ -1618,7 +1606,7 @@ void editor_window_level_properties() {
             if (Lgr->get_mask_index("maskbig") >= 0) {
                 strcpy(mask_name, "maskbig");
             }
-            editor_window_select_sprite_name(null_name, foreground_name, mask_name,
+            editor_window_select_sprite_name(BufferMain, null_name, foreground_name, mask_name,
                                              SpriteType::Texture);
             erase_cursor();
             blit8(BufferMain, BufferBall);
@@ -1631,7 +1619,7 @@ void editor_window_level_properties() {
             if (Lgr->get_mask_index("maskbig") >= 0) {
                 strcpy(mask_name, "maskbig");
             }
-            editor_window_select_sprite_name(null_name, background_name, mask_name,
+            editor_window_select_sprite_name(BufferMain, null_name, background_name, mask_name,
                                              SpriteType::Texture);
             erase_cursor();
             blit8(BufferMain, BufferBall);

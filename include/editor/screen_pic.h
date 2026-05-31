@@ -7,7 +7,13 @@ class pic8;
 
 class screen_pic {
   public:
-    screen_pic(pic8* initial);
+    enum class Mode {
+        OutsideEditor,
+        EditorGui,
+        EditorCanvas,
+    };
+
+    screen_pic(pic8* initial, Mode mode);
     void blit_to_screen();
     pic8* pic() const { return pic_.get(); };
     void reset();
@@ -18,6 +24,7 @@ class screen_pic {
 
     pic8* initial_;
     std::unique_ptr<pic8> pic_;
+    Mode mode_;
 };
 
 #endif

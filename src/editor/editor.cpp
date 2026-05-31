@@ -273,8 +273,6 @@ void draw_editor_border(pic8& pic) {
 static void draw_editor_gui() {
     // Entire screen blue
     BufferMain->fill_box(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, EditorPaletteId::MENU);
-    // Entire screen border
-    draw_editor_border(*BufferMain);
     // Tooltip section line (top)
     BufferMain->line(0, EDITOR_MENU_Y - 1, SCREEN_WIDTH - 1, EDITOR_MENU_Y - 1,
                      EditorPaletteId::MENU_BORDER);
@@ -439,10 +437,10 @@ static void draw_editor() {
     }
 
     // Background of level canvas
-    BufferMain->fill_box(EDITOR_MENU_X, EDITOR_MENU_Y, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2,
+    BufferMain->fill_box(EDITOR_MENU_X, EDITOR_MENU_Y, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1,
                          EditorPaletteId::BACKGROUND);
     // Background of tooltip section (top)
-    BufferMain->fill_box(1, 1, SCREEN_WIDTH - 2, EDITOR_MENU_Y - 2, EditorPaletteId::BACKGROUND);
+    BufferMain->fill_box(1, 1, SCREEN_WIDTH - 1, EDITOR_MENU_Y - 2, EditorPaletteId::BACKGROUND);
 
     // Tooltip section
     EditorWhiteFont->write(BufferMain, 6, 15, "File:");

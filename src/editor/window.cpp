@@ -862,11 +862,11 @@ void editor_window_choose_sprite() {
     box box_ok = {x1 + 50, y2 - 30, x1 + 100, y2 - 10};
     box box_cancel = {x1 + 130, y2 - 30, x1 + 180, y2 - 10};
 
+    screen_pic screen = screen_pic(BufferMain, screen_pic::Mode::EditorCanvas);
     empty_keypress_buffer();
     bool rerender = true;
     while (true) {
         handle_events();
-        update_and_draw_cursor();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             return;
         }
@@ -877,34 +877,22 @@ void editor_window_choose_sprite() {
             return;
         }
         if (clicked_box(box_picture)) {
-            editor_window_select_sprite_name(BufferMain, picture_name, null_name, null_name,
+            editor_window_select_sprite_name(screen.pic(), picture_name, null_name, null_name,
                                              SpriteType::Picture);
-            erase_cursor();
-            blit8(BufferMain, BufferBall);
-            bltfront(BufferMain);
-            draw_cursor();
             if (picture_name[0]) {
                 texture_name[0] = mask_name[0] = 0;
             }
             rerender = true;
         } else if (clicked_box(box_texture)) {
-            editor_window_select_sprite_name(BufferMain, null_name, texture_name, mask_name,
+            editor_window_select_sprite_name(screen.pic(), null_name, texture_name, mask_name,
                                              SpriteType::Texture);
-            erase_cursor();
-            blit8(BufferMain, BufferBall);
-            bltfront(BufferMain);
-            draw_cursor();
             if (texture_name[0]) {
                 picture_name[0] = 0;
             }
             rerender = true;
         } else if (clicked_box(box_mask)) {
-            editor_window_select_sprite_name(BufferMain, null_name, texture_name, mask_name,
+            editor_window_select_sprite_name(screen.pic(), null_name, texture_name, mask_name,
                                              SpriteType::Mask);
-            erase_cursor();
-            blit8(BufferMain, BufferBall);
-            bltfront(BufferMain);
-            draw_cursor();
             if (mask_name[0]) {
                 picture_name[0] = 0;
             }
@@ -913,41 +901,40 @@ void editor_window_choose_sprite() {
         if (rerender) {
             rerender = false;
 
-            erase_cursor();
-
-            render_box(BufferMain, x1, y1, x2, y2, EditorPaletteId::WINDOW,
+            render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                        EditorPaletteId::WINDOW_BORDER);
 
-            EditorBlackFont->write_centered(BufferMain, (x1 + x2) / 2, y1 + 20, "Choose picture");
+            EditorBlackFont->write_centered(screen.pic(), (x1 + x2) / 2, y1 + 20, "Choose picture");
 
-            render_box(BufferMain, box_ok, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_ok, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            render_box(BufferMain, box_cancel, EditorPaletteId::WINDOW_BUTTON,
+            render_box(screen.pic(), box_cancel, EditorPaletteId::WINDOW_BUTTON,
                        EditorPaletteId::WINDOW_BORDER);
-            EditorBlackFont->write_centered(BufferMain, (box_ok.x1 + box_ok.x2) / 2, box_ok.y1 + 15,
-                                            "OK");
-            EditorBlackFont->write_centered(BufferMain, (box_cancel.x1 + box_cancel.x2) / 2,
+            EditorBlackFont->write_centered(screen.pic(), (box_ok.x1 + box_ok.x2) / 2,
+                                            box_ok.y1 + 15, "OK");
+            EditorBlackFont->write_centered(screen.pic(), (box_cancel.x1 + box_cancel.x2) / 2,
                                             box_cancel.y1 + 15, "CANCEL");
 
             int label_x1 = x1 + 8;
-            EditorBlackFont->write(BufferMain, label_x1, box_picture.y1 + 15, "Normal Picture:");
-            render_box(BufferMain, box_picture, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_picture.y1 + 15, "Normal Picture:");
+            render_box(screen.pic(), box_picture, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_textbox_left(BufferMain, box_picture, EditorPaletteId::WINDOW_INPUT, picture_name);
+            draw_textbox_left(screen.pic(), box_picture, EditorPaletteId::WINDOW_INPUT,
+                              picture_name);
 
-            EditorBlackFont->write(BufferMain, label_x1, box_texture.y1 + 15, "Texture:");
-            render_box(BufferMain, box_texture, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_texture.y1 + 15, "Texture:");
+            render_box(screen.pic(), box_texture, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_textbox_left(BufferMain, box_texture, EditorPaletteId::WINDOW_INPUT, texture_name);
+            draw_textbox_left(screen.pic(), box_texture, EditorPaletteId::WINDOW_INPUT,
+                              texture_name);
 
-            EditorBlackFont->write(BufferMain, label_x1, box_mask.y1 + 15, "Mask:");
-            render_box(BufferMain, box_mask, EditorPaletteId::WINDOW_INPUT,
+            EditorBlackFont->write(screen.pic(), label_x1, box_mask.y1 + 15, "Mask:");
+            render_box(screen.pic(), box_mask, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            draw_textbox_left(BufferMain, box_mask, EditorPaletteId::WINDOW_INPUT, mask_name);
-
-            bltfront(BufferMain);
-            draw_cursor();
+            draw_textbox_left(screen.pic(), box_mask, EditorPaletteId::WINDOW_INPUT, mask_name);
         }
+
+        screen.blit_to_screen();
     }
 }
 

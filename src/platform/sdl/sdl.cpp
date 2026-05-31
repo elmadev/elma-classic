@@ -400,17 +400,8 @@ void handle_events() {
             quit();
             break;
         case SDL_WINDOWEVENT:
-            // Force editor redraw if focus gained/lost to fix editor sometimes blanking
-            switch (event.window.event) {
-            case SDL_WINDOWEVENT_FOCUS_GAINED:
-                invalidate_editor_gui();
-                break;
-            case SDL_WINDOWEVENT_FOCUS_LOST:
-                invalidate_editor_gui();
-                break;
-            case SDL_WINDOWEVENT_RESIZED:
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
                 window_resize_event(event.window.data1, event.window.data2);
-                break;
             }
             break;
         case SDL_KEYDOWN: {

@@ -107,7 +107,9 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         internal_error("dialog text_length < 1");
     }
 
+    screen_pic::Mode mode = screen_pic::Mode::EditorCanvas;
     if (!InEditor) {
+        mode = screen_pic::Mode::OutsideEditor;
         hide_cursor();
         if (is_fullscreen()) {
             MouseX = SCREEN_WIDTH / 2;
@@ -134,7 +136,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     int y1 = screen_height / 2 - height / 2;
     int x2 = screen_width / 2 + width / 2;
     int y2 = screen_height / 2 + height / 2;
-    screen_pic screen = screen_pic(BufferMain);
+    screen_pic screen = screen_pic(BufferMain, mode);
     render_box(screen.pic(), x1, y1, x2, y2, EditorPaletteId::WINDOW,
                EditorPaletteId::WINDOW_BORDER);
 

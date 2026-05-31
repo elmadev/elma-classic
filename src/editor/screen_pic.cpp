@@ -1,4 +1,5 @@
 #include "editor/screen_pic.h"
+#include "editor/canvas.h"
 #include "editor/editor.h"
 #include "main.h"
 #include "pic8.h"
@@ -6,8 +7,25 @@
 #include "platform/implementation.h"
 #include <algorithm>
 
-screen_pic::screen_pic(pic8* initial)
-    : initial_(initial) {
+static void draw_background(pic8& pic, screen_pic::Mode mode) {
+    switch (mode) {
+    case screen_pic::Mode::OutsideEditor:
+        pic.fill_box(EditorPaletteId::BACKGROUND);
+        return;
+    case screen_pic::Mode::EditorGui:
+        pic.fill_box(EditorPaletteId::MENU);
+        return;
+    case screen_pic::Mode::EditorCanvas:
+        pic.fill_box(EditorPaletteId::BACKGROUND);
+        pic.fill_box(0, EDITOR_MENU_Y, EDITOR_MENU_X - 1, pic.get_height() - 1,
+                     EditorPaletteId::MENU);
+        return;
+    }
+}
+
+screen_pic::screen_pic(pic8* initial, Mode mode)
+    : initial_(initial),
+      mode_(mode) {
     int width = MIN_WIDTH;
     int height = MIN_HEIGHT;
     if (initial_) {
@@ -36,6 +54,7 @@ void screen_pic::blit_to_screen(bool cursor_shape_is_x) {
 
     pic8* surface = lockbackbuffer_pic(false);
 
+    draw_background(*surface, mode_);
     blit8(surface, pic());
 
     constexpr int CURSOR_RADIUS = 4;
@@ -62,5 +81,6 @@ void screen_pic::reset() {
     if (!initial_) {
         internal_error("screen_pic::restore !initial_");
     }
+    draw_background(*pic(), mode_);
     blit8(pic(), initial_);
 }

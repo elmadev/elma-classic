@@ -5,7 +5,7 @@
 #include "level.h"
 #include "log.h"
 #include "menu/external.h"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include "util/util.h"

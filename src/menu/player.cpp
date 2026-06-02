@@ -1,5 +1,5 @@
 #include "menu/player.h"
-#include "abc8.h"
+#include "pic/abc8.h"
 #include "keys.h"
 #include "main.h"
 #include "menu/dialog.h"

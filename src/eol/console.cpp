@@ -1,5 +1,5 @@
 #include "eol/console.h"
-#include "abc8.h"
+#include "pic/abc8.h"
 #include "eol/eol.h"
 #include "eol/status_messages.h"
 #include "eol/settings.h"

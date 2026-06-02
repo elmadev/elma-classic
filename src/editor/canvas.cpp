@@ -4,7 +4,7 @@
 #include "M_PIC.H"
 #include "main.h"
 #include "menu/pic.h"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include <algorithm>
 #include <cmath>
 

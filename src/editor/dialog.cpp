@@ -1,11 +1,11 @@
 #include "editor/dialog.h"
-#include "abc8.h"
+#include "pic/abc8.h"
 #include "editor/editor.h"
 #include "keys.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu/pic.h"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include <algorithm>

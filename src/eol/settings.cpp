@@ -1,6 +1,6 @@
 #include "eol/settings.h"
 #include "level_load.h"
-#include "lgr.h"
+#include "pic/lgr.h"
 #include "main.h"
 #include "renderer/object_overlay.h"
 #include "state.h"

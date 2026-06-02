@@ -1,5 +1,5 @@
 #include "menu/nav.h"
-#include "abc8.h"
+#include "pic/abc8.h"
 #include "eol/settings.h"
 #include "fs_utils.h"
 #include "keys.h"

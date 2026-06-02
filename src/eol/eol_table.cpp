@@ -1,6 +1,6 @@
 #include "eol/eol_table.h"
-#include "abc8.h"
-#include "pic8.h"
+#include "pic/abc8.h"
+#include "pic/pic8.h"
 #include <algorithm>
 
 constexpr int TITLE_GAP = 22;

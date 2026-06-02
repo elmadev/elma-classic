@@ -9,7 +9,7 @@
 #include "platform/sdl/gl_renderer.h"
 #include "main.h"
 #include "M_PIC.H"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include <directinput/scancodes.h>
 #include <algorithm>
 #include <chrono>

@@ -9,7 +9,7 @@
 #include "renderer/render.h"
 #include "physics/forces.h"
 #include "level.h"
-#include "lgr.h"
+#include "pic/lgr.h"
 #include "main.h"
 #include "object.h"
 #include "physics/init.h"

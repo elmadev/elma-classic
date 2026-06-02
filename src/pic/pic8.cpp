@@ -1,6 +1,6 @@
 #include "M_PIC.H"
 #include "main.h"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include "qopen.h"

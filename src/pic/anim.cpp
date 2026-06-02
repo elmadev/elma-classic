@@ -1,7 +1,7 @@
-#include "anim.h"
+#include "pic/anim.h"
 #include "main.h"
 #include "renderer/render.h"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include <cstring>
 #include <format>
 

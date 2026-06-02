@@ -1,8 +1,8 @@
-#include "abc8.h"
+#include "pic/abc8.h"
 #include "log.h"
 #include "main.h"
 #include "menu/pic.h"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include "qopen.h"
 #include <cstring>
 #include <string>

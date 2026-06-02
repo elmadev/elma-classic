@@ -1,9 +1,9 @@
 #include "eol/eol.h"
 #include "eol/status_messages.h"
-#include "abc8.h"
+#include "pic/abc8.h"
 #include "level.h"
 #include "log.h"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include "util/util.h"
 #include <algorithm>
 #include <filesystem>

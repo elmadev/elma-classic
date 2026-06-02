@@ -3,10 +3,10 @@
 #include "editor/editor.h"
 #include "eol/settings.h"
 #include "editor/canvas.h"
-#include "lgr.h"
+#include "pic/lgr.h"
 #include "main.h"
 #include "menu/pic.h"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include "platform/implementation.h"
 #include "renderer/render.h"
 

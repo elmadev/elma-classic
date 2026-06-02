@@ -1,7 +1,7 @@
 #include "eol/status_messages.h"
 
-#include "abc8.h"
-#include "pic8.h"
+#include "pic/abc8.h"
+#include "pic/pic8.h"
 #include "platform/implementation.h"
 
 constexpr size_t MAX_STATUS_MESSAGES = 3;

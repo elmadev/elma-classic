@@ -6,7 +6,7 @@
 #include "editor/window.h"
 #include "editor/editor.h"
 #include "polygon.h"
-#include "lgr.h"
+#include "pic/lgr.h"
 #include "level_load.h"
 #include "main.h"
 #include "object.h"

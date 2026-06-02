@@ -4,7 +4,7 @@
 #include "editor/editor.h"
 #include "fs_utils.h"
 #include "level.h"
-#include "lgr.h"
+#include "pic/lgr.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "physics/init.h"

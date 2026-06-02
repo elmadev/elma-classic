@@ -1,7 +1,7 @@
 #ifndef GRASS_H
 #define GRASS_H
 
-#include "lgr.h"
+#include "pic/lgr.h"
 #include <memory>
 #include <vector>
 

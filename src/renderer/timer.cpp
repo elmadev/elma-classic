@@ -1,6 +1,6 @@
-#include "lgr.h"
+#include "pic/lgr.h"
 #include "main.h"
-#include "pic8.h"
+#include "pic/pic8.h"
 #include "renderer/timer.h"
 #include "util/util.h"
 

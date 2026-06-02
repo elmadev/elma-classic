@@ -1,7 +1,7 @@
 #include "sprite.h"
 #include "editor/canvas.h"
 #include "fs_utils.h"
-#include "lgr.h"
+#include "pic/lgr.h"
 #include "main.h"
 #include "physics/init.h"
 #include <cstring>

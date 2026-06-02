@@ -8,7 +8,7 @@
 #include "grass.h"
 #include "renderer/render.h"
 #include "level/level.h"
-#include "level_load.h"
+#include "game/level_load.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu/pic.h"

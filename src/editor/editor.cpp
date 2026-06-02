@@ -10,7 +10,7 @@
 #include "LEJATSZO.H"
 #include "level/level.h"
 #include "pic/lgr.h"
-#include "level_load.h"
+#include "game/level_load.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu/pic.h"

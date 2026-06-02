@@ -1,9 +1,9 @@
 #include "eol/settings.h"
-#include "level_load.h"
+#include "game/level_load.h"
 #include "pic/lgr.h"
 #include "main.h"
 #include "renderer/object_overlay.h"
-#include "state.h"
+#include "game/state.h"
 #include "physics/init.h"
 #include "platform/implementation.h"
 #include <fstream>

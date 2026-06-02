@@ -2,7 +2,7 @@
 #include "debug/profiler.h"
 #include "fs_utils.h"
 #include "main.h"
-#include "recorder.h"
+#include "game/recorder.h"
 #include <filesystem>
 #include <unordered_set>
 

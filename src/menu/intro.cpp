@@ -13,8 +13,8 @@
 #include "pic/pic8.h"
 #include "platform/implementation.h"
 #include "menu/rec_list.h"
-#include "recorder.h"
-#include "state.h"
+#include "game/recorder.h"
+#include "game/state.h"
 #include "qopen.h"
 #include <directinput/scancodes.h>
 

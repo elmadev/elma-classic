@@ -5,7 +5,7 @@
 #include "menu/nav.h"
 #include "menu/pic.h"
 #include "platform/utils.h"
-#include "state.h"
+#include "game/state.h"
 #include "util/util.h"
 #include <cstring>
 #include <format>

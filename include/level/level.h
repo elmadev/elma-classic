@@ -1,7 +1,7 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
-#include "state.h"
+#include "game/state.h"
 #include "vect2.h"
 #include <optional>
 

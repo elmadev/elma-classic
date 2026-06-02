@@ -7,7 +7,7 @@
 #include "physics/collision.h"
 #include "physics/init.h"
 #include "physics/move.h"
-#include "recorder.h"
+#include "game/recorder.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cmath>

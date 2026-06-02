@@ -8,7 +8,7 @@
 #include "menu/nav.h"
 #include "menu/pic.h"
 #include "platform/implementation.h"
-#include "state.h"
+#include "game/state.h"
 #include "util/util.h"
 #include <directinput/scancodes.h>
 #include <cstring>

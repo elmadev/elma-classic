@@ -1,7 +1,7 @@
 #include "menu/options.h"
 #include "eol/settings.h"
 #include "fs_utils.h"
-#include "level_load.h"
+#include "game/level_load.h"
 #include "M_PIC.H"
 #include "menu/controls.h"
 #include "menu/dialog.h"
@@ -9,7 +9,7 @@
 #include "menu/pic.h"
 #include "menu/player.h"
 #include "platform/implementation.h"
-#include "state.h"
+#include "game/state.h"
 #include <cstring>
 #include <cmath>
 #include <format>

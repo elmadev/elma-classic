@@ -1,7 +1,7 @@
 #ifndef LEJATSZO_H
 #define LEJATSZO_H
 
-#include "recorder.h"
+#include "game/recorder.h"
 #include <string>
 
 extern int Single;

@@ -7,7 +7,7 @@
 #include "editor/editor.h"
 #include "level/polygon.h"
 #include "pic/lgr.h"
-#include "level_load.h"
+#include "game/level_load.h"
 #include "main.h"
 #include "level/object.h"
 #include "physics/init.h"

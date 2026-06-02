@@ -2,13 +2,13 @@
 #include "menu/nav.h"
 #include "fs_utils.h"
 #include "LEJATSZO.H"
-#include "level_load.h"
+#include "game/level_load.h"
 #include "main.h"
 #include "menu/nav.h"
 #include "menu/pic.h"
 #include "menu/play.h"
 #include "platform/implementation.h"
-#include "state.h"
+#include "game/state.h"
 #include "directinput/scancodes.h"
 #include <cstring>
 #include <string>

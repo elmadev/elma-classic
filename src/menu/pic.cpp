@@ -8,7 +8,7 @@
 #include "pic/pic8.h"
 #include "platform/implementation.h"
 #include <directinput/scancodes.h>
-#include "state.h"
+#include "game/state.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>

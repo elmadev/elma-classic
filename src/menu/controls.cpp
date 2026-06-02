@@ -5,7 +5,7 @@
 #include "main.h"
 #include "menu/nav.h"
 #include "platform/implementation.h"
-#include "state.h"
+#include "game/state.h"
 #include <cstring>
 #include <format>
 

@@ -2,7 +2,7 @@
 #include "main.h"
 #include "menu/pic.h"
 #include "platform/utils.h"
-#include "state.h"
+#include "game/state.h"
 #include <cstring>
 
 bool is_skippable(int index) {

@@ -39,7 +39,7 @@ elma_sources = files(
     'src/renderer/render.cpp',
     'grass.cpp',
     'src/platform/utils.cpp',
-    'LEJATSZO.CPP',
+    'src/game/game.cpp',
     'src/physics/forces.cpp',
     'src/pic/lgr.cpp',
     'src/game/level_load.cpp',

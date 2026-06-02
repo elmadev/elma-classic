@@ -9,7 +9,7 @@
 #include "eol/status_messages.h"
 #include "eol/settings.h"
 #include "flagtag.h"
-#include "LEJATSZO.H"
+#include "game/game.h"
 #include "level/level.h"
 #include "pic/lgr.h"
 #include "M_PIC.H"

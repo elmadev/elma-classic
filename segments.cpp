@@ -1,5 +1,5 @@
 #include "segments.h"
-#include "LEJATSZO.H"
+#include "game/game.h"
 #include "level/level.h"
 #include "main.h"
 #include "level/polygon.h"

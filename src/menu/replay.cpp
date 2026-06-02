@@ -4,7 +4,7 @@
 #include "eol/settings.h"
 #include "fs_utils.h"
 #include "menu/rec_list.h"
-#include "LEJATSZO.H"
+#include "game/game.h"
 #include "level/level.h"
 #include "game/level_load.h"
 #include "menu/dialog.h"

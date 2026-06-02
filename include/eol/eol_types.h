@@ -1,7 +1,7 @@
 #ifndef EOL_TYPES_H
 #define EOL_TYPES_H
 
-#include "LEJATSZO.H"
+#include "game/game.h"
 #include "level/level.h"
 #include "fs_utils.h"
 #include "physics/init.h"

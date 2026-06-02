@@ -1,4 +1,4 @@
-#include "LEJATSZO.H"
+#include "game/game.h"
 #include "editor/editor.h"
 #include "eol/console.h"
 #include "eol/eol.h"

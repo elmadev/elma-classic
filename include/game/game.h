@@ -1,5 +1,5 @@
-#ifndef LEJATSZO_H
-#define LEJATSZO_H
+#ifndef GAME_H
+#define GAME_H
 
 #include "game/recorder.h"
 #include <string>

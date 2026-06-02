@@ -1,7 +1,7 @@
 #include "menu/external.h"
 #include "menu/nav.h"
 #include "fs_utils.h"
-#include "LEJATSZO.H"
+#include "game/game.h"
 #include "game/level_load.h"
 #include "main.h"
 #include "menu/nav.h"

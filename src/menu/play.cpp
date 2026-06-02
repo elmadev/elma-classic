@@ -5,7 +5,7 @@
 #include "editor/editor.h"
 #include "flagtag.h"
 #include "keys.h"
-#include "LEJATSZO.H"
+#include "game/game.h"
 #include "level/level.h"
 #include "game/level_load.h"
 #include "main.h"

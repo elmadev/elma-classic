@@ -7,7 +7,7 @@
 #include "editor/tool.h"
 #include "editor/topology.h"
 #include "keys.h"
-#include "LEJATSZO.H"
+#include "game/game.h"
 #include "level/level.h"
 #include "pic/lgr.h"
 #include "game/level_load.h"

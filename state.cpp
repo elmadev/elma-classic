@@ -1,6 +1,6 @@
 #include "state.h"
 #include "eol/settings.h"
-#include "level.h"
+#include "level/level.h"
 #include "main.h"
 #include "menu/dialog.h"
 #include "util/util.h"

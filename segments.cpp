@@ -1,8 +1,8 @@
 #include "segments.h"
 #include "LEJATSZO.H"
-#include "level.h"
+#include "level/level.h"
 #include "main.h"
-#include "polygon.h"
+#include "level/polygon.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>

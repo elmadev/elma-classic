@@ -1,6 +1,6 @@
 #include "editor/canvas.h"
 #include "editor/editor.h"
-#include "level.h"
+#include "level/level.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu/pic.h"

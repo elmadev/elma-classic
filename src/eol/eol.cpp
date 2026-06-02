@@ -2,7 +2,7 @@
 #include "eol/status_messages.h"
 #include "eol/console.h"
 #include "eol/settings.h"
-#include "level.h"
+#include "level/level.h"
 #include "log.h"
 #include "menu/external.h"
 #include "pic/pic8.h"

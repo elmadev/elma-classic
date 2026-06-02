@@ -4,7 +4,7 @@
 #include "grass.h"
 #include "pic/lgr.h"
 #include "main.h"
-#include "sprite.h"
+#include "level/sprite.h"
 #include "vect2.h"
 #include <cstdint>
 #include <vector>

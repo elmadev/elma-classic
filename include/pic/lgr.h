@@ -1,7 +1,7 @@
 #ifndef LGRFILE_H
 #define LGRFILE_H
 
-#include "sprite.h"
+#include "level/sprite.h"
 
 class anim;
 class grass;

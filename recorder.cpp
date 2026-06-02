@@ -1,10 +1,10 @@
 #include "recorder.h"
 #include "flagtag.h"
 #include "fs_utils.h"
-#include "level.h"
+#include "level/level.h"
 #include "main.h"
 #include "menu/rec_list.h"
-#include "object.h"
+#include "level/object.h"
 #include "qopen.h"
 #include "util/util.h"
 #include <algorithm>

@@ -1,8 +1,8 @@
 #ifndef EDITOR_WINDOW_H
 #define EDITOR_WINDOW_H
 
-#include "object.h"
-#include "polygon.h"
+#include "level/object.h"
+#include "level/polygon.h"
 #include <string>
 
 class sprite;

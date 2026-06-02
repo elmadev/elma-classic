@@ -1,7 +1,7 @@
 #ifndef PICLIST_H
 #define PICLIST_H
 
-#include "sprite.h"
+#include "level/sprite.h"
 #include <cstdio>
 
 #define MAX_PICLIST_LENGTH (3000)

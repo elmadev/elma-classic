@@ -1,4 +1,4 @@
-#include "sprite.h"
+#include "level/sprite.h"
 #include "editor/canvas.h"
 #include "fs_utils.h"
 #include "pic/lgr.h"

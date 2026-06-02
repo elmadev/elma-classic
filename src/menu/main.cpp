@@ -5,7 +5,7 @@
 #include "eol/settings.h"
 #include "fs_utils.h"
 #include "LEJATSZO.H"
-#include "level.h"
+#include "level/level.h"
 #include "level_load.h"
 #include "main.h"
 #include "menu/intro.h"

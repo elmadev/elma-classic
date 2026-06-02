@@ -1,7 +1,7 @@
 #ifndef EDITOR_TOOL_H
 #define EDITOR_TOOL_H
 
-#include "object.h"
+#include "level/object.h"
 
 void tool_move_leftclick(int mouse_x, int mouse_y);
 void tool_move_rightclick(int mouse_x, int mouse_y);

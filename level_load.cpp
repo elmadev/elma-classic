@@ -3,7 +3,7 @@
 #include "editor/dialog.h"
 #include "editor/editor.h"
 #include "fs_utils.h"
-#include "level.h"
+#include "level/level.h"
 #include "pic/lgr.h"
 #include "main.h"
 #include "menu/pic.h"

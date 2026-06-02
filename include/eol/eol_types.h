@@ -2,7 +2,7 @@
 #define EOL_TYPES_H
 
 #include "LEJATSZO.H"
-#include "level.h"
+#include "level/level.h"
 #include "fs_utils.h"
 #include "physics/init.h"
 #include <cstdint>

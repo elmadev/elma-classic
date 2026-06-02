@@ -5,7 +5,7 @@
 #include "editor/editor.h"
 #include "fs_utils.h"
 #include "keys.h"
-#include "level.h"
+#include "level/level.h"
 #include "level_load.h"
 #include "pic/lgr.h"
 #include "M_PIC.H"
@@ -14,9 +14,9 @@
 #include "pic/pic8.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
-#include "polygon.h"
+#include "level/polygon.h"
 #include "util/util.h"
-#include "sprite.h"
+#include "level/sprite.h"
 #include <algorithm>
 #include <cstring>
 #include <directinput/scancodes.h>

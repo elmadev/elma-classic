@@ -2,9 +2,9 @@
 #include "editor/canvas.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
-#include "level.h"
-#include "object.h"
-#include "polygon.h"
+#include "level/level.h"
+#include "level/object.h"
+#include "level/polygon.h"
 
 bool check_topology(bool show_dialog) {
     dialog("Checking Topology, please wait!", DIALOG_BUTTONS, DIALOG_RETURN);

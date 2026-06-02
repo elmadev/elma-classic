@@ -6,7 +6,7 @@
 #include "flagtag.h"
 #include "keys.h"
 #include "LEJATSZO.H"
-#include "level.h"
+#include "level/level.h"
 #include "level_load.h"
 #include "main.h"
 #include "menu/external.h"

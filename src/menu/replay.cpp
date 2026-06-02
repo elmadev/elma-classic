@@ -5,7 +5,7 @@
 #include "fs_utils.h"
 #include "menu/rec_list.h"
 #include "LEJATSZO.H"
-#include "level.h"
+#include "level/level.h"
 #include "level_load.h"
 #include "menu/dialog.h"
 #include "menu/nav.h"

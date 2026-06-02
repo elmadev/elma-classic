@@ -7,7 +7,7 @@
 #include "fs_utils.h"
 #include "grass.h"
 #include "renderer/render.h"
-#include "level.h"
+#include "level/level.h"
 #include "level_load.h"
 #include "M_PIC.H"
 #include "main.h"
@@ -16,7 +16,7 @@
 #include "pic/piclist.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
-#include "sprite.h"
+#include "level/sprite.h"
 #include "debug/profiler.h"
 #include <algorithm>
 #include <cstring>

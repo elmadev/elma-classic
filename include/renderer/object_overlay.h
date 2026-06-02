@@ -1,7 +1,7 @@
 #ifndef OBJECT_OVERLAY_H
 #define OBJECT_OVERLAY_H
 
-#include "object.h"
+#include "level/object.h"
 
 class pic8;
 

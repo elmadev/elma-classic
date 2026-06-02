@@ -1,7 +1,7 @@
-#include "polygon.h"
+#include "level/polygon.h"
 #include "editor/canvas.h"
 #include "editor/dialog.h"
-#include "level.h"
+#include "level/level.h"
 #include "main.h"
 #include "util/util.h"
 #include <algorithm>

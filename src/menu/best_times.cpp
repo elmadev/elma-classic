@@ -1,7 +1,7 @@
 #include "pic/abc8.h"
 #include "menu/best_times.h"
 #include "eol/settings.h"
-#include "level.h"
+#include "level/level.h"
 #include "menu/nav.h"
 #include "menu/pic.h"
 #include "platform/utils.h"

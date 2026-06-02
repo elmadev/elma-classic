@@ -4,14 +4,14 @@
 #include "editor/window.h"
 #include "editor/editor.h"
 #include "platform/implementation.h"
-#include "polygon.h"
-#include "level.h"
+#include "level/polygon.h"
+#include "level/level.h"
 #include "pic/lgr.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu/pic.h"
 #include "pic/pic8.h"
-#include "sprite.h"
+#include "level/sprite.h"
 
 static bool delete_polygon(polygon* poly) {
     int poly_count = 0;

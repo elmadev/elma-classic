@@ -98,8 +98,8 @@ static void sound_init() {
     }
 }
 
-static hud_visibility HudVisibility1 = {true, false, true, false};
-static hud_visibility HudVisibility2 = {true, false, true, false};
+static hud_visibility HudVisibility1 = {true, false, true, true};
+static hud_visibility HudVisibility2 = {true, false, true, true};
 
 static BikeState handle_object_interaction(int object_id, int* apple_count, motorst* mot) {
     if (object_id < 0 || object_id >= MAX_OBJECTS) {

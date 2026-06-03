@@ -25,6 +25,7 @@ elma_sources = files(
     'src/eol/eol.cpp',
     'src/eol/settings.cpp',
     'src/eol/status_messages.cpp',
+    'src/game/driver.cpp',
     'src/game/game.cpp',
     'src/game/level_load.cpp',
     'src/game/qopen.cpp',

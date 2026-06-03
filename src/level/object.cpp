@@ -139,4 +139,6 @@ std::optional<MotorGravity> object::gravity() const {
     case object::Property::GravityRight:
         return MotorGravity::Right;
     }
+
+    internal_error("object::gravity() invalid property!");
 }

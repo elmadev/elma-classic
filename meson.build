@@ -43,7 +43,7 @@ elma_sources = files(
     'src/physics/forces.cpp',
     'src/pic/lgr.cpp',
     'src/game/level_load.cpp',
-    'main.cpp',
+    'src/main.cpp',
     'src/menu/main.cpp',
     'src/menu/external.cpp',
     'src/menu/pic.cpp',

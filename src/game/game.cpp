@@ -139,7 +139,7 @@ static BikeState handle_object_interaction(driver& driv, int object_id) {
 static void physics_subframe(driver& driv, double time, double dt) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
-    bike_metadata* metadata = driv.meta;
+    bike_metadata* metadata = &driv.meta;
     recorder* rec = driv.rec;
 
     // Adjust key inputs to only allow valid inputs, accounting for volt delay and cripples
@@ -205,10 +205,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
         mot->body_r = mot->body_r + BikeStartOffset;
 
         bool draw_view = metadata->draw_view;
-        memset(metadata, 0, sizeof(bike_metadata));
-        metadata->bike_turning.turn_time = -1000.0;
-        metadata->camera_turning.turn_time = -1000.0;
-        metadata->volt_time = -100.0;
+        driv.reset_metadata();
         metadata->draw_view = draw_view;
 
         // Give flag to other player
@@ -252,7 +249,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
 
 static void update_view_settings(driver& driv, bool* other_draw_view) {
     player_keys* keys = driv.keys;
-    bike_metadata* metadata = driv.meta;
+    bike_metadata* metadata = &driv.meta;
 
     // Visibility of player viewpoint
     if (was_game_key_just_pressed(keys->toggle_visibility)) {
@@ -322,7 +319,7 @@ static void update_camera_turn_phase(turning_data* data, double time, int flippe
 
 static void update_graphical_metadata(driver& driv, recorder* rec, double time) {
     motorst& mot = *driv.mot;
-    bike_metadata& metadata = *driv.meta;
+    bike_metadata& metadata = driv.meta;
 
     // Update bike turn data
     update_bike_turn_phase(&metadata.bike_turning, rec, time, mot.flipped_bike);
@@ -343,7 +340,7 @@ static void update_graphical_metadata(driver& driv, recorder* rec, double time) 
 static void physics_frame_end(driver& driv, double time, bool* other_draw_view) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
-    bike_metadata* metadata = driv.meta;
+    bike_metadata* metadata = &driv.meta;
 
     // Update the hud and player visibility
     update_view_settings(driv, other_draw_view);
@@ -478,17 +475,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     stopwatch_reset();
 
-    bike_metadata metadata1;
-    memset(&metadata1, 0, sizeof(metadata1));
-    bike_metadata metadata2;
-    memset(&metadata2, 0, sizeof(metadata2));
-    metadata1.bike_turning.turn_time = metadata2.bike_turning.turn_time = -1000.0;
-    metadata1.camera_turning.turn_time = metadata2.camera_turning.turn_time = -1000.0;
-    metadata1.volt_time = metadata2.volt_time = -100.0;
-    metadata1.draw_view = metadata2.draw_view = true;
-
-    driver driv1(Motor1, &metadata1, Rec1, &State->keys1, &HudGame1);
-    driver driv2(Motor2, &metadata2, Rec2, &State->keys2, &HudGame2);
+    driver driv1(Motor1, Rec1, &State->keys1, &HudGame1);
+    driver driv2(Motor2, Rec2, &State->keys2, &HudGame2);
 
     reset_motor_forces(Motor1);
     reset_motor_forces(Motor2);
@@ -603,20 +591,21 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             flagtag(time);
         }
 
-        set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
+        set_motor_frequency(true, driv1.meta.sound.motor_frequency, driv1.meta.sound.gas);
         if (Single) {
-            set_friction_volume(metadata1.sound.friction_volume);
+            set_friction_volume(driv1.meta.sound.friction_volume);
         } else {
-            set_friction_volume(metadata1.sound.friction_volume + metadata2.sound.friction_volume);
-            set_motor_frequency(false, metadata2.sound.motor_frequency, metadata2.sound.gas);
+            set_friction_volume(driv1.meta.sound.friction_volume +
+                                driv2.meta.sound.friction_volume);
+            set_motor_frequency(false, driv2.meta.sound.motor_frequency, driv2.meta.sound.gas);
         }
 
-        physics_frame_end(driv1, time, &metadata2.draw_view);
+        physics_frame_end(driv1, time, &driv2.meta.draw_view);
         if (!Single) {
-            physics_frame_end(driv2, time, &metadata1.draw_view);
+            physics_frame_end(driv2, time, &driv1.meta.draw_view);
         }
 
-        render_game(time, &metadata1, &metadata2, HudGame1.minimap, HudGame1.timer,
+        render_game(time, &driv1.meta, &driv2.meta, HudGame1.minimap, HudGame1.timer,
                     HudGame2.minimap, HudGame2.timer, current_camera);
 
         // Universal controls
@@ -678,7 +667,7 @@ static void reverse_events(driver& driv, double time) {
 // During rewind, compute animation state from the recorder's event list
 // instead of relying on the forward-only state machine.
 static void rewind_override_animations(driver& driv, double time) {
-    bike_metadata* metadata = driv.meta;
+    bike_metadata* metadata = &driv.meta;
     motorst* mot = driv.mot;
     recorder* rec = driv.rec;
 
@@ -699,7 +688,7 @@ static void rewind_override_animations(driver& driv, double time) {
 // Load replay data (instead of simulating bike physics)
 static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
     motorst* mot = driv.mot;
-    bike_metadata* metadata = driv.meta;
+    bike_metadata* metadata = &driv.meta;
     recorder* rec = driv.rec;
 
     // Update the hud and player visibility
@@ -762,22 +751,14 @@ int replay_loop(const char* filename, int restore_player_visibility) {
     reset_event_buffer();
     stopwatch_reset();
 
-    bike_metadata metadata1;
-    memset(&metadata1, 0, sizeof(metadata1));
-    bike_metadata metadata2;
-    memset(&metadata2, 0, sizeof(metadata2));
-    metadata1.bike_turning.turn_time = metadata2.bike_turning.turn_time = -1000.0;
-    metadata1.camera_turning.turn_time = metadata2.camera_turning.turn_time = -1000.0;
-    metadata1.volt_time = metadata2.volt_time = -100.0;
+    driver driv1(Motor1, Rec1, &State->keys1, &HudReplay1);
+    driver driv2(Motor2, Rec2, &State->keys2, &HudReplay2);
 
-    driver driv1(Motor1, &metadata1, Rec1, &State->keys1, &HudReplay1);
-    driver driv2(Motor2, &metadata2, Rec2, &State->keys2, &HudReplay2);
-
-    metadata1.draw_view = true;
-    metadata2.draw_view = !MergedRec;
+    driv1.meta.draw_view = true;
+    driv2.meta.draw_view = !MergedRec;
     if (restore_player_visibility) {
-        metadata1.draw_view = PreviousReplayDrawView1;
-        metadata2.draw_view = PreviousReplayDrawView2;
+        driv1.meta.draw_view = PreviousReplayDrawView1;
+        driv2.meta.draw_view = PreviousReplayDrawView2;
     }
 
     reset_motor_forces(Motor1);
@@ -838,10 +819,10 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         double time = current_replay_time;
 
         // Load replay data
-        bool finished1 = !replay_frame(driv1, time, &metadata2.draw_view);
+        bool finished1 = !replay_frame(driv1, time, &driv2.meta.draw_view);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &metadata1.draw_view);
+            finished2 = !replay_frame(driv2, time, &driv1.meta.draw_view);
         }
 
         // Reverse events if rewinding
@@ -871,8 +852,8 @@ int replay_loop(const char* filename, int restore_player_visibility) {
             Mute = true;
             Level->unflip_objects();
 
-            PreviousReplayDrawView1 = metadata1.draw_view;
-            PreviousReplayDrawView2 = metadata2.draw_view;
+            PreviousReplayDrawView1 = driv1.meta.draw_view;
+            PreviousReplayDrawView2 = driv2.meta.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return 0;
@@ -893,15 +874,16 @@ int replay_loop(const char* filename, int restore_player_visibility) {
             flagtag_replay(time);
         }
 
-        set_motor_frequency(true, metadata1.sound.motor_frequency, metadata1.sound.gas);
+        set_motor_frequency(true, driv1.meta.sound.motor_frequency, driv1.meta.sound.gas);
         if (Single) {
-            set_friction_volume(metadata1.sound.friction_volume);
+            set_friction_volume(driv1.meta.sound.friction_volume);
         } else {
-            set_motor_frequency(false, metadata2.sound.motor_frequency, metadata2.sound.gas);
-            set_friction_volume(metadata1.sound.friction_volume + metadata2.sound.friction_volume);
+            set_motor_frequency(false, driv2.meta.sound.motor_frequency, driv2.meta.sound.gas);
+            set_friction_volume(driv1.meta.sound.friction_volume +
+                                driv2.meta.sound.friction_volume);
         }
 
-        render_game(time, &metadata1, &metadata2, HudReplay1.minimap, HudReplay1.timer,
+        render_game(time, &driv1.meta, &driv2.meta, HudReplay1.minimap, HudReplay1.timer,
                     HudReplay2.minimap, HudReplay2.timer, current_camera);
 
         // Universal controls
@@ -929,8 +911,8 @@ int replay_loop(const char* filename, int restore_player_visibility) {
 
             Level->unflip_objects();
 
-            PreviousReplayDrawView1 = metadata1.draw_view;
-            PreviousReplayDrawView2 = metadata2.draw_view;
+            PreviousReplayDrawView1 = driv1.meta.draw_view;
+            PreviousReplayDrawView2 = driv2.meta.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return -1;
@@ -957,24 +939,14 @@ void render_replay(const char* level_filename) {
     FlagTag = Rec1->flagtag();
     setup_gameloop(level_filename);
 
-    bike_metadata metadata1;
-    memset(&metadata1, 0, sizeof(metadata1));
-    bike_metadata metadata2;
-    memset(&metadata2, 0, sizeof(metadata2));
-    metadata1.bike_turning.turn_time = metadata2.bike_turning.turn_time = -1000.0;
-    metadata1.camera_turning.turn_time = metadata2.camera_turning.turn_time = -1000.0;
-    metadata1.volt_time = metadata2.volt_time = -100.0;
-    metadata1.draw_view = true;
-    metadata2.draw_view = true;
-
     camera current_camera;
     current_camera.mode = CameraMode::Normal;
 
     VideoRecordingMode = true;
     VideoFrameIndex = 0;
 
-    driver driv1(Motor1, &metadata1, Rec1, &State->keys1, &HudReplay1);
-    driver driv2(Motor2, &metadata2, Rec2, &State->keys2, &HudReplay2);
+    driver driv1(Motor1, Rec1, &State->keys1, &HudReplay1);
+    driver driv2(Motor2, Rec2, &State->keys2, &HudReplay2);
 
     while (true) {
         handle_events();
@@ -985,10 +957,10 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024) /
                       EolSettings->recording_fps();
 
-        bool finished1 = !replay_frame(driv1, time, &metadata2.draw_view);
+        bool finished1 = !replay_frame(driv1, time, &driv2.meta.draw_view);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &metadata1.draw_view);
+            finished2 = !replay_frame(driv2, time, &driv1.meta.draw_view);
         }
 
         update_graphical_metadata(driv1, nullptr, time);
@@ -1004,7 +976,7 @@ void render_replay(const char* level_filename) {
             flagtag_replay(time);
         }
 
-        render_game(time, &metadata1, &metadata2, HudReplay1.minimap, HudReplay1.timer,
+        render_game(time, &driv1.meta, &driv2.meta, HudReplay1.minimap, HudReplay1.timer,
                     HudReplay2.minimap, HudReplay2.timer, current_camera);
 
         VideoFrameIndex++;

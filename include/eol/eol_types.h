@@ -1,7 +1,7 @@
 #ifndef EOL_TYPES_H
 #define EOL_TYPES_H
 
-#include "game/game.h"
+#include "game/driver.h"
 #include "level/level.h"
 #include "main.h"
 #include "physics/init.h"

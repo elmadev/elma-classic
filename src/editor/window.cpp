@@ -4,7 +4,7 @@
 #include "editor/dialog.h"
 #include "editor/editor.h"
 #include "fs_utils.h"
-#include "keys.h"
+#include "util/text.h"
 #include "level/level.h"
 #include "game/level_load.h"
 #include "pic/lgr.h"

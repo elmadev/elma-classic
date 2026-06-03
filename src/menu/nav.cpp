@@ -2,7 +2,7 @@
 #include "pic/abc8.h"
 #include "eol/settings.h"
 #include "fs_utils.h"
-#include "keys.h"
+#include "util/text.h"
 #include "main.h"
 #include "M_PIC.H"
 #include "platform/implementation.h"

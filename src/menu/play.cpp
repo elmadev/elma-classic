@@ -4,7 +4,7 @@
 #include "menu/best_times.h"
 #include "editor/editor.h"
 #include "physics/flagtag.h"
-#include "keys.h"
+#include "util/text.h"
 #include "game/game.h"
 #include "level/level.h"
 #include "game/level_load.h"

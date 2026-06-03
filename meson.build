@@ -70,7 +70,7 @@ elma_sources = files(
     'vect2.cpp',
     'src/eol/settings.cpp',
     'src/sound/engine.cpp',
-    'keys.cpp',
+    'src/util/text.cpp',
     'fs_utils.cpp',
     'src/level/object.cpp',
     'src/renderer/object_overlay.cpp',

@@ -1,5 +1,5 @@
-#ifndef KEYS_H
-#define KEYS_H
+#ifndef UTIL_TEXT_H
+#define UTIL_TEXT_H
 
 constexpr int MaxKeycode = 256;
 

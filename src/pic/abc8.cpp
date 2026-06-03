@@ -3,7 +3,7 @@
 #include "main.h"
 #include "menu/pic.h"
 #include "pic/pic8.h"
-#include "qopen.h"
+#include "game/qopen.h"
 #include <cstring>
 #include <string>
 

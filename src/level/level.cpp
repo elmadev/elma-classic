@@ -14,7 +14,7 @@
 #include "platform/utils.h"
 #include "level/sprite.h"
 #include "util/util.h"
-#include "qopen.h"
+#include "game/qopen.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>

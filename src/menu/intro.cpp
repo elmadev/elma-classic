@@ -15,7 +15,7 @@
 #include "menu/rec_list.h"
 #include "game/recorder.h"
 #include "game/state.h"
-#include "qopen.h"
+#include "game/qopen.h"
 #include <directinput/scancodes.h>
 
 static void show_intro_screen() {

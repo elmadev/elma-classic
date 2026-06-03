@@ -1,7 +1,7 @@
 #include "sound/wav.h"
 #include "main.h"
 #include "platform/utils.h"
-#include "qopen.h"
+#include "game/qopen.h"
 #include <algorithm>
 #include <cstring>
 

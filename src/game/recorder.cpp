@@ -5,7 +5,7 @@
 #include "main.h"
 #include "menu/rec_list.h"
 #include "level/object.h"
-#include "qopen.h"
+#include "game/qopen.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cmath>

@@ -51,7 +51,7 @@ elma_sources = files(
     'src/pic/pic8.cpp',
     'src/pic/piclist.cpp',
     'src/menu/play.cpp',
-    'qopen.cpp',
+    'src/game/qopen.cpp',
     'src/game/recorder.cpp',
     'src/menu/rec_list.cpp',
     'src/menu/replay.cpp',

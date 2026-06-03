@@ -348,7 +348,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
             // Buffer is full
             double dt = mot->frequency_prev;
             double next_dt = mot->frequency_next;
-            double ddt = 0;
+            double ddt = 0.0;
             if (source_length > 30) {
                 ddt = (next_dt - dt) / source_length;
             }

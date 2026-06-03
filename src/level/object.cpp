@@ -115,7 +115,7 @@ void object::save(FILE* h) {
 }
 
 double object::checksum() const {
-    double sum = 0;
+    double sum = 0.0;
     sum += r.x;
     sum += r.y;
     sum += (int)type;

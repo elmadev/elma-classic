@@ -420,7 +420,7 @@ void polygon::update_boundaries(double* x1, double* y1, double* x2, double* y2) 
 }
 
 double polygon::checksum() const {
-    double sum = 0;
+    double sum = 0.0;
     for (int i = 0; i < vertex_count; i++) {
         sum += vertices[i].x;
         sum += vertices[i].y;

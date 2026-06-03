@@ -172,8 +172,8 @@ void simulate_bike_physics(motorst* mot, double time, double dt, bool gas, bool 
     mot->prev_brake = brake;
 
     // Create torque from pressing gas, up to a max rotation
-    double torque_left_wheel = 0;
-    double torque_right_wheel = 0;
+    double torque_left_wheel = 0.0;
+    double torque_right_wheel = 0.0;
     if (gas) {
         double MAX_ANGULAR_VELOCITY = 110.0;
         double GAS_TORQUE = 600.0;

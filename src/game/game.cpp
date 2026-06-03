@@ -85,11 +85,14 @@ static void update_freecam(double dt, camera& current_camera) {
 }
 
 struct hud_visibility {
-    bool game_minimap;
-    bool replay_minimap;
-    bool game_timer;
-    bool replay_timer;
+    bool minimap;
+    bool timer;
 };
+
+static hud_visibility HudGame1 = {true, true};
+static hud_visibility HudReplay1 = {false, true};
+static hud_visibility HudGame2 = {true, true};
+static hud_visibility HudReplay2 = {false, true};
 
 static void sound_init() {
     static bool SoundInitialized = false;
@@ -98,9 +101,6 @@ static void sound_init() {
         sound_engine_init();
     }
 }
-
-static hud_visibility HudVisibility1 = {true, false, true, true};
-static hud_visibility HudVisibility2 = {true, false, true, true};
 
 static BikeState handle_object_interaction(driver& driv, int object_id) {
     if (object_id < 0 || object_id >= MAX_OBJECTS) {
@@ -250,7 +250,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
     }
 }
 
-static void update_view_settings(driver& driv, bool* minimap, bool* timer, bool* other_draw_view) {
+static void update_view_settings(driver& driv, bool* other_draw_view) {
     player_keys* keys = driv.keys;
     bike_metadata* metadata = driv.meta;
 
@@ -267,11 +267,11 @@ static void update_view_settings(driver& driv, bool* minimap, bool* timer, bool*
     }
 
     if (was_game_key_just_pressed(keys->toggle_minimap)) {
-        *minimap = !*minimap;
+        driv.hud->minimap = !driv.hud->minimap;
     }
 
     if (was_game_key_just_pressed(keys->toggle_timer)) {
-        *timer = !*timer;
+        driv.hud->timer = !driv.hud->timer;
     }
 }
 
@@ -340,14 +340,13 @@ static void update_graphical_metadata(driver& driv, recorder* rec, double time) 
 
 // The only physics-relevant part of this function is turning the bike. The rest is "cosmetic" for
 // rendering the frame.
-static void physics_frame_end(driver& driv, hud_visibility* hud, double time,
-                              bool* other_draw_view) {
+static void physics_frame_end(driver& driv, double time, bool* other_draw_view) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
     bike_metadata* metadata = driv.meta;
 
     // Update the hud and player visibility
-    update_view_settings(driv, &hud->game_minimap, &hud->game_timer, other_draw_view);
+    update_view_settings(driv, other_draw_view);
 
     // Check for bike turn and update turn graphics
     if (!driv.dead) {
@@ -488,8 +487,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     metadata1.volt_time = metadata2.volt_time = -100.0;
     metadata1.draw_view = metadata2.draw_view = true;
 
-    driver driv1(Motor1, &metadata1, Rec1, &State->keys1);
-    driver driv2(Motor2, &metadata2, Rec2, &State->keys2);
+    driver driv1(Motor1, &metadata1, Rec1, &State->keys1, &HudGame1);
+    driver driv2(Motor2, &metadata2, Rec2, &State->keys2, &HudGame2);
 
     reset_motor_forces(Motor1);
     reset_motor_forces(Motor2);
@@ -612,14 +611,13 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             set_motor_frequency(false, metadata2.sound.motor_frequency, metadata2.sound.gas);
         }
 
-        physics_frame_end(driv1, &HudVisibility1, time, &metadata2.draw_view);
+        physics_frame_end(driv1, time, &metadata2.draw_view);
         if (!Single) {
-            physics_frame_end(driv2, &HudVisibility2, time, &metadata1.draw_view);
+            physics_frame_end(driv2, time, &metadata1.draw_view);
         }
 
-        render_game(time, &metadata1, &metadata2, HudVisibility1.game_minimap,
-                    HudVisibility1.game_timer, HudVisibility2.game_minimap,
-                    HudVisibility2.game_timer, current_camera);
+        render_game(time, &metadata1, &metadata2, HudGame1.minimap, HudGame1.timer,
+                    HudGame2.minimap, HudGame2.timer, current_camera);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -699,13 +697,13 @@ static void rewind_override_animations(driver& driv, double time) {
 }
 
 // Load replay data (instead of simulating bike physics)
-static bool replay_frame(driver& driv, double time, hud_visibility* hud, bool* other_draw_view) {
+static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
     motorst* mot = driv.mot;
     bike_metadata* metadata = driv.meta;
     recorder* rec = driv.rec;
 
     // Update the hud and player visibility
-    update_view_settings(driv, &hud->replay_minimap, &hud->replay_timer, other_draw_view);
+    update_view_settings(driv, other_draw_view);
 
     // Load replay data
     bool alive = rec->recall_frame(mot, time, &metadata->sound);
@@ -772,8 +770,8 @@ int replay_loop(const char* filename, int restore_player_visibility) {
     metadata1.camera_turning.turn_time = metadata2.camera_turning.turn_time = -1000.0;
     metadata1.volt_time = metadata2.volt_time = -100.0;
 
-    driver driv1(Motor1, &metadata1, Rec1, &State->keys1);
-    driver driv2(Motor2, &metadata2, Rec2, &State->keys2);
+    driver driv1(Motor1, &metadata1, Rec1, &State->keys1, &HudReplay1);
+    driver driv2(Motor2, &metadata2, Rec2, &State->keys2, &HudReplay2);
 
     metadata1.draw_view = true;
     metadata2.draw_view = !MergedRec;
@@ -840,10 +838,10 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         double time = current_replay_time;
 
         // Load replay data
-        bool finished1 = !replay_frame(driv1, time, &HudVisibility1, &metadata2.draw_view);
+        bool finished1 = !replay_frame(driv1, time, &metadata2.draw_view);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &HudVisibility2, &metadata1.draw_view);
+            finished2 = !replay_frame(driv2, time, &metadata1.draw_view);
         }
 
         // Reverse events if rewinding
@@ -903,9 +901,8 @@ int replay_loop(const char* filename, int restore_player_visibility) {
             set_friction_volume(metadata1.sound.friction_volume + metadata2.sound.friction_volume);
         }
 
-        render_game(time, &metadata1, &metadata2, HudVisibility1.replay_minimap,
-                    HudVisibility1.replay_timer, HudVisibility2.replay_minimap,
-                    HudVisibility2.replay_timer, current_camera);
+        render_game(time, &metadata1, &metadata2, HudReplay1.minimap, HudReplay1.timer,
+                    HudReplay2.minimap, HudReplay2.timer, current_camera);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -976,8 +973,8 @@ void render_replay(const char* level_filename) {
     VideoRecordingMode = true;
     VideoFrameIndex = 0;
 
-    driver driv1(Motor1, &metadata1, Rec1, &State->keys1);
-    driver driv2(Motor2, &metadata2, Rec2, &State->keys2);
+    driver driv1(Motor1, &metadata1, Rec1, &State->keys1, &HudReplay1);
+    driver driv2(Motor2, &metadata2, Rec2, &State->keys2, &HudReplay2);
 
     while (true) {
         handle_events();
@@ -988,10 +985,10 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024) /
                       EolSettings->recording_fps();
 
-        bool finished1 = !replay_frame(driv1, time, &HudVisibility1, &metadata2.draw_view);
+        bool finished1 = !replay_frame(driv1, time, &metadata2.draw_view);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &HudVisibility2, &metadata1.draw_view);
+            finished2 = !replay_frame(driv2, time, &metadata1.draw_view);
         }
 
         update_graphical_metadata(driv1, nullptr, time);
@@ -1007,9 +1004,8 @@ void render_replay(const char* level_filename) {
             flagtag_replay(time);
         }
 
-        render_game(time, &metadata1, &metadata2, HudVisibility1.replay_minimap,
-                    HudVisibility1.replay_timer, HudVisibility2.replay_minimap,
-                    HudVisibility2.replay_timer, current_camera);
+        render_game(time, &metadata1, &metadata2, HudReplay1.minimap, HudReplay1.timer,
+                    HudReplay2.minimap, HudReplay2.timer, current_camera);
 
         VideoFrameIndex++;
     }

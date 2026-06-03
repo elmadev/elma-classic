@@ -15,11 +15,9 @@ constexpr double ZOOM_IN_LIMIT = 0.017;
 constexpr double ZOOM_OUT_LIMIT = 500.0;
 constexpr double ZOOM_FACTOR = 170.0;
 static double AspectRatio = 1.0;
-static double ZOOM_OUT_LIMIT_HEIGHT = ZOOM_OUT_LIMIT;
 
 void editor_canvas_update_resolution() {
     AspectRatio = double(SCREEN_WIDTH - EDITOR_MENU_X - 1) / (SCREEN_HEIGHT - EDITOR_MENU_Y - 1);
-    ZOOM_OUT_LIMIT_HEIGHT = ZOOM_OUT_LIMIT / AspectRatio;
 }
 
 static vect2 CanvasTopLeft(-10.0, -10.0);
@@ -72,32 +70,6 @@ void zoom(vect2 center, double width) {
     CanvasMetersToPixels =
         (SCREEN_WIDTH - EDITOR_MENU_X - 1) / (CanvasBottomRight.x - CanvasTopLeft.x);
     CanvasPixelsToMeters = 1.0 / CanvasMetersToPixels;
-
-    // Disallow zooming too far away from the level.
-    // Nudge the view back towards the center if needed
-    double x1;
-    double y1;
-    double x2;
-    double y2;
-    Level->get_boundaries(&x1, &y1, &x2, &y2, true);
-    double dx = 0.0;
-    double dy = 0.0;
-    if (CanvasTopLeft.x < x2 - ZOOM_OUT_LIMIT) {
-        dx = (x2 - ZOOM_OUT_LIMIT) - CanvasTopLeft.x;
-    }
-    if (CanvasBottomRight.x > x1 + ZOOM_OUT_LIMIT) {
-        dx = -(CanvasBottomRight.x - (x1 + ZOOM_OUT_LIMIT));
-    }
-    if (CanvasTopLeft.y < y2 - ZOOM_OUT_LIMIT_HEIGHT) {
-        dy = (y2 - ZOOM_OUT_LIMIT_HEIGHT) - CanvasTopLeft.y;
-    }
-    if (CanvasBottomRight.y > y1 + ZOOM_OUT_LIMIT_HEIGHT) {
-        dy = -(CanvasBottomRight.y - (y1 + ZOOM_OUT_LIMIT_HEIGHT));
-    }
-    CanvasTopLeft.x += dx;
-    CanvasTopLeft.y += dy;
-    CanvasBottomRight.x += dx;
-    CanvasBottomRight.y += dy;
 
     // Recalculate center of display and diagonal length from center to corner of display
     CanvasCenter = (CanvasTopLeft + CanvasBottomRight) * 0.5;

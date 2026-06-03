@@ -136,7 +136,7 @@ static BikeState handle_object_interaction(driver& driv, int object_id) {
 }
 
 // Subframe physics calculation. Contains all the physics calculations except for bike turning
-static void physics_subframe(driver& driv, int* finish_time, bool* dead, double time, double dt) {
+static void physics_subframe(driver& driv, double time, double dt) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
     bike_metadata* metadata = driv.meta;
@@ -193,7 +193,7 @@ static void physics_subframe(driver& driv, int* finish_time, bool* dead, double 
         rec->store_frames(mot, time, &metadata->sound);
 
         if (Single || !FlagTag || OutOfBounds) {
-            *dead = true;
+            driv.dead = true;
             return;
         }
 
@@ -235,10 +235,10 @@ static void physics_subframe(driver& driv, int* finish_time, bool* dead, double 
             int prev_apple_count = mot->apple_count;
             BikeState bike_state = handle_object_interaction(driv, object_id);
             if (bike_state == BikeState::Dead) {
-                *dead = true;
+                driv.dead = true;
             }
             if (bike_state == BikeState::Finish) {
-                *finish_time = (int)(time * TIME_TO_CENTISECONDS);
+                driv.finish_time = (int)(time * TIME_TO_CENTISECONDS);
             }
             if (prev_apple_count < mot->apple_count) {
                 mot->last_apple_time = (int)(time * TIME_TO_CENTISECONDS);
@@ -340,8 +340,8 @@ static void update_graphical_metadata(driver& driv, recorder* rec, double time) 
 
 // The only physics-relevant part of this function is turning the bike. The rest is "cosmetic" for
 // rendering the frame.
-static void physics_frame_end(driver& driv, hud_visibility* hud, double time, bool* other_draw_view,
-                              bool dead) {
+static void physics_frame_end(driver& driv, hud_visibility* hud, double time,
+                              bool* other_draw_view) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
     bike_metadata* metadata = driv.meta;
@@ -350,7 +350,7 @@ static void physics_frame_end(driver& driv, hud_visibility* hud, double time, bo
     update_view_settings(driv, &hud->game_minimap, &hud->game_timer, other_draw_view);
 
     // Check for bike turn and update turn graphics
-    if (!dead) {
+    if (!driv.dead) {
         bool is_turn_down = is_game_key_down(keys->turn);
         if (EolSettings->cripple_no_turn()) {
             is_turn_down = false;
@@ -491,10 +491,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     driver driv1(Motor1, &metadata1, Rec1, &State->keys1);
     driver driv2(Motor2, &metadata2, Rec2, &State->keys2);
 
-    bool dead1 = false;
-    bool dead2 = false;
-    int finish_time1 = 0;
-    int finish_time2 = 0;
     reset_motor_forces(Motor1);
     reset_motor_forces(Motor2);
 
@@ -542,36 +538,36 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                 continue;
             }
 
-            if (!dead1) {
-                physics_subframe(driv1, &finish_time1, &dead1, time, dt);
+            if (!driv1.dead) {
+                physics_subframe(driv1, time, dt);
             }
-            if (!Single && !dead2) {
-                physics_subframe(driv2, &finish_time2, &dead2, time, dt);
+            if (!Single && !driv2.dead) {
+                physics_subframe(driv2, time, dt);
             }
 
             if (!Single && both_bikes_alive) {
                 // If both die at same time, player 1 is considered to have died first
-                if (dead1) {
+                if (driv1.dead) {
                     stop_motor_sound(true);
                     WhoDiedFirst = 1;
                     both_bikes_alive = false;
-                } else if (dead2) {
+                } else if (driv2.dead) {
                     stop_motor_sound(false);
                     WhoDiedFirst = 2;
                     both_bikes_alive = false;
                 }
             }
 
-            if (finish_time1 || finish_time2 || (dead1 && (Single || dead2))) {
-                int finish_time = finish_time1;
-                if (finish_time2) {
-                    finish_time = finish_time2;
+            if (driv1.finish_time || driv2.finish_time || (driv1.dead && (Single || driv2.dead))) {
+                int finish_time = driv1.finish_time;
+                if (driv2.finish_time) {
+                    finish_time = driv2.finish_time;
                 }
 
                 if (finish_time) {
                     WhoDiedFirst = 0;
                 }
-                Player1Finished = (bool)finish_time1;
+                Player1Finished = (bool)driv1.finish_time;
 
                 set_motor_frequency(true, 1.0, 0);
                 set_motor_frequency(false, 1.0, 0);
@@ -616,9 +612,9 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             set_motor_frequency(false, metadata2.sound.motor_frequency, metadata2.sound.gas);
         }
 
-        physics_frame_end(driv1, &HudVisibility1, time, &metadata2.draw_view, dead1);
+        physics_frame_end(driv1, &HudVisibility1, time, &metadata2.draw_view);
         if (!Single) {
-            physics_frame_end(driv2, &HudVisibility2, time, &metadata1.draw_view, dead2);
+            physics_frame_end(driv2, &HudVisibility2, time, &metadata1.draw_view);
         }
 
         render_game(time, &metadata1, &metadata2, HudVisibility1.game_minimap,
@@ -799,9 +795,6 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         start_motor_sound(false);
     }
 
-    bool alive1 = true;
-    bool alive2 = true;
-
     double current_replay_time = 0.0;
     double last_stopwatch = stopwatch();
 
@@ -847,10 +840,10 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         double time = current_replay_time;
 
         // Load replay data
-        bool dead1 = !replay_frame(driv1, time, &HudVisibility1, &metadata2.draw_view);
-        bool dead2 = false;
+        bool finished1 = !replay_frame(driv1, time, &HudVisibility1, &metadata2.draw_view);
+        bool finished2 = false;
         if (!Single) {
-            dead2 = !replay_frame(driv2, time, &HudVisibility2, &metadata1.draw_view);
+            finished2 = !replay_frame(driv2, time, &HudVisibility2, &metadata1.draw_view);
         }
 
         // Reverse events if rewinding
@@ -869,7 +862,7 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         }
 
         // End of replay
-        if ((Single && dead1) || (!Single && dead1 && dead2)) {
+        if ((Single && finished1) || (!Single && finished1 && finished2)) {
             set_motor_frequency(true, 1.0, 0);
             set_motor_frequency(false, 1.0, 0);
             stop_motor_sound(true);
@@ -889,13 +882,13 @@ int replay_loop(const char* filename, int restore_player_visibility) {
 
         // Death (or finish)
         if (!Single) {
-            if (alive1 && dead1) {
+            if (!driv1.dead && finished1) {
                 stop_motor_sound(true);
-                alive1 = false;
+                driv1.dead = true;
             }
-            if (alive2 && dead2) {
+            if (!driv2.dead && finished2) {
                 stop_motor_sound(false);
-                alive2 = false;
+                driv2.dead = true;
             }
 
             // Update flagtag time
@@ -995,10 +988,10 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024) /
                       EolSettings->recording_fps();
 
-        bool dead1 = !replay_frame(driv1, time, &HudVisibility1, &metadata2.draw_view);
-        bool dead2 = false;
+        bool finished1 = !replay_frame(driv1, time, &HudVisibility1, &metadata2.draw_view);
+        bool finished2 = false;
         if (!Single) {
-            dead2 = !replay_frame(driv2, time, &HudVisibility2, &metadata1.draw_view);
+            finished2 = !replay_frame(driv2, time, &HudVisibility2, &metadata1.draw_view);
         }
 
         update_graphical_metadata(driv1, nullptr, time);
@@ -1006,7 +999,7 @@ void render_replay(const char* level_filename) {
             update_graphical_metadata(driv2, nullptr, time);
         }
 
-        if ((Single && dead1) || (!Single && dead1 && dead2)) {
+        if ((Single && finished1) || (!Single && finished1 && finished2)) {
             break;
         }
 

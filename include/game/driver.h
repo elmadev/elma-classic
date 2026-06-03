@@ -10,6 +10,8 @@ struct player_keys;
 struct driver {
     motorst* mot;
     bike_metadata* meta;
+    bool dead = false;
+    int finish_time = 0;
     recorder* rec;
     player_keys* keys;
 

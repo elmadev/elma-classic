@@ -12,7 +12,8 @@
 bool RedrawingEditor = false;
 
 constexpr double ZOOM_IN_LIMIT = 0.017;
-constexpr double ZOOM_OUT_LIMIT = 170.0;
+constexpr double ZOOM_OUT_LIMIT = 500.0;
+constexpr double ZOOM_FACTOR = 170.0;
 static double AspectRatio = 1.0;
 static double ZOOM_OUT_LIMIT_HEIGHT = ZOOM_OUT_LIMIT;
 
@@ -298,7 +299,7 @@ double get_zoom() {
     if (fabs(CanvasBottomRight.x - CanvasTopLeft.x) == 0.0) {
         internal_error("get_zoom 0!");
     }
-    return ZOOM_OUT_LIMIT / fabs(CanvasBottomRight.x - CanvasTopLeft.x);
+    return ZOOM_FACTOR / fabs(CanvasBottomRight.x - CanvasTopLeft.x);
 }
 
 // Convert a length of 10 pixels to elmameters, as 10 pixels is the max grab distance for the cursor

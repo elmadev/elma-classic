@@ -4,6 +4,7 @@
 #include "eol/eol.h"
 #include "eol/settings.h"
 #include "eol/status_messages.h"
+#include "game/driver.h"
 #include "level/level.h"
 #include "level/object.h"
 #include "level/segments.h"
@@ -101,13 +102,15 @@ static void sound_init() {
 static hud_visibility HudVisibility1 = {true, false, true, true};
 static hud_visibility HudVisibility2 = {true, false, true, true};
 
-static BikeState handle_object_interaction(int object_id, int* apple_count, motorst* mot) {
+static BikeState handle_object_interaction(driver& driv, int object_id) {
     if (object_id < 0 || object_id >= MAX_OBJECTS) {
         internal_error("handle_object_interaction object_id < 0 || object_id >= MAX_OBJECTS!");
     }
     if (!Level->objects[object_id]) {
         internal_error("handle_object_interaction !Level->objects[object_id]!");
     }
+
+    motorst* mot = driv.mot;
 
     object::Type type = Level->objects[object_id]->type;
 
@@ -116,7 +119,7 @@ static BikeState handle_object_interaction(int object_id, int* apple_count, moto
     }
     if (type == object::Type::Food) {
         Level->objects[object_id]->active = false;
-        (*apple_count)++;
+        mot->apple_count++;
         add_event_buffer(WavEvent::Food, 0.99, -1);
         std::optional<MotorGravity> gravity = Level->objects[object_id]->gravity();
         if (gravity.has_value()) {
@@ -133,8 +136,12 @@ static BikeState handle_object_interaction(int object_id, int* apple_count, moto
 }
 
 // Subframe physics calculation. Contains all the physics calculations except for bike turning
-static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* metadata,
-                             recorder* rec, int* finish_time, bool* dead, double time, double dt) {
+static void physics_subframe(driver& driv, int* finish_time, bool* dead, double time, double dt) {
+    motorst* mot = driv.mot;
+    player_keys* keys = driv.keys;
+    bike_metadata* metadata = driv.meta;
+    recorder* rec = driv.rec;
+
     // Adjust key inputs to only allow valid inputs, accounting for volt delay and cripples
     bool is_gas_down = is_game_key_down(keys->gas);
     bool is_brake_down = is_game_key_down(keys->brake) || is_game_key_down(keys->brake_alias) ||
@@ -226,7 +233,7 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
     while (get_event_buffer(&wav_id, &volume, &object_id)) {
         if (object_id >= 0) {
             int prev_apple_count = mot->apple_count;
-            BikeState bike_state = handle_object_interaction(object_id, &mot->apple_count, mot);
+            BikeState bike_state = handle_object_interaction(driv, object_id);
             if (bike_state == BikeState::Dead) {
                 *dead = true;
             }
@@ -243,8 +250,10 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
     }
 }
 
-static void update_view_settings(player_keys* keys, bike_metadata* metadata, bool* minimap,
-                                 bool* timer, bool* other_draw_view) {
+static void update_view_settings(driver& driv, bool* minimap, bool* timer, bool* other_draw_view) {
+    player_keys* keys = driv.keys;
+    bike_metadata* metadata = driv.meta;
+
     // Visibility of player viewpoint
     if (was_game_key_just_pressed(keys->toggle_visibility)) {
         reset_game_background();
@@ -311,8 +320,10 @@ static void update_camera_turn_phase(turning_data* data, double time, int flippe
     }
 }
 
-static void update_graphical_metadata(motorst& mot, bike_metadata& metadata, recorder* rec,
-                                      double time) {
+static void update_graphical_metadata(driver& driv, recorder* rec, double time) {
+    motorst& mot = *driv.mot;
+    bike_metadata& metadata = *driv.meta;
+
     // Update bike turn data
     update_bike_turn_phase(&metadata.bike_turning, rec, time, mot.flipped_bike);
 
@@ -329,11 +340,14 @@ static void update_graphical_metadata(motorst& mot, bike_metadata& metadata, rec
 
 // The only physics-relevant part of this function is turning the bike. The rest is "cosmetic" for
 // rendering the frame.
-static void physics_frame_end(motorst* mot, player_keys* keys, bike_metadata* metadata,
-                              recorder* rec, hud_visibility* hud, double time,
-                              bool* other_draw_view, bool dead) {
+static void physics_frame_end(driver& driv, hud_visibility* hud, double time, bool* other_draw_view,
+                              bool dead) {
+    motorst* mot = driv.mot;
+    player_keys* keys = driv.keys;
+    bike_metadata* metadata = driv.meta;
+
     // Update the hud and player visibility
-    update_view_settings(keys, metadata, &hud->game_minimap, &hud->game_timer, other_draw_view);
+    update_view_settings(driv, &hud->game_minimap, &hud->game_timer, other_draw_view);
 
     // Check for bike turn and update turn graphics
     if (!dead) {
@@ -352,7 +366,7 @@ static void physics_frame_end(motorst* mot, player_keys* keys, bike_metadata* me
         metadata->turn_key_previous = is_turn_down;
     }
 
-    update_graphical_metadata(*mot, *metadata, rec, time);
+    update_graphical_metadata(driv, driv.rec, time);
 }
 
 static void handle_eol_inputs() {
@@ -474,6 +488,9 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     metadata1.volt_time = metadata2.volt_time = -100.0;
     metadata1.draw_view = metadata2.draw_view = true;
 
+    driver driv1(Motor1, &metadata1, Rec1, &State->keys1);
+    driver driv2(Motor2, &metadata2, Rec2, &State->keys2);
+
     bool dead1 = false;
     bool dead2 = false;
     int finish_time1 = 0;
@@ -526,12 +543,10 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             }
 
             if (!dead1) {
-                physics_subframe(Motor1, &State->keys1, &metadata1, Rec1, &finish_time1, &dead1,
-                                 time, dt);
+                physics_subframe(driv1, &finish_time1, &dead1, time, dt);
             }
             if (!Single && !dead2) {
-                physics_subframe(Motor2, &State->keys2, &metadata2, Rec2, &finish_time2, &dead2,
-                                 time, dt);
+                physics_subframe(driv2, &finish_time2, &dead2, time, dt);
             }
 
             if (!Single && both_bikes_alive) {
@@ -601,11 +616,9 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             set_motor_frequency(false, metadata2.sound.motor_frequency, metadata2.sound.gas);
         }
 
-        physics_frame_end(Motor1, &State->keys1, &metadata1, Rec1, &HudVisibility1, time,
-                          &metadata2.draw_view, dead1);
+        physics_frame_end(driv1, &HudVisibility1, time, &metadata2.draw_view, dead1);
         if (!Single) {
-            physics_frame_end(Motor2, &State->keys2, &metadata2, Rec2, &HudVisibility2, time,
-                              &metadata1.draw_view, dead2);
+            physics_frame_end(driv2, &HudVisibility2, time, &metadata1.draw_view, dead2);
         }
 
         render_game(time, &metadata1, &metadata2, HudVisibility1.game_minimap,
@@ -645,7 +658,10 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     }
 }
 
-static void reverse_events(motorst* mot, recorder* rec, double time) {
+static void reverse_events(driver& driv, double time) {
+    motorst* mot = driv.mot;
+    recorder* rec = driv.rec;
+
     WavEvent wav;
     double vol;
     int obj_id;
@@ -667,8 +683,11 @@ static void reverse_events(motorst* mot, recorder* rec, double time) {
 
 // During rewind, compute animation state from the recorder's event list
 // instead of relying on the forward-only state machine.
-static void rewind_override_animations(bike_metadata* metadata, motorst* mot, recorder* rec,
-                                       double time) {
+static void rewind_override_animations(driver& driv, double time) {
+    bike_metadata* metadata = driv.meta;
+    motorst* mot = driv.mot;
+    recorder* rec = driv.rec;
+
     double turn_time = rec->find_last_turn_frame_time(time);
     metadata->bike_turning.flipped = mot->flipped_bike;
     metadata->bike_turning.turn_time = turn_time;
@@ -684,10 +703,13 @@ static void rewind_override_animations(bike_metadata* metadata, motorst* mot, re
 }
 
 // Load replay data (instead of simulating bike physics)
-static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadata, recorder* rec,
-                         double time, hud_visibility* hud, bool* other_draw_view) {
+static bool replay_frame(driver& driv, double time, hud_visibility* hud, bool* other_draw_view) {
+    motorst* mot = driv.mot;
+    bike_metadata* metadata = driv.meta;
+    recorder* rec = driv.rec;
+
     // Update the hud and player visibility
-    update_view_settings(keys, metadata, &hud->replay_minimap, &hud->replay_timer, other_draw_view);
+    update_view_settings(driv, &hud->replay_minimap, &hud->replay_timer, other_draw_view);
 
     // Load replay data
     bool alive = rec->recall_frame(mot, time, &metadata->sound);
@@ -700,7 +722,7 @@ static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadat
     while (rec->recall_event(time, &wav_id, &volume, &object_id)) {
         if (object_id >= 0) {
             int prev_apple_count = mot->apple_count;
-            handle_object_interaction(object_id, &mot->apple_count, mot);
+            handle_object_interaction(driv, object_id);
             if (prev_apple_count < mot->apple_count) {
                 mot->last_apple_time = (int)(time * TIME_TO_CENTISECONDS);
             }
@@ -753,6 +775,9 @@ int replay_loop(const char* filename, int restore_player_visibility) {
     metadata1.bike_turning.turn_time = metadata2.bike_turning.turn_time = -1000.0;
     metadata1.camera_turning.turn_time = metadata2.camera_turning.turn_time = -1000.0;
     metadata1.volt_time = metadata2.volt_time = -100.0;
+
+    driver driv1(Motor1, &metadata1, Rec1, &State->keys1);
+    driver driv2(Motor2, &metadata2, Rec2, &State->keys2);
 
     metadata1.draw_view = true;
     metadata2.draw_view = !MergedRec;
@@ -822,27 +847,25 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         double time = current_replay_time;
 
         // Load replay data
-        bool dead1 = !replay_frame(Motor1, &State->keys1, &metadata1, Rec1, time, &HudVisibility1,
-                                   &metadata2.draw_view);
+        bool dead1 = !replay_frame(driv1, time, &HudVisibility1, &metadata2.draw_view);
         bool dead2 = false;
         if (!Single) {
-            dead2 = !replay_frame(Motor2, &State->keys2, &metadata2, Rec2, time, &HudVisibility2,
-                                  &metadata1.draw_view);
+            dead2 = !replay_frame(driv2, time, &HudVisibility2, &metadata1.draw_view);
         }
 
         // Reverse events if rewinding
         if (rewinding) {
-            reverse_events(Motor1, Rec1, time);
-            rewind_override_animations(&metadata1, Motor1, Rec1, time);
+            reverse_events(driv1, time);
+            rewind_override_animations(driv1, time);
             if (!Single) {
-                reverse_events(Motor2, Rec2, time);
-                rewind_override_animations(&metadata2, Motor2, Rec2, time);
+                reverse_events(driv2, time);
+                rewind_override_animations(driv2, time);
             }
         }
 
-        update_graphical_metadata(*Motor1, metadata1, nullptr, time);
+        update_graphical_metadata(driv1, nullptr, time);
         if (!Single) {
-            update_graphical_metadata(*Motor2, metadata2, nullptr, time);
+            update_graphical_metadata(driv2, nullptr, time);
         }
 
         // End of replay
@@ -960,6 +983,9 @@ void render_replay(const char* level_filename) {
     VideoRecordingMode = true;
     VideoFrameIndex = 0;
 
+    driver driv1(Motor1, &metadata1, Rec1, &State->keys1);
+    driver driv2(Motor2, &metadata2, Rec2, &State->keys2);
+
     while (true) {
         handle_events();
         if (is_game_key_down(DIK_ESCAPE)) {
@@ -969,17 +995,15 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024) /
                       EolSettings->recording_fps();
 
-        bool dead1 = !replay_frame(Motor1, &State->keys1, &metadata1, Rec1, time, &HudVisibility1,
-                                   &metadata2.draw_view);
+        bool dead1 = !replay_frame(driv1, time, &HudVisibility1, &metadata2.draw_view);
         bool dead2 = false;
         if (!Single) {
-            dead2 = !replay_frame(Motor2, &State->keys2, &metadata2, Rec2, time, &HudVisibility2,
-                                  &metadata1.draw_view);
+            dead2 = !replay_frame(driv2, time, &HudVisibility2, &metadata1.draw_view);
         }
 
-        update_graphical_metadata(*Motor1, metadata1, nullptr, time);
+        update_graphical_metadata(driv1, nullptr, time);
         if (!Single) {
-            update_graphical_metadata(*Motor2, metadata2, nullptr, time);
+            update_graphical_metadata(driv2, nullptr, time);
         }
 
         if ((Single && dead1) || (!Single && dead1 && dead2)) {

@@ -117,8 +117,12 @@ static void reset_keyframe_time(double current_time) {
     }
 }
 
+double BallSpeed = 1.0;
+
 // Update ball positions
 void balls_simulate(double dt) {
+    dt *= BallSpeed;
+
     // A minimal time delay before we actually start the ball animation.
     // This amount of time is inconsequential - it used to be 400.0
     if (FirstTimeDelay < 1.0) {

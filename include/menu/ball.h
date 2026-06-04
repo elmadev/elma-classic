@@ -24,5 +24,6 @@ void balls_resolution_change();
 extern int BallCount;
 extern ball* Balls;
 extern double** CollisionTimeGrid;
+extern double BallSpeed;
 
 #endif

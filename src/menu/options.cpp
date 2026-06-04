@@ -3,6 +3,7 @@
 #include "game/level_load.h"
 #include "game/state.h"
 #include "main.h"
+#include "menu/ball.h"
 #include "menu/controls.h"
 #include "menu/dialog.h"
 #include "menu/main.h"
@@ -17,6 +18,8 @@
 #include <format>
 
 void menu_about() {
+    BallSpeed = 10.0;
+
     menu_nav nav("Elasto Mania Online " ELMA_VERSION);
 
     int i = 1;
@@ -45,6 +48,8 @@ void menu_about() {
     nav.add_row("Smibu", "", NAV_FUNC(){});
 
     nav.navigate();
+
+    BallSpeed = 1.0;
 }
 
 void menu_help() {

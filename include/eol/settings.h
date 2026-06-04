@@ -112,6 +112,7 @@ class eol_settings {
     Clamp<int> recording_fps_{30, 30, 120};
     Default<bool> show_demo_menu_{true};
     Default<bool> show_help_menu_{true};
+    Default<bool> show_about_menu_{true};
     Default<bool> show_best_times_menu_{true};
     Default<bool> skip_intro_{false};
     Default<bool> still_objects_{false};
@@ -178,6 +179,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(recording_fps);
     DECLARE_FIELD_FUNCS(show_demo_menu);
     DECLARE_FIELD_FUNCS(show_help_menu);
+    DECLARE_FIELD_FUNCS(show_about_menu);
     DECLARE_FIELD_FUNCS(show_best_times_menu);
     DECLARE_FIELD_FUNCS(skip_intro);
     DECLARE_FIELD_FUNCS(still_objects);

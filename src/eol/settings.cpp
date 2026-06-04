@@ -179,6 +179,7 @@ void eol_settings::set_recording_fps(int fps) { recording_fps_ = fps; }
 
 void eol_settings::set_show_demo_menu(bool show) { show_demo_menu_ = show; }
 void eol_settings::set_show_help_menu(bool show) { show_help_menu_ = show; }
+void eol_settings::set_show_about_menu(bool show) { show_about_menu_ = show; }
 void eol_settings::set_show_best_times_menu(bool show) { show_best_times_menu_ = show; }
 void eol_settings::set_skip_intro(bool skip) { skip_intro_ = skip; }
 
@@ -374,6 +375,7 @@ void from_json(const json& j, FullscreenMode& f) {
     JSON_FIELD(recording_fps)                                                                      \
     JSON_FIELD(show_demo_menu)                                                                     \
     JSON_FIELD(show_help_menu)                                                                     \
+    JSON_FIELD(show_about_menu)                                                                    \
     JSON_FIELD(show_best_times_menu)                                                               \
     JSON_FIELD(skip_intro)                                                                         \
     JSON_FIELD(still_objects)                                                                      \

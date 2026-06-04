@@ -1,5 +1,5 @@
 #include "game/recorder.h"
-#include "flagtag.h"
+#include "physics/flagtag.h"
 #include "fs_utils.h"
 #include "level/level.h"
 #include "main.h"

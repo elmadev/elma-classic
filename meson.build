@@ -29,7 +29,7 @@ elma_sources = files(
     'src/editor/tool.cpp',
     'src/editor/editor.cpp',
     'src/editor/topology.cpp',
-    'flagtag.cpp',
+    'src/physics/flagtag.cpp',
     'src/menu/ball_handler.cpp',
     'src/menu/ball.cpp',
     'src/menu/ball_collision.cpp',

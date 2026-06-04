@@ -4,7 +4,7 @@
 #include "eol/eol.h"
 #include "eol/status_messages.h"
 #include "eol/settings.h"
-#include "flagtag.h"
+#include "physics/flagtag.h"
 #include "sound/engine.h"
 #include "renderer/render.h"
 #include "physics/forces.h"

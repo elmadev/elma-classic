@@ -3,7 +3,7 @@
 #include "pic/abc8.h"
 #include "menu/best_times.h"
 #include "editor/editor.h"
-#include "flagtag.h"
+#include "physics/flagtag.h"
 #include "keys.h"
 #include "game/game.h"
 #include "level/level.h"

@@ -8,7 +8,7 @@
 #include "eol/eol.h"
 #include "eol/status_messages.h"
 #include "eol/settings.h"
-#include "flagtag.h"
+#include "physics/flagtag.h"
 #include "game/game.h"
 #include "level/level.h"
 #include "pic/lgr.h"

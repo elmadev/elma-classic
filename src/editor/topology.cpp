@@ -5,6 +5,8 @@
 #include "level/level.h"
 #include "level/object.h"
 #include "level/polygon.h"
+#include "segments.h"
+#include <format>
 
 bool check_topology(bool show_dialog) {
     dialog("Checking Topology, please wait!", DIALOG_BUTTONS, DIALOG_RETURN);
@@ -89,12 +91,32 @@ bool check_topology(bool show_dialog) {
         }
     }
 
-    // Make sure objects are not outside of level borders
+    // Check level width/height
     double x1;
     double y1;
     double x2;
     double y2;
     Level->get_boundaries(&x1, &y1, &x2, &y2, false);
+    double width = x2 - x1;
+    double height = y2 - y1;
+    std::string current_size =
+        std::format("The current level dimensions are {:.1f}x{:.1f}.", width, height);
+    std::string max_size =
+        std::format("The max level dimensions are {}x{}.", LEVEL_MAX_SIZE, LEVEL_MAX_SIZE);
+    if (width > LEVEL_MAX_SIZE) {
+        if (show_dialog) {
+            dialog("Error: The level is too wide!", current_size.c_str(), max_size.c_str());
+        }
+        return true;
+    }
+    if (height > LEVEL_MAX_SIZE) {
+        if (show_dialog) {
+            dialog("Error: The level is too tall!", current_size.c_str(), max_size.c_str());
+        }
+        return true;
+    }
+
+    // Make sure objects are not outside of level borders
     x1 -= 1.0;
     y1 -= 1.0;
     x2 += 1.0;

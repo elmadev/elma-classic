@@ -94,6 +94,7 @@
 * When mousing over pictures, sometimes the clipping would not be updated in the tooltip
 * Create Picture tooltip will show the default distance/clipping instead of 0, Unclipped
 * Wheel no longer increases in size by 2.5% while turning
+* Internal editor level-too-big topology check is graphically improved and provides more information
 
 ## Removed Legacy Features
 * It is no longer possible to upgrade from across.res to elma.res

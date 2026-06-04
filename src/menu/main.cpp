@@ -97,6 +97,7 @@ void menu_main() {
         if (EolSettings->show_help_menu()) {
             nav.add_row("Help", NAV_FUNC() { menu_help(); });
         }
+        nav.add_row("About", NAV_FUNC() { menu_about(); });
         if (EolSettings->show_best_times_menu()) {
             nav.add_row("Best Times", NAV_FUNC() { menu_best_times(); });
         }

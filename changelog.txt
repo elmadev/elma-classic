@@ -56,6 +56,7 @@
 * You can select a default gravity and animation via right click when using the Create Food tool in the editor
 * You can delete polygons using the Delete Vertex tool in the editor
 * Front grass in front of the bike is properly zoomed
+* About menu updated
 * When saving internal replay, internal number and name will be shown instead of QWQUU0XX.lev
 
 ## Minor Bug Fixes

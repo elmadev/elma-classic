@@ -16,6 +16,37 @@
 #include <cstring>
 #include <format>
 
+void menu_about() {
+    menu_nav nav("Elasto Mania Online " ELMA_VERSION);
+
+    int i = 1;
+    constexpr int DY = 60;
+    nav.add_overlay("https://elma.online", 320, nav.y_title + DY * i++, OverlayAlignment::Centered,
+                    ScreenAnchor::Center);
+    nav.add_overlay("Find Our Community on Discord!", 320, nav.y_title + DY * i++,
+                    OverlayAlignment::Centered, ScreenAnchor::Center);
+    nav.add_overlay("Thank You to Our Contributors!", 320, nav.y_title + DY * i++,
+                    OverlayAlignment::Centered, ScreenAnchor::Center);
+    nav.y_entries = nav.y_title + DY * i++;
+
+    // Alphabetical
+    nav.add_row("bene", "", NAV_FUNC(){});
+    nav.add_row("joey", "", NAV_FUNC(){});
+    nav.add_row("Kopaka", "", NAV_FUNC(){});
+    nav.add_row("Markku", "", NAV_FUNC(){});
+    nav.add_row("sunl", "", NAV_FUNC(){});
+
+    // Alphabetical
+    nav.add_row("Hibernatus", "", NAV_FUNC(){});
+    nav.add_row("milagros", "", NAV_FUNC(){});
+
+    // Alphabetical
+    nav.add_row("amarshalov", "", NAV_FUNC(){});
+    nav.add_row("Smibu", "", NAV_FUNC(){});
+
+    nav.navigate();
+}
+
 void menu_help() {
     menu_pic menu;
 

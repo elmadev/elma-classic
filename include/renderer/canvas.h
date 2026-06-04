@@ -1,7 +1,7 @@
 #ifndef RENDERER_CANVAS_H
 #define RENDERER_CANVAS_H
 
-#include "grass.h"
+#include "renderer/grass.h"
 #include "pic/lgr.h"
 #include "main.h"
 #include "level/sprite.h"

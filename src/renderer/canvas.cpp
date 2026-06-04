@@ -2,7 +2,7 @@
 #include "pic/anim.h"
 #include "editor/editor.h"
 #include "eol/settings.h"
-#include "grass.h"
+#include "renderer/grass.h"
 #include "level/polygon.h"
 #include "level/level.h"
 #include "pic/lgr.h"

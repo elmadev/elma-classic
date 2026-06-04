@@ -37,7 +37,7 @@ elma_sources = files(
     'src/sound/wav.cpp',
     'src/menu/player.cpp',
     'src/renderer/render.cpp',
-    'grass.cpp',
+    'src/renderer/grass.cpp',
     'src/platform/utils.cpp',
     'src/game/game.cpp',
     'src/physics/forces.cpp',

@@ -5,7 +5,7 @@
 #include "renderer/canvas.h"
 #include "eol/settings.h"
 #include "fs_utils.h"
-#include "grass.h"
+#include "renderer/grass.h"
 #include "renderer/render.h"
 #include "level/level.h"
 #include "game/level_load.h"

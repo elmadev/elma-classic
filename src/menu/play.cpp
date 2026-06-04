@@ -29,7 +29,16 @@
 #include <optional>
 
 // Prompt for replay filename and return true if enter, false if esc
-static bool menu_prompt_replay_name(char* filename) {
+static bool menu_prompt_replay_name(int internal_index, const char* external_filename,
+                                    char* filename) {
+    std::string level_name;
+    if (external_filename) {
+        level_name = external_filename;
+    } else {
+        level_name =
+            std::format("{}: {}", internal_index + 1, get_internal_level_name(internal_index));
+    }
+
     menu_pic menu;
     int i = 0;
     empty_keypress_buffer();
@@ -68,20 +77,21 @@ static bool menu_prompt_replay_name(char* filename) {
             rerender = false;
             menu.clear();
 
+            menu.add_line_centered(level_name, 320, 120);
+            menu.add_line_centered("Please enter the filename:", 320, 180);
+
             filename[i] = '_';
             filename[i + 1] = 0;
             menu.add_line_centered(filename, 320, 240);
             filename[i] = 0;
-
-            menu.add_line_centered("Please enter the filename:", 320, 180);
         }
         menu.render();
     }
 }
 
-static void menu_save_play(int level_id) {
+static void menu_save_play(int internal_index, const char* external_filename, int level_id) {
     recname tmp = "";
-    if (!menu_prompt_replay_name(tmp)) {
+    if (!menu_prompt_replay_name(internal_index, external_filename, tmp)) {
         return;
     }
     strcat(tmp, ".rec");
@@ -376,7 +386,10 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
                 MenuPalette->set();
             });
 
-        nav.add_row("Save play", NAV_FUNC() { menu_save_play(Level->level_id); });
+        nav.add_row(
+            "Save play", NAV_FUNC(&internal_index, &external_filename) {
+                menu_save_play(internal_index, external_filename, Level->level_id);
+            });
 
         nav.add_row(
             "Level replays", NAV_FUNC() {

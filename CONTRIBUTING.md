@@ -76,4 +76,4 @@ Once commits are merged to `main`, they are never rebased, amended, or squashed.
 - **Global variables:** `PascalCase`
 - **Functions / local variables:** `snake_case`
 - **Struct/class member variables:** trailing underscore (`name_`, `screen_width_`)
-- **Filenames:** new files use lowercase (`menu_play.cpp`). Uppercase files (`EDITTOLT.CPP`) are legacy and will be renamed over time.
+- **Filenames:** new files use lowercase (`menu_play.cpp`).

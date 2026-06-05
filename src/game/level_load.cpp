@@ -9,7 +9,7 @@
 #include "menu/pic.h"
 #include "physics/init.h"
 #include "platform/utils.h"
-#include "segments.h"
+#include "level/segments.h"
 #include "debug/profiler.h"
 #include <cstring>
 

@@ -5,7 +5,7 @@
 #include "main.h"
 #include "level/object.h"
 #include "physics/init.h"
-#include "segments.h"
+#include "level/segments.h"
 #include "vect2.h"
 
 // Check for collision between a wheel/head of a certain radius, and a provided segment.

@@ -12,7 +12,7 @@
 #include "level/object.h"
 #include "physics/init.h"
 #include "pic/pic8.h"
-#include "segments.h"
+#include "level/segments.h"
 #include "debug/profiler.h"
 #include <algorithm>
 #include <climits>

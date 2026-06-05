@@ -15,7 +15,7 @@
 #include "physics/init.h"
 #include "platform/implementation.h"
 #include "platform/sdl/keyboard.h"
-#include "segments.h"
+#include "level/segments.h"
 #include "renderer/timer.h"
 #include <algorithm>
 #include <cmath>

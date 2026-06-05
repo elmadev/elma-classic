@@ -61,7 +61,7 @@ elma_sources = files(
     'src/menu/skip.cpp',
     'src/eol/status_messages.cpp',
     'src/game/state.cpp',
-    'segments.cpp',
+    'src/level/segments.cpp',
     'src/menu/intro.cpp',
     'src/physics/collision.cpp',
     'src/level/level.cpp',

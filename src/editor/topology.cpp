@@ -5,7 +5,7 @@
 #include "level/level.h"
 #include "level/object.h"
 #include "level/polygon.h"
-#include "segments.h"
+#include "level/segments.h"
 #include <format>
 
 bool check_topology(bool show_dialog) {

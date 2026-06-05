@@ -16,7 +16,7 @@ static void move_wheel_out_of_ground(rigidbody* rb, vect2* point) {
 }
 
 // Minimum speed loss to trigger a bump sound effect
-constexpr double BumpThreshold = 1.5;
+constexpr double BUMP_THRESHOLD = 1.5;
 
 // Handle collision between a wheel and one anchor point
 // Return true if there is collision
@@ -33,7 +33,7 @@ static bool simulate_anchor_point_collision(rigidbody* rb, vect2* point, vect2 f
     rb->v = rb->v - deleted_velocity;
     // Make a "bump" sound effect if enough velocity deleted
     double bump_magnitude = deleted_velocity.length();
-    if (bump_magnitude > BumpThreshold) {
+    if (bump_magnitude > BUMP_THRESHOLD) {
         bump_magnitude = bump_magnitude / 0.8 * 0.1;
         bump_magnitude = std::min(bump_magnitude, 0.99);
         add_event_buffer(WavEvent::Bump, bump_magnitude, -1);

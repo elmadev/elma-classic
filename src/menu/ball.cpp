@@ -14,15 +14,15 @@ double** CollisionTimeGrid = nullptr;
 static double NextCollisionTime = UNKNOWN_COLLISION_TIME;
 static double ElapsedTimeSinceKeyframe = 0.0;
 
-constexpr int InitColumns = 3;
-constexpr int InitRows = 3;
+constexpr int INITIAL_COLUMNS = 3;
+constexpr int INITIAL_ROWS = 3;
 
 static void create_balls() {
-    BallCount = InitColumns * InitRows;
+    BallCount = INITIAL_COLUMNS * INITIAL_ROWS;
     Balls = new ball[BallCount];
-    for (int x = 0; x < InitColumns; x++) {
-        for (int y = 0; y < InitRows; y++) {
-            int i = y * InitRows + x;
+    for (int x = 0; x < INITIAL_COLUMNS; x++) {
+        for (int y = 0; y < INITIAL_ROWS; y++) {
+            int i = y * INITIAL_ROWS + x;
             if (x == 0) {
                 Balls[i].radius = 24.0;
             }

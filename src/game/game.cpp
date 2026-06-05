@@ -231,10 +231,10 @@ static void physics_subframe(motorst* mot, player_keys* keys, bike_metadata* met
                 *dead = true;
             }
             if (bike_state == BikeState::Finish) {
-                *finish_time = (int)(time * TimeToCentiseconds);
+                *finish_time = (int)(time * TIME_TO_CENTISECONDS);
             }
             if (prev_apple_count < mot->apple_count) {
-                mot->last_apple_time = (int)(time * TimeToCentiseconds);
+                mot->last_apple_time = (int)(time * TIME_TO_CENTISECONDS);
             }
         } else {
             start_wav(wav_id, volume);
@@ -574,8 +574,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                 Mute = true;
 
                 if (Single) {
-                    EolClient->exit_level(filename, time * TimeToCentiseconds, Motor1->apple_count,
-                                          TotalApples, !finish_time);
+                    EolClient->exit_level(filename, time * TIME_TO_CENTISECONDS,
+                                          Motor1->apple_count, TotalApples, !finish_time);
                 }
 
                 Level->unflip_objects();
@@ -637,7 +637,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
             if (Single) {
-                EolClient->exit_level(filename, time * TimeToCentiseconds, Motor1->apple_count,
+                EolClient->exit_level(filename, time * TIME_TO_CENTISECONDS, Motor1->apple_count,
                                       TotalApples, true);
             }
             return -1;
@@ -702,7 +702,7 @@ static bool replay_frame(motorst* mot, player_keys* keys, bike_metadata* metadat
             int prev_apple_count = mot->apple_count;
             handle_object_interaction(object_id, &mot->apple_count, mot);
             if (prev_apple_count < mot->apple_count) {
-                mot->last_apple_time = (int)(time * TimeToCentiseconds);
+                mot->last_apple_time = (int)(time * TIME_TO_CENTISECONDS);
             }
         } else {
             start_wav(wav_id, volume);

@@ -233,14 +233,14 @@ void draw_timers(const char* best_time_text, double flag_tag_time, double curren
 
     // Draw current time
     int current_time_x = dest_width - edge_width - timer_width;
-    int current_time_centiseconds = (int)(current_time * TimeToCentiseconds);
+    int current_time_centiseconds = (int)(current_time * TIME_TO_CENTISECONDS);
     char current_time_text[20];
     util::text::centiseconds_to_string(current_time_centiseconds, current_time_text);
     draw_timer(current_time_text, current_time_x, y);
 
     // Draw flag tag time
     if (flag_tag_time >= 0) {
-        int flag_tag_time_centiseconds = (int)(flag_tag_time * TimeToCentiseconds);
+        int flag_tag_time_centiseconds = (int)(flag_tag_time * TIME_TO_CENTISECONDS);
         char flag_tag_time_text[20];
         util::text::centiseconds_to_string(flag_tag_time_centiseconds, flag_tag_time_text);
         draw_timer(flag_tag_time_text, (best_time_x + current_time_x) / 2, y);

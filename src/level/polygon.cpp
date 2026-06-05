@@ -338,11 +338,11 @@ static double get_and_fix_angle(vect2* a, vect2 b, vect2 c) {
         }
         if (angle < 0.0000002) {
             // Move a perpendicularly to the line
-            constexpr double displacement = 0.0002;
+            constexpr double DISPLACEMENT = 0.0002;
             vect2 perpendicular = *a - b;
             perpendicular = rotate_90deg(perpendicular);
             perpendicular.normalize();
-            *a = *a + perpendicular * displacement;
+            *a = *a + perpendicular * DISPLACEMENT;
             continue;
         }
         return angle;
@@ -353,10 +353,10 @@ static double get_and_fix_angle(vect2* a, vect2 b, vect2 c) {
 // point until minimum separation is achieved This is
 // because lines of length 0 result in undefined angles.
 static void separate_two_stacked_vertices(vect2* a, vect2* b) {
-    constexpr double displacement = 0.0002;
+    constexpr double DISPLACEMENT = 0.0002;
     if (fabs(a->x - b->x) < 0.0000002 && fabs(a->y - b->y) < 0.0000002) {
-        a->x += displacement + displacement * util::random::range(1000) / 1200.0;
-        a->y += displacement + displacement * util::random::range(1000) / 1200.0;
+        a->x += DISPLACEMENT + DISPLACEMENT * util::random::range(1000) / 1200.0;
+        a->y += DISPLACEMENT + DISPLACEMENT * util::random::range(1000) / 1200.0;
     }
 }
 

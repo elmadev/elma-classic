@@ -3,7 +3,7 @@
 #include "editor/dialog.h"
 #include "editor/editor.h"
 #include "eol/settings.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "game/game.h"
 #include "level/level.h"
 #include "game/level_load.h"

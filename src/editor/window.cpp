@@ -3,7 +3,7 @@
 #include "editor/canvas.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "keys.h"
 #include "level/level.h"
 #include "game/level_load.h"

@@ -1,6 +1,6 @@
 #include "level/sprite.h"
 #include "editor/canvas.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "pic/lgr.h"
 #include "main.h"
 #include "physics/init.h"

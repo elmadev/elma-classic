@@ -20,7 +20,7 @@
 #include "menu/skip.h"
 #include "renderer/timer.h"
 #include "eol/settings.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "directinput/scancodes.h"
 #include <algorithm>
 #include <cstring>

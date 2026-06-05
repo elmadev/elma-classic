@@ -2,7 +2,7 @@
 #include "renderer/canvas.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "level/level.h"
 #include "pic/lgr.h"
 #include "main.h"

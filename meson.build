@@ -71,7 +71,7 @@ elma_sources = files(
     'src/eol/settings.cpp',
     'src/sound/engine.cpp',
     'keys.cpp',
-    'fs_utils.cpp',
+    'src/util/file_iter.cpp',
     'src/level/object.cpp',
     'src/renderer/object_overlay.cpp',
     'src/level/sprite.cpp',

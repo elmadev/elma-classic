@@ -1,6 +1,6 @@
 #include "menu/external.h"
 #include "menu/nav.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "game/game.h"
 #include "game/level_load.h"
 #include "main.h"

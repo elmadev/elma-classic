@@ -1,5 +1,5 @@
 #include "level/level.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "editor/topology.h"
 #include "editor/canvas.h"
 #include "editor/dialog.h"

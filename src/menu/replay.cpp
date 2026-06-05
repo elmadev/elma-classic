@@ -2,7 +2,7 @@
 #include "menu/best_times.h"
 #include "editor/editor.h"
 #include "eol/settings.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "menu/rec_list.h"
 #include "game/game.h"
 #include "level/level.h"

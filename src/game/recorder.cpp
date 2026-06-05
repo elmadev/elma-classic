@@ -1,6 +1,6 @@
 #include "game/recorder.h"
 #include "physics/flagtag.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "level/level.h"
 #include "main.h"
 #include "menu/rec_list.h"

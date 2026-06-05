@@ -1,6 +1,6 @@
 #include "menu/options.h"
 #include "eol/settings.h"
-#include "fs_utils.h"
+#include "util/file_iter.h"
 #include "game/level_load.h"
 #include "M_PIC.H"
 #include "main.h"

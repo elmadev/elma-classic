@@ -3,7 +3,7 @@
 #include "eol/eol.h"
 #include "eol/status_messages.h"
 #include "eol/settings.h"
-#include "keys.h"
+#include "platform/text_input.h"
 #include "log.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"

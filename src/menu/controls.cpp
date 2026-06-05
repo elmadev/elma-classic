@@ -1,7 +1,7 @@
 #include "menu/controls.h"
 #include <directinput/scancodes.h>
 #include "eol/settings.h"
-#include "keys.h"
+#include "platform/text_input.h"
 #include "main.h"
 #include "menu/nav.h"
 #include "platform/implementation.h"

@@ -1,7 +1,7 @@
 #include "editor/dialog.h"
 #include "pic/abc8.h"
 #include "editor/editor.h"
-#include "keys.h"
+#include "platform/text_input.h"
 #include "M_PIC.H"
 #include "main.h"
 #include "menu/pic.h"

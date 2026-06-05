@@ -6,7 +6,7 @@
 #include "editor/window.h"
 #include "editor/tool.h"
 #include "editor/topology.h"
-#include "keys.h"
+#include "platform/text_input.h"
 #include "game/game.h"
 #include "level/level.h"
 #include "pic/lgr.h"

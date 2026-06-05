@@ -4,7 +4,7 @@
 #include "eol/eol.h"
 #include "editor/editor.h"
 #include "sound/engine.h"
-#include "keys.h"
+#include "platform/text_input.h"
 #include "platform/sdl/keyboard.h"
 #include "platform/sdl/gl_renderer.h"
 #include "main.h"

@@ -2,7 +2,7 @@
 #include "pic/abc8.h"
 #include "eol/settings.h"
 #include "util/file_iter.h"
-#include "keys.h"
+#include "platform/text_input.h"
 #include "main.h"
 #include "M_PIC.H"
 #include "platform/implementation.h"

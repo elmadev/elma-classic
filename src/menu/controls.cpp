@@ -7,7 +7,6 @@
 #include "platform/scancode.h"
 #include "platform/text_input.h"
 #include <cstring>
-#include <directinput/scancodes.h>
 #include <format>
 #include <vector>
 
@@ -70,7 +69,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_RETURN:
         return "ENTER";
     case DIK_LCONTROL:
-        return "LEFT CTRL";
+        return "L CTRL";
     case DIK_A:
         return "A";
     case DIK_S:
@@ -96,7 +95,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_GRAVE:
         return "`";
     case DIK_LSHIFT:
-        return "LEFT SHIFT";
+        return "L SHIFT";
     case DIK_BACKSLASH:
         return "\\";
     case DIK_Z:
@@ -120,11 +119,11 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_SLASH:
         return "SLASH";
     case DIK_RSHIFT:
-        return "RIGHT SHIFT";
+        return "R SHIFT";
     case DIK_MULTIPLY:
         return "PAD_*";
     case DIK_LMENU:
-        return "LEFT ALT";
+        return "L ALT";
     case DIK_SPACE:
         return "SPACEBAR";
     case DIK_CAPITAL:
@@ -218,7 +217,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_NUMPADENTER:
         return "PAD_ENTER";
     case DIK_RCONTROL:
-        return "RIGHT CTRL";
+        return "R CTRL";
     case DIK_NUMPADCOMMA:
         return "COMMA";
     case DIK_DIVIDE:
@@ -226,7 +225,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_SYSRQ:
         return "SYSRQ";
     case DIK_RMENU:
-        return "RIGHT ALT";
+        return "R ALT";
     case DIK_HOME:
         return "HOME";
     case DIK_UP:
@@ -248,13 +247,19 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_DELETE:
         return "DEL";
     case DIK_LWIN:
-        return "LEFT WIN";
+        return "L WIN";
     case DIK_RWIN:
-        return "RIGHT WIN";
+        return "R WIN";
     case DIK_APPS:
         return "APPLICATION";
     }
     return std::format("Key code: {}", keycode);
+}
+
+std::string dik_to_string(const combo_scancode& keycode) {
+    std::string modifier = (keycode.modifier ? dik_to_string(keycode.modifier) + " + " : "");
+    std::string key = dik_to_string(keycode.key);
+    return modifier + key;
 }
 
 // A list of pointers to where the keys are stored (somewhere in a state class object)

@@ -67,7 +67,7 @@ elma_sources = files(
     'src/level/level.cpp',
     'src/log.cpp',
     'src/menu/nav.cpp',
-    'vect2.cpp',
+    'src/vect2.cpp',
     'src/eol/settings.cpp',
     'src/sound/engine.cpp',
     'keys.cpp',

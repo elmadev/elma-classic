@@ -283,10 +283,21 @@ static void load_control(menu_nav* nav, key_pointers& keys, std::string label, D
     }
 }
 
-// Await keypress to choose a new key for one control
-static void prompt_control(menu_nav& nav, key_pointers& keys, int index) {
-    nav.entry_right(index) = "_";
+// Disallow multiple controls being mapped to the same key
+static void deduplicate_controls(DikScancode keycode) {
+    auto clear_matches = [keycode](const key_pointers& keys) {
+        for (DikScancode* key : keys) {
+            if (key && *key == keycode) {
+                *key = DIK_NONE;
+            }
+        }
+    };
+    clear_matches(UniversalKeys);
+    clear_matches(Player1Keys);
+    clear_matches(Player2Keys);
+}
 
+static void prompt_key_control(menu_nav& nav, DikScancode* key) {
     // Render only!
     nav.navigate(true);
     while (true) {
@@ -301,22 +312,18 @@ static void prompt_control(menu_nav& nav, key_pointers& keys, int index) {
             if (!is_key_down(keycode)) {
                 continue;
             }
-            // Disallow multiple controls being mapped to the same key
-            auto clear_matches = [keycode](const key_pointers& ref) {
-                for (DikScancode* key : ref) {
-                    if (key && *key == keycode) {
-                        *key = DIK_NONE;
-                    }
-                }
-            };
-            clear_matches(UniversalKeys);
-            clear_matches(Player1Keys);
-            clear_matches(Player2Keys);
-            *keys[index] = keycode;
+            deduplicate_controls(keycode);
+            *key = keycode;
             return;
         }
         nav.render();
     }
+}
+
+// Await keypress to choose a new key for one control
+static void prompt_control(menu_nav& nav, key_pointers& keys, int index) {
+    nav.entry_right(index) = "_";
+    prompt_key_control(nav, keys[index]);
 }
 
 // Setup the menu to display the universal controls

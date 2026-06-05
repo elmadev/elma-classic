@@ -8,6 +8,7 @@
 #include "platform/text_input.h"
 #include <cstring>
 #include <format>
+#include <ranges>
 #include <vector>
 
 std::string dik_to_string(DikScancode keycode) {
@@ -263,7 +264,11 @@ std::string dik_to_string(const combo_scancode& keycode) {
 }
 
 // A list of pointers to where the keys are stored (somewhere in a state class object)
-using key_pointers = std::vector<DikScancode*>;
+struct scancode_pointer {
+    DikScancode* dik;
+    combo_scancode* combo;
+};
+using key_pointers = std::vector<scancode_pointer>;
 
 constexpr int UNIVERSAL_KEYS_START = 4;
 static key_pointers UniversalKeys; // +/- and Screenshot
@@ -272,8 +277,13 @@ static key_pointers Player2Keys;
 static key_pointers ReplayKeys;
 
 // Setup the menu to display one control key
-static void load_control(menu_nav* nav, key_pointers& keys, std::string label, DikScancode* key) {
-    keys.emplace_back(key);
+template <typename Scancode>
+static void load_control(menu_nav* nav, key_pointers& keys, std::string label, Scancode* key) {
+    if constexpr (std::is_same_v<Scancode, DikScancode>) {
+        keys.emplace_back(scancode_pointer{key, nullptr});
+    } else {
+        keys.emplace_back(scancode_pointer{nullptr, key});
+    }
     if (!nav) {
         return;
     }
@@ -286,9 +296,9 @@ static void load_control(menu_nav* nav, key_pointers& keys, std::string label, D
 // Disallow multiple controls being mapped to the same key
 static void deduplicate_controls(DikScancode keycode) {
     auto clear_matches = [keycode](const key_pointers& keys) {
-        for (DikScancode* key : keys) {
-            if (key && *key == keycode) {
-                *key = DIK_NONE;
+        for (const scancode_pointer& key : keys) {
+            if (key.dik && *key.dik == keycode) {
+                *key.dik = DIK_NONE;
             }
         }
     };
@@ -297,7 +307,7 @@ static void deduplicate_controls(DikScancode keycode) {
     clear_matches(Player2Keys);
 }
 
-static void prompt_key_control(menu_nav& nav, DikScancode* key) {
+static void prompt_control_dik(menu_nav& nav, DikScancode* key) {
     // Render only!
     nav.navigate(true);
     while (true) {
@@ -320,10 +330,47 @@ static void prompt_key_control(menu_nav& nav, DikScancode* key) {
     }
 }
 
+static bool is_valid_modifier(DikScancode key) {
+    return std::ranges::find(MODIFIERS, key) != std::ranges::end(MODIFIERS);
+}
+
+static void prompt_control_combo(menu_nav& nav, combo_scancode* key) {
+    // Render only!
+    nav.navigate(true);
+    while (true) {
+        handle_events();
+        for (DikScancode keycode = 1; keycode < MaxKeycode; keycode++) {
+            if (is_key_down(DIK_ESCAPE)) {
+                return;
+            }
+            if (keycode == DIK_RETURN || keycode == DIK_ESCAPE) {
+                continue;
+            }
+            if (is_valid_modifier(keycode)) {
+                continue;
+            }
+            if (!is_key_down(keycode)) {
+                continue;
+            }
+            *key = keycode;
+            auto modifier = std::ranges::find_if(MODIFIERS, is_key_down);
+            if (modifier != MODIFIERS.end()) {
+                key->modifier = *modifier;
+            }
+            return;
+        }
+        nav.render();
+    }
+}
+
 // Await keypress to choose a new key for one control
 static void prompt_control(menu_nav& nav, key_pointers& keys, int index) {
     nav.entry_right(index) = "_";
-    prompt_key_control(nav, keys[index]);
+    if (keys[index].dik) {
+        prompt_control_dik(nav, keys[index].dik);
+    } else {
+        prompt_control_combo(nav, keys[index].combo);
+    }
 }
 
 // Setup the menu to display the universal controls

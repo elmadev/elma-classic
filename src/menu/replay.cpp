@@ -7,6 +7,7 @@
 #include "game/game.h"
 #include "level/level.h"
 #include "game/level_load.h"
+#include "main.h"
 #include "menu/dialog.h"
 #include "menu/nav.h"
 #include "menu/pic.h"

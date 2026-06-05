@@ -1,6 +1,7 @@
 #include "menu/rec_list.h"
 #include "debug/profiler.h"
 #include "fs_utils.h"
+#include "main.h"
 #include "menu/replay_cache.h"
 
 namespace {

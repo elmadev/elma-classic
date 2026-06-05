@@ -3,8 +3,10 @@
 #include "fs_utils.h"
 #include "game/level_load.h"
 #include "M_PIC.H"
+#include "main.h"
 #include "menu/controls.h"
 #include "menu/dialog.h"
+#include "menu/main.h"
 #include "menu/nav.h"
 #include "menu/pic.h"
 #include "menu/player.h"
@@ -55,7 +57,7 @@ static void menu_lgr() {
     nav.search_pattern = SearchPattern::Sorted;
 
     finame filename;
-    bool done = find_first("lgr/*.lgr", filename);
+    bool done = find_first("lgr/*.lgr", filename, MAX_FILENAME_LEN);
     while (!done) {
         constexpr int LGR_EXT_LEN = 4;
         int len = strlen(filename);

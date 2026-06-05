@@ -3,7 +3,7 @@
 
 #include "game/game.h"
 #include "level/level.h"
-#include "fs_utils.h"
+#include "main.h"
 #include "physics/init.h"
 #include <cstdint>
 #include <optional>

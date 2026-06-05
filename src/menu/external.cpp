@@ -49,7 +49,7 @@ static bool menu_external_levels_inner() {
     nav.search_pattern = SearchPattern::Sorted;
 
     finame filename;
-    bool done = find_first("lev/*.lev", filename);
+    bool done = find_first("lev/*.lev", filename, MAX_FILENAME_LEN);
     while (!done) {
         nav.add_row(filename, NAV_FUNC() { play_external(left, is_key_down(DIK_F1)); });
         done = find_next(filename);

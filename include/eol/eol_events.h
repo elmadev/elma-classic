@@ -2,7 +2,7 @@
 #define EOL_EVENTS_H
 
 #include "eol/eol_types.h"
-#include "fs_utils.h"
+#include "main.h"
 #include <cstdint>
 #include <span>
 #include <string_view>

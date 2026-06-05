@@ -22,7 +22,7 @@ elma_sources = files(
     'src/renderer/timer.cpp',
     'src/editor/canvas.cpp',
     'src/renderer/affine.cpp',
-    'D_PIC.CPP',
+    'src/pic/surface.cpp',
     'src/renderer/canvas.cpp',
     'src/editor/help.cpp',
     'src/editor/window.cpp',

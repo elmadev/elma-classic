@@ -2,7 +2,7 @@
 #include "pic/abc8.h"
 #include "editor/editor.h"
 #include "platform/text_input.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "pic/pic8.h"

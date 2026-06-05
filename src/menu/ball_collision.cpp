@@ -1,7 +1,7 @@
 #include "menu/ball_collision.h"
 #include "menu/ball.h"
 #include "main.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include <cmath>
 
 bool WallsDisabled = false;

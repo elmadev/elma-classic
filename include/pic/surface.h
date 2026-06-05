@@ -1,5 +1,5 @@
-#ifndef M_PIC_H
-#define M_PIC_H
+#ifndef PIC_SURFACE_H
+#define PIC_SURFACE_H
 
 class pic8;
 

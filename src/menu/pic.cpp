@@ -3,7 +3,7 @@
 #include "pic/anim.h"
 #include "menu/ball.h"
 #include "renderer/render.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "main.h"
 #include "pic/pic8.h"
 #include "platform/implementation.h"

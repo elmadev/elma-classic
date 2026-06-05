@@ -7,7 +7,7 @@
 #include "level/level.h"
 #include "pic/lgr.h"
 #include "main.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "menu/pic.h"
 #include "level/object.h"
 #include "physics/init.h"

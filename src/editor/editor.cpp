@@ -11,7 +11,7 @@
 #include "level/level.h"
 #include "pic/lgr.h"
 #include "game/level_load.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "level/object.h"

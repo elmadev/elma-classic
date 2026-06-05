@@ -2,7 +2,7 @@
 #include "eol/eol.h"
 #include "eol/settings.h"
 #include "log.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "main.h"
 #include "menu/intro.h"
 #include "menu/pic.h"

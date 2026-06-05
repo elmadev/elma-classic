@@ -1,4 +1,4 @@
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "menu/ball.h"
 #include "editor/editor.h"
 #include "eol/settings.h"

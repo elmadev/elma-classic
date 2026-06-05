@@ -12,7 +12,7 @@
 #include "game/game.h"
 #include "level/level.h"
 #include "pic/lgr.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "main.h"
 #include "level/object.h"
 #include "pic/pic8.h"

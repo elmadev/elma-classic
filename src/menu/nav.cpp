@@ -4,7 +4,7 @@
 #include "util/file_iter.h"
 #include "platform/text_input.h"
 #include "main.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include "util/util.h"

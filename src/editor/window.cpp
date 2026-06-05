@@ -8,7 +8,7 @@
 #include "level/level.h"
 #include "game/level_load.h"
 #include "pic/lgr.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "pic/pic8.h"

@@ -1,5 +1,5 @@
 #include "menu/play.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "pic/abc8.h"
 #include "menu/best_times.h"
 #include "editor/editor.h"

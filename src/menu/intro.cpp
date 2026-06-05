@@ -4,7 +4,7 @@
 #include "editor/editor.h"
 #include "eol/settings.h"
 #include "renderer/render.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "main.h"
 #include "menu/main.h"
 #include "menu/pic.h"

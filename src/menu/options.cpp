@@ -2,7 +2,7 @@
 #include "eol/settings.h"
 #include "util/file_iter.h"
 #include "game/level_load.h"
-#include "M_PIC.H"
+#include "pic/surface.h"
 #include "main.h"
 #include "menu/controls.h"
 #include "menu/dialog.h"

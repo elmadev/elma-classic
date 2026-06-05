@@ -22,6 +22,24 @@ bool was_key_just_pressed(DikScancode code) {
     return keyboard::was_just_pressed(sdl_code);
 }
 
+bool was_key_just_pressed(combo_scancode code) {
+    if (!was_key_just_pressed(code.key)) {
+        return false;
+    }
+
+    if (code.modifier != DIK_NONE) {
+        return is_key_down(code.modifier);
+    }
+
+    for (DikScancode modifier : MODIFIERS) {
+        if (is_key_down(modifier)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 DikScancode get_any_key_just_pressed() {
     for (int i = 0; i < MaxKeycode; i++) {
         if (was_key_just_pressed(i)) {

@@ -53,6 +53,10 @@ void eol::set_battle_results_title(const char* label) {
     battle_results_table.set_title(new_title);
 }
 
+bool eol::in_apple_battle() const {
+    return current_battle && current_battle->type == BattleType::Apple && proto.in_battle_level();
+}
+
 void eol::process(const battle_started& bs) {
     current_battle = bs.bat;
     current_battle->level_exists = std::filesystem::exists(

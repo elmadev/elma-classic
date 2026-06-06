@@ -9,6 +9,7 @@ class null_protocol {
     void connect() {}
     void tick() {}
     template <typename T> void send(const T&) {}
+    bool in_battle_level() const { return false; }
 };
 
 #endif

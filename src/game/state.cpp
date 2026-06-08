@@ -428,6 +428,18 @@ void state::reset_keys() {
     key_replay_slow_4x = EolSettings->replay_slow_4x_key_default();
     key_replay_pause = EolSettings->replay_pause_key_default();
     key_replay_rewind = EolSettings->replay_rewind_key_default();
+
+    key_show_others = EolSettings->show_others_key_default();
+    key_spy_next_kuski = EolSettings->spy_next_kuski_key_default();
+    key_spy_prev_kuski = EolSettings->spy_prev_kuski_key_default();
+    key_battle_queue = EolSettings->battle_queue_key_default();
+    key_download_battle_level = EolSettings->download_battle_level_key_default();
+    key_download_level = EolSettings->download_level_key_default();
+    key_players_online = EolSettings->players_online_key_default();
+    key_battle_results = EolSettings->battle_results_key_default();
+    key_chat = EolSettings->chat_key_default();
+    key_battle_status = EolSettings->battle_status_key_default();
+    key_battle_leader = EolSettings->battle_leader_key_default();
 }
 
 player* state::get_player(const char* player_name) {

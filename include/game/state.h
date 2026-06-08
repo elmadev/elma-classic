@@ -72,6 +72,7 @@ class state {
 
     player_keys keys1;
     player_keys keys2;
+
     DikScancode key_increase_screen_size;
     DikScancode key_decrease_screen_size;
     DikScancode key_screenshot;
@@ -83,6 +84,18 @@ class state {
     DikScancode key_replay_slow_4x;
     DikScancode key_replay_pause;
     DikScancode key_replay_rewind;
+
+    combo_scancode key_show_others;
+    combo_scancode key_spy_next_kuski;
+    combo_scancode key_spy_prev_kuski;
+    combo_scancode key_battle_queue;
+    combo_scancode key_download_battle_level;
+    combo_scancode key_download_level;
+    combo_scancode key_players_online;
+    combo_scancode key_battle_results;
+    combo_scancode key_chat;
+    combo_scancode key_battle_status;
+    combo_scancode key_battle_leader;
 
     char editor_filename[20];
     char external_filename[20];

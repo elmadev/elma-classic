@@ -488,6 +488,18 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->key_replay_slow_4x = EolSettings->replay_slow_4x_key();
     s->key_replay_pause = EolSettings->replay_pause_key();
     s->key_replay_rewind = EolSettings->replay_rewind_key();
+
+    s->key_show_others = EolSettings->show_others_key();
+    s->key_spy_next_kuski = EolSettings->spy_next_kuski_key();
+    s->key_spy_prev_kuski = EolSettings->spy_prev_kuski_key();
+    s->key_battle_queue = EolSettings->battle_queue_key();
+    s->key_download_battle_level = EolSettings->download_battle_level_key();
+    s->key_download_level = EolSettings->download_level_key();
+    s->key_players_online = EolSettings->players_online_key();
+    s->key_battle_results = EolSettings->battle_results_key();
+    s->key_chat = EolSettings->chat_key();
+    s->key_battle_status = EolSettings->battle_status_key();
+    s->key_battle_leader = EolSettings->battle_leader_key();
 }
 
 void eol_settings::sync_controls_from_state(state* s) {
@@ -509,4 +521,16 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_replay_slow_4x_key(s->key_replay_slow_4x);
     EolSettings->persist_replay_pause_key(s->key_replay_pause);
     EolSettings->persist_replay_rewind_key(s->key_replay_rewind);
+
+    EolSettings->persist_show_others_key(s->key_show_others);
+    EolSettings->persist_spy_next_kuski_key(s->key_spy_next_kuski);
+    EolSettings->persist_spy_prev_kuski_key(s->key_spy_prev_kuski);
+    EolSettings->persist_battle_queue_key(s->key_battle_queue);
+    EolSettings->persist_download_battle_level_key(s->key_download_battle_level);
+    EolSettings->persist_download_level_key(s->key_download_level);
+    EolSettings->persist_players_online_key(s->key_players_online);
+    EolSettings->persist_battle_results_key(s->key_battle_results);
+    EolSettings->persist_chat_key(s->key_chat);
+    EolSettings->persist_battle_status_key(s->key_battle_status);
+    EolSettings->persist_battle_leader_key(s->key_battle_leader);
 }

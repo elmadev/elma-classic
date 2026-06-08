@@ -39,7 +39,7 @@ static int TotalApples;
 // to prevent key presses from affecting the gameplay.
 static bool handle_console_input() {
     bool was_active = Console->is_input_active();
-    if (was_key_just_pressed(DIK_F9)) {
+    if (was_key_just_pressed(State->key_chat)) {
         Console->toggle_active();
     } else if (Console->is_input_active()) {
         Console->handle_input();
@@ -54,7 +54,7 @@ static bool is_game_key_down(DikScancode code) {
     return is_key_down(code);
 }
 
-static bool was_game_key_just_pressed(DikScancode code) {
+template <typename Scancode> static bool was_game_key_just_pressed(Scancode code) {
     if (Console->is_input_active()) {
         return false;
     }
@@ -360,47 +360,44 @@ static void physics_frame_end(driver& driv, double time, bool* other_draw_view) 
 }
 
 static void handle_eol_inputs() {
-    if (was_game_key_just_pressed(DIK_F1)) {
+    if (was_game_key_just_pressed(State->key_show_others)) {
         EolSettings->set_show_others(!EolSettings->show_others());
         StatusMessages->add(EolSettings->show_others() ? "other players shown"
                                                        : "other players hidden");
     }
 
-    if (was_game_key_just_pressed(DIK_F2)) {
-        if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
-            EolClient->spy_prev_kuski();
-        } else {
-            EolClient->spy_next_kuski();
-        }
+    if (was_game_key_just_pressed(State->key_spy_next_kuski)) {
+        EolClient->spy_next_kuski();
+    }
+    if (was_game_key_just_pressed(State->key_spy_prev_kuski)) {
+        EolClient->spy_prev_kuski();
     }
 
-    if (was_game_key_just_pressed(DIK_F4)) {
-        if (is_game_key_down(DIK_LCONTROL) || is_game_key_down(DIK_RCONTROL)) {
-            Console->label_mode("[Download] ", "!download ", true, false);
-            Console->toggle_active();
-        } else {
-            EolClient->download_battle_level();
-        }
-    }
-
-    if (was_game_key_just_pressed(DIK_F5)) {
-        EolClient->set_table(TableType::PlayersOnline);
-    }
-
-    if (was_game_key_just_pressed(DIK_F3)) {
+    if (was_game_key_just_pressed(State->key_battle_queue)) {
         EolClient->toggle_battle_queue();
     }
 
-    if (was_game_key_just_pressed(DIK_F6)) {
+    if (was_game_key_just_pressed(State->key_download_battle_level)) {
+        EolClient->download_battle_level();
+    }
+    if (was_game_key_just_pressed(State->key_download_level)) {
+        Console->label_mode("[Download] ", "!download ", true, false);
+        Console->toggle_active();
+    }
+
+    if (was_game_key_just_pressed(State->key_players_online)) {
+        EolClient->set_table(TableType::PlayersOnline);
+    }
+
+    if (was_game_key_just_pressed(State->key_battle_results)) {
         EolClient->toggle_battle_results();
     }
 
-    if (was_game_key_just_pressed(DIK_F10)) {
-        if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
-            EolClient->toggle_show_battle_leader();
-        } else {
-            EolClient->toggle_battle_status();
-        }
+    if (was_game_key_just_pressed(State->key_battle_status)) {
+        EolClient->toggle_battle_status();
+    }
+    if (was_game_key_just_pressed(State->key_battle_leader)) {
+        EolClient->toggle_show_battle_leader();
     }
 }
 

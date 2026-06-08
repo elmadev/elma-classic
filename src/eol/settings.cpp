@@ -130,40 +130,42 @@ void eol_settings::set_turn_time(double t) { turn_time_ = t; }
 void eol_settings::set_lctrl_search(bool lctrl_search) { lctrl_search_ = lctrl_search; }
 
 void eol_settings::set_alovolt_key_player_a(DikScancode key) { alovolt_key_player_a_ = key; }
-
 void eol_settings::set_alovolt_key_player_b(DikScancode key) { alovolt_key_player_b_ = key; }
-
 void eol_settings::set_brake_alias_key_player_a(DikScancode key) {
     brake_alias_key_player_a_ = key;
 }
-
 void eol_settings::set_brake_alias_key_player_b(DikScancode key) {
     brake_alias_key_player_b_ = key;
 }
-
 void eol_settings::set_one_frame_brake_key_player_a(DikScancode key) {
     one_frame_brake_key_player_a_ = key;
 }
-
 void eol_settings::set_one_frame_brake_key_player_b(DikScancode key) {
     one_frame_brake_key_player_b_ = key;
 }
 
 void eol_settings::set_escape_alias_key(DikScancode key) { escape_alias_key_ = key; }
-
 void eol_settings::set_replay_fast_2x_key(DikScancode key) { replay_fast_2x_key_ = key; }
-
 void eol_settings::set_replay_fast_4x_key(DikScancode key) { replay_fast_4x_key_ = key; }
-
 void eol_settings::set_replay_fast_8x_key(DikScancode key) { replay_fast_8x_key_ = key; }
-
 void eol_settings::set_replay_slow_2x_key(DikScancode key) { replay_slow_2x_key_ = key; }
-
 void eol_settings::set_replay_slow_4x_key(DikScancode key) { replay_slow_4x_key_ = key; }
-
 void eol_settings::set_replay_pause_key(DikScancode key) { replay_pause_key_ = key; }
-
 void eol_settings::set_replay_rewind_key(DikScancode key) { replay_rewind_key_ = key; }
+
+void eol_settings::set_show_others_key(combo_scancode key) { show_others_key_ = key; }
+void eol_settings::set_spy_next_kuski_key(combo_scancode key) { spy_next_kuski_key_ = key; }
+void eol_settings::set_spy_prev_kuski_key(combo_scancode key) { spy_prev_kuski_key_ = key; }
+void eol_settings::set_battle_queue_key(combo_scancode key) { battle_queue_key_ = key; }
+void eol_settings::set_download_battle_level_key(combo_scancode key) {
+    download_battle_level_key_ = key;
+}
+void eol_settings::set_download_level_key(combo_scancode key) { download_level_key_ = key; }
+void eol_settings::set_players_online_key(combo_scancode key) { players_online_key_ = key; }
+void eol_settings::set_battle_results_key(combo_scancode key) { battle_results_key_ = key; }
+void eol_settings::set_chat_key(combo_scancode key) { chat_key_ = key; }
+void eol_settings::set_battle_status_key(combo_scancode key) { battle_status_key_ = key; }
+void eol_settings::set_battle_leader_key(combo_scancode key) { battle_leader_key_ = key; }
 
 void eol_settings::set_default_lgr_name(std::string name) {
     if (default_lgr_name_.value != name) {
@@ -360,6 +362,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(fullscreen)                                                                         \
     JSON_FIELD(turn_time)                                                                          \
     JSON_FIELD(lctrl_search)                                                                       \
+                                                                                                   \
     JSON_FIELD(alovolt_key_player_a)                                                               \
     JSON_FIELD(alovolt_key_player_b)                                                               \
     JSON_FIELD(brake_alias_key_player_a)                                                           \
@@ -367,6 +370,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(one_frame_brake_key_player_a)                                                       \
     JSON_FIELD(one_frame_brake_key_player_b)                                                       \
     JSON_FIELD(escape_alias_key)                                                                   \
+                                                                                                   \
     JSON_FIELD(replay_fast_2x_key)                                                                 \
     JSON_FIELD(replay_fast_4x_key)                                                                 \
     JSON_FIELD(replay_fast_8x_key)                                                                 \
@@ -374,6 +378,19 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(replay_slow_4x_key)                                                                 \
     JSON_FIELD(replay_pause_key)                                                                   \
     JSON_FIELD(replay_rewind_key)                                                                  \
+                                                                                                   \
+    JSON_FIELD(show_others_key)                                                                    \
+    JSON_FIELD(spy_next_kuski_key)                                                                 \
+    JSON_FIELD(spy_prev_kuski_key)                                                                 \
+    JSON_FIELD(battle_queue_key)                                                                   \
+    JSON_FIELD(download_battle_level_key)                                                          \
+    JSON_FIELD(download_level_key)                                                                 \
+    JSON_FIELD(players_online_key)                                                                 \
+    JSON_FIELD(battle_results_key)                                                                 \
+    JSON_FIELD(chat_key)                                                                           \
+    JSON_FIELD(battle_status_key)                                                                  \
+    JSON_FIELD(battle_leader_key)                                                                  \
+                                                                                                   \
     JSON_FIELD(default_lgr_name)                                                                   \
     JSON_FIELD(show_last_apple_time)                                                               \
     JSON_FIELD(show_gravity_arrows)                                                                \

@@ -91,6 +91,7 @@ class eol_settings {
     Default<bool> zoom_grass_{true};
     Clamp<double> turn_time_{0.0, 0.35, 0.35};
     Default<bool> lctrl_search_{false};
+
     Default<DikScancode> alovolt_key_player_a_{DIK_NONE};
     Default<DikScancode> alovolt_key_player_b_{DIK_NONE};
     Default<DikScancode> brake_alias_key_player_a_{DIK_NONE};
@@ -98,6 +99,7 @@ class eol_settings {
     Default<DikScancode> one_frame_brake_key_player_a_{DIK_NONE};
     Default<DikScancode> one_frame_brake_key_player_b_{DIK_NONE};
     Default<DikScancode> escape_alias_key_{DIK_NONE};
+
     Default<DikScancode> replay_fast_2x_key_{DIK_UP};
     Default<DikScancode> replay_fast_4x_key_{DIK_RIGHT};
     Default<DikScancode> replay_fast_8x_key_{DIK_PRIOR};
@@ -105,6 +107,19 @@ class eol_settings {
     Default<DikScancode> replay_slow_4x_key_{DIK_NEXT};
     Default<DikScancode> replay_pause_key_{DIK_SPACE};
     Default<DikScancode> replay_rewind_key_{DIK_LEFT};
+
+    Default<combo_scancode> show_others_key_{combo_scancode{DIK_NONE, DIK_F1}};
+    Default<combo_scancode> spy_next_kuski_key_{combo_scancode{DIK_NONE, DIK_F2}};
+    Default<combo_scancode> spy_prev_kuski_key_{combo_scancode{DIK_LSHIFT, DIK_F2}};
+    Default<combo_scancode> battle_queue_key_{combo_scancode{DIK_NONE, DIK_F3}};
+    Default<combo_scancode> download_battle_level_key_{combo_scancode{DIK_NONE, DIK_F4}};
+    Default<combo_scancode> download_level_key_{combo_scancode{DIK_LCONTROL, DIK_F4}};
+    Default<combo_scancode> players_online_key_{combo_scancode{DIK_NONE, DIK_F5}};
+    Default<combo_scancode> battle_results_key_{combo_scancode{DIK_NONE, DIK_F6}};
+    Default<combo_scancode> chat_key_{combo_scancode{DIK_NONE, DIK_F9}};
+    Default<combo_scancode> battle_status_key_{combo_scancode{DIK_NONE, DIK_F10}};
+    Default<combo_scancode> battle_leader_key_{combo_scancode{DIK_LSHIFT, DIK_F10}};
+
     Default<std::string> default_lgr_name_{"default"};
     Default<bool> show_last_apple_time_{true};
     Default<bool> show_gravity_arrows_{true};
@@ -158,6 +173,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(zoom_grass);
     DECLARE_FIELD_FUNCS(turn_time);
     DECLARE_FIELD_FUNCS(lctrl_search);
+
     DECLARE_FIELD_FUNCS(alovolt_key_player_a);
     DECLARE_FIELD_FUNCS(alovolt_key_player_b);
     DECLARE_FIELD_FUNCS(brake_alias_key_player_a);
@@ -165,6 +181,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(one_frame_brake_key_player_a);
     DECLARE_FIELD_FUNCS(one_frame_brake_key_player_b);
     DECLARE_FIELD_FUNCS(escape_alias_key);
+
     DECLARE_FIELD_FUNCS(replay_fast_2x_key);
     DECLARE_FIELD_FUNCS(replay_fast_4x_key);
     DECLARE_FIELD_FUNCS(replay_fast_8x_key);
@@ -172,6 +189,19 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(replay_slow_4x_key);
     DECLARE_FIELD_FUNCS(replay_pause_key);
     DECLARE_FIELD_FUNCS(replay_rewind_key);
+
+    DECLARE_FIELD_FUNCS(show_others_key);
+    DECLARE_FIELD_FUNCS(spy_next_kuski_key);
+    DECLARE_FIELD_FUNCS(spy_prev_kuski_key);
+    DECLARE_FIELD_FUNCS(battle_queue_key);
+    DECLARE_FIELD_FUNCS(download_battle_level_key);
+    DECLARE_FIELD_FUNCS(download_level_key);
+    DECLARE_FIELD_FUNCS(players_online_key);
+    DECLARE_FIELD_FUNCS(battle_results_key);
+    DECLARE_FIELD_FUNCS(chat_key);
+    DECLARE_FIELD_FUNCS(battle_status_key);
+    DECLARE_FIELD_FUNCS(battle_leader_key);
+
     DECLARE_FIELD_FUNCS(default_lgr_name);
     DECLARE_FIELD_FUNCS(show_last_apple_time);
     DECLARE_FIELD_FUNCS(show_gravity_arrows);

@@ -270,11 +270,12 @@ struct scancode_pointer {
 };
 using key_pointers = std::vector<scancode_pointer>;
 
-constexpr int UNIVERSAL_KEYS_START = 4;
+constexpr int UNIVERSAL_KEYS_START = 5;
 static key_pointers UniversalKeys; // +/- and Screenshot
 static key_pointers Player1Keys;
 static key_pointers Player2Keys;
 static key_pointers ReplayKeys;
+static key_pointers FunctionKeys;
 
 // Setup the menu to display one control key
 template <typename Scancode>
@@ -410,6 +411,22 @@ static void load_player_controls(menu_nav* nav, key_pointers& keys, player_keys*
     load_control(nav, keys, "Toggle Show/Hide", &player_controls->toggle_visibility);
 }
 
+// Setup the menu to display EOL function key controls
+static void load_function_controls(menu_nav* nav) {
+    FunctionKeys.resize(0);
+    load_control(nav, FunctionKeys, "Show Others", &State->key_show_others);
+    load_control(nav, FunctionKeys, "Spy Next Kuski", &State->key_spy_next_kuski);
+    load_control(nav, FunctionKeys, "Spy Prev Kuski", &State->key_spy_prev_kuski);
+    load_control(nav, FunctionKeys, "Battle Queue", &State->key_battle_queue);
+    load_control(nav, FunctionKeys, "Download Battle Level", &State->key_download_battle_level);
+    load_control(nav, FunctionKeys, "Download Level", &State->key_download_level);
+    load_control(nav, FunctionKeys, "Players Online", &State->key_players_online);
+    load_control(nav, FunctionKeys, "Battle Results", &State->key_battle_results);
+    load_control(nav, FunctionKeys, "Chat", &State->key_chat);
+    load_control(nav, FunctionKeys, "Hide Battle Status", &State->key_battle_status);
+    load_control(nav, FunctionKeys, "Hide Battle Leader", &State->key_battle_leader);
+}
+
 // Menu to change controls for one player
 static void menu_customize_player(key_pointers& keys, player_keys* player_controls,
                                   char player_letter) {
@@ -453,6 +470,27 @@ static void menu_customize_replay() {
     }
 }
 
+// Menu to change EOL function keys
+static void menu_customize_function() {
+    int choice = 0;
+    while (true) {
+        menu_nav nav("Customize Function Keys");
+        nav.select_row(choice);
+        nav.x_left = 20;
+        nav.x_right = 400;
+        nav.y_entries = 86;
+        nav.dy = 40;
+
+        load_function_controls(&nav);
+
+        choice = nav.navigate();
+        if (choice < 0) {
+            return;
+        }
+        prompt_control(nav, FunctionKeys, choice);
+    }
+}
+
 // Menu to customize universal controls or select a player
 void menu_customize_controls() {
     // Initialize these pointers so we can check/modify the values in prompt_control
@@ -479,6 +517,8 @@ void menu_customize_controls() {
             NAV_FUNC() { menu_customize_player(Player2Keys, &State->keys2, 'B'); });
 
         nav.add_row("Customize Replay VCR", NAV_FUNC() { menu_customize_replay(); });
+
+        nav.add_row("Customize Function Keys", NAV_FUNC() { menu_customize_function(); });
 
         load_universal_controls(&nav);
 

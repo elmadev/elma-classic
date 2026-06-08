@@ -8,10 +8,10 @@
 #include "menu/pic.h"
 #include "pic/abc8.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "platform/text_input.h"
 #include "util/util.h"
 #include <cstring>
-#include <directinput/scancodes.h>
 
 constexpr int MAX_PLAYERNAME_INPUT = 8;
 static_assert(MAX_PLAYERNAME_INPUT < MAX_PLAYERNAME_LENGTH);

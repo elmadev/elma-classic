@@ -7,11 +7,11 @@
 #include "pic/pic8.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "renderer/render.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <directinput/scancodes.h>
 
 // Drawing of the screen when there is no ball. Also used as generic buffer by editor.
 pic8* BufferMain = nullptr;

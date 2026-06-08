@@ -6,7 +6,6 @@
 #include "util/util.h"
 #include <algorithm>
 #include <cstring>
-#include <directinput/scancodes.h>
 #include <filesystem>
 
 constexpr int STATE_VERSION = 200;

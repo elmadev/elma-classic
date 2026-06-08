@@ -1,5 +1,4 @@
 #include "menu/external.h"
-#include "directinput/scancodes.h"
 #include "game/game.h"
 #include "game/level_load.h"
 #include "game/state.h"
@@ -8,6 +7,7 @@
 #include "menu/pic.h"
 #include "menu/play.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "util/file_iter.h"
 #include <cstring>
 #include <string>

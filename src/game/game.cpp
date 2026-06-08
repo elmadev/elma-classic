@@ -14,6 +14,7 @@
 #include "physics/init.h"
 #include "pic/lgr.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "platform/sdl/keyboard.h"
 #include "renderer/render.h"
 #include "renderer/timer.h"
@@ -21,7 +22,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <directinput/scancodes.h>
 #include <filesystem>
 
 int Single = 1;

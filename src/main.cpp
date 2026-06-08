@@ -7,9 +7,9 @@
 #include "menu/pic.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "util/util.h"
 #include <cstdlib>
-#include <directinput/scancodes.h>
 #include <string>
 
 static double StopwatchStartTime = 0.0;

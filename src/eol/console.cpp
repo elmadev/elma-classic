@@ -5,10 +5,10 @@
 #include "log.h"
 #include "pic/abc8.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "platform/text_input.h"
 #include "platform/utils.h"
 #include "util/util.h"
-#include <directinput/scancodes.h>
 #include <format>
 #include <optional>
 #include <ranges>

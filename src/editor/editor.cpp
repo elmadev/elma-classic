@@ -18,11 +18,11 @@
 #include "pic/pic8.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "platform/text_input.h"
 #include "platform/utils.h"
 #include <climits>
 #include <cstring>
-#include <directinput/scancodes.h>
 #include <format>
 
 level* Level = nullptr;

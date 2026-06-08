@@ -1,5 +1,4 @@
 #include "menu/play.h"
-#include "directinput/scancodes.h"
 #include "editor/editor.h"
 #include "eol/settings.h"
 #include "game/game.h"
@@ -18,13 +17,13 @@
 #include "pic/abc8.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "platform/text_input.h"
 #include "renderer/timer.h"
 #include "util/file_iter.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cstring>
-#include <directinput/scancodes.h>
 #include <format>
 #include <optional>
 

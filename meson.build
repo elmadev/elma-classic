@@ -71,6 +71,7 @@ elma_sources = files(
     'src/pic/surface.cpp',
     'src/platform/sdl/gl_renderer.cpp',
     'src/platform/sdl/keyboard.cpp',
+    'src/platform/sdl/scancode.cpp',
     'src/platform/sdl/sdl.cpp',
     'src/platform/text_input.cpp',
     'src/platform/utils.cpp',

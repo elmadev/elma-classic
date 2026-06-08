@@ -1,8 +1,7 @@
 #ifndef EOL_SETTINGS
 #define EOL_SETTINGS
 
-#include "platform/implementation.h"
-#include <directinput/scancodes.h>
+#include "platform/scancode.h"
 #include <string>
 
 class state;

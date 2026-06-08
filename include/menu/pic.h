@@ -1,7 +1,7 @@
 #ifndef MENU_PIC_H
 #define MENU_PIC_H
 
-#include "platform/implementation.h"
+#include "platform/scancode.h"
 
 #include <string>
 #include <vector>

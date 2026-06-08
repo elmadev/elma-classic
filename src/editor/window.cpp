@@ -14,13 +14,13 @@
 #include "pic/pic8.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "platform/text_input.h"
 #include "platform/utils.h"
 #include "util/file_iter.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cstring>
-#include <directinput/scancodes.h>
 #include <vector>
 
 std::vector<std::string> ListEntries;

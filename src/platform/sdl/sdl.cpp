@@ -13,10 +13,8 @@
 #include <SDL.h>
 #include <algorithm>
 #include <chrono>
-#include <directinput/scancodes.h>
 #include <filesystem>
 #include <format>
-#include <sdl/scancodes_windows.h>
 
 static SDL_Window* SDLWindow = nullptr;
 static SDL_Surface* SDLSurfaceMain = nullptr;
@@ -478,31 +476,6 @@ bool was_left_mouse_just_clicked() { return LeftMouseDown && !LeftMouseDownPrevF
 
 bool was_right_mouse_just_clicked() { return RightMouseDown && !RightMouseDownPrevFrame; }
 
-bool is_key_down(DikScancode code) {
-    if (code < 0 || code >= MaxKeycode) {
-        internal_error("code out of range in is_key_down()!");
-    }
-
-    SDL_Scancode sdl_code = windows_scancode_table[code];
-
-    return keyboard::is_down(sdl_code);
-}
-
-bool was_key_just_pressed(DikScancode code) {
-    SDL_Scancode sdl_code = windows_scancode_table[code];
-    return keyboard::was_just_pressed(sdl_code);
-}
-
-DikScancode get_any_key_just_pressed() {
-    for (int i = 0; i < MaxKeycode; i++) {
-        if (was_key_just_pressed(i)) {
-            return i;
-        }
-    }
-
-    return DIK_UNKNOWN;
-}
-
 std::string get_clipboard_text() {
     char* text = SDL_GetClipboardText();
     if (!text) {
@@ -511,20 +484,6 @@ std::string get_clipboard_text() {
     std::string result(text);
     SDL_free(text);
     return result;
-}
-
-bool is_shortcut_modifier_down() {
-    SDL_Keymod mod = SDL_GetModState();
-#ifdef __APPLE__
-    return (mod & KMOD_GUI) != 0;
-#else
-    return (mod & KMOD_CTRL) != 0;
-#endif
-}
-
-bool was_key_down(DikScancode code) {
-    SDL_Scancode sdl_code = windows_scancode_table[code];
-    return keyboard::was_down(sdl_code);
 }
 
 int get_mouse_wheel_delta() { return MouseWheelDelta; }

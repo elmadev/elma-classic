@@ -7,12 +7,12 @@
 #include "pic/pic8.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include "platform/text_input.h"
 #include "platform/utils.h"
 #include <algorithm>
 #include <cctype>
 #include <cstring>
-#include <directinput/scancodes.h>
 
 bool InEditor = false;
 

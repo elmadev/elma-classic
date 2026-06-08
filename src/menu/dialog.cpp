@@ -1,8 +1,7 @@
 #include "menu/dialog.h"
 #include "main.h"
 #include "menu/pic.h"
-#include "platform/implementation.h"
-#include <directinput/scancodes.h>
+#include "platform/scancode.h"
 
 // Display the menu with the provided text, then return the key pressed by the user.
 DikScancode menu_dialog(const char* text1, const char* text2, const char* text3, const char* text4,

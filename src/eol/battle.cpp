@@ -4,6 +4,7 @@
 #include "log.h"
 #include "pic/abc8.h"
 #include "pic/pic8.h"
+#include "platform/implementation.h"
 #include "util/util.h"
 #include <algorithm>
 #include <filesystem>

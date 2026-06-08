@@ -57,6 +57,7 @@ template struct Default<MapAlignment>;
 template struct Default<RendererType>;
 template struct Default<FullscreenMode>;
 template struct Default<DikScancode>;
+template struct Default<combo_scancode>;
 template struct Default<std::string>;
 template struct Clamp<int>;
 template struct Clamp<double>;
@@ -339,6 +340,10 @@ void from_json(const json& j, FullscreenMode& f) {
         throw("[json.exception.type_error.302] (/fullscreen) invalid value");
     }
 }
+
+void to_json(json& j, const combo_scancode& r) { j = (unsigned long long)(r); }
+
+void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned long long)(j)); }
 
 #define FIELD_LIST                                                                                 \
     JSON_FIELD(screen_width)                                                                       \

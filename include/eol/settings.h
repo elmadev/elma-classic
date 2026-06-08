@@ -15,7 +15,7 @@ template <typename T> struct Default {
     T persisted;
     T def;
 
-    constexpr Default(T default_value)
+    constexpr Default(const T& default_value)
         : value(default_value),
           persisted(default_value),
           def(default_value) {}

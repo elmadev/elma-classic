@@ -1,13 +1,13 @@
 #include "physics/forces.h"
-#include "renderer/canvas.h"
 #include "editor/editor.h"
 #include "game/game.h"
+#include "game/recorder.h"
 #include "level/level.h"
 #include "level/object.h"
 #include "physics/collision.h"
 #include "physics/init.h"
 #include "physics/move.h"
-#include "game/recorder.h"
+#include "renderer/canvas.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cmath>

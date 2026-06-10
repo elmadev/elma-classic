@@ -1,29 +1,29 @@
 #include "editor/editor.h"
-#include "pic/abc8.h"
-#include "editor/help.h"
 #include "editor/canvas.h"
 #include "editor/dialog.h"
-#include "editor/window.h"
+#include "editor/help.h"
 #include "editor/tool.h"
 #include "editor/topology.h"
-#include "platform/text_input.h"
+#include "editor/window.h"
 #include "game/game.h"
-#include "level/level.h"
-#include "pic/lgr.h"
 #include "game/level_load.h"
-#include "pic/surface.h"
-#include "main.h"
-#include "menu/pic.h"
+#include "level/level.h"
 #include "level/object.h"
-#include "pic/pic8.h"
-#include "platform/implementation.h"
-#include "platform/utils.h"
 #include "level/polygon.h"
 #include "level/sprite.h"
+#include "main.h"
+#include "menu/pic.h"
+#include "pic/abc8.h"
+#include "pic/lgr.h"
+#include "pic/pic8.h"
+#include "pic/surface.h"
+#include "platform/implementation.h"
+#include "platform/text_input.h"
+#include "platform/utils.h"
+#include <climits>
 #include <cstring>
 #include <directinput/scancodes.h>
 #include <format>
-#include <climits>
 
 level* Level = nullptr;
 

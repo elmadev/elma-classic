@@ -1,8 +1,7 @@
 #include "menu/options.h"
 #include "eol/settings.h"
-#include "util/file_iter.h"
 #include "game/level_load.h"
-#include "pic/surface.h"
+#include "game/state.h"
 #include "main.h"
 #include "menu/controls.h"
 #include "menu/dialog.h"
@@ -10,10 +9,11 @@
 #include "menu/nav.h"
 #include "menu/pic.h"
 #include "menu/player.h"
+#include "pic/surface.h"
 #include "platform/implementation.h"
-#include "game/state.h"
-#include <cstring>
+#include "util/file_iter.h"
 #include <cmath>
+#include <cstring>
 #include <format>
 
 void menu_help() {

@@ -1,11 +1,11 @@
 #include "game/recorder.h"
-#include "physics/flagtag.h"
-#include "util/file_iter.h"
+#include "game/qopen.h"
 #include "level/level.h"
+#include "level/object.h"
 #include "main.h"
 #include "menu/rec_list.h"
-#include "level/object.h"
-#include "game/qopen.h"
+#include "physics/flagtag.h"
+#include "util/file_iter.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cmath>

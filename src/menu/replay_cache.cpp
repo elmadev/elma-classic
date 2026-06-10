@@ -1,8 +1,8 @@
 #include "menu/replay_cache.h"
 #include "debug/profiler.h"
-#include "util/file_iter.h"
-#include "main.h"
 #include "game/recorder.h"
+#include "main.h"
+#include "util/file_iter.h"
 #include <filesystem>
 #include <unordered_set>
 

@@ -1,10 +1,10 @@
 #include "editor/canvas.h"
 #include "editor/editor.h"
 #include "level/level.h"
-#include "pic/surface.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "pic/pic8.h"
+#include "pic/surface.h"
 #include <algorithm>
 #include <cmath>
 

@@ -1,16 +1,16 @@
 #include "game/level_load.h"
-#include "renderer/canvas.h"
+#include "debug/profiler.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
-#include "util/file_iter.h"
 #include "level/level.h"
-#include "pic/lgr.h"
+#include "level/segments.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "physics/init.h"
+#include "pic/lgr.h"
 #include "platform/utils.h"
-#include "level/segments.h"
-#include "debug/profiler.h"
+#include "renderer/canvas.h"
+#include "util/file_iter.h"
 #include <cstring>
 
 static bool ReloadLevel = false;

@@ -1,8 +1,8 @@
 #include "menu/rec_list.h"
 #include "debug/profiler.h"
-#include "util/file_iter.h"
 #include "main.h"
 #include "menu/replay_cache.h"
+#include "util/file_iter.h"
 
 namespace {
 replay_cache Cache;

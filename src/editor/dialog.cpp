@@ -1,12 +1,12 @@
 #include "editor/dialog.h"
-#include "pic/abc8.h"
 #include "editor/editor.h"
-#include "platform/text_input.h"
-#include "pic/surface.h"
 #include "main.h"
 #include "menu/pic.h"
+#include "pic/abc8.h"
 #include "pic/pic8.h"
+#include "pic/surface.h"
 #include "platform/implementation.h"
+#include "platform/text_input.h"
 #include "platform/utils.h"
 #include <algorithm>
 #include <cctype>

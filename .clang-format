@@ -4,7 +4,7 @@ TabWidth: 4
 UseTab: Never
 ColumnLimit: 100
 PackConstructorInitializers: Never
-SortIncludes: false
+SortIncludes: true
 InsertBraces: true
 DerivePointerAlignment: false
 PointerAlignment: Left

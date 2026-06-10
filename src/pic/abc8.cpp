@@ -1,9 +1,9 @@
 #include "pic/abc8.h"
+#include "game/qopen.h"
 #include "log.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "pic/pic8.h"
-#include "game/qopen.h"
 #include <cstring>
 #include <string>
 

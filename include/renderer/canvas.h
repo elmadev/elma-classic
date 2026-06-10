@@ -1,10 +1,10 @@
 #ifndef RENDERER_CANVAS_H
 #define RENDERER_CANVAS_H
 
-#include "renderer/grass.h"
-#include "pic/lgr.h"
-#include "main.h"
 #include "level/sprite.h"
+#include "main.h"
+#include "pic/lgr.h"
+#include "renderer/grass.h"
 #include "vect2.h"
 #include <cstdint>
 #include <vector>

@@ -1,15 +1,14 @@
 #include "menu/external.h"
-#include "menu/nav.h"
-#include "util/file_iter.h"
+#include "directinput/scancodes.h"
 #include "game/game.h"
 #include "game/level_load.h"
+#include "game/state.h"
 #include "main.h"
 #include "menu/nav.h"
 #include "menu/pic.h"
 #include "menu/play.h"
 #include "platform/implementation.h"
-#include "game/state.h"
-#include "directinput/scancodes.h"
+#include "util/file_iter.h"
 #include <cstring>
 #include <string>
 

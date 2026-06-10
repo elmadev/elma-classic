@@ -1,8 +1,7 @@
 #include "platform/sdl/gl_renderer.h"
 #include "main.h"
-
-#include <glad/glad.h>
 #include <cstring>
+#include <glad/glad.h>
 
 static const char* VertexShaderSource = R"(
 #version 410 core

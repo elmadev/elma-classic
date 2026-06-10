@@ -1,7 +1,7 @@
 #include "menu/ball.h"
+#include "main.h"
 #include "menu/ball_collision.h"
 #include "menu/ball_handler.h"
-#include "main.h"
 #include "pic/surface.h"
 #include "util/util.h"
 #include <cmath>

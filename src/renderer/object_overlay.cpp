@@ -1,7 +1,7 @@
 #include "renderer/object_overlay.h"
-#include "pic/anim.h"
 #include "eol/settings.h"
 #include "main.h"
+#include "pic/anim.h"
 #include "pic/pic8.h"
 
 // Gravity arrow sprites indexed by object::Property (1=Up, 2=Down, 3=Left, 4=Right)

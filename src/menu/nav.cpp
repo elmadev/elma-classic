@@ -1,12 +1,12 @@
 #include "menu/nav.h"
-#include "pic/abc8.h"
 #include "eol/settings.h"
-#include "util/file_iter.h"
-#include "platform/text_input.h"
 #include "main.h"
+#include "pic/abc8.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "platform/text_input.h"
 #include "platform/utils.h"
+#include "util/file_iter.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cstring>

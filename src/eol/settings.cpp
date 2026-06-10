@@ -1,11 +1,11 @@
 #include "eol/settings.h"
 #include "game/level_load.h"
-#include "pic/lgr.h"
-#include "main.h"
-#include "renderer/object_overlay.h"
 #include "game/state.h"
+#include "main.h"
 #include "physics/init.h"
+#include "pic/lgr.h"
 #include "platform/implementation.h"
+#include "renderer/object_overlay.h"
 #include <fstream>
 #define JSON_DIAGNOSTICS 1
 #include <nlohmann/json.hpp>

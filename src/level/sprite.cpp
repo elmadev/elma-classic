@@ -1,9 +1,9 @@
 #include "level/sprite.h"
 #include "editor/canvas.h"
-#include "util/file_iter.h"
-#include "pic/lgr.h"
 #include "main.h"
 #include "physics/init.h"
+#include "pic/lgr.h"
+#include "util/file_iter.h"
 #include <cstring>
 
 const char* clipping_to_string(Clipping clipping) {

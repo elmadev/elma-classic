@@ -1,21 +1,21 @@
-#include "platform/implementation.h"
 #include "editor/dialog.h"
-#include "eol/settings.h"
-#include "eol/eol.h"
 #include "editor/editor.h"
-#include "sound/engine.h"
-#include "platform/text_input.h"
-#include "platform/sdl/keyboard.h"
-#include "platform/sdl/gl_renderer.h"
+#include "eol/eol.h"
+#include "eol/settings.h"
 #include "main.h"
-#include "pic/surface.h"
 #include "pic/pic8.h"
-#include <directinput/scancodes.h>
+#include "pic/surface.h"
+#include "platform/implementation.h"
+#include "platform/sdl/gl_renderer.h"
+#include "platform/sdl/keyboard.h"
+#include "platform/text_input.h"
+#include "sound/engine.h"
+#include <SDL.h>
 #include <algorithm>
 #include <chrono>
+#include <directinput/scancodes.h>
 #include <filesystem>
 #include <format>
-#include <SDL.h>
 #include <sdl/scancodes_windows.h>
 
 static SDL_Window* SDLWindow = nullptr;

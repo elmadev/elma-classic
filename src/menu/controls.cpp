@@ -1,12 +1,12 @@
 #include "menu/controls.h"
-#include <directinput/scancodes.h>
 #include "eol/settings.h"
-#include "platform/text_input.h"
+#include "game/state.h"
 #include "main.h"
 #include "menu/nav.h"
 #include "platform/implementation.h"
-#include "game/state.h"
+#include "platform/text_input.h"
 #include <cstring>
+#include <directinput/scancodes.h>
 #include <format>
 
 std::string dik_to_string(DikScancode keycode) {

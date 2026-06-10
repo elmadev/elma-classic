@@ -1,6 +1,6 @@
 #include "renderer/affine.h"
-#include "renderer/render.h"
 #include "pic/pic8.h"
+#include "renderer/render.h"
 #include "vect2.h"
 #include <algorithm>
 #include <cmath>

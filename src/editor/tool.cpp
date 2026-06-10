@@ -1,17 +1,17 @@
 #include "editor/tool.h"
 #include "editor/canvas.h"
 #include "editor/dialog.h"
-#include "editor/window.h"
 #include "editor/editor.h"
-#include "platform/implementation.h"
-#include "level/polygon.h"
+#include "editor/window.h"
 #include "level/level.h"
-#include "pic/lgr.h"
-#include "pic/surface.h"
+#include "level/polygon.h"
+#include "level/sprite.h"
 #include "main.h"
 #include "menu/pic.h"
+#include "pic/lgr.h"
 #include "pic/pic8.h"
-#include "level/sprite.h"
+#include "pic/surface.h"
+#include "platform/implementation.h"
 
 static bool delete_polygon(polygon* poly) {
     int poly_count = 0;

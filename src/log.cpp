@@ -1,5 +1,4 @@
 #include "log.h"
-
 #include "eol/console.h"
 #include <chrono>
 #include <cstring>

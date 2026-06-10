@@ -1,12 +1,12 @@
-#include "pic/surface.h"
-#include "main.h"
 #include "pic/pic8.h"
+#include "game/qopen.h"
+#include "main.h"
+#include "pic/surface.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
-#include "game/qopen.h"
 #include <algorithm>
-#include <cstring>
 #include <climits>
+#include <cstring>
 
 void pic8::allocate(int w, int h) {
     if (rows || pixels) {

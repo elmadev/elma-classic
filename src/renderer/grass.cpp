@@ -1,6 +1,6 @@
 #include "renderer/grass.h"
-#include "main.h"
 #include "level/polygon.h"
+#include "main.h"
 #include "physics/init.h"
 #include "pic/pic8.h"
 #include <algorithm>

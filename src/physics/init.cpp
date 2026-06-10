@@ -1,5 +1,5 @@
-#include "eol/settings.h"
 #include "physics/init.h"
+#include "eol/settings.h"
 
 static motorst Motorst1;
 static motorst Motorst2;

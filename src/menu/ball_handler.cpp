@@ -1,6 +1,6 @@
+#include "menu/ball_handler.h"
 #include "menu/ball.h"
 #include "menu/ball_collision.h"
-#include "menu/ball_handler.h"
 
 static WallId wall_id(int collider) { return static_cast<WallId>(collider - BallCount); }
 

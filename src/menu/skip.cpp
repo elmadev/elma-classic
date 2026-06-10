@@ -1,8 +1,8 @@
 #include "menu/skip.h"
+#include "game/state.h"
 #include "main.h"
 #include "menu/pic.h"
 #include "platform/utils.h"
-#include "game/state.h"
 #include <cstring>
 
 bool is_skippable(int index) {

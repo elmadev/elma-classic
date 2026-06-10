@@ -1,18 +1,18 @@
 #include "eol/console.h"
-#include "pic/abc8.h"
 #include "eol/eol.h"
-#include "eol/status_messages.h"
 #include "eol/settings.h"
-#include "platform/text_input.h"
+#include "eol/status_messages.h"
 #include "log.h"
+#include "pic/abc8.h"
 #include "platform/implementation.h"
+#include "platform/text_input.h"
 #include "platform/utils.h"
 #include "util/util.h"
 #include <directinput/scancodes.h>
 #include <format>
 #include <optional>
-#include <string>
 #include <ranges>
+#include <string>
 
 console* Console = nullptr;
 

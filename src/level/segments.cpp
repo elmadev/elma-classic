@@ -1,8 +1,8 @@
 #include "level/segments.h"
 #include "game/game.h"
 #include "level/level.h"
-#include "main.h"
 #include "level/polygon.h"
+#include "main.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>

@@ -1,6 +1,6 @@
 #include "menu/ball_collision.h"
-#include "menu/ball.h"
 #include "main.h"
+#include "menu/ball.h"
 #include "pic/surface.h"
 #include <cmath>
 

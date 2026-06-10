@@ -1,5 +1,4 @@
 #include "eol/status_messages.h"
-
 #include "pic/abc8.h"
 #include "pic/pic8.h"
 #include "platform/implementation.h"

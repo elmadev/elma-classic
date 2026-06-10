@@ -1,32 +1,32 @@
 #include "renderer/render.h"
-#include "pic/abc8.h"
-#include "pic/anim.h"
-#include "renderer/affine.h"
-#include "renderer/canvas.h"
 #include "editor/editor.h"
 #include "eol/console.h"
 #include "eol/eol.h"
-#include "eol/status_messages.h"
 #include "eol/settings.h"
-#include "physics/flagtag.h"
+#include "eol/status_messages.h"
 #include "game/game.h"
 #include "level/level.h"
-#include "pic/lgr.h"
-#include "pic/surface.h"
-#include "main.h"
 #include "level/object.h"
-#include "pic/pic8.h"
-#include "platform/implementation.h"
+#include "main.h"
+#include "physics/flagtag.h"
 #include "physics/init.h"
+#include "pic/abc8.h"
+#include "pic/anim.h"
+#include "pic/lgr.h"
+#include "pic/pic8.h"
+#include "pic/surface.h"
+#include "platform/implementation.h"
+#include "renderer/affine.h"
+#include "renderer/canvas.h"
 #include "renderer/object_overlay.h"
 #include "renderer/timer.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <string>
-#include <format>
 #include <filesystem>
+#include <format>
+#include <string>
 
 static bool GameBackgroundRender = false;
 

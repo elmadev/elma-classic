@@ -1,6 +1,6 @@
 #include "sound/engine.h"
-#include "main.h"
 #include "game/state.h"
+#include "main.h"
 #include "sound/wav.h"
 #include <algorithm>
 #include <cstring>

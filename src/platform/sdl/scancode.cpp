@@ -29,7 +29,7 @@ DikScancode get_any_key_just_pressed() {
         }
     }
 
-    return DIK_UNKNOWN;
+    return DIK_NONE;
 }
 
 bool was_key_down(DikScancode code) {

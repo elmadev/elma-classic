@@ -69,7 +69,7 @@ DikScancode menu_pic::loop_until_any_key() {
     while (true) {
         handle_events();
         DikScancode code = get_any_key_just_pressed();
-        if (code != DIK_UNKNOWN) {
+        if (code != DIK_NONE) {
             return code;
         }
         render();

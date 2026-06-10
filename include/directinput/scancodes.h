@@ -5,7 +5,7 @@
  ****************************************************************************/
 // DirectInput does not define this.
 // Added to have a named default for unset keys.
-#define DIK_UNKNOWN 0x00
+#define DIK_NONE 0x00
 
 #define DIK_ESCAPE 0x01
 #define DIK_1 0x02

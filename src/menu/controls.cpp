@@ -12,7 +12,7 @@
 
 std::string dik_to_string(DikScancode keycode) {
     switch (keycode) {
-    case DIK_UNKNOWN:
+    case DIK_NONE:
         return "NONE";
     case DIK_1:
         return "1";

@@ -1,6 +1,8 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+#include "main.h"
+
 class pic8;
 
 constexpr double TIME_TO_CENTISECONDS = 100.0 / (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024);

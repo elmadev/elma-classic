@@ -14,6 +14,10 @@ bool is_key_down(DikScancode code) {
 }
 
 bool was_key_just_pressed(DikScancode code) {
+    if (code < 0 || code >= MaxKeycode) {
+        internal_error("code out of range in was_key_just_pressed()!");
+    }
+
     SDL_Scancode sdl_code = windows_scancode_table[code];
     return keyboard::was_just_pressed(sdl_code);
 }

@@ -296,7 +296,7 @@ void segments::setup_collision_grid(double max_radius) {
 
     // Allocate the collision_grid
     int grid_size = collision_grid_width * collision_grid_height;
-    collision_grid = new psegment_node[grid_size];
+    collision_grid = new segment_node*[grid_size];
     if (!collision_grid) {
         external_error("segments::setup_collision_grid out of memory!");
     }

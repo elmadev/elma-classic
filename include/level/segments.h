@@ -22,8 +22,6 @@ struct segment_node {
     segment_node* next;
 };
 
-typedef segment_node* psegment_node;
-
 // Memory structure to allocate data for segment_node
 constexpr int SEGMENT_NODE_BLOCK_LENGTH = 5000;
 struct segment_node_array {
@@ -46,7 +44,7 @@ class segments {
     int seg_list_iteration_index;
 
     // 2D grid representing the level for (kuski <-> line segment) collision purposes
-    psegment_node* collision_grid;
+    segment_node** collision_grid;
     int collision_grid_width, collision_grid_height;
     double collision_grid_cell_size;
     vect2 collision_grid_origin;

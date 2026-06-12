@@ -3,9 +3,13 @@
 
 #include "game/recorder.h"
 
-struct hud_visibility;
 struct motorst;
 struct player_keys;
+
+struct hud_visibility {
+    bool minimap;
+    bool timer;
+};
 
 struct turning_data {
     int flipped;

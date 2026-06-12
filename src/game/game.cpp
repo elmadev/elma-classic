@@ -84,11 +84,6 @@ static void update_freecam(double dt, camera& current_camera) {
     current_camera.y = std::clamp(current_camera.y, current_camera.min_y, current_camera.max_y);
 }
 
-struct hud_visibility {
-    bool minimap;
-    bool timer;
-};
-
 static hud_visibility HudGame1 = {true, true};
 static hud_visibility HudReplay1 = {false, true};
 static hud_visibility HudGame2 = {true, true};
@@ -602,8 +597,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             physics_frame_end(driv2, time, &driv1.meta.draw_view);
         }
 
-        render_game(time, &driv1.meta, &driv2.meta, HudGame1.minimap, HudGame1.timer,
-                    HudGame2.minimap, HudGame2.timer, current_camera);
+        render_game(time, driv1, driv2, current_camera);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -877,8 +871,7 @@ int replay_loop(const char* filename, int restore_player_visibility) {
                                 driv2.meta.sound.friction_volume);
         }
 
-        render_game(time, &driv1.meta, &driv2.meta, HudReplay1.minimap, HudReplay1.timer,
-                    HudReplay2.minimap, HudReplay2.timer, current_camera);
+        render_game(time, driv1, driv2, current_camera);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -970,8 +963,7 @@ void render_replay(const char* level_filename) {
             flagtag_replay(time);
         }
 
-        render_game(time, &driv1.meta, &driv2.meta, HudReplay1.minimap, HudReplay1.timer,
-                    HudReplay2.minimap, HudReplay2.timer, current_camera);
+        render_game(time, driv1, driv2, current_camera);
 
         VideoFrameIndex++;
     }

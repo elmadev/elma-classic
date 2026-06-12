@@ -83,8 +83,8 @@ abc8::~abc8() {
     }
 }
 
-static int SpaceWidth = 5;
-static int SpaceWidthMenu = 10;
+constexpr int SPACE_WIDTH = 5;
+constexpr int SPACE_WIDTH_MENU = 10;
 
 void abc8::write(pic8* dest, int x, int y, const char* text) {
 #ifdef DEBUG
@@ -96,9 +96,9 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
         if (!sprites[index]) {
             if (index == ' ') {
                 if (this == MenuFont) {
-                    x += SpaceWidthMenu;
+                    x += SPACE_WIDTH_MENU;
                 } else {
-                    x += SpaceWidth;
+                    x += SPACE_WIDTH;
                 }
                 text++;
                 continue;
@@ -126,9 +126,9 @@ int abc8::len(const char* text) {
         if (!sprites[index]) {
             if (index == ' ') {
                 if (this == MenuFont) {
-                    width += SpaceWidthMenu;
+                    width += SPACE_WIDTH_MENU;
                 } else {
-                    width += SpaceWidth;
+                    width += SPACE_WIDTH;
                 }
                 text++;
                 continue;

@@ -194,9 +194,10 @@ void eol_settings::set_fancyboost(bool b) {
 }
 
 void eol_settings::set_show_last_apple_time(bool show) { show_last_apple_time_ = show; }
-
 void eol_settings::set_show_gravity_arrows(bool b) { show_gravity_arrows_ = b; }
 
+void eol_settings::set_show_fps(bool show) { show_fps_ = show; }
+void eol_settings::set_show_ups(bool show) { show_ups_ = show; }
 void eol_settings::set_recording_fps(int fps) { recording_fps_ = fps; }
 
 void eol_settings::set_show_demo_menu(bool show) { show_demo_menu_ = show; }
@@ -420,7 +421,11 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
                                                                                                    \
     JSON_FIELD(show_last_apple_time)                                                               \
     JSON_FIELD(show_gravity_arrows)                                                                \
+                                                                                                   \
+    JSON_FIELD(show_fps)                                                                           \
+    JSON_FIELD(show_ups)                                                                           \
     JSON_FIELD(recording_fps)                                                                      \
+                                                                                                   \
     JSON_FIELD(show_demo_menu)                                                                     \
     JSON_FIELD(show_help_menu)                                                                     \
     JSON_FIELD(show_about_menu)                                                                    \

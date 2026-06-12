@@ -439,8 +439,10 @@ void menu_options() {
         BOOL_OPTION("Fancyboost LGRs:", fancyboost);
 
         BOOL_OPTION("Show Apple Time:", show_last_apple_time);
-
         BOOL_OPTION("Gravity Arrows:", show_gravity_arrows);
+
+        BOOL_OPTION("Show FPS:", show_fps);
+        BOOL_OPTION("Show UPS:", show_ups);
 
         nav.add_row(
             "Record Replay FPS:", std::to_string(EolSettings->recording_fps_persisted()),

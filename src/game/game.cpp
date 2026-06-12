@@ -182,10 +182,10 @@ static void physics_subframe(driver& driv, double time, double dt) {
     // Check for head death and record object interactions
     BikeState head_state = check_object_collision(mot);
     if (head_state == BikeState::Dead) {
-        metadata->sound.friction_volume = 0;
-        metadata->sound.motor_frequency = -1;
-        metadata->sound.gas = 0;
-        rec->store_frames(mot, time, &metadata->sound);
+        driv.sound.friction_volume = 0;
+        driv.sound.motor_frequency = -1;
+        driv.sound.gas = 0;
+        rec->store_frames(mot, time, &driv.sound);
 
         if (Single || !FlagTag || OutOfBounds) {
             driv.dead = true;
@@ -206,15 +206,15 @@ static void physics_subframe(driver& driv, double time, double dt) {
     }
 
     // Update sound
-    metadata->sound.friction_volume = get_bike_friction_volume();
+    driv.sound.friction_volume = get_bike_friction_volume();
     double wheel_vel =
         mot->flipped_bike ? mot->left_wheel.angular_velocity : mot->right_wheel.angular_velocity;
     wheel_vel = std::min(30.0, fabs(wheel_vel) * 0.025);
-    metadata->sound.motor_frequency = 2.0 - exp(-wheel_vel);
-    metadata->sound.gas = (char)is_gas_down;
+    driv.sound.motor_frequency = 2.0 - exp(-wheel_vel);
+    driv.sound.gas = (char)is_gas_down;
 
     // Update replay
-    rec->store_frames(mot, time, &metadata->sound);
+    rec->store_frames(mot, time, &driv.sound);
 
     // Handle object ineractions
     WavEvent wav_id;
@@ -580,13 +580,12 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             flagtag(time);
         }
 
-        set_motor_frequency(true, driv1.meta.sound.motor_frequency, driv1.meta.sound.gas);
+        set_motor_frequency(true, driv1.sound.motor_frequency, driv1.sound.gas);
         if (Single) {
-            set_friction_volume(driv1.meta.sound.friction_volume);
+            set_friction_volume(driv1.sound.friction_volume);
         } else {
-            set_friction_volume(driv1.meta.sound.friction_volume +
-                                driv2.meta.sound.friction_volume);
-            set_motor_frequency(false, driv2.meta.sound.motor_frequency, driv2.meta.sound.gas);
+            set_friction_volume(driv1.sound.friction_volume + driv2.sound.friction_volume);
+            set_motor_frequency(false, driv2.sound.motor_frequency, driv2.sound.gas);
         }
 
         physics_frame_end(driv1, time, &driv2.draw_view);
@@ -683,7 +682,7 @@ static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
     update_view_settings(driv, other_draw_view);
 
     // Load replay data
-    bool alive = rec->recall_frame(mot, time, &metadata->sound);
+    bool alive = rec->recall_frame(mot, time, &driv.sound);
     set_head_position(mot);
 
     // Play events
@@ -858,13 +857,12 @@ int replay_loop(const char* filename, int restore_player_visibility) {
             flagtag_replay(time);
         }
 
-        set_motor_frequency(true, driv1.meta.sound.motor_frequency, driv1.meta.sound.gas);
+        set_motor_frequency(true, driv1.sound.motor_frequency, driv1.sound.gas);
         if (Single) {
-            set_friction_volume(driv1.meta.sound.friction_volume);
+            set_friction_volume(driv1.sound.friction_volume);
         } else {
-            set_motor_frequency(false, driv2.meta.sound.motor_frequency, driv2.meta.sound.gas);
-            set_friction_volume(driv1.meta.sound.friction_volume +
-                                driv2.meta.sound.friction_volume);
+            set_motor_frequency(false, driv2.sound.motor_frequency, driv2.sound.gas);
+            set_friction_volume(driv1.sound.friction_volume + driv2.sound.friction_volume);
         }
 
         render_game(time, driv1, driv2, current_camera);

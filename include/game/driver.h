@@ -18,7 +18,6 @@ struct turning_data {
 };
 
 struct bike_metadata {
-    bike_sound sound;
     double volt_time;
     bool volt_is_right;
 
@@ -37,6 +36,7 @@ struct driver {
     recorder* rec;
     player_keys* keys;
     hud_visibility* hud;
+    bike_sound sound;
 
     bool dead = false;
     int finish_time = 0;

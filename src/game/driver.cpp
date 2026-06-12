@@ -2,9 +2,9 @@
 #include "physics/forces.h"
 
 void driver::reset_metadata() {
-    meta.sound.motor_frequency = 0.0;
-    meta.sound.gas = 0;
-    meta.sound.friction_volume = 0.0;
+    sound.motor_frequency = 0.0;
+    sound.gas = 0;
+    sound.friction_volume = 0.0;
 
     meta.volt_time = -100.0;
     meta.volt_is_right = false;

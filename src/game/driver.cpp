@@ -9,8 +9,6 @@ void driver::reset_metadata() {
     meta.volt_time = -100.0;
     meta.volt_is_right = false;
 
-    meta.draw_view = true;
-
     meta.turn_key_previous = false;
     meta.one_turn_used = false;
 

@@ -798,8 +798,8 @@ static void render_view(bool player1, pic8* pic, double time, driver& driv, driv
 
 void render_game(double time, driver& driv1, driver& driv2, camera& current_camera) {
     // Determine who we are going to draw (player 1, player 2 or both)
-    bool draw_player1 = driv1.meta.draw_view;
-    bool draw_player2 = driv2.meta.draw_view;
+    bool draw_player1 = driv1.draw_view;
+    bool draw_player2 = driv2.draw_view;
     if (Single || current_camera.mode == CameraMode::MapViewer) {
         draw_player1 = true;
         draw_player2 = false;

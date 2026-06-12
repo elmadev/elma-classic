@@ -22,8 +22,6 @@ struct bike_metadata {
     double volt_time;
     bool volt_is_right;
 
-    bool draw_view;
-
     bool turn_key_previous;
     bool one_turn_used;
 
@@ -36,11 +34,13 @@ struct bike_metadata {
 struct driver {
     motorst* mot;
     bike_metadata meta;
-    bool dead = false;
-    int finish_time = 0;
     recorder* rec;
     player_keys* keys;
     hud_visibility* hud;
+
+    bool dead = false;
+    int finish_time = 0;
+    bool draw_view = true;
 
     driver(motorst* mot, recorder* rec, player_keys* keys, hud_visibility* hud);
     void reset_metadata();

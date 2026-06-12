@@ -199,9 +199,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
         mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;
         mot->body_r = mot->body_r + BikeStartOffset;
 
-        bool draw_view = metadata->draw_view;
         driv.reset_metadata();
-        metadata->draw_view = draw_view;
 
         // Give flag to other player
         FlagTagAHasFlag = mot == Motor2;
@@ -244,7 +242,6 @@ static void physics_subframe(driver& driv, double time, double dt) {
 
 static void update_view_settings(driver& driv, bool* other_draw_view) {
     player_keys* keys = driv.keys;
-    bike_metadata* metadata = &driv.meta;
 
     // Visibility of player viewpoint
     if (was_game_key_just_pressed(keys->toggle_visibility)) {
@@ -252,9 +249,9 @@ static void update_view_settings(driver& driv, bool* other_draw_view) {
         if (!*other_draw_view) {
             // You cannot have 0 players visible, so make both players visible instead
             *other_draw_view = true;
-            metadata->draw_view = true;
+            driv.draw_view = true;
         } else {
-            metadata->draw_view = !metadata->draw_view;
+            driv.draw_view = !driv.draw_view;
         }
     }
 
@@ -592,9 +589,9 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             set_motor_frequency(false, driv2.meta.sound.motor_frequency, driv2.meta.sound.gas);
         }
 
-        physics_frame_end(driv1, time, &driv2.meta.draw_view);
+        physics_frame_end(driv1, time, &driv2.draw_view);
         if (!Single) {
-            physics_frame_end(driv2, time, &driv1.meta.draw_view);
+            physics_frame_end(driv2, time, &driv1.draw_view);
         }
 
         render_game(time, driv1, driv2, current_camera);
@@ -745,11 +742,10 @@ int replay_loop(const char* filename, int restore_player_visibility) {
     driver driv1(Motor1, Rec1, &State->keys1, &HudReplay1);
     driver driv2(Motor2, Rec2, &State->keys2, &HudReplay2);
 
-    driv1.meta.draw_view = true;
-    driv2.meta.draw_view = !MergedRec;
+    driv2.draw_view = !MergedRec;
     if (restore_player_visibility) {
-        driv1.meta.draw_view = PreviousReplayDrawView1;
-        driv2.meta.draw_view = PreviousReplayDrawView2;
+        driv1.draw_view = PreviousReplayDrawView1;
+        driv2.draw_view = PreviousReplayDrawView2;
     }
 
     camera current_camera;
@@ -807,10 +803,10 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         double time = current_replay_time;
 
         // Load replay data
-        bool finished1 = !replay_frame(driv1, time, &driv2.meta.draw_view);
+        bool finished1 = !replay_frame(driv1, time, &driv2.draw_view);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &driv1.meta.draw_view);
+            finished2 = !replay_frame(driv2, time, &driv1.draw_view);
         }
 
         // Reverse events if rewinding
@@ -840,8 +836,8 @@ int replay_loop(const char* filename, int restore_player_visibility) {
             Mute = true;
             Level->unflip_objects();
 
-            PreviousReplayDrawView1 = driv1.meta.draw_view;
-            PreviousReplayDrawView2 = driv2.meta.draw_view;
+            PreviousReplayDrawView1 = driv1.draw_view;
+            PreviousReplayDrawView2 = driv2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return 0;
@@ -898,8 +894,8 @@ int replay_loop(const char* filename, int restore_player_visibility) {
 
             Level->unflip_objects();
 
-            PreviousReplayDrawView1 = driv1.meta.draw_view;
-            PreviousReplayDrawView2 = driv2.meta.draw_view;
+            PreviousReplayDrawView1 = driv1.draw_view;
+            PreviousReplayDrawView2 = driv2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return -1;
@@ -944,10 +940,10 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024) /
                       EolSettings->recording_fps();
 
-        bool finished1 = !replay_frame(driv1, time, &driv2.meta.draw_view);
+        bool finished1 = !replay_frame(driv1, time, &driv2.draw_view);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &driv1.meta.draw_view);
+            finished2 = !replay_frame(driv2, time, &driv1.draw_view);
         }
 
         update_graphical_metadata(driv1, nullptr, time);

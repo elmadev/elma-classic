@@ -39,8 +39,7 @@ void init_menu_pictures() {
     BufferBall = new pic8(SCREEN_WIDTH, SCREEN_HEIGHT);
     BackgroundTileMain = new pic8("szoveg1.pcx"); // "text1"
     BackgroundTileBall = new pic8("szoveg2.pcx"); // "text2"
-    MenuFont = new abc8("menu.abc");
-    MenuFont->set_spacing(2);
+    MenuFont = new abc8("menu.abc", 2, 33);
 
     ErrorGraphicsLoaded = true;
 

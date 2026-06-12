@@ -61,10 +61,8 @@ void menu_intro() {
     init_sound();
 
     // Load globals
-    EditorWhiteFont = new abc8("kisbetu1.abc"); // "small letter 1"
-    EditorWhiteFont->set_spacing(1);
-    EditorBlackFont = new abc8("kisbetu2.abc"); // "small letter 2"
-    EditorBlackFont->set_spacing(1);
+    EditorWhiteFont = new abc8("kisbetu1.abc", 1, 19); // "small letter 1"
+    EditorBlackFont = new abc8("kisbetu2.abc", 1, 19); // "small letter 2"
 
     init_renderer();
 

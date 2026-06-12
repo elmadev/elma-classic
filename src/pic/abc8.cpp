@@ -15,8 +15,9 @@ static void close_file(FILE* h, bool res_file) {
     }
 }
 
-abc8::abc8(const char* filename) {
-    spacing = 0;
+abc8::abc8(const char* filename, int spacing, int line_height)
+    : spacing(spacing),
+      line_height_(line_height) {
     for (int i = 0; i < MAX_CODEPOINTS; i++) {
         sprites[i] = nullptr;
     }
@@ -145,8 +146,6 @@ int abc8::len(const char* text) {
     return width;
 }
 
-void abc8::set_spacing(int new_spacing) { spacing = new_spacing; }
-
 bool abc8::has_char(unsigned char c) const {
     // Space is always supported (handled specially in write)
     if (c == ' ') {
@@ -164,12 +163,3 @@ void abc8::write_right_align(pic8* dest, int x, int y, const char* text) {
     int width = len(text);
     write(dest, x - width, y, text);
 }
-
-#ifdef DEBUG
-int abc8::line_height() const {
-    if (line_height_ == 0) {
-        internal_error("line height not set!");
-    }
-    return line_height_;
-}
-#endif

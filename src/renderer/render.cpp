@@ -88,12 +88,8 @@ void init_renderer() {
     shirt = eol::load_shirt(EolSettings->nick());
     init_gravity_arrows();
 
-    SmallFont = new abc8("small.abc");
-    SmallFont->set_spacing(1);
-    SmallFont->set_line_height(12);
-
-    MediumFont = new abc8("medium.abc");
-    MediumFont->set_spacing(1);
+    SmallFont = new abc8("small.abc", 1, 12);
+    MediumFont = new abc8("medium.abc", 1, 18);
 
     Console = new console();
     Console->register_console_commands();

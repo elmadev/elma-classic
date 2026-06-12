@@ -17,19 +17,10 @@ static void close_file(FILE* h, bool res_file) {
 
 abc8::abc8(const char* filename) {
     spacing = 0;
-    y_offset = nullptr;
-    sprites = new pic8*[256];
-    if (!sprites) {
-        external_error("memory");
-    }
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MAX_CODEPOINTS; i++) {
         sprites[i] = nullptr;
     }
-    y_offset = new short[256];
-    if (!y_offset) {
-        external_error("memory");
-    }
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < MAX_CODEPOINTS; i++) {
         y_offset[i] = 0;
     }
 
@@ -57,7 +48,7 @@ abc8::abc8(const char* filename) {
     if (fread(&sprite_count, 2, 1, h) != 1) {
         internal_error(std::string("Could not read abc8 file: ") + filename);
     }
-    if (sprite_count <= 0 || sprite_count > 256) {
+    if (sprite_count <= 0 || sprite_count > MAX_CODEPOINTS) {
         internal_error(std::string("Invalid codepoint count for abc8 file: ") + filename);
     }
     for (int i = 0; i < sprite_count; i++) {
@@ -84,19 +75,11 @@ abc8::abc8(const char* filename) {
 }
 
 abc8::~abc8() {
-    if (sprites) {
-        for (int i = 0; i < 256; i++) {
-            if (sprites[i]) {
-                delete sprites[i];
-                sprites[i] = nullptr;
-            }
+    for (int i = 0; i < MAX_CODEPOINTS; i++) {
+        if (sprites[i]) {
+            delete sprites[i];
+            sprites[i] = nullptr;
         }
-        delete sprites;
-        sprites = nullptr;
-    }
-    if (y_offset) {
-        delete y_offset;
-        y_offset = nullptr;
     }
 }
 
@@ -169,7 +152,7 @@ bool abc8::has_char(unsigned char c) const {
     if (c == ' ') {
         return true;
     }
-    return sprites && sprites[c] != nullptr;
+    return sprites[c] != nullptr;
 }
 
 void abc8::write_centered(pic8* dest, int x, int y, const char* text) {

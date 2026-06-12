@@ -5,8 +5,10 @@ class pic8;
 
 class abc8 {
   private:
-    pic8** sprites;
-    short* y_offset;
+    static constexpr int MAX_CODEPOINTS = 256;
+
+    pic8* sprites[MAX_CODEPOINTS];
+    short y_offset[MAX_CODEPOINTS];
     int spacing;
     int line_height_;
 

@@ -5,6 +5,7 @@
 #include "eol/settings.h"
 #include "eol/status_messages.h"
 #include "game/driver.h"
+#include "game/fps.h"
 #include "level/level.h"
 #include "level/object.h"
 #include "level/segments.h"
@@ -508,6 +509,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     }
 
     bool both_bikes_alive = true;
+    fps::reset();
     while (true) {
         const bool frozen = time == 0.0 && current_camera.mode != CameraMode::MapViewer &&
                             EolClient->bike_frozen_by_countdown();
@@ -537,6 +539,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                     continue;
                 }
 
+                fps::count_ups();
                 if (!driv1.dead) {
                     physics_subframe(driv1, time, dt);
                 }
@@ -797,6 +800,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
     double current_replay_time = 0.0;
     double last_stopwatch = stopwatch();
 
+    fps::reset();
     while (true) {
         handle_events();
 
@@ -966,6 +970,7 @@ void render_replay(const char* level_filename) {
     driver driv1(Motor1, Rec1, &State->keys1, &HudReplay1);
     driver driv2(Motor2, Rec2, &State->keys2, &HudReplay2);
 
+    fps::reset();
     while (true) {
         handle_events();
         if (is_game_key_down(DIK_ESCAPE)) {

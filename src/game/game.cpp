@@ -478,9 +478,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     driver driv1(Motor1, Rec1, &State->keys1, &HudGame1);
     driver driv2(Motor2, Rec2, &State->keys2, &HudGame2);
 
-    reset_motor_forces(Motor1);
-    reset_motor_forces(Motor2);
-
     camera current_camera;
     current_camera.mode = camera_mode;
     current_camera.x = Motor1->bike.r.x;
@@ -760,9 +757,6 @@ int replay_loop(const char* filename, int restore_player_visibility) {
         driv1.meta.draw_view = PreviousReplayDrawView1;
         driv2.meta.draw_view = PreviousReplayDrawView2;
     }
-
-    reset_motor_forces(Motor1);
-    reset_motor_forces(Motor2);
 
     camera current_camera;
     current_camera.mode = CameraMode::Normal;

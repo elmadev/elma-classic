@@ -1,4 +1,5 @@
 #include "game/driver.h"
+#include "physics/forces.h"
 
 void driver::reset_metadata() {
     meta.sound.motor_frequency = 0.0;
@@ -30,4 +31,5 @@ driver::driver(motorst* mot, recorder* rec, player_keys* keys, hud_visibility* h
       keys(keys),
       hud(hud) {
     reset_metadata();
+    reset_motor_forces(mot);
 }

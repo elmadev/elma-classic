@@ -265,14 +265,16 @@ static void update_view_settings(driver& driv, bool* other_draw_view) {
 }
 
 // The `rec` argument is only used for game play, not when playing a replay.
-static void update_bike_turn_phase(turning_data* data, recorder* rec, double time, int flipped) {
+static void update_bike_turn_phase(driver& driv, bool update_rec, double time, int flipped) {
+    turning_data* data = &driv.meta.bike_turning;
+
     if (data->flipped != flipped) {
         // New flip this frame
         data->flipped = flipped;
         data->turn_time = time;
-        if (rec) {
+        if (update_rec) {
             start_wav(WavEvent::Turn, 0.99);
-            rec->store_event(time, WavEvent::Turn, 0.99, -1);
+            driv.rec->store_event(time, WavEvent::Turn, 0.99, -1);
         }
     }
 
@@ -309,12 +311,12 @@ static void update_camera_turn_phase(turning_data* data, double time, int flippe
     }
 }
 
-static void update_graphical_metadata(driver& driv, recorder* rec, double time) {
+static void update_graphical_metadata(driver& driv, bool update_rec, double time) {
     motorst& mot = *driv.mot;
     bike_metadata& metadata = driv.meta;
 
     // Update bike turn data
-    update_bike_turn_phase(&metadata.bike_turning, rec, time, mot.flipped_bike);
+    update_bike_turn_phase(driv, update_rec, time, mot.flipped_bike);
 
     // Update camera position
     int flipped_camera = mot.flipped_bike;
@@ -354,7 +356,7 @@ static void physics_frame_end(driver& driv, double time, bool* other_draw_view) 
         metadata->turn_key_previous = is_turn_down;
     }
 
-    update_graphical_metadata(driv, driv.rec, time);
+    update_graphical_metadata(driv, true, time);
 }
 
 static void handle_eol_inputs() {
@@ -818,9 +820,9 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             }
         }
 
-        update_graphical_metadata(driv1, nullptr, time);
+        update_graphical_metadata(driv1, false, time);
         if (!Single) {
-            update_graphical_metadata(driv2, nullptr, time);
+            update_graphical_metadata(driv2, false, time);
         }
 
         // End of replay
@@ -944,9 +946,9 @@ void render_replay(const char* level_filename) {
             finished2 = !replay_frame(driv2, time, &driv1.draw_view);
         }
 
-        update_graphical_metadata(driv1, nullptr, time);
+        update_graphical_metadata(driv1, false, time);
         if (!Single) {
-            update_graphical_metadata(driv2, nullptr, time);
+            update_graphical_metadata(driv2, false, time);
         }
 
         if ((Single && finished1) || (!Single && finished1 && finished2)) {

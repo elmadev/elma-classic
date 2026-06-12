@@ -135,7 +135,7 @@ static void replay_randomizer(std::vector<std::string>& filenames) {
         if (loaded == LoadReplayResult::Success) {
             Rec1->rewind();
             Rec2->rewind();
-            if (replay_loop(Rec1->level_filename, 0)) {
+            if (replay_loop(Rec1->level_filename, false)) {
                 return;
             }
         } else if (loaded == LoadReplayResult::Abort) {

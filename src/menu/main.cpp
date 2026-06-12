@@ -46,7 +46,7 @@ static void menu_demo() {
         }
         Rec1->rewind();
         Rec2->rewind();
-        if (replay_loop(Rec1->level_filename, 0)) {
+        if (replay_loop(Rec1->level_filename, false)) {
             MenuPalette->set();
             return;
         }

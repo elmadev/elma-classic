@@ -714,7 +714,7 @@ static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
 static bool PreviousReplayDrawView1 = true;
 static bool PreviousReplayDrawView2 = true;
 
-int replay_loop(const char* filename, int restore_player_visibility) {
+int replay_loop(const char* filename, bool restore_player_visibility) {
     // Bindings during gameplay must be honored by raw scancode: numpad-6
     // is right-volt, not "Right Arrow when NumLock is off".
     NumpadNavGuard numpad_nav_guard;

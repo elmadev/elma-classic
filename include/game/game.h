@@ -26,7 +26,7 @@ struct camera {
 };
 
 int game_loop(const char* filename, CameraMode camera_mode);
-int replay_loop(const char* filename, int restore_player_visibility);
+int replay_loop(const char* filename, bool restore_player_visibility);
 
 void setup_render_directory(const std::string& replay_filename);
 void render_replay(const char* level_filename);

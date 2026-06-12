@@ -17,6 +17,7 @@ void reset_game_background();
 void increase_view_size();
 void decrease_view_size();
 
-void render_game(double time, driver& driv1, driver& driv2, camera& current_camera);
+enum class GameLoop { Game, Replay, Render };
+void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop);
 
 #endif

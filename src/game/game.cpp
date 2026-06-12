@@ -637,7 +637,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             update_view_settings(driv2, &driv1.draw_view);
         }
 
-        render_game(time, driv1, driv2, current_camera);
+        render_game(time, driv1, driv2, current_camera, GameLoop::Game);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -906,7 +906,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             set_friction_volume(driv1.sound.friction_volume + driv2.sound.friction_volume);
         }
 
-        render_game(time, driv1, driv2, current_camera);
+        render_game(time, driv1, driv2, current_camera, GameLoop::Replay);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -999,7 +999,7 @@ void render_replay(const char* level_filename) {
             flagtag_replay(time);
         }
 
-        render_game(time, driv1, driv2, current_camera);
+        render_game(time, driv1, driv2, current_camera, GameLoop::Render);
 
         VideoFrameIndex++;
     }

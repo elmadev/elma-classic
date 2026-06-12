@@ -17,14 +17,13 @@ static void close_file(FILE* h, bool res_file) {
 
 abc8::abc8(const char* filename) {
     spacing = 0;
-    ppsprite = nullptr;
     y_offset = nullptr;
-    ppsprite = new ptrpic8[256];
-    if (!ppsprite) {
+    sprites = new pic8*[256];
+    if (!sprites) {
         external_error("memory");
     }
     for (int i = 0; i < 256; i++) {
-        ppsprite[i] = nullptr;
+        sprites[i] = nullptr;
     }
     y_offset = new short[256];
     if (!y_offset) {
@@ -75,25 +74,25 @@ abc8::abc8(const char* filename) {
         if (fread(&y_offset[c], 2, 1, h) != 1) {
             internal_error(std::string("Could not read abc8 file: ") + filename);
         }
-        if (ppsprite[c]) {
+        if (sprites[c]) {
             internal_error(std::string("Duplicate codepoint in abc8 file: ") + filename);
         }
-        ppsprite[c] = new pic8(".spr", h);
+        sprites[c] = new pic8(".spr", h);
     }
 
     close_file(h, res_file);
 }
 
 abc8::~abc8() {
-    if (ppsprite) {
+    if (sprites) {
         for (int i = 0; i < 256; i++) {
-            if (ppsprite[i]) {
-                delete ppsprite[i];
-                ppsprite[i] = nullptr;
+            if (sprites[i]) {
+                delete sprites[i];
+                sprites[i] = nullptr;
             }
         }
-        delete ppsprite;
-        ppsprite = nullptr;
+        delete sprites;
+        sprites = nullptr;
     }
     if (y_offset) {
         delete y_offset;
@@ -111,7 +110,7 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
     while (*text) {
         int index = (unsigned char)*text;
         // Space character is hardcoded
-        if (!ppsprite[index]) {
+        if (!sprites[index]) {
             if (index == ' ') {
                 if (this == MenuFont) {
                     x += SpaceWidthMenu;
@@ -126,8 +125,8 @@ void abc8::write(pic8* dest, int x, int y, const char* text) {
             text++;
             continue;
         }
-        blit8(dest, ppsprite[index], x, y + y_offset[index]);
-        x += spacing + ppsprite[index]->get_width();
+        blit8(dest, sprites[index], x, y + y_offset[index]);
+        x += spacing + sprites[index]->get_width();
 
         text++;
     }
@@ -141,7 +140,7 @@ int abc8::len(const char* text) {
     while (*text) {
         int index = (unsigned char)*text;
         // Space character is hardcoded
-        if (!ppsprite[index]) {
+        if (!sprites[index]) {
             if (index == ' ') {
                 if (this == MenuFont) {
                     width += SpaceWidthMenu;
@@ -156,7 +155,7 @@ int abc8::len(const char* text) {
             text++;
             continue;
         }
-        width += spacing + ppsprite[index]->get_width();
+        width += spacing + sprites[index]->get_width();
 
         text++;
     }
@@ -170,7 +169,7 @@ bool abc8::has_char(unsigned char c) const {
     if (c == ' ') {
         return true;
     }
-    return ppsprite && ppsprite[c] != nullptr;
+    return sprites && sprites[c] != nullptr;
 }
 
 void abc8::write_centered(pic8* dest, int x, int y, const char* text) {

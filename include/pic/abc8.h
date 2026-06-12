@@ -2,11 +2,10 @@
 #define ABC8_H
 
 class pic8;
-typedef pic8* ptrpic8;
 
 class abc8 {
   private:
-    ptrpic8* ppsprite;
+    pic8** sprites;
     short* y_offset;
     int spacing;
     int line_height_;

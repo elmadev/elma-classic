@@ -172,6 +172,7 @@ void eol_settings::set_default_lgr_name(std::string name) {
 }
 
 void eol_settings::set_show_last_apple_time(bool show) { show_last_apple_time_ = show; }
+void eol_settings::set_show_fps_ups(bool show) { show_fps_ups_ = show; }
 
 void eol_settings::set_show_gravity_arrows(bool b) { show_gravity_arrows_ = b; }
 
@@ -370,7 +371,10 @@ void from_json(const json& j, FullscreenMode& f) {
     JSON_FIELD(replay_pause_key)                                                                   \
     JSON_FIELD(replay_rewind_key)                                                                  \
     JSON_FIELD(default_lgr_name)                                                                   \
+                                                                                                   \
     JSON_FIELD(show_last_apple_time)                                                               \
+    JSON_FIELD(show_fps_ups)                                                                       \
+                                                                                                   \
     JSON_FIELD(show_gravity_arrows)                                                                \
     JSON_FIELD(recording_fps)                                                                      \
     JSON_FIELD(show_demo_menu)                                                                     \

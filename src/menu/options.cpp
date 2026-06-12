@@ -434,6 +434,7 @@ void menu_options() {
             "Default LGR:", EolSettings->default_lgr_name_persisted(), NAV_FUNC() { menu_lgr(); });
 
         BOOL_OPTION("Show Apple Time:", show_last_apple_time);
+        BOOL_OPTION("Show FPS/UPS:", show_fps_ups);
 
         BOOL_OPTION("Gravity Arrows:", show_gravity_arrows);
 

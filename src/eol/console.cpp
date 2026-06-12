@@ -86,6 +86,8 @@ void console::register_console_commands() {
     });
     REGISTER_SETTINGS_STR(default_lgr_name);
     REGISTER_SETTINGS_BOOL(show_last_apple_time);
+    REGISTER_SETTINGS_BOOL(show_fps_ups);
+    register_alias("show_fps", "show_fps_ups");
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
     REGISTER_SETTINGS_BOOL(cripple_no_brake);
     register_alias("nobrake", "cripple_no_brake");

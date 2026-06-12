@@ -825,7 +825,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     // rows are rendered in the order they were added (last added on top)
     std::vector<info_panel_row> info_rows;
 
-    if (bottom_player && loop != GameLoop::Render) {
+    if (bottom_player && loop != GameLoop::Render && EolSettings->show_fps_ups()) {
         bool show_ups = loop == GameLoop::Game;
         info_rows.push_back({fps::header(show_ups), fps::value(show_ups)});
     }

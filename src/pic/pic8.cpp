@@ -883,11 +883,9 @@ void pic8::subview(int x1, int y1, int x2, int y2, pic8* source) {
     if (!rows) {
         internal_error("pic8::subview() realloc failed!");
     }
-#ifdef DEBUG
-    if (x1 < 0 || x2 >= SCREEN_WIDTH || y1 < 0 || y2 >= SCREEN_HEIGHT) {
+    if (x1 < 0 || x2 >= source->get_width() || y1 < 0 || y2 >= source->get_height()) {
         internal_error("pic8::subview!");
     }
-#endif
     for (int y = 0; y < height; y++) {
         rows[y] = source->get_row(y + y1) + x1;
     }

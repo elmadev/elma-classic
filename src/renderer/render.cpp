@@ -253,17 +253,24 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         break;
     }
 
-    const int minimap_x1 = (int)(MinimapX + align * MinimapDx);
+    const int minimap_x1 = std::max(1, (int)(MinimapX + align * MinimapDx));
     const int minimap_x2 = minimap_x1 + MinimapWidth - 1;
     const int minimap_y1 = 1;
     const int minimap_y2 = minimap_y1 + MinimapHeight - 1;
-    static pic8 minimap_view = pic8();
-    minimap_view.subview(minimap_x1, minimap_y1, minimap_x2, minimap_y2, pic);
 
     const int border_x1 = minimap_x1 - 1;
     const int border_x2 = minimap_x2 + 1;
     const int border_y1 = minimap_y1 - 1;
     const int border_y2 = minimap_y2 + 1;
+
+    if (border_x1 < 0 || border_y1 < 0 || border_x2 >= pic->get_width() ||
+        border_y2 >= pic->get_height()) {
+        // Minimap doesn't fit on the screen, so skip drawing it entirely
+        return;
+    }
+
+    static pic8 minimap_view = pic8();
+    minimap_view.subview(minimap_x1, minimap_y1, minimap_x2, minimap_y2, pic);
     static pic8 border_view = pic8();
     border_view.subview(border_x1, border_y1, border_x2, border_y2, pic);
 

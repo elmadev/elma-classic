@@ -28,6 +28,7 @@
 #include <filesystem>
 #include <format>
 #include <string>
+#include <vector>
 
 static bool GameBackgroundRender = false;
 
@@ -614,6 +615,37 @@ static bool bike_in_view(const motorst* mot, vect2 center) {
     return distance < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters;
 }
 
+struct info_panel_row {
+    std::string label;
+    std::string value;
+};
+
+// Render the bottom-right info panel: rows[0] is the bottom row, each later row stacks above it
+// (the backbuffer is upside-down, so larger y is higher on screen).
+static void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows) {
+    constexpr int RIGHT_MARGIN = 10;
+    constexpr int BOTTOM_MARGIN = 10;
+    constexpr int LABEL_OFFSET = 180;
+    constexpr int EXTRA_SPACE_PER_CHAR = 6;
+
+    int max_value_length = 0;
+    for (const info_panel_row& row : rows) {
+        max_value_length = std::max(max_value_length, (int)row.value.size());
+    }
+    int label_offset = LABEL_OFFSET;
+    if (max_value_length > 10) {
+        label_offset += (max_value_length - 10) * EXTRA_SPACE_PER_CHAR;
+    }
+
+    int value_x = GameViewWidth - RIGHT_MARGIN;
+    int label_x = GameViewWidth - label_offset;
+    for (size_t i = 0; i < rows.size(); i++) {
+        int y = BOTTOM_MARGIN + (int)i * SmallFont->line_height();
+        SmallFont->write(pic, label_x, y, rows[i].label.c_str());
+        SmallFont->write_right_align(pic, value_x, y, rows[i].value.c_str());
+    }
+}
+
 // Render the view for one player
 static void render_view(bool player1, pic8* pic, double time, driver& driv, driver& other_driv,
                         camera& current_camera) {
@@ -788,19 +820,19 @@ static void render_view(bool player1, pic8* pic, double time, driver& driv, driv
         draw_timers(BestTime, flagtag_time, time, pic, GameViewWidth, GameViewHeight);
     }
 
-    // Draw the bottom-right info panel
-    if (driv.mot->apple_count && EolSettings->show_last_apple_time()) {
-        char tmp[100];
-        sprintf(tmp, "last apple (%d)        ", driv.mot->apple_count - driv.mot->apple_bug_count);
-        util::text::centiseconds_to_string(driv.mot->last_apple_time, tmp + strlen(tmp), true,
-                                           true);
+    // Build the bottom-right info panel rows.
+    // rows are rendered in the order they were added (last added on top)
+    std::vector<info_panel_row> info_rows;
 
-        constexpr int RIGHT_MARGIN = 5;
-        constexpr int BOTTOM_MARGIN = 5;
-        int x = GameViewWidth - RIGHT_MARGIN;
-        int y = BOTTOM_MARGIN;
-        SmallFont->write_right_align(pic, x, y, tmp);
+    if (driv.mot->apple_count && EolSettings->show_last_apple_time()) {
+        char apple_time[32];
+        util::text::centiseconds_to_string(driv.mot->last_apple_time, apple_time, true, true);
+        info_rows.push_back(
+            {std::format("last apple ({})", driv.mot->apple_count - driv.mot->apple_bug_count),
+             apple_time});
     }
+
+    render_info_panel(pic, info_rows);
 }
 
 void render_game(double time, driver& driv1, driver& driv2, camera& current_camera) {

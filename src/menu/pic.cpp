@@ -321,7 +321,7 @@ void menu_pic::render(bool skip_balls_helmet) {
     }
 
     // We're done!
-    bltfront(ScreenBuffer);
+    blit_to_screen(ScreenBuffer);
 }
 
 static bool IntroAnimFirstFrame = true;
@@ -424,7 +424,7 @@ bool menu_pic::render_intro_anim(double time) {
           SCREEN_HEIGHT / 2 - Intro->get_height() / 2 + frame);
 
     // We're done!
-    bltfront(ScreenBuffer);
+    blit_to_screen(ScreenBuffer);
     return true;
 }
 

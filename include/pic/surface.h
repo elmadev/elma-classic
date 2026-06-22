@@ -7,11 +7,11 @@ extern int SCREEN_WIDTH;
 extern int SCREEN_HEIGHT;
 
 void on_resolution_change();
-void update_resolution(int w, int h);
+void update_resolution(int width, int height);
 
-pic8* lockbackbuffer_pic(bool flipped = true);
-void unlockbackbuffer_pic();
+pic8* lock_backbuffer_pic(bool flipped = true);
+void unlock_backbuffer_pic();
 
-void bltfront(pic8* ppic);
+void blit_to_screen(pic8* pic);
 
 #endif

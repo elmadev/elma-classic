@@ -54,12 +54,12 @@ screen_pic::screen_pic(pic8* initial, Mode mode)
 void screen_pic::blit_to_screen() {
     get_mouse_position(&MouseX, &MouseY);
 
-    pic8* surface = lockbackbuffer_pic(false);
+    pic8* surface = lock_backbuffer_pic(false);
     draw_background(*surface, mode_);
     blit8(surface, pic());
     draw_foreground(*surface, mode_);
     draw_cursor(*surface, false);
-    unlockbackbuffer_pic();
+    unlock_backbuffer_pic();
 }
 
 void screen_pic::reset() {

@@ -60,7 +60,7 @@ static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
     strcat(filename, ".lgr");
     blit8(BufferBall, BufferMain);
     BufferMain->fill_box(EditorPaletteId::BACKGROUND);
-    bltfront(BufferMain);
+    blit_to_screen(BufferMain);
     if (!InEditor) {
         EditorPalette->set();
     }
@@ -74,7 +74,7 @@ static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
     if (!InEditor) {
         MenuPalette->set();
         blit8(BufferMain, BufferBall);
-        bltfront(BufferMain);
+        blit_to_screen(BufferMain);
     }
     return false;
 }

@@ -13,9 +13,9 @@
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 600;
 
-static pic8 Lockbuff = pic8();
+static pic8 Buffer = pic8();
 
-static int Backpiclocked = 0;
+static int BufferLocked = 0;
 
 void on_resolution_change() {
     editor_canvas_update_resolution();
@@ -28,32 +28,32 @@ void on_resolution_change() {
     balls_resolution_change();
 }
 
-void update_resolution(int w, int h) {
-    EolSettings->persist_screen_width(w);
-    EolSettings->persist_screen_height(h);
-    platform_resize_window(w, h);
+void update_resolution(int width, int height) {
+    EolSettings->persist_screen_width(width);
+    EolSettings->persist_screen_height(height);
+    platform_resize_window(width, height);
     on_resolution_change();
 }
 
-pic8* lockbackbuffer_pic(bool flipped) {
-    if (Backpiclocked) {
-        internal_error("lbb_p lock!");
+pic8* lock_backbuffer_pic(bool flipped) {
+    if (BufferLocked) {
+        internal_error("lock_backbuffer_pic lock!");
     }
-    Backpiclocked = 1;
-    lock_backbuffer(Lockbuff, flipped);
-    return &Lockbuff;
+    BufferLocked = 1;
+    lock_backbuffer(Buffer, flipped);
+    return &Buffer;
 }
 
-void unlockbackbuffer_pic() {
-    if (!Backpiclocked) {
-        internal_error("ulbb_p lock!");
+void unlock_backbuffer_pic() {
+    if (!BufferLocked) {
+        internal_error("unlock_backbuffer_pic lock!");
     }
-    Backpiclocked = 0;
+    BufferLocked = 0;
     unlock_backbuffer();
 }
 
-void bltfront(pic8* ppic) {
-    pic8* surface = lockbackbuffer_pic(false);
-    blit8(surface, ppic);
-    unlockbackbuffer_pic();
+void blit_to_screen(pic8* pic) {
+    pic8* surface = lock_backbuffer_pic(false);
+    blit8(surface, pic);
+    unlock_backbuffer_pic();
 }

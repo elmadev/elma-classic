@@ -19,11 +19,11 @@
 #include <directinput/scancodes.h>
 
 static void show_intro_screen() {
-    pic8* intro_screen = lockbackbuffer_pic(false);
+    pic8* intro_screen = lock_backbuffer_pic(false);
     intro_screen->fill_box(BLACK_PALETTE_ID);
     blit8(intro_screen, Intro, SCREEN_WIDTH / 2 - Intro->get_width() / 2,
           SCREEN_HEIGHT / 2 - Intro->get_height() / 2);
-    unlockbackbuffer_pic();
+    unlock_backbuffer_pic();
 }
 
 void menu_intro() {

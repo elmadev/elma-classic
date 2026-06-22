@@ -817,7 +817,7 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     bool splitscreen = draw_player1 && draw_player2;
 
     // Get the screen, upside-down
-    pic8* pic = lockbackbuffer_pic();
+    pic8* pic = lock_backbuffer_pic();
 
     // If we need to recalculate the screen position, redraw the background qframe
     if (GameBackgroundRender) {
@@ -852,5 +852,5 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     // Conditionally save screenshot
     handle_screenshot(pic);
 
-    unlockbackbuffer_pic();
+    unlock_backbuffer_pic();
 }

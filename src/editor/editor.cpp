@@ -613,11 +613,11 @@ static void get_mouse_position_editor(int* mouse_x, int* mouse_y) {
 }
 
 static void editor_to_screen() {
-    pic8* surface = lockbackbuffer_pic(false);
+    pic8* surface = lock_backbuffer_pic(false);
     blit8(surface, BufferMain);
     draw_editor_border(*surface);
     draw_cursor(*surface, CursorShapeIsX);
-    unlockbackbuffer_pic();
+    unlock_backbuffer_pic();
 }
 
 void editor() {

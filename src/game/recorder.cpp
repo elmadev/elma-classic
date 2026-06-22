@@ -344,7 +344,7 @@ bool recorder::recall_event(double time, WavEvent* event_id, double* volume, int
     return false;
 }
 
-double recorder::find_last_turn_frame_time(double time) const {
+std::optional<double> recorder::find_last_turn_frame_time(double time) const {
     int index = std::min((int)(TIME_TO_FRAME_INDEX * time), frame_count_ - 1);
     index = std::max(index, 0);
     bool current_flipped = (frames[index].flags >> FLAG_FLIPPED) & 1;
@@ -354,10 +354,10 @@ double recorder::find_last_turn_frame_time(double time) const {
             return (i + 1) * FRAME_INDEX_TO_TIME;
         }
     }
-    return -1000.0;
+    return std::nullopt;
 }
 
-double recorder::find_last_volt_time(double time, bool* is_right_volt) const {
+std::optional<double> recorder::find_last_volt_time(double time, bool* is_right_volt) const {
     for (int i = current_event_index - 1; i >= 0; i--) {
         if (events[i].time > time) {
             continue;
@@ -371,7 +371,7 @@ double recorder::find_last_volt_time(double time, bool* is_right_volt) const {
             return events[i].time;
         }
     }
-    return -1000.0;
+    return std::nullopt;
 }
 
 MotorGravity recorder::gravity(const level& lev) const {

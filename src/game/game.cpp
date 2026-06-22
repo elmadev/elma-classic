@@ -692,7 +692,7 @@ static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
             int prev_apple_count = mot->apple_count;
             handle_object_interaction(driv, ev->object_id);
             if (prev_apple_count < mot->apple_count) {
-                mot->last_apple_time = (int)(time * TIME_TO_CENTISECONDS);
+                mot->last_apple_time = (int)(ev->time * TIME_TO_CENTISECONDS);
             }
         } else {
             start_wav(ev->event_id, ev->volume);

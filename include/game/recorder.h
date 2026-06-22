@@ -123,6 +123,10 @@ class recorder {
     // if none found.
     std::optional<double> last_volt_time(bool* is_right_volt) const;
 
+    // Time of the last apple collected at or before the current event cursor.
+    // Returns nullopt if none found.
+    std::optional<double> last_apple_time() const;
+
     bool flagtag() const { return (bool)(flagtag_); };
     void set_flagtag(bool flagtag) { flagtag_ = (int)(flagtag); }
 

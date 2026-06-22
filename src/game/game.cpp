@@ -646,6 +646,8 @@ static void reverse_events(driver& driv, double time) {
             obj->active = true;
             mot->apple_count--;
 
+            mot->last_apple_time = (int)(rec->last_apple_time().value_or(0) * TIME_TO_CENTISECONDS);
+
             if (obj->gravity()) {
                 mot->gravity_direction = rec->gravity(*Level);
             }

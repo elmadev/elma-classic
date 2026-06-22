@@ -371,6 +371,15 @@ std::optional<double> recorder::last_volt_time(bool* is_right_volt) const {
     return std::nullopt;
 }
 
+std::optional<double> recorder::last_apple_time() const {
+    for (int i = current_event_index - 1; i >= 0; i--) {
+        if (events[i].event_id == WavEvent::Food) {
+            return events[i].time;
+        }
+    }
+    return std::nullopt;
+}
+
 MotorGravity recorder::gravity(const level& lev) const {
     for (int event_id = current_event_index; event_id > 0; event_id--) {
         int obj_id = events[event_id - 1].object_id;

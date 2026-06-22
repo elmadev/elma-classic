@@ -634,14 +634,11 @@ static void reverse_events(driver& driv, double time) {
     motorst* mot = driv.mot;
     recorder* rec = driv.rec;
 
-    WavEvent wav;
-    double vol;
-    int obj_id;
-    while (rec->recall_event_reverse(time, &wav, &vol, &obj_id)) {
-        if (obj_id < 0) {
+    while (std::optional<event> ev = rec->recall_event_reverse(time)) {
+        if (ev->object_id < 0) {
             continue;
         }
-        object* obj = Level->objects[obj_id];
+        object* obj = Level->objects[ev->object_id];
         if (obj && obj->type == object::Type::Food) {
             obj->active = true;
             mot->apple_count--;
@@ -690,23 +687,20 @@ static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
     set_head_position(mot);
 
     // Play events
-    WavEvent wav_id;
-    double volume;
-    int object_id;
-    while (rec->recall_event(time, &wav_id, &volume, &object_id)) {
-        if (object_id >= 0) {
+    while (std::optional<event> ev = rec->recall_event(time)) {
+        if (ev->object_id >= 0) {
             int prev_apple_count = mot->apple_count;
-            handle_object_interaction(driv, object_id);
+            handle_object_interaction(driv, ev->object_id);
             if (prev_apple_count < mot->apple_count) {
                 mot->last_apple_time = (int)(time * TIME_TO_CENTISECONDS);
             }
         } else {
-            start_wav(wav_id, volume);
-            if (wav_id == WavEvent::RightVolt) {
+            start_wav(ev->event_id, ev->volume);
+            if (ev->event_id == WavEvent::RightVolt) {
                 metadata->volt_is_right = true;
                 metadata->volt_time = time;
             }
-            if (wav_id == WavEvent::LeftVolt) {
+            if (ev->event_id == WavEvent::LeftVolt) {
                 metadata->volt_is_right = false;
                 metadata->volt_time = time;
             }

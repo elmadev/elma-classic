@@ -331,17 +331,11 @@ void recorder::store_event(double time, WavEvent event_id, double volume, int ob
     event_count++;
 }
 
-bool recorder::recall_event(double time, WavEvent* event_id, double* volume, int* object_id) {
-    if (current_event_index < event_count) {
-        if (events[current_event_index].time <= time) {
-            *event_id = events[current_event_index].event_id;
-            *volume = events[current_event_index].volume;
-            *object_id = events[current_event_index].object_id;
-            current_event_index++;
-            return true;
-        }
+std::optional<event> recorder::recall_event(double time) {
+    if (current_event_index < event_count && events[current_event_index].time <= time) {
+        return events[current_event_index++];
     }
-    return false;
+    return std::nullopt;
 }
 
 std::optional<double> recorder::find_last_turn_frame_time(double time) const {
@@ -395,16 +389,11 @@ MotorGravity recorder::gravity(const level& lev) const {
     return MotorGravity::Down;
 }
 
-bool recorder::recall_event_reverse(double time, WavEvent* event_id, double* volume,
-                                    int* object_id) {
+std::optional<event> recorder::recall_event_reverse(double time) {
     if (current_event_index > 0 && events[current_event_index - 1].time > time) {
-        current_event_index--;
-        *event_id = events[current_event_index].event_id;
-        *volume = events[current_event_index].volume;
-        *object_id = events[current_event_index].object_id;
-        return true;
+        return events[--current_event_index];
     }
-    return false;
+    return std::nullopt;
 }
 
 [[noreturn]] static void read_error(const char* filename) {

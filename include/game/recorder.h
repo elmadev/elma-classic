@@ -106,10 +106,10 @@ class recorder {
     void store_frames(motorst* mot, double time, bike_sound* sound);
 
     void store_event(double time, WavEvent event_id, double volume, int object_id);
-    // Return true if a new event has occurred
-    bool recall_event(double time, WavEvent* event_id, double* volume, int* object_id);
-    // Walk events backward: returns true for each event whose time > `time`
-    bool recall_event_reverse(double time, WavEvent* event_id, double* volume, int* object_id);
+    // Return the next event at or before `time`, or nullopt if there is none
+    std::optional<event> recall_event(double time);
+    // Walk events backward: return each event whose time > `time`, else nullopt
+    std::optional<event> recall_event_reverse(double time);
     // Returns the currently applicable gravity by iterating backwards through events
     MotorGravity gravity(const level& lev) const;
 

@@ -118,9 +118,10 @@ class recorder {
     // Returns nullopt if no direction change found.
     std::optional<double> find_last_turn_frame_time(double time) const;
 
-    // Find time of the last volt (RightVolt or LeftVolt) at or before `time`.
-    // Sets `is_right_volt` to indicate direction. Returns nullopt if none found.
-    std::optional<double> find_last_volt_time(double time, bool* is_right_volt) const;
+    // Time of the last volt (RightVolt or LeftVolt) at or before the current
+    // event cursor. Sets `is_right_volt` to indicate direction. Returns nullopt
+    // if none found.
+    std::optional<double> last_volt_time(bool* is_right_volt) const;
 
     bool flagtag() const { return (bool)(flagtag_); };
     void set_flagtag(bool flagtag) { flagtag_ = (int)(flagtag); }

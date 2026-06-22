@@ -357,11 +357,8 @@ std::optional<double> recorder::find_last_turn_frame_time(double time) const {
     return std::nullopt;
 }
 
-std::optional<double> recorder::find_last_volt_time(double time, bool* is_right_volt) const {
+std::optional<double> recorder::last_volt_time(bool* is_right_volt) const {
     for (int i = current_event_index - 1; i >= 0; i--) {
-        if (events[i].time > time) {
-            continue;
-        }
         if (events[i].event_id == WavEvent::RightVolt) {
             *is_right_volt = true;
             return events[i].time;

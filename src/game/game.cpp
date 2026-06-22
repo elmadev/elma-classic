@@ -671,8 +671,7 @@ static void rewind_override_animations(driver& driv, double time) {
     }
     metadata->camera_turning.flipped = flipped_camera;
 
-    metadata->volt_time =
-        rec->find_last_volt_time(time, &metadata->volt_is_right).value_or(-1000.0);
+    metadata->volt_time = rec->last_volt_time(&metadata->volt_is_right).value_or(-1000.0);
 }
 
 // Load replay data (instead of simulating bike physics)

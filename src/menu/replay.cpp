@@ -13,7 +13,6 @@
 #include "menu/play.h"
 #include "menu/rec_list.h"
 #include "platform/implementation.h"
-#include "util/file_iter.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cstdlib>
@@ -222,20 +221,25 @@ void menu_merge_replays() {
     }
 }
 
-static void wait_for_cache() {
+// Returns false if the user cancelled with ESC before it finished,
+// in which case the cache is still building and callers must not touch it.
+static bool wait_for_cache() {
     if (!rec_list::is_cache_ready()) {
         loading_screen();
         while (!rec_list::is_cache_ready()) {
             handle_events();
             if (is_key_down(DIK_ESCAPE)) {
-                return;
+                return false;
             }
         }
     }
+    return true;
 }
 
 void menu_replay_level(int level_id) {
-    wait_for_cache();
+    if (!wait_for_cache()) {
+        return;
+    }
 
     std::vector<std::string> replay_names = rec_list::replays_for_level(level_id);
     std::erase(replay_names, std::string(LAST_REC_FILENAME));
@@ -266,7 +270,9 @@ void menu_replay_level(int level_id) {
 }
 
 void menu_merge_level(int level_id, const std::string& merge_file) {
-    wait_for_cache();
+    if (!wait_for_cache()) {
+        return;
+    }
 
     std::vector<std::string> replay_names = rec_list::replays_for_level(level_id);
     std::erase(replay_names, std::string(LAST_REC_FILENAME));

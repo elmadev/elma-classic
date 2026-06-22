@@ -13,10 +13,6 @@
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 600;
 
-static pic8 Buffer = pic8();
-
-static int BufferLocked = 0;
-
 void on_resolution_change() {
     editor_canvas_update_resolution();
     reinit_menu_pictures();
@@ -35,11 +31,14 @@ void update_resolution(int width, int height) {
     on_resolution_change();
 }
 
+static pic8 Buffer = pic8();
+static bool BufferLocked = false;
+
 pic8* lock_backbuffer_pic(bool flipped) {
     if (BufferLocked) {
         internal_error("lock_backbuffer_pic lock!");
     }
-    BufferLocked = 1;
+    BufferLocked = true;
     lock_backbuffer(Buffer, flipped);
     return &Buffer;
 }
@@ -48,7 +47,7 @@ void unlock_backbuffer_pic() {
     if (!BufferLocked) {
         internal_error("unlock_backbuffer_pic lock!");
     }
-    BufferLocked = 0;
+    BufferLocked = false;
     unlock_backbuffer();
 }
 

@@ -110,8 +110,9 @@ class recorder {
     std::optional<event> recall_event(double time);
     // Walk events backward: return each event whose time > `time`, else nullopt
     std::optional<event> recall_event_reverse(double time);
-    // Returns the currently applicable gravity by iterating backwards through events
-    MotorGravity gravity(const level& lev) const;
+    // Currently applicable gravity at the current event cursor (from the last
+    // gravity apple). Returns MotorGravity::Down if none.
+    MotorGravity last_gravity(const level& lev) const;
 
     // Find frame time of the last direction change at or before `time`,
     // detected from the flipped_bike flag in frame data.

@@ -374,9 +374,9 @@ std::optional<double> recorder::last_apple_time() const {
     return std::nullopt;
 }
 
-MotorGravity recorder::gravity(const level& lev) const {
-    for (int event_id = current_event_index; event_id > 0; event_id--) {
-        int obj_id = events[event_id - 1].object_id;
+MotorGravity recorder::last_gravity(const level& lev) const {
+    for (int i = current_event_index - 1; i >= 0; i--) {
+        int obj_id = events[i].object_id;
         if (obj_id < 0) {
             continue;
         }

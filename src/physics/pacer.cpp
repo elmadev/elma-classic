@@ -1,7 +1,9 @@
 #include "physics/pacer.h"
 #include "eol/settings.h"
 #include "eol/status_messages.h"
+#include "game/fps.h"
 #include "main.h"
+#include "platform/implementation.h"
 #include <format>
 
 namespace pacer {
@@ -11,8 +13,13 @@ namespace {
 bool FpsLimitEnabled = false;
 int FpsLimit = 0;
 
-static double time = 0.0;
-static double target_time = 0.0;
+// In physics units of time
+double time = 0.0;
+double target_time = 0.0;
+
+// In milliseconds
+long long start_time = 0;
+long long real_frame_count = 0;
 
 } // namespace
 
@@ -41,10 +48,32 @@ void request_fps_limit(bool enabled, int limit) {
 void reset() {
     time = 0.0;
     target_time = 0.0;
+
+    start_time = get_milliseconds();
+    real_frame_count = 0;
+
+    FpsLimitEnabled = EolSettings->fps_limit_enabled();
+    FpsLimit = EolSettings->fps_limit();
 }
 
 void new_frame() {
-    target_time = stopwatch() * 0.0024;
+    long long now = get_milliseconds();
+    long long elapsed = now - start_time;
+
+    if (FpsLimitEnabled) {
+        // In milliunits (a value of 1000 corresponds to one allowed frame)
+        long long max_allowed_frames = elapsed * FpsLimit;
+
+        if (real_frame_count * 1000LL > max_allowed_frames) {
+            // Skip current frame
+            return;
+        }
+    }
+
+    real_frame_count++;
+    fps::count_fps();
+
+    target_time = elapsed * MILLISECONDS_TO_PHYS_TIME;
     target_time = std::max(0.000001, target_time);
 }
 

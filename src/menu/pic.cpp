@@ -311,7 +311,7 @@ void menu_pic::render(bool skip_balls_helmet) {
     if (!skip_balls_helmet) {
         pic8* helmet_frame = nullptr;
         if (State->animated_menus) {
-            helmet_frame = Helmet->get_frame_by_time(time * 0.0024);
+            helmet_frame = Helmet->get_frame_by_time(time * STOPWATCH_TO_PHYS_TIME);
         } else {
             helmet_frame = Helmet->get_frame_by_index(25);
         }
@@ -411,7 +411,7 @@ bool menu_pic::render_intro_anim(double time) {
     // The helmet moves down from -SCREEN_HEIGHT to 0
     pic8* helmet_frame = nullptr;
     if (State->animated_menus) {
-        helmet_frame = Helmet->get_frame_by_time(time * 0.0024);
+        helmet_frame = Helmet->get_frame_by_time(time * STOPWATCH_TO_PHYS_TIME);
     } else {
         helmet_frame = Helmet->get_frame_by_index(25);
     }

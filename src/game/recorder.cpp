@@ -20,7 +20,8 @@ bool MergedRec = false;
 constexpr int MAGIC_NUMBER = 4796277;
 
 constexpr int FRAME_RATE = 30;
-constexpr double TIME_TO_FRAME_INDEX = FRAME_RATE / (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024);
+constexpr double TIME_TO_FRAME_INDEX =
+    FRAME_RATE / (STOPWATCH_MULTIPLIER * 1000.0 * STOPWATCH_TO_PHYS_TIME);
 constexpr double FRAME_INDEX_TO_TIME = 1.0 / TIME_TO_FRAME_INDEX;
 
 constexpr int INITIAL_FRAMES = FRAME_RATE * 60 * 60; // 30 fps * 60 sec * 60 min

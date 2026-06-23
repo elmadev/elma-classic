@@ -36,7 +36,7 @@ void reset() {
     prev_time = get_milliseconds();
 }
 
-static void calculate() {
+void update() {
     long long update_interval = UPDATE_INTERVAL;
     if (prev_fps == 0.0) {
         update_interval = FIRST_UPDATE_INTERVAL;
@@ -54,11 +54,7 @@ static void calculate() {
     }
 }
 
-void count_fps() {
-    frame_count++;
-
-    calculate();
-}
+void count_fps() { frame_count++; }
 
 void count_ups() { update_count++; }
 

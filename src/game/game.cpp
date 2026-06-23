@@ -551,7 +551,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         BattleRunCripples = EolClient->battle_cripples();
     }
 
-    stopwatch_reset();
     pacer::reset();
 
     driver driv1(Motor1, Rec1, &State->keys1, &HudGame1);
@@ -584,11 +583,11 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         const bool frozen = time == 0.0 && current_camera.mode != CameraMode::MapViewer &&
                             EolClient->bike_frozen_by_countdown();
         if (frozen) {
-            stopwatch_reset();
             pacer::reset();
         }
 
         handle_events();
+
         bool console_was_active = handle_console_input();
 
         if (!frozen) {

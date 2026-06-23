@@ -454,6 +454,7 @@ void menu_options() {
                 static constexpr int steps[] = {60, 100, 144, 240, 500};
                 if (!EolSettings->fps_limit_enabled_persisted()) {
                     EolSettings->persist_fps_limit_enabled(true);
+                    EolSettings->persist_fps_boost(false);
                     EolSettings->persist_fps_limit(steps[0]);
                     return;
                 }
@@ -466,6 +467,15 @@ void menu_options() {
                 }
                 EolSettings->persist_fps_limit_enabled(false);
                 EolSettings->persist_fps_limit(steps[0]);
+            });
+
+        nav.add_row(
+            "Simulate Max FPS:", EolSettings->fps_boost_persisted() ? "Yes" : "No", NAV_FUNC() {
+                bool enabled = !EolSettings->fps_boost_persisted();
+                EolSettings->persist_fps_boost(enabled);
+                if (enabled) {
+                    EolSettings->persist_fps_limit_enabled(false);
+                }
             });
 
         nav.add_row(

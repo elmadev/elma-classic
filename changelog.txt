@@ -63,6 +63,7 @@
 * Default foreground/background textures no longer get reset if texture not found or wrong lgr used
 * You can now individually force the foreground and background textures to "ground" and "sky", and can also set it via keybind
 * Instead of just displaying FPS, you can now display FPS (game frames; 0-1000), UPS (physics frames; 79-1000) and GPU (screen refresh rate; 0-infinity)
+* Screen text will now always confirm if an !fps setting change is successful, instead of silently failing or succeeding if the FPS counter is hidden
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems

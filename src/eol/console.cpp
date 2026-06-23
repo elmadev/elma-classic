@@ -93,7 +93,6 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
 
     REGISTER_SETTINGS_BOOL(show_fps);
-
     // eol-client !fps aggregate:
     //   fps         -> toggle show_fps
     //   fps on/off  -> queue limit on/off
@@ -105,7 +104,9 @@ void console::register_console_commands() {
             return;
         }
         std::string s(text);
-        if (strcmpi(s.c_str(), "on") == 0) {
+        if (strcmpi(s.c_str(), "boost") == 0) {
+            pacer::toggle_fps_boost();
+        } else if (strcmpi(s.c_str(), "on") == 0) {
             pacer::request_fps_limit(true, EolSettings->fps_limit());
         } else if (strcmpi(s.c_str(), "off") == 0) {
             pacer::request_fps_limit(false, EolSettings->fps_limit());

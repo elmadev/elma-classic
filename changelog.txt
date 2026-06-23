@@ -25,6 +25,7 @@
 ### Gameplay
 * Internal level total time is displayed in menu
 * All internal levels may be immediately unlocked via the Options
+* Game FPS can be boosted to the max of 1000, regardless of the computer's processing power and screen display settings
 * When saving an internal replay, the internal number and name will be shown instead of QWQUU0XX.lev
 * !levinfo prints basic information about the current level
 * Save play is enabled for internal level 55 (More Levels)

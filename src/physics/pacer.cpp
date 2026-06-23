@@ -4,6 +4,7 @@
 #include "game/fps.h"
 #include "main.h"
 #include "platform/implementation.h"
+#include <climits>
 #include <format>
 
 namespace pacer {
@@ -26,16 +27,34 @@ long long real_frame_count = 0;
 
 std::string format_fps_limit() {
     bool enabled = pacer::FpsLimitEnabled;
-    int limit = enabled ? pacer::FpsLimit : 0;
+    bool boost = pacer::FpsBoost;
+    int limit = 0;
+    if (enabled) {
+        limit = pacer::FpsLimit;
+    } else if (boost) {
+        limit = INT_MAX;
+    }
+
     bool next_enabled = EolSettings->fps_limit_enabled();
-    int next_limit = next_enabled ? EolSettings->fps_limit() : 0;
+    bool next_boost = EolSettings->fps_boost();
+    int next_limit = 0;
+    if (next_enabled) {
+        next_limit = EolSettings->fps_limit();
+    } else if (next_boost) {
+        next_limit = INT_MAX;
+    }
+
     auto format_limit = [](int limit) -> std::string {
         if (limit == 0) {
             return "off";
         }
+        if (limit == INT_MAX) {
+            return "^1000";
+        }
         return std::to_string(limit);
     };
-    if (enabled || next_enabled) {
+
+    if (enabled || boost || next_enabled || next_boost) {
         if (limit != next_limit) {
             return std::format(" ({} -> {})", format_limit(limit), format_limit(next_limit));
         }

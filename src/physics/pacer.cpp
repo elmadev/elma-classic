@@ -26,6 +26,26 @@ long long real_frame_count = 0;
 
 } // namespace
 
+std::string format_fps_limit() {
+    bool enabled = pacer::FpsLimitEnabled;
+    int limit = enabled ? pacer::FpsLimit : 0;
+    bool next_enabled = EolSettings->fps_limit_enabled();
+    int next_limit = next_enabled ? EolSettings->fps_limit() : 0;
+    auto format_limit = [](int limit) -> std::string {
+        if (limit == 0) {
+            return "off";
+        }
+        return std::to_string(limit);
+    };
+    if (enabled || next_enabled) {
+        if (limit != next_limit) {
+            return std::format(" ({} -> {})", format_limit(limit), format_limit(next_limit));
+        }
+        return std::format(" ({})", format_limit(limit));
+    }
+    return "";
+}
+
 void request_fps_limit(bool enabled, int limit) {
     if (!EolSettings->show_fps()) {
         bool enabled_changed =

@@ -1,18 +1,28 @@
 #include "physics/pacer.h"
 #include "eol/settings.h"
 #include "eol/status_messages.h"
+#include "game/fps.h"
 #include "main.h"
+#include "platform/implementation.h"
 #include <format>
 
 namespace pacer {
 
 namespace {
 
+constexpr long long LIMITER_TIMEOUT_MS = 33;
+
 bool FpsLimitEnabled = false;
 int FpsLimit = 0;
 
+// In physics units of time
 double time = 0.0;
 double target_time = 0.0;
+
+// In milliseconds
+long long start_time = 0;
+long long last_real_frame_time = 0;
+long long real_frame_count = 0;
 
 } // namespace
 
@@ -43,11 +53,36 @@ void request_fps_limit(bool enabled, int limit) {
 void reset() {
     time = 0.0;
     target_time = 0.0;
+
+    start_time = get_milliseconds();
+    last_real_frame_time = start_time;
+    real_frame_count = 0;
+
+    FpsLimitEnabled = EolSettings->fps_limit_enabled();
+    FpsLimit = EolSettings->fps_limit();
 }
 
 void new_frame() {
-    target_time = stopwatch() * STOPWATCH_TO_PHYS_TIME;
-    target_time = std::max(0.000001, target_time);
+    long long now = get_milliseconds();
+    long long elapsed = now - start_time;
+
+    if (FpsLimitEnabled) {
+        // In milliunits (a value of 1000 corresponds to one allowed frame)
+        long long max_allowed_frames = elapsed * FpsLimit;
+
+        // eol-client forces a real frame at least every 33 ms even when over the limit
+        if (real_frame_count * 1000LL > max_allowed_frames &&
+            now - last_real_frame_time <= LIMITER_TIMEOUT_MS) {
+            // Skip current frame
+            return;
+        }
+    }
+
+    real_frame_count++;
+    last_real_frame_time = now;
+    fps::count_fps();
+
+    target_time = std::max(elapsed * MILLISECONDS_TO_PHYS_TIME, 0.000001);
 }
 
 bool subframe(double* out_dt) {

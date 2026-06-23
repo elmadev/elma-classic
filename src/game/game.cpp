@@ -52,6 +52,7 @@ static BattleAttributes::Kind active_cripples() {
     cripples |= EolSettings->cripple_no_throttle() ? NoThrottle : 0;
     cripples |= EolSettings->cripple_always_throttle() ? AlwaysThrottle : 0;
     cripples |= EolSettings->cripple_drunk() ? Drunk : 0;
+    cripples |= EolSettings->cripple_one_wheel() ? OneWheel : 0;
     return static_cast<Kind>(cripples);
 }
 
@@ -263,6 +264,10 @@ static void physics_subframe(driver& driv, double time, double dt) {
             start_wav(wav_id, volume);
         }
         rec->store_event(time, wav_id, volume, object_id);
+    }
+
+    if (cripples & OneWheel && driv.mot->one_wheel_failed) {
+        driv.dead = true;
     }
 }
 

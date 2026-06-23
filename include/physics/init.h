@@ -42,6 +42,8 @@ struct rigidbody {
     double inertia; // Moment of inertia
     vect2 r;
     vect2 v;
+
+    bool touching_edge; // true if wheel is touching polygon edge
 };
 
 struct motorst {
@@ -58,6 +60,8 @@ struct motorst {
     int apple_count;
     int last_apple_time;
     int apple_bug_count;
+
+    bool one_wheel_failed;
 
     bool prev_brake;
     double left_wheel_brake_rotation;

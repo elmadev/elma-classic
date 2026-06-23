@@ -14,6 +14,7 @@ constexpr long long LIMITER_TIMEOUT_MS = 33;
 
 bool FpsLimitEnabled = false;
 int FpsLimit = 0;
+bool FpsBoost = false;
 
 // In physics units of time
 double time = 0.0;
@@ -80,6 +81,7 @@ void reset() {
 
     FpsLimitEnabled = EolSettings->fps_limit_enabled();
     FpsLimit = EolSettings->fps_limit();
+    FpsBoost = EolSettings->fps_boost();
 }
 
 void new_frame() {
@@ -110,7 +112,11 @@ bool subframe(double* out_dt) {
     if (0.000001 > dt) {
         return false;
     }
-    dt = std::min(dt, PHYS_MAX_TIMESTEP);
+
+    // Minimum UPS is 79.4, or 1000.0 if booster is enabled
+    const bool boost = FpsBoost && !FpsLimitEnabled;
+    const double max_timestep = boost ? MILLISECONDS_TO_PHYS_TIME : PHYS_MAX_TIMESTEP;
+    dt = std::min(dt, max_timestep);
     *out_dt = dt;
     time += dt;
     return true;

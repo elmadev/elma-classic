@@ -12,6 +12,7 @@
 #include "main.h"
 #include "physics/flagtag.h"
 #include "physics/init.h"
+#include "physics/pacer.h"
 #include "pic/abc8.h"
 #include "pic/anim.h"
 #include "pic/lgr.h"
@@ -831,7 +832,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     if (bottom_player && loop != GameLoop::Render) {
         // FPS
         if (EolSettings->show_fps()) {
-            info_rows.push_back({"FPS", fps::format_fps()});
+            info_rows.push_back({"FPS", fps::format_fps() + pacer::format_fps_limit()});
         }
 
         // UPS

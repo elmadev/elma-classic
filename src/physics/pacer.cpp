@@ -47,6 +47,19 @@ std::string format_fps_limit() {
     return "";
 }
 
+void toggle_fps_boost() {
+    bool enabled = !EolSettings->fps_boost();
+    if (!EolSettings->show_fps()) {
+        StatusMessages->add(
+            std::format("Turning FPS booster {} when the next run starts", enabled ? "on" : "off"));
+    }
+
+    EolSettings->set_fps_boost(enabled);
+    if (enabled) {
+        EolSettings->set_fps_limit_enabled(false);
+    }
+}
+
 void request_fps_limit(bool enabled, int limit) {
     if (!EolSettings->show_fps()) {
         bool enabled_changed =
@@ -69,6 +82,10 @@ void request_fps_limit(bool enabled, int limit) {
     }
     EolSettings->set_fps_limit_enabled(enabled);
     EolSettings->set_fps_limit(limit);
+
+    if (enabled) {
+        EolSettings->set_fps_boost(false);
+    }
 }
 
 void reset() {

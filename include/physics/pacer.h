@@ -12,6 +12,9 @@ constexpr double PHYS_MAX_TIMESTEP = 0.0055;
 std::string format_fps_limit();
 
 // Will be updated on the next run
+void toggle_fps_boost();
+
+// Will be updated on the next run
 void request_fps_limit(bool enabled, int limit);
 
 void reset();

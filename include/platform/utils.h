@@ -13,7 +13,6 @@
 #define strncmpi _strncmpi
 #define strlwr _strlwr
 #define access _access
-#define strupr _strupr
 #endif
 
 #ifndef _WIN32
@@ -23,7 +22,6 @@ void itoa(int value, char* str, int base);
 int strcmpi(const char* a, const char* b);
 int strnicmp(const char* a, const char* b, size_t len);
 
-void strupr(char* str);
 void strlwr(char* str);
 
 #endif

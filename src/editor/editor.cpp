@@ -444,7 +444,6 @@ static void draw_editor() {
 
     // Tooltip section
     EditorWhiteFont->write(BufferMain, 6, 15, "File:");
-    strupr(State->editor_filename);
     int filename_x = 41;
     if (State->editor_filename[0] == 0) {
         EditorBlackFont->write(BufferMain, filename_x, 15, "UNNAMED");

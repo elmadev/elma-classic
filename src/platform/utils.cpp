@@ -34,13 +34,6 @@ int strnicmp(const char* a, const char* b, size_t len) {
     return v;
 }
 
-void strupr(char* str) {
-    while (*str) {
-        *str = std::toupper((unsigned char)*str);
-        str++;
-    }
-}
-
 void strlwr(char* str) {
     while (*str) {
         *str = std::tolower((unsigned char)*str);

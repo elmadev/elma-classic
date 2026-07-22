@@ -88,6 +88,8 @@ struct apple_battle_progress {
     bool taken[MAX_OBJECTS]{};
     void clear();
     void record(int object_index);
+    // Deactivate the already-taken apples in the level.
+    void apply(const level& lev) const;
 };
 
 #endif

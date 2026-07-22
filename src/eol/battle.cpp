@@ -1,6 +1,7 @@
 #include "eol/eol.h"
 #include "eol/status_messages.h"
 #include "level/level.h"
+#include "level/object.h"
 #include "log.h"
 #include "pic/abc8.h"
 #include "pic/pic8.h"
@@ -60,6 +61,19 @@ bool eol::in_apple_battle() const {
 void apple_battle_progress::clear() { std::ranges::fill(taken, false); }
 
 void apple_battle_progress::record(int object_index) { taken[object_index] = true; }
+
+void apple_battle_progress::apply(const level& lev) const {
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* obj = lev.objects[i];
+        if (!obj) {
+            break;
+        }
+        if (obj->type == object::Type::Food && taken[i] &&
+            obj->property == object::Property::None) {
+            obj->active = false;
+        }
+    }
+}
 
 void eol::record_apple_for_apple_battle(int object_index) {
     if (in_apple_battle()) {

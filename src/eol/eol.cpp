@@ -285,6 +285,10 @@ void eol::download_battle_level() {
 void eol::enter_level(const char* level_name, const level* lev, bool spying) {
     struct enter_level el{.lev = lev, .name = level_name, .spying = spying};
     proto.send(el);
+
+    if (in_apple_battle()) {
+        online_apple_battle.apply(*lev);
+    }
 }
 
 void eol::record_apple_taken(int object_index, int num_apples) {

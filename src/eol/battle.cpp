@@ -108,6 +108,15 @@ void eol::process(const battle_countdown_ended&) {
     StatusMessages->add("battle running");
 }
 
+void eol::process(const restore_apple_battle_progress& e) {
+    static_assert(std::is_same_v<decltype(e.apples_taken), decltype(online_apple_battle.taken)>);
+    std::ranges::copy(e.apples_taken, online_apple_battle.taken);
+
+    auto apple_count = std::ranges::count(e.apples_taken, true);
+    StatusMessages->add(std::format("apple battle progress restored ({} apple{} taken)",
+                                    apple_count, apple_count == 1 ? "" : "s"));
+}
+
 void eol::process(const battle_ended& be) {
     set_battle_results_title("results");
     current_battle.reset();

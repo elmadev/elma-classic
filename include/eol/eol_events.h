@@ -78,6 +78,10 @@ struct apple_taken {
     uint32_t num_apples;
 };
 
+struct restore_apple_battle_progress {
+    bool apples_taken[MAX_OBJECTS];
+};
+
 struct clear_spy_data {
     unsigned int kuski_id;
 };

@@ -37,6 +37,7 @@ class eol {
     void process(const battle_time_sync&);
     void process(const battle_line_update&);
     void process(const battle_queue_update&);
+    void process(const restore_apple_battle_progress&);
     void process(const level_download&);
 
     void download_level(std::string_view name);

@@ -84,4 +84,10 @@ struct battle {
     bool download_requested = false;
 };
 
+struct apple_battle_progress {
+    bool taken[MAX_OBJECTS]{};
+    void clear();
+    void record(int object_index);
+};
+
 #endif

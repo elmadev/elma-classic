@@ -293,6 +293,8 @@ void eol::record_apple_taken(int object_index, int num_apples) {
         return;
     }
 
+    record_apple_for_apple_battle(object_index);
+
     proto.send(apple_taken{
         .apple_index = static_cast<uint8_t>(object_index),
         .num_apples = static_cast<uint32_t>(num_apples),

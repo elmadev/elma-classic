@@ -57,11 +57,22 @@ bool eol::in_apple_battle() const {
     return current_battle && current_battle->type == BattleType::Apple && proto.in_battle_level();
 }
 
+void apple_battle_progress::clear() { std::ranges::fill(taken, false); }
+
+void apple_battle_progress::record(int object_index) { taken[object_index] = true; }
+
+void eol::record_apple_for_apple_battle(int object_index) {
+    if (in_apple_battle()) {
+        online_apple_battle.record(object_index);
+    }
+}
+
 void eol::process(const battle_started& bs) {
     current_battle = bs.bat;
     current_battle->level_exists = std::filesystem::exists(
         std::format("lev/{}.lev", (const char*)current_battle->level_filename));
     battle_leaderboard_.clear();
+    online_apple_battle.clear();
     set_battle_results_title("standings");
     sync_battle_results_table();
 
@@ -86,6 +97,7 @@ void eol::process(const battle_countdown_ended&) {
 void eol::process(const battle_ended& be) {
     set_battle_results_title("results");
     current_battle.reset();
+    online_apple_battle.clear();
     StatusMessages->add(be.aborted ? "battle aborted" : "battle over");
 }
 

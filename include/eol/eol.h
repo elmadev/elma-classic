@@ -77,6 +77,8 @@ class eol {
 
     void set_battle_results_title(const char* label);
 
+    void record_apple_for_apple_battle(int object_index);
+
     const std::vector<kuski>& all_kuskis() const { return kuskis_; }
     std::string_view lookup_nick(unsigned int kuski_id) const;
 
@@ -95,6 +97,7 @@ class eol {
     unsigned int id2;
     std::vector<kuski> kuskis_;
     std::optional<battle> current_battle;
+    apple_battle_progress online_apple_battle;
     std::vector<battle_leaderboard_entry> battle_leaderboard_;
     std::vector<battle_queue_entry> battle_queue_;
     eol_table* cur_table;

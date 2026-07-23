@@ -148,7 +148,8 @@ void balls_simulate(double dt) {
     // At least one collision will occur during dt
     // Or alternatively, some collision times are unknown
     // Handle all the collisions
-    while (true) {
+    // Cap iterations to 20 to prevent menu freeze if window is small causing infinite collisions
+    for (int iterations = 0; iterations < 20; iterations++) {
         // Update all the collision times and get the next collision time
         int collider1;
         int collider2;

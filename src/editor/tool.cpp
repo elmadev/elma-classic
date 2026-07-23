@@ -421,7 +421,7 @@ void tool_create_food_rightclick() {
                                   &DefaultFoodAnimation);
 }
 
-void tool_create_object_leftclick(int mouse_x, int mouse_y, bool is_food) {
+void tool_create_object_leftclick(int mouse_x, int mouse_y, object::Type type) {
     int object_count = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
         if (Level->objects[i]) {
@@ -440,12 +440,8 @@ void tool_create_object_leftclick(int mouse_x, int mouse_y, bool is_food) {
         if (!Level->objects[i]) {
             double x = pixel_to_meter_x(mouse_x);
             double y = pixel_to_meter_y(mouse_y);
-            object::Type type = object::Type::Food;
-            if (!is_food) {
-                type = object::Type::Killer;
-            }
             Level->objects[i] = new object(x, y, type);
-            if (is_food) {
+            if (type == object::Type::Food) {
                 Level->objects[i]->property = DefaultFoodProperty;
                 Level->objects[i]->animation = DefaultFoodAnimation;
             }
@@ -464,12 +460,20 @@ void tool_delete_object_leftclick(int mouse_x, int mouse_y) {
     if (!obj) {
         return;
     }
+
+    int obj_count = 0;
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        if (Level->objects[i]) {
+            obj_count++;
+        }
+    }
+    if (obj_count <= 2) {
+        dialog("A level must contain at least two objects!");
+        return;
+    }
+
     for (int i = 0; i < MAX_OBJECTS; i++) {
         if (Level->objects[i] == obj) {
-            if (obj->type == object::Type::Exit) {
-                dialog("You cannot delete the Exit object!");
-                return;
-            }
             if (obj->type == object::Type::Start) {
                 dialog("You cannot delete the Start object!");
                 return;

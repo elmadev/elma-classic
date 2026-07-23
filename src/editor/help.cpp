@@ -158,6 +158,11 @@ void editor_help_create_killer() {
         "mouse button to place a new killer object. You can see a 'K' inside the killer objects.");
 }
 
+void editor_help_create_exit() {
+    dialog("With the Create Exit tool you can create new exit objects. Just click the left",
+           "mouse button to place a new exit object. You can see an 'E' inside the exit objects.");
+}
+
 void editor_help_delete_object() {
     dialog(
         "With the Delete Object tool you can delete food and killer objects. Just click the left",

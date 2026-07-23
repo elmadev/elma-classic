@@ -21,7 +21,7 @@ void tool_delete_polygon_leftclick(int mouse_x, int mouse_y);
 extern object::Property DefaultFoodProperty;
 extern int DefaultFoodAnimation;
 void tool_create_food_rightclick();
-void tool_create_object_leftclick(int mouse_x, int mouse_y, bool is_food);
+void tool_create_object_leftclick(int mouse_x, int mouse_y, object::Type type);
 void tool_delete_object_leftclick(int mouse_x, int mouse_y);
 
 void tool_create_sprite_leftclick(int mouse_x, int mouse_y);

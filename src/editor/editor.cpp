@@ -42,33 +42,34 @@ bool LevelChanged = false;
 palette* EditorPalette = nullptr;
 
 constexpr int COMMANDS_LENGTH = 13;
-constexpr int TOOLS_LENGTH = 10;
+constexpr int TOOLS_LENGTH = 11;
 constexpr int MENU_LENGTH = COMMANDS_LENGTH + TOOLS_LENGTH;
 constexpr int MENU_ENTRY_HEIGHT = 19;
 
-constexpr char MENU_TEXT[23][15] = {"Exit",
-                                    "New",
-                                    "Open",
-                                    "Save As",
-                                    "Save",
-                                    "Save and Play",
-                                    "Check Topology",
-                                    "Properties",
-                                    "Zoom Out",
-                                    "Zoom Fill",
-                                    "View Options",
-                                    "Help",
-                                    "",
-                                    "Move",
-                                    "Zoom In",
-                                    "Create Vertex",
-                                    "Delete Vertex",
-                                    "Delete Polygon",
-                                    "Create Food",
-                                    "Create Killer",
-                                    "Delete Object",
-                                    "Create Picture",
-                                    "Delete Picture"};
+constexpr char MENU_TEXT[MENU_LENGTH][15] = {"Exit",
+                                             "New",
+                                             "Open",
+                                             "Save As",
+                                             "Save",
+                                             "Save and Play",
+                                             "Check Topology",
+                                             "Properties",
+                                             "Zoom Out",
+                                             "Zoom Fill",
+                                             "View Options",
+                                             "Help",
+                                             "",
+                                             "Move",
+                                             "Zoom In",
+                                             "Create Vertex",
+                                             "Delete Vertex",
+                                             "Delete Polygon",
+                                             "Create Food",
+                                             "Create Killer",
+                                             "Create Exit",
+                                             "Delete Object",
+                                             "Create Picture",
+                                             "Delete Picture"};
 
 enum class Tool {
     Move = 0,
@@ -78,6 +79,7 @@ enum class Tool {
     DeletePolygon,
     CreateFood,
     CreateKiller,
+    CreateExit,
     DeleteObject,
     CreateSprite,
     DeleteSprite
@@ -240,6 +242,9 @@ void draw_tooltip_help() {
         break;
     case Tool::CreateKiller:
         draw_tooltip("Left click to place a new Killer object.");
+        break;
+    case Tool::CreateExit:
+        draw_tooltip("Left click to place a new Exit object.");
         break;
     case Tool::DeleteObject:
         draw_tooltip("Left click near the center of the object you want to delete.");
@@ -775,10 +780,12 @@ void editor() {
                 } else if (i == 6) {
                     editor_help_create_killer();
                 } else if (i == 7) {
-                    editor_help_delete_object();
+                    editor_help_create_exit();
                 } else if (i == 8) {
-                    editor_help_create_sprite();
+                    editor_help_delete_object();
                 } else if (i == 9) {
+                    editor_help_create_sprite();
+                } else if (i == 10) {
                     editor_help_delete_sprite();
                 }
             }
@@ -811,13 +818,16 @@ void editor() {
                 tool_delete_polygon_leftclick(click_x, click_y);
             }
             if (SelectedTool == Tool::CreateFood && left_click) {
-                tool_create_object_leftclick(click_x, click_y, true);
+                tool_create_object_leftclick(click_x, click_y, object::Type::Food);
             }
             if (SelectedTool == Tool::CreateFood && right_click) {
                 tool_create_food_rightclick();
             }
             if (SelectedTool == Tool::CreateKiller && left_click) {
-                tool_create_object_leftclick(click_x, click_y, false);
+                tool_create_object_leftclick(click_x, click_y, object::Type::Killer);
+            }
+            if (SelectedTool == Tool::CreateExit && left_click) {
+                tool_create_object_leftclick(click_x, click_y, object::Type::Exit);
             }
             if (SelectedTool == Tool::DeleteObject && left_click) {
                 tool_delete_object_leftclick(click_x, click_y);

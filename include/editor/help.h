@@ -22,6 +22,7 @@ void editor_help_delete_vertex();
 void editor_help_delete_polygon();
 void editor_help_create_food();
 void editor_help_create_killer();
+void editor_help_create_exit();
 void editor_help_delete_object();
 void editor_help_create_sprite();
 void editor_help_delete_sprite();

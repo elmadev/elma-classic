@@ -509,6 +509,12 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     bool both_bikes_alive = true;
     while (true) {
+        const bool frozen = time == 0.0 && current_camera.mode != CameraMode::MapViewer &&
+                            EolClient->bike_frozen_by_countdown();
+        if (frozen) {
+            stopwatch_reset();
+        }
+
         // Get timestep
         double target_time = stopwatch() * 0.0024;
         target_time = std::max(0.000001, target_time);
@@ -517,100 +523,103 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
         bool console_was_active = handle_console_input();
 
-        while (time <= target_time - 0.000001) {
-            // Cap slowest frame to 0.0055 (approximately 12.6 milliseconds or 79.4 fps)
-            double dt = 0.0055;
-            if (time + dt > target_time) {
-                dt = target_time - time;
-            }
+        if (!frozen) {
+            while (time <= target_time - 0.000001) {
+                // Cap slowest frame to 0.0055 (approximately 12.6 milliseconds or 79.4 fps)
+                double dt = 0.0055;
+                if (time + dt > target_time) {
+                    dt = target_time - time;
+                }
 
-            if (current_camera.mode == CameraMode::MapViewer) {
-                update_freecam(dt, current_camera);
-                time += dt;
-                continue;
-            }
+                if (current_camera.mode == CameraMode::MapViewer) {
+                    update_freecam(dt, current_camera);
+                    time += dt;
+                    continue;
+                }
 
-            if (!driv1.dead) {
-                physics_subframe(driv1, time, dt);
-            }
-            if (!Single && !driv2.dead) {
-                physics_subframe(driv2, time, dt);
-            }
+                if (!driv1.dead) {
+                    physics_subframe(driv1, time, dt);
+                }
+                if (!Single && !driv2.dead) {
+                    physics_subframe(driv2, time, dt);
+                }
 
-            if (!Single && both_bikes_alive) {
-                // If both die at same time, player 1 is considered to have died first
-                if (driv1.dead) {
+                if (!Single && both_bikes_alive) {
+                    // If both die at same time, player 1 is considered to have died first
+                    if (driv1.dead) {
+                        stop_motor_sound(true);
+                        WhoDiedFirst = 1;
+                        both_bikes_alive = false;
+                    } else if (driv2.dead) {
+                        stop_motor_sound(false);
+                        WhoDiedFirst = 2;
+                        both_bikes_alive = false;
+                    }
+                }
+
+                if (driv1.finish_time || driv2.finish_time ||
+                    (driv1.dead && (Single || driv2.dead))) {
+                    int finish_time = driv1.finish_time;
+                    if (driv2.finish_time) {
+                        finish_time = driv2.finish_time;
+                    }
+
+                    if (finish_time) {
+                        WhoDiedFirst = 0;
+                    }
+                    Player1Finished = (bool)driv1.finish_time;
+
+                    set_motor_frequency(true, 1.0, 0);
+                    set_motor_frequency(false, 1.0, 0);
+                    if (finish_time) {
+                        start_wav(WavEvent::Win, 0.999);
+                    } else {
+                        start_wav(WavEvent::Dead, 0.999);
+                    }
+                    delay((int)(LevelEndDelay * 1000.0));
+
+                    Console->deactivate_input();
+
                     stop_motor_sound(true);
-                    WhoDiedFirst = 1;
-                    both_bikes_alive = false;
-                } else if (driv2.dead) {
                     stop_motor_sound(false);
-                    WhoDiedFirst = 2;
-                    both_bikes_alive = false;
+                    Mute = true;
+
+                    if (Single) {
+                        EolClient->exit_level(filename, time * TIME_TO_CENTISECONDS,
+                                              Motor1->apple_count, TotalApples, !finish_time);
+                    }
+
+                    Level->unflip_objects();
+                    Rec1->encode_frame_count();
+                    Rec2->encode_frame_count();
+                    if (finish_time) {
+                        return finish_time;
+                    }
+                    return -1;
                 }
+                time += dt;
             }
 
-            if (driv1.finish_time || driv2.finish_time || (driv1.dead && (Single || driv2.dead))) {
-                int finish_time = driv1.finish_time;
-                if (driv2.finish_time) {
-                    finish_time = driv2.finish_time;
-                }
-
-                if (finish_time) {
-                    WhoDiedFirst = 0;
-                }
-                Player1Finished = (bool)driv1.finish_time;
-
-                set_motor_frequency(true, 1.0, 0);
-                set_motor_frequency(false, 1.0, 0);
-                if (finish_time) {
-                    start_wav(WavEvent::Win, 0.999);
-                } else {
-                    start_wav(WavEvent::Dead, 0.999);
-                }
-                delay((int)(LevelEndDelay * 1000.0));
-
-                Console->deactivate_input();
-
-                stop_motor_sound(true);
-                stop_motor_sound(false);
-                Mute = true;
-
-                if (Single) {
-                    EolClient->exit_level(filename, time * TIME_TO_CENTISECONDS,
-                                          Motor1->apple_count, TotalApples, !finish_time);
-                }
-
-                Level->unflip_objects();
-                Rec1->encode_frame_count();
-                Rec2->encode_frame_count();
-                if (finish_time) {
-                    return finish_time;
-                }
-                return -1;
+            if (!Single && FlagTag) {
+                flagtag(time);
             }
-            time += dt;
-        }
 
-        if (!Single && FlagTag) {
-            flagtag(time);
-        }
+            set_motor_frequency(true, driv1.sound.motor_frequency, driv1.sound.gas);
+            if (Single) {
+                set_friction_volume(driv1.sound.friction_volume);
+            } else {
+                set_friction_volume(driv1.sound.friction_volume + driv2.sound.friction_volume);
+                set_motor_frequency(false, driv2.sound.motor_frequency, driv2.sound.gas);
+            }
 
-        set_motor_frequency(true, driv1.sound.motor_frequency, driv1.sound.gas);
-        if (Single) {
-            set_friction_volume(driv1.sound.friction_volume);
-        } else {
-            set_friction_volume(driv1.sound.friction_volume + driv2.sound.friction_volume);
-            set_motor_frequency(false, driv2.sound.motor_frequency, driv2.sound.gas);
-        }
-
-        // Turn state
-        physics_frame_turn(driv1);
-        if (camera_mode != CameraMode::MapViewer) {
-            EolClient->send_kuski_data(time * TIME_TO_CENTISECONDS, driv1);
-        }
-        if (!Single) {
-            physics_frame_turn(driv2);
+            // Turn state
+            physics_frame_turn(driv1);
+            if (camera_mode != CameraMode::MapViewer) {
+                EolClient->send_kuski_data(time * TIME_TO_CENTISECONDS, driv1);
+            }
+            if (!Single) {
+                physics_frame_turn(driv2);
+            }
         }
 
         // Turn phase and arm position

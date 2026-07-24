@@ -1046,7 +1046,13 @@ lgrfile::~lgrfile() {
 void lgrfile::sanitize_default_texture_names(char* fg_name, char* bg_name) {
     // Disallow identical foreground/background textures
     if (strcmpi(fg_name, bg_name) == 0) {
-        bg_name[0] = 0;
+        if (EolSettings->default_sky() && !EolSettings->default_ground()) {
+            // Prioritize texture override over level-defined texture
+            fg_name[0] = 0;
+        } else {
+            // Default case
+            bg_name[0] = 0;
+        }
     }
 
     // Erase missing texture names
@@ -1093,8 +1099,16 @@ void lgrfile::sanitize_default_texture_names(char* fg_name, char* bg_name) {
 void lgrfile::reload_default_textures(level& lev, bool force) {
     char level_foreground_name[10] = {};
     char level_background_name[10] = {};
-    strncpy(level_foreground_name, lev.foreground_name, sizeof(level_foreground_name) - 1);
-    strncpy(level_background_name, lev.background_name, sizeof(level_background_name) - 1);
+    if (EolSettings->default_ground()) {
+        strcpy(level_foreground_name, "ground");
+    } else {
+        strncpy(level_foreground_name, lev.foreground_name, sizeof(level_foreground_name) - 1);
+    }
+    if (EolSettings->default_sky()) {
+        strcpy(level_background_name, "sky");
+    } else {
+        strncpy(level_background_name, lev.background_name, sizeof(level_background_name) - 1);
+    }
     sanitize_default_texture_names(level_foreground_name, level_background_name);
 
     // Recreate background texture

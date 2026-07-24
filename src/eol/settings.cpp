@@ -1,4 +1,5 @@
 #include "eol/settings.h"
+#include "editor/editor.h"
 #include "game/level_load.h"
 #include "game/state.h"
 #include "main.h"
@@ -67,8 +68,18 @@ void eol_settings::set_screen_width(int w) { screen_width_ = w; }
 void eol_settings::set_screen_height(int h) { screen_height_ = h; }
 
 void eol_settings::set_pictures_in_background(bool b) { pictures_in_background_ = b; }
-void eol_settings::set_default_ground(bool b) { default_ground_ = b; }
-void eol_settings::set_default_sky(bool b) { default_sky_ = b; }
+void eol_settings::set_default_ground(bool b) {
+    default_ground_ = b;
+    if (Level && Lgr) {
+        Lgr->reload_default_textures(*Level, false);
+    }
+}
+void eol_settings::set_default_sky(bool b) {
+    default_sky_ = b;
+    if (Level && Lgr) {
+        Lgr->reload_default_textures(*Level, false);
+    }
+}
 void eol_settings::set_default_ground_sky_key(combo_scancode key) { default_ground_sky_key_ = key; }
 
 void eol_settings::set_center_camera(bool b) { center_camera_ = b; }

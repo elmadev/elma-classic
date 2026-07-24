@@ -24,6 +24,7 @@
 #include <cmath>
 #include <cstring>
 #include <filesystem>
+#include <optional>
 
 int Single = 1;
 int FlagTag = 0;
@@ -35,6 +36,24 @@ int VideoFrameIndex = 0;
 std::string VideoOutputDirectory;
 
 static int TotalApples;
+
+static std::optional<BattleAttributes::Kind> BattleRunCripples;
+
+static BattleAttributes::Kind active_cripples() {
+    using namespace BattleAttributes;
+    if (BattleRunCripples) {
+        return *BattleRunCripples;
+    }
+    int cripples = 0;
+    cripples |= EolSettings->cripple_no_volt() ? NoVolt : 0;
+    cripples |= EolSettings->cripple_no_turn() ? NoTurn : 0;
+    cripples |= EolSettings->cripple_one_turn() ? OneTurn : 0;
+    cripples |= EolSettings->cripple_no_brake() ? NoBrake : 0;
+    cripples |= EolSettings->cripple_no_throttle() ? NoThrottle : 0;
+    cripples |= EolSettings->cripple_always_throttle() ? AlwaysThrottle : 0;
+    cripples |= EolSettings->cripple_drunk() ? Drunk : 0;
+    return static_cast<Kind>(cripples);
+}
 
 // Returns whether console was active at the beginning of this frame,
 // to prevent key presses from affecting the gameplay.
@@ -145,24 +164,26 @@ static void physics_subframe(driver& driv, double time, double dt) {
     bool is_right_volt_down = is_game_key_down(keys->right_volt);
     bool is_left_volt_down = is_game_key_down(keys->left_volt);
 
-    if (EolSettings->cripple_drunk() && ((mot->apple_count - mot->apple_bug_count) & 1)) {
+    using namespace BattleAttributes;
+    const Kind cripples = active_cripples();
+    if ((cripples & Drunk) && ((mot->apple_count - mot->apple_bug_count) & 1)) {
         std::swap(is_gas_down, is_brake_down);
         std::swap(is_right_volt_down, is_left_volt_down);
     }
-    if (EolSettings->cripple_no_brake()) {
+    if (cripples & NoBrake) {
         is_brake_down = false;
     }
-    if (EolSettings->cripple_no_throttle()) {
+    if (cripples & NoThrottle) {
         is_gas_down = false;
     }
-    if (EolSettings->cripple_always_throttle()) {
+    if (cripples & AlwaysThrottle) {
         is_gas_down = true;
         is_brake_down = false;
     }
 
     bool right_volt = false;
     bool left_volt = false;
-    if (time > metadata->volt_time + VoltDelay && !EolSettings->cripple_no_volt()) {
+    if (time > metadata->volt_time + VoltDelay && !(cripples & NoVolt)) {
         if (is_right_volt_down || is_game_key_down(keys->alovolt)) {
             right_volt = true;
             metadata->volt_time = time;
@@ -337,11 +358,13 @@ static void physics_frame_turn(driver& driv) {
     bike_metadata* metadata = &driv.meta;
 
     if (!driv.dead) {
+        using namespace BattleAttributes;
+        const Kind cripples = active_cripples();
         bool is_turn_down = is_game_key_down(keys->turn);
-        if (EolSettings->cripple_no_turn()) {
+        if (cripples & NoTurn) {
             is_turn_down = false;
         }
-        if (EolSettings->cripple_one_turn() && metadata->one_turn_used) {
+        if ((cripples & OneTurn) && metadata->one_turn_used) {
             is_turn_down = false;
         }
         if (!metadata->turn_key_previous && is_turn_down) {
@@ -480,6 +503,11 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     if (Single) {
         EolClient->enter_level(filename, Level, camera_mode == CameraMode::MapViewer);
+    }
+
+    BattleRunCripples.reset();
+    if (Single && camera_mode != CameraMode::MapViewer) {
+        BattleRunCripples = EolClient->battle_cripples();
     }
 
     stopwatch_reset();

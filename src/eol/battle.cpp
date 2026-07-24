@@ -75,6 +75,14 @@ bool eol::bike_frozen_by_countdown() const {
            get_milliseconds() < current_battle->local_start_ms;
 }
 
+std::optional<BattleAttributes::Kind> eol::battle_cripples() const {
+    if (!current_battle || !proto.playing_battle_level()) {
+        return std::nullopt;
+    }
+    using namespace BattleAttributes;
+    return static_cast<Kind>(current_battle->attributes & CrippleMask);
+}
+
 void apple_battle_progress::clear() { std::ranges::fill(taken, false); }
 
 void apple_battle_progress::record(int object_index) { taken[object_index] = true; }

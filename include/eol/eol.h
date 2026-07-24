@@ -62,6 +62,7 @@ class eol {
     void render_battle_countdown(pic8& dest, abc8& large_font, abc8& data_font) const;
 
     bool in_apple_battle() const;
+    std::optional<BattleAttributes::Kind> battle_cripples() const;
 
     bool bike_frozen_by_countdown() const;
 

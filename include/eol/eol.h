@@ -62,6 +62,8 @@ class eol {
 
     bool in_apple_battle() const;
 
+    bool bike_frozen_by_countdown() const;
+
     void record_apple_taken(int object_index, int num_apples);
 
     void toggle_battle_results() { set_table(TableType::BattleResults); }

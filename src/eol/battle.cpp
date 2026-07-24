@@ -59,6 +59,22 @@ bool eol::in_apple_battle() const {
            proto.playing_battle_level();
 }
 
+static bool has_countdown(BattleType t) {
+    using enum BattleType;
+    return t == OneLife || t == FirstFinish || t == Apple || t == FinishCount || t == FlagTag;
+}
+
+// Flag tag shows the countdown but lets you drive while waiting for the flag.
+static bool freezes_during_countdown(BattleType t) {
+    return has_countdown(t) && t != BattleType::FlagTag;
+}
+
+bool eol::bike_frozen_by_countdown() const {
+    return current_battle && current_battle->in_countdown &&
+           freezes_during_countdown(current_battle->type) && proto.playing_battle_level() &&
+           get_milliseconds() < current_battle->local_start_ms;
+}
+
 void apple_battle_progress::clear() { std::ranges::fill(taken, false); }
 
 void apple_battle_progress::record(int object_index) { taken[object_index] = true; }

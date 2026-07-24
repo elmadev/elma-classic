@@ -1043,6 +1043,53 @@ lgrfile::~lgrfile() {
     }
 }
 
+void lgrfile::sanitize_default_texture_names() {
+    // Disallow identical foreground/background textures
+    if (strcmpi(Level->foreground_name, Level->background_name) == 0) {
+        Level->background_name[0] = 0;
+    }
+
+    // Erase missing texture names
+    if (get_texture_index(Level->foreground_name) < 0) {
+        Level->foreground_name[0] = 0;
+    }
+
+    if (get_texture_index(Level->background_name) < 0) {
+        Level->background_name[0] = 0;
+    }
+
+    if (texture_count < 2) {
+        internal_error("Lgr must have at least 2 textures!");
+    }
+
+    // If we have missing/invalid texture name, replace the name with a texture from the list.
+    // Skip qgrass since it isn't a typical foreground/background texture; fall back to it only
+    // when no other texture is available.
+    auto pick_default_texture = [&](const char* exclude_name) -> const char* {
+        const char* qgrass_fallback = nullptr;
+        for (int i = 0; i < texture_count; i++) {
+            const char* name = textures[i].name;
+            if (strcmpi(name, exclude_name) == 0) {
+                continue;
+            }
+            if (textures[i].is_qgrass) {
+                qgrass_fallback = name;
+                continue;
+            }
+            return name;
+        }
+        return qgrass_fallback;
+    };
+
+    if (!Level->foreground_name[0]) {
+        strcpy(Level->foreground_name, pick_default_texture(Level->background_name));
+    }
+
+    if (!Level->background_name[0]) {
+        strcpy(Level->background_name, pick_default_texture(Level->foreground_name));
+    }
+}
+
 void lgrfile::reload_default_textures(bool force) {
     if (!Level->foreground_name[0] || !Level->background_name[0]) {
         internal_error("!Level->foreground_name[0] || !Level->background_name[0]");

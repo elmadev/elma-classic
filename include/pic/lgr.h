@@ -118,6 +118,7 @@ class lgrfile {
     int foreground_original_width;
     char foreground_name[10];
     char background_name[10];
+    void sanitize_default_texture_names();
     void reload_default_textures(bool force = false);
 
     // From QCOLORS.pcx

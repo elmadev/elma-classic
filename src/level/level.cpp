@@ -1113,6 +1113,7 @@ int level::initialize_objects(motorst* mot) {
                 mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
                 mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;
                 mot->body_r = mot->body_r + BikeStartOffset;
+                mot->head_r = mot->head_r + BikeStartOffset;
             }
         }
     }

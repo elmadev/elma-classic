@@ -1,5 +1,6 @@
 #include "physics/init.h"
 #include "eol/settings.h"
+#include "physics/forces.h"
 
 static motorst Motorst1;
 static motorst Motorst2;
@@ -70,6 +71,8 @@ void init_motor(motorst* motor) {
 
     motor->body_r = vect2(2.75, 4.04);
     motor->body_v = vect2(0.0, 0.0);
+
+    set_head_position(motor);
 }
 
 void set_zoom_factor() {

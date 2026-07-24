@@ -34,6 +34,7 @@ static bool GameBackgroundRender = false;
 
 static abc8* SmallFont = nullptr;
 static abc8* MediumFont = nullptr;
+static abc8* LargeFont = nullptr;
 
 // Percentage of the screen used to render the game (QFRAME drawn on the edge)
 static double VisibleFraction = 1.0;
@@ -92,6 +93,7 @@ void init_renderer() {
 
     SmallFont = new abc8("small.abc", 1, 12);
     MediumFont = new abc8("medium.abc", 1, 18);
+    LargeFont = new abc8("large.abc", 2, 90);
 
     Console = new console();
     Console->register_console_commands();
@@ -880,6 +882,7 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     StatusMessages->render(*pic, *SmallFont);
     EolClient->render_table(*pic, *MediumFont, *SmallFont);
     EolClient->render_battle_status(*pic, *SmallFont);
+    EolClient->render_battle_countdown(*pic, *LargeFont, *SmallFont);
 
     // Conditionally save screenshot
     handle_screenshot(pic);

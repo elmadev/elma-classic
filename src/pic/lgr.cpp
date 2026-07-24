@@ -1043,19 +1043,19 @@ lgrfile::~lgrfile() {
     }
 }
 
-void lgrfile::sanitize_default_texture_names() {
+void lgrfile::sanitize_default_texture_names(char* fg_name, char* bg_name) {
     // Disallow identical foreground/background textures
-    if (strcmpi(Level->foreground_name, Level->background_name) == 0) {
-        Level->background_name[0] = 0;
+    if (strcmpi(fg_name, bg_name) == 0) {
+        bg_name[0] = 0;
     }
 
     // Erase missing texture names
-    if (get_texture_index(Level->foreground_name) < 0) {
-        Level->foreground_name[0] = 0;
+    if (get_texture_index(fg_name) < 0) {
+        fg_name[0] = 0;
     }
 
-    if (get_texture_index(Level->background_name) < 0) {
-        Level->background_name[0] = 0;
+    if (get_texture_index(bg_name) < 0) {
+        bg_name[0] = 0;
     }
 
     if (texture_count < 2) {
@@ -1081,23 +1081,25 @@ void lgrfile::sanitize_default_texture_names() {
         return qgrass_fallback;
     };
 
-    if (!Level->foreground_name[0]) {
-        strcpy(Level->foreground_name, pick_default_texture(Level->background_name));
+    if (!fg_name[0]) {
+        strcpy(fg_name, pick_default_texture(bg_name));
     }
 
-    if (!Level->background_name[0]) {
-        strcpy(Level->background_name, pick_default_texture(Level->foreground_name));
+    if (!bg_name[0]) {
+        strcpy(bg_name, pick_default_texture(fg_name));
     }
 }
 
-void lgrfile::reload_default_textures(bool force) {
-    if (!Level->foreground_name[0] || !Level->background_name[0]) {
-        internal_error("!Level->foreground_name[0] || !Level->background_name[0]");
-    }
+void lgrfile::reload_default_textures(level& lev, bool force) {
+    char level_foreground_name[10] = {};
+    char level_background_name[10] = {};
+    strncpy(level_foreground_name, lev.foreground_name, sizeof(level_foreground_name) - 1);
+    strncpy(level_background_name, lev.background_name, sizeof(level_background_name) - 1);
+    sanitize_default_texture_names(level_foreground_name, level_background_name);
 
     // Recreate background texture
-    if (force || strcmpi(background_name, Level->background_name) != 0) {
-        strcpy(background_name, Level->background_name);
+    if (force || strcmpi(background_name, level_background_name) != 0) {
+        strcpy(background_name, level_background_name);
         delete background;
         background = nullptr;
 
@@ -1111,8 +1113,8 @@ void lgrfile::reload_default_textures(bool force) {
     }
 
     // Recreate foreground texture
-    if (force || strcmpi(foreground_name, Level->foreground_name) != 0) {
-        strcpy(foreground_name, Level->foreground_name);
+    if (force || strcmpi(foreground_name, level_foreground_name) != 0) {
+        strcpy(foreground_name, level_foreground_name);
         delete foreground;
         foreground = nullptr;
 

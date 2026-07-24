@@ -191,9 +191,6 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
             }
         }
     }
-
-    Lgr->sanitize_default_texture_names();
-
     return sprites_deleted;
 }
 

@@ -5,6 +5,7 @@
 
 class anim;
 class grass;
+class level;
 class palette;
 class pic8;
 class piclist;
@@ -75,6 +76,8 @@ class lgrfile {
     void add_texture(pic8* pic, piclist* list, int index);
     void add_mask(pic8* pic, piclist* list, int index);
 
+    void sanitize_default_texture_names(char* fg_name, char* bg_name);
+
     static bool try_load_lgr(const char* lgr_name, const char* desc);
     lgrfile(const char* lgrname);
     ~lgrfile();
@@ -118,8 +121,7 @@ class lgrfile {
     int foreground_original_width;
     char foreground_name[10];
     char background_name[10];
-    void sanitize_default_texture_names();
-    void reload_default_textures(bool force = false);
+    void reload_default_textures(level& lev, bool force);
 
     // From QCOLORS.pcx
     unsigned char minimap_foreground_palette_id;

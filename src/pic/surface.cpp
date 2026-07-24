@@ -17,7 +17,7 @@ void on_resolution_change() {
     editor_canvas_update_resolution();
     reinit_menu_pictures();
     if (Level && Lgr) {
-        Lgr->reload_default_textures(true);
+        Lgr->reload_default_textures(*Level, true);
     }
     invalidate_editor_gui();
     reset_game_background();

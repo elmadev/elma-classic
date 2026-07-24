@@ -60,6 +60,7 @@
 * Editor cursor no longer disappears when inputting a clipping or distance
 * When saving internal replay, internal number and name will be shown instead of QWQUU0XX.lev
 * Flowers can be created/deleted in the internal editor.
+* Default foreground/background textures no longer get reset if texture not found or wrong lgr used
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems

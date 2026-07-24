@@ -399,6 +399,30 @@ static void handle_eol_inputs() {
     if (was_game_key_just_pressed(State->key_battle_leader)) {
         EolClient->toggle_show_battle_leader();
     }
+
+    if (was_game_key_just_pressed(State->key_default_ground_sky)) {
+        int permutation = (EolSettings->default_ground() << 1) | (EolSettings->default_sky() << 0);
+        permutation = (permutation + 3) % 4;
+        bool ground = (permutation & 0b10) != 0;
+        bool sky = (permutation & 0b01) != 0;
+
+        EolSettings->set_default_ground(ground);
+        EolSettings->set_default_sky(sky);
+
+        if (!ground && !sky) {
+            StatusMessages->add("texture override disabled");
+        }
+        if (ground && sky) {
+            StatusMessages->add(
+                "overriding foreground and background textures with \"ground\" and \"sky\"");
+        }
+        if (ground && !sky) {
+            StatusMessages->add("overriding foreground texture with \"ground\"");
+        }
+        if (!ground && sky) {
+            StatusMessages->add("overriding background texture with \"sky\"");
+        }
+    }
 }
 
 // Common setup function

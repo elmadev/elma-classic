@@ -381,6 +381,7 @@ static void load_universal_controls(menu_nav* nav) {
     load_control(nav, UniversalKeys, "Dec. Screen Size", &State->key_decrease_screen_size);
     load_control(nav, UniversalKeys, "Make a Screenshot", &State->key_screenshot);
     load_control(nav, UniversalKeys, "Escape Alias", &State->key_escape_alias);
+    load_control(nav, UniversalKeys, "Toggle Ground/Sky", &State->key_default_ground_sky);
 }
 
 // Setup the menu to display the replay controls

@@ -488,7 +488,10 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->keys2.brake_alias = EolSettings->brake_alias_key_player_b();
     s->keys1.one_frame_brake = EolSettings->one_frame_brake_key_player_a();
     s->keys2.one_frame_brake = EolSettings->one_frame_brake_key_player_b();
+
     s->key_escape_alias = EolSettings->escape_alias_key();
+    s->key_default_ground_sky = EolSettings->default_ground_sky_key();
+
     s->key_replay_fast_2x = EolSettings->replay_fast_2x_key();
     s->key_replay_fast_4x = EolSettings->replay_fast_4x_key();
     s->key_replay_fast_8x = EolSettings->replay_fast_8x_key();
@@ -521,7 +524,10 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_brake_alias_key_player_b(s->keys2.brake_alias);
     EolSettings->persist_one_frame_brake_key_player_a(s->keys1.one_frame_brake);
     EolSettings->persist_one_frame_brake_key_player_b(s->keys2.one_frame_brake);
+
     EolSettings->persist_escape_alias_key(s->key_escape_alias);
+    EolSettings->persist_default_ground_sky_key(s->key_default_ground_sky);
+
     EolSettings->persist_replay_fast_2x_key(s->key_replay_fast_2x);
     EolSettings->persist_replay_fast_4x_key(s->key_replay_fast_4x);
     EolSettings->persist_replay_fast_8x_key(s->key_replay_fast_8x);

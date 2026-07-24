@@ -335,6 +335,28 @@ void eol::render_battle_status(pic8& dest, abc8& font) const {
     font.write_centered(&dest, dest.get_width() / 2, y - font.line_height(), leader_line.c_str());
 }
 
+void eol::render_battle_countdown(pic8& dest, abc8& large_font, abc8& data_font) const {
+    if (!current_battle || !has_countdown(current_battle->type) ||
+        current_battle->countdown_seconds == 0 || !proto.playing_battle_level()) {
+        return;
+    }
+
+    const long long remaining_ms = current_battle->local_start_ms - get_milliseconds();
+
+    std::string text;
+    if (current_battle->in_countdown && remaining_ms > 0) {
+        text = std::format("{}", std::max(1LL, (remaining_ms + 999) / 1000));
+    } else if (remaining_ms > -1000) {
+        // Show for the first second after the battle started
+        text = current_battle->type == BattleType::FlagTag ? "0" : "GOOOOO!!!";
+    } else {
+        return;
+    }
+
+    const int y = eol_table::table_y_offset(dest, data_font) - 106;
+    large_font.write_centered(&dest, dest.get_width() / 2, y, text.c_str());
+}
+
 void eol::process(const battle_queue_update& e) {
     battle_queue_ = e.entries;
     sync_battle_queue_table();

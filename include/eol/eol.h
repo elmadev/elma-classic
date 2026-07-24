@@ -59,6 +59,7 @@ class eol {
     void toggle_battle_status() const;
     void toggle_show_battle_leader() const;
     void render_battle_status(pic8& dest, abc8& font) const;
+    void render_battle_countdown(pic8& dest, abc8& large_font, abc8& data_font) const;
 
     bool in_apple_battle() const;
 

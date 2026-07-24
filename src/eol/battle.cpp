@@ -105,7 +105,7 @@ void eol::process(const battle_countdown_ended&) {
     }
 
     current_battle->in_countdown = false;
-    current_battle->local_start_ms = get_milliseconds();
+    current_battle->local_start_ms = std::min(current_battle->local_start_ms, get_milliseconds());
     StatusMessages->add("battle running");
 }
 

@@ -79,7 +79,12 @@ constexpr int DEFAULT_TCP_PORT = 4470;
 class eol_settings {
     Clamp<int> screen_width_{640, 800, 10000};
     Clamp<int> screen_height_{480, 600, 10000};
+
     Default<bool> pictures_in_background_{false};
+    Default<bool> default_ground_{false};
+    Default<bool> default_sky_{false};
+    Default<combo_scancode> default_ground_sky_key_{combo_scancode{DIK_LCONTROL, DIK_G}};
+
     Default<bool> center_camera_{false};
     Default<bool> center_map_{false};
     Default<MapAlignment> map_alignment_{MapAlignment::None};
@@ -161,7 +166,12 @@ class eol_settings {
 
     DECLARE_FIELD_FUNCS(screen_width);
     DECLARE_FIELD_FUNCS(screen_height);
+
     DECLARE_FIELD_FUNCS(pictures_in_background);
+    DECLARE_FIELD_FUNCS(default_ground);
+    DECLARE_FIELD_FUNCS(default_sky);
+    DECLARE_FIELD_FUNCS(default_ground_sky_key);
+
     DECLARE_FIELD_FUNCS(center_camera);
     DECLARE_FIELD_FUNCS(center_map);
     DECLARE_FIELD_FUNCS(map_alignment);

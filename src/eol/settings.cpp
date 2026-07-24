@@ -67,6 +67,9 @@ void eol_settings::set_screen_width(int w) { screen_width_ = w; }
 void eol_settings::set_screen_height(int h) { screen_height_ = h; }
 
 void eol_settings::set_pictures_in_background(bool b) { pictures_in_background_ = b; }
+void eol_settings::set_default_ground(bool b) { default_ground_ = b; }
+void eol_settings::set_default_sky(bool b) { default_sky_ = b; }
+void eol_settings::set_default_ground_sky_key(combo_scancode key) { default_ground_sky_key_ = key; }
 
 void eol_settings::set_center_camera(bool b) { center_camera_ = b; }
 
@@ -350,7 +353,12 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
 #define FIELD_LIST                                                                                 \
     JSON_FIELD(screen_width)                                                                       \
     JSON_FIELD(screen_height)                                                                      \
+                                                                                                   \
     JSON_FIELD(pictures_in_background)                                                             \
+    JSON_FIELD(default_ground)                                                                     \
+    JSON_FIELD(default_sky)                                                                        \
+    JSON_FIELD(default_ground_sky_key)                                                             \
+                                                                                                   \
     JSON_FIELD(center_camera)                                                                      \
     JSON_FIELD(center_map)                                                                         \
     JSON_FIELD(map_alignment)                                                                      \

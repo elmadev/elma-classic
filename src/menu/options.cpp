@@ -273,6 +273,9 @@ void menu_options() {
                 invalidate_level();
             });
 
+        BOOL_OPTION("Override Ground:", default_ground);
+        BOOL_OPTION("Override Sky:", default_sky);
+
         BOOL_OPTION("Centered Camera:", center_camera);
         BOOL_OPTION("Centered Minimap:", center_map);
 

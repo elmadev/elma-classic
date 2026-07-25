@@ -330,17 +330,11 @@ static void update_graphical_metadata(driver& driv, bool update_rec, double time
     metadata.arm_position = std::max(0.0, 1.0 - (time - metadata.volt_time) / VoltDelay);
 }
 
-// The only physics-relevant part of this function is turning the bike. The rest is "cosmetic" for
-// rendering the frame.
-static void physics_frame_end(driver& driv, double time, bool* other_draw_view) {
+static void physics_frame_turn(driver& driv) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
     bike_metadata* metadata = &driv.meta;
 
-    // Update the hud and player visibility
-    update_view_settings(driv, other_draw_view);
-
-    // Check for bike turn and update turn graphics
     if (!driv.dead) {
         bool is_turn_down = is_game_key_down(keys->turn);
         if (EolSettings->cripple_no_turn()) {
@@ -356,8 +350,6 @@ static void physics_frame_end(driver& driv, double time, bool* other_draw_view) 
         }
         metadata->turn_key_previous = is_turn_down;
     }
-
-    update_graphical_metadata(driv, true, time);
 }
 
 static void handle_eol_inputs() {
@@ -612,13 +604,25 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             set_motor_frequency(false, driv2.sound.motor_frequency, driv2.sound.gas);
         }
 
-        physics_frame_end(driv1, time, &driv2.draw_view);
+        // Turn state
+        physics_frame_turn(driv1);
         if (camera_mode != CameraMode::MapViewer) {
             EolClient->send_kuski_data(time * TIME_TO_CENTISECONDS, driv1);
         }
-
         if (!Single) {
-            physics_frame_end(driv2, time, &driv1.draw_view);
+            physics_frame_turn(driv2);
+        }
+
+        // Turn phase and arm position
+        update_graphical_metadata(driv1, true, time);
+        if (!Single) {
+            update_graphical_metadata(driv2, true, time);
+        }
+
+        // Update the hud and player visibility
+        update_view_settings(driv1, &driv2.draw_view);
+        if (!Single) {
+            update_view_settings(driv2, &driv1.draw_view);
         }
 
         render_game(time, driv1, driv2, current_camera);

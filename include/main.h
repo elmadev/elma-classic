@@ -31,4 +31,11 @@ void delay(int milliseconds);
 [[noreturn]] void external_error(const std::string& message,
                                  std::source_location loc = std::source_location::current());
 
+#define ELMA_ASSERT(condition)                                                                     \
+    do {                                                                                           \
+        if (!(condition)) {                                                                        \
+            internal_error("Assertion failed: " #condition);                                       \
+        }                                                                                          \
+    } while (0)
+
 #endif

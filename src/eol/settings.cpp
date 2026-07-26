@@ -188,7 +188,10 @@ void eol_settings::set_default_lgr_name(std::string name) {
     }
 }
 
-void eol_settings::set_fancyboost(bool b) { fancyboost_ = b; }
+void eol_settings::set_fancyboost(bool b) {
+    fancyboost_ = b;
+    invalidate_lgr_cache();
+}
 
 void eol_settings::set_show_last_apple_time(bool show) { show_last_apple_time_ = show; }
 

@@ -72,6 +72,7 @@ constexpr int MAX_QFOOD = 9;
 class lgrfile {
     void chop_bike(pic8* bike, bike_pics* bp);
 
+    void add_fancyboost(int size, int index);
     void add_picture(pic8* pic, piclist* list, int index);
     void add_texture(pic8* pic, piclist* list, int index);
     void add_mask(pic8* pic, piclist* list, int index);

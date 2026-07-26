@@ -33,6 +33,40 @@ bike_box BikeBox2 = {32, 183, 147, 297};
 bike_box BikeBox3 = {146, 141, 273, 264};
 bike_box BikeBox4 = {272, 181, 353, 244};
 
+constexpr char FANCYBOOST_NAMES[256][10] = {
+    "zz000000", "zz783000", "zz200000", "zzB4C4AC", "zz9C0000", "zzA40000", "zz606038", "zz000808",
+    "zz080008", "zz380000", "zz686068", "zz606868", "zz9C1808", "zz500848", "zzF47000", "zz500000",
+    "zz9C2808", "zzB40000", "zz9C2800", "zz780000", "zz884010", "zz9C1008", "zz280800", "zz008008",
+    "zz008000", "zzF4E410", "zz800000", "zz383030", "zz202030", "zz006000", "zzBCCCBC", "zz000030",
+    "zz882800", "zz401808", "zzB4C4B4", "zz381000", "zz2870B4", "zzC46010", "zz000800", "zz88B4D4",
+    "zz006800", "zz682800", "zz9C6808", "zz881800", "zz9C9C48", "zzDCE4DC", "zz006008", "zz600000",
+    "zz808080", "zz888860", "zz788094", "zz484020", "zz00D418", "zz606060", "zz686060", "zz943000",
+    "zz8830C4", "zz782000", "zz9C9C60", "zz889C50", "zz88A4CC", "zz003078", "zz005000", "zz309C30",
+    "zz687060", "zz484848", "zz687070", "zzBCC4B4", "zzFC7000", "zz008018", "zz6094C4", "zz6094CC",
+    "zz609494", "zz1060AC", "zzA44008", "zz94B4D4", "zzC40000", "zz003000", "zz940000", "zzAC0000",
+    "zz883000", "zz002000", "zz401000", "zzB4BCBC", "zz008808", "zz486048", "zz00AC00", "zz9410C4",
+    "zzF4D410", "zz783010", "zz942800", "zzC40008", "zz808094", "zz941000", "zz180800", "zz501800",
+    "zz080850", "zz103818", "zzB4B4AC", "zz1860AC", "zz9C2088", "zz380800", "zz283840", "zz803008",
+    "zz78A4CC", "zz78A470", "zz100000", "zzBCB440", "zzECBC38", "zz202020", "zzA4B4AC", "zz007808",
+    "zz505050", "zz007800", "zz880000", "zz1860B4", "zz007810", "zz689CCC", "zz107000", "zz689CB4",
+    "zzCCDCC4", "zz107010", "zz580800", "zz680008", "zz087000", "zz007008", "zz580000", "zz482800",
+    "zz007000", "zz686860", "zz086000", "zz687878", "zzC40808", "zz384040", "zz004000", "zz946860",
+    "zz384020", "zz6000A4", "zzE46008", "zz101008", "zz101010", "zz2068B4", "zz709CCC", "zzB49C30",
+    "zz101810", "zz9410CC", "zz200008", "zz943808", "zz181048", "zz5088C4", "zz505858", "zz3878BC",
+    "zz781000", "zz4080BC", "zz4880BC", "zz94BCD4", "zz308828", "zz3078BC", "zz782008", "zz780800",
+    "zz505038", "zz480000", "zz404040", "zz606058", "zz881808", "zz102008", "zz280000", "zz485040",
+    "zz283028", "zz107808", "zz3068BC", "zz001008", "zz5888C4", "zz9C0800", "zz608050", "zz787878",
+    "zz4888C4", "zz381800", "zzB40808", "zz787848", "zz786020", "zz08B408", "zz4880C4", "zz884820",
+    "zz007020", "zz1868B4", "zz581810", "zz604018", "zzBCCCB4", "zz888894", "zz3070B4", "zz181818",
+    "zz103800", "zz78ACCC", "zz081018", "zz50D428", "zz68D4F4", "zz0060CC", "zz683010", "zz6060CC",
+    "zz680000", "zz5088BC", "zzA49CA4", "zz940050", "zzBC2030", "zz0858AC", "zz207018", "zz384838",
+    "zz0050AC", "zzFCA420", "zzDCA418", "zz106070", "zz0858B4", "zz201818", "zz88FC00", "zz2870BC",
+    "zz788880", "zzECDC48", "zz202840", "zz783008", "zz68A4C4", "zzF4A478", "zzEC9C78", "zz784010",
+    "zzBC1008", "zz601800", "zz281008", "zz4078BC", "zz001000", "zz40D418", "zz48E408", "zz3828D4",
+    "zz20E428", "zz6894C4", "zz0058AC", "zz108010", "zzC4CCC4", "zz085010", "zzDCF4DC", "zzEC1030",
+    "zz281000", "zz2868B4", "zz789CDC", "zz5810D4", "zz303050", "zz5894C4", "zzDC0000", "zzD4D4D4",
+    "zz00089C", "zz0094C4", "zz585050", "zz48DC28", "zz1050AC", "zzE48060", "zzCC4018", "zzFCFCFC"};
+
 void invalidate_lgr_cache() {
     invalidate_level();
     CurrentLgrName[0] = '\0';
@@ -318,6 +352,36 @@ void lgrfile::add_picture(pic8* pic, piclist* list, int index) {
             PictureBuffer.insert(PictureBuffer.end(), row + x, row + x + count);
             x += count;
         }
+    }
+
+    new_pic->data = new unsigned char[PictureBuffer.size()];
+    if (!new_pic->data) {
+        internal_error("Not enough memory!");
+    }
+    std::copy(PictureBuffer.begin(), PictureBuffer.end(), new_pic->data);
+
+    picture_count++;
+}
+
+void lgrfile::add_fancyboost(int size, int index) {
+    if (picture_count >= MAX_PICTURES) {
+        external_error("Too many pictures in lgr file!");
+    }
+
+    // Generate picture
+    picture* new_pic = &pictures[picture_count];
+    strcpy(new_pic->name, FANCYBOOST_NAMES[index]);
+    new_pic->default_distance = 999;
+    new_pic->default_clipping = Clipping::Ground;
+    new_pic->width = size;
+    new_pic->height = size;
+
+    PictureBuffer.resize(0);
+    for (int i = 0; i < size; i++) {
+        write_varint(PictureBuffer, 0);
+        write_varint(PictureBuffer, size);
+        PictureBuffer.insert(PictureBuffer.end(), size, (unsigned char)index);
+        write_varint(PictureBuffer, -1);
     }
 
     new_pic->data = new unsigned char[PictureBuffer.size()];
@@ -638,6 +702,13 @@ lgrfile::lgrfile(const char* lgrname) {
             ERROR_CORRUPT();
         }
 
+        // Skip fancyboost-pattern files as we will internally construct them
+        // "zzXXXXXX" where X is a hexadecimal number
+        if (asset_filename[0] == 'z' && asset_filename[1] == 'z' && strlen(asset_filename) == 12) {
+            fseek(h, asset_size, SEEK_CUR);
+            continue;
+        }
+
         int curpos = ftell(h);
         pic8* asset_pic = new pic8(asset_filename, h);
         fseek(h, curpos + asset_size, SEEK_SET);
@@ -800,6 +871,14 @@ lgrfile::lgrfile(const char* lgrname) {
 
     fclose(h);
     h = nullptr;
+
+    // Create fancyboost pictures
+    if (EolSettings->fancyboost()) {
+        int fancyboost_size = (int)(zoom * 200);
+        for (int i = 0; i < 256; i++) {
+            add_fancyboost(fancyboost_size, i);
+        }
+    }
 
     // Check that the LGR is complete
     if (texture_count < 2) {

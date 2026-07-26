@@ -82,9 +82,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     for (int i = 0; i < text_length; i++) {
         if (strcmp(text_array[i], DIALOG_BUTTONS) == 0) {
             button_length = text_length - i - 1;
-            if (button_length <= 0) {
-                internal_error("dialog button_length <= 0!");
-            }
+            ELMA_ASSERT(button_length > 0);
             text_length = i;
             for (int j = 0; j < button_length; j++) {
                 button_array[j] = text_array[text_length + j + 1];
@@ -103,9 +101,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         button_length = 0;
         immediately_return = true;
     }
-    if (text_length < 1) {
-        internal_error("dialog text_length < 1");
-    }
+    ELMA_ASSERT(text_length > 0);
 
     screen_pic::Mode mode = screen_pic::Mode::EditorCanvas;
     if (!InEditor) {
@@ -152,6 +148,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
     int button_y1 = y2 - 30;
     int button_y2 = y2 - 10;
     int button_dx = 80;
+    ELMA_ASSERT(button_length < 4);
     if (button_length == 1) {
         button_array_x1[0] = screen_width / 2;
     }
@@ -164,9 +161,7 @@ int dialog(const char* text1, const char* text2, const char* text3, const char* 
         button_array_x1[1] = screen_width / 2;
         button_array_x1[2] = screen_width / 2 + button_dx;
     }
-    if (button_length > 3) {
-        internal_error("dialog button_length > 3");
-    }
+
     // Draw buttons
     for (int i = 0; i < button_length; i++) {
         int button_width = EditorBlackFont->len(button_array[i]) + 10;

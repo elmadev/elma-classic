@@ -875,7 +875,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         handle_eol_inputs();
 
-        if (!console_was_active && was_key_just_pressed(DIK_ESCAPE)) {
+        if (!console_was_active && is_key_down(DIK_ESCAPE)) {
             set_motor_frequency(true, 1.0, 0);
             set_motor_frequency(false, 1.0, 0);
             stop_motor_sound(true);

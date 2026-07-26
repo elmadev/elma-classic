@@ -126,6 +126,8 @@ class eol_settings {
     Default<combo_scancode> battle_leader_key_{combo_scancode{DIK_LSHIFT, DIK_F10}};
 
     Default<std::string> default_lgr_name_{"default"};
+    Default<bool> fancyboost_{true};
+
     Default<bool> show_last_apple_time_{true};
     Default<bool> show_gravity_arrows_{true};
     Clamp<int> recording_fps_{30, 30, 120};
@@ -213,6 +215,8 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(battle_leader_key);
 
     DECLARE_FIELD_FUNCS(default_lgr_name);
+    DECLARE_FIELD_FUNCS(fancyboost);
+
     DECLARE_FIELD_FUNCS(show_last_apple_time);
     DECLARE_FIELD_FUNCS(show_gravity_arrows);
     DECLARE_FIELD_FUNCS(recording_fps);

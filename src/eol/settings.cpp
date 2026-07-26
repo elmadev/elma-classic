@@ -188,6 +188,8 @@ void eol_settings::set_default_lgr_name(std::string name) {
     }
 }
 
+void eol_settings::set_fancyboost(bool b) { fancyboost_ = b; }
+
 void eol_settings::set_show_last_apple_time(bool show) { show_last_apple_time_ = show; }
 
 void eol_settings::set_show_gravity_arrows(bool b) { show_gravity_arrows_ = b; }
@@ -411,6 +413,8 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(battle_leader_key)                                                                  \
                                                                                                    \
     JSON_FIELD(default_lgr_name)                                                                   \
+    JSON_FIELD(fancyboost)                                                                         \
+                                                                                                   \
     JSON_FIELD(show_last_apple_time)                                                               \
     JSON_FIELD(show_gravity_arrows)                                                                \
     JSON_FIELD(recording_fps)                                                                      \

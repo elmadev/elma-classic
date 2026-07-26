@@ -84,7 +84,10 @@ void console::register_console_commands() {
         }
         StatusMessages->add(std::format("log: {}", show_log_lines ? "on" : "off"));
     });
+
     REGISTER_SETTINGS_STR(default_lgr_name);
+    REGISTER_SETTINGS_BOOL(fancyboost);
+
     REGISTER_SETTINGS_BOOL(show_last_apple_time);
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
     REGISTER_SETTINGS_BOOL(cripple_no_brake);

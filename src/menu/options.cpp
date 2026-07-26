@@ -436,6 +436,8 @@ void menu_options() {
         nav.add_row(
             "Default LGR:", EolSettings->default_lgr_name_persisted(), NAV_FUNC() { menu_lgr(); });
 
+        BOOL_OPTION("Fancyboost LGRs:", fancyboost);
+
         BOOL_OPTION("Show Apple Time:", show_last_apple_time);
 
         BOOL_OPTION("Gravity Arrows:", show_gravity_arrows);

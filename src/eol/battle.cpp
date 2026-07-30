@@ -55,7 +55,8 @@ void eol::set_battle_results_title(const char* label) {
 }
 
 bool eol::in_apple_battle() const {
-    return current_battle && current_battle->type == BattleType::Apple && proto.in_battle_level();
+    return current_battle && current_battle->type == BattleType::Apple &&
+           proto.playing_battle_level();
 }
 
 void apple_battle_progress::clear() { std::ranges::fill(taken, false); }

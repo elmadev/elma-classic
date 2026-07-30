@@ -20,6 +20,7 @@ class eol_table {
     void add_row(std::vector<std::string> values);
     void clear_rows();
 
+    static int table_y_offset(pic8& dest, abc8& data_font);
     void render(pic8& dest, abc8& title_font, abc8& data_font, Align alignment) const;
 
     void set_title(std::string title_) { title = std::move(title_); }

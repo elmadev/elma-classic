@@ -15,8 +15,12 @@ void eol_table::add_row(std::vector<std::string> values) { rows.push_back(std::m
 
 void eol_table::clear_rows() { rows.clear(); }
 
+int eol_table::table_y_offset(pic8& dest, abc8& data_font) {
+    return (dest.get_height() * 5) / 6 + data_font.line_height() * 3;
+}
+
 void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alignment) const {
-    int y_top = (dest.get_height() * 5) / 6 + data_font.line_height() * 3;
+    int y_top = eol_table::table_y_offset(dest, data_font);
 
     int x_center;
     switch (alignment) {

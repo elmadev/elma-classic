@@ -860,6 +860,13 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
              apple_time});
     }
 
+    if (!EolClient->play_offline() && !EolClient->connected()) {
+        MediumFont->write_right_align(
+            pic, GameViewWidth - 10, GameViewHeight - MediumFont->line_height() * 2,
+            std::format("Lost connection ({} to reconnect)", dik_to_string(State->key_reconnect))
+                .c_str());
+    }
+
     render_info_panel(pic, info_rows);
 }
 

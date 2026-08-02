@@ -124,6 +124,8 @@ class eol_settings {
     Default<combo_scancode> chat_key_{combo_scancode{DIK_NONE, DIK_F9}};
     Default<combo_scancode> battle_status_key_{combo_scancode{DIK_NONE, DIK_F10}};
     Default<combo_scancode> battle_leader_key_{combo_scancode{DIK_LSHIFT, DIK_F10}};
+    Default<combo_scancode> reconnect_key_{combo_scancode{DIK_NONE, DIK_F12}};
+    Default<combo_scancode> disconnect_key_{combo_scancode{DIK_LSHIFT, DIK_F12}};
 
     Default<std::string> default_lgr_name_{"default"};
     Default<bool> fancyboost_{true};
@@ -217,6 +219,8 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(chat_key);
     DECLARE_FIELD_FUNCS(battle_status_key);
     DECLARE_FIELD_FUNCS(battle_leader_key);
+    DECLARE_FIELD_FUNCS(reconnect_key);
+    DECLARE_FIELD_FUNCS(disconnect_key);
 
     DECLARE_FIELD_FUNCS(default_lgr_name);
     DECLARE_FIELD_FUNCS(fancyboost);

@@ -440,6 +440,8 @@ void state::reset_keys() {
     key_chat = EolSettings->chat_key_default();
     key_battle_status = EolSettings->battle_status_key_default();
     key_battle_leader = EolSettings->battle_leader_key_default();
+    key_reconnect = EolSettings->reconnect_key_default();
+    key_disconnect = EolSettings->disconnect_key_default();
 }
 
 player* state::get_player(const char* player_name) {

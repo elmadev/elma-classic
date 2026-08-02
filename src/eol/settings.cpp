@@ -180,6 +180,8 @@ void eol_settings::set_battle_results_key(combo_scancode key) { battle_results_k
 void eol_settings::set_chat_key(combo_scancode key) { chat_key_ = key; }
 void eol_settings::set_battle_status_key(combo_scancode key) { battle_status_key_ = key; }
 void eol_settings::set_battle_leader_key(combo_scancode key) { battle_leader_key_ = key; }
+void eol_settings::set_reconnect_key(combo_scancode key) { reconnect_key_ = key; }
+void eol_settings::set_disconnect_key(combo_scancode key) { disconnect_key_ = key; }
 
 void eol_settings::set_default_lgr_name(std::string name) {
     if (default_lgr_name_.value != name) {
@@ -415,6 +417,8 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(chat_key)                                                                           \
     JSON_FIELD(battle_status_key)                                                                  \
     JSON_FIELD(battle_leader_key)                                                                  \
+    JSON_FIELD(reconnect_key)                                                                      \
+    JSON_FIELD(disconnect_key)                                                                     \
                                                                                                    \
     JSON_FIELD(default_lgr_name)                                                                   \
     JSON_FIELD(fancyboost)                                                                         \
@@ -534,6 +538,8 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->key_chat = EolSettings->chat_key();
     s->key_battle_status = EolSettings->battle_status_key();
     s->key_battle_leader = EolSettings->battle_leader_key();
+    s->key_reconnect = EolSettings->reconnect_key();
+    s->key_disconnect = EolSettings->disconnect_key();
 }
 
 void eol_settings::sync_controls_from_state(state* s) {
@@ -570,4 +576,6 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_chat_key(s->key_chat);
     EolSettings->persist_battle_status_key(s->key_battle_status);
     EolSettings->persist_battle_leader_key(s->key_battle_leader);
+    EolSettings->persist_reconnect_key(s->key_reconnect);
+    EolSettings->persist_disconnect_key(s->key_disconnect);
 }

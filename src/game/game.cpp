@@ -417,6 +417,18 @@ static void handle_eol_inputs() {
         EolClient->toggle_show_battle_leader();
     }
 
+    if (was_game_key_just_pressed(State->key_reconnect)) {
+        EolSettings->set_play_offline(false);
+        EolClient->disconnect();
+        EolClient->connect();
+    }
+
+    if (was_game_key_just_pressed(State->key_disconnect)) {
+        EolSettings->set_play_offline(true);
+        EolClient->disconnect();
+        StatusMessages->add("disconnected from the server");
+    }
+
     if (was_game_key_just_pressed(State->key_default_ground_sky)) {
         int permutation = (EolSettings->default_ground() << 1) | (EolSettings->default_sky() << 0);
         permutation = (permutation + 3) % 4;

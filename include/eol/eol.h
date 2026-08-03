@@ -11,6 +11,7 @@
 #include <vector>
 
 class abc8;
+struct driver;
 class pic8;
 
 class eol {
@@ -46,6 +47,7 @@ class eol {
     void exit_level(const char* level_name, double time, int apple_count, int level_apple_count,
                     bool dead);
     void send_chat(std::string_view message);
+    void send_kuski_data(double time, driver& driv);
 
     void set_table(TableType);
     void render_table(pic8& dest, abc8& title_font, abc8& data_font) const;

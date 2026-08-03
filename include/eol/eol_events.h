@@ -86,6 +86,13 @@ struct clear_spy_data {
     unsigned int kuski_id;
 };
 
+struct send_kuski_data {
+    unsigned int kuski_id;
+    double time;
+    motorst* mot;
+    bike_metadata* metadata;
+};
+
 struct show_table {
     TableType table;
 };

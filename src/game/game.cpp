@@ -612,6 +612,10 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         }
 
         physics_frame_end(driv1, time, &driv2.draw_view);
+        if (camera_mode != CameraMode::MapViewer) {
+            EolClient->send_kuski_data(time * TIME_TO_CENTISECONDS, driv1);
+        }
+
         if (!Single) {
             physics_frame_end(driv2, time, &driv1.draw_view);
         }

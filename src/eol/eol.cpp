@@ -2,6 +2,7 @@
 #include "eol/console.h"
 #include "eol/settings.h"
 #include "eol/status_messages.h"
+#include "game/driver.h"
 #include "level/level.h"
 #include "log.h"
 #include "menu/external.h"
@@ -342,6 +343,12 @@ void eol::send_chat(std::string_view message) {
     }
     struct send_chat sc{.kuski_id = id, .message = message};
     proto.send(sc);
+}
+
+void eol::send_kuski_data(double time, driver& d) {
+    const struct send_kuski_data data{
+        .kuski_id = id, .time = time, .mot = d.mot, .metadata = &d.meta};
+    proto.send(data);
 }
 
 void eol::set_table(TableType table) {

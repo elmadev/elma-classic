@@ -7,6 +7,7 @@ class null_protocol {
   public:
     null_protocol(eol&) {}
     void connect() {}
+    bool connected() const { return false; }
     void tick() {}
     bool play_offline() const { return true; }
     template <typename T> void send(const T&) {}

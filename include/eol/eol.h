@@ -19,6 +19,7 @@ class eol {
     eol();
 
     void connect() { proto.connect(); }
+    bool connected() const { return proto.connected(); }
     void tick() { proto.tick(); }
 
     bool play_offline() const { return proto.play_offline(); }

@@ -20,6 +20,10 @@ class eol {
 
     void connect() { proto.connect(); }
     bool connected() const { return proto.connected(); }
+    void disconnect() {
+        proto.disconnect();
+        reset();
+    }
     void tick() { proto.tick(); }
     void reset();
 

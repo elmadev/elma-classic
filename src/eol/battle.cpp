@@ -103,6 +103,7 @@ void eol::process(const battle_started& bs) {
     current_battle->level_exists = std::filesystem::exists(
         std::format("lev/{}.lev", (const char*)current_battle->level_filename));
     battle_leaderboard_.clear();
+    battle_leaderboard_type_ = current_battle->type;
     online_apple_battle.clear();
     set_battle_results_title("standings");
     sync_battle_results_table();
@@ -166,9 +167,6 @@ void eol::upsert_leaderboard_entry(const battle_leaderboard_entry& entry, uint16
 
 void eol::sync_battle_results_table() {
     battle_results_table.clear_rows();
-    if (!current_battle) {
-        return;
-    }
 
     for (size_t i = 0; i < battle_leaderboard_.size(); i++) {
         const battle_leaderboard_entry& entry = battle_leaderboard_[i];
@@ -177,7 +175,7 @@ void eol::sync_battle_results_table() {
                                              lookup_nick(entry.kuski_id2))
                                : std::format("{}. {}", i + 1, lookup_nick(entry.kuski_id));
         std::string result =
-            format_battle_result(current_battle->type, entry.score, entry.apple_count);
+            format_battle_result(battle_leaderboard_type_, entry.score, entry.apple_count);
         battle_results_table.add_row({std::move(nick), std::move(result)});
     }
 }

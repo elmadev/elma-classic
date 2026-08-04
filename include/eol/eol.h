@@ -105,6 +105,7 @@ class eol {
     std::optional<battle> current_battle;
     apple_battle_progress online_apple_battle;
     std::vector<battle_leaderboard_entry> battle_leaderboard_;
+    BattleType battle_leaderboard_type_ = BattleType::Normal;
     std::vector<battle_queue_entry> battle_queue_;
     eol_table* cur_table;
     eol_table players_online_table;

@@ -138,7 +138,9 @@ void eol::process(const battle_ended& be) {
     set_battle_results_title("results");
     current_battle.reset();
     online_apple_battle.clear();
-    StatusMessages->add(be.aborted ? "battle aborted" : "battle over");
+    StatusMessages->add(be.aborted ? "battle aborted"
+                                   : std::format("battle over ({} for results)",
+                                                 dik_to_string(State->key_battle_results)));
 }
 
 void eol::toggle_battle_status() const {

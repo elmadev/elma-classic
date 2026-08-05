@@ -197,6 +197,38 @@ void platform_apply_fullscreen_mode() {
     resize_renderer(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
+// Snap the configured resolution to what the fullscreen mode will actually
+// produce, so the window is created at its final size and no resolution
+// change fires during startup, before the game is fully initialized.
+static void resolve_startup_resolution() {
+    SDL_DisplayMode mode;
+    switch (EolSettings->fullscreen()) {
+    case FullscreenMode::Windowed:
+        return;
+    case FullscreenMode::Fullscreen: {
+        SDL_DisplayMode desired = {};
+        desired.w = SCREEN_WIDTH;
+        desired.h = SCREEN_HEIGHT;
+        if (!SDL_GetClosestDisplayMode(0, &desired, &mode)) {
+            return;
+        }
+        break;
+    }
+    case FullscreenMode::FullscreenDesktop:
+        if (SDL_GetDesktopDisplayMode(0, &mode) != 0) {
+            return;
+        }
+        break;
+    }
+
+    if (mode.w != SCREEN_WIDTH || mode.h != SCREEN_HEIGHT) {
+        SCREEN_WIDTH = mode.w;
+        SCREEN_HEIGHT = mode.h;
+        EolSettings->persist_screen_width(mode.w);
+        EolSettings->persist_screen_height(mode.h);
+    }
+}
+
 void platform_init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         internal_error(SDL_GetError());
@@ -205,6 +237,7 @@ void platform_init() {
     SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
     SDL_EventState(SDL_DROPTEXT, SDL_DISABLE);
 
+    resolve_startup_resolution();
     create_window(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     keyboard::init();

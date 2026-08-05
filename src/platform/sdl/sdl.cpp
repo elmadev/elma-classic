@@ -183,13 +183,13 @@ void platform_apply_fullscreen_mode() {
     }
     case FullscreenMode::FullscreenDesktop: {
         SDL_SetWindowFullscreen(SDLWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-        int w;
-        int h;
-        SDL_GetWindowSize(SDLWindow, &w, &h);
-        if (w != SCREEN_WIDTH || h != SCREEN_HEIGHT) {
-            update_resolution(w, h);
+        int display_index = SDL_GetWindowDisplayIndex(SDLWindow);
+        SDL_DisplayMode mode;
+        if (display_index >= 0 && SDL_GetDesktopDisplayMode(display_index, &mode) == 0) {
+            if (mode.w != SCREEN_WIDTH || mode.h != SCREEN_HEIGHT) {
+                update_resolution(mode.w, mode.h);
+            }
         }
-
         break;
     }
     }

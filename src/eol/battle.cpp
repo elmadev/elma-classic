@@ -120,15 +120,11 @@ std::string eol::format_level(std::string_view level) {
 }
 
 void eol::set_battle_results_title(const char* label) {
-    std::string new_title;
+    std::string new_title = std::format("{} {} in {}", format_battle_type(current_battle->type),
+                                        label, format_level(current_battle->level_filename));
     if (current_battle->type == BattleType::Apple) {
         uint32_t apple_count = current_battle->level_apple_count;
-        new_title = std::format("Apple battle {} in {} ({} apple{})", label,
-                                format_level(current_battle->level_filename), apple_count,
-                                apple_count == 1 ? "" : "s");
-    } else {
-        new_title =
-            std::format("Battle {} in {}", label, format_level(current_battle->level_filename));
+        new_title += std::format(" ({} apple{})", apple_count, apple_count == 1 ? "" : "s");
     }
     battle_results_table.set_title(new_title);
 }

@@ -192,6 +192,15 @@ void eol::record_apple_for_apple_battle(int object_index) {
     }
 }
 
+void eol::process(const flag_owner_changed& e) {
+    if (!current_battle) {
+        LOG_ERROR("Received flag_owner_changed message, but no battle is active");
+        return;
+    }
+
+    current_battle->flag_owner_id = e.kuski_id;
+}
+
 void eol::process(const battle_started& bs) {
     current_battle = bs.bat;
     current_battle->level_exists = std::filesystem::exists(

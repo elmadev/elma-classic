@@ -84,6 +84,7 @@ struct battle {
     long long local_start_ms;
     bool level_exists = false;
     bool download_requested = false;
+    std::optional<unsigned int> flag_owner_id;
 };
 
 struct apple_battle_progress {

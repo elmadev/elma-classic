@@ -143,6 +143,10 @@ struct battle_line_update {
     uint16_t rank;
 };
 
+struct flag_owner_changed {
+    unsigned int kuski_id;
+};
+
 struct battle_queue_entry {
     unsigned int designer_id;
     BattleType battle_type;

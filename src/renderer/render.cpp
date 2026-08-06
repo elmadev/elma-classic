@@ -396,10 +396,22 @@ static void render_background(pic8* pic) {
     }
 }
 
+// Local (2-player) flag tag: does this player's bike currently show the flag?
+static bool local_flag_tag_has_flag(bool player1, double time) {
+    if (Single || !FlagTag) {
+        return false;
+    }
+    if ((player1 && FlagTagAHasFlag) || (!player1 && !FlagTagAHasFlag)) {
+        return true;
+    }
+    // Other player has flag, but this player just lost the flag
+    // Blink the flag away while immunity applies
+    return FlagTagImmunity && (int)(time * 30.0) % 2 != 0;
+}
+
 // Render an entire bike + kuski
-static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_corner,
-                        const motorst* mot, const bike_metadata* metadata, const bike_pics* bike,
-                        const pic8* shirt) {
+static void render_bike(pic8* pic, bool has_flag, vect2 bottomleft_corner, const motorst* mot,
+                        const bike_metadata* metadata, const bike_pics* bike, const pic8* shirt) {
     double arm_position = metadata->arm_position;
     double turn_phase = metadata->bike_turning.turn_phase;
 
@@ -485,21 +497,7 @@ static void render_bike(bool player1, pic8* pic, double time, vect2 bottomleft_c
     render_affine_pic(susp2_r, right_wheel_r, pic, 0.06, bike->susp2, 0.0, 0.1, false);
 
     // Draw flagtag flag
-    bool draw_flag = false;
-    if (!Single && FlagTag) {
-        if ((player1 && FlagTagAHasFlag) || (!player1 && !FlagTagAHasFlag)) {
-            // Current player has flag
-            draw_flag = true;
-        } else if (FlagTagImmunity) {
-            // Other player has flag, but current player just lost the flag
-            // Blink the flag away while immunity applies
-            int blinking_flag_phase = (int)(time * 30.0);
-            if (blinking_flag_phase % 2) {
-                draw_flag = true;
-            }
-        }
-    }
-    if (draw_flag) {
+    if (has_flag) {
         vect2 flag_base_r = BikeFrameI * (500.0 + 107 - BikeFrameX) +
                             BikeFrameJ * (BikeFrameY + 114 - 600.0) + BikeFrameR;
         vect2 flag_tip_r = flag_base_r + (BikeFrameI * 356.0 + BikeFrameJ * 500.0) * 0.2;
@@ -772,8 +770,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
             }
 
             if (bike_in_view(&k->mot, center)) {
-                render_bike(false, pic, time, bottomleft_corner, &k->mot, &k->metadata, bike2,
-                            ku.shirt);
+                render_bike(pic, false, bottomleft_corner, &k->mot, &k->metadata, bike2, ku.shirt);
             }
         }
     }
@@ -781,7 +778,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     if (spy_kuski) {
         const spy_data* k = spy_kuski->spy_data();
         if (k && bike_in_view(&k->mot, center)) {
-            render_bike(false, pic, time, bottomleft_corner, &k->mot, &k->metadata, bike2,
+            render_bike(pic, false, bottomleft_corner, &k->mot, &k->metadata, bike2,
                         spy_kuski->shirt);
         }
     }
@@ -790,13 +787,14 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
         if (!Single) {
             // Draw the other bike if it's on-screen
             if (bike_in_view(other_driv.mot, center)) {
-                render_bike(!player1, pic, time, bottomleft_corner, other_driv.mot,
-                            &other_driv.meta, bike2, nullptr);
+                render_bike(pic, local_flag_tag_has_flag(!player1, time), bottomleft_corner,
+                            other_driv.mot, &other_driv.meta, bike2, nullptr);
             }
         }
 
         // Draw the current player's bike
-        render_bike(player1, pic, time, bottomleft_corner, driv.mot, &driv.meta, bike1, shirt);
+        render_bike(pic, local_flag_tag_has_flag(player1, time), bottomleft_corner, driv.mot,
+                    &driv.meta, bike1, shirt);
     }
 
     // Draw the foreground

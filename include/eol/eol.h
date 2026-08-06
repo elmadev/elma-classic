@@ -75,6 +75,8 @@ class eol {
     bool in_apple_battle() const;
     bool battle_hides_exit() const;
     std::optional<BattleAttributes::Kind> battle_cripples() const;
+    bool kuski_has_flag(unsigned int kuski_id) const;
+    bool own_bike_has_flag() const;
 
     bool bike_frozen_by_countdown() const;
 

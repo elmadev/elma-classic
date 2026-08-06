@@ -134,6 +134,13 @@ bool eol::in_apple_battle() const {
            proto.playing_battle_level();
 }
 
+bool eol::kuski_has_flag(unsigned int kuski_id) const {
+    return current_battle && current_battle->type == BattleType::FlagTag &&
+           current_battle->flag_owner_id == kuski_id && proto.playing_battle_level();
+}
+
+bool eol::own_bike_has_flag() const { return kuski_has_flag(id); }
+
 // Battle types where finishing is impossible: the exit is hidden and untouchable.
 static bool battle_type_hides_exit(BattleType t) {
     using enum BattleType;

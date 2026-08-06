@@ -770,7 +770,8 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
             }
 
             if (bike_in_view(&k->mot, center)) {
-                render_bike(pic, false, bottomleft_corner, &k->mot, &k->metadata, bike2, ku.shirt);
+                render_bike(pic, EolClient->kuski_has_flag(ku.id), bottomleft_corner, &k->mot,
+                            &k->metadata, bike2, ku.shirt);
             }
         }
     }
@@ -778,8 +779,8 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     if (spy_kuski) {
         const spy_data* k = spy_kuski->spy_data();
         if (k && bike_in_view(&k->mot, center)) {
-            render_bike(pic, false, bottomleft_corner, &k->mot, &k->metadata, bike2,
-                        spy_kuski->shirt);
+            render_bike(pic, EolClient->kuski_has_flag(spy_kuski->id), bottomleft_corner, &k->mot,
+                        &k->metadata, bike2, spy_kuski->shirt);
         }
     }
 
@@ -793,8 +794,8 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
         }
 
         // Draw the current player's bike
-        render_bike(pic, local_flag_tag_has_flag(player1, time), bottomleft_corner, driv.mot,
-                    &driv.meta, bike1, shirt);
+        render_bike(pic, local_flag_tag_has_flag(player1, time) || EolClient->own_bike_has_flag(),
+                    bottomleft_corner, driv.mot, &driv.meta, bike1, shirt);
     }
 
     // Draw the foreground

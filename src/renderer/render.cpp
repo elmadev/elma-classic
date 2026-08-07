@@ -840,23 +840,13 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     if (bottom_player && loop != GameLoop::Render) {
         // FPS
         if (EolSettings->show_fps()) {
-            const double fps_value = fps::fps();
-            std::string fps_text = "";
-            if (fps_value != 0.0) {
-                fps_text = std::format("{:.0f}", fps_value);
-            }
-            info_rows.push_back({"FPS", std::move(fps_text)});
+            info_rows.push_back({"FPS", fps::format_fps()});
         }
 
         // UPS
         if (EolSettings->show_ups() && loop == GameLoop::Game &&
             current_camera.mode == CameraMode::Normal) {
-            const double ups_value = fps::ups();
-            std::string ups_text = "";
-            if (ups_value != 0.0) {
-                ups_text = std::format("{:.0f}", ups_value);
-            }
-            info_rows.push_back({"UPS", std::move(ups_text)});
+            info_rows.push_back({"UPS", fps::format_ups()});
         }
     }
 

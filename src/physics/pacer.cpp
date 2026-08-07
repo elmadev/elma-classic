@@ -71,10 +71,13 @@ void new_frame() {
     }
 
     real_frame_count++;
-    fps::count_fps();
 
-    target_time = elapsed * MILLISECONDS_TO_PHYS_TIME;
-    target_time = std::max(0.000001, target_time);
+    double new_time = elapsed * MILLISECONDS_TO_PHYS_TIME;
+    new_time = std::max(new_time, target_time);
+    if (new_time != target_time) {
+        fps::count_fps();
+    }
+    target_time = new_time;
 }
 
 bool subframe(double* out_dt) {

@@ -1,5 +1,6 @@
 #include "game/fps.h"
 #include "platform/implementation.h"
+#include <format>
 
 namespace {
 
@@ -12,13 +13,20 @@ double prev_fps;
 double prev_ups;
 long long prev_time;
 
+std::string format_value(double value) {
+    if (value == 0.0) {
+        return "";
+    }
+    return std::format("{:.0f}", value);
+}
+
 } // namespace
 
 namespace fps {
 
-double fps() { return prev_fps; }
+std::string format_fps() { return format_value(prev_fps); }
 
-double ups() { return prev_ups; }
+std::string format_ups() { return format_value(prev_ups); }
 
 void reset() {
     frame_count = 0;

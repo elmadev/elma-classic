@@ -526,6 +526,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         bool console_was_active = handle_console_input();
 
         if (!frozen) {
+            bool counted_fps = false;
             while (time <= target_time - 0.000001) {
                 // Cap slowest frame to 0.0055 (approximately 12.6 milliseconds or 79.4 fps)
                 double dt = 0.0055;
@@ -539,7 +540,12 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                     continue;
                 }
 
+                if (!counted_fps) {
+                    fps::count_fps();
+                    counted_fps = true;
+                }
                 fps::count_ups();
+
                 if (!driv1.dead) {
                     physics_subframe(driv1, time, dt);
                 }

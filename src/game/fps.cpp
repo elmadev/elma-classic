@@ -62,14 +62,14 @@ static void calculate() {
     }
 }
 
-void count_fps() {
-    frame_count++;
-
-    calculate();
-}
+void count_fps() { frame_count++; }
 
 void count_ups() { update_count++; }
 
-void count_gpu() { render_count++; }
+void count_gpu() {
+    render_count++;
+
+    calculate();
+}
 
 } // namespace fps

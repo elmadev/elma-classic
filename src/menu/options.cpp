@@ -443,6 +443,7 @@ void menu_options() {
 
         BOOL_OPTION("Show FPS:", show_fps);
         BOOL_OPTION("Show UPS:", show_ups);
+        BOOL_OPTION("Show GPU Framerate:", show_gpu);
 
         nav.add_row(
             "Record Replay FPS:", std::to_string(EolSettings->recording_fps_persisted()),

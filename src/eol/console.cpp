@@ -93,7 +93,9 @@ void console::register_console_commands() {
 
     REGISTER_SETTINGS_BOOL(show_fps);
     REGISTER_SETTINGS_BOOL(show_ups);
+    REGISTER_SETTINGS_BOOL(show_gpu);
     register_alias("ups", "show_ups");
+    register_alias("gpu", "show_gpu");
 
     REGISTER_SETTINGS_BOOL(cripple_no_brake);
     register_alias("nobrake", "cripple_no_brake");

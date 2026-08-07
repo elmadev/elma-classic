@@ -198,6 +198,7 @@ void eol_settings::set_show_gravity_arrows(bool b) { show_gravity_arrows_ = b; }
 
 void eol_settings::set_show_fps(bool show) { show_fps_ = show; }
 void eol_settings::set_show_ups(bool show) { show_ups_ = show; }
+void eol_settings::set_show_gpu(bool show) { show_gpu_ = show; }
 void eol_settings::set_recording_fps(int fps) { recording_fps_ = fps; }
 
 void eol_settings::set_show_demo_menu(bool show) { show_demo_menu_ = show; }
@@ -424,6 +425,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
                                                                                                    \
     JSON_FIELD(show_fps)                                                                           \
     JSON_FIELD(show_ups)                                                                           \
+    JSON_FIELD(show_gpu)                                                                           \
     JSON_FIELD(recording_fps)                                                                      \
                                                                                                    \
     JSON_FIELD(show_demo_menu)                                                                     \

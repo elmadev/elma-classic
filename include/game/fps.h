@@ -1,6 +1,8 @@
 #ifndef GAME_FPS_H
 #define GAME_FPS_H
 
+#include <string>
+
 namespace fps {
 
 void reset();
@@ -8,8 +10,8 @@ void reset();
 void count_fps();
 void count_ups();
 
-double fps();
-double ups();
+std::string format_fps();
+std::string format_ups();
 
 } // namespace fps
 

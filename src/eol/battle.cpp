@@ -30,6 +30,85 @@ static std::string format_battle_result(BattleType type, uint32_t time, uint16_t
     return std::format("{} apple{}", apples, apples == 1 ? "" : "s");
 }
 
+static std::string format_hms(int seconds) {
+    seconds = std::max(seconds, 0);
+    int hours = seconds / 3600;
+    int mins = (seconds / 60) % 60;
+    int secs = seconds % 60;
+
+    if (hours > 0) {
+        return std::format("{}:{:02}:{:02}", hours, mins, secs);
+    }
+
+    return std::format("{}:{:02}", mins, secs);
+}
+
+static std::string_view battle_type_prefix(BattleType t) {
+    using enum BattleType;
+
+    switch (t) {
+    case Normal:
+        return "";
+    case OneLife:
+        return "one-life ";
+    case FirstFinish:
+        return "first finish ";
+    case Slowness:
+        return "slowness ";
+    case Survivor:
+        return "survivor ";
+    case LastCounts:
+        return "last counts ";
+    case FinishCount:
+        return "finish-count ";
+    case HourTT:
+        return "1 hour TT ";
+    case FlagTag:
+        return "flag tag ";
+    case Apple:
+        return "apple ";
+    case Speed:
+        return "speed ";
+    }
+    return "";
+}
+
+static std::string format_battle_type(BattleType t) {
+    std::string out = std::format("{}battle", battle_type_prefix(t));
+    out.front() = static_cast<char>(std::toupper(static_cast<unsigned char>(out.front())));
+    return out;
+}
+
+static std::string format_type_with_cripples(BattleType t, BattleAttributes::Kind attrs) {
+    using namespace BattleAttributes;
+
+    constexpr std::pair<Kind, std::string_view> cripples[] = {
+        {NoVolt, "no-volt "},
+        {NoTurn, "no-turn "},
+        {OneTurn, "one-turn "},
+        {NoBrake, "no-brake "},
+        {NoThrottle, "no-throttle "},
+        {AlwaysThrottle, "always-throttle "},
+        {OneWheel, "one-wheel "},
+        {Drunk, "drunk "},
+        {Multi, "multi "},
+    };
+
+    std::string out{battle_type_prefix(t)};
+
+    for (auto [flag, text] : cripples) {
+        if (attrs & flag) {
+            out += text;
+        }
+    }
+
+    out += "battle";
+
+    out.front() = static_cast<char>(std::toupper(static_cast<unsigned char>(out.front())));
+
+    return out;
+}
+
 std::string eol::format_level(std::string_view level) {
     std::string with_ext = std::format("{}.lev", level);
     auto idx = get_internal_index(with_ext.c_str());
@@ -203,85 +282,6 @@ void eol::process(const battle_time_sync& bts) {
     }
 
     current_battle->local_start_ms = bts.local_start_ms;
-}
-
-static std::string format_hms(int seconds) {
-    seconds = std::max(seconds, 0);
-    int hours = seconds / 3600;
-    int mins = (seconds / 60) % 60;
-    int secs = seconds % 60;
-
-    if (hours > 0) {
-        return std::format("{}:{:02}:{:02}", hours, mins, secs);
-    }
-
-    return std::format("{}:{:02}", mins, secs);
-}
-
-static std::string_view battle_type_prefix(BattleType t) {
-    using enum BattleType;
-
-    switch (t) {
-    case Normal:
-        return "";
-    case OneLife:
-        return "one-life ";
-    case FirstFinish:
-        return "first finish ";
-    case Slowness:
-        return "slowness ";
-    case Survivor:
-        return "survivor ";
-    case LastCounts:
-        return "last counts ";
-    case FinishCount:
-        return "finish-count ";
-    case HourTT:
-        return "1 hour TT ";
-    case FlagTag:
-        return "flag tag ";
-    case Apple:
-        return "apple ";
-    case Speed:
-        return "speed ";
-    }
-    return "";
-}
-
-static std::string format_battle_type(BattleType t) {
-    std::string out = std::format("{}battle", battle_type_prefix(t));
-    out.front() = static_cast<char>(std::toupper(static_cast<unsigned char>(out.front())));
-    return out;
-}
-
-static std::string format_type_with_cripples(BattleType t, BattleAttributes::Kind attrs) {
-    using namespace BattleAttributes;
-
-    constexpr std::pair<Kind, std::string_view> cripples[] = {
-        {NoVolt, "no-volt "},
-        {NoTurn, "no-turn "},
-        {OneTurn, "one-turn "},
-        {NoBrake, "no-brake "},
-        {NoThrottle, "no-throttle "},
-        {AlwaysThrottle, "always-throttle "},
-        {OneWheel, "one-wheel "},
-        {Drunk, "drunk "},
-        {Multi, "multi "},
-    };
-
-    std::string out{battle_type_prefix(t)};
-
-    for (auto [flag, text] : cripples) {
-        if (attrs & flag) {
-            out += text;
-        }
-    }
-
-    out += "battle";
-
-    out.front() = static_cast<char>(std::toupper(static_cast<unsigned char>(out.front())));
-
-    return out;
 }
 
 void eol::render_battle_status(pic8& dest, abc8& font) const {

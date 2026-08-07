@@ -62,6 +62,7 @@
 * Flowers can be created/deleted in the internal editor.
 * Default foreground/background textures no longer get reset if texture not found or wrong lgr used
 * You can now individually force the foreground and background textures to "ground" and "sky", and can also set it via keybind
+* Instead of just displaying FPS, you can now display FPS (game frames), UPS (physics frames) and GPU (screen refresh rate)
 
 ## Minor Bug Fixes
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems

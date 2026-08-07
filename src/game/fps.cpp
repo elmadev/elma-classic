@@ -30,7 +30,7 @@ std::string format_fps() { return format_value(prev_fps); }
 
 std::string format_ups() { return format_value(prev_ups); }
 
-double gpu() { return prev_gpu; }
+std::string format_gpu() { return format_value(prev_gpu); }
 
 void reset() {
     frame_count = 0;

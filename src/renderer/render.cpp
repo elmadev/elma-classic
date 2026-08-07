@@ -834,9 +834,26 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
         }
 
         // UPS
-        if (EolSettings->show_ups() && loop == GameLoop::Game &&
-            current_camera.mode == CameraMode::Normal) {
-            info_rows.push_back({"UPS", fps::format_ups()});
+        bool show_ups = EolSettings->show_ups() && loop == GameLoop::Game &&
+                        current_camera.mode == CameraMode::Normal;
+        bool show_gpu = EolSettings->show_gpu();
+        std::string cpu_title = "";
+        std::string cpu_value = "";
+        if (show_gpu) {
+            cpu_title += "GPU";
+            cpu_value = fps::format_gpu();
+        }
+        if (show_ups) {
+            if (show_gpu) {
+                cpu_title += "/UPS";
+                cpu_value += "/";
+            } else {
+                cpu_title += "UPS";
+            }
+            cpu_value += fps::format_ups();
+        }
+        if (show_gpu || show_ups) {
+            info_rows.push_back({cpu_title, std::move(cpu_value)});
         }
     }
 

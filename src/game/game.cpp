@@ -60,7 +60,10 @@ static BattleAttributes::Kind active_cripples() {
 static bool handle_console_input() {
     bool was_active = Console->is_input_active();
     if (was_key_just_pressed(State->key_chat)) {
-        Console->toggle_active();
+        if (Console->is_input_active() ||
+            EolSettings->chat_visibility() != ChatVisibility::Hidden) {
+            Console->toggle_active();
+        }
     } else if (Console->is_input_active()) {
         Console->handle_input();
     }

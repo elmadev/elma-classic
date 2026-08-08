@@ -459,15 +459,17 @@ void console::render(pic8& screen) {
     }
     rendering = true;
 
-    auto view = lines | std::views::reverse |
-                std::views::filter([this](const auto& l) { return should_show(l); }) |
-                std::views::drop(scroll_offset) | std::views::take(EolSettings->chat_lines());
+    if (EolSettings->chat_visibility() != ChatVisibility::Hidden) {
+        auto view = lines | std::views::reverse |
+                    std::views::filter([this](const auto& l) { return should_show(l); }) |
+                    std::views::drop(scroll_offset) | std::views::take(EolSettings->chat_lines());
 
-    int line_height = font->line_height();
-    int y = MARGIN_Y + line_height + 8;
-    for (const console_line& line : view) {
-        font->write(&screen, MARGIN_X, y, line.text.c_str());
-        y += line_height;
+        int line_height = font->line_height();
+        int y = MARGIN_Y + line_height + 8;
+        for (const console_line& line : view) {
+            font->write(&screen, MARGIN_X, y, line.text.c_str());
+            y += line_height;
+        }
     }
 
     if (input_active) {

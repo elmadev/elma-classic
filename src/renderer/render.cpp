@@ -917,6 +917,7 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     StatusMessages->render(*pic, *SmallFont);
     EolClient->render_table(*pic, *MediumFont, *SmallFont);
     EolClient->render_battle_status(*pic, *SmallFont);
+    EolClient->render_battle_leader(*pic, *SmallFont);
     EolClient->render_battle_countdown(*pic, *LargeFont, *SmallFont);
 
     // Conditionally save screenshot

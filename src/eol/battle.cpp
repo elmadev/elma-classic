@@ -319,10 +319,14 @@ void eol::render_battle_status(pic8& dest, abc8& font) const {
 
     const int y = 15 + font.line_height() * (1 + EolSettings->chat_lines());
     font.write_centered(&dest, dest.get_width() / 2, y, out.c_str());
+}
 
-    if (!EolSettings->show_battle_leader()) {
+void eol::render_battle_leader(pic8& dest, abc8& font) const {
+    if (!EolSettings->show_battle_leader() || !current_battle) {
         return;
     }
+
+    const int y = 15 + font.line_height() * (1 + EolSettings->chat_lines());
 
     if (!(current_battle->attributes & BattleAttributes::SeeTimes)) {
         font.write_centered(&dest, dest.get_width() / 2, y - font.line_height(), "Times hidden");

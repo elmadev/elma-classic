@@ -120,6 +120,7 @@ class eol {
 
     const std::vector<kuski>& all_kuskis() const { return kuskis_; }
     std::string_view lookup_nick(unsigned int kuski_id) const;
+    void send_chat_line(std::string_view message);
 
     static std::string format_level(std::string_view level);
 

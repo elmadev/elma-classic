@@ -114,6 +114,13 @@ struct send_chat {
     std::string_view message;
 };
 
+struct send_pm {
+    unsigned int from_kuski_id;
+    unsigned int to_kuski_id; // 0 = team chat
+    bool is_team_chat;
+    std::string_view message;
+};
+
 struct private_message {
     unsigned int from_kuski_id;
     unsigned int to_kuski_id;

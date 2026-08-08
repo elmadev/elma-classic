@@ -426,15 +426,28 @@ void eol::send_chat(std::string_view message) {
         if (split == std::string_view::npos || split < MAX_LEN - SPLIT_MARGIN) {
             split = MAX_LEN;
         }
-        struct send_chat sc{.kuski_id = id, .message = message.substr(0, split)};
-        proto.send(sc);
+        send_chat_line(message.substr(0, split));
         message.remove_prefix(split);
         if (!message.empty() && message.front() == ' ') {
             message.remove_prefix(1);
         }
     }
-    struct send_chat sc{.kuski_id = id, .message = message};
-    proto.send(sc);
+    send_chat_line(message);
+}
+
+void eol::send_chat_line(std::string_view message) {
+    if (pm_kuski_id) {
+        proto.send(send_pm{.from_kuski_id = id,
+                           .to_kuski_id = *pm_kuski_id,
+                           .is_team_chat = false,
+                           .message = message});
+    } else if (is_team_chat) {
+        proto.send(send_pm{
+            .from_kuski_id = id, .to_kuski_id = 0, .is_team_chat = true, .message = message});
+    } else {
+        struct send_chat sc{.kuski_id = id, .message = message};
+        proto.send(sc);
+    }
 }
 
 void eol::send_kuski_data(double time, driver& d) {

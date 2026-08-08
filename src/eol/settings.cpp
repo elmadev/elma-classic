@@ -188,6 +188,7 @@ void eol_settings::set_clear_finished_times_key(combo_scancode key) {
 }
 void eol_settings::set_chat_key(combo_scancode key) { chat_key_ = key; }
 void eol_settings::set_show_chat_key(combo_scancode key) { show_chat_key_ = key; }
+void eol_settings::set_team_chat_key(combo_scancode key) { team_chat_key_ = key; }
 void eol_settings::set_battle_status_key(combo_scancode key) { battle_status_key_ = key; }
 void eol_settings::set_battle_leader_key(combo_scancode key) { battle_leader_key_ = key; }
 void eol_settings::set_speedometer_key(combo_scancode key) { speedometer_key_ = key; }
@@ -497,6 +498,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(clear_finished_times_key)                                                           \
     JSON_FIELD(chat_key)                                                                           \
     JSON_FIELD(show_chat_key)                                                                      \
+    JSON_FIELD(team_chat_key)                                                                      \
     JSON_FIELD(battle_status_key)                                                                  \
     JSON_FIELD(battle_leader_key)                                                                  \
     JSON_FIELD(speedometer_key)                                                                    \
@@ -635,6 +637,7 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->key_clear_finished_times = EolSettings->clear_finished_times_key();
     s->key_chat = EolSettings->chat_key();
     s->key_show_chat = EolSettings->show_chat_key();
+    s->key_team_chat = EolSettings->team_chat_key();
     s->key_battle_status = EolSettings->battle_status_key();
     s->key_battle_leader = EolSettings->battle_leader_key();
     s->key_speedometer = EolSettings->speedometer_key();
@@ -680,6 +683,7 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_clear_finished_times_key(s->key_clear_finished_times);
     EolSettings->persist_chat_key(s->key_chat);
     EolSettings->persist_show_chat_key(s->key_show_chat);
+    EolSettings->persist_team_chat_key(s->key_team_chat);
     EolSettings->persist_battle_status_key(s->key_battle_status);
     EolSettings->persist_battle_leader_key(s->key_battle_leader);
     EolSettings->persist_speedometer_key(s->key_speedometer);

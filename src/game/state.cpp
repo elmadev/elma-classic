@@ -439,6 +439,7 @@ void state::reset_keys() {
     key_clear_finished_times = EolSettings->clear_finished_times_key_default();
     key_chat = EolSettings->chat_key_default();
     key_show_chat = EolSettings->show_chat_key_default();
+    key_team_chat = EolSettings->team_chat_key_default();
     key_battle_status = EolSettings->battle_status_key_default();
     key_battle_leader = EolSettings->battle_leader_key_default();
     key_speedometer = EolSettings->speedometer_key_default();

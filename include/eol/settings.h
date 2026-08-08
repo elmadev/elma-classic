@@ -130,6 +130,7 @@ class eol_settings {
     Default<combo_scancode> clear_finished_times_key_{combo_scancode{DIK_LCONTROL, DIK_F7}};
     Default<combo_scancode> chat_key_{combo_scancode{DIK_NONE, DIK_F9}};
     Default<combo_scancode> show_chat_key_{combo_scancode{DIK_LSHIFT, DIK_F9}};
+    Default<combo_scancode> team_chat_key_{combo_scancode{DIK_LCONTROL, DIK_F9}};
     Default<combo_scancode> battle_status_key_{combo_scancode{DIK_NONE, DIK_F10}};
     Default<combo_scancode> battle_leader_key_{combo_scancode{DIK_LSHIFT, DIK_F10}};
     Default<combo_scancode> speedometer_key_{combo_scancode{DIK_LCONTROL, DIK_F10}};
@@ -242,6 +243,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(clear_finished_times_key);
     DECLARE_FIELD_FUNCS(chat_key);
     DECLARE_FIELD_FUNCS(show_chat_key);
+    DECLARE_FIELD_FUNCS(team_chat_key);
     DECLARE_FIELD_FUNCS(battle_status_key);
     DECLARE_FIELD_FUNCS(battle_leader_key);
     DECLARE_FIELD_FUNCS(speedometer_key);

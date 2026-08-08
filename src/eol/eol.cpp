@@ -513,6 +513,13 @@ void eol::spy_next_kuski() { set_spy_kuski(spy_kuski_id, kuskis()); }
 
 void eol::spy_prev_kuski() { set_spy_kuski(spy_kuski_id, std::views::reverse(kuskis())); }
 
+void eol::toggle_team_chat() {
+    is_team_chat = !is_team_chat;
+    StatusMessages->add(is_team_chat ? std::format("Team chat on (press {} to chat)",
+                                                   dik_to_string(State->key_chat))
+                                     : "Team chat off");
+}
+
 void kuski::clear_apple_data() {
     for (bool& taken : apples_taken) {
         taken = false;

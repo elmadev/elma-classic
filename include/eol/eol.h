@@ -96,6 +96,8 @@ class eol {
     void spy_next_kuski();
     void spy_prev_kuski();
 
+    void toggle_team_chat();
+
     static pic8* load_shirt(std::string_view nick);
 
   private:
@@ -142,6 +144,7 @@ class eol {
     eol_table finished_times_table;
     std::optional<unsigned int> spy_kuski_id;
     int min_spy_frames = 3;
+    bool is_team_chat = false;
 };
 
 extern eol* EolClient;

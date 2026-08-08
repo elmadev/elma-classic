@@ -444,6 +444,9 @@ static void handle_eol_inputs() {
     if (was_game_key_just_pressed(State->key_show_chat)) {
         Console->cycle_show_chat();
     }
+    if (was_game_key_just_pressed(State->key_team_chat)) {
+        EolClient->toggle_team_chat();
+    }
 
     if (was_game_key_just_pressed(State->key_reconnect)) {
         EolSettings->set_play_offline(false);

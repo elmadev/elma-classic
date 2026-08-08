@@ -102,7 +102,7 @@ int get_touching_object(vect2 r, double radius) {
 
         // Skip Exit in flagtag or apple-battle mode
         if (obj->type == object::Type::Exit) {
-            if ((!Single && FlagTag) || EolClient->in_apple_battle()) {
+            if ((!Single && FlagTag) || EolClient->battle_hides_exit()) {
                 continue;
             }
         }

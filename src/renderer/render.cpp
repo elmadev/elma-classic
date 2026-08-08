@@ -317,7 +317,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
             palette_id = Lgr->minimap_food_palette_id;
             break;
         case object::Type::Exit:
-            if ((!Single && FlagTag) || EolClient->in_apple_battle()) {
+            if ((!Single && FlagTag) || EolClient->battle_hides_exit()) {
                 continue;
             }
             palette_id = Lgr->minimap_exit_palette_id;
@@ -695,7 +695,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
             continue;
         }
         if (obj->type == object::Type::Exit &&
-            ((!Single && FlagTag) || EolClient->in_apple_battle())) {
+            ((!Single && FlagTag) || EolClient->battle_hides_exit())) {
             continue;
         }
 

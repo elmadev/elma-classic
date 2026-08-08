@@ -134,6 +134,17 @@ bool eol::in_apple_battle() const {
            proto.playing_battle_level();
 }
 
+// Battle types where finishing is impossible: the exit is hidden and untouchable.
+static bool battle_type_hides_exit(BattleType t) {
+    using enum BattleType;
+    return t == Apple || t == FlagTag || t == Speed;
+}
+
+bool eol::battle_hides_exit() const {
+    return current_battle && battle_type_hides_exit(current_battle->type) &&
+           proto.playing_battle_level();
+}
+
 static bool has_countdown(BattleType t) {
     using enum BattleType;
     return t == OneLife || t == FirstFinish || t == Apple || t == FinishCount || t == FlagTag;

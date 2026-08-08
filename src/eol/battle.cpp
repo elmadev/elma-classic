@@ -350,24 +350,35 @@ void eol::render_battle_status(pic8& dest, abc8& font) const {
 }
 
 std::string eol::battle_leader_line() const {
+    std::string flag_text;
+    if (current_battle->type == BattleType::FlagTag && current_battle->flag_owner_id &&
+        (*current_battle->flag_owner_id != id || proto.playing_battle_level())) {
+        flag_text = std::format("{} has the flag", lookup_nick(*current_battle->flag_owner_id));
+    }
+
     if (!(current_battle->attributes & BattleAttributes::SeeTimes)) {
-        return "Times hidden";
+        return flag_text.empty() ? "Times hidden" : flag_text;
     }
 
     if (battle_leaderboard_.empty()) {
-        return "";
+        return flag_text;
     }
     const battle_leaderboard_entry& leader = battle_leaderboard_.front();
     if (leader.score == 0 && leader.apple_count == 0) {
-        return "";
+        return flag_text;
     }
 
     const std::string result =
         format_battle_result(current_battle->type, leader.score, leader.apple_count);
-    return leader.kuski_id2 != 0
-               ? std::format("Battle leaders: {} & {} {}", lookup_nick(leader.kuski_id),
-                             lookup_nick(leader.kuski_id2), result)
-               : std::format("Battle leader: {} {}", lookup_nick(leader.kuski_id), result);
+    std::string line =
+        leader.kuski_id2 != 0
+            ? std::format("Battle leaders: {} & {} {}", lookup_nick(leader.kuski_id),
+                          lookup_nick(leader.kuski_id2), result)
+            : std::format("Battle leader: {} {}", lookup_nick(leader.kuski_id), result);
+    if (!flag_text.empty()) {
+        line += std::format(", {}", flag_text);
+    }
+    return line;
 }
 
 void eol::render_battle_leader(pic8& dest, abc8& font) const {

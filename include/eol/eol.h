@@ -98,6 +98,12 @@ class eol {
 
     void toggle_team_chat();
 
+    void pm_next_kuski();
+    void pm_prev_kuski();
+    void pm_jump_to_char(char c);
+    void clear_pm_kuski();
+    std::string chat_prompt() const;
+
     static pic8* load_shirt(std::string_view nick);
 
   private:
@@ -145,6 +151,7 @@ class eol {
     std::optional<unsigned int> spy_kuski_id;
     int min_spy_frames = 3;
     bool is_team_chat = false;
+    std::optional<unsigned int> pm_kuski_id;
 };
 
 extern eol* EolClient;

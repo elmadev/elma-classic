@@ -11,6 +11,7 @@
 #include "platform/utils.h"
 #include "util/util.h"
 #include <algorithm>
+#include <cctype>
 #include <cstring>
 #include <ctime>
 #include <filesystem>
@@ -135,6 +136,14 @@ void eol::process(const new_kuski& nk) {
 }
 
 void eol::process(const kuski_logout& kl) {
+    if (pm_kuski_id && (*pm_kuski_id == kl.id || *pm_kuski_id == kl.id2)) {
+        StatusMessages->add(std::format("{} logged out, cancelling PM", lookup_nick(*pm_kuski_id)));
+        pm_kuski_id.reset();
+        if (Console->is_input_active() && !Console->in_command_prompt()) {
+            Console->deactivate_input();
+        }
+    }
+
     for (kuski& k : kuskis_) {
         if (k.id == kl.id || k.id == kl.id2) {
             k.is_online = false;
@@ -518,6 +527,57 @@ void eol::toggle_team_chat() {
     StatusMessages->add(is_team_chat ? std::format("Team chat on (press {} to chat)",
                                                    dik_to_string(State->key_chat))
                                      : "Team chat off");
+}
+
+template <typename Range>
+static void cycle_pm_kuski(std::optional<unsigned int>& pm_kuski_id, Range&& range) {
+    bool found_current = !pm_kuski_id;
+
+    for (const kuski& k : range) {
+        if (pm_kuski_id && *pm_kuski_id == k.id) {
+            found_current = true;
+            continue;
+        }
+
+        if (found_current) {
+            pm_kuski_id = k.id;
+            return;
+        }
+    }
+
+    // wraps through the "no target" slot, back to public/team chat
+    pm_kuski_id.reset();
+}
+
+void eol::pm_next_kuski() { cycle_pm_kuski(pm_kuski_id, kuskis()); }
+
+void eol::pm_prev_kuski() { cycle_pm_kuski(pm_kuski_id, std::views::reverse(kuskis())); }
+
+void eol::pm_jump_to_char(char c) {
+    // nearest nick at or after the character, else the alphabetically last one
+    const kuski* last = nullptr;
+    for (const kuski& k : kuskis()) {
+        if (tolower((unsigned char)k.nick[0]) >= tolower((unsigned char)c)) {
+            pm_kuski_id = k.id;
+            return;
+        }
+        last = &k;
+    }
+    if (last) {
+        pm_kuski_id = last->id;
+    }
+}
+
+void eol::clear_pm_kuski() { pm_kuski_id.reset(); }
+
+std::string eol::chat_prompt() const {
+    if (pm_kuski_id) {
+        return std::format("-><{}> ", lookup_nick(*pm_kuski_id));
+    }
+    if (is_team_chat) {
+        return "[Team] ";
+    }
+    return "";
 }
 
 void kuski::clear_apple_data() {

@@ -41,6 +41,8 @@ class console {
     void label_mode(std::string label, std::string label_alias, bool clear_label,
                     bool allow_commands);
     void clear_label_mode();
+    // in a prompt whose submitted text becomes a command via a hidden prefix
+    bool in_command_prompt() const { return !input_label_alias.empty(); }
 
     void cycle_show_chat();
 

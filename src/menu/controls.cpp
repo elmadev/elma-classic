@@ -178,6 +178,9 @@ static void load_function_controls(menu_nav* nav) {
     load_control(nav, FunctionKeys, "Chat", &State->key_chat);
     load_control(nav, FunctionKeys, "Show Chat", &State->key_show_chat);
     load_control(nav, FunctionKeys, "Team Chat", &State->key_team_chat);
+    load_control(nav, FunctionKeys, "PM Next Kuski", &State->key_pm_next_kuski);
+    load_control(nav, FunctionKeys, "PM Prev Kuski", &State->key_pm_prev_kuski);
+    load_control(nav, FunctionKeys, "PM Clear", &State->key_pm_clear_kuski);
     load_control(nav, FunctionKeys, "Hide Battle Status", &State->key_battle_status);
     load_control(nav, FunctionKeys, "Hide Battle Leader", &State->key_battle_leader);
     load_control(nav, FunctionKeys, "Show Speedometer", &State->key_speedometer);

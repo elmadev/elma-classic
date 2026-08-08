@@ -103,6 +103,9 @@ class state {
     combo_scancode key_chat;
     combo_scancode key_show_chat;
     combo_scancode key_team_chat;
+    combo_scancode key_pm_next_kuski;
+    combo_scancode key_pm_prev_kuski;
+    combo_scancode key_pm_clear_kuski;
     combo_scancode key_battle_status;
     combo_scancode key_battle_leader;
     combo_scancode key_speedometer;

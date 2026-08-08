@@ -176,6 +176,7 @@ static void load_function_controls(menu_nav* nav) {
                  &State->key_cycle_finished_times_filter);
     load_control(nav, FunctionKeys, "Clear Finished Times", &State->key_clear_finished_times);
     load_control(nav, FunctionKeys, "Chat", &State->key_chat);
+    load_control(nav, FunctionKeys, "Show Chat", &State->key_show_chat);
     load_control(nav, FunctionKeys, "Hide Battle Status", &State->key_battle_status);
     load_control(nav, FunctionKeys, "Hide Battle Leader", &State->key_battle_leader);
     load_control(nav, FunctionKeys, "Reconnect", &State->key_reconnect);

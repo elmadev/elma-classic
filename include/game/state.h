@@ -99,6 +99,7 @@ class state {
     combo_scancode key_cycle_finished_times_filter;
     combo_scancode key_clear_finished_times;
     combo_scancode key_chat;
+    combo_scancode key_show_chat;
     combo_scancode key_battle_status;
     combo_scancode key_battle_leader;
     combo_scancode key_reconnect;

@@ -7,6 +7,7 @@
 #include "eol/settings.h"
 #include <optional>
 #include <ranges>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -92,6 +93,7 @@ class eol {
     void sync_battle_queue_table();
 
     void set_battle_results_title(const char* label);
+    std::string battle_leader_line() const;
 
     void record_apple_for_apple_battle(int object_index);
 

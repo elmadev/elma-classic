@@ -321,35 +321,39 @@ void eol::render_battle_status(pic8& dest, abc8& font) const {
     font.write_centered(&dest, dest.get_width() / 2, y, out.c_str());
 }
 
+std::string eol::battle_leader_line() const {
+    if (!(current_battle->attributes & BattleAttributes::SeeTimes)) {
+        return "Times hidden";
+    }
+
+    if (battle_leaderboard_.empty()) {
+        return "";
+    }
+    const battle_leaderboard_entry& leader = battle_leaderboard_.front();
+    if (leader.score == 0 && leader.apple_count == 0) {
+        return "";
+    }
+
+    const std::string result =
+        format_battle_result(current_battle->type, leader.score, leader.apple_count);
+    return leader.kuski_id2 != 0
+               ? std::format("Battle leaders: {} & {} {}", lookup_nick(leader.kuski_id),
+                             lookup_nick(leader.kuski_id2), result)
+               : std::format("Battle leader: {} {}", lookup_nick(leader.kuski_id), result);
+}
+
 void eol::render_battle_leader(pic8& dest, abc8& font) const {
     if (!EolSettings->show_battle_leader() || !current_battle) {
         return;
     }
 
+    const std::string line = battle_leader_line();
+    if (line.empty()) {
+        return;
+    }
+
     const int y = 15 + font.line_height() * (1 + EolSettings->chat_lines());
-
-    if (!(current_battle->attributes & BattleAttributes::SeeTimes)) {
-        font.write_centered(&dest, dest.get_width() / 2, y - font.line_height(), "Times hidden");
-        return;
-    }
-
-    if (battle_leaderboard_.empty()) {
-        return;
-    }
-    const battle_leaderboard_entry& leader = battle_leaderboard_.front();
-    if (leader.score == 0 && leader.apple_count == 0) {
-        return;
-    }
-
-    const std::string result =
-        format_battle_result(current_battle->type, leader.score, leader.apple_count);
-    const std::string leader_line =
-        leader.kuski_id2 != 0
-            ? std::format("Battle leaders: {} & {} {}", lookup_nick(leader.kuski_id),
-                          lookup_nick(leader.kuski_id2), result)
-            : std::format("Battle leader: {} {}", lookup_nick(leader.kuski_id), result);
-
-    font.write_centered(&dest, dest.get_width() / 2, y - font.line_height(), leader_line.c_str());
+    font.write_centered(&dest, dest.get_width() / 2, y - font.line_height(), line.c_str());
 }
 
 void eol::render_battle_countdown(pic8& dest, abc8& large_font, abc8& data_font) const {

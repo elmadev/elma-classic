@@ -284,11 +284,7 @@ static int battle_status_y(const abc8& font) {
     return 15 + font.line_height() * (1 + EolSettings->chat_lines());
 }
 
-void eol::render_battle_status(pic8& dest, abc8& font) const {
-    if (!EolSettings->show_battle_status() || !current_battle) {
-        return;
-    }
-
+std::string eol::battle_status_line() const {
     const std::string type_text =
         format_type_with_cripples(current_battle->type, current_battle->attributes);
     const std::string level_text = format_level(current_battle->level_filename);
@@ -321,7 +317,16 @@ void eol::render_battle_status(pic8& dest, abc8& font) const {
         out += current_battle->level_exists ? " (F4 to rewrite)" : " (F4 to download)";
     }
 
-    font.write_centered(&dest, dest.get_width() / 2, battle_status_y(font), out.c_str());
+    return out;
+}
+
+void eol::render_battle_status(pic8& dest, abc8& font) const {
+    if (!EolSettings->show_battle_status() || !current_battle) {
+        return;
+    }
+
+    const std::string line = battle_status_line();
+    font.write_centered(&dest, dest.get_width() / 2, battle_status_y(font), line.c_str());
 }
 
 std::string eol::battle_leader_line() const {

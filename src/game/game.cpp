@@ -26,6 +26,7 @@
 #include <cstring>
 #include <filesystem>
 #include <optional>
+#include <utility>
 
 int Single = 1;
 int FlagTag = 0;
@@ -57,6 +58,58 @@ static BattleAttributes::Kind active_cripples() {
     return static_cast<Kind>(cripples);
 }
 
+// Show the chat prompt (PM target > team chat > public) as the input label.
+static void push_chat_prompt() {
+    if (Console->in_chat_mode()) {
+        Console->label_mode(EolClient->chat_prompt(), "", true, true);
+    }
+}
+
+static void handle_pm_target_keys() {
+    if (!Console->in_chat_mode() || Console->in_command_prompt()) {
+        return;
+    }
+
+    bool target_changed = false;
+    if (was_key_just_pressed(State->key_pm_next_kuski)) {
+        EolClient->pm_next_kuski();
+        target_changed = true;
+    }
+
+    if (was_key_just_pressed(State->key_pm_prev_kuski)) {
+        EolClient->pm_prev_kuski();
+        target_changed = true;
+    }
+
+    if (was_key_just_pressed(State->key_pm_clear_kuski)) {
+        EolClient->clear_pm_kuski();
+        target_changed = true;
+    }
+
+    static constexpr std::pair<DikScancode, char> JUMP_KEYS[] = {
+        {DIK_0, '0'}, {DIK_1, '1'}, {DIK_2, '2'}, {DIK_3, '3'}, {DIK_4, '4'}, {DIK_5, '5'},
+        {DIK_6, '6'}, {DIK_7, '7'}, {DIK_8, '8'}, {DIK_9, '9'}, {DIK_A, 'a'}, {DIK_B, 'b'},
+        {DIK_C, 'c'}, {DIK_D, 'd'}, {DIK_E, 'e'}, {DIK_F, 'f'}, {DIK_G, 'g'}, {DIK_H, 'h'},
+        {DIK_I, 'i'}, {DIK_J, 'j'}, {DIK_K, 'k'}, {DIK_L, 'l'}, {DIK_M, 'm'}, {DIK_N, 'n'},
+        {DIK_O, 'o'}, {DIK_P, 'p'}, {DIK_Q, 'q'}, {DIK_R, 'r'}, {DIK_S, 's'}, {DIK_T, 't'},
+        {DIK_U, 'u'}, {DIK_V, 'v'}, {DIK_W, 'w'}, {DIK_X, 'x'}, {DIK_Y, 'y'}, {DIK_Z, 'z'},
+    };
+    for (auto [key, c] : JUMP_KEYS) {
+        // Ctrl+Shift+V pastes into the console; don't also treat it as a jump.
+        if (key == DIK_V && is_paste_modifier_down()) {
+            continue;
+        }
+        if (was_key_just_pressed(combo_scancode{DIK_LCONTROL, key})) {
+            EolClient->pm_jump_to_char(c);
+            target_changed = true;
+        }
+    }
+
+    if (target_changed) {
+        push_chat_prompt();
+    }
+}
+
 // Returns whether console was active at the beginning of this frame,
 // to prevent key presses from affecting the gameplay.
 static bool handle_console_input() {
@@ -65,8 +118,10 @@ static bool handle_console_input() {
         if (Console->is_input_active() ||
             EolSettings->chat_visibility() != ChatVisibility::Hidden) {
             Console->toggle_active();
+            push_chat_prompt();
         }
     } else if (Console->is_input_active()) {
+        handle_pm_target_keys();
         Console->handle_input();
     }
     return was_active;

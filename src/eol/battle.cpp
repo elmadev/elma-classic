@@ -280,6 +280,10 @@ void eol::process(const battle_time_sync& bts) {
     current_battle->local_start_ms = bts.local_start_ms;
 }
 
+static int battle_status_y(const abc8& font) {
+    return 15 + font.line_height() * (1 + EolSettings->chat_lines());
+}
+
 void eol::render_battle_status(pic8& dest, abc8& font) const {
     if (!EolSettings->show_battle_status() || !current_battle) {
         return;
@@ -317,8 +321,7 @@ void eol::render_battle_status(pic8& dest, abc8& font) const {
         out += current_battle->level_exists ? " (F4 to rewrite)" : " (F4 to download)";
     }
 
-    const int y = 15 + font.line_height() * (1 + EolSettings->chat_lines());
-    font.write_centered(&dest, dest.get_width() / 2, y, out.c_str());
+    font.write_centered(&dest, dest.get_width() / 2, battle_status_y(font), out.c_str());
 }
 
 std::string eol::battle_leader_line() const {
@@ -352,8 +355,8 @@ void eol::render_battle_leader(pic8& dest, abc8& font) const {
         return;
     }
 
-    const int y = 15 + font.line_height() * (1 + EolSettings->chat_lines());
-    font.write_centered(&dest, dest.get_width() / 2, y - font.line_height(), line.c_str());
+    const int y = battle_status_y(font) - font.line_height();
+    font.write_centered(&dest, dest.get_width() / 2, y, line.c_str());
 }
 
 void eol::render_battle_countdown(pic8& dest, abc8& large_font, abc8& data_font) const {

@@ -430,6 +430,10 @@ static void handle_eol_inputs() {
         EolClient->toggle_show_battle_leader();
     }
 
+    if (was_game_key_just_pressed(State->key_show_chat)) {
+        Console->cycle_show_chat();
+    }
+
     if (was_game_key_just_pressed(State->key_reconnect)) {
         EolSettings->set_play_offline(false);
         EolClient->disconnect();

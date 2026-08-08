@@ -42,6 +42,8 @@ class console {
                     bool allow_commands);
     void clear_label_mode();
 
+    void cycle_show_chat();
+
   private:
     static constexpr size_t MAX_LINES = 1000;
     static constexpr int LINE_HEIGHT = 12;

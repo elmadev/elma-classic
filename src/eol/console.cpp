@@ -282,10 +282,32 @@ bool console::should_show(const console_line& line) const {
     if (line.type == LineType::Info) {
         return true;
     }
+    if (EolSettings->chat_visibility() == ChatVisibility::PublicHidden &&
+        line.type == LineType::Chat) {
+        return false;
+    }
     if (mode == Mode::Chat) {
         return line.type != LineType::System;
     }
     return true;
+}
+
+void console::cycle_show_chat() {
+    switch (EolSettings->chat_visibility()) {
+    case ChatVisibility::Shown:
+        EolSettings->set_chat_visibility(ChatVisibility::PublicHidden);
+        StatusMessages->add("public chat hidden");
+        break;
+    case ChatVisibility::PublicHidden:
+        EolSettings->set_chat_visibility(ChatVisibility::Hidden);
+        StatusMessages->add("chat hidden");
+        break;
+    case ChatVisibility::Hidden:
+        EolSettings->set_chat_visibility(ChatVisibility::Shown);
+        StatusMessages->add("chat shown");
+        break;
+    }
+    scroll_offset = 0;
 }
 
 int console::max_scroll_offset() const {

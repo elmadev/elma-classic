@@ -233,6 +233,9 @@ bool console::should_show(const console_line& line) const {
     if (line.type == LineType::Log) {
         return show_log_lines;
     }
+    if (line.type == LineType::Info) {
+        return true;
+    }
     if (mode == Mode::Chat) {
         return line.type != LineType::System;
     }

@@ -17,6 +17,7 @@ class console {
         Team,
         System,
         Log,
+        Info,
     };
 
     struct command {

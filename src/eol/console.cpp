@@ -125,7 +125,7 @@ void console::register_console_commands() {
     register_alias("dl", "download");
     register_command("download_battle",
                      [](std::string_view /*text*/) { EolClient->download_battle_level(); });
-    register_alias("dlb", "download");
+    register_alias("dlb", "download_battle");
 }
 
 void console::add_line(std::string text, LineType type) {

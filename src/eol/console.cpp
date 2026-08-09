@@ -1,7 +1,11 @@
 #include "eol/console.h"
+#include "editor/editor.h"
 #include "eol/eol.h"
 #include "eol/settings.h"
 #include "eol/status_messages.h"
+#include "game/level_load.h"
+#include "level/level.h"
+#include "level/object.h"
 #include "log.h"
 #include "pic/abc8.h"
 #include "platform/implementation.h"
@@ -57,6 +61,47 @@ static std::optional<int> parse_int(std::string_view text) {
         return std::nullopt;
     }
     return value;
+}
+
+static void print_level_info(std::string_view /*text*/) {
+    if (!Level) {
+        Console->add_line("No level loaded", console::LineType::Info);
+        return;
+    }
+
+    int apples = 0;
+    int killers = 0;
+    int flowers = 0;
+
+    for (object* obj : Level->objects) {
+        if (!obj) {
+            break;
+        }
+        switch (obj->type) {
+        case object::Type::Food:
+            apples++;
+            break;
+        case object::Type::Killer:
+            killers++;
+            break;
+        case object::Type::Exit:
+            flowers++;
+            break;
+        default:
+            break;
+        }
+    }
+
+    const char* filename = current_level_filename();
+    Console->add_line(std::format("name: {}", *filename ? filename : "(unnamed)"),
+                      console::LineType::Info);
+    Console->add_line(std::format("title: {}", (const char*)Level->level_name),
+                      console::LineType::Info);
+    Console->add_line(std::format("lgr: {}", (const char*)Level->lgr_name),
+                      console::LineType::Info);
+    Console->add_line(std::format("crc: {}", Level->level_id), console::LineType::Info);
+    Console->add_line(std::format("apples: {}, killers: {}, flowers: {}", apples, killers, flowers),
+                      console::LineType::Info);
 }
 
 #define REGISTER_SETTINGS_STR(field)                                                               \
@@ -156,6 +201,7 @@ void console::register_console_commands() {
     register_command("download_battle",
                      [](std::string_view /*text*/) { EolClient->download_battle_level(); });
     register_alias("dlb", "download_battle");
+    register_command("levinfo", print_level_info);
 }
 
 void console::add_line(std::string text, LineType type) {

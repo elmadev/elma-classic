@@ -48,6 +48,7 @@ class eol {
     void process(const battle_line_update&);
     void process(const flag_owner_changed&);
     void process(const battle_queue_update&);
+    void process(const finished_time&);
     void process(const restore_apple_battle_progress&);
     void process(const level_download&);
 
@@ -84,6 +85,9 @@ class eol {
 
     void toggle_battle_results() { set_table(TableType::BattleResults); }
     void toggle_battle_queue() { set_table(TableType::BattleQueue); }
+    void toggle_finished_times() { set_table(TableType::FinishedTimes); }
+    void cycle_finished_times_filter();
+    void clear_finished_times();
 
     const kuski* spy_kuski();
     void spy_next_kuski();
@@ -95,6 +99,7 @@ class eol {
     void sync_players_online_table();
     void sync_battle_results_table();
     void sync_battle_queue_table();
+    void sync_finished_times_table();
 
     void set_battle_results_title(const char* label);
     std::string battle_status_line() const;
@@ -124,10 +129,14 @@ class eol {
     std::vector<battle_leaderboard_entry> battle_leaderboard_;
     BattleType battle_leaderboard_type_ = BattleType::Normal;
     std::vector<battle_queue_entry> battle_queue_;
+    enum class FinishedTimesFilter { All, Internal, External };
+    FinishedTimesFilter finished_times_filter_ = FinishedTimesFilter::All;
+    std::vector<finished_time> finished_times_;
     eol_table* cur_table;
     eol_table players_online_table;
     eol_table battle_results_table;
     eol_table battle_queue_table;
+    eol_table finished_times_table;
     std::optional<unsigned int> spy_kuski_id;
 };
 

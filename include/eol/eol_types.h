@@ -34,7 +34,7 @@ struct kuski {
     std::optional<struct spy_data> data;
 };
 
-enum class TableType { None, PlayersOnline, BattleResults, BattleQueue };
+enum class TableType { None, PlayersOnline, BattleResults, BattleQueue, FinishedTimes };
 
 enum class BattleType : uint8_t {
     Normal = 0,

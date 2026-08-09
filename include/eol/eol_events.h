@@ -157,4 +157,10 @@ struct battle_queue_update {
     std::vector<battle_queue_entry> entries;
 };
 
+struct finished_time {
+    unsigned int kuski_id;
+    char level[MAX_FILENAME_LEN + 1];
+    uint32_t time; // In centiseconds
+};
+
 #endif

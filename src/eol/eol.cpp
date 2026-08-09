@@ -53,7 +53,8 @@ eol::eol()
       cur_table(nullptr),
       players_online_table("Players online"),
       battle_results_table("Battle results"),
-      battle_queue_table("Battle queue") {
+      battle_queue_table("Battle queue"),
+      finished_times_table("Finished times") {
     players_online_table.add_column(100, eol_table::Align::Left);
     players_online_table.add_column(100, eol_table::Align::Right);
     battle_results_table.add_column(100, eol_table::Align::Left);
@@ -61,6 +62,10 @@ eol::eol()
     battle_queue_table.add_column(100, eol_table::Align::Left);
     battle_queue_table.add_column(60, eol_table::Align::Right);
     battle_queue_table.add_column(130, eol_table::Align::Right);
+    finished_times_table.add_column(100, eol_table::Align::Left);
+    finished_times_table.add_column(60, eol_table::Align::Right);
+    finished_times_table.add_column(130, eol_table::Align::Right);
+    finished_times_table.set_overflow(eol_table::Overflow::NewestRows);
 }
 
 void eol::reset() {
@@ -186,6 +191,68 @@ void eol::sync_players_online_table() {
 std::string_view eol::lookup_nick(unsigned int kuski_id) const {
     auto match = std::ranges::find(all_kuskis(), kuski_id, &kuski::id);
     return match != all_kuskis().end() ? std::string_view{match->nick} : "?";
+}
+
+void eol::process(const finished_time& ft) {
+    constexpr size_t MAX_FINISHED_TIMES = 500;
+
+    if (!get_kuski(kuskis_, ft.kuski_id)) {
+        return;
+    }
+
+    finished_times_.push_back(ft);
+    if (finished_times_.size() > MAX_FINISHED_TIMES) {
+        finished_times_.erase(finished_times_.begin());
+    }
+    sync_finished_times_table();
+}
+
+void eol::sync_finished_times_table() {
+    finished_times_table.clear_rows();
+    for (const finished_time& ft : finished_times_) {
+        if (finished_times_filter_ != FinishedTimesFilter::All) {
+            bool internal = get_internal_index(std::format("{}.lev", ft.level).c_str()).has_value();
+            if (internal != (finished_times_filter_ == FinishedTimesFilter::Internal)) {
+                continue;
+            }
+        }
+
+        char time_buf[32] = "";
+        util::text::centiseconds_to_string(int(ft.time), time_buf, true, true);
+        finished_times_table.add_row(
+            {std::string(lookup_nick(ft.kuski_id)), time_buf, format_level(ft.level)});
+    }
+}
+
+void eol::cycle_finished_times_filter() {
+    if (cur_table != &finished_times_table) {
+        return;
+    }
+
+    switch (finished_times_filter_) {
+    case FinishedTimesFilter::All:
+        finished_times_filter_ = FinishedTimesFilter::Internal;
+        finished_times_table.set_title("Finished internal times");
+        break;
+    case FinishedTimesFilter::Internal:
+        finished_times_filter_ = FinishedTimesFilter::External;
+        finished_times_table.set_title("Finished external times");
+        break;
+    case FinishedTimesFilter::External:
+        finished_times_filter_ = FinishedTimesFilter::All;
+        finished_times_table.set_title("Finished times");
+        break;
+    }
+    sync_finished_times_table();
+}
+
+void eol::clear_finished_times() {
+    if (cur_table != &finished_times_table) {
+        return;
+    }
+
+    finished_times_.clear();
+    sync_finished_times_table();
 }
 
 void eol::process(const chat_message& msg) {
@@ -378,6 +445,9 @@ void eol::set_table(TableType table) {
         break;
     case TableType::BattleQueue:
         new_table = &battle_queue_table;
+        break;
+    case TableType::FinishedTimes:
+        new_table = &finished_times_table;
         break;
     }
 

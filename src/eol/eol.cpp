@@ -48,6 +48,8 @@ static kuski* get_kuski(std::vector<kuski>& kuskis, std::string_view nick) {
 
 eol::eol()
     : proto(*this),
+      id(0),
+      id2(0),
       cur_table(nullptr),
       players_online_table("Players online"),
       battle_results_table("Battle results"),
@@ -59,6 +61,17 @@ eol::eol()
     battle_queue_table.add_column(100, eol_table::Align::Left);
     battle_queue_table.add_column(60, eol_table::Align::Right);
     battle_queue_table.add_column(130, eol_table::Align::Right);
+}
+
+void eol::reset() {
+    id = 0;
+    id2 = 0;
+    kuskis_.clear();
+    current_battle.reset();
+    online_apple_battle.clear();
+    battle_queue_.clear();
+    set_table(TableType::None);
+    spy_kuski_id.reset();
 }
 
 void eol::process(const login& l) {

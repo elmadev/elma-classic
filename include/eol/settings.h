@@ -121,6 +121,7 @@ class eol_settings {
     Default<combo_scancode> download_level_key_{combo_scancode{DIK_LCONTROL, DIK_F4}};
     Default<combo_scancode> players_online_key_{combo_scancode{DIK_NONE, DIK_F5}};
     Default<combo_scancode> battle_results_key_{combo_scancode{DIK_NONE, DIK_F6}};
+    Default<combo_scancode> finished_times_key_{combo_scancode{DIK_NONE, DIK_F7}};
     Default<combo_scancode> chat_key_{combo_scancode{DIK_NONE, DIK_F9}};
     Default<combo_scancode> battle_status_key_{combo_scancode{DIK_NONE, DIK_F10}};
     Default<combo_scancode> battle_leader_key_{combo_scancode{DIK_LSHIFT, DIK_F10}};
@@ -216,6 +217,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(download_level_key);
     DECLARE_FIELD_FUNCS(players_online_key);
     DECLARE_FIELD_FUNCS(battle_results_key);
+    DECLARE_FIELD_FUNCS(finished_times_key);
     DECLARE_FIELD_FUNCS(chat_key);
     DECLARE_FIELD_FUNCS(battle_status_key);
     DECLARE_FIELD_FUNCS(battle_leader_key);

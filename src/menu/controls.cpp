@@ -171,6 +171,7 @@ static void load_function_controls(menu_nav* nav) {
     load_control(nav, FunctionKeys, "Download Level", &State->key_download_level);
     load_control(nav, FunctionKeys, "Players Online", &State->key_players_online);
     load_control(nav, FunctionKeys, "Battle Results", &State->key_battle_results);
+    load_control(nav, FunctionKeys, "Finished Times", &State->key_finished_times);
     load_control(nav, FunctionKeys, "Chat", &State->key_chat);
     load_control(nav, FunctionKeys, "Hide Battle Status", &State->key_battle_status);
     load_control(nav, FunctionKeys, "Hide Battle Leader", &State->key_battle_leader);

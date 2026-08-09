@@ -287,6 +287,11 @@ void console::deactivate_input() {
     }
 }
 
+void console::clear_input() {
+    input_buffer.clear();
+    cursor_pos = 0;
+}
+
 void console::toggle_active() {
     empty_keypress_buffer();
     if (input_active) {

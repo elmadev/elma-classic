@@ -32,6 +32,7 @@ class console {
     bool is_input_active() const;
     void toggle_active();
     void deactivate_input();
+    void clear_input();
     void handle_input();
 
     void register_command(std::string_view name,

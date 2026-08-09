@@ -110,6 +110,20 @@ static void handle_pm_target_keys() {
     }
 }
 
+static void toggle_download_prompt() {
+    if (Console->is_input_active() && Console->in_command_prompt()) {
+        Console->deactivate_input();
+        return;
+    }
+
+    Console->label_mode("[Download] ", "!download ", true, false);
+    if (Console->is_input_active()) {
+        Console->clear_input();
+    } else {
+        Console->toggle_active();
+    }
+}
+
 // Returns whether console was active at the beginning of this frame,
 // to prevent key presses from affecting the gameplay.
 static bool handle_console_input() {
@@ -121,8 +135,12 @@ static bool handle_console_input() {
             push_chat_prompt();
         }
     } else if (Console->is_input_active()) {
-        handle_pm_target_keys();
-        Console->handle_input();
+        if (was_key_just_pressed(State->key_download_level)) {
+            toggle_download_prompt();
+        } else {
+            handle_pm_target_keys();
+            Console->handle_input();
+        }
     }
     return was_active;
 }
@@ -462,8 +480,7 @@ static void handle_eol_inputs() {
         EolClient->download_battle_level();
     }
     if (was_game_key_just_pressed(State->key_download_level)) {
-        Console->label_mode("[Download] ", "!download ", true, false);
-        Console->toggle_active();
+        toggle_download_prompt();
     }
 
     if (was_game_key_just_pressed(State->key_players_online)) {

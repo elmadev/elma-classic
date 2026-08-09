@@ -19,7 +19,8 @@ int eol_table::table_y_offset(pic8& dest, abc8& data_font) {
     return (dest.get_height() * 5) / 6 + data_font.line_height() * 3;
 }
 
-void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alignment) const {
+void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alignment,
+                       int reserved_lines) const {
     int y_top = eol_table::table_y_offset(dest, data_font);
 
     int x_center;
@@ -46,7 +47,7 @@ void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alig
     }
 
     // Calculate max rows that fit vertically
-    int screen_max_rows = std::max((y_top - TITLE_GAP) / data_font.line_height(), 1);
+    int screen_max_rows = std::max(y_top / data_font.line_height() - reserved_lines, 1);
 
     int first_row_index = 0;
     if (overflow == Overflow::NewestRows) {

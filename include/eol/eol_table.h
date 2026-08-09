@@ -24,7 +24,8 @@ class eol_table {
     void clear_rows();
 
     static int table_y_offset(pic8& dest, abc8& data_font);
-    void render(pic8& dest, abc8& title_font, abc8& data_font, Align alignment) const;
+    void render(pic8& dest, abc8& title_font, abc8& data_font, Align alignment,
+                int reserved_lines) const;
 
     void set_title(std::string title_) { title = std::move(title_); }
     void set_overflow(Overflow overflow_) { overflow = overflow_; }

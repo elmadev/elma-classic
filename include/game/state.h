@@ -96,6 +96,7 @@ class state {
     combo_scancode key_players_online;
     combo_scancode key_battle_results;
     combo_scancode key_finished_times;
+    combo_scancode key_clear_finished_times;
     combo_scancode key_chat;
     combo_scancode key_battle_status;
     combo_scancode key_battle_leader;

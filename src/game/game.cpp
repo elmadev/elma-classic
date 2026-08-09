@@ -413,6 +413,9 @@ static void handle_eol_inputs() {
     if (was_game_key_just_pressed(State->key_finished_times)) {
         EolClient->toggle_finished_times();
     }
+    if (was_game_key_just_pressed(State->key_clear_finished_times)) {
+        EolClient->clear_finished_times();
+    }
 
     if (was_game_key_just_pressed(State->key_battle_status)) {
         EolClient->toggle_battle_status();

@@ -9,6 +9,7 @@
 #include "platform/text_input.h"
 #include "platform/utils.h"
 #include "util/util.h"
+#include <charconv>
 #include <format>
 #include <optional>
 #include <ranges>
@@ -49,6 +50,15 @@ static std::optional<bool> parse_bool(std::string_view text) {
     return std::nullopt;
 }
 
+static std::optional<int> parse_int(std::string_view text) {
+    int value = 0;
+    auto [ptr, ec] = std::from_chars(text.data(), text.data() + text.size(), value);
+    if (ec != std::errc() || ptr != text.data() + text.size()) {
+        return std::nullopt;
+    }
+    return value;
+}
+
 #define REGISTER_SETTINGS_STR(field)                                                               \
     register_command(#field,                                                                       \
                      [](std::string_view text) { EolSettings->set_##field(std::string(text)); });
@@ -66,6 +76,18 @@ static std::optional<bool> parse_bool(std::string_view text) {
             } else {                                                                               \
                 add_line(std::format("invalid value: {}", text), LineType::System);                \
             }                                                                                      \
+        }                                                                                          \
+    });
+
+#define REGISTER_SETTINGS_INT(field)                                                               \
+    register_command(#field, [this](std::string_view text) {                                       \
+        if (text.empty()) {                                                                        \
+            StatusMessages->add(std::format("{}: {}", #field, EolSettings->field()));              \
+        } else if (auto val = parse_int(text)) {                                                   \
+            EolSettings->set_##field(*val);                                                        \
+            StatusMessages->add(std::format("{}: {}", #field, EolSettings->field()));              \
+        } else {                                                                                   \
+            add_line(std::format("invalid value: {}", text), LineType::System);                    \
         }                                                                                          \
     });
 
@@ -96,6 +118,8 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(default_sky);
     register_alias("defsky", "default_sky");
     REGISTER_SETTINGS_BOOL(still_objects);
+
+    REGISTER_SETTINGS_INT(chat_lines);
 
     REGISTER_SETTINGS_BOOL(show_fps);
     REGISTER_SETTINGS_BOOL(show_ups);

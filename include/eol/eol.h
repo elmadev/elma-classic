@@ -21,6 +21,8 @@ class eol {
     void connect() { proto.connect(); }
     void tick() { proto.tick(); }
 
+    bool play_offline() const { return proto.play_offline(); }
+
     void process(const login&);
     void process(const new_kuski&);
     void process(const kuski_logout&);

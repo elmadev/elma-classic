@@ -8,6 +8,7 @@ class null_protocol {
     null_protocol(eol&) {}
     void connect() {}
     void tick() {}
+    bool play_offline() const { return true; }
     template <typename T> void send(const T&) {}
     bool in_battle_level() const { return false; }
     bool playing_battle_level() const { return false; }

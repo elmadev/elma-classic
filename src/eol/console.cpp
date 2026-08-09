@@ -91,6 +91,12 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(show_last_apple_time);
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
 
+    REGISTER_SETTINGS_BOOL(default_ground);
+    register_alias("defground", "default_ground");
+    REGISTER_SETTINGS_BOOL(default_sky);
+    register_alias("defsky", "default_sky");
+    REGISTER_SETTINGS_BOOL(still_objects);
+
     REGISTER_SETTINGS_BOOL(show_fps);
     REGISTER_SETTINGS_BOOL(show_ups);
     register_alias("ups", "show_ups");

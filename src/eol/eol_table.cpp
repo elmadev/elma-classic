@@ -48,6 +48,12 @@ void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alig
     // Calculate max rows that fit vertically
     int screen_max_rows = std::max((y_top - TITLE_GAP) / data_font.line_height(), 1);
 
+    int first_row_index = 0;
+    if (overflow == Overflow::NewestRows) {
+        first_row_index = std::max(total_rows - screen_max_rows, 0);
+    }
+    int visible_rows = total_rows - first_row_index;
+
     // Total width of one column group
     int total_col_width = 0;
     for (const auto& col : columns) {
@@ -58,7 +64,7 @@ void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alig
     // Left-aligned tables grow rightward, right-aligned grow leftward, center grows both ways.
     int group_stride = total_col_width + GROUP_GAP;
     int screen_max_groups = (dest.get_width() + GROUP_GAP) / group_stride;
-    int needed_groups = (total_rows + screen_max_rows - 1) / screen_max_rows;
+    int needed_groups = (visible_rows + screen_max_rows - 1) / screen_max_rows;
     int num_groups = std::min(needed_groups, screen_max_groups);
     int all_groups_width = num_groups * group_stride - GROUP_GAP;
 
@@ -76,9 +82,9 @@ void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alig
     }
 
     // draw rows top to bottom, in groups left to right
-    for (int i = 0; i < total_rows; i++) {
-        int group = i / screen_max_rows;
-        int row_in_group = i % screen_max_rows;
+    for (int i = first_row_index; i < total_rows; i++) {
+        int group = (i - first_row_index) / screen_max_rows;
+        int row_in_group = (i - first_row_index) % screen_max_rows;
 
         int y = y_top - data_font.line_height() * row_in_group - TITLE_GAP;
         int group_x = groups_base_x + group * group_stride;

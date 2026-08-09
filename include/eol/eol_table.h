@@ -10,6 +10,9 @@ class pic8;
 class eol_table {
   public:
     enum class Align { Left, Center, Right };
+    // WrapGroups: overflowing rows wrap into additional column groups drawn side by side.
+    // NewestRows: no wrapping; only the newest rows that fit on screen are drawn.
+    enum class Overflow { WrapGroups, NewestRows };
 
     eol_table(std::string title_)
         : title(std::move(title_)) {}
@@ -24,6 +27,7 @@ class eol_table {
     void render(pic8& dest, abc8& title_font, abc8& data_font, Align alignment) const;
 
     void set_title(std::string title_) { title = std::move(title_); }
+    void set_overflow(Overflow overflow_) { overflow = overflow_; }
 
   private:
     struct column {
@@ -34,6 +38,7 @@ class eol_table {
     std::string title;
     std::vector<column> columns;
     std::vector<std::vector<std::string>> rows;
+    Overflow overflow = Overflow::WrapGroups;
 };
 
 #endif

@@ -5,6 +5,9 @@
 
 void invalidate_level();
 
+// Filename of the currently loaded level, or "".
+const char* current_level_filename();
+
 bool load_level_play(const char* levelname);
 
 bool load_level_editor(const char* levelname);

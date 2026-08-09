@@ -18,6 +18,8 @@ static finame CurrentLevelName = "";
 
 void invalidate_level() { ReloadLevel = true; }
 
+const char* current_level_filename() { return CurrentLevelName; }
+
 // return true if Level is reloaded, false if Level is unchanged
 static bool load_level(const char* levelname) {
     if (!levelname) {

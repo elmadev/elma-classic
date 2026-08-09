@@ -438,6 +438,7 @@ void state::reset_keys() {
     key_players_online = EolSettings->players_online_key_default();
     key_battle_results = EolSettings->battle_results_key_default();
     key_finished_times = EolSettings->finished_times_key_default();
+    key_cycle_finished_times_filter = EolSettings->cycle_finished_times_filter_key_default();
     key_clear_finished_times = EolSettings->clear_finished_times_key_default();
     key_chat = EolSettings->chat_key_default();
     key_battle_status = EolSettings->battle_status_key_default();

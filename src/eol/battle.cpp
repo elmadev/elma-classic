@@ -341,7 +341,8 @@ std::string eol::battle_status_line() const {
 
     if ((current_battle->attributes & BattleAttributes::Uploaded) &&
         !current_battle->download_requested) {
-        out += current_battle->level_exists ? " (F4 to rewrite)" : " (F4 to download)";
+        out += std::format(" ({} to {})", dik_to_string(State->key_download_battle_level),
+                           current_battle->level_exists ? "rewrite" : "download");
     }
 
     return out;

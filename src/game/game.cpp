@@ -831,7 +831,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         // Get timestep
         double now = stopwatch();
-        double dt = (now - last_stopwatch) * 0.0024;
+        double dt = (now - last_stopwatch) * STOPWATCH_TO_PHYS_TIME;
         last_stopwatch = now;
 
         double speed = 1.0;
@@ -1000,7 +1000,7 @@ void render_replay(const char* level_filename) {
             break;
         }
 
-        double time = (double)VideoFrameIndex * (STOPWATCH_MULTIPLIER * 1000.0 * 0.0024) /
+        double time = (double)VideoFrameIndex * (pacer::MILLISECONDS_TO_PHYS_TIME * 1000.0) /
                       EolSettings->recording_fps();
 
         bool finished1 = !replay_frame(driv1, time, &driv2.draw_view);

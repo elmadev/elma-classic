@@ -1,8 +1,11 @@
 #ifndef EOL_PACER_H
 #define EOL_PACER_H
 
+#include "main.h"
+
 namespace pacer {
 
+constexpr double MILLISECONDS_TO_PHYS_TIME = STOPWATCH_MULTIPLIER * STOPWATCH_TO_PHYS_TIME;
 constexpr double PHYS_MAX_TIMESTEP = 0.0055;
 
 // Will be updated on the next run

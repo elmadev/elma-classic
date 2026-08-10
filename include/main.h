@@ -18,6 +18,7 @@ using recname = char[MAX_REPLAY_EXT_LEN + 1];
 using recpath = char[MAX_REPLAY_PATH_LEN + 1];
 
 constexpr double STOPWATCH_MULTIPLIER = 0.182;
+constexpr double STOPWATCH_TO_PHYS_TIME = 0.0024;
 extern bool ErrorGraphicsLoaded;
 
 [[noreturn]] void quit();

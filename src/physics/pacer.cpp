@@ -46,7 +46,7 @@ void reset() {
 }
 
 void new_frame() {
-    target_time = stopwatch() * 0.0024;
+    target_time = stopwatch() * STOPWATCH_TO_PHYS_TIME;
     target_time = std::max(0.000001, target_time);
 }
 

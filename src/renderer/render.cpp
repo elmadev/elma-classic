@@ -822,9 +822,10 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
         }
         double shown_time = time;
         if (Single && EolClient->is_spying()) {
-            shown_time = spy_kuski && !EolClient->battle_hides_times()
-                             ? spy_kuski->spy_data()->time * (STOPWATCH_MULTIPLIER * 0.0024)
-                             : 0.0;
+            shown_time =
+                spy_kuski && !EolClient->battle_hides_times()
+                    ? spy_kuski->spy_data()->time * (STOPWATCH_MULTIPLIER * STOPWATCH_TO_PHYS_TIME)
+                    : 0.0;
         }
         draw_timers(BestTime, flagtag_time, shown_time, pic, GameViewWidth, GameViewHeight);
     }

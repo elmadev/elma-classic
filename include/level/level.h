@@ -25,7 +25,6 @@ class level {
 
   public:
     int level_id;
-    bool lgr_not_found;
     bool topology_errors;
     polygon* polygons[MAX_POLYGONS];
     object* objects[MAX_OBJECTS];

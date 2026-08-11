@@ -79,7 +79,6 @@ const char* get_internal_level_name(int index) {
 
 level::level() {
     level_id = 0;
-    lgr_not_found = false;
     objects_flipped = false;
     topology_errors = false;
     topten_file_offset = 0;
@@ -595,7 +594,6 @@ static bool write_encrypted(void* buffer, int length, FILE* h) {
 }
 
 void level::from_file(const char* filename, bool internal) {
-    lgr_not_found = false;
     objects_flipped = false;
     topology_errors = false;
     topten_file_offset = 0;

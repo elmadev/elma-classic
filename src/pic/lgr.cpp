@@ -159,7 +159,6 @@ void lgrfile::load_lgr_file(const char* lgr_name) {
 
         LevelChanged = true;
         strcpy(Level->lgr_name, "default");
-        Level->lgr_not_found = true;
     }
 
     if (!override_is_default) {

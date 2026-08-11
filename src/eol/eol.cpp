@@ -406,7 +406,8 @@ void eol::record_apple_taken(int object_index, int num_apples) {
     });
 }
 
-void eol::exit_level(const driver& d, double time, int level_apple_count) {
+void eol::exit_level(const driver& d, const level* lev, double time, int level_apple_count,
+                     bool spying) {
     for (kuski& k : kuskis_) {
         k.clear_spy_data();
         k.clear_apple_data();
@@ -421,6 +422,11 @@ void eol::exit_level(const driver& d, double time, int level_apple_count) {
                          .dead = d.dead,
                          .esc = d.finish_time == 0 && !d.dead};
     proto.send(fl);
+
+    if (!spying) {
+        struct upload_rec ur{.lev = lev, .name = d.rec->level_filename, .rec = d.rec};
+        proto.send(ur);
+    }
 }
 
 void eol::send_chat(std::string_view message) {

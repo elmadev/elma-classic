@@ -56,7 +56,8 @@ class eol {
     void download_level(std::string_view name);
     void download_battle_level();
     void enter_level(const char* level_name, const level* lev, bool spying);
-    void exit_level(const driver& d, double time, int level_apple_count);
+    void exit_level(const driver& d, const level* lev, double time, int level_apple_count,
+                    bool spying);
     void send_chat(std::string_view message);
     void send_kuski_data(double time, driver& driv);
 

@@ -9,6 +9,8 @@
 #include <string_view>
 #include <vector>
 
+class recorder;
+
 constexpr int MAX_MESSAGE_LEN = 65;
 
 struct login {
@@ -67,6 +69,12 @@ struct exit_level {
     int level_apple_count;
     bool dead;
     bool esc;
+};
+
+struct upload_rec {
+    const level* lev;
+    const char* name;
+    recorder* rec;
 };
 
 struct spy_apple_data {

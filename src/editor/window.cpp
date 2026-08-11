@@ -1174,19 +1174,17 @@ void editor_window_sprite_properties(sprite* spr) {
             Clipping default_clipping = Clipping::Unknown;
             if (spr->picture_name[0]) {
                 int index = Lgr->get_picture_index(spr->picture_name);
-                if (index < 0) {
-                    internal_error("editor_window_sprite_properties index < 0");
+                if (index >= 0) {
+                    default_distance = Lgr->pictures[index].default_distance;
+                    default_clipping = Lgr->pictures[index].default_clipping;
                 }
-                default_distance = Lgr->pictures[index].default_distance;
-                default_clipping = Lgr->pictures[index].default_clipping;
             }
             if (spr->texture_name[0]) {
                 int index = Lgr->get_texture_index(spr->texture_name);
-                if (index < 0) {
-                    internal_error("editor_window_sprite_properties index < 0");
+                if (index >= 0) {
+                    default_distance = Lgr->textures[index].default_distance;
+                    default_clipping = Lgr->textures[index].default_clipping;
                 }
-                default_distance = Lgr->textures[index].default_distance;
-                default_clipping = Lgr->textures[index].default_clipping;
             }
 
             char tmp[10];

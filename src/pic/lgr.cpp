@@ -83,11 +83,6 @@ static bool lgr_exists(const char* lgr_name, const char* backup_lgr) {
         return false;
     }
 
-    // LGR not found
-    if (!Level) {
-        internal_error("load_lgr_file !Level!");
-    }
-
     // Display warning
     finame filename;
     strcpy(filename, lgr_name);
@@ -148,17 +143,9 @@ void lgrfile::load_lgr_file(const char* lgr_name) {
 
     if (!is_default && !override_is_same) {
         const char* desc = override_is_default ? "default.lgr" : "the default lgr file";
-
         if (try_load_lgr(lgr_load_name, desc)) {
             return;
         }
-
-        if (!Level) {
-            internal_error("load_lgr_file !Level!");
-        }
-
-        LevelChanged = true;
-        strcpy(Level->lgr_name, "default");
     }
 
     if (!override_is_default) {

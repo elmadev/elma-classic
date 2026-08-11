@@ -82,7 +82,7 @@
 ### Internal Editor Graphics
 * Foreground and background textures are previewed when selecting
 * Cursor no longer disappears when inputting a clipping or distance
-* Foreground and background textures no longer get reset if texture is not found
+* Foreground and background textures no longer get reset if texture is not found. The lgr name will no longer be reset if lgr is not found.
 * Dialog pop-ups (help, topology check, etc) are now vertically centered on the screen
 
 ## Minor Bug Fixes

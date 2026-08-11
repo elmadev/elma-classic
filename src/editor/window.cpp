@@ -3,6 +3,7 @@
 #include "editor/dialog.h"
 #include "editor/editor.h"
 #include "editor/screen_pic.h"
+#include "editor/topology.h"
 #include "game/level_load.h"
 #include "level/level.h"
 #include "level/polygon.h"
@@ -1559,6 +1560,8 @@ void editor_window_level_properties() {
                 lgrfile::load_lgr_file(Level->lgr_name);
                 Level->load_sprite_wireframes(Lgr, true);
             }
+
+            check_textures();
             return;
         }
         if (clicked_box(box_foreground)) {

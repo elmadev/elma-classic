@@ -6,7 +6,38 @@
 #include "level/object.h"
 #include "level/polygon.h"
 #include "level/segments.h"
+#include "main.h"
+#include "pic/lgr.h"
+#include "platform/utils.h"
 #include <format>
+
+// Pop-up warnings without failing topology check
+void check_textures() {
+    ELMA_ASSERT(Lgr);
+    ELMA_ASSERT(Level);
+
+    // Disallow identical foreground/background textures
+    if (strcmpi(Level->foreground_name, Level->background_name) == 0) {
+        dialog("Warning: the default foreground and background textures are identical!",
+               "The incorrect textures will be loaded",
+               "Please change the foreground or background texture!");
+        return;
+    }
+
+    // Check for missing foreground texture
+    if (Lgr->get_texture_index(Level->foreground_name) < 0) {
+        dialog("Warning: the default foreground is not found!",
+               "The incorrect textures will be loaded", "Please change the foreground texture!");
+        return;
+    }
+
+    // Check for missing background texture
+    if (Lgr->get_texture_index(Level->background_name) < 0) {
+        dialog("Warning: the default background is not found!",
+               "The incorrect textures will be loaded", "Please change the background texture!");
+        return;
+    }
+}
 
 bool check_topology(bool show_dialog) {
     dialog("Checking Topology, please wait!", DIALOG_BUTTONS, DIALOG_RETURN);

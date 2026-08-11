@@ -661,6 +661,8 @@ void editor() {
     invalidate_editor_gui();
     draw_editor();
 
+    check_textures();
+
     while (true) {
         handle_events();
         // Control keys
@@ -735,6 +737,7 @@ void editor() {
         } else if (i == 5 && right_click) {
             editor_help_save_and_play();
         } else if (i == 6 && left_click) {
+            check_textures();
             check_topology(true);
         } else if (i == 6 && right_click) {
             editor_help_check_topology();

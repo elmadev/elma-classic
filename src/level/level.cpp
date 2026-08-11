@@ -123,8 +123,8 @@ level::~level() {
     }
 }
 
-bool level::discard_missing_lgr_assets(lgrfile* lgr) {
-    bool sprites_deleted = false;
+void level::load_sprite_wireframes(lgrfile* lgr, bool warn_if_missing) {
+    bool missing_sprites = false;
     for (int i = 0; i < MAX_SPRITES; i++) {
         if (!sprites[i]) {
             continue;
@@ -136,17 +136,14 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
         spr->wireframe_height = PixelsToMeters * DEFAULT_SPRITE_WIREFRAME;
 
         if (spr->picture_name[0] && (spr->mask_name[0] || spr->texture_name[0])) {
-            internal_error("discard_missing_lgr_assets invalid pic/mask/text combination!");
+            internal_error("load_sprite_wireframes invalid pic/mask/text combination!");
         }
 
-        // Delete any sprite not existing in lgr, and also set the size of the asset
+        // Set the editor size of each sprite, and check if any sprites are missing
         if (spr->picture_name[0]) {
             int index = lgr->get_picture_index(spr->picture_name);
-            if (index < 0) {
-                spr->picture_name[0] = 0;
-                delete sprites[i];
-                sprites[i] = nullptr;
-                sprites_deleted = true;
+            if (lgr->get_picture_index(spr->picture_name) < 0) {
+                missing_sprites = true;
                 continue;
             }
 
@@ -156,10 +153,7 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
             if (spr->mask_name[0]) {
                 int index = lgr->get_mask_index(spr->mask_name);
                 if (index < 0) {
-                    spr->mask_name[0] = 0;
-                    delete sprites[i];
-                    sprites[i] = nullptr;
-                    sprites_deleted = true;
+                    missing_sprites = true;
                     continue;
                 }
 
@@ -167,30 +161,19 @@ bool level::discard_missing_lgr_assets(lgrfile* lgr) {
                 spr->wireframe_height = lgr->masks[index].height * PixelsToMeters;
 
                 if (spr->texture_name[0]) {
-                    int index = lgr->get_texture_index(spr->texture_name);
-                    if (index < 0) {
-                        spr->texture_name[0] = 0;
-                        delete sprites[i];
-                        sprites[i] = nullptr;
-                        sprites_deleted = true;
+                    if (lgr->get_texture_index(spr->texture_name) < 0) {
+                        missing_sprites = true;
+                        continue;
                     }
                 }
             }
         }
     }
 
-    bool sprites_shifted = true;
-    while (sprites_shifted) {
-        sprites_shifted = false;
-        for (int i = 0; i < MAX_SPRITES - 1; i++) {
-            if (!sprites[i] && sprites[i + 1]) {
-                sprites[i] = sprites[i + 1];
-                sprites[i + 1] = nullptr;
-                sprites_shifted = true;
-            }
-        }
+    if (missing_sprites && warn_if_missing) {
+        dialog("The LGR file has changed since the last edition of this level and",
+               "some pictures do not exist in the LGR file!");
     }
-    return sprites_deleted;
 }
 
 polygon* level::get_closest_vertex(double x, double y, int* vertex_index, double* distance,

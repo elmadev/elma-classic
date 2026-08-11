@@ -1557,9 +1557,7 @@ void editor_window_level_properties() {
                 LevelChanged = true;
                 strcpy(Level->lgr_name, lgr_name);
                 lgrfile::load_lgr_file(Level->lgr_name);
-                if (Level->discard_missing_lgr_assets(Lgr)) {
-                    dialog_warn_lgr_assets_deleted();
-                }
+                Level->load_sprite_wireframes(Lgr, true);
             }
             return;
         }

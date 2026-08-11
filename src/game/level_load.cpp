@@ -64,7 +64,7 @@ bool load_level_play(const char* levelname) {
         }
 
         lgrfile::load_lgr_file(Level->lgr_name);
-        Level->discard_missing_lgr_assets(Lgr);
+        Level->load_sprite_wireframes(Lgr, false);
 
         START_TIME(segments_timer);
         delete Segments;
@@ -84,9 +84,7 @@ bool load_level_play(const char* levelname) {
 bool load_level_editor(const char* levelname) {
     if (load_level(levelname)) {
         lgrfile::load_lgr_file(Level->lgr_name);
-        if (Level->discard_missing_lgr_assets(Lgr)) {
-            dialog_warn_lgr_assets_deleted();
-        }
+        Level->load_sprite_wireframes(Lgr, true);
     }
 
     // Segments are not properly updated in the editor
@@ -99,12 +97,4 @@ bool load_level_editor(const char* levelname) {
     }
 
     return true;
-}
-
-void dialog_warn_lgr_assets_deleted() {
-    dialog("The LGR file has changed since the last edition of this level and",
-           "some parts (pictures, textures or border polygons) of the level",
-           "must have been deleted!", "", "!!!!IMPORTANT!!!!",
-           "If you do not want to lose these parts, do not save this level",
-           "on its original name!");
 }

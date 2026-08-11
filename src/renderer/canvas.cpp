@@ -733,11 +733,11 @@ void canvas::draw_sprites(Clipping clipping) {
             }
             int texture_index = Lgr->get_texture_index(spr->texture_name);
             if (texture_index < 0) {
-                internal_error("draw_sprites texture_index < 0");
+                continue;
             }
             int mask_index = Lgr->get_mask_index(spr->mask_name);
             if (mask_index < 0) {
-                internal_error("draw_sprites mask_index < 0");
+                continue;
             }
             draw_texture(spr, texture_index, mask_index, clipping);
             continue;
@@ -749,7 +749,7 @@ void canvas::draw_sprites(Clipping clipping) {
         // Picture
         int picture_index = Lgr->get_picture_index(spr->picture_name);
         if (picture_index < 0) {
-            internal_error("draw_sprites picture_index < 0");
+            continue;
         }
         picture* pict = &Lgr->pictures[picture_index];
 

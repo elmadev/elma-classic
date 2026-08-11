@@ -18,7 +18,7 @@ console* Console = nullptr;
 
 static std::optional<bool> parse_bool(std::string_view text) {
     if (text.empty()) {
-        return {};
+        return std::nullopt;
     }
 
     if (strcmpi(text.data(), "yes") == 0 || strcmpi(text.data(), "true") == 0) {
@@ -30,7 +30,7 @@ static std::optional<bool> parse_bool(std::string_view text) {
     }
 
     if (text.size() != 1) {
-        return {};
+        return std::nullopt;
     }
 
     switch (text[0]) {
@@ -46,7 +46,7 @@ static std::optional<bool> parse_bool(std::string_view text) {
         break;
     }
 
-    return {};
+    return std::nullopt;
 }
 
 #define REGISTER_SETTINGS_STR(field)                                                               \

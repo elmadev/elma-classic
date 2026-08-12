@@ -232,6 +232,10 @@ void console::register_console_commands() {
                      [](std::string_view /*text*/) { EolClient->download_battle_level(); });
     register_alias("dlb", "download_battle");
     register_command("levinfo", print_level_info);
+
+    REGISTER_SETTINGS_BOOL(show_speedometer);
+    register_alias("speedometer", "show_speedometer");
+    register_alias("speed", "show_speedometer");
 }
 
 void console::add_line(std::string text, LineType type) {

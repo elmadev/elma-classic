@@ -1212,7 +1212,7 @@ void editor_window_sprite_properties(sprite* spr) {
 
             render_box(screen.pic(), box_clipping, EditorPaletteId::WINDOW_INPUT,
                        EditorPaletteId::WINDOW_BORDER);
-            strcpy(tmp, clipping_to_string(default_clipping));
+            strcpy(tmp, clipping_to_string(clipping));
             draw_textbox_centered(screen.pic(), box_clipping, EditorPaletteId::WINDOW_INPUT, tmp);
             EditorBlackFont->write_centered(screen.pic(), x1 + 198, box_clipping.y2 + 14,
                                             "(U, S, G)");

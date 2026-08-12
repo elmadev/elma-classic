@@ -1,116 +1,147 @@
-* Version 1.4
+# Version 1.4
 
 ## Major Features
-* Polygons no longer have a per-polygon max vertex count. There is now only a maximum total vertex count for the entire level.
-* Steam elma.res is supported
-* Elma now honors the local keyboard layout for text input instead of being forced to US qwerty layout
-* QGRASS texture is available in internal editor
-* Replays: maximum duration increased from 1 hour to about 828 days.
-* Add support for LGR13
-* Add setting to properly scale grass with zoom
-* There is now navigation to "Level replays" after playing a level to view replays in that level
-* There is now navigation to "Merge with" after playing a level to merge last run with replays in that level
+* Native support for windowed mode
+* Grass may be optionally scaled with zoom
+* Elma now uses the local keyboard layout instead of the US layout
+* Level menu lists all replays linked to the current level
+* Level menu can merge last run with any replay linked to the current level
+* Replay maximum duration increased from 1 hour to 828 days
+* QGRASS texture is selectable in the internal editor
+* Polygons no longer have a per-polygon max vertex count - there is now only a maximum total vertex count for the entire level
+* Steam elma.res and Steam LGR13 files are supported
 
 ## Major Bug Fixes
-* It is possible to properly collect more than 200 apples in a single frame
-* Wheel turning the wrong way in replays is fixed (glitch starts at 455 speed instead of 124 speed, where max gas speed is approximately 220)
-* Fix crash related to "too complicated" (too large) mask and too large picture in lgr
-* Fix Uphill Battle bug where very wide grass polygons are not rendered properly at high zoom
-* Going out of bounds will kill the player instead of crashing
+* Rewinding in replays correctly shows arm position and restores apples
+* Wide grass polygons are properly rendered at high zoom (Uphill Battle grass bug)
+* Bike wheels no longer increase in size by 2.5% while turning
+* Wheels no longer spin the wrong way at max speed in replays - the wheel used to spin the wrong way at a speed of 124 (max gas speed is 220) - the glitch now only occurs above a speed of 455
+* Large masks and pictures no longer crash, especially at high zoom
+* Going out-of-bounds kills the player instead of crashing
+* More than 200 apples can be collected in one frame
 
 ## Minor Features
-* Improve picture loading speed by allocating all needed memory at once instead of allocating in blocks of 64 KB (DOS-era restriction)
-* Error messages and menu warnings are now vertically centered on the screen
-* Intro scrolling animation will always take 1.15 seconds, regardless of screen resolution
-* Intro scrolling animation is now skippable by pressing Enter or Esc, instead of being an eolconf setting
-* Background menu balls start off centered in the screen
-* Palette is processed as a 24-bit color instead of an 18-bit color, slightly improving color accuracy
-* Maximum number of displayed levels/recs in menu increased from 29 to up to 200 for high resolutions
-* Dialog pop-ups are centered on the screen
-* message.inf is no longer required to view error messages, and error messages are now all in English
-* turntime can now be configured
-* You can now type more non-letter symbols in game menus, like saving a replay or level named `!cov!`
-* Save play is enabled for internal 55, More Levels
-* Key repeat now works in menu so you can hold arrow down to go down or a to save many a.rec
-* Numpad NumLock state is now respected: navigation when NumLock is off, digit input when on
-* Bike controls configured to numpad keys now work regardless of NumLock state
-* You can now use mouse scroll wheel to navigate the menu
-* Mouse scroll now works in the editor for selecting level, lgr and pictures
-* Elma now saves State.dat when you change options
-* You can now f1-p in editor (same as f1-enter but in editor)
-* You can now change what LGR to use as the default from inside the options menu
-* Replays recorded with f1-enter are now saved into renders/rec_filename folder instead of the root
-* Internal editor allows Start object to be inside the ground
-* Improved lgr and level loading speeds
-* New setting to enable access to all internal levels without requiring them to be finished
-* Minimap opacity now can be configured from the options menu
-* Total time is now shown in the internal level list
-* You can now filter the options menu to find options
-* Level names in the internal editor can now be up to 50 characters long
-* When choosing foreground or background texture, internal editor will preview the image
-* Unlimited amount of files supported in lev/ and rec/ folders
-* Mask previews are no longer horizontally truncated in the internal editor
-* Screenshots are now saved into the screenshots folder with a timestamp-name instead of root snp00001
-* Screenshots are now saved as bmp instead of pcx
-* error.txt has been replaced with eol.log
-* You can select a default gravity and animation via right click when using the Create Food tool in the editor
-* You can delete polygons using the Delete Vertex tool in the editor
+
+### Gameplay
+* Internal level total time is displayed in menu
+* All internal levels may be immediately unlocked via the Options
+* When saving an internal replay, the internal number and name will be shown instead of QWQUU0XX.lev
+* !levinfo prints basic information about the current level
+* Save play is enabled for internal level 55 (More Levels)
+
+### Game Rendering
+* Bike turn time is configurable
+* default.lgr may be overridden with a different lgr file via Options
+* Minimap may be made partially opaque via Options
+* Foreground and background textures may be individually forced to "ground" and "sky"
+* Recorded replays are saved in the renders/rec_filename subfolder
+* Screenshots are timestamped and saved as .bmp in the screenshots/ subfolder
+* Significantly improved level and lgr loading speeds
 * Front grass in front of the bike is properly zoomed
+
+### Console and Shortcuts
+* Ctrl+G: toggle "ground"/"sky" foreground/background textures
+
+### System
+* lev/ and rec/ folders no longer have a maximum file limit
+* Image RGB values are processed as 24-bit colors instead of 18-bit colors, slightly improving color accuracy
+* Pictures are loaded faster by removing a DOS-era 64 KB memory page size limit
+
+### Menu
+* Intro scrolling animation will always take 1.15 seconds, regardless of screen resolution
+* Intro scrolling animation is now skippable by pressing Enter or Esc, instead of being a setting
+* Maximum rows increased from 29 to 200 for high resolutions
 * About menu updated
-* Editor cursor no longer disappears when inputting a clipping or distance
-* When saving internal replay, internal number and name will be shown instead of QWQUU0XX.lev
-* Flowers can be created/deleted in the internal editor.
-* Default foreground/background textures no longer get reset if texture not found or wrong lgr used
-* You can now individually force the foreground and background textures to "ground" and "sky", and can also set it via keybind
-* New console command !levinfo to print information about current level
+* Background menu balls start centered in the screen
+* state.dat is updated after using the Options menu
+
+### Key Input
+* Many non-alphanumeric symbols can now be typed in the menu and editor, such as `!`
+* Search is improved for replays, internal and external levels. Filter search is enabled for Options
+* Search is improved/enabled when in the editor browsing levels, lgrs and pictures
+* Numpad NumLock is supported (bike controls linked to numpad always work regardless of NumLock)
+* Key repeat can be used for typing and for scrolling up/down the menu
+* Mouse wheel scrolls up/down the menu and in the editor
+
+### Errors
+* message.inf is no longer required to view error messages, and error messages are in English
+* error.txt is replaced with eol.log
+* Error and warning messages are vertically centered on the screen
+
+### Internal Editor
+* Flowers can be created and deleted
+* F1+Play enables free camera mode from the editor
+* Start object may be inside the ground
+* Level descriptions can now be up to 50 characters long
+* Create Food tool can select a default gravity and animation via right click
+* Delete Vertex tool can also delete polygons
+* Level-too-big topology error is improved and now displays level dimensions
+
+### Internal Editor Graphics
+* Foreground and background textures are previewed when selecting
+* Cursor no longer disappears when inputting a clipping or distance
+* Foreground and background textures no longer get reset if texture is not found
+* Dialog pop-ups (help, topology check, etc) are now vertically centered on the screen
 
 ## Minor Bug Fixes
-* Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems
-* Front grass in front of the bike was accidentally inefficiently calculated, causing increased load time
-* Internal editor's Save As dialog box could cause buffer overflows
-* Internal editor's Save As would sometimes overwrite old files without giving a warning
-* Level description in internal editor is properly centered
-* Internal editor marks a level as changed if the case of the level description is changed
-* Pictures named "aaccbbdd" could prevent internal editor tooltip from properly updating
-* Show dialog if state.dat is inaccessible when updating top10 in an internal or merging state.dat
-* Background menu balls would sometimes vanish on the "Please do not distribute" screen
-* Improve some slightly buggy/inconsistent mouse click behaviour in internal editor
-* Red helmet animation will no longer skip frames after the intro scrolling animation
-* In internal editor, improve mouse lag and fix bug where mouse cursor would sometimes leave visual artifacts when left-clicking in empty space
-* Sometimes there was a missing pixel in the internal editor where two lines touch each other
-* The 3 timers (best time, flag tag time, current time) are now properly centered on screen
-* Fix bike flickering at high zoom
-* Fix some minor bike jitters in replay playback when bike or wheel rotates past an angle of 0 degrees (upright position)
-* Fix bike/wheel jitters in replay playback in the first 2 frames of the replay
-* Fixed a bug where a replay named a.rec.rec could not be played by elma
-* Some minor grammatical or spelling mistakes are fixed
-* When replay randomizer is unable to file a level file, Escing goes back to the Replay menu instead of jumping all the way back to Main menu
-* Apples and flowers now maintain correct bobbing animation when the view zoom level changes.
-* Pictures extremely out of bounds to the far left or right will no longer prevent other pictures and textures from being rendered
-* Extremely vertical grass polygon lines could crash, especially at high zoom
-* Replay animations now rewind correctly and apples get restored
-* Out-of-bounds grass and masks no longer cause a hard crash
-* You can no longer create a player with a duplicate name
-* Warning instead of crash if you reach max number of players in state.dat
-* You can open level and replay files with multiple dots e.g. pack.01.lev
+
+### Game Rendering
+* Bikes and kuskis no longer flicker at high zoom
+* Apple and flower vertical bobbing scales with zoom
+* Timers (best time, flag tag time and current time) are properly centered on the screen
 * Minimap icons no longer disappear 1 pixel too early at the edge of the minimap
-* Changing an apples animation number is now correctly saved by Save and Play
-* Incorrect texture distance/clipping data no longer erroneously appears when selecting a mask in Create Picture
-* Zoom number in top tooltip of editor no longer shifts when zooming out
-* Mouse behaviour in internal editor when trying to go off screen is standardized between the top and left edges
-* When mousing over pictures, sometimes the clipping would not be updated in the tooltip
-* Create Picture tooltip will show the default distance/clipping instead of 0, Unclipped
-* Wheel no longer increases in size by 2.5% while turning
-* Internal editor level-too-big topology check is graphically improved and provides more information
+* Level loading time significantly improved by fixing bug in front grass position calculations
+* Out-of-bounds grass and masks no longer crash/freeze the game
+* Out-of-bounds pictures to the far left or right no longer prevent other pictures and textures from being rendered
+* Extremely vertical grass polygon lines no longer crash the game
+
+### Replay
+* Bike and wheel rotation positions are no longer choppy in the first 0.03 seconds of a replay
+* Bike and wheel rotation positions are no longer briefly incorrect when rotating through an angle of 0 degrees (upright position)
+
+### System
+* Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems
+* Level and replay filenames may have multiple dots (e.g. pack.01.lev)
+* When the replay Randomizer is unable to find a level file, pressing Esc goes back to the Replay menu instead of going to the Main Menu
+* Some minor grammatical and spelling mistakes are fixed
+
+### Menu
+* Background balls no longer vanish at high resolution on the "Please do not distribute" screen
+* Red helmet animation is now smooth after the intro scrolling animation
+
+### State
+* Disallow duplicate players with identical names
+* Warn instead of crash when reaching the max number of players
+* When state.dat cannot be opened, show a dialog to give a second chance to save a run's time instead of freezing
+
+### Internal Editor
+* Create Picture tool tooltip shows default distance and default clipping instead of 0, Unclipped
+* Create Picture window no longer shows incorrect distance/clipping data when selecting a mask
+* Move tool tooltip over pictures no longer occasionally shows erroneous clipping value
+* Mouse position teleporting is standardized between dragging over the top edge versus left edge
+* Changing an apple's animation number or updating the level description correctly marks the level as changed
+* Save As no longer sometimes silently overwrites existing files
+* Save As no longer has a buffer overflow bug
+
+### Internal Editor Graphics
+* Editor no longer turns entirely black with some graphics systems
+* Mouse position no longer fails to update
+* Left-clicking no longer occasionally causes a visual mouse cursor artifact on the screen
+* Inconsistent and glitchy mouse clicking behaviour fixed and standardized across all editor windows
+* Missing pixels added at some connection points between two polygon lines
+* Level description text is properly centered in Level properties
+* Mask/texture previews are no longer horizontally truncated
+* Tooltip zoom information position no longer shifts around with different zoom values
+* Tooltip information no longer occasionally fails to update if a picture is named "aaccbbdd"
 
 ## Removed Legacy Features
-* It is no longer possible to upgrade from across.res to elma.res
-* Readme.txt is no longer autogenerated
-* noretrac.inf (software backbuffer) is no longer supported
-* fordit.inf (invert volt buttons) is no longer supported
-* nemmem.inf (Across memory check) is no longer supported
-* files.inf (files are read from ../files, instead of elma.res) is no longer supported
-* f_rate.inf (FPS estimate) is no longer supported
-* Debug code to generate elma.res/desclist.txt is removed
 * Level files are always unlocked, and you can no longer Save Lock
-* 1997 Action SuperCross debug message removed from Save Play
+* Disabled upgrading across.res to elma.res
+* Disabled autogenerated readme.txt
+* Disabled noretrac.inf (software backbuffer)
+* Disabled fordit.inf (invert volt buttons)
+* Disabled nemmem.inf (2 MB memory check)
+* Disabled files.inf (folder instead of elma.res)
+* Disabled f_rate.inf (average run FPS)
+* Disabled debug function to generate desclist.txt
+* Disabled secret 1997 Action SuperCross watermark in Save Play

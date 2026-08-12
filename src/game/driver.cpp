@@ -1,5 +1,19 @@
 #include "game/driver.h"
 #include "physics/forces.h"
+#include <cmath>
+#include <format>
+
+constexpr double PHYSICS_SPEED_TO_EOL_SPEED = 5.0;
+
+static std::string format_value(double value) { return std::format("{:.2f}", value); }
+
+std::string motor_stats::format_speed() const { return format_value(speed); }
+std::string motor_stats::format_max_speed() const { return format_value(max_speed); }
+
+void driver::update_speed() {
+    stats.speed = mot->bike.v.length() * PHYSICS_SPEED_TO_EOL_SPEED;
+    stats.max_speed = std::max(stats.max_speed, stats.speed);
+}
 
 void driver::reset_metadata() {
     sound.motor_frequency = 0.0;

@@ -837,6 +837,11 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
 
     if (loop == GameLoop::Game) {
         if (current_camera.mode != CameraMode::MapViewer) {
+            if (EolSettings->show_speedometer()) {
+                info_rows.push_back({"max speed", driv.stats.format_max_speed()});
+                info_rows.push_back({"speed", driv.stats.format_speed()});
+            }
+
             if (EolSettings->show_one_wheel_status()) {
                 info_rows.push_back({"one wheel", driv.mot->one_wheel_failed ? "no" : "yes"});
             }

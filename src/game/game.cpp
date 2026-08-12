@@ -684,6 +684,11 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                 set_motor_frequency(false, driv2.sound.motor_frequency, driv2.sound.gas);
             }
 
+            driv1.update_speed();
+            if (!Single) {
+                driv2.update_speed();
+            }
+
             // Turn state
             physics_frame_turn(driv1);
             if (camera_mode != CameraMode::MapViewer) {

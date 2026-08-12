@@ -179,6 +179,7 @@ static void load_function_controls(menu_nav* nav) {
     load_control(nav, FunctionKeys, "Show Chat", &State->key_show_chat);
     load_control(nav, FunctionKeys, "Hide Battle Status", &State->key_battle_status);
     load_control(nav, FunctionKeys, "Hide Battle Leader", &State->key_battle_leader);
+    load_control(nav, FunctionKeys, "Show Speedometer", &State->key_speedometer);
     load_control(nav, FunctionKeys, "Reconnect", &State->key_reconnect);
     load_control(nav, FunctionKeys, "Disconnect", &State->key_disconnect);
     load_control(nav, FunctionKeys, "Show Last Apple Time", &State->key_toggle_last_apple_time);

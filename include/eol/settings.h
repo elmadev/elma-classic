@@ -132,6 +132,7 @@ class eol_settings {
     Default<combo_scancode> show_chat_key_{combo_scancode{DIK_LSHIFT, DIK_F9}};
     Default<combo_scancode> battle_status_key_{combo_scancode{DIK_NONE, DIK_F10}};
     Default<combo_scancode> battle_leader_key_{combo_scancode{DIK_LSHIFT, DIK_F10}};
+    Default<combo_scancode> speedometer_key_{combo_scancode{DIK_LCONTROL, DIK_F10}};
     Default<combo_scancode> reconnect_key_{combo_scancode{DIK_NONE, DIK_F12}};
     Default<combo_scancode> disconnect_key_{combo_scancode{DIK_LSHIFT, DIK_F12}};
     Default<combo_scancode> toggle_one_wheel_status_key_{combo_scancode{DIK_LCONTROL, DIK_F11}};
@@ -177,9 +178,12 @@ class eol_settings {
     Default<std::string> password_{""};
     Default<bool> play_offline_{false};
     Default<bool> tcp_only_{false};
+
     Default<bool> show_others_{true};
     Default<bool> show_battle_status_{true};
     Default<bool> show_battle_leader_{true};
+    Default<bool> show_speedometer_{false};
+
     Default<eol_table::Align> table_alignment_{eol_table::Align::Center};
     Default<ChatVisibility> chat_visibility_{ChatVisibility::Shown};
 
@@ -240,6 +244,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(show_chat_key);
     DECLARE_FIELD_FUNCS(battle_status_key);
     DECLARE_FIELD_FUNCS(battle_leader_key);
+    DECLARE_FIELD_FUNCS(speedometer_key);
     DECLARE_FIELD_FUNCS(reconnect_key);
     DECLARE_FIELD_FUNCS(disconnect_key);
     DECLARE_FIELD_FUNCS(toggle_one_wheel_status_key);
@@ -285,9 +290,12 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(password);
     DECLARE_FIELD_FUNCS(play_offline);
     DECLARE_FIELD_FUNCS(tcp_only);
+
     DECLARE_FIELD_FUNCS(show_others);
     DECLARE_FIELD_FUNCS(show_battle_status);
     DECLARE_FIELD_FUNCS(show_battle_leader);
+    DECLARE_FIELD_FUNCS(show_speedometer);
+
     DECLARE_FIELD_FUNCS(table_alignment);
     DECLARE_FIELD_FUNCS(chat_visibility);
 };

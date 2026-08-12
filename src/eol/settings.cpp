@@ -190,6 +190,7 @@ void eol_settings::set_chat_key(combo_scancode key) { chat_key_ = key; }
 void eol_settings::set_show_chat_key(combo_scancode key) { show_chat_key_ = key; }
 void eol_settings::set_battle_status_key(combo_scancode key) { battle_status_key_ = key; }
 void eol_settings::set_battle_leader_key(combo_scancode key) { battle_leader_key_ = key; }
+void eol_settings::set_speedometer_key(combo_scancode key) { speedometer_key_ = key; }
 void eol_settings::set_reconnect_key(combo_scancode key) { reconnect_key_ = key; }
 void eol_settings::set_disconnect_key(combo_scancode key) { disconnect_key_ = key; }
 void eol_settings::set_toggle_one_wheel_status_key(combo_scancode key) {
@@ -293,10 +294,9 @@ void eol_settings::set_play_offline(bool o) { play_offline_ = o; }
 void eol_settings::set_tcp_only(bool t) { tcp_only_ = t; }
 
 void eol_settings::set_show_others(bool s) { show_others_ = s; }
-
 void eol_settings::set_show_battle_status(bool s) { show_battle_status_ = s; }
-
 void eol_settings::set_show_battle_leader(bool s) { show_battle_leader_ = s; }
+void eol_settings::set_show_speedometer(bool s) { show_speedometer_ = s; }
 
 void eol_settings::set_table_alignment(eol_table::Align a) { table_alignment_ = a; }
 
@@ -499,6 +499,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(show_chat_key)                                                                      \
     JSON_FIELD(battle_status_key)                                                                  \
     JSON_FIELD(battle_leader_key)                                                                  \
+    JSON_FIELD(speedometer_key)                                                                    \
     JSON_FIELD(reconnect_key)                                                                      \
     JSON_FIELD(disconnect_key)                                                                     \
     JSON_FIELD(toggle_one_wheel_status_key)                                                        \
@@ -544,9 +545,12 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(password)                                                                           \
     JSON_FIELD(play_offline)                                                                       \
     JSON_FIELD(tcp_only)                                                                           \
+                                                                                                   \
     JSON_FIELD(show_others)                                                                        \
     JSON_FIELD(show_battle_status)                                                                 \
     JSON_FIELD(show_battle_leader)                                                                 \
+    JSON_FIELD(show_speedometer)                                                                   \
+                                                                                                   \
     JSON_FIELD(table_alignment)                                                                    \
     JSON_FIELD(chat_visibility)
 
@@ -633,6 +637,7 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->key_show_chat = EolSettings->show_chat_key();
     s->key_battle_status = EolSettings->battle_status_key();
     s->key_battle_leader = EolSettings->battle_leader_key();
+    s->key_speedometer = EolSettings->speedometer_key();
     s->key_reconnect = EolSettings->reconnect_key();
     s->key_disconnect = EolSettings->disconnect_key();
     s->key_toggle_one_wheel_status = EolSettings->toggle_one_wheel_status_key();
@@ -677,6 +682,7 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_show_chat_key(s->key_show_chat);
     EolSettings->persist_battle_status_key(s->key_battle_status);
     EolSettings->persist_battle_leader_key(s->key_battle_leader);
+    EolSettings->persist_speedometer_key(s->key_speedometer);
     EolSettings->persist_reconnect_key(s->key_reconnect);
     EolSettings->persist_disconnect_key(s->key_disconnect);
     EolSettings->persist_toggle_one_wheel_status_key(s->key_toggle_one_wheel_status);

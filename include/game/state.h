@@ -104,6 +104,7 @@ class state {
     combo_scancode key_show_chat;
     combo_scancode key_battle_status;
     combo_scancode key_battle_leader;
+    combo_scancode key_speedometer;
     combo_scancode key_reconnect;
     combo_scancode key_disconnect;
     combo_scancode key_toggle_one_wheel_status;

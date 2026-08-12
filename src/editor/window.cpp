@@ -1542,6 +1542,10 @@ void editor_window_level_properties() {
     while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
+            if (strcmpi(lgr_name, Level->lgr_name) != 0) {
+                // Revert lgr back to original
+                lgrfile::load_lgr_file(Level->lgr_name);
+            }
             return;
         }
         if (was_key_just_pressed(DIK_RETURN) || clicked_box(box_ok)) {
@@ -1555,9 +1559,9 @@ void editor_window_level_properties() {
             strcpy(Level->level_name, level_name);
 
             if (strcmpi(lgr_name, Level->lgr_name) != 0) {
+                // Apply new loaded LGR
                 LevelChanged = true;
                 strcpy(Level->lgr_name, lgr_name);
-                lgrfile::load_lgr_file(Level->lgr_name);
                 Level->load_sprite_wireframes(Lgr, true);
             }
 
@@ -1587,6 +1591,7 @@ void editor_window_level_properties() {
             rerender = true;
         } else if (clicked_box(box_lgr)) {
             editor_window_choose_lgr(screen.pic(), lgr_name);
+            lgrfile::load_lgr_file(lgr_name);
             rerender = true;
         }
         if (rerender) {

@@ -124,6 +124,7 @@
 * Move tool tooltip over pictures no longer occasionally shows erroneous clipping value
 * Mouse position teleporting is standardized between dragging over the top edge versus left edge
 * Changing an apple's animation number or updating the level description correctly marks the level as changed
+* Foreground and background texture menu entries are immediately updated after selecting a new LGR
 * Save As no longer sometimes silently overwrites existing files
 * Save As no longer has a buffer overflow bug
 

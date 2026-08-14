@@ -217,7 +217,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
         switch (mot->motor_state) {
         case MotorState::Ignition:
             // Bike turn on sound at start of level
-            if (mot->playback_index_ignition + buffer_length > SoundMotorIgnition->size()) {
+            if (mot->playback_index_ignition + buffer_length >= SoundMotorIgnition->size()) {
                 // We're finished with the ignition sound. Transition to idle sound
                 source_length = SoundMotorIgnition->size() - mot->playback_index_ignition;
                 mix_into_buffer(&buffer[copied_counter],
@@ -245,7 +245,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
             } else {
                 // Otherwise, infinitely loop the idle sound
                 source_length = buffer_length - copied_counter;
-                if (source_length > SoundMotorIdle->size() - mot->playback_index_idle) {
+                if (source_length >= SoundMotorIdle->size() - mot->playback_index_idle) {
                     // Copy until the end of the sound effect, then loop
                     source_length = SoundMotorIdle->size() - mot->playback_index_idle;
                     mix_into_buffer(&buffer[copied_counter],
@@ -295,7 +295,7 @@ static void mix_motor_sounds(bool is_motor1, short* buffer, int buffer_length) {
         case MotorState::GasStart:
             // start-of-gas sound effect (sound frequency does not yet depend on speed)
             source_length = buffer_length - copied_counter;
-            if (source_length > SoundMotorGasStart->size() - mot->playback_index_gas_start) {
+            if (source_length >= SoundMotorGasStart->size() - mot->playback_index_gas_start) {
                 // We're finished with the start-of-gas sound. Transition to full gas sound
                 source_length = SoundMotorGasStart->size() - mot->playback_index_gas_start;
                 mix_into_buffer(&buffer[copied_counter],
@@ -417,7 +417,7 @@ void sound_mixer(short* buffer, int buffer_length) {
     for (int i = 0; i < MAX_WAV_EVENTS; i++) {
         if (WavEventActive[i]) {
             int length = buffer_length;
-            if (length > WavEventSound[i]->size() - WavEventPlaybackIndex[i]) {
+            if (length >= WavEventSound[i]->size() - WavEventPlaybackIndex[i]) {
                 length = WavEventSound[i]->size() - WavEventPlaybackIndex[i];
                 WavEventActive[i] = 0;
                 ActiveWavEvents--;

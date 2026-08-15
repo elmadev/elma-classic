@@ -435,6 +435,11 @@ static void handle_eol_inputs() {
     if (was_game_key_just_pressed(State->key_battle_leader)) {
         EolClient->toggle_show_battle_leader();
     }
+    if (was_game_key_just_pressed(State->key_speedometer)) {
+        EolSettings->set_show_speedometer(!EolSettings->show_speedometer());
+        StatusMessages->add(EolSettings->show_speedometer() ? "speedometer shown"
+                                                            : "speedometer hidden");
+    }
 
     if (was_game_key_just_pressed(State->key_show_chat)) {
         Console->cycle_show_chat();

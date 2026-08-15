@@ -147,6 +147,10 @@ void eol::process(const kuski_logout& kl) {
     for (kuski& k : kuskis_) {
         if (k.id == kl.id || k.id == kl.id2) {
             k.is_online = false;
+            k.clear_spy_data();
+            if (spy_kuski_id && *spy_kuski_id == k.id) {
+                spy_kuski_id.reset();
+            }
         }
     }
     sync_players_online_table();

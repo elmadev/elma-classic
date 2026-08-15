@@ -87,6 +87,11 @@ struct clear_spy_data {
     unsigned int kuski_id;
 };
 
+struct server_config {
+    // Number of frames to buffer before spy playback starts.
+    uint8_t min_spy_frames;
+};
+
 struct send_kuski_data {
     unsigned int kuski_id;
     double time;

@@ -311,6 +311,8 @@ void eol::process(const clear_spy_data& sd) {
     }
 }
 
+void eol::process(const server_config& sc) { min_spy_frames = sc.min_spy_frames; }
+
 void eol::process(const level_download& ld) {
     const char* level_name = (const char*)ld.level;
     switch (ld.result) {

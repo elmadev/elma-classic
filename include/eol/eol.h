@@ -41,6 +41,7 @@ class eol {
     void process(const spy_data&);
     void process(const spy_apple_data&);
     void process(const clear_spy_data&);
+    void process(const server_config&);
     void process(const battle_started&);
     void process(const battle_countdown_ended&);
     void process(const battle_ended&);
@@ -140,6 +141,7 @@ class eol {
     eol_table battle_queue_table;
     eol_table finished_times_table;
     std::optional<unsigned int> spy_kuski_id;
+    int min_spy_frames = 3;
 };
 
 extern eol* EolClient;

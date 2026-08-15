@@ -60,6 +60,7 @@ template struct Default<FullscreenMode>;
 template struct Default<DikScancode>;
 template struct Default<combo_scancode>;
 template struct Default<std::string>;
+template struct Default<eol_table::Align>;
 template struct Clamp<int>;
 template struct Clamp<double>;
 
@@ -281,6 +282,8 @@ void eol_settings::set_show_battle_status(bool s) { show_battle_status_ = s; }
 
 void eol_settings::set_show_battle_leader(bool s) { show_battle_leader_ = s; }
 
+void eol_settings::set_table_alignment(eol_table::Align a) { table_alignment_ = a; }
+
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.
  *
@@ -322,6 +325,30 @@ void from_json(const json& j, MapAlignment& m) {
         m = MapAlignment::Right;
     } else {
         throw("[json.exception.type_error.302] (/map_alignment) invalid value");
+    }
+}
+
+void to_json(json& j, const eol_table::Align& a) {
+    switch (a) {
+    case eol_table::Align::Left:
+        j = "left";
+        break;
+    case eol_table::Align::Center:
+        j = "center";
+        break;
+    case eol_table::Align::Right:
+        j = "right";
+        break;
+    }
+}
+
+void from_json(const json& j, eol_table::Align& a) {
+    if (j == "left") {
+        a = eol_table::Align::Left;
+    } else if (j == "center") {
+        a = eol_table::Align::Center;
+    } else if (j == "right") {
+        a = eol_table::Align::Right;
     }
 }
 
@@ -467,7 +494,8 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(tcp_only)                                                                           \
     JSON_FIELD(show_others)                                                                        \
     JSON_FIELD(show_battle_status)                                                                 \
-    JSON_FIELD(show_battle_leader)
+    JSON_FIELD(show_battle_leader)                                                                 \
+    JSON_FIELD(table_alignment)
 
 #define JSON_FIELD(name)                                                                           \
     void eol_settings::persist_##name(decltype(eol_settings::name##_.value) v) {                   \

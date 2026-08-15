@@ -467,7 +467,7 @@ void eol::render_table(pic8& dest, abc8& title_font, abc8& data_font) const {
     }
 
     int reserved_lines = 5 + EolSettings->chat_lines();
-    cur_table->render(dest, title_font, data_font, eol_table::Align::Center, reserved_lines);
+    cur_table->render(dest, title_font, data_font, EolSettings->table_alignment(), reserved_lines);
 }
 
 const kuski* eol::spy_kuski() {

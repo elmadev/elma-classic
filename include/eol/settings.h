@@ -1,6 +1,7 @@
 #ifndef EOL_SETTINGS
 #define EOL_SETTINGS
 
+#include "eol_table.h"
 #include "platform/scancode.h"
 #include <string>
 
@@ -168,6 +169,7 @@ class eol_settings {
     Default<bool> show_others_{true};
     Default<bool> show_battle_status_{true};
     Default<bool> show_battle_leader_{true};
+    Default<eol_table::Align> table_alignment_{eol_table::Align::Center};
 
   public:
     static void read_settings();
@@ -266,6 +268,7 @@ class eol_settings {
     DECLARE_FIELD_FUNCS(show_others);
     DECLARE_FIELD_FUNCS(show_battle_status);
     DECLARE_FIELD_FUNCS(show_battle_leader);
+    DECLARE_FIELD_FUNCS(table_alignment);
 };
 
 #undef DECLARE_FIELD_FUNCS

@@ -479,6 +479,33 @@ void menu_options() {
         BOOL_OPTION("Show battle status:", show_battle_status);
         BOOL_OPTION("Show battle leader:", show_battle_leader);
 
+        nav.add_row(
+            "Table Alignment:",
+            [] {
+                switch (EolSettings->table_alignment_persisted()) {
+                case eol_table::Align::Left:
+                    return "Left";
+                case eol_table::Align::Center:
+                    return "Center";
+                case eol_table::Align::Right:
+                    return "Right";
+                }
+                return "";
+            }(),
+            NAV_FUNC() {
+                switch (EolSettings->table_alignment_persisted()) {
+                case eol_table::Align::Left:
+                    EolSettings->persist_table_alignment(eol_table::Align::Center);
+                    return;
+                case eol_table::Align::Center:
+                    EolSettings->persist_table_alignment(eol_table::Align::Right);
+                    return;
+                case eol_table::Align::Right:
+                    EolSettings->persist_table_alignment(eol_table::Align::Left);
+                    return;
+                }
+            });
+
         choice = nav.navigate();
 
         if (choice < 0) {

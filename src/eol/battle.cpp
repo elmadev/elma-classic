@@ -401,8 +401,15 @@ std::string eol::battle_leader_line() const {
     if (battle_leaderboard_.empty()) {
         return flag_text;
     }
+
     const battle_leaderboard_entry& leader = battle_leaderboard_.front();
     if (leader.score == 0 && leader.apple_count == 0) {
+        return flag_text;
+    }
+
+    // An unfinished internal counts as STATS_MAX_TIME, so this total means nothing was finished.
+    if (current_battle->type == BattleType::HourTT &&
+        leader.score == (INTERNAL_LEVEL_COUNT - 1) * STATS_MAX_TIME) {
         return flag_text;
     }
 

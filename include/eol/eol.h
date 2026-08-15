@@ -75,6 +75,7 @@ class eol {
 
     bool in_apple_battle() const;
     bool battle_hides_exit() const;
+    bool battle_hides_times() const;
     std::optional<BattleAttributes::Kind> battle_cripples() const;
     bool kuski_has_flag(unsigned int kuski_id) const;
     bool own_bike_has_flag() const;
@@ -90,6 +91,7 @@ class eol {
     void clear_finished_times();
 
     const kuski* spy_kuski();
+    bool is_spying() const { return spy_kuski_id.has_value(); }
     void spy_next_kuski();
     void spy_prev_kuski();
 

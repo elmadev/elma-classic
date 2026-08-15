@@ -820,7 +820,13 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
         if (!Single && FlagTag) {
             flagtag_time = player1 ? FlagTimeA : FlagTimeB;
         }
-        draw_timers(BestTime, flagtag_time, time, pic, GameViewWidth, GameViewHeight);
+        double shown_time = time;
+        if (Single && EolClient->is_spying()) {
+            shown_time = spy_kuski && !EolClient->battle_hides_times()
+                             ? spy_kuski->spy_data()->time * (STOPWATCH_MULTIPLIER * 0.0024)
+                             : 0.0;
+        }
+        draw_timers(BestTime, flagtag_time, shown_time, pic, GameViewWidth, GameViewHeight);
     }
 
     // Build the bottom-right info panel rows.

@@ -152,6 +152,11 @@ bool eol::battle_hides_exit() const {
            proto.playing_battle_level();
 }
 
+bool eol::battle_hides_times() const {
+    return current_battle && !(current_battle->attributes & BattleAttributes::SeeTimes) &&
+           proto.playing_battle_level();
+}
+
 static bool has_countdown(BattleType t) {
     using enum BattleType;
     return t == OneLife || t == FirstFinish || t == Apple || t == FinishCount || t == FlagTag;

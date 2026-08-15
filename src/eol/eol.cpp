@@ -297,7 +297,7 @@ void eol::process(const team_message& msg) {
 void eol::process(const spy_data& sd) {
     kuski* k = get_kuski(kuskis_, sd.kuski_id);
     if (k) {
-        k->add_spy_data(sd);
+        k->add_spy_data(sd, min_spy_frames);
     }
 }
 
@@ -321,7 +321,7 @@ void eol::process(const spy_apple_data& sd) {
 void eol::process(const stop_spy_data& sd) {
     kuski* k = get_kuski(kuskis_, sd.kuski_id);
     if (k) {
-        k->clear_spy_data();
+        k->stop_spy_data();
     }
 }
 
@@ -596,4 +596,11 @@ std::string eol::chat_prompt() const {
         return "[Team] ";
     }
     return "";
+}
+
+void eol::update_spy_kuskis() {
+    const uint32_t now = static_cast<uint32_t>(get_milliseconds());
+    for (kuski& k : kuskis_) {
+        k.update_spy_data(now, min_spy_frames);
+    }
 }

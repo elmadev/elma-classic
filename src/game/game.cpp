@@ -801,6 +801,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         if (!Single) {
             update_graphical_metadata(driv2, true, time);
         }
+        EolClient->update_spy_kuskis();
 
         // Update the hud and player visibility
         update_view_settings(driv1, &driv2.draw_view);

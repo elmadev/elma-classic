@@ -94,6 +94,7 @@ class eol {
     bool is_spying() const { return spy_kuski_id.has_value(); }
     void spy_next_kuski();
     void spy_prev_kuski();
+    void update_spy_kuskis();
 
     void toggle_team_chat();
 

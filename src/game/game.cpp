@@ -474,6 +474,12 @@ static void handle_eol_inputs() {
             StatusMessages->add("overriding background texture with \"sky\"");
         }
     }
+
+    if (was_game_key_just_pressed(State->key_toggle_one_wheel_status)) {
+        EolSettings->set_show_one_wheel_status(!EolSettings->show_one_wheel_status());
+        StatusMessages->add(EolSettings->show_one_wheel_status() ? "one-wheel status shown"
+                                                                 : "one-wheel status hidden");
+    }
 }
 
 // Common setup function

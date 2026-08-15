@@ -9,6 +9,8 @@ constexpr int MAX_PLAYERNAME_LENGTH = 14;
 constexpr int STATE_LEVEL_COUNT = 90;
 constexpr int INTERNAL_LEVEL_COUNT = 55;
 constexpr int MAX_TIMES = 10;
+// Default time if uncompleted level: 10 minutes
+constexpr int STATS_MAX_TIME = 100 * 60 * 10;
 
 struct player {
     char name[MAX_PLAYERNAME_LENGTH + 2];

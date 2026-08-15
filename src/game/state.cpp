@@ -208,9 +208,6 @@ static void write_stats_topten(FILE* h, topten* tten, bool single) {
     }
 }
 
-// Default time if uncompleted level: 10 minutes
-constexpr int STATS_MAX_TIME = 100 * 60 * 10;
-
 int state::player_total_time(const char* player_name, bool single) {
     int total_time = 0;
     for (int i = 0; i < INTERNAL_LEVEL_COUNT - 1; i++) {

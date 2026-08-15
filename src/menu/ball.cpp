@@ -60,9 +60,9 @@ void balls_init() {
     // The last 4 elements represent the 4 walls
     NextCollisionTime = UNKNOWN_COLLISION_TIME;
     ElapsedTimeSinceKeyframe = 0.0;
-    if (BallsInitialized) {
-        internal_error("Balls already initialized!");
-    }
+
+    ELMA_ASSERT(!BallsInitialized);
+
     bool allocation_success = true;
     CollisionTimeGrid = new double*[BallCount + 4];
     if (!CollisionTimeGrid) {
@@ -129,9 +129,8 @@ void balls_simulate(double dt) {
         FirstTimeDelay += dt;
         dt = 0.00000000001;
     }
-    if (!BallsInitialized) {
-        internal_error("balls_simulate - balls not initialized!");
-    }
+
+    ELMA_ASSERT(BallsInitialized);
 
     // If no collision occurs during dt, then just update position
     double current_time = ElapsedTimeSinceKeyframe + dt;
@@ -175,6 +174,8 @@ void balls_simulate(double dt) {
 }
 
 void balls_resolution_change() {
+    ELMA_ASSERT(BallsInitialized);
+
     // Synchronize time of all the balls
     reset_keyframe_time(ElapsedTimeSinceKeyframe);
     ElapsedTimeSinceKeyframe = 0.0;

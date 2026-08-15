@@ -106,8 +106,8 @@ void eol_settings::set_fullscreen(FullscreenMode f) {
     }
 
     fullscreen_ = f;
-    if (has_window()) {
-        platform_apply_fullscreen_mode();
+    if (has_window() && platform_apply_fullscreen_mode()) {
+        on_resolution_change();
     }
 }
 

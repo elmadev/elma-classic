@@ -41,7 +41,8 @@ std::string get_clipboard_text();
 bool is_fullscreen();
 long long get_milliseconds();
 
-void platform_apply_fullscreen_mode();
+// Returns true if the resolution changed; the caller must run on_resolution_change().
+bool platform_apply_fullscreen_mode();
 std::vector<std::pair<int, int>> platform_get_display_modes();
 std::pair<int, int> platform_get_desktop_resolution();
 

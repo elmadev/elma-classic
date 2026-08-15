@@ -65,6 +65,7 @@ struct exit_level {
     int apple_count;
     int level_apple_count;
     bool dead;
+    bool esc;
 };
 
 struct spy_apple_data {

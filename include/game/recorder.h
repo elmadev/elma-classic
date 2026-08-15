@@ -4,6 +4,7 @@
 #include "physics/init.h"
 #include "sound/engine.h"
 #include "vect2.h"
+#include <cstdint>
 #include <cstdio>
 #include <optional>
 #include <string>
@@ -74,7 +75,7 @@ class recorder {
     // Load replay of one bike
     int load(const char* filename, FILE* h, bool is_first_replay);
     // Save replay of one bike
-    void save(const char* filename, FILE* h, int level_id);
+    void save(const char* filename, FILE* h, int level_id) const;
 
   public:
     char level_filename[16];
@@ -97,6 +98,8 @@ class recorder {
     static merge_result load_merge(const std::string& filename1, const std::string& filename2);
     // Read only the header (level_id + level_filename) from a .rec file
     static std::optional<rec_header> read_header(const std::string& filename);
+
+    std::vector<uint8_t> to_bytes(int level_id) const;
 
     bool is_empty() const { return frame_count_ == 0; }
     int frame_count() const { return frame_count_; }

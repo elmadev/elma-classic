@@ -129,8 +129,10 @@ void eol::set_battle_results_title(const char* label) {
         {SeeOthers, "see others"},
     };
 
-    std::string new_title = std::format("{} {} in {}", format_battle_type(current_battle->type),
-                                        label, format_level(current_battle->level_filename));
+    std::string new_title = std::format("{} {}", format_battle_type(current_battle->type), label);
+    if (current_battle->type != BattleType::HourTT) {
+        new_title += std::format(" in {}", format_level(current_battle->level_filename));
+    }
 
     std::string details;
     if (current_battle->type == BattleType::Apple) {

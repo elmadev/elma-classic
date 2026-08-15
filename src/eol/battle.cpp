@@ -119,13 +119,38 @@ std::string eol::format_level(std::string_view level) {
     return with_ext;
 }
 
+// First Finish battle results in Sju250.lev (apple bugs, see others)
 void eol::set_battle_results_title(const char* label) {
+    using namespace BattleAttributes;
+
+    constexpr std::pair<Kind, std::string_view> extras[] = {
+        {AcceptBugs, "apple bugs"},
+        {AllowStarter, "allow starter"},
+        {SeeOthers, "see others"},
+    };
+
     std::string new_title = std::format("{} {} in {}", format_battle_type(current_battle->type),
                                         label, format_level(current_battle->level_filename));
+
+    std::string details;
     if (current_battle->type == BattleType::Apple) {
         uint32_t apple_count = current_battle->level_apple_count;
-        new_title += std::format(" ({} apple{})", apple_count, apple_count == 1 ? "" : "s");
+        details = std::format("{} apple{}", apple_count, apple_count == 1 ? "" : "s");
     }
+
+    for (auto [flag, text] : extras) {
+        if (current_battle->attributes & flag) {
+            if (!details.empty()) {
+                details += ", ";
+            }
+            details += text;
+        }
+    }
+
+    if (!details.empty()) {
+        new_title += std::format(" ({})", details);
+    }
+
     battle_results_table.set_title(new_title);
 }
 

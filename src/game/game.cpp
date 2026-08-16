@@ -480,6 +480,12 @@ static void handle_eol_inputs() {
         StatusMessages->add(EolSettings->show_one_wheel_status() ? "one-wheel status shown"
                                                                  : "one-wheel status hidden");
     }
+
+    if (was_game_key_just_pressed(State->key_toggle_last_apple_time)) {
+        EolSettings->set_show_last_apple_time(!EolSettings->show_last_apple_time());
+        StatusMessages->add(EolSettings->show_last_apple_time() ? "last apple time shown"
+                                                                : "last apple time hidden");
+    }
 }
 
 // Common setup function

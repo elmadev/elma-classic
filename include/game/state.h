@@ -105,6 +105,7 @@ class state {
     combo_scancode key_reconnect;
     combo_scancode key_disconnect;
     combo_scancode key_toggle_one_wheel_status;
+    combo_scancode key_toggle_last_apple_time;
 
     char editor_filename[20];
     char external_filename[20];

@@ -132,7 +132,7 @@ class eol_settings {
     Default<combo_scancode> battle_leader_key_{combo_scancode{DIK_LSHIFT, DIK_F10}};
     Default<combo_scancode> reconnect_key_{combo_scancode{DIK_NONE, DIK_F12}};
     Default<combo_scancode> disconnect_key_{combo_scancode{DIK_LSHIFT, DIK_F12}};
-    Default<combo_scancode> toggle_one_wheel_status_key_{combo_scancode{DIK_LSHIFT, DIK_F11}};
+    Default<combo_scancode> toggle_one_wheel_status_key_{combo_scancode{DIK_LCONTROL, DIK_F11}};
     Default<combo_scancode> toggle_last_apple_time_key_{combo_scancode{DIK_LCONTROL, DIK_F8}};
 
     Default<std::string> default_lgr_name_{"default"};

@@ -9,8 +9,6 @@ namespace pacer {
 
 namespace {
 
-constexpr long long LIMITER_TIMEOUT_MS = 33;
-
 bool FpsLimitEnabled = false;
 int FpsLimit = 0;
 
@@ -87,9 +85,7 @@ void new_frame() {
         // In milliunits (a value of 1000 corresponds to one allowed frame)
         long long max_allowed_frames = elapsed * FpsLimit;
 
-        // eol-client forces a real frame at least every 33 ms even when over the limit
-        if (real_frame_count * 1000LL > max_allowed_frames &&
-            now - last_real_frame_time <= LIMITER_TIMEOUT_MS) {
+        if (real_frame_count * 1000LL > max_allowed_frames) {
             // Skip current frame
             return;
         }

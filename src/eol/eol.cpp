@@ -220,7 +220,7 @@ void eol::sync_finished_times_table() {
         char time_buf[32] = "";
         util::text::centiseconds_to_string(int(ft.time), time_buf, true, true);
         finished_times_table.add_row(
-            {std::string(lookup_nick(ft.kuski_id)), time_buf, format_level(ft.level)});
+            {std::string(lookup_nick(ft.kuski_id)), format_level(ft.level), time_buf});
     }
 }
 

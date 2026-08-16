@@ -667,5 +667,5 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_battle_leader_key(s->key_battle_leader);
     EolSettings->persist_reconnect_key(s->key_reconnect);
     EolSettings->persist_disconnect_key(s->key_disconnect);
-    EolSettings->persist_disconnect_key(s->key_toggle_one_wheel_status);
+    EolSettings->persist_toggle_one_wheel_status_key(s->key_toggle_one_wheel_status);
 }

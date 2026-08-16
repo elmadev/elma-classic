@@ -56,12 +56,12 @@ bool was_key_down(DikScancode code) {
     return keyboard::was_down(sdl_code);
 }
 
-bool is_shortcut_modifier_down() {
+bool is_paste_modifier_down() {
     SDL_Keymod mod = SDL_GetModState();
 #ifdef __APPLE__
     return (mod & KMOD_GUI) != 0;
 #else
-    return (mod & KMOD_CTRL) != 0;
+    return (mod & KMOD_CTRL) != 0 && (mod & KMOD_SHIFT) != 0;
 #endif
 }
 

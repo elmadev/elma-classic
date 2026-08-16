@@ -56,8 +56,8 @@ DikScancode get_any_key_just_pressed();
 // Used for OS-level key repeat functionality (text input)
 bool was_key_down(DikScancode code);
 
-// If Ctrl (Windows) or Command (Mac) is held down
-bool is_shortcut_modifier_down();
+// If Command (Mac) or Ctrl+Shift (Windows/Linux) is held down
+bool is_paste_modifier_down();
 
 std::string dik_to_string(const combo_scancode& keycode);
 

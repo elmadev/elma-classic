@@ -367,7 +367,7 @@ void console::handle_input() {
         return;
     }
 
-    if (was_key_just_pressed(DIK_V) && is_shortcut_modifier_down()) {
+    if (was_key_just_pressed(DIK_V) && is_paste_modifier_down()) {
         std::string clipboard = get_clipboard_text();
         if (!clipboard.empty()) {
             paste_text(clipboard);

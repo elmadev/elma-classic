@@ -47,23 +47,21 @@ std::string format_fps_limit() {
 }
 
 void request_fps_limit(bool enabled, int limit) {
-    if (!EolSettings->show_fps()) {
-        bool enabled_changed =
-            enabled != FpsLimitEnabled || enabled != EolSettings->fps_limit_enabled();
-        if (!enabled) {
-            if (enabled_changed) {
-                StatusMessages->add("Turning FPS limiter off when the next run starts");
-            } else {
-                StatusMessages->add("FPS limiter is already off");
-            }
+    bool enabled_changed =
+        enabled != FpsLimitEnabled || enabled != EolSettings->fps_limit_enabled();
+    if (!enabled) {
+        if (enabled_changed) {
+            StatusMessages->add("Turning FPS limiter off when the next run starts");
         } else {
-            bool limit_changed = limit != FpsLimit || limit != EolSettings->fps_limit();
-            if (enabled_changed || limit_changed) {
-                StatusMessages->add(
-                    std::format("Setting FPS limiter to {} when the next run starts", limit));
-            } else {
-                StatusMessages->add(std::format("FPS is already limited to {}", limit));
-            }
+            StatusMessages->add("FPS limiter is already off");
+        }
+    } else {
+        bool limit_changed = limit != FpsLimit || limit != EolSettings->fps_limit();
+        if (enabled_changed || limit_changed) {
+            StatusMessages->add(
+                std::format("Setting FPS limiter to {} when the next run starts", limit));
+        } else {
+            StatusMessages->add(std::format("FPS is already limited to {}", limit));
         }
     }
     EolSettings->set_fps_limit_enabled(enabled);

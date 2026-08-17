@@ -503,11 +503,11 @@ static void merge_toptens(topten* src, topten* mrg, bool single) {
     for (int i = 0; i < src->times_count; i++) {
         times[i] = src->times[i];
         from_mrg[i] = false;
-        strcpy(names1[i], src->names1[i]);
+        strncpy(names1[i], src->names1[i], sizeof(player_name));
         if (single) {
-            names2[i][0] = 0;
+            memset(names2[i], 0, sizeof(player_name));
         } else {
-            strcpy(names2[i], src->names2[i]);
+            strncpy(names2[i], src->names2[i], sizeof(player_name));
         }
     }
 
@@ -516,11 +516,11 @@ static void merge_toptens(topten* src, topten* mrg, bool single) {
         int idest = src->times_count + i;
         times[idest] = mrg->times[i];
         from_mrg[idest] = true;
-        strcpy(names1[idest], mrg->names1[i]);
+        strncpy(names1[idest], mrg->names1[i], sizeof(player_name));
         if (single) {
-            names2[idest][0] = 0;
+            memset(names2[idest], 0, sizeof(player_name));
         } else {
-            strcpy(names2[idest], mrg->names2[i]);
+            strncpy(names2[idest], mrg->names2[i], sizeof(player_name));
         }
     }
 
@@ -564,13 +564,13 @@ static void merge_toptens(topten* src, topten* mrg, bool single) {
                 from_mrg[i + 1] = tmp;
 
                 player_name tmp_name;
-                strcpy(tmp_name, names1[i]);
-                strcpy(names1[i], names1[i + 1]);
-                strcpy(names1[i + 1], tmp_name);
+                strncpy(tmp_name, names1[i], sizeof(player_name));
+                strncpy(names1[i], names1[i + 1], sizeof(player_name));
+                strncpy(names1[i + 1], tmp_name, sizeof(player_name));
 
-                strcpy(tmp_name, names2[i]);
-                strcpy(names2[i], names2[i + 1]);
-                strcpy(names2[i + 1], tmp_name);
+                strncpy(tmp_name, names2[i], sizeof(player_name));
+                strncpy(names2[i], names2[i + 1], sizeof(player_name));
+                strncpy(names2[i + 1], tmp_name, sizeof(player_name));
             }
         }
     }
@@ -584,8 +584,8 @@ static void merge_toptens(topten* src, topten* mrg, bool single) {
                 for (int j = i + 1; j < combined_count - 1; j++) {
                     times[j] = times[j + 1];
                     from_mrg[j] = from_mrg[j + 1];
-                    strcpy(names1[j], names1[j + 1]);
-                    strcpy(names2[j], names2[j + 1]);
+                    strncpy(names1[j], names1[j + 1], sizeof(player_name));
+                    strncpy(names2[j], names2[j + 1], sizeof(player_name));
                 }
                 combined_count--;
                 break;
@@ -599,15 +599,15 @@ static void merge_toptens(topten* src, topten* mrg, bool single) {
     // Clear the best times
     for (int i = 0; i < MAX_TIMES; i++) {
         src->times[i] = -1;
-        src->names1[i][0] = 0;
-        src->names2[i][0] = 0;
+        memset(src->names1[i], 0, sizeof(player_name));
+        memset(src->names2[i], 0, sizeof(player_name));
     }
 
     // Write new data
     for (int i = 0; i < combined_count; i++) {
         src->times[i] = times[i];
-        strcpy(src->names1[i], names1[i]);
-        strcpy(src->names2[i], names2[i]);
+        strncpy(src->names1[i], names1[i], sizeof(player_name));
+        strncpy(src->names2[i], names2[i], sizeof(player_name));
     }
 }
 

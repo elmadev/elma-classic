@@ -443,6 +443,8 @@ void state::reset_keys() {
     key_battle_leader = EolSettings->battle_leader_key_default();
     key_reconnect = EolSettings->reconnect_key_default();
     key_disconnect = EolSettings->disconnect_key_default();
+    key_toggle_one_wheel_status = EolSettings->toggle_one_wheel_status_key_default();
+    key_toggle_last_apple_time = EolSettings->toggle_last_apple_time_key_default();
 }
 
 player* state::get_player(const char* player_name) {

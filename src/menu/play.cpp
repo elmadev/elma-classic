@@ -159,8 +159,8 @@ void update_top_ten(int time, char* time_message, int internal_index,
     if (tten->times_count == 0) {
         tten->times_count = 1;
         tten->times[0] = time;
-        strcpy(tten->names1[0], State->player1);
-        strcpy(tten->names2[0], State->player2);
+        strncpy(tten->names1[0], State->player1, sizeof(player_name));
+        strncpy(tten->names2[0], State->player2, sizeof(player_name));
         strcat(time_message, "     Best Time!");
         if (external_level) {
             Level->save_topten(external_filename);
@@ -181,12 +181,12 @@ void update_top_ten(int time, char* time_message, int internal_index,
     // Add your time to the end of the best time list
     if (tten->times_count == MAX_TIMES) {
         tten->times[MAX_TIMES - 1] = time;
-        strcpy(tten->names1[MAX_TIMES - 1], State->player1);
-        strcpy(tten->names2[MAX_TIMES - 1], State->player2);
+        strncpy(tten->names1[MAX_TIMES - 1], State->player1, sizeof(player_name));
+        strncpy(tten->names2[MAX_TIMES - 1], State->player2, sizeof(player_name));
     } else {
         tten->times[int(tten->times_count)] = time;
-        strcpy(tten->names1[int(tten->times_count)], State->player1);
-        strcpy(tten->names2[int(tten->times_count)], State->player2);
+        strncpy(tten->names1[int(tten->times_count)], State->player1, sizeof(player_name));
+        strncpy(tten->names2[int(tten->times_count)], State->player2, sizeof(player_name));
         tten->times_count++;
     }
 
@@ -199,13 +199,13 @@ void update_top_ten(int time, char* time_message, int internal_index,
                 tten->times[j + 1] = tmp;
 
                 player_name tmp_name;
-                strcpy(tmp_name, tten->names1[j]);
-                strcpy(tten->names1[j], tten->names1[j + 1]);
-                strcpy(tten->names1[j + 1], tmp_name);
+                strncpy(tmp_name, tten->names1[j], sizeof(player_name));
+                strncpy(tten->names1[j], tten->names1[j + 1], sizeof(player_name));
+                strncpy(tten->names1[j + 1], tmp_name, sizeof(player_name));
 
-                strcpy(tmp_name, tten->names2[j]);
-                strcpy(tten->names2[j], tten->names2[j + 1]);
-                strcpy(tten->names2[j + 1], tmp_name);
+                strncpy(tmp_name, tten->names2[j], sizeof(player_name));
+                strncpy(tten->names2[j], tten->names2[j + 1], sizeof(player_name));
+                strncpy(tten->names2[j + 1], tmp_name, sizeof(player_name));
             }
         }
     }

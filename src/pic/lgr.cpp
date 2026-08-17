@@ -72,7 +72,7 @@ void invalidate_lgr_cache() {
     CurrentLgrName[0] = '\0';
 }
 
-static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
+static bool lgr_exists(const char* lgr_name, const char* backup_lgr) {
     filepath path;
     sprintf(path, "lgr/%s.lgr", lgr_name);
     if (std::filesystem::exists(path)) {
@@ -114,7 +114,7 @@ static bool try_access_lgr(const char* lgr_name, const char* backup_lgr) {
 }
 
 bool lgrfile::try_load_lgr(const char* name, const char* desc) {
-    if (!try_access_lgr(name, desc)) {
+    if (!lgr_exists(name, desc)) {
         return false;
     }
 

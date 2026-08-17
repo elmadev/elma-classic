@@ -836,8 +836,10 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     std::vector<info_panel_row> info_rows;
 
     if (loop == GameLoop::Game) {
-        if (EolSettings->show_one_wheel_status()) {
-            info_rows.push_back({"one wheel", driv.mot->one_wheel_failed ? "no" : "yes"});
+        if (current_camera.mode != CameraMode::MapViewer) {
+            if (EolSettings->show_one_wheel_status()) {
+                info_rows.push_back({"one wheel", driv.mot->one_wheel_failed ? "no" : "yes"});
+            }
         }
 
         if (bottom_player) {

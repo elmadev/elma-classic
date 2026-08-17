@@ -304,7 +304,7 @@ void eol::process(const spy_apple_data& sd) {
     }
 }
 
-void eol::process(const clear_spy_data& sd) {
+void eol::process(const stop_spy_data& sd) {
     kuski* k = get_kuski(kuskis_, sd.kuski_id);
     if (k) {
         k->clear_spy_data();

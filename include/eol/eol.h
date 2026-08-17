@@ -40,7 +40,7 @@ class eol {
     void process(const team_message&);
     void process(const spy_data&);
     void process(const spy_apple_data&);
-    void process(const clear_spy_data&);
+    void process(const stop_spy_data&);
     void process(const server_config&);
     void process(const battle_started&);
     void process(const battle_countdown_ended&);

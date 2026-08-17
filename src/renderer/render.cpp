@@ -835,20 +835,21 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     // rows are rendered in the order they were added (last added on top)
     std::vector<info_panel_row> info_rows;
 
-    if (EolSettings->show_one_wheel_status() && loop == GameLoop::Game) {
-        info_rows.push_back({"one wheel", driv.mot->one_wheel_failed ? "no" : "yes"});
-    }
-
-    if (bottom_player && loop != GameLoop::Render) {
-        // FPS
-        if (EolSettings->show_fps()) {
-            info_rows.push_back({"FPS", fps::format_fps() + pacer::format_fps_limit()});
+    if (loop == GameLoop::Game) {
+        if (EolSettings->show_one_wheel_status()) {
+            info_rows.push_back({"one wheel", driv.mot->one_wheel_failed ? "no" : "yes"});
         }
 
-        // UPS
-        if (EolSettings->show_ups() && loop == GameLoop::Game &&
-            current_camera.mode == CameraMode::Normal) {
-            info_rows.push_back({"UPS", fps::format_ups()});
+        if (bottom_player) {
+            // FPS
+            if (EolSettings->show_fps()) {
+                info_rows.push_back({"FPS", fps::format_fps() + pacer::format_fps_limit()});
+            }
+
+            // UPS
+            if (EolSettings->show_ups() && current_camera.mode == CameraMode::Normal) {
+                info_rows.push_back({"UPS", fps::format_ups()});
+            }
         }
     }
 

@@ -106,6 +106,7 @@
 * Level and replay filenames may have multiple dots (e.g. pack.01.lev)
 * When the replay Randomizer is unable to find a level file, pressing Esc goes back to the Replay menu instead of going to the Main Menu
 * Some minor grammatical and spelling mistakes are fixed
+* .lev and .rec files no longer leak old data
 
 ### Menu
 * Background balls no longer vanish at high resolution on the "Please do not distribute" screen

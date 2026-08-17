@@ -916,16 +916,15 @@ void level::save(const char* filename, bool skip_topology) {
 
     if (SAVE_INTERNAL) {
         // Internals don't have a level name
-        char empty_level_name[LEVEL_NAME_LENGTH + 1];
-        memset(empty_level_name, 0, sizeof(empty_level_name));
-        fwrite(empty_level_name, 1, LEVEL_NAME_LENGTH + 1, h);
+        const char empty_level_name[LEVEL_NAME_LENGTH + 1] = {};
+        util::text::fwrite_array(empty_level_name, LEVEL_NAME_LENGTH + 1, h);
     } else {
-        fwrite(level_name, 1, LEVEL_NAME_LENGTH + 1, h);
+        util::text::fwrite_array(level_name, LEVEL_NAME_LENGTH + 1, h);
     }
 
-    fwrite(lgr_name, 1, 16, h);
-    fwrite(foreground_name, 1, 10, h);
-    fwrite(background_name, 1, 10, h);
+    util::text::fwrite_array(lgr_name, 16, h);
+    util::text::fwrite_array(foreground_name, 10, h);
+    util::text::fwrite_array(background_name, 10, h);
 
     int polygon_count = 0;
     for (int i = 0; i < MAX_POLYGONS; i++) {

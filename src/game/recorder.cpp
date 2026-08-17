@@ -39,7 +39,7 @@ recorder::recorder() {
     frame_count_ = 0;
     event_count = 0;
     flagtag_ = 0;
-    level_filename[0] = 0;
+    memset(level_filename, 0, sizeof(level_filename));
 
     frames.reserve(INITIAL_FRAMES);
     events.reserve(INITIAL_EVENTS);
@@ -51,7 +51,7 @@ void recorder::erase(const char* lev_filename) {
     if (strlen(lev_filename) > MAX_FILENAME_LEN + 4) {
         internal_error("recorder::erase strlen");
     }
-    strcpy(level_filename, lev_filename);
+    strncpy(level_filename, lev_filename, sizeof(level_filename));
     frame_count_ = 0;
     event_count = 0;
     finished = false;

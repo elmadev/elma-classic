@@ -477,6 +477,6 @@ void eol::sync_battle_queue_table() {
         std::string duration =
             std::format("{} min{}", entry.duration_minutes, entry.duration_minutes == 1 ? "" : "s");
         battle_queue_table.add_row(
-            {std::string(nick), std::move(duration), format_battle_type(entry.battle_type)});
+            {std::string(nick), format_battle_type(entry.battle_type), std::move(duration)});
     }
 }

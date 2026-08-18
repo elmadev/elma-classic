@@ -6,6 +6,7 @@
 #include "pic/abc8.h"
 #include "pic/pic8.h"
 #include "platform/implementation.h"
+#include "platform/utils.h"
 #include "util/util.h"
 #include <algorithm>
 #include <filesystem>
@@ -299,8 +300,18 @@ void eol::toggle_show_battle_leader() const {
 }
 
 void eol::upsert_leaderboard_entry(const battle_leaderboard_entry& entry, uint16_t rank) {
+    // Reconnecting mid-battle assigns a new kuski id, so the stale line is only
+    // found by nick; multi lines may also arrive with the pair swapped.
+    auto nick_eq = [](const char* a, const char* b) { return a && b && strcmpi(a, b) == 0; };
+    const char* nick = find_nick(entry.kuski_id);
+    const char* nick2 = find_nick(entry.kuski_id2);
     std::erase_if(battle_leaderboard_, [&](const battle_leaderboard_entry& e) {
-        return e.kuski_id == entry.kuski_id && e.kuski_id2 == entry.kuski_id2;
+        const char* e_nick = find_nick(e.kuski_id);
+        const char* e_nick2 = find_nick(e.kuski_id2);
+        return ((e.kuski_id == entry.kuski_id || nick_eq(e_nick, nick)) &&
+                (e.kuski_id2 == entry.kuski_id2 || nick_eq(e_nick2, nick2))) ||
+               ((e.kuski_id == entry.kuski_id2 || nick_eq(e_nick, nick2)) &&
+                (e.kuski_id2 == entry.kuski_id || nick_eq(e_nick2, nick)));
     });
     size_t idx = std::min<size_t>(rank, battle_leaderboard_.size());
     battle_leaderboard_.insert(battle_leaderboard_.begin() + idx, entry);

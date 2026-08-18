@@ -188,9 +188,14 @@ void eol::sync_players_online_table() {
     }
 }
 
-std::string_view eol::lookup_nick(unsigned int kuski_id) const {
+const char* eol::find_nick(unsigned int kuski_id) const {
     auto match = std::ranges::find(all_kuskis(), kuski_id, &kuski::id);
-    return match != all_kuskis().end() ? std::string_view{match->nick} : "?";
+    return match != all_kuskis().end() ? match->nick : nullptr;
+}
+
+std::string_view eol::lookup_nick(unsigned int kuski_id) const {
+    const char* nick = find_nick(kuski_id);
+    return nick ? nick : "?";
 }
 
 void eol::process(const finished_time& ft) {

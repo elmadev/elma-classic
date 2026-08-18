@@ -4,6 +4,7 @@
 #include "physics/init.h"
 #include "pic/lgr.h"
 #include "util/file_iter.h"
+#include "util/util.h"
 #include <cstring>
 
 const char* clipping_to_string(Clipping clipping) {
@@ -115,26 +116,20 @@ sprite::sprite(FILE* h) {
 }
 
 void sprite::save(FILE* h) {
-    if (fwrite(picture_name, 1, 10, h) != 10) {
-        internal_error("Failed to write sprite to file!");
-    }
-    if (fwrite(texture_name, 1, 10, h) != 10) {
-        internal_error("Failed to write sprite to file!");
-    }
-    if (fwrite(mask_name, 1, 10, h) != 10) {
-        internal_error("Failed to write sprite to file!");
-    }
+    util::text::fwrite_array(picture_name, 10, h);
+    util::text::fwrite_array(texture_name, 10, h);
+    util::text::fwrite_array(mask_name, 10, h);
     if (fwrite(&r.x, 1, sizeof(r.x), h) != 8) {
-        internal_error("Failed to write sprite to file!");
+        external_error("Failed to write to file!");
     }
     if (fwrite(&r.y, 1, sizeof(r.y), h) != 8) {
-        internal_error("Failed to write sprite to file!");
+        external_error("Failed to write to file!");
     }
     if (fwrite(&distance, 1, sizeof(distance), h) != 4) {
-        internal_error("Failed to write sprite to file!");
+        external_error("Failed to write to file!");
     }
     if (fwrite(&clipping, 1, sizeof(clipping), h) != 4) {
-        internal_error("Failed to write sprite to file!");
+        external_error("Failed to write to file!");
     }
 }
 

@@ -1,6 +1,7 @@
 #ifndef UTIL_UTIL_H
 #define UTIL_UTIL_H
 
+#include <fstream>
 #include <optional>
 
 constexpr double PI = 3.141592;
@@ -31,6 +32,9 @@ void centiseconds_to_string(int time, char* text, bool show_hours = false, bool 
 
 // Length of the common case-insensitive prefix of two C strings.
 size_t common_prefix_len(const char* a, const char* b);
+
+// fwrite a char array without leaking data after the first \0
+void fwrite_array(const char* buffer, size_t size, FILE* h);
 
 } // namespace util::text
 

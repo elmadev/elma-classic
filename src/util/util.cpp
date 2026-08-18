@@ -1,7 +1,9 @@
 #include "util/util.h"
+#include "main.h"
 #include <cassert>
 #include <cctype>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <format>
 
@@ -100,6 +102,18 @@ size_t common_prefix_len(const char* a, const char* b) {
         if (ca != cb || ca == 0) {
             return n;
         }
+    }
+}
+
+// fwrite a char array without leaking data after the first \0
+void fwrite_array(const char* buffer, size_t size, FILE* h) {
+    const size_t MAX_SIZE = 51;
+    ELMA_ASSERT(size <= MAX_SIZE);
+
+    char clean_buffer[MAX_SIZE];
+    strncpy(clean_buffer, buffer, size);
+    if (fwrite(clean_buffer, 1, size, h) != size) {
+        external_error("Failed to write to file!");
     }
 }
 

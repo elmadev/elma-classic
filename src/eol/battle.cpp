@@ -429,7 +429,8 @@ std::string eol::battle_leader_line() const {
 }
 
 void eol::render_battle_leader(pic8& dest, abc8& font) const {
-    if (!EolSettings->show_battle_leader() || !current_battle) {
+    if (!EolSettings->show_battle_leader() || !EolSettings->show_battle_status() ||
+        !current_battle) {
         return;
     }
 

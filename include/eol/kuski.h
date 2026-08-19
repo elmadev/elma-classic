@@ -18,7 +18,18 @@ struct spy_data {
     bike_metadata metadata;
 };
 
-struct kuski {
+class spy_playback {
+  public:
+    const struct spy_data* spy_data() const;
+    void add(const struct spy_data& sd);
+    void clear();
+
+  private:
+    std::optional<struct spy_data> data;
+};
+
+class kuski {
+  public:
     unsigned int id;
     char nick[16];
     char level[MAX_FILENAME_LEN + 1];
@@ -27,12 +38,12 @@ struct kuski {
     pic8* shirt;
     bool apples_taken[MAX_OBJECTS];
     void clear_apple_data();
-    const struct spy_data* spy_data() const;
-    void add_spy_data(const struct spy_data& sd);
-    void clear_spy_data();
+    const struct spy_data* spy_data() const { return spy.spy_data(); }
+    void add_spy_data(const struct spy_data& sd) { spy.add(sd); }
+    void clear_spy_data() { spy.clear(); }
 
   private:
-    std::optional<struct spy_data> data;
+    spy_playback spy;
 };
 
 #endif

@@ -6,8 +6,8 @@ void kuski::clear_apple_data() {
     }
 }
 
-const struct spy_data* kuski::spy_data() const { return data ? &*data : nullptr; }
+const struct spy_data* spy_playback::spy_data() const { return data ? &*data : nullptr; }
 
-void kuski::add_spy_data(const struct spy_data& sd) { data = sd; }
+void spy_playback::add(const struct spy_data& sd) { data = sd; }
 
-void kuski::clear_spy_data() { data.reset(); }
+void spy_playback::clear() { data.reset(); }

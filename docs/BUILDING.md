@@ -34,27 +34,73 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
   pip install meson ninja
   ```
 
-### Setup
+### Setup Meson
 
-1. Configure the build directory (only needed once):
+You only need to configure the build directory once.
 
-   ```
-   meson setup build
-   ```
+- On macOS and Linux:
 
-   For a release build use this setup:
+  ```
+  meson setup build
+  ```
 
-   ```
-   meson setup build -Dbuildtype=release
-   ```
+  For a release build use this setup:
 
-2. Compile the project:
+  ```
+  meson setup build -Dbuildtype=release
+  ```
+
+- On Windows:
+
+  If you don't have Visual Studio 2022 in your PATH, you must run meson within the Visual Studio terminal called `Developer Command Prompt for VS 2022`
+
+  To add this terminal to Visual Studio Code, add the following to .vscode/settings.json:
+
+  ```
+  {
+    "terminal.integrated.profiles.windows": {
+      "VsDevCmd 64-bit (2022)": {
+        "path": [
+          "${env:windir}\\Sysnative\\cmd.exe",
+          "${env:windir}\\System32\\cmd.exe"
+        ],
+        "args": [
+          "/k",
+          // Path below assumes a VS2022 Community install;
+          // update as appropriate if your IDE installation path
+          // is different, or if using the standalone build tools
+          "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat",
+          "-arch=x64",
+          "-host_arch=x64"
+        ],
+        "overrideName": true,
+        "icon": "terminal-cmd"
+      }
+    }
+  }
+  ```
+
+  With Visual Studio in your PATH or via the `Developer Command Prompt for VS 2022`, run the following command:
+
+  ```
+  meson setup build --vsenv
+  ```
+
+  For a release build use this setup:
+
+  ```
+  meson setup build --vsenv -Dbuildtype=release
+  ```
+
+### Compile and Run Project
+
+1. Compile the project:
 
    ```
    meson compile -C build
    ```
 
-3. Copy files to build folder:
+2. Copy game files once to build folder:
 
    ```
    build/elma.res
@@ -63,7 +109,7 @@ This project uses [Meson](https://mesonbuild.com/) as its build system.
    etc
    ```
 
-4. Run the executable:
+3. Run the executable:
    ```
    cd build
    ./elma
@@ -111,44 +157,6 @@ However, here are the relevant options:
 - **Reconfigure Options**: `meson setup --reconfigure build`
 - **List Options**: `meson configure build`
 - **Set Options**: `meson configure build -Doption=value`
-
-### Windows
-
-If you don't have Visual Studio 2022 in your PATH, you must run meson within the Visual Studio terminal called `Developer Command Prompt for VS 2022`
-
-To add this terminal to Visual Studio Code, add the following to .vscode/settings.json:
-
-```
-{
-  "terminal.integrated.profiles.windows": {
-    "VsDevCmd 64-bit (2022)": {
-      "path": [
-        "${env:windir}\\Sysnative\\cmd.exe",
-        "${env:windir}\\System32\\cmd.exe"
-      ],
-      "args": [
-        "/k",
-        // Path below assumes a VS2022 Community install;
-        // update as appropriate if your IDE installation path
-        // is different, or if using the standalone build tools
-        "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat",
-        "-arch=x64",
-        "-host_arch=x64"
-      ],
-      "overrideName": true,
-      "icon": "terminal-cmd"
-    }
-  }
-}
-```
-
-When running the setup step of meson you will need to pass `--vsenv`, like so:
-
-```
-meson setup build --vsenv
-```
-
----
 
 ## Code Formatting with clang-format
 

@@ -24,6 +24,7 @@ elma_sources = files(
     'src/eol/console.cpp',
     'src/eol/eol_table.cpp',
     'src/eol/eol.cpp',
+    'src/eol/kuski.cpp',
     'src/eol/settings.cpp',
     'src/eol/status_messages.cpp',
     'src/game/driver.cpp',

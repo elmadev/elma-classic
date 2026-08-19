@@ -2,6 +2,7 @@
 #define EOL_EVENTS_H
 
 #include "eol/eol_types.h"
+#include "eol/kuski.h"
 #include "main.h"
 #include <cstdint>
 #include <span>

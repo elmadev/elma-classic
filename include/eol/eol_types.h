@@ -12,6 +12,7 @@ class pic8;
 
 struct spy_data {
     unsigned int kuski_id;
+    uint8_t run_id;
     uint32_t time;
     motorst mot;
     bike_metadata metadata;

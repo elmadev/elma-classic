@@ -2,10 +2,20 @@
 #include "main.h"
 #include <cassert>
 #include <cctype>
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <format>
+
+namespace util::math {
+
+double positive_fmod(double val, double mod) {
+    const double rem = fmod(val, mod);
+    return rem < 0 ? rem + mod : rem;
+}
+
+} // namespace util::math
 
 namespace util::random {
 

@@ -65,11 +65,6 @@ template struct Default<eol_table::Align>;
 template struct Clamp<int>;
 template struct Clamp<double>;
 
-void eol_settings::set_screen_width(int w) { screen_width_ = w; }
-
-void eol_settings::set_screen_height(int h) { screen_height_ = h; }
-
-void eol_settings::set_pictures_in_background(bool b) { pictures_in_background_ = b; }
 void eol_settings::set_default_ground(bool b) {
     default_ground_ = b;
     if (Level && Lgr) {
@@ -82,13 +77,6 @@ void eol_settings::set_default_sky(bool b) {
         Lgr->reload_default_textures(*Level, false);
     }
 }
-void eol_settings::set_default_ground_sky_key(combo_scancode key) { default_ground_sky_key_ = key; }
-
-void eol_settings::set_center_camera(bool b) { center_camera_ = b; }
-
-void eol_settings::set_center_map(bool b) { center_map_ = b; }
-
-void eol_settings::set_map_alignment(MapAlignment m) { map_alignment_ = m; }
 
 void eol_settings::set_renderer(RendererType r) {
     if (renderer_ == r) {
@@ -141,69 +129,6 @@ void eol_settings::set_zoom_grass(bool zoom_grass) {
     invalidate_lgr_cache();
 }
 
-void eol_settings::set_turn_time(double t) { turn_time_ = t; }
-
-void eol_settings::set_lctrl_search(bool lctrl_search) { lctrl_search_ = lctrl_search; }
-
-void eol_settings::set_alovolt_key_player_a(DikScancode key) { alovolt_key_player_a_ = key; }
-void eol_settings::set_alovolt_key_player_b(DikScancode key) { alovolt_key_player_b_ = key; }
-void eol_settings::set_brake_alias_key_player_a(DikScancode key) {
-    brake_alias_key_player_a_ = key;
-}
-void eol_settings::set_brake_alias_key_player_b(DikScancode key) {
-    brake_alias_key_player_b_ = key;
-}
-void eol_settings::set_one_frame_brake_key_player_a(DikScancode key) {
-    one_frame_brake_key_player_a_ = key;
-}
-void eol_settings::set_one_frame_brake_key_player_b(DikScancode key) {
-    one_frame_brake_key_player_b_ = key;
-}
-
-void eol_settings::set_escape_alias_key(DikScancode key) { escape_alias_key_ = key; }
-void eol_settings::set_replay_fast_2x_key(DikScancode key) { replay_fast_2x_key_ = key; }
-void eol_settings::set_replay_fast_4x_key(DikScancode key) { replay_fast_4x_key_ = key; }
-void eol_settings::set_replay_fast_8x_key(DikScancode key) { replay_fast_8x_key_ = key; }
-void eol_settings::set_replay_slow_2x_key(DikScancode key) { replay_slow_2x_key_ = key; }
-void eol_settings::set_replay_slow_4x_key(DikScancode key) { replay_slow_4x_key_ = key; }
-void eol_settings::set_replay_pause_key(DikScancode key) { replay_pause_key_ = key; }
-void eol_settings::set_replay_rewind_key(DikScancode key) { replay_rewind_key_ = key; }
-
-void eol_settings::set_show_others_key(combo_scancode key) { show_others_key_ = key; }
-void eol_settings::set_spy_next_kuski_key(combo_scancode key) { spy_next_kuski_key_ = key; }
-void eol_settings::set_spy_prev_kuski_key(combo_scancode key) { spy_prev_kuski_key_ = key; }
-void eol_settings::set_battle_queue_key(combo_scancode key) { battle_queue_key_ = key; }
-void eol_settings::set_download_battle_level_key(combo_scancode key) {
-    download_battle_level_key_ = key;
-}
-void eol_settings::set_download_level_key(combo_scancode key) { download_level_key_ = key; }
-void eol_settings::set_players_online_key(combo_scancode key) { players_online_key_ = key; }
-void eol_settings::set_battle_results_key(combo_scancode key) { battle_results_key_ = key; }
-void eol_settings::set_finished_times_key(combo_scancode key) { finished_times_key_ = key; }
-void eol_settings::set_cycle_finished_times_filter_key(combo_scancode key) {
-    cycle_finished_times_filter_key_ = key;
-}
-void eol_settings::set_clear_finished_times_key(combo_scancode key) {
-    clear_finished_times_key_ = key;
-}
-void eol_settings::set_chat_key(combo_scancode key) { chat_key_ = key; }
-void eol_settings::set_show_chat_key(combo_scancode key) { show_chat_key_ = key; }
-void eol_settings::set_team_chat_key(combo_scancode key) { team_chat_key_ = key; }
-void eol_settings::set_pm_next_kuski_key(combo_scancode key) { pm_next_kuski_key_ = key; }
-void eol_settings::set_pm_prev_kuski_key(combo_scancode key) { pm_prev_kuski_key_ = key; }
-void eol_settings::set_pm_clear_kuski_key(combo_scancode key) { pm_clear_kuski_key_ = key; }
-void eol_settings::set_battle_status_key(combo_scancode key) { battle_status_key_ = key; }
-void eol_settings::set_battle_leader_key(combo_scancode key) { battle_leader_key_ = key; }
-void eol_settings::set_speedometer_key(combo_scancode key) { speedometer_key_ = key; }
-void eol_settings::set_reconnect_key(combo_scancode key) { reconnect_key_ = key; }
-void eol_settings::set_disconnect_key(combo_scancode key) { disconnect_key_ = key; }
-void eol_settings::set_toggle_one_wheel_status_key(combo_scancode key) {
-    toggle_one_wheel_status_key_ = key;
-}
-void eol_settings::set_toggle_last_apple_time_key(combo_scancode key) {
-    toggle_last_apple_time_key_ = key;
-}
-
 void eol_settings::set_default_lgr_name(std::string name) {
     if (default_lgr_name_.value != name) {
         default_lgr_name_ = std::move(name);
@@ -215,39 +140,6 @@ void eol_settings::set_fancyboost(bool b) {
     fancyboost_ = b;
     invalidate_lgr_cache();
 }
-
-void eol_settings::set_show_last_apple_time(bool show) { show_last_apple_time_ = show; }
-void eol_settings::set_show_gravity_arrows(bool b) { show_gravity_arrows_ = b; }
-
-void eol_settings::set_show_fps(bool show) { show_fps_ = show; }
-void eol_settings::set_show_ups(bool show) { show_ups_ = show; }
-void eol_settings::set_fps_limit_enabled(bool b) { fps_limit_enabled_ = b; }
-void eol_settings::set_fps_limit(int fps) { fps_limit_ = fps; }
-void eol_settings::set_recording_fps(int fps) { recording_fps_ = fps; }
-
-void eol_settings::set_show_demo_menu(bool show) { show_demo_menu_ = show; }
-void eol_settings::set_show_help_menu(bool show) { show_help_menu_ = show; }
-void eol_settings::set_show_about_menu(bool show) { show_about_menu_ = show; }
-void eol_settings::set_show_best_times_menu(bool show) { show_best_times_menu_ = show; }
-void eol_settings::set_skip_intro(bool skip) { skip_intro_ = skip; }
-
-void eol_settings::set_still_objects(bool still) { still_objects_ = still; }
-
-void eol_settings::set_all_internals_accessible(bool b) { all_internals_accessible_ = b; }
-
-void eol_settings::set_show_total_time(bool show) { show_total_time_ = show; }
-
-void eol_settings::set_minimap_width(int w) { minimap_width_ = w; }
-
-void eol_settings::set_minimap_height(int h) { minimap_height_ = h; }
-
-void eol_settings::set_minimap_opacity(int opacity) { minimap_opacity_ = opacity; }
-
-void eol_settings::set_chat_lines(int lines) { chat_lines_ = lines; }
-
-void eol_settings::set_cripple_no_brake(bool b) { cripple_no_brake_ = b; }
-
-void eol_settings::set_cripple_drunk(bool b) { cripple_drunk_ = b; }
 
 void eol_settings::set_cripple_no_throttle(bool b) {
     cripple_no_throttle_ = b;
@@ -270,41 +162,12 @@ void eol_settings::set_cripple_no_turn(bool b) {
     }
 }
 
-void eol_settings::set_cripple_no_volt(bool b) { cripple_no_volt_ = b; }
-
 void eol_settings::set_cripple_one_turn(bool b) {
     cripple_one_turn_ = b;
     if (b) {
         cripple_no_turn_ = false;
     }
 }
-
-void eol_settings::set_cripple_one_wheel(bool b) { cripple_one_wheel_ = b; }
-
-void eol_settings::set_show_one_wheel_status(bool b) { show_one_wheel_status_ = b; }
-
-void eol_settings::set_hostname(std::string hostname) { hostname_ = std::move(hostname); }
-
-void eol_settings::set_tcp_port(int p) { tcp_port_ = p; }
-
-void eol_settings::set_udp_port(int p) { udp_port_ = p; }
-
-void eol_settings::set_nick(std::string nick) { nick_ = std::move(nick); }
-
-void eol_settings::set_password(std::string password) { password_ = std::move(password); }
-
-void eol_settings::set_play_offline(bool o) { play_offline_ = o; }
-
-void eol_settings::set_tcp_only(bool t) { tcp_only_ = t; }
-
-void eol_settings::set_show_others(bool s) { show_others_ = s; }
-void eol_settings::set_show_battle_status(bool s) { show_battle_status_ = s; }
-void eol_settings::set_show_battle_leader(bool s) { show_battle_leader_ = s; }
-void eol_settings::set_show_speedometer(bool s) { show_speedometer_ = s; }
-
-void eol_settings::set_table_alignment(eol_table::Align a) { table_alignment_ = a; }
-
-void eol_settings::set_chat_visibility(ChatVisibility c) { chat_visibility_ = c; }
 
 /*
  * This uses the nlohmann json library to (de)serialise `eol_settings` to json.

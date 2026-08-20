@@ -69,13 +69,16 @@ template <typename T> struct Clamp {
 //   int foo_default() const { return foo_.def; }
 #define DECLARE_SETTING_COMMON(name)                                                               \
     SETTING_VALUE_TYPE(name) name() const { return name##_; }                                      \
-    void set_##name(SETTING_VALUE_TYPE(name));                                                     \
     void persist_##name(SETTING_VALUE_TYPE(name));                                                 \
     SETTING_VALUE_TYPE(name) name##_persisted() const { return name##_.persisted; }                \
     SETTING_VALUE_TYPE(name) name##_default() const { return name##_.def; }
 
-#define DECLARE_SETTING(name) DECLARE_SETTING_COMMON(name)
-#define DECLARE_SETTING_CUSTOM(name) DECLARE_SETTING_COMMON(name)
+#define DECLARE_SETTING(name)                                                                      \
+    DECLARE_SETTING_COMMON(name)                                                                   \
+    void set_##name(SETTING_VALUE_TYPE(name) v) { name##_ = std::move(v); }
+#define DECLARE_SETTING_CUSTOM(name)                                                               \
+    DECLARE_SETTING_COMMON(name)                                                                   \
+    void set_##name(SETTING_VALUE_TYPE(name));
 
 #ifndef DEBUG
 constexpr int DEFAULT_TCP_PORT = 4460;

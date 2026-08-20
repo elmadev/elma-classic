@@ -67,12 +67,15 @@ template <typename T> struct Clamp {
 //   void persist_foo(int);
 //   int foo_persisted() const { return foo_.persisted; }
 //   int foo_default() const { return foo_.def; }
-#define DECLARE_SETTING(name)                                                                      \
+#define DECLARE_SETTING_COMMON(name)                                                               \
     SETTING_VALUE_TYPE(name) name() const { return name##_; }                                      \
     void set_##name(SETTING_VALUE_TYPE(name));                                                     \
     void persist_##name(SETTING_VALUE_TYPE(name));                                                 \
     SETTING_VALUE_TYPE(name) name##_persisted() const { return name##_.persisted; }                \
     SETTING_VALUE_TYPE(name) name##_default() const { return name##_.def; }
+
+#define DECLARE_SETTING(name) DECLARE_SETTING_COMMON(name)
+#define DECLARE_SETTING_CUSTOM(name) DECLARE_SETTING_COMMON(name)
 
 #ifndef DEBUG
 constexpr int DEFAULT_TCP_PORT = 4460;
@@ -203,19 +206,19 @@ class eol_settings {
     DECLARE_SETTING(screen_height);
 
     DECLARE_SETTING(pictures_in_background);
-    DECLARE_SETTING(default_ground);
-    DECLARE_SETTING(default_sky);
+    DECLARE_SETTING_CUSTOM(default_ground);
+    DECLARE_SETTING_CUSTOM(default_sky);
     DECLARE_SETTING(default_ground_sky_key);
 
     DECLARE_SETTING(center_camera);
     DECLARE_SETTING(center_map);
     DECLARE_SETTING(map_alignment);
-    DECLARE_SETTING(renderer);
-    DECLARE_SETTING(fullscreen);
-    DECLARE_SETTING(zoom);
-    DECLARE_SETTING(minimap_zoom);
-    DECLARE_SETTING(zoom_textures);
-    DECLARE_SETTING(zoom_grass);
+    DECLARE_SETTING_CUSTOM(renderer);
+    DECLARE_SETTING_CUSTOM(fullscreen);
+    DECLARE_SETTING_CUSTOM(zoom);
+    DECLARE_SETTING_CUSTOM(minimap_zoom);
+    DECLARE_SETTING_CUSTOM(zoom_textures);
+    DECLARE_SETTING_CUSTOM(zoom_grass);
     DECLARE_SETTING(turn_time);
     DECLARE_SETTING(lctrl_search);
 
@@ -260,8 +263,8 @@ class eol_settings {
     DECLARE_SETTING(toggle_one_wheel_status_key);
     DECLARE_SETTING(toggle_last_apple_time_key);
 
-    DECLARE_SETTING(default_lgr_name);
-    DECLARE_SETTING(fancyboost);
+    DECLARE_SETTING_CUSTOM(default_lgr_name);
+    DECLARE_SETTING_CUSTOM(fancyboost);
 
     DECLARE_SETTING(show_last_apple_time);
     DECLARE_SETTING(show_gravity_arrows);
@@ -285,11 +288,11 @@ class eol_settings {
     DECLARE_SETTING(minimap_opacity);
     DECLARE_SETTING(chat_lines);
     DECLARE_SETTING(cripple_no_brake);
-    DECLARE_SETTING(cripple_no_throttle);
-    DECLARE_SETTING(cripple_always_throttle);
-    DECLARE_SETTING(cripple_no_turn);
+    DECLARE_SETTING_CUSTOM(cripple_no_throttle);
+    DECLARE_SETTING_CUSTOM(cripple_always_throttle);
+    DECLARE_SETTING_CUSTOM(cripple_no_turn);
     DECLARE_SETTING(cripple_no_volt);
-    DECLARE_SETTING(cripple_one_turn);
+    DECLARE_SETTING_CUSTOM(cripple_one_turn);
     DECLARE_SETTING(cripple_drunk);
     DECLARE_SETTING(cripple_one_wheel);
     DECLARE_SETTING(show_one_wheel_status);
@@ -312,6 +315,7 @@ class eol_settings {
 
 #undef SETTING_VALUE_TYPE
 #undef DECLARE_SETTING
+#undef DECLARE_SETTING_CUSTOM
 
 extern eol_settings* EolSettings;
 

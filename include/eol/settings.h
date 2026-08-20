@@ -56,6 +56,8 @@ template <typename T> struct Clamp {
     void mark_persisted();
 };
 
+#define SETTING_VALUE_TYPE(name) decltype(eol_settings::name##_.value)
+
 // Declares/defines getter/setter/default for a field of `eol_settings`.
 // For a field:
 //   int foo;
@@ -66,11 +68,11 @@ template <typename T> struct Clamp {
 //   int foo_persisted() const { return foo_.persisted; }
 //   int foo_default() const { return foo_.def; }
 #define DECLARE_SETTING(name)                                                                      \
-    decltype(eol_settings::name##_.value) name() const { return name##_; }                         \
-    void set_##name(decltype(eol_settings::name##_.value));                                        \
-    void persist_##name(decltype(eol_settings::name##_.value));                                    \
-    decltype(eol_settings::name##_.value) name##_persisted() const { return name##_.persisted; }   \
-    decltype(eol_settings::name##_.value) name##_default() const { return name##_.def; }
+    SETTING_VALUE_TYPE(name) name() const { return name##_; }                                      \
+    void set_##name(SETTING_VALUE_TYPE(name));                                                     \
+    void persist_##name(SETTING_VALUE_TYPE(name));                                                 \
+    SETTING_VALUE_TYPE(name) name##_persisted() const { return name##_.persisted; }                \
+    SETTING_VALUE_TYPE(name) name##_default() const { return name##_.def; }
 
 #ifndef DEBUG
 constexpr int DEFAULT_TCP_PORT = 4460;
@@ -308,6 +310,7 @@ class eol_settings {
     DECLARE_SETTING(chat_visibility);
 };
 
+#undef SETTING_VALUE_TYPE
 #undef DECLARE_SETTING
 
 extern eol_settings* EolSettings;

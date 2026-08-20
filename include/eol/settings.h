@@ -65,7 +65,7 @@ template <typename T> struct Clamp {
 //   void persist_foo(int);
 //   int foo_persisted() const { return foo_.persisted; }
 //   int foo_default() const { return foo_.def; }
-#define DECLARE_FIELD_FUNCS(name)                                                                  \
+#define DECLARE_SETTING(name)                                                                      \
     decltype(eol_settings::name##_.value) name() const { return name##_; }                         \
     void set_##name(decltype(eol_settings::name##_.value));                                        \
     void persist_##name(decltype(eol_settings::name##_.value));                                    \
@@ -197,118 +197,118 @@ class eol_settings {
     static void sync_controls_to_state(state* s);
     static void sync_controls_from_state(state* s);
 
-    DECLARE_FIELD_FUNCS(screen_width);
-    DECLARE_FIELD_FUNCS(screen_height);
+    DECLARE_SETTING(screen_width);
+    DECLARE_SETTING(screen_height);
 
-    DECLARE_FIELD_FUNCS(pictures_in_background);
-    DECLARE_FIELD_FUNCS(default_ground);
-    DECLARE_FIELD_FUNCS(default_sky);
-    DECLARE_FIELD_FUNCS(default_ground_sky_key);
+    DECLARE_SETTING(pictures_in_background);
+    DECLARE_SETTING(default_ground);
+    DECLARE_SETTING(default_sky);
+    DECLARE_SETTING(default_ground_sky_key);
 
-    DECLARE_FIELD_FUNCS(center_camera);
-    DECLARE_FIELD_FUNCS(center_map);
-    DECLARE_FIELD_FUNCS(map_alignment);
-    DECLARE_FIELD_FUNCS(renderer);
-    DECLARE_FIELD_FUNCS(fullscreen);
-    DECLARE_FIELD_FUNCS(zoom);
-    DECLARE_FIELD_FUNCS(minimap_zoom);
-    DECLARE_FIELD_FUNCS(zoom_textures);
-    DECLARE_FIELD_FUNCS(zoom_grass);
-    DECLARE_FIELD_FUNCS(turn_time);
-    DECLARE_FIELD_FUNCS(lctrl_search);
+    DECLARE_SETTING(center_camera);
+    DECLARE_SETTING(center_map);
+    DECLARE_SETTING(map_alignment);
+    DECLARE_SETTING(renderer);
+    DECLARE_SETTING(fullscreen);
+    DECLARE_SETTING(zoom);
+    DECLARE_SETTING(minimap_zoom);
+    DECLARE_SETTING(zoom_textures);
+    DECLARE_SETTING(zoom_grass);
+    DECLARE_SETTING(turn_time);
+    DECLARE_SETTING(lctrl_search);
 
-    DECLARE_FIELD_FUNCS(alovolt_key_player_a);
-    DECLARE_FIELD_FUNCS(alovolt_key_player_b);
-    DECLARE_FIELD_FUNCS(brake_alias_key_player_a);
-    DECLARE_FIELD_FUNCS(brake_alias_key_player_b);
-    DECLARE_FIELD_FUNCS(one_frame_brake_key_player_a);
-    DECLARE_FIELD_FUNCS(one_frame_brake_key_player_b);
-    DECLARE_FIELD_FUNCS(escape_alias_key);
+    DECLARE_SETTING(alovolt_key_player_a);
+    DECLARE_SETTING(alovolt_key_player_b);
+    DECLARE_SETTING(brake_alias_key_player_a);
+    DECLARE_SETTING(brake_alias_key_player_b);
+    DECLARE_SETTING(one_frame_brake_key_player_a);
+    DECLARE_SETTING(one_frame_brake_key_player_b);
+    DECLARE_SETTING(escape_alias_key);
 
-    DECLARE_FIELD_FUNCS(replay_fast_2x_key);
-    DECLARE_FIELD_FUNCS(replay_fast_4x_key);
-    DECLARE_FIELD_FUNCS(replay_fast_8x_key);
-    DECLARE_FIELD_FUNCS(replay_slow_2x_key);
-    DECLARE_FIELD_FUNCS(replay_slow_4x_key);
-    DECLARE_FIELD_FUNCS(replay_pause_key);
-    DECLARE_FIELD_FUNCS(replay_rewind_key);
+    DECLARE_SETTING(replay_fast_2x_key);
+    DECLARE_SETTING(replay_fast_4x_key);
+    DECLARE_SETTING(replay_fast_8x_key);
+    DECLARE_SETTING(replay_slow_2x_key);
+    DECLARE_SETTING(replay_slow_4x_key);
+    DECLARE_SETTING(replay_pause_key);
+    DECLARE_SETTING(replay_rewind_key);
 
-    DECLARE_FIELD_FUNCS(show_others_key);
-    DECLARE_FIELD_FUNCS(spy_next_kuski_key);
-    DECLARE_FIELD_FUNCS(spy_prev_kuski_key);
-    DECLARE_FIELD_FUNCS(battle_queue_key);
-    DECLARE_FIELD_FUNCS(download_battle_level_key);
-    DECLARE_FIELD_FUNCS(download_level_key);
-    DECLARE_FIELD_FUNCS(players_online_key);
-    DECLARE_FIELD_FUNCS(battle_results_key);
-    DECLARE_FIELD_FUNCS(finished_times_key);
-    DECLARE_FIELD_FUNCS(cycle_finished_times_filter_key);
-    DECLARE_FIELD_FUNCS(clear_finished_times_key);
-    DECLARE_FIELD_FUNCS(chat_key);
-    DECLARE_FIELD_FUNCS(show_chat_key);
-    DECLARE_FIELD_FUNCS(team_chat_key);
-    DECLARE_FIELD_FUNCS(pm_next_kuski_key);
-    DECLARE_FIELD_FUNCS(pm_prev_kuski_key);
-    DECLARE_FIELD_FUNCS(pm_clear_kuski_key);
-    DECLARE_FIELD_FUNCS(battle_status_key);
-    DECLARE_FIELD_FUNCS(battle_leader_key);
-    DECLARE_FIELD_FUNCS(speedometer_key);
-    DECLARE_FIELD_FUNCS(reconnect_key);
-    DECLARE_FIELD_FUNCS(disconnect_key);
-    DECLARE_FIELD_FUNCS(toggle_one_wheel_status_key);
-    DECLARE_FIELD_FUNCS(toggle_last_apple_time_key);
+    DECLARE_SETTING(show_others_key);
+    DECLARE_SETTING(spy_next_kuski_key);
+    DECLARE_SETTING(spy_prev_kuski_key);
+    DECLARE_SETTING(battle_queue_key);
+    DECLARE_SETTING(download_battle_level_key);
+    DECLARE_SETTING(download_level_key);
+    DECLARE_SETTING(players_online_key);
+    DECLARE_SETTING(battle_results_key);
+    DECLARE_SETTING(finished_times_key);
+    DECLARE_SETTING(cycle_finished_times_filter_key);
+    DECLARE_SETTING(clear_finished_times_key);
+    DECLARE_SETTING(chat_key);
+    DECLARE_SETTING(show_chat_key);
+    DECLARE_SETTING(team_chat_key);
+    DECLARE_SETTING(pm_next_kuski_key);
+    DECLARE_SETTING(pm_prev_kuski_key);
+    DECLARE_SETTING(pm_clear_kuski_key);
+    DECLARE_SETTING(battle_status_key);
+    DECLARE_SETTING(battle_leader_key);
+    DECLARE_SETTING(speedometer_key);
+    DECLARE_SETTING(reconnect_key);
+    DECLARE_SETTING(disconnect_key);
+    DECLARE_SETTING(toggle_one_wheel_status_key);
+    DECLARE_SETTING(toggle_last_apple_time_key);
 
-    DECLARE_FIELD_FUNCS(default_lgr_name);
-    DECLARE_FIELD_FUNCS(fancyboost);
+    DECLARE_SETTING(default_lgr_name);
+    DECLARE_SETTING(fancyboost);
 
-    DECLARE_FIELD_FUNCS(show_last_apple_time);
-    DECLARE_FIELD_FUNCS(show_gravity_arrows);
+    DECLARE_SETTING(show_last_apple_time);
+    DECLARE_SETTING(show_gravity_arrows);
 
-    DECLARE_FIELD_FUNCS(show_fps);
-    DECLARE_FIELD_FUNCS(show_ups);
-    DECLARE_FIELD_FUNCS(fps_limit_enabled);
-    DECLARE_FIELD_FUNCS(fps_limit);
-    DECLARE_FIELD_FUNCS(recording_fps);
+    DECLARE_SETTING(show_fps);
+    DECLARE_SETTING(show_ups);
+    DECLARE_SETTING(fps_limit_enabled);
+    DECLARE_SETTING(fps_limit);
+    DECLARE_SETTING(recording_fps);
 
-    DECLARE_FIELD_FUNCS(show_demo_menu);
-    DECLARE_FIELD_FUNCS(show_help_menu);
-    DECLARE_FIELD_FUNCS(show_about_menu);
-    DECLARE_FIELD_FUNCS(show_best_times_menu);
-    DECLARE_FIELD_FUNCS(skip_intro);
-    DECLARE_FIELD_FUNCS(still_objects);
-    DECLARE_FIELD_FUNCS(all_internals_accessible);
-    DECLARE_FIELD_FUNCS(show_total_time);
-    DECLARE_FIELD_FUNCS(minimap_width);
-    DECLARE_FIELD_FUNCS(minimap_height);
-    DECLARE_FIELD_FUNCS(minimap_opacity);
-    DECLARE_FIELD_FUNCS(chat_lines);
-    DECLARE_FIELD_FUNCS(cripple_no_brake);
-    DECLARE_FIELD_FUNCS(cripple_no_throttle);
-    DECLARE_FIELD_FUNCS(cripple_always_throttle);
-    DECLARE_FIELD_FUNCS(cripple_no_turn);
-    DECLARE_FIELD_FUNCS(cripple_no_volt);
-    DECLARE_FIELD_FUNCS(cripple_one_turn);
-    DECLARE_FIELD_FUNCS(cripple_drunk);
-    DECLARE_FIELD_FUNCS(cripple_one_wheel);
-    DECLARE_FIELD_FUNCS(show_one_wheel_status);
-    DECLARE_FIELD_FUNCS(hostname);
-    DECLARE_FIELD_FUNCS(tcp_port);
-    DECLARE_FIELD_FUNCS(udp_port);
-    DECLARE_FIELD_FUNCS(nick);
-    DECLARE_FIELD_FUNCS(password);
-    DECLARE_FIELD_FUNCS(play_offline);
-    DECLARE_FIELD_FUNCS(tcp_only);
+    DECLARE_SETTING(show_demo_menu);
+    DECLARE_SETTING(show_help_menu);
+    DECLARE_SETTING(show_about_menu);
+    DECLARE_SETTING(show_best_times_menu);
+    DECLARE_SETTING(skip_intro);
+    DECLARE_SETTING(still_objects);
+    DECLARE_SETTING(all_internals_accessible);
+    DECLARE_SETTING(show_total_time);
+    DECLARE_SETTING(minimap_width);
+    DECLARE_SETTING(minimap_height);
+    DECLARE_SETTING(minimap_opacity);
+    DECLARE_SETTING(chat_lines);
+    DECLARE_SETTING(cripple_no_brake);
+    DECLARE_SETTING(cripple_no_throttle);
+    DECLARE_SETTING(cripple_always_throttle);
+    DECLARE_SETTING(cripple_no_turn);
+    DECLARE_SETTING(cripple_no_volt);
+    DECLARE_SETTING(cripple_one_turn);
+    DECLARE_SETTING(cripple_drunk);
+    DECLARE_SETTING(cripple_one_wheel);
+    DECLARE_SETTING(show_one_wheel_status);
+    DECLARE_SETTING(hostname);
+    DECLARE_SETTING(tcp_port);
+    DECLARE_SETTING(udp_port);
+    DECLARE_SETTING(nick);
+    DECLARE_SETTING(password);
+    DECLARE_SETTING(play_offline);
+    DECLARE_SETTING(tcp_only);
 
-    DECLARE_FIELD_FUNCS(show_others);
-    DECLARE_FIELD_FUNCS(show_battle_status);
-    DECLARE_FIELD_FUNCS(show_battle_leader);
-    DECLARE_FIELD_FUNCS(show_speedometer);
+    DECLARE_SETTING(show_others);
+    DECLARE_SETTING(show_battle_status);
+    DECLARE_SETTING(show_battle_leader);
+    DECLARE_SETTING(show_speedometer);
 
-    DECLARE_FIELD_FUNCS(table_alignment);
-    DECLARE_FIELD_FUNCS(chat_visibility);
+    DECLARE_SETTING(table_alignment);
+    DECLARE_SETTING(chat_visibility);
 };
 
-#undef DECLARE_FIELD_FUNCS
+#undef DECLARE_SETTING
 
 extern eol_settings* EolSettings;
 

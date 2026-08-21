@@ -16,7 +16,9 @@
 #include "util/file_iter.h"
 #include "util/util.h"
 #include <algorithm>
+#include <bit>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <limits>
 #include <optional>
@@ -1212,4 +1214,45 @@ vect2 level::midpoint() const {
     }
 
     return vect2((min_x + max_x) * 0.5, (min_y + max_y) * 0.5);
+}
+
+static inline uint32_t crc_double(double d) {
+    const uint64_t bits = std::bit_cast<std::uint64_t>(d);
+    const uint32_t lo = static_cast<std::uint32_t>(bits);
+    const uint32_t hi = static_cast<std::uint32_t>(bits >> 32);
+    return lo + hi;
+}
+
+int level::crc() const {
+    int crc = level_id;
+    int poly_count = 0;
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        const polygon* poly = polygons[i];
+        if (!poly) {
+            continue;
+        }
+
+        poly_count++;
+        crc ^= poly->vertex_count + poly->is_grass;
+        for (int j = 0; j < poly->vertex_count; j++) {
+            crc ^= crc_double(poly->vertices[j].x) + crc_double(poly->vertices[j].y);
+        }
+    }
+    crc ^= poly_count;
+
+    int obj_count = 0;
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        const object* obj = objects[i];
+        if (!obj) {
+            continue;
+        }
+
+        obj_count++;
+        double inv = (objects_flipped ? -1.0 : 1.0) * obj->r.y;
+        crc ^= crc_double(obj->r.x) + crc_double(inv);
+        crc ^= (int)obj->type + (int)obj->property + obj->animation;
+    }
+    crc ^= obj_count;
+
+    return crc;
 }

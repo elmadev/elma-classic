@@ -81,6 +81,7 @@ class level {
     void unflip_objects();
 
     vect2 midpoint() const;
+    int crc() const;
 };
 
 extern vect2 BikeStartOffset;

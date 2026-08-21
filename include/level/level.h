@@ -79,6 +79,8 @@ class level {
     // Invert the y of all objects (needs to be inverted for in-game, and uninverted in editor)
     void flip_objects();
     void unflip_objects();
+
+    vect2 midpoint() const;
 };
 
 extern vect2 BikeStartOffset;

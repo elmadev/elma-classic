@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <limits>
 #include <optional>
 
 constexpr int TOP_TEN_HEADER = 6754362;
@@ -1185,4 +1186,30 @@ void level::unflip_objects() {
             obj->r.y = -obj->r.y;
         }
     }
+}
+
+vect2 level::midpoint() const {
+    double min_x = std::numeric_limits<double>::infinity();
+    double min_y = std::numeric_limits<double>::infinity();
+    double max_x = -std::numeric_limits<double>::infinity();
+    double max_y = -std::numeric_limits<double>::infinity();
+
+    for (int i = 0; i < MAX_POLYGONS; i++) {
+        const polygon* poly = polygons[i];
+        if (!poly) {
+            continue;
+        }
+
+        for (int j = 0; j < poly->vertex_count; j++) {
+            double x = poly->vertices[j].x;
+            double y = -poly->vertices[j].y;
+
+            min_x = std::min(min_x, x);
+            max_x = std::max(max_x, x);
+            min_y = std::min(min_y, y);
+            max_y = std::max(max_y, y);
+        }
+    }
+
+    return vect2((min_x + max_x) * 0.5, (min_y + max_y) * 0.5);
 }

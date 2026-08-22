@@ -43,6 +43,7 @@
 
 ### Console and Shortcuts
 * Ctrl+G: toggle "ground"/"sky" foreground/background textures
+* Ctrl+H: toggle Video Detail (high quality textures)
 
 ### System
 * lev/ and rec/ folders no longer have a maximum file limit

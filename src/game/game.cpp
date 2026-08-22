@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
+#include <format>
 #include <optional>
 #include <utility>
 
@@ -536,6 +537,12 @@ static void handle_eol_inputs() {
         EolSettings->set_play_offline(true);
         EolClient->disconnect();
         StatusMessages->add("disconnected from the server");
+    }
+
+    if (was_game_key_just_pressed(State->key_high_quality)) {
+        State->high_quality = !State->high_quality;
+        canvas::invalidate_canvases();
+        StatusMessages->add(std::format("Video Detail: {}", State->high_quality ? "High" : "Low"));
     }
 
     if (was_game_key_just_pressed(State->key_default_ground_sky)) {

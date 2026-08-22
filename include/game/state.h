@@ -79,6 +79,7 @@ class state {
     DikScancode key_decrease_screen_size;
     DikScancode key_screenshot;
     DikScancode key_escape_alias;
+    combo_scancode key_high_quality;
     combo_scancode key_default_ground_sky;
 
     DikScancode key_replay_fast_2x;

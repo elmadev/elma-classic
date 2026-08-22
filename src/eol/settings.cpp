@@ -318,6 +318,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(screen_width)                                                                       \
     JSON_FIELD(screen_height)                                                                      \
                                                                                                    \
+    JSON_FIELD(high_quality_key)                                                                   \
     JSON_FIELD(pictures_in_background)                                                             \
     JSON_FIELD(default_ground)                                                                     \
     JSON_FIELD(default_sky)                                                                        \
@@ -483,6 +484,7 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->keys2.one_frame_brake = EolSettings->one_frame_brake_key_player_b();
 
     s->key_escape_alias = EolSettings->escape_alias_key();
+    s->key_high_quality = EolSettings->high_quality_key();
     s->key_default_ground_sky = EolSettings->default_ground_sky_key();
 
     s->key_replay_fast_2x = EolSettings->replay_fast_2x_key();
@@ -532,6 +534,7 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_one_frame_brake_key_player_b(s->keys2.one_frame_brake);
 
     EolSettings->persist_escape_alias_key(s->key_escape_alias);
+    EolSettings->persist_high_quality_key(s->key_high_quality);
     EolSettings->persist_default_ground_sky_key(s->key_default_ground_sky);
 
     EolSettings->persist_replay_fast_2x_key(s->key_replay_fast_2x);

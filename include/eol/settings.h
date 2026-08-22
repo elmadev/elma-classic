@@ -92,6 +92,7 @@ class eol_settings {
     Clamp<int> screen_width_{640, 800, 10000};
     Clamp<int> screen_height_{480, 600, 10000};
 
+    Default<combo_scancode> high_quality_key_{combo_scancode{DIK_LCONTROL, DIK_H}};
     Default<bool> pictures_in_background_{false};
     Default<bool> default_ground_{false};
     Default<bool> default_sky_{false};
@@ -208,6 +209,7 @@ class eol_settings {
     DECLARE_SETTING(screen_width);
     DECLARE_SETTING(screen_height);
 
+    DECLARE_SETTING(high_quality_key);
     DECLARE_SETTING(pictures_in_background);
     DECLARE_SETTING_CUSTOM(default_ground);
     DECLARE_SETTING_CUSTOM(default_sky);

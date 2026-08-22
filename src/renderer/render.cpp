@@ -878,6 +878,8 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
 }
 
 void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop) {
+    reload_graphic_assets();
+
     fps::update();
 
     // Determine who we are going to draw (player 1, player 2 or both)

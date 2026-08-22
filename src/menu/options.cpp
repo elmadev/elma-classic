@@ -11,6 +11,7 @@
 #include "menu/player.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "renderer/canvas.h"
 #include "util/file_iter.h"
 #include <cmath>
 #include <cstring>
@@ -247,7 +248,7 @@ void menu_options() {
         nav.add_row(
             "Video Detail:", State->high_quality ? "High" : "Low", NAV_FUNC() {
                 State->high_quality = !State->high_quality;
-                invalidate_level();
+                canvas::invalidate_canvases();
             });
 
         nav.add_row(

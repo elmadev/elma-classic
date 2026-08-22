@@ -13,6 +13,7 @@
 #include "platform/scancode.h"
 #include "platform/text_input.h"
 #include "platform/utils.h"
+#include "renderer/canvas.h"
 #include "util/util.h"
 #include <charconv>
 #include <format>
@@ -158,6 +159,19 @@ void console::register_console_commands() {
 
     REGISTER_SETTINGS_BOOL(show_last_apple_time);
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
+
+    register_command("hq", [this](std::string_view text) {
+        if (text.empty()) {
+            State->high_quality = !State->high_quality;
+        } else if (auto val = parse_bool(text)) {
+            State->high_quality = (int)(*val);
+        } else {
+            add_line(std::format("invalid value: {}", text), LineType::System);
+            return;
+        }
+        canvas::invalidate_canvases();
+        StatusMessages->add(std::format("Video Detail: {}", State->high_quality ? "High" : "Low"));
+    });
 
     REGISTER_SETTINGS_BOOL(default_ground);
     register_alias("defground", "default_ground");

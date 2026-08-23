@@ -402,14 +402,15 @@ void eol::record_apple_taken(int object_index, int num_apples) {
     });
 }
 
-void eol::exit_level(const driver& d, const char* level_name, double time, int apple_count,
-                     int level_apple_count, bool dead, bool esc) {
+void eol::exit_level(const driver& d, const char* level_name, double time, int level_apple_count,
+                     bool dead, bool esc) {
     for (kuski& k : kuskis_) {
         k.clear_spy_data();
         k.clear_apple_data();
     }
 
     spy_kuski_id.reset();
+    int apple_count = d.mot->apple_count - d.mot->apple_bug_count;
     struct exit_level fl{.name = level_name,
                          .time = time,
                          .apple_count = apple_count,

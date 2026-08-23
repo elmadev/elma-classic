@@ -749,7 +749,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
                     if (Single) {
                         EolClient->exit_level(driv1, filename, time * TIME_TO_CENTISECONDS,
-                                              TotalApples, !finish_time, false);
+                                              TotalApples, false);
                     }
 
                     Level->unflip_objects();
@@ -837,7 +837,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             Rec2->encode_frame_count();
             if (Single) {
                 EolClient->exit_level(driv1, filename, time * TIME_TO_CENTISECONDS, TotalApples,
-                                      false, true);
+                                      true);
             }
             return -1;
         }

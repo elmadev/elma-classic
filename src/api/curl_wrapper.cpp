@@ -90,3 +90,20 @@ void easy_handle::setopt_write_to_filesystem(std::string destination) {
     file_name = std::move(destination);
     setopt(CURLOPT_WRITEFUNCTION, write_callback_filesystem);
 }
+
+std::string share_interface::error_message(CURLSHcode code) {
+    return std::string(curl_share_strerror(code));
+}
+
+share_interface::share_interface() {
+    share = curl_share_init();
+    ELMA_ASSERT(share);
+}
+
+share_interface::~share_interface() {
+    CURLSHcode code = curl_share_cleanup(share);
+    if (code != CURLSHE_OK) {
+        internal_error(error_message(code));
+    }
+    share = nullptr;
+}

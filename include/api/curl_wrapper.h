@@ -57,4 +57,24 @@ class easy_handle {
     void setopt_write_to_filesystem(std::string destination);
 };
 
+// Thin wrapper around libcurl-share with error-checking and memory management
+class share_interface {
+    CURLSH* share = nullptr;
+
+    static std::string error_message(CURLSHcode code);
+
+  public:
+    template <typename T> void setopt(CURLSHoption option, T value) {
+        CURLSHcode code = curl_share_setopt(share, option, value);
+        if (code != CURLSHE_OK) {
+            internal_error("curl_share_setopt() failed: " + error_message(code));
+        }
+    }
+
+    share_interface();
+    ~share_interface();
+
+    CURLSH* get() { return share; }
+};
+
 #endif

@@ -32,6 +32,9 @@ void init() {
     sequential_handle->setopt(CURLOPT_TIMEOUT_MS, 60000L);
     sequential_handle->setopt(CURLOPT_MAXFILESIZE, 40L * 1024L * 1024L);
     sequential_handle->setopt(CURLOPT_USERAGENT, "Eol Client/" ELMA_VERSION);
+#ifdef CURL_VERBOSE
+    sequential_handle->setopt(CURLOPT_VERBOSE, 1L);
+#endif
 }
 
 void cleanup() {

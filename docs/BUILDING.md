@@ -141,6 +141,13 @@ However, here are the relevant options:
 - `address` - Add AddressSanitizer (memory errors, support by Clang/GCC/MSVC)
 - `address,undefined` - Add AddressSanitizer and UndefinedBehaviourSanitizer (Clang/GCC only)
 
+#### curl_verbose
+
+`meson configure build -Dcurl_verbose=`
+
+- `false` - Disabled
+- `true`- Set libcurl to verbose mode to debug api issues (CURLOPT_VERBOSE)
+
 #### profile_performance
 
 `meson configure build -Dprofile_performance=`

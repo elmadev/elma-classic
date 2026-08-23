@@ -10,6 +10,10 @@ if get_option('profile_performance') == true
     add_project_arguments('-DPROFILE_PERFORMANCE', language: 'cpp')
 endif
 
+if get_option('curl_verbose') == true
+    add_project_arguments('-DCURL_VERBOSE', language: 'cpp')
+endif
+
 elma_sources = files(
     'src/api/api.cpp',
     'src/api/curl_wrapper.cpp',

@@ -1,6 +1,5 @@
 #include "menu/options.h"
 #include "eol/settings.h"
-#include "game/level_load.h"
 #include "game/state.h"
 #include "main.h"
 #include "menu/ball.h"
@@ -267,13 +266,7 @@ void menu_options() {
 
         nav.add_row("Cripples ...", NAV_FUNC() { menu_cripples(); });
 
-        nav.add_row(
-            "Pics In Background:", EolSettings->pictures_in_background_persisted() ? "Yes" : "No",
-            NAV_FUNC() {
-                EolSettings->persist_pictures_in_background(
-                    !EolSettings->pictures_in_background_persisted());
-                invalidate_level();
-            });
+        BOOL_OPTION("Pics In Background:", pictures_in_background);
 
         BOOL_OPTION("Override Ground:", default_ground);
         BOOL_OPTION("Override Sky:", default_sky);

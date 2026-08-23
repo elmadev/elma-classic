@@ -1,11 +1,11 @@
 #include "eol/settings.h"
 #include "editor/editor.h"
-#include "game/level_load.h"
 #include "game/state.h"
 #include "main.h"
 #include "physics/init.h"
 #include "pic/lgr.h"
 #include "platform/implementation.h"
+#include "renderer/canvas.h"
 #include "renderer/object_overlay.h"
 #include <fstream>
 #define JSON_DIAGNOSTICS 1
@@ -65,6 +65,14 @@ template struct Default<eol_table::Align>;
 template struct Clamp<int>;
 template struct Clamp<double>;
 
+void eol_settings::set_pictures_in_background(bool b) {
+    if (pictures_in_background_ == b) {
+        return;
+    }
+    pictures_in_background_ = b;
+    canvas::invalidate_canvases();
+}
+
 void eol_settings::set_default_ground(bool b) {
     default_ground_ = b;
     if (Level && Lgr) {
@@ -113,7 +121,7 @@ void eol_settings::set_minimap_zoom(double z) {
     if (z != minimap_zoom_) {
         minimap_zoom_ = z;
         set_minimap_zoom_factor();
-        invalidate_level();
+        canvas::invalidate_canvases();
     }
 }
 

@@ -210,7 +210,7 @@ class eol_settings {
     DECLARE_SETTING(screen_height);
 
     DECLARE_SETTING(high_quality_key);
-    DECLARE_SETTING(pictures_in_background);
+    DECLARE_SETTING_CUSTOM(pictures_in_background);
     DECLARE_SETTING_CUSTOM(default_ground);
     DECLARE_SETTING_CUSTOM(default_sky);
     DECLARE_SETTING(default_ground_sky_key);

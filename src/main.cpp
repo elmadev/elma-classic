@@ -64,7 +64,7 @@ bool ErrorGraphicsLoaded = false;
 
     if (InError) {
         message_box("A fatal error occurred. Details written to eol.log.");
-        quit();
+        exit(1);
     }
     InError = true;
 

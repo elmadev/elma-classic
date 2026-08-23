@@ -15,6 +15,26 @@
 // For example, ' ' needs to be encoded as "%20"
 std::string url_encode(const std::string& text);
 
+// Thin wrapper around libcurl-share with error-checking and memory management
+class share_interface {
+    friend class easy_handle;
+
+    CURLSH* share = nullptr;
+
+    static std::string error_message(CURLSHcode code);
+
+  public:
+    template <typename T> void setopt(CURLSHoption option, T value) {
+        CURLSHcode code = curl_share_setopt(share, option, value);
+        if (code != CURLSHE_OK) {
+            internal_error("curl_share_setopt() failed: " + error_message(code));
+        }
+    }
+
+    share_interface();
+    ~share_interface();
+};
+
 // Thin wrapper around libcurl-easy with error-checking and memory management
 class easy_handle {
     CURL* handle = nullptr;
@@ -50,7 +70,8 @@ class easy_handle {
     std::optional<std::string> perform_to_filesystem();
 
     // Copy the settings of `base`, or create a new default handle if nullptr
-    easy_handle(easy_handle* base);
+    // Optionally provide a share interface for faster connections
+    easy_handle(easy_handle* base, share_interface* share);
     ~easy_handle();
 
     // Set file destination target

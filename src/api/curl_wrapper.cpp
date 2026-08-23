@@ -1,4 +1,5 @@
 #include "api/curl_wrapper.h"
+#include "log.h"
 #include "main.h"
 #include <filesystem>
 #include <format>
@@ -9,6 +10,23 @@ std::string url_encode(const std::string& text) {
     std::string encoded_string = std::string(encoded_text);
     curl_free(encoded_text);
     return encoded_string;
+}
+
+std::string share_interface::error_message(CURLSHcode code) {
+    return std::string(curl_share_strerror(code));
+}
+
+share_interface::share_interface() {
+    share = curl_share_init();
+    ELMA_ASSERT(share);
+}
+
+share_interface::~share_interface() {
+    CURLSHcode code = curl_share_cleanup(share);
+    if (code != CURLSHE_OK) {
+        LOG_WARN("Failed to release curl-share resources: {}", error_message(code));
+    }
+    share = nullptr;
 }
 
 std::size_t easy_handle::write_callback_filesystem(char* ptr, size_t size, size_t nmemb,
@@ -72,7 +90,7 @@ std::optional<std::string> easy_handle::perform_to_filesystem() {
     return std::nullopt;
 }
 
-easy_handle::easy_handle(easy_handle* base) {
+easy_handle::easy_handle(easy_handle* base, share_interface* share) {
     if (base) {
         handle = curl_easy_duphandle(base->handle);
     } else {
@@ -85,6 +103,11 @@ easy_handle::easy_handle(easy_handle* base) {
 
     // Pass a reference to self in write callback function
     setopt(CURLOPT_WRITEDATA, this);
+
+    if (share) {
+        // CURLOPT_SHARE is not copied when using curl_easy_duphandle(), so set it manually
+        setopt(CURLOPT_SHARE, share->share);
+    }
 }
 
 easy_handle::~easy_handle() {

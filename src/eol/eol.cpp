@@ -402,8 +402,7 @@ void eol::record_apple_taken(int object_index, int num_apples) {
     });
 }
 
-void eol::exit_level(const driver& d, const char* level_name, double time, int level_apple_count,
-                     bool esc) {
+void eol::exit_level(const driver& d, const char* level_name, double time, int level_apple_count) {
     for (kuski& k : kuskis_) {
         k.clear_spy_data();
         k.clear_apple_data();
@@ -416,7 +415,7 @@ void eol::exit_level(const driver& d, const char* level_name, double time, int l
                          .apple_count = apple_count,
                          .level_apple_count = level_apple_count,
                          .dead = d.dead,
-                         .esc = esc};
+                         .esc = d.finish_time == 0 && !d.dead};
     proto.send(fl);
 }
 

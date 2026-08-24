@@ -1,5 +1,7 @@
 #include "api/api.h"
 #include "api/curl_wrapper.h"
+#include "eol/settings.h"
+#include <format>
 
 namespace eol_api {
 
@@ -45,6 +47,23 @@ void cleanup() {
     share = nullptr;
 
     curl_global_cleanup();
+}
+
+#ifdef DEBUG
+// Avoid incrementing the download counter at https://elma.online/lgrs
+#define LGR_GET_DL ""
+#else
+#define LGR_GET_DL "?dl"
+#endif
+
+// https://api.elma.online/api/lgr/get/LGRNAME.lgr?dl
+std::optional<std::string> lgr_get(const std::string& lgr_name) {
+    easy_handle curl = easy_handle(sequential_handle);
+    std::string url = std::format("https://{}/api/lgr/get/{}" LGR_GET_DL, EolSettings->api_name(),
+                                  url_encode(lgr_name));
+    curl.setopt(CURLOPT_URL, url.c_str());
+    curl.setopt_write_to_filesystem(std::format("lgr/{}.lgr", lgr_name));
+    return curl.perform_to_filesystem();
 }
 
 } // namespace eol_api

@@ -83,9 +83,11 @@ template <typename T> struct Clamp {
 #ifndef DEBUG
 constexpr int DEFAULT_TCP_PORT = 4460;
 constexpr int DEFAULT_UDP_PORT = 4461;
+#define API_NAME "api.elma.online"
 #else
 constexpr int DEFAULT_TCP_PORT = 4470;
 constexpr int DEFAULT_UDP_PORT = 4471;
+#define API_NAME "apitest.elma.online"
 #endif
 
 class eol_settings {
@@ -186,9 +188,12 @@ class eol_settings {
     Default<bool> cripple_drunk_{false};
     Default<bool> cripple_one_wheel_{false};
     Default<bool> show_one_wheel_status_{false};
+
     Default<std::string> hostname_{"eol.elma.online"};
+    Default<std::string> api_name_{API_NAME};
     Default<int> tcp_port_{DEFAULT_TCP_PORT};
     Default<int> udp_port_{DEFAULT_UDP_PORT};
+
     Default<std::string> nick_{""};
     Default<std::string> password_{""};
     Default<bool> play_offline_{false};
@@ -305,9 +310,12 @@ class eol_settings {
     DECLARE_SETTING(cripple_drunk);
     DECLARE_SETTING(cripple_one_wheel);
     DECLARE_SETTING(show_one_wheel_status);
+
     DECLARE_SETTING(hostname);
+    DECLARE_SETTING(api_name);
     DECLARE_SETTING(tcp_port);
     DECLARE_SETTING(udp_port);
+
     DECLARE_SETTING(nick);
     DECLARE_SETTING(password);
     DECLARE_SETTING(play_offline);

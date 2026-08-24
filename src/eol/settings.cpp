@@ -444,9 +444,12 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(cripple_drunk)                                                                      \
     JSON_FIELD(cripple_one_wheel)                                                                  \
     JSON_FIELD(show_one_wheel_status)                                                              \
+                                                                                                   \
     JSON_FIELD(hostname)                                                                           \
+    JSON_FIELD(api_name)                                                                           \
     JSON_FIELD(tcp_port)                                                                           \
     JSON_FIELD(udp_port)                                                                           \
+                                                                                                   \
     JSON_FIELD(nick)                                                                               \
     JSON_FIELD(password)                                                                           \
     JSON_FIELD(play_offline)                                                                       \

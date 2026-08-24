@@ -1,4 +1,5 @@
 #include "game/game.h"
+#include "editor/dialog.h"
 #include "editor/editor.h"
 #include "eol/console.h"
 #include "eol/eol.h"
@@ -664,10 +665,14 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     double time = 0.0;
     reset_event_buffer();
 
+    EnterMode mode = EnterMode::Play;
+    if (InEditor) {
+        mode = EnterMode::Editor;
+    } else if (camera_mode == CameraMode::MapViewer) {
+        mode = EnterMode::Spy;
+    }
     if (Single) {
-        EolClient->enter_level(filename, Level,
-                               camera_mode == CameraMode::MapViewer ? EnterMode::Spy
-                                                                    : EnterMode::Play);
+        EolClient->enter_level(filename, Level, mode);
     }
 
     BattleRunCripples.reset();
@@ -784,7 +789,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
                     Rec1->encode_frame_count();
                     Rec2->encode_frame_count();
-                    if (Single) {
+                    if (Single && !InEditor) {
                         EolClient->exit_level(driv1, Level, time * TIME_TO_CENTISECONDS,
                                               TotalApples, camera_mode == CameraMode::MapViewer);
                     }
@@ -871,7 +876,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             Level->unflip_objects();
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
-            if (Single) {
+            if (Single && !InEditor) {
                 EolClient->exit_level(driv1, Level, time * TIME_TO_CENTISECONDS, TotalApples,
                                       camera_mode == CameraMode::MapViewer);
             }

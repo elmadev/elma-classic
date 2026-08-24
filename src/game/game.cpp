@@ -1000,6 +1000,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
     reset_event_buffer();
     stopwatch_reset();
 
+    EolClient->enter_level(filename, Level, EnterMode::Replay);
+
     driver driv1(Motor1, Rec1, &State->keys1, &HudReplay1);
     driver driv2(Motor2, Rec2, &State->keys2, &HudReplay2);
 
@@ -1176,6 +1178,8 @@ void render_replay(const char* level_filename) {
     Single = !MultiplayerRec;
     FlagTag = Rec1->flagtag();
     setup_gameloop(level_filename);
+
+    EolClient->enter_level(level_filename, Level, EnterMode::Replay);
 
     camera current_camera;
     current_camera.mode = CameraMode::Normal;

@@ -1558,6 +1558,11 @@ void canvas::create_front_grass() {
     }
 }
 
+bool canvas::bike_out_of_bounds(vect2 pos) {
+    vect2 relative_pos = pos - origin;
+    return relative_pos.x < OUT_OF_BOUNDS_LEFT || relative_pos.y < OUT_OF_BOUNDS_BOTTOM;
+}
+
 void canvas::create_canvases() {
     START_TIME(canvas_timer);
     Lgr->reload_default_textures(*Level, false);
@@ -1672,9 +1677,4 @@ canvas_chunk_node* node_finder::get_chunk(int x, int y) {
         }
     }
     return current_node;
-}
-
-bool canvas::bike_out_of_bounds(vect2 pos) {
-    vect2 relative_pos = pos - origin;
-    return relative_pos.x < OUT_OF_BOUNDS_LEFT || relative_pos.y < OUT_OF_BOUNDS_BOTTOM;
 }

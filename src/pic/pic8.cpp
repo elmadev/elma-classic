@@ -6,6 +6,7 @@
 #include "platform/utils.h"
 #include <algorithm>
 #include <climits>
+#include <cmath>
 #include <cstring>
 
 void pic8::allocate(int w, int h) {
@@ -852,6 +853,88 @@ void pic8::line(int x1, int y1, int x2, int y2, unsigned char index) {
         return;
     }
     internal_error("pic8::line diagonal lines not implemented!");
+}
+
+void pic8::line(double x1, double y1, double x2, double y2, unsigned char index) {
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+    if (dx == 0.0 && dy == 0.0) {
+        return;
+    }
+
+    // Always draw along the least-steep axis
+    bool invert_axes = false;
+    int major_axis_length = width;
+    int minor_axis_length = height;
+    if (std::abs(dy) > std::abs(dx)) {
+        invert_axes = true;
+        std::swap(dx, dy);
+        std::swap(x1, y1);
+        std::swap(x2, y2);
+        std::swap(major_axis_length, minor_axis_length);
+    }
+
+    // Always draw low-to-high
+    if (x1 > x2) {
+        std::swap(x1, x2);
+        std::swap(y1, y2);
+    }
+
+    // Derive equation y=slope*x + yintercept
+    double slope = dy / dx;
+    double intercept = y1 - slope * x1;
+
+    // Bound x within picture
+    int start = std::max(0, (int)std::round(x1));
+    int end = std::min(major_axis_length - 1, (int)std::round(x2));
+
+    if (slope == 0.0) {
+        // Draw straight line
+        int j = (int)std::round(intercept);
+#ifdef DEBUG
+        ELMA_ASSERT(j >= 0 && j < minor_axis_length);
+#endif
+        for (int i = start; i <= end; i++) {
+            if (invert_axes) {
+                rows[i][j] = index;
+            } else {
+                rows[j][i] = index;
+            }
+        }
+        return;
+    }
+
+    // Bound y within picture
+    double minor_intercept_0 = -intercept / slope;
+    double minor_intercept_height = ((minor_axis_length - 1) - intercept) / slope;
+    if (slope > 0.0) {
+        start = std::max(start, (int)std::ceil(minor_intercept_0));
+        end = std::min(end, (int)std::floor(minor_intercept_height));
+    } else {
+        start = std::max(start, (int)std::ceil(minor_intercept_height));
+        end = std::min(end, (int)std::floor(minor_intercept_0));
+    }
+
+    // Draw line
+    for (int i = start; i <= end; i++) {
+        int j = (int)std::round(slope * i + intercept);
+#ifdef DEBUG
+        ELMA_ASSERT(j >= 0 && j < minor_axis_length);
+#endif
+        if (invert_axes) {
+#ifdef DEBUG
+            ELMA_ASSERT(i >= 0 && i < height);
+            ELMA_ASSERT(j >= 0 && j < width);
+#endif
+            rows[i][j] = index;
+        } else {
+#ifdef DEBUG
+            ELMA_ASSERT(i >= 0 && i < width);
+            ELMA_ASSERT(j >= 0 && j < height);
+#endif
+            rows[j][i] = index;
+        }
+    }
 }
 
 void pic8::subview(int w, int h, unsigned char* source, int pitch, bool inverted) {

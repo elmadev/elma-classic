@@ -37,6 +37,8 @@ void draw_affine_pic_row(unsigned char transparency, int length, unsigned char* 
     }
 }
 
+// Set stretch parameters
+// bike_center is in meters and not translated to bottomleft_corner
 void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
                             double meters_to_pixels) {
     StretchCenter = bike_center;
@@ -46,19 +48,11 @@ void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
     StretchMetersToPixels = meters_to_pixels;
 }
 
-void draw_affine_pic(pic8* dest, const pic8* aff, unsigned char transparency, vect2 u, vect2 v,
-                     vect2 r) {
+// Apply stretch parameters
+// u, v, and r are in meters and NOT translated to bottomleft_corner
+void apply_stretch_parameters(vect2& u, vect2& v, vect2& r) {
     // Bike is turning! Let's stretch the bike
     if (StretchEnabled) {
-        // Convert the coordinates from pixels to meters, since the StretchEnabled vars are in
-        // meters
-        r.x /= StretchMetersToPixels;
-        r.y /= StretchMetersToPixels;
-        u.x /= StretchMetersToPixels;
-        u.y /= StretchMetersToPixels;
-        v.x /= StretchMetersToPixels;
-        v.y /= StretchMetersToPixels;
-
         // Stretch coordinate r
         double distance = (r - StretchCenter) * StretchAxis;
         vect2 delta = (distance * (1.0 - StretchFactor)) * StretchAxis;
@@ -73,15 +67,13 @@ void draw_affine_pic(pic8* dest, const pic8* aff, unsigned char transparency, ve
         distance = v * StretchAxis;
         delta = (distance * (1.0 - StretchFactor)) * StretchAxis;
         v = v - delta;
-
-        // Convert the coordinates back into pixels
-        r.x *= StretchMetersToPixels;
-        r.y *= StretchMetersToPixels;
-        u.x *= StretchMetersToPixels;
-        u.y *= StretchMetersToPixels;
-        v.x *= StretchMetersToPixels;
-        v.y *= StretchMetersToPixels;
     }
+}
+
+// Draw affine pic
+// u, v, and r are in pixels and r IS translated to bottomleft_corner
+void draw_affine_pic(pic8* dest, const pic8* aff, unsigned char transparency, vect2 u, vect2 v,
+                     vect2 r) {
 
     // Check if the picture is rotated at a 90-degree offset +- tolerance of MINIMUM_ROTATION.
     // The reason why we do this is linear algebra: it is impossible to invert a matrix that

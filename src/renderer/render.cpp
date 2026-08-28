@@ -8,7 +8,6 @@
 #include "game/fps.h"
 #include "game/game.h"
 #include "level/level.h"
-#include "level/object.h"
 #include "main.h"
 #include "physics/flagtag.h"
 #include "physics/init.h"
@@ -43,8 +42,15 @@ static double VisibleFraction = 1.0;
 constexpr double VISIBLE_FRACTION_SCALING_FACTOR = 1.1;
 
 void reset_game_background() { GameBackgroundRender = true; }
+static bool is_opengl_render() {
+    return !std::getenv("CPURENDER") && EolSettings->renderer() == RendererType::OpenGL;
+}
 
 void increase_view_size() {
+    if (is_opengl_render()) {
+        GlZoom /= 1.1;
+        return;
+    }
     VisibleFraction *= VISIBLE_FRACTION_SCALING_FACTOR;
     if (VisibleFraction >= 0.999) {
         VisibleFraction = 1.0;
@@ -53,6 +59,10 @@ void increase_view_size() {
 }
 
 void decrease_view_size() {
+    if (is_opengl_render()) {
+        GlZoom *= 1.1;
+        return;
+    }
     VisibleFraction /= VISIBLE_FRACTION_SCALING_FACTOR;
     VisibleFraction = std::max(VisibleFraction, 0.7);
     reset_game_background();
@@ -80,10 +90,10 @@ double AffinePicScreenBottom;
 double AffinePicScreenTop;
 
 // In pixels from the bottom-left corner of screen
-static int MinimapWidth;
-static int MinimapHeight;
-static int MinimapX;
-static int MinimapDx;
+int MinimapWidth;
+int MinimapHeight;
+int MinimapX;
+int MinimapDx;
 
 pic8* shirt = nullptr;
 
@@ -151,225 +161,6 @@ static void calculate_viewpoints(bool splitscreen) {
     MinimapDx = GameViewWidth - 2 * MinimapX - MinimapWidth;
 }
 
-// Render an affine_pic (remember all affine_pic images are loaded sideways in the lgr)
-// All units are in meters
-// a = coordinate of middle left of affine_pic position (distal end of the limb)
-// b = coordinate of middle right of affine_pic position (proximal end of the limb)
-// Along the axis of the vector b->a, displace coordinate a by `a_stretch` meters
-// Along the axis of the vector a->b, displace coordinate b by `b_stretch` meters
-// height represents the vertical length of the affine_pic (thickness of the limb)
-static void render_affine_pic(vect2 a, vect2 b, pic8* dest, double height, const pic8* affine,
-                              double a_stretch, double b_stretch, bool flip) {
-    vect2 i = unit_vector(b - a);
-    b = b + i * b_stretch;
-    a = a - i * a_stretch;
-    vect2 u = b - a;
-    vect2 v;
-    if (flip) {
-        v = rotate_90deg(i) * height;
-    } else {
-        v = rotate_minus90deg(i) * height;
-    }
-    a = a - v;
-
-    a.x *= MetersToPixels;
-    a.y *= MetersToPixels;
-    u.x *= MetersToPixels;
-    u.y *= MetersToPixels;
-    v.x *= MetersToPixels;
-    v.y *= MetersToPixels;
-    draw_affine_pic(dest, affine, affine->gpixel(0, 0), u, v * 2.0, a);
-}
-
-// Render a wheel or head affine_pic
-static void render_rigidbody(vect2 r, double radius, double rotation, pic8* dest, pic8* affine,
-                             bool flip) {
-    vect2 direction(cos(rotation) * radius, sin(rotation) * radius);
-    if (flip) {
-        render_affine_pic(r + direction, r - direction, dest, radius, affine, 0.0, 0.0, flip);
-    } else {
-        render_affine_pic(r - direction, r + direction, dest, radius, affine, 0.0, 0.0, flip);
-    }
-}
-
-static double BikeFrameX;
-static double BikeFrameY;
-static vect2 BikeFrameI;
-static vect2 BikeFrameJ;
-static vect2 BikeFrameR;
-static vect2 BikeFrameIPixels;
-static vect2 BikeFrameJPixels;
-static vect2 BikeFrameRPixels;
-
-// Render a bike frame fragment
-static void render_bike_part(pic8* dest, pic8* part, unsigned char transparency, bike_box* box) {
-    vect2 r = BikeFrameIPixels * (box->x1 + 260 - BikeFrameX) +
-              BikeFrameJPixels * (BikeFrameY - (box->y1 + 260)) + BikeFrameRPixels;
-    vect2 u = BikeFrameIPixels * (box->x2 - box->x1);
-    vect2 v = BikeFrameJPixels * (box->y1 - box->y2);
-
-    draw_affine_pic(dest, part, transparency, u, v, r);
-}
-
-// Render a 3x3 square onto the minimap
-static void render_minimap_icon(pic8* pic, int x, int y, unsigned char palette_id) {
-    if (x < -1 || x > pic->get_width() || y < -1 || y > pic->get_height()) {
-        // Skip drawing icons that are completely out of bounds
-        return;
-    }
-    pic->ppixel(x - 1, y - 1, palette_id);
-    pic->ppixel(x, y - 1, palette_id);
-    pic->ppixel(x + 1, y - 1, palette_id);
-    pic->ppixel(x - 1, y, palette_id);
-    pic->ppixel(x + 1, y, palette_id);
-    pic->ppixel(x - 1, y + 1, palette_id);
-    pic->ppixel(x, y + 1, palette_id);
-    pic->ppixel(x + 1, y + 1, palette_id);
-}
-
-// Render the entire minimap
-static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, vect2 bike_center,
-                           motorst* other_motor) {
-    // Calculate minimap size and minimap frame of reference
-    double minimap_width = MinimapWidth * MinimapScaleFactor * PixelsToMeters;
-    double minimap_height = MinimapHeight * MinimapScaleFactor * PixelsToMeters;
-
-    double camera_x = EolSettings->center_map() ? 0.5 : 0.2;
-    double camera_dx = 1.0 - 2.0 * camera_x;
-    vect2 camera_pos(minimap_width * (camera_x + camera_turn_phase * camera_dx),
-                     minimap_height / 2);
-    vect2 bottomleft_corner = bike_center - camera_pos;
-
-    double align;
-    switch (EolSettings->map_alignment()) {
-    case MapAlignment::None:
-        align = camera_turn_phase;
-        break;
-    case MapAlignment::Left:
-        align = 0.0;
-        break;
-    case MapAlignment::Middle:
-        align = 0.5;
-        break;
-    case MapAlignment::Right:
-        align = 1.0;
-        break;
-    }
-
-    const int minimap_x1 = std::max(1, (int)(MinimapX + align * MinimapDx));
-    const int minimap_x2 = minimap_x1 + MinimapWidth - 1;
-    const int minimap_y1 = 1;
-    const int minimap_y2 = minimap_y1 + MinimapHeight - 1;
-
-    const int border_x1 = minimap_x1 - 1;
-    const int border_x2 = minimap_x2 + 1;
-    const int border_y1 = minimap_y1 - 1;
-    const int border_y2 = minimap_y2 + 1;
-
-    if (border_x1 < 0 || border_y1 < 0 || border_x2 >= pic->get_width() ||
-        border_y2 >= pic->get_height()) {
-        // Minimap doesn't fit on the screen, so skip drawing it entirely
-        return;
-    }
-
-    static pic8 minimap_view = pic8();
-    minimap_view.subview(minimap_x1, minimap_y1, minimap_x2, minimap_y2, pic);
-    static pic8 border_view = pic8();
-    border_view.subview(border_x1, border_y1, border_x2, border_y2, pic);
-
-    // Save game scene pixels under the minimap area (including 1px border margin)
-    int opacity = EolSettings->minimap_opacity();
-    static pic8* save_pic = nullptr;
-    if (opacity < 100) {
-        if (!save_pic || save_pic->get_width() != border_view.get_width() ||
-            save_pic->get_height() != border_view.get_height()) {
-            delete save_pic;
-            save_pic = new pic8(border_view.get_width(), border_view.get_height());
-        }
-        blit8(save_pic, &border_view);
-    }
-
-    // Draw the minimap border
-    border_view.fill_box(Lgr->minimap_border_palette_id);
-
-    // Draw the background (polygons)
-    CanvasMinimap->render_minimap(player1, &minimap_view, bottomleft_corner, 0, 0, MinimapWidth - 1,
-                                  MinimapHeight - 1);
-
-    // Draw the objects
-    int corner_x;
-    int corner_y;
-    CanvasMinimap->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
-    const kuski* spy_kuski = EolClient->spy_kuski();
-    for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Level->objects[i];
-        if (!obj) {
-            break;
-        }
-
-        unsigned char palette_id;
-        switch (obj->type) {
-        case object::Type::Food:
-            if (!obj->active || (spy_kuski && spy_kuski->apples_taken[i])) {
-                continue;
-            }
-            palette_id = Lgr->minimap_food_palette_id;
-            break;
-        case object::Type::Exit:
-            if ((!Single && FlagTag) || EolClient->battle_hides_exit()) {
-                continue;
-            }
-            palette_id = Lgr->minimap_exit_palette_id;
-            break;
-        default:
-            continue;
-        }
-
-        render_minimap_icon(&minimap_view, obj->minimap_canvas_x - corner_x,
-                            obj->minimap_canvas_y - corner_y, palette_id);
-    }
-
-    // Select the correct color for each bike
-    unsigned char bike1_id = Lgr->minimap_bike1_palette_id;
-    unsigned char bike2_id = Lgr->minimap_bike2_palette_id;
-    if ((State->player1_bike1 && !player1) || (!State->player1_bike1 && player1)) {
-        bike1_id = Lgr->minimap_bike2_palette_id;
-        bike2_id = Lgr->minimap_bike1_palette_id;
-    }
-
-    if (EolSettings->show_others()) {
-        for (const kuski& ku : EolClient->kuskis()) {
-            const spy_data* k = ku.spy_data();
-            if (!k) {
-                continue;
-            }
-
-            vect2 k_pos = k->mot.bike.r - bottomleft_corner;
-            int k_x = (int)(k_pos.x * MetersToMinimapPixels);
-            int k_y = (int)(k_pos.y * MetersToMinimapPixels);
-            render_minimap_icon(&minimap_view, k_x, k_y, bike2_id);
-        }
-    }
-
-    // Draw the other bike
-    if (other_motor) {
-        vect2 other_pos = other_motor->bike.r - bottomleft_corner;
-        int other_x = (int)(other_pos.x * MetersToMinimapPixels);
-        int other_y = (int)(other_pos.y * MetersToMinimapPixels);
-        render_minimap_icon(&minimap_view, other_x, other_y, bike2_id);
-    }
-
-    // Draw the current player's bike
-    int bike_x = (int)(camera_pos.x * MetersToMinimapPixels);
-    int bike_y = (int)(camera_pos.y * MetersToMinimapPixels);
-    render_minimap_icon(&minimap_view, bike_x, bike_y, bike1_id);
-
-    // Bring back pixels from the saved game scene based on opacity
-    if (opacity < 100) {
-        blit8_dither(&border_view, save_pic, 0, 0, opacity);
-    }
-}
-
 static void handle_screenshot(pic8* pic) {
     if (VideoRecordingMode) {
         std::string filename = std::format("snp{:05}.pcx", VideoFrameIndex);
@@ -386,15 +177,6 @@ static void handle_screenshot(pic8* pic) {
     }
 }
 
-// Cover the screen with qframe
-static void render_background(pic8* pic) {
-    for (int i = 0; i < pic->get_height(); i += Lgr->qframe->get_height()) {
-        for (int j = 0; j < pic->get_width(); j += Lgr->qframe->get_width()) {
-            blit8(pic, Lgr->qframe, j, i);
-        }
-    }
-}
-
 // Local (2-player) flag tag: does this player's bike currently show the flag?
 static bool local_flag_tag_has_flag(bool player1, double time) {
     if (Single || !FlagTag) {
@@ -408,221 +190,14 @@ static bool local_flag_tag_has_flag(bool player1, double time) {
     return FlagTagImmunity && (int)(time * 30.0) % 2 != 0;
 }
 
-// Render an entire bike + kuski
-static void render_bike(pic8* pic, bool has_flag, vect2 bottomleft_corner, const motorst* mot,
-                        const bike_metadata* metadata, const bike_pics* bike, const pic8* shirt) {
-    double arm_position = metadata->arm_position;
-    double turn_phase = metadata->bike_turning.turn_phase;
-
-    // Check to see if bike is turning, and calculate the progress from -1.0 to 1.0 using cos
-    bool is_turning = false;
-    StretchEnabled = false;
-    if (turn_phase < 0.999) {
-        is_turning = true;
-        turn_phase = -cos(turn_phase * PI);
-    }
-
-    // Calculate wheel position relative to screen
-    vect2 left_wheel_r = (mot->left_wheel.r - bottomleft_corner);
-    vect2 right_wheel_r = (mot->right_wheel.r - bottomleft_corner);
-
-    // If turning, we will be rendering one wheel in the foreground (usually they are rendered in
-    // background)
-    bool left_wheel_in_back = true;
-    bool right_wheel_in_back = true;
-    if (is_turning) {
-        if ((turn_phase > 0.0 && !mot->flipped_bike) || (turn_phase <= 0.0 && mot->flipped_bike)) {
-            left_wheel_in_back = false;
-        } else {
-            right_wheel_in_back = false;
-        }
-    }
-
-    // Render background wheels
-    constexpr double WHEEL_RENDER_RADIUS = 0.395;
-    if (left_wheel_in_back) {
-        render_rigidbody(left_wheel_r, WHEEL_RENDER_RADIUS, mot->left_wheel.rotation, pic,
-                         bike->wheel, false);
-    }
-    if (right_wheel_in_back) {
-        render_rigidbody(right_wheel_r, WHEEL_RENDER_RADIUS, mot->right_wheel.rotation, pic,
-                         bike->wheel, false);
-    }
-
-    // Get the bike position and angle
-    vect2 bike_r = mot->bike.r - bottomleft_corner;
-    vect2 bike_i = vect2(cos(mot->bike.rotation), sin(mot->bike.rotation));
-    vect2 bike_j = rotate_90deg(bike_i);
-
-    // If bike is turning, squish the bike
-    if (is_turning) {
-        StretchEnabled = true;
-        set_stretch_parameters(bike_r, bike_i, turn_phase, MetersToPixels);
-    }
-
-    // If the bike is turned, flip the bike
-    // Swap the wheels temporarily for the purposes of drawing the suspension
-    if (mot->flipped_bike) {
-        bike_i = Vect2null - bike_i;
-        std::swap(left_wheel_r, right_wheel_r);
-    }
-
-    // Bike frame calculations. Rotate the bike frame by 0.62 radians
-    BikeFrameX = 390.0;
-    BikeFrameY = 420.0;
-    constexpr double BIKE_FRAME_ROTATION = 0.62;
-    constexpr double BIKE_FRAME_WIDTH = 0.0045;
-    BikeFrameI = bike_i * (BIKE_FRAME_WIDTH * cos(BIKE_FRAME_ROTATION)) +
-                 bike_j * (BIKE_FRAME_WIDTH * sin(BIKE_FRAME_ROTATION));
-    BikeFrameJ = rotate_90deg(BikeFrameI);
-    if (mot->flipped_bike) {
-        BikeFrameJ = Vect2null - BikeFrameJ;
-    }
-    BikeFrameR = bike_r;
-
-    // Convert bike position from meters to pixels
-    BikeFrameIPixels = BikeFrameI * MetersToPixels;
-    BikeFrameJPixels = BikeFrameJ * MetersToPixels;
-    BikeFrameRPixels = BikeFrameR * MetersToPixels;
-
-    // Draw susp1
-    vect2 susp1_r =
-        BikeFrameI * (365.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 292.0) + BikeFrameR;
-    render_affine_pic(left_wheel_r, susp1_r, pic, 0.06, bike->susp1, 0.05, 0.03, false);
-
-    // Draw susp2
-    vect2 susp2_r =
-        BikeFrameI * (370.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 520.0) + BikeFrameR;
-    render_affine_pic(susp2_r, right_wheel_r, pic, 0.06, bike->susp2, 0.0, 0.1, false);
-
-    // Draw flagtag flag
-    if (has_flag) {
-        vect2 flag_base_r = BikeFrameI * (500.0 + 107 - BikeFrameX) +
-                            BikeFrameJ * (BikeFrameY + 114 - 600.0) + BikeFrameR;
-        vect2 flag_tip_r = flag_base_r + (BikeFrameI * 356.0 + BikeFrameJ * 500.0) * 0.2;
-        render_affine_pic(flag_base_r, flag_tip_r, pic, 0.2, Lgr->flag, 0.0, 0.0,
-                          mot->flipped_bike);
-    }
-
-    // Draw bike frame
-    unsigned char bike_part_transparency = bike->bike_part1->gpixel(0, 0);
-    render_bike_part(pic, bike->bike_part1, bike_part_transparency, &BikeBox1);
-    render_bike_part(pic, bike->bike_part2, bike_part_transparency, &BikeBox2);
-    render_bike_part(pic, bike->bike_part3, bike_part_transparency, &BikeBox3);
-    render_bike_part(pic, bike->bike_part4, bike_part_transparency, &BikeBox4);
-
-    // Calculations to draw the kuski
-    vect2 body_r = (mot->body_r - bottomleft_corner);
-    vect2 hip_r = body_r + BikeFrameI * 75.0 + BikeFrameJ * (-47.0);
-    vect2 shoulder_r = body_r + BikeFrameI * 47.0 + BikeFrameJ * 65.0;
-    vect2 neck_r = body_r + BikeFrameI * 41.0 + BikeFrameJ * 70.0;
-    vect2 foot_r =
-        BikeFrameI * (346.0 - BikeFrameX) + BikeFrameJ * (BikeFrameY - 514.0) + BikeFrameR;
-
-    // Calculate how to bend the knee based on the hip and foot positions
-    vect2 knee_r;
-    constexpr double THIGH_LENGTH = 0.51;
-    constexpr double LEG_LENGTH = 0.51;
-    if (mot->flipped_bike) {
-        knee_r = circles_intersection(hip_r, foot_r, THIGH_LENGTH, LEG_LENGTH);
-    } else {
-        knee_r = circles_intersection(foot_r, hip_r, LEG_LENGTH, THIGH_LENGTH);
-    }
-
-    // Draw head
-    render_rigidbody(mot->head_r - bottomleft_corner, HeadRadius, mot->bike.rotation, pic,
-                     bike->head, mot->flipped_bike);
-
-    // Hand is located on the handlebars, unless we are volting
-    vect2 hand_r = susp1_r;
-    if (arm_position > 0.0001) {
-        // Invert the arm volt percentage to progress from 0->1
-        arm_position = 1.0 - arm_position;
-        // Left volt + facing left OR right volt + facing left -> Arm goes up
-        bool arm_goes_up = true;
-        if ((metadata->volt_is_right && !mot->flipped_bike) ||
-            (!metadata->volt_is_right && mot->flipped_bike)) {
-            // Right volt + facing left OR left volt + facing right -> arm goes down
-            arm_goes_up = false;
-        }
-
-        // Describe the arm movement for up and down movements
-        const double arm_apex_time = arm_goes_up ? 0.25 : 0.2;    // 0.0 to 1.0
-        const double max_arm_rotation = arm_goes_up ? 2.7 : -1.6; // radians
-        const double max_arm_stretch = arm_goes_up ? -0.3 : 0.15; // meters
-
-        // Calculate arm movement progression away from neutral (0.0 to 1.0)
-        double interpolation;
-        if (arm_position < arm_apex_time) {
-            interpolation = arm_position / arm_apex_time;
-        } else {
-            interpolation = 1.0 - (arm_position - arm_apex_time) / (1.0 - arm_apex_time);
-        }
-
-        // Calculate arm rotation and stretch
-        double arm_rotation = max_arm_rotation * interpolation;
-        double arm_stretch = max_arm_stretch * interpolation + 1.0;
-
-        // Update hand position based on arm rotation and stretch
-        vect2 arm_vector = hand_r - shoulder_r;
-        if (!mot->flipped_bike) {
-            arm_vector.rotate(-arm_rotation);
-        } else {
-            arm_vector.rotate(arm_rotation);
-        }
-        arm_vector = arm_vector * arm_stretch;
-        hand_r = shoulder_r + arm_vector;
-    }
-
-    // Calculate how to bend the elbow based on shoulder and hand position
-    constexpr double FORARM_LENGTH = 0.308 * 1.05;
-    constexpr double UP_ARM_LENGTH = 0.328 * 1.05;
-    vect2 elbow_r;
-    if (mot->flipped_bike) {
-        elbow_r = circles_intersection(hand_r, shoulder_r, FORARM_LENGTH, UP_ARM_LENGTH);
-    } else {
-        elbow_r = circles_intersection(shoulder_r, hand_r, UP_ARM_LENGTH, FORARM_LENGTH);
-    }
-
-    // Draw the whole kuski (excluding head)
-    render_affine_pic(knee_r, hip_r, pic, 0.14, bike->thigh, 0.03, 0.1, mot->flipped_bike);
-    render_affine_pic(foot_r, knee_r, pic, 0.21, bike->leg, 0.03, 0.03, mot->flipped_bike);
-    const pic8* body = shirt ? shirt : bike->body;
-    render_affine_pic(hip_r, neck_r, pic, 0.2, body, 0.1, 0.05, mot->flipped_bike);
-    render_affine_pic(elbow_r, shoulder_r, pic, 0.11, bike->up_arm, 0.08, 0.1, !mot->flipped_bike);
-    render_affine_pic(hand_r, elbow_r, pic, 0.076, bike->forarm, 0.08, 0.1, mot->flipped_bike);
-
-    // Draw foreground wheels
-    StretchEnabled = false;
-    if (!left_wheel_in_back || !right_wheel_in_back) {
-        if (mot->flipped_bike) {
-            // If we had temporarily inverted the wheels earlier in this function, undo that now
-            std::swap(left_wheel_r, right_wheel_r);
-        }
-        if (!left_wheel_in_back) {
-            render_rigidbody(left_wheel_r, WHEEL_RENDER_RADIUS, mot->left_wheel.rotation, pic,
-                             bike->wheel, false);
-        }
-        if (!right_wheel_in_back) {
-            render_rigidbody(right_wheel_r, WHEEL_RENDER_RADIUS, mot->right_wheel.rotation, pic,
-                             bike->wheel, false);
-        }
-    }
-}
-
 static bool bike_in_view(const motorst* mot, vect2 center) {
     double distance = (mot->bike.r - center).length();
     return distance < (std::max(SCREEN_WIDTH, SCREEN_HEIGHT) * 27.0 / 32.0) * PixelsToMeters;
 }
 
-struct info_panel_row {
-    std::string label;
-    std::string value;
-};
-
 // Render the bottom-right info panel: rows[0] is the bottom row, each later row stacks above it
 // (the backbuffer is upside-down, so larger y is higher on screen).
-static void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows) {
+void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows) {
     constexpr int RIGHT_MARGIN = 10;
     constexpr int BOTTOM_MARGIN = 10;
     constexpr int LABEL_OFFSET = 180;
@@ -646,188 +221,8 @@ static void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows
     }
 }
 
-// Render the view for one player
-static void render_view(bool player1, bool bottom_player, pic8* pic, double time, driver& driv,
-                        driver& other_driv, camera& current_camera, GameLoop loop) {
-    // Calculate frame of reference
-    vect2 bike_center = driv.mot->bike.r;
-    if (current_camera.mode == CameraMode::MapViewer) {
-        bike_center = vect2(current_camera.x, current_camera.y);
-    }
-
-    const kuski* spy_kuski = EolClient->spy_kuski();
-    if (spy_kuski) {
-        bike_center = spy_kuski->spy_data()->mot.bike.r;
-    }
-
-    vect2 bottomleft_corner(bike_center.x -
-                                (CameraX + driv.meta.camera_turning.turn_phase * CameraDx),
-                            bike_center.y - CameraY);
-    vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
-                 bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
-
-    // Draw the background
-    CanvasBack->render(player1, pic, bottomleft_corner, 0, 0, GameViewWidth - 1,
-                       GameViewHeight - 1);
-
-    // Draw the objects
-    int corner_x;
-    int corner_y;
-    CanvasBack->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
-    int object_border_left = corner_x - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
-    int object_border_bottom = corner_y - (int)(ANIM_WIDTH * EolSettings->zoom()) - 2;
-    int object_border_right = corner_x + SCREEN_WIDTH;
-    int object_border_top = corner_y + SCREEN_HEIGHT;
-    for (int i = 0; i < MAX_OBJECTS; i++) {
-        object* obj = Level->objects[i];
-        if (!obj) {
-            break;
-        }
-
-        if (obj->type == object::Type::Start) {
-            continue;
-        }
-        if (obj->type == object::Type::Food &&
-            (!obj->active || (spy_kuski && spy_kuski->apples_taken[i]))) {
-            continue;
-        }
-        if (obj->type == object::Type::Exit &&
-            ((!Single && FlagTag) || EolClient->battle_hides_exit())) {
-            continue;
-        }
-
-        if (obj->canvas_x < object_border_left || obj->canvas_y < object_border_bottom ||
-            obj->canvas_x > object_border_right || obj->canvas_y > object_border_top) {
-            continue;
-        }
-
-        pic8* obj_frame = nullptr;
-        int phase_y_offset = 0;
-        if (State->animated_objects) {
-            switch (obj->type) {
-            case object::Type::Food:
-                obj_frame = Lgr->food[obj->animation % Lgr->food_count]->get_frame_by_time(time);
-                phase_y_offset =
-                    (int)(5.0 * EolSettings->zoom() * sin(time * 15.5 + obj->floating_phase));
-                break;
-            case object::Type::Exit:
-                obj_frame = Lgr->exit->get_frame_by_time(time);
-                phase_y_offset =
-                    (int)(5.0 * EolSettings->zoom() * sin(time * 15.5 + obj->floating_phase));
-                break;
-            case object::Type::Killer:
-                obj_frame = Lgr->killer->get_frame_by_time(time);
-                break;
-            default:
-                internal_error("render_view invalid object type");
-            }
-
-            if (EolSettings->still_objects()) {
-                phase_y_offset = 0;
-            }
-        } else {
-            switch (obj->type) {
-            case object::Type::Food:
-                obj_frame = Lgr->food[obj->animation % Lgr->food_count]->get_frame_by_index(0);
-                break;
-            case object::Type::Exit:
-                obj_frame = Lgr->exit->get_frame_by_index(0);
-                break;
-            case object::Type::Killer:
-                obj_frame = Lgr->killer->get_frame_by_index(0);
-                break;
-            default:
-                internal_error("render_view invalid object type");
-            }
-        }
-
-        blit8(pic, obj_frame, obj->canvas_x - corner_x, obj->canvas_y - corner_y + phase_y_offset);
-
-        if (EolSettings->show_gravity_arrows() && obj->type == object::Type::Food &&
-            obj->property != object::Property::None) {
-            draw_gravity_arrow(pic, obj->canvas_x - corner_x,
-                               obj->canvas_y - corner_y + phase_y_offset, obj->property);
-        }
-    }
-
-    // Select the correct bike for each player
-    bike_pics* bike1 = &Lgr->bike1;
-    bike_pics* bike2 = &Lgr->bike2;
-    if ((State->player1_bike1 && !player1) || (!State->player1_bike1 && player1)) {
-        bike1 = &Lgr->bike2;
-        bike2 = &Lgr->bike1;
-    }
-
-    if (EolSettings->show_others()) {
-        for (const kuski& ku : EolClient->kuskis()) {
-            if (&ku == spy_kuski) {
-                continue;
-            }
-            const spy_data* k = ku.spy_data();
-            if (!k) {
-                continue;
-            }
-
-            if (bike_in_view(&k->mot, center)) {
-                render_bike(pic, EolClient->kuski_has_flag(ku.id), bottomleft_corner, &k->mot,
-                            &k->metadata, bike2, ku.shirt);
-            }
-        }
-    }
-
-    if (spy_kuski) {
-        const spy_data* k = spy_kuski->spy_data();
-        if (k && bike_in_view(&k->mot, center)) {
-            render_bike(pic, EolClient->kuski_has_flag(spy_kuski->id), bottomleft_corner, &k->mot,
-                        &k->metadata, bike2, spy_kuski->shirt);
-        }
-    }
-
-    if (current_camera.mode == CameraMode::Normal) {
-        if (!Single) {
-            // Draw the other bike if it's on-screen
-            if (bike_in_view(other_driv.mot, center)) {
-                render_bike(pic, local_flag_tag_has_flag(!player1, time), bottomleft_corner,
-                            other_driv.mot, &other_driv.meta, bike2, nullptr);
-            }
-        }
-
-        // Draw the current player's bike
-        render_bike(pic, local_flag_tag_has_flag(player1, time) || EolClient->own_bike_has_flag(),
-                    bottomleft_corner, driv.mot, &driv.meta, bike1, shirt);
-    }
-
-    // Draw the foreground
-    if (!EolSettings->pictures_in_background()) {
-        CanvasFront->render(player1, pic, bottomleft_corner, 0, 0, GameViewWidth - 1,
-                            GameViewHeight - 1);
-    }
-
-    // Draw the minimap
-    if (driv.hud->minimap) {
-        if (Single) {
-            render_minimap(player1, pic, driv.meta.camera_turning.turn_phase, bike_center, nullptr);
-        } else {
-            render_minimap(player1, pic, driv.meta.camera_turning.turn_phase, bike_center,
-                           other_driv.mot);
-        }
-    }
-
-    // Draw the timers
-    if (driv.hud->timer) {
-        double flagtag_time = -1.0;
-        if (!Single && FlagTag) {
-            flagtag_time = player1 ? FlagTimeA : FlagTimeB;
-        }
-        double shown_time = time;
-        if (Single && EolClient->is_spying()) {
-            shown_time =
-                spy_kuski && !EolClient->battle_hides_times()
-                    ? spy_kuski->spy_data()->time * (STOPWATCH_MULTIPLIER * STOPWATCH_TO_PHYS_TIME)
-                    : 0.0;
-        }
-        draw_timers(BestTime, flagtag_time, shown_time, pic, GameViewWidth, GameViewHeight);
-    }
+static std::vector<info_panel_row> get_info_rows(bool bottom_player, GameLoop loop,
+                                                 camera current_camera, driver& driv) {
 
     // Build the bottom-right info panel rows.
     // rows are rendered in the order they were added (last added on top)
@@ -867,24 +262,146 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
              apple_time});
     }
 
+    return info_rows;
+}
+
+// Render the view for one player
+void GameRenderer::render_view(bool player1, bool bottom_player, int left, int bottom, int right,
+                               int top) {
+
+    auto driv = player1 ? driv1 : driv2;
+    auto other_driv = player1 ? driv2 : driv1;
+
+    // Give advance notice of the timers since OpenGL is a diva
+    // (should come before subview)
+    if (driv.hud->timer) {
+        double flagtag_time = -1.0;
+        if (!Single && FlagTag) {
+            flagtag_time = player1 ? FlagTimeA : FlagTimeB;
+        }
+    }
+
+    // Calculate frame of reference
+    vect2 bike_center = driv.mot->bike.r;
+    if (current_camera.mode == CameraMode::MapViewer) {
+        bike_center = vect2(current_camera.x, current_camera.y);
+    }
+
+    const kuski* spy_kuski = EolClient->spy_kuski();
+    if (spy_kuski) {
+        bike_center = spy_kuski->spy_data()->mot.bike.r;
+    }
+
+    bottomleft_corner.x =
+        bike_center.x - (CameraX + driv.meta.camera_turning.turn_phase * CameraDx);
+    bottomleft_corner.y = bike_center.y - CameraY;
+
+    center.x = bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters;
+    center.y = bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters;
+
+    // Set part of screen to draw on
+    subview(left, bottom, right, top);
+
+    // Draw the background
+    render_back(player1);
+
+    // Draw the objects
+    render_objects();
+
+    // Select the correct bike for each player
+    bike_pics* bike1 = &Lgr->bike1;
+    bike_pics* bike2 = &Lgr->bike2;
+    if ((State->player1_bike1 && !player1) || (!State->player1_bike1 && player1)) {
+        bike1 = &Lgr->bike2;
+        bike2 = &Lgr->bike1;
+    }
+
+    if (EolSettings->show_others()) {
+        for (const kuski& ku : EolClient->kuskis()) {
+            if (&ku == spy_kuski) {
+                continue;
+            }
+            const spy_data* k = ku.spy_data();
+            if (!k) {
+                continue;
+            }
+
+            if (bike_in_view(&k->mot, center)) {
+                render_bike(EolClient->kuski_has_flag(ku.id), &k->mot, &k->metadata, bike2,
+                            ku.shirt);
+            }
+        }
+    }
+
+    if (spy_kuski) {
+        const spy_data* k = spy_kuski->spy_data();
+        if (k && bike_in_view(&k->mot, center)) {
+            render_bike(EolClient->kuski_has_flag(spy_kuski->id), &k->mot, &k->metadata, bike2,
+                        spy_kuski->shirt);
+        }
+    }
+
+    if (current_camera.mode == CameraMode::Normal) {
+        if (!Single) {
+            // Draw the other bike if it's on-screen
+            if (bike_in_view(other_driv.mot, center)) {
+                render_bike(local_flag_tag_has_flag(!player1, time), other_driv.mot,
+                            &other_driv.meta, bike2, nullptr);
+            }
+        }
+
+        // Draw the current player's bike
+        render_bike(local_flag_tag_has_flag(player1, time) || EolClient->own_bike_has_flag(),
+                    driv.mot, &driv.meta, bike1, shirt);
+    }
+
+    // Draw the foreground
+    if (!EolSettings->pictures_in_background()) {
+        render_front(player1);
+    }
+
+    // Draw the minimap
+    if (driv.hud->minimap) {
+        auto other = Single ? nullptr : other_driv.mot;
+        dispatch_minimap(player1, driv.meta.camera_turning.turn_phase, bike_center, other);
+    }
+
+    // Draw the timers
+    if (driv.hud->timer) {
+        double flagtag_time = -1.0;
+        if (!Single && FlagTag) {
+            flagtag_time = player1 ? FlagTimeA : FlagTimeB;
+        }
+        render_timers(BestTime, flagtag_time, GameViewWidth, GameViewHeight);
+    }
+
+    /*
+     * Pic rendering stuff
+     */
+
+    auto info_rows = get_info_rows(bottom_player, loop, current_camera, driv);
+
+    auto pic = get_backbuffer_pic();
+    render_info_panel(pic, info_rows);
+
     if (!EolClient->play_offline() && !EolClient->connected()) {
         MediumFont->write_right_align(
             pic, GameViewWidth - 10, GameViewHeight - MediumFont->line_height() * 2,
             std::format("Lost connection ({} to reconnect)", dik_to_string(State->key_reconnect))
                 .c_str());
     }
-
-    render_info_panel(pic, info_rows);
 }
 
-void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop) {
-    reload_graphic_assets();
-
-    fps::update();
-
+GameRenderer::GameRenderer(double time, driver& driv1, driver& driv2, camera& current_camera,
+                           GameLoop loop)
+    : time(time),
+      driv1(driv1),
+      driv2(driv2),
+      current_camera(current_camera),
+      loop(loop) {
     // Determine who we are going to draw (player 1, player 2 or both)
-    bool draw_player1 = driv1.draw_view;
-    bool draw_player2 = driv2.draw_view;
+    draw_player1 = driv1.draw_view;
+    draw_player2 = driv2.draw_view;
     if (Single || current_camera.mode == CameraMode::MapViewer) {
         draw_player1 = true;
         draw_player2 = false;
@@ -892,36 +409,31 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     if (!draw_player1 && !draw_player2) {
         internal_error("render_game nobody visible!");
     }
-    bool splitscreen = draw_player1 && draw_player2;
+    splitscreen = draw_player1 && draw_player2;
+}
 
-    // Get the screen, upside-down
-    pic8* pic = lock_backbuffer_pic(true);
+void GameRenderer::render() {
+
+    start_frame();
 
     // If we need to recalculate the screen position, redraw the background qframe
     if (GameBackgroundRender) {
         GameBackgroundRender = false;
         calculate_viewpoints(splitscreen);
-        render_background(pic);
     }
 
-    // Draw 1 or 2 players
-    static pic8 player_view = pic8();
-    if (splitscreen) {
-        player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
-        render_view(true, false, &player_view, time, driv1, driv2, current_camera, loop);
+    render_qframe(GameBackgroundRender);
 
-        player_view.subview(GameViewLeft, GameViewBottom2, GameViewRight, GameViewTop2, pic);
-        render_view(false, true, &player_view, time, driv2, driv1, current_camera, loop);
+    // Draw 1 or 2 players
+    if (splitscreen) {
+        render_view(true, false, GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1);
+        render_view(false, true, GameViewLeft, GameViewBottom2, GameViewRight, GameViewTop2);
     } else {
-        player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
-        if (draw_player1) {
-            render_view(true, true, &player_view, time, driv1, driv2, current_camera, loop);
-        } else {
-            render_view(false, true, &player_view, time, driv2, driv1, current_camera, loop);
-        }
+        render_view(draw_player1, true, GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1);
     }
 
     // Draw EOL overlays
+    auto pic = get_backbuffer_pic();
     Console->render(*pic);
     StatusMessages->render(*pic, *SmallFont);
     EolClient->render_table(*pic, *MediumFont, *SmallFont);
@@ -929,8 +441,56 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     EolClient->render_battle_leader(*pic, *SmallFont);
     EolClient->render_battle_countdown(*pic, *LargeFont, *SmallFont);
 
+    end_frame();
+
     // Conditionally save screenshot
     handle_screenshot(pic);
+}
 
-    unlock_backbuffer_pic();
+// Render the entire minimap
+void GameRenderer::dispatch_minimap(bool player1, double camera_turn_phase, vect2 bike_center,
+                                    motorst* other_motor) {
+    // Calculate minimap size and minimap frame of reference
+    double minimap_width = MinimapWidth * MinimapScaleFactor * PixelsToMeters;
+    double minimap_height = MinimapHeight * MinimapScaleFactor * PixelsToMeters;
+
+    double camera_x = EolSettings->center_map() ? 0.5 : 0.2;
+    double camera_dx = 1.0 - 2.0 * camera_x;
+    vect2 camera_pos(minimap_width * (camera_x + camera_turn_phase * camera_dx),
+                     minimap_height / 2);
+    vect2 bottomleft_corner = bike_center - camera_pos;
+
+    double align;
+    switch (EolSettings->map_alignment()) {
+    case MapAlignment::None:
+        align = camera_turn_phase;
+        break;
+    case MapAlignment::Left:
+        align = 0.0;
+        break;
+    case MapAlignment::Middle:
+        align = 0.5;
+        break;
+    case MapAlignment::Right:
+        align = 1.0;
+        break;
+    }
+
+    const int minimap_x1 = std::max(1, (int)(MinimapX + align * MinimapDx));
+    const int minimap_x2 = minimap_x1 + MinimapWidth - 1;
+    const int minimap_y1 = 1;
+    const int minimap_y2 = minimap_y1 + MinimapHeight - 1;
+
+    render_minimap(player1, other_motor, minimap_x1, minimap_y1, minimap_x2, minimap_y2,
+                   bottomleft_corner, camera_pos);
+}
+
+void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop) {
+    reload_graphic_assets();
+
+    fps::update();
+
+    auto renderer = createPicRenderer(time, driv1, driv2, current_camera, loop);
+
+    renderer->render();
 }

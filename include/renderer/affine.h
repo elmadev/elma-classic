@@ -25,4 +25,7 @@ extern bool StretchEnabled;
 void set_stretch_parameters(vect2 bike_center, vect2 bike_i, double stretch,
                             double meters_to_pixels);
 
+// Apply stretch parameters
+void apply_stretch_parameters(vect2& u, vect2& v, vect2& r);
+
 #endif

@@ -1,7 +1,10 @@
 #ifndef RENDERER_RENDER_H
 #define RENDERER_RENDER_H
 
+#include "eol/clickable.h"
+
 class pic8;
+class vect2;
 struct bike_metadata;
 struct camera;
 struct driver;
@@ -21,5 +24,8 @@ enum class GameLoop { Game, Replay, Render };
 void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop);
 
 void level_to_bmp(const char* filename);
+
+// Mouse position in pixels and meters
+game_mouse get_mouse_position_game();
 
 #endif

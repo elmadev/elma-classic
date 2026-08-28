@@ -24,6 +24,7 @@
 #include "renderer/object_overlay.h"
 #include "renderer/timer.h"
 #include "util/util.h"
+#include "vect2.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -111,6 +112,8 @@ static void calculate_viewpoints(bool splitscreen) {
     GameViewBottom1 = (SCREEN_HEIGHT - GameViewHeight) / 2;
     GameViewRight = GameViewLeft + GameViewWidth - 1;
     GameViewTop1 = GameViewBottom1 + GameViewHeight - 1;
+    GameViewBottom2 = -1;
+    GameViewTop2 = -1;
     if (splitscreen) {
         GameViewHeight = (SCREEN_HEIGHT / 2) - 6;
         GameViewBottom1 = (SCREEN_HEIGHT / 2) + 6;
@@ -931,4 +934,33 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     handle_screenshot(pic);
 
     unlock_backbuffer_pic();
+}
+
+std::optional<vect2> get_mouse_position_game() {
+    // screen is rendered upside-down so we need to invert the y position
+    int mou_x;
+    int mou_y;
+    get_mouse_position(&mou_x, &mou_y);
+    mou_y = SCREEN_HEIGHT - mou_y;
+
+    if (mou_x < GameViewLeft || mou_x > GameViewRight) {
+        return std::nullopt;
+    }
+    // Player 1 subview
+    if (mou_y >= GameViewBottom1 && mou_y <= GameViewTop1) {
+        mou_x -= GameViewLeft;
+        mou_y -= GameViewBottom1;
+        double x = CameraBottomLeft1.x + mou_x * PixelsToMeters;
+        double y = CameraBottomLeft1.y + mou_y * PixelsToMeters;
+        return vect2{x, y};
+    }
+    // Player 2 subview
+    if (mou_y >= GameViewBottom2 && mou_y <= GameViewTop2) {
+        mou_x -= GameViewLeft;
+        mou_y -= GameViewBottom2;
+        double x = CameraBottomLeft2.x + mou_x * PixelsToMeters;
+        double y = CameraBottomLeft2.y + mou_y * PixelsToMeters;
+        return vect2{x, y};
+    }
+    return std::nullopt;
 }

@@ -1,7 +1,10 @@
 #ifndef RENDER_H
 #define RENDER_H
 
+#include <optional>
+
 class pic8;
+class vect2;
 struct bike_metadata;
 struct camera;
 struct driver;
@@ -19,5 +22,7 @@ void decrease_view_size();
 
 enum class GameLoop { Game, Replay, Render };
 void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop);
+
+std::optional<vect2> get_mouse_position_game();
 
 #endif

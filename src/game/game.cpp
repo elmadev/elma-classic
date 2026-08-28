@@ -23,6 +23,7 @@
 #include "renderer/timer.h"
 #include "sound/engine.h"
 #include <algorithm>
+#include <climits>
 #include <cmath>
 #include <filesystem>
 #include <optional>
@@ -576,12 +577,34 @@ static void handle_eol_inputs() {
 }
 
 static void handle_mouse() {
+    int mou_x;
+    int mou_y;
+    get_mouse_position(&mou_x, &mou_y);
+
     std::optional<vect2> coord = get_mouse_position_game();
     if (!coord) {
         return;
     }
-    checkpoint::editor_update(coord.value(), was_left_mouse_just_clicked(),
-                              was_right_mouse_just_clicked());
+
+    bool left_click = was_left_mouse_just_clicked();
+    bool right_click = was_right_mouse_just_clicked();
+    if (clickable::ClickMode == clickable::Mode::Normal && (left_click || right_click)) {
+        int dist = INT_MAX;
+        clickable* closest = nullptr;
+        checkpoint::get_closest(coord.value(), dist, closest);
+
+        if (closest) {
+            if (left_click) {
+                closest->left_clicked(mou_x, mou_y, coord.value());
+            } else {
+                closest->right_clicked(mou_x, mou_y, coord.value());
+            }
+            left_click = false;
+            right_click = false;
+        }
+    }
+
+    checkpoint::editor_update(coord.value(), left_click, right_click);
 }
 
 // Common setup function

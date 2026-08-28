@@ -17,25 +17,37 @@ constexpr unsigned char LINE_COLOR = 25;
 
 } // namespace
 
+void checkpoint::endpoint::left_clicked(int x, int y, vect2 coord) {
+    checkpoint::held_end = this;
+    clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
+}
+
+void checkpoint::endpoint::right_clicked(int x, int y, vect2 coord) {
+    internal_error("Not implemented");
+}
+
 void checkpoint::editor_update(vect2 coord, bool left_click, bool right_click) {
     if (!editor_mode) {
         return;
     }
 
-    if (!held && left_click) {
+    if (!held_end && left_click) {
         linear_checkpoints.emplace_back(coord);
-        held = &linear_checkpoints.back().end;
-        last_coord = held->click_anchor;
-    } else if (held && left_click) {
-        held->click_anchor = coord;
-        held = nullptr;
-    } else if (held && right_click) {
+        held_end = &linear_checkpoints.back().end;
+        last_coord = held_end->click_anchor;
+        clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
+    } else if (held_end && left_click) {
+        held_end->click_anchor = coord;
+        held_end = nullptr;
+        clickable::ClickMode = clickable::Mode::Normal;
+    } else if (held_end && right_click) {
         internal_error("Not implemented - we need to enforce minimum line length before being able "
                        "to drop stuff");
-        held->click_anchor = last_coord;
-        held = nullptr;
-    } else if (held) {
-        held->click_anchor = coord;
+        held_end->click_anchor = last_coord;
+        held_end = nullptr;
+        clickable::ClickMode = clickable::Mode::Normal;
+    } else if (held_end) {
+        held_end->click_anchor = coord;
     }
 }
 
@@ -57,5 +69,26 @@ void checkpoint::render_all(pic8& screen, vect2 corner) {
     }
     for (const checkpoint& linear : linear_checkpoints) {
         linear.render(screen, corner);
+    }
+}
+
+void checkpoint::get_closest(vect2 coord, int& dist, clickable*& closest) {
+    if (!editor_mode) {
+        return;
+    }
+    ELMA_ASSERT(!held_end);
+
+    for (checkpoint& linear : linear_checkpoints) {
+        int start_dist = linear.start.distance(coord);
+        if (start_dist < dist) {
+            dist = start_dist;
+            closest = &linear.start;
+        }
+
+        int end_dist = linear.end.distance(coord);
+        if (end_dist < dist) {
+            dist = end_dist;
+            closest = &linear.end;
+        }
     }
 }

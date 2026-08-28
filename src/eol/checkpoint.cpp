@@ -15,6 +15,14 @@ vect2 last_coord;
 
 } // namespace
 
+void checkpoint::endpoint::left_clicked(const game_mouse& /*pos*/) {
+    // Pick up checkpoint end
+    checkpoint::held_end = this;
+    clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
+}
+
+void checkpoint::endpoint::right_clicked(const game_mouse& /*pos*/) {}
+
 void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool right_click) {
     if (!Editor) {
         return;
@@ -66,5 +74,29 @@ void checkpoint::render_all(pic8& screen, vect2 corner) {
     }
     for (const checkpoint& linear : linear_checkpoints) {
         linear.render(screen, corner);
+    }
+}
+
+void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& closest) {
+    if (!Editor) {
+        return;
+    }
+    if (!pos.coord) {
+        return;
+    }
+    ELMA_ASSERT(!held_end);
+
+    for (checkpoint& linear : linear_checkpoints) {
+        int start_dist = linear.start.distance(pos);
+        if (start_dist < dist) {
+            dist = start_dist;
+            closest = &linear.start;
+        }
+
+        int end_dist = linear.end.distance(pos);
+        if (end_dist < dist) {
+            dist = end_dist;
+            closest = &linear.end;
+        }
     }
 }

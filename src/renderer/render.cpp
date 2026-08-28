@@ -113,6 +113,8 @@ static void calculate_viewpoints(bool splitscreen) {
     GameViewBottom1 = (SCREEN_HEIGHT - GameViewHeight) / 2;
     GameViewRight = GameViewLeft + GameViewWidth - 1;
     GameViewTop1 = GameViewBottom1 + GameViewHeight - 1;
+    GameViewBottom2 = -1;
+    GameViewTop2 = -1;
     if (splitscreen) {
         GameViewHeight = (SCREEN_HEIGHT / 2) - 6;
         GameViewBottom1 = (SCREEN_HEIGHT / 2) + 6;
@@ -1032,4 +1034,40 @@ void level_to_bmp(const char* filename) {
 
     level_pic.vertical_flip();
     level_pic.save(filename, Lgr->palette_data);
+}
+
+game_mouse get_mouse_position_game() {
+    int mouse_x;
+    int mouse_y;
+    get_mouse_position(&mouse_x, &mouse_y);
+
+    game_mouse pos;
+    pos.x = mouse_x;
+    pos.y = mouse_y;
+
+    // screen is rendered upside-down so we need to invert the y position
+    mouse_y = SCREEN_HEIGHT - mouse_y;
+
+    if (mouse_x < GameViewLeft || mouse_x > GameViewRight) {
+        return pos;
+    }
+    // Player 1 subview
+    if (mouse_y >= GameViewBottom1 && mouse_y <= GameViewTop1) {
+        mouse_x -= GameViewLeft;
+        mouse_y -= GameViewBottom1;
+        double coord_x = CameraBottomLeft1.x + mouse_x * PixelsToMeters;
+        double coord_y = CameraBottomLeft1.y + mouse_y * PixelsToMeters;
+        pos.coord = vect2{coord_x, coord_y};
+        return pos;
+    }
+    // Player 2 subview
+    if (mouse_y >= GameViewBottom2 && mouse_y <= GameViewTop2) {
+        mouse_x -= GameViewLeft;
+        mouse_y -= GameViewBottom2;
+        double coord_x = CameraBottomLeft2.x + mouse_x * PixelsToMeters;
+        double coord_y = CameraBottomLeft2.y + mouse_y * PixelsToMeters;
+        pos.coord = vect2{coord_x, coord_y};
+        return pos;
+    }
+    return pos;
 }

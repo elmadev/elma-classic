@@ -22,6 +22,7 @@ elma_sources = files(
     'src/editor/window.cpp',
     'src/eol/battle.cpp',
     'src/eol/checkpoint.cpp',
+    'src/eol/clickable.cpp',
     'src/eol/console.cpp',
     'src/eol/eol_table.cpp',
     'src/eol/eol.cpp',

@@ -1,5 +1,6 @@
 #include "renderer/render.h"
 #include "editor/editor.h"
+#include "eol/checkpoint.h"
 #include "eol/console.h"
 #include "eol/eol.h"
 #include "eol/settings.h"
@@ -680,6 +681,9 @@ static void render_view(bool player1, bool splitscreen, pic8* pic, double time, 
     // Draw the background
     CanvasBack->render(player1, pic, bottomleft_corner, 0, 0, GameViewWidth - 1,
                        GameViewHeight - 1);
+
+    // Draw the checkpoints
+    checkpoint::render_all(*pic, bottomleft_corner);
 
     // Draw the objects
     int corner_x;

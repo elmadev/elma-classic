@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "editor/editor.h"
+#include "eol/checkpoint.h"
 #include "eol/console.h"
 #include "eol/eol.h"
 #include "eol/settings.h"
@@ -574,6 +575,15 @@ static void handle_eol_inputs() {
     }
 }
 
+static void handle_mouse() {
+    std::optional<vect2> coord = get_mouse_position_game();
+    if (!coord) {
+        return;
+    }
+    checkpoint::editor_update(coord.value(), was_left_mouse_just_clicked(),
+                              was_right_mouse_just_clicked());
+}
+
 // Common setup function
 static void setup_gameloop(const char* filename) {
     load_best_time(filename, Single);
@@ -822,6 +832,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         }
 
         handle_eol_inputs();
+        handle_mouse();
 
         if (!console_was_active &&
             (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {

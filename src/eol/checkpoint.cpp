@@ -15,6 +15,16 @@ vect2 last_coord;
 
 } // namespace
 
+void checkpoint::endpoint::left_clicked(int x, int y, vect2 coord) {
+    // Pick up checkpoint end
+    checkpoint::held_end = this;
+    clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
+}
+
+void checkpoint::endpoint::right_clicked(int x, int y, vect2 coord) {
+    internal_error("Not implemented");
+}
+
 void checkpoint::editor_update(vect2 coord, bool left_click, bool right_click) {
     if (!Editor) {
         return;
@@ -25,10 +35,12 @@ void checkpoint::editor_update(vect2 coord, bool left_click, bool right_click) {
         linear_checkpoints.emplace_back(coord);
         held_end = &linear_checkpoints.back().end;
         last_coord = held_end->click_anchor;
+        clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
     } else if (held_end && left_click) {
         // Drop the checkpoint end
         held_end->click_anchor = coord;
         held_end = nullptr;
+        clickable::ClickMode = clickable::Mode::Normal;
     } else if (held_end && right_click) {
         // Restore the checkpoint end to its previous position
         internal_error("Not implemented");
@@ -56,5 +68,26 @@ void checkpoint::render_all(pic8& screen, vect2 corner) {
     }
     for (const checkpoint& linear : linear_checkpoints) {
         linear.render(screen, corner);
+    }
+}
+
+void checkpoint::get_closest(vect2 coord, int& dist, clickable*& closest) {
+    if (!Editor) {
+        return;
+    }
+    ELMA_ASSERT(!held_end);
+
+    for (checkpoint& linear : linear_checkpoints) {
+        int start_dist = linear.start.distance(coord);
+        if (start_dist < dist) {
+            dist = start_dist;
+            closest = &linear.start;
+        }
+
+        int end_dist = linear.end.distance(coord);
+        if (end_dist < dist) {
+            dist = end_dist;
+            closest = &linear.end;
+        }
     }
 }

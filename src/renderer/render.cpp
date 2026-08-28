@@ -396,13 +396,14 @@ void GameRenderer::render() {
 
     start_frame();
 
-    // If we need to recalculate the screen position, redraw the background qframe
+    // Check if we need to recalculate the screen position
+    auto scale_changed = GameBackgroundRender;
     if (GameBackgroundRender) {
         GameBackgroundRender = false;
         calculate_viewpoints(splitscreen);
     }
-
-    render_qframe(GameBackgroundRender);
+    // Draw qframe
+    render_qframe(scale_changed);
 
     // Draw 1 or 2 players
     if (splitscreen) {

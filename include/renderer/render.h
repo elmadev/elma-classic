@@ -27,8 +27,6 @@ void decrease_view_size();
 enum class GameLoop { Game, Replay, Render };
 void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop);
 
-inline float GlZoom = 1.0;
-
 struct info_panel_row {
     std::string label;
     std::string value;

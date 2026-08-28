@@ -42,15 +42,8 @@ static double VisibleFraction = 1.0;
 constexpr double VISIBLE_FRACTION_SCALING_FACTOR = 1.1;
 
 void reset_game_background() { GameBackgroundRender = true; }
-static bool is_opengl_render() {
-    return !std::getenv("CPURENDER") && EolSettings->renderer() == RendererType::OpenGL;
-}
 
 void increase_view_size() {
-    if (is_opengl_render()) {
-        GlZoom /= 1.1;
-        return;
-    }
     VisibleFraction *= VISIBLE_FRACTION_SCALING_FACTOR;
     if (VisibleFraction >= 0.999) {
         VisibleFraction = 1.0;
@@ -59,10 +52,6 @@ void increase_view_size() {
 }
 
 void decrease_view_size() {
-    if (is_opengl_render()) {
-        GlZoom *= 1.1;
-        return;
-    }
     VisibleFraction /= VISIBLE_FRACTION_SCALING_FACTOR;
     VisibleFraction = std::max(VisibleFraction, 0.7);
     reset_game_background();
@@ -271,15 +260,6 @@ void GameRenderer::render_view(bool player1, bool bottom_player, int left, int b
 
     auto driv = player1 ? driv1 : driv2;
     auto other_driv = player1 ? driv2 : driv1;
-
-    // Give advance notice of the timers since OpenGL is a diva
-    // (should come before subview)
-    if (driv.hud->timer) {
-        double flagtag_time = -1.0;
-        if (!Single && FlagTag) {
-            flagtag_time = player1 ? FlagTimeA : FlagTimeB;
-        }
-    }
 
     // Calculate frame of reference
     vect2 bike_center = driv.mot->bike.r;

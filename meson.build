@@ -21,6 +21,7 @@ elma_sources = files(
     'src/editor/topology.cpp',
     'src/editor/window.cpp',
     'src/eol/battle.cpp',
+    'src/eol/checkpoint.cpp',
     'src/eol/console.cpp',
     'src/eol/eol_table.cpp',
     'src/eol/eol.cpp',

@@ -28,6 +28,7 @@
 #include <cmath>
 #include <filesystem>
 #include <format>
+#include <limits>
 #include <optional>
 #include <utility>
 
@@ -638,6 +639,22 @@ static void handle_mouse() {
     game_mouse pos = get_mouse_position_game();
     bool left_click = was_left_mouse_just_clicked();
     bool right_click = was_right_mouse_just_clicked();
+
+    if (clickable::ClickMode == clickable::Mode::Normal && (left_click || right_click)) {
+        int dist = std::numeric_limits<int>::max();
+        clickable* closest = nullptr;
+        checkpoint::get_closest(pos, dist, closest);
+
+        if (closest) {
+            if (left_click) {
+                closest->left_clicked(pos);
+            } else {
+                closest->right_clicked(pos);
+            }
+            left_click = false;
+            right_click = false;
+        }
+    }
 
     checkpoint::editor_update(pos, left_click, right_click);
 }

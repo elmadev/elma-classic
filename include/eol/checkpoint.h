@@ -7,11 +7,12 @@
 class pic8;
 
 class checkpoint {
-    struct endpoint {
-        vect2 click_anchor;
+    struct endpoint : game_clickable {
+        void left_clicked(const game_mouse& pos) override;
+        void right_clicked(const game_mouse& pos) override;
 
         endpoint(vect2 coord)
-            : click_anchor(coord) {}
+            : game_clickable(coord) {}
     };
 
     endpoint start;
@@ -31,6 +32,7 @@ class checkpoint {
 
     static void editor_update(const game_mouse& pos, bool left_click, bool right_click);
     static void render_all(pic8& screen, vect2 corner);
+    static void get_closest(const game_mouse& pos, int& dist, clickable*& closest);
 };
 
 #endif

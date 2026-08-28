@@ -73,6 +73,8 @@ int GameViewHeight;
 static double CameraY;
 static double CameraX;
 static double CameraDx;
+vect2 CameraBottomLeft1;
+vect2 CameraBottomLeft2;
 
 // In pixels from the bottom-left corner of screen
 double AffinePicScreenLeft;
@@ -650,7 +652,7 @@ static void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows
 }
 
 // Render the view for one player
-static void render_view(bool player1, bool bottom_player, pic8* pic, double time, driver& driv,
+static void render_view(bool player1, bool splitscreen, pic8* pic, double time, driver& driv,
                         driver& other_driv, camera& current_camera, GameLoop loop) {
     // Calculate frame of reference
     vect2 bike_center = driv.mot->bike.r;
@@ -666,6 +668,12 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     vect2 bottomleft_corner(bike_center.x -
                                 (CameraX + driv.meta.camera_turning.turn_phase * CameraDx),
                             bike_center.y - CameraY);
+    if (player1 || !splitscreen) {
+        CameraBottomLeft1 = bottomleft_corner;
+    } else {
+        CameraBottomLeft2 = bottomleft_corner;
+    }
+
     vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
                  bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
 
@@ -848,7 +856,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
             }
         }
 
-        if (bottom_player) {
+        if (!splitscreen || !player1) {
             // FPS
             if (EolSettings->show_fps()) {
                 info_rows.push_back({"FPS", fps::format_fps() + pacer::format_fps_limit()});
@@ -909,16 +917,16 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     static pic8 player_view = pic8();
     if (splitscreen) {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
-        render_view(true, false, &player_view, time, driv1, driv2, current_camera, loop);
+        render_view(true, true, &player_view, time, driv1, driv2, current_camera, loop);
 
         player_view.subview(GameViewLeft, GameViewBottom2, GameViewRight, GameViewTop2, pic);
         render_view(false, true, &player_view, time, driv2, driv1, current_camera, loop);
     } else {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
         if (draw_player1) {
-            render_view(true, true, &player_view, time, driv1, driv2, current_camera, loop);
+            render_view(true, false, &player_view, time, driv1, driv2, current_camera, loop);
         } else {
-            render_view(false, true, &player_view, time, driv2, driv1, current_camera, loop);
+            render_view(false, false, &player_view, time, driv2, driv1, current_camera, loop);
         }
     }
 

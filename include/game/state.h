@@ -81,6 +81,8 @@ class state {
     DikScancode key_escape_alias;
     combo_scancode key_high_quality;
     combo_scancode key_default_ground_sky;
+    combo_scancode key_zoom_out;
+    combo_scancode key_zoom_in;
 
     DikScancode key_replay_fast_2x;
     DikScancode key_replay_fast_4x;

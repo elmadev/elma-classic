@@ -97,6 +97,8 @@ class eol_settings {
     Default<bool> default_ground_{false};
     Default<bool> default_sky_{false};
     Default<combo_scancode> default_ground_sky_key_{combo_scancode{DIK_LCONTROL, DIK_G}};
+    Default<combo_scancode> zoom_out_key_{combo_scancode{DIK_NONE, DIK_SUBTRACT}};
+    Default<combo_scancode> zoom_in_key_{combo_scancode{DIK_NONE, DIK_ADD}};
 
     Default<bool> center_camera_{false};
     Default<bool> center_map_{false};
@@ -214,6 +216,8 @@ class eol_settings {
     DECLARE_SETTING_CUSTOM(default_ground);
     DECLARE_SETTING_CUSTOM(default_sky);
     DECLARE_SETTING(default_ground_sky_key);
+    DECLARE_SETTING(zoom_out_key);
+    DECLARE_SETTING(zoom_in_key);
 
     DECLARE_SETTING(center_camera);
     DECLARE_SETTING(center_map);

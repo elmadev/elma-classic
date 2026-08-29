@@ -1008,6 +1008,8 @@ void canvas::draw_killers() {
         return;
     }
 
+    const double y_sign = Level->objects_flipped ? 1 : -1;
+
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = Level->objects[i];
         if (!obj) {
@@ -1024,7 +1026,7 @@ void canvas::draw_killers() {
             unsigned char* source = Lgr->minimap_killer_palette_id;
             int distance = 499;
             int x = (int)((obj->r.x - origin.x) * MetersToMinimapPixels);
-            int y = (int)((-obj->r.y - origin.y) * MetersToMinimapPixels);
+            int y = (int)((y_sign * obj->r.y - origin.y) * MetersToMinimapPixels);
             canvas_pixels source_pixels = canvas_pixels::pointer(source);
             draw_pixels(source_pixels, distance, x - 1, x + 1, y - 1, Clipping::Unclipped);
             draw_pixels(source_pixels, distance, x - 1, x - 1, y, Clipping::Unclipped);

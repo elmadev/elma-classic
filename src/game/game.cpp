@@ -569,6 +569,18 @@ static void handle_eol_inputs() {
         }
     }
 
+    if (was_game_key_just_pressed(State->key_zoom_out)) {
+        const double zoom = EolSettings->zoom() - 0.25;
+        EolSettings->set_zoom(zoom);
+        StatusMessages->add(std::format("Zoom: {:.2f}", EolSettings->zoom()));
+    }
+
+    if (was_game_key_just_pressed(State->key_zoom_in)) {
+        const double zoom = EolSettings->zoom() + 0.25;
+        EolSettings->set_zoom(zoom);
+        StatusMessages->add(std::format("Zoom: {:.2f}", EolSettings->zoom()));
+    }
+
     if (was_game_key_just_pressed(State->key_toggle_one_wheel_status)) {
         EolSettings->set_show_one_wheel_status(!EolSettings->show_one_wheel_status());
         StatusMessages->add(EolSettings->show_one_wheel_status() ? "one-wheel status shown"

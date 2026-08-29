@@ -87,6 +87,7 @@ class lgrfile {
     static void invalidate_lgr_cache();
     static void recreate_lgr_if_needed();
     static void load_lgr_file(const char* lgr_name, bool warn_missing);
+    static const char* current_lgr_name();
 
     int picture_count;
     picture pictures[MAX_PICTURES];

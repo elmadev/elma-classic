@@ -79,6 +79,8 @@ void lgrfile::recreate_lgr_if_needed() {
     reset_game_background();
 }
 
+const char* lgrfile::current_lgr_name() { return CurrentLgrName; }
+
 // If `lgr_name` does not exist, only show a dialog if `backup_lgr` is not NULL.
 static bool lgr_exists(const char* lgr_name, const char* backup_lgr) {
     filepath path;

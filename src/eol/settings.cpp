@@ -1,10 +1,12 @@
 #include "eol/settings.h"
 #include "editor/editor.h"
 #include "game/state.h"
+#include "level/level.h"
 #include "main.h"
 #include "physics/init.h"
 #include "pic/lgr.h"
 #include "platform/implementation.h"
+#include "platform/utils.h"
 #include "renderer/canvas.h"
 #include "renderer/object_overlay.h"
 #include <fstream>
@@ -138,10 +140,32 @@ void eol_settings::set_zoom_grass(bool zoom_grass) {
 }
 
 void eol_settings::set_default_lgr_name(std::string name) {
-    if (default_lgr_name_.value != name) {
-        default_lgr_name_ = std::move(name);
-        lgrfile::invalidate_lgr_cache();
+    if (default_lgr_name_.value == name) {
+        return;
     }
+
+    if (!Level || !Lgr) {
+        default_lgr_name_ = std::move(name);
+        return;
+    }
+
+    if (strcmpi(Level->lgr_name, "default") == 0) {
+        // Level uses default.lgr
+        lgrfile::invalidate_lgr_cache();
+    } else if (strcmpi(lgrfile::current_lgr_name(), "default") == 0) {
+        // Level does not use default.lgr, but we are using default.lgr as a fallback
+        lgrfile::invalidate_lgr_cache();
+    } else if (strcmpi(Level->lgr_name, default_lgr_name_.value.c_str()) != 0 &&
+               strcmpi(lgrfile::current_lgr_name(), default_lgr_name_.value.c_str()) == 0) {
+        // Level does not use the previous default_lgr_name,
+        // but we are using the previous default_lgr_name as an override
+        lgrfile::invalidate_lgr_cache();
+    } else {
+        // The level was using a non-default LGR, don't invalidate the cache since the
+        // default is not currently loaded.
+    }
+
+    default_lgr_name_ = std::move(name);
 }
 
 void eol_settings::set_fancyboost(bool b) {

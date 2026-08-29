@@ -71,6 +71,7 @@ void invalidate_lgr_cache() {
     CurrentLgrName[0] = '\0';
 }
 
+// If `lgr_name` does not exist, only show a dialog if `backup_lgr` is not NULL.
 static bool lgr_exists(const char* lgr_name, const char* backup_lgr) {
     filepath path;
     sprintf(path, "lgr/%s.lgr", lgr_name);
@@ -122,7 +123,7 @@ bool lgrfile::try_load_lgr(const char* name, const char* desc) {
     return true;
 }
 
-void lgrfile::load_lgr_file(const char* lgr_name) {
+void lgrfile::load_lgr_file(const char* lgr_name, bool warn_missing) {
     if (strlen(lgr_name) > MAX_FILENAME_LEN) {
         internal_error("load_lgr_file strlen( lgr_name ) > MAX_FILENAME_LEN!");
     }
@@ -142,13 +143,13 @@ void lgrfile::load_lgr_file(const char* lgr_name) {
 
     if (!is_default && !override_is_same) {
         const char* desc = override_is_default ? "default.lgr" : "the default lgr file";
-        if (try_load_lgr(lgr_load_name, desc)) {
+        if (try_load_lgr(lgr_load_name, warn_missing ? desc : nullptr)) {
             return;
         }
     }
 
     if (!override_is_default) {
-        if (try_load_lgr(default_override.c_str(), "default.lgr")) {
+        if (try_load_lgr(default_override.c_str(), warn_missing ? "default.lgr" : nullptr)) {
             return;
         }
     }

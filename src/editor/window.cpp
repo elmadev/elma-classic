@@ -1544,7 +1544,7 @@ void editor_window_level_properties() {
         if (was_key_just_pressed(DIK_ESCAPE) || clicked_box(box_cancel)) {
             if (strcmpi(lgr_name, Level->lgr_name) != 0) {
                 // Revert lgr back to original
-                lgrfile::load_lgr_file(Level->lgr_name);
+                lgrfile::load_lgr_file(Level->lgr_name, true);
             }
             return;
         }
@@ -1591,7 +1591,7 @@ void editor_window_level_properties() {
             rerender = true;
         } else if (clicked_box(box_lgr)) {
             editor_window_choose_lgr(screen.pic(), lgr_name);
-            lgrfile::load_lgr_file(lgr_name);
+            lgrfile::load_lgr_file(lgr_name, true);
             rerender = true;
         }
         if (rerender) {

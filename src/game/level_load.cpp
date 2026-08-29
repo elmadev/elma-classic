@@ -62,7 +62,7 @@ bool load_level_play(const char* levelname) {
             return false;
         }
 
-        lgrfile::load_lgr_file(Level->lgr_name);
+        lgrfile::load_lgr_file(Level->lgr_name, true);
         Level->load_sprite_wireframes(Lgr, false);
 
         START_TIME(segments_timer);
@@ -82,7 +82,7 @@ bool load_level_play(const char* levelname) {
 
 bool load_level_editor(const char* levelname) {
     if (load_level(levelname)) {
-        lgrfile::load_lgr_file(Level->lgr_name);
+        lgrfile::load_lgr_file(Level->lgr_name, true);
         Level->load_sprite_wireframes(Lgr, true);
     }
 

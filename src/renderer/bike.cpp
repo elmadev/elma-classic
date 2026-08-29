@@ -7,8 +7,8 @@
 #include <cmath>
 
 // Render an entire bike + kuski
-void GameRenderer::render_bike(bool has_flag, const motorst* mot, const bike_metadata* metadata,
-                               const bike_pics* bike, const pic8* shirt) {
+void game_renderer::render_bike(bool has_flag, const motorst* mot, const bike_metadata* metadata,
+                                const bike_pics* bike, const pic8* shirt) {
 
     // Bike positionals
     double BikeFrameX;

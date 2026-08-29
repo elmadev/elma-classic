@@ -17,7 +17,7 @@
  * Renderer which draws to a pic8* buffer
  */
 
-class PicRenderer : public GameRenderer {
+class pic_renderer : public game_renderer {
 
   protected:
     // backbuffer
@@ -229,18 +229,18 @@ class PicRenderer : public GameRenderer {
 
   public:
     // Include parent methods
-    using GameRenderer::GameRenderer;
+    using game_renderer::game_renderer;
 };
 
 /*
- * Top level definitions other than PicRenderer conditional so that
- * this file can be #included to subclass PicRenderer.
+ * Top level definitions other than pic_renderer conditional so that
+ * this file can be #included to subclass pic_renderer.
  * Just avoids an additional .h and double definitions of all the methods.
  */
 
 #ifndef RENDER_PIC_IS_INCLUDE
-std::unique_ptr<GameRenderer> createPicRenderer(double time, driver& driv1, driver& driv2,
-                                                camera& current_camera, GameLoop loop) {
-    return std::make_unique<PicRenderer>(time, driv1, driv2, current_camera, loop);
+std::unique_ptr<game_renderer> create_pic_renderer(double time, driver& driv1, driver& driv2,
+                                                   camera& current_camera, GameLoop loop) {
+    return std::make_unique<pic_renderer>(time, driv1, driv2, current_camera, loop);
 }
 #endif

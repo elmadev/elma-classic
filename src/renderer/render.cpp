@@ -255,8 +255,8 @@ static std::vector<info_panel_row> get_info_rows(bool bottom_player, GameLoop lo
 }
 
 // Render the view for one player
-void GameRenderer::render_view(bool player1, bool bottom_player, int left, int bottom, int right,
-                               int top) {
+void game_renderer::render_view(bool player1, bool bottom_player, int left, int bottom, int right,
+                                int top) {
 
     auto driv = player1 ? driv1 : driv2;
     auto other_driv = player1 ? driv2 : driv1;
@@ -372,8 +372,8 @@ void GameRenderer::render_view(bool player1, bool bottom_player, int left, int b
     }
 }
 
-GameRenderer::GameRenderer(double time, driver& driv1, driver& driv2, camera& current_camera,
-                           GameLoop loop)
+game_renderer::game_renderer(double time, driver& driv1, driver& driv2, camera& current_camera,
+                             GameLoop loop)
     : time(time),
       driv1(driv1),
       driv2(driv2),
@@ -392,7 +392,7 @@ GameRenderer::GameRenderer(double time, driver& driv1, driver& driv2, camera& cu
     splitscreen = draw_player1 && draw_player2;
 }
 
-void GameRenderer::render() {
+void game_renderer::render() {
 
     start_frame();
 
@@ -429,8 +429,8 @@ void GameRenderer::render() {
 }
 
 // Render the entire minimap
-void GameRenderer::dispatch_minimap(bool player1, double camera_turn_phase, vect2 bike_center,
-                                    motorst* other_motor) {
+void game_renderer::dispatch_minimap(bool player1, double camera_turn_phase, vect2 bike_center,
+                                     motorst* other_motor) {
     // Calculate minimap size and minimap frame of reference
     double minimap_width = MinimapWidth * MinimapScaleFactor * PixelsToMeters;
     double minimap_height = MinimapHeight * MinimapScaleFactor * PixelsToMeters;
@@ -471,7 +471,7 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
 
     fps::update();
 
-    auto renderer = createPicRenderer(time, driv1, driv2, current_camera, loop);
+    auto renderer = create_pic_renderer(time, driv1, driv2, current_camera, loop);
 
     renderer->render();
 }

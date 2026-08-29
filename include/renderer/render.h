@@ -36,10 +36,10 @@ void render_minimap_subview(bool player1, pic8* minimap_view, const motorst* oth
                             vect2 bottomleft_corner, vect2 camera_pos);
 
 /*
- * GameRenderer abstract superclass
+ * game_renderer abstract superclass
  */
 
-class GameRenderer {
+class game_renderer {
 
   protected:
     bool draw_player1;
@@ -82,12 +82,12 @@ class GameRenderer {
                           motorst* other_motor);
 
   public:
-    GameRenderer(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop);
-    virtual ~GameRenderer() = default;
+    game_renderer(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop);
+    virtual ~game_renderer() = default;
     void render();
 };
 
-std::unique_ptr<GameRenderer> createPicRenderer(double time, driver& driv1, driver& driv2,
-                                                camera& current_camera, GameLoop loop);
+std::unique_ptr<game_renderer> create_pic_renderer(double time, driver& driv1, driver& driv2,
+                                                   camera& current_camera, GameLoop loop);
 
 #endif

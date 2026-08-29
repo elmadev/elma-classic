@@ -582,7 +582,10 @@ static void handle_eol_inputs() {
     }
 }
 
-void reload_graphic_assets() { canvas::recreate_canvases_if_needed(); }
+void reload_graphic_assets() {
+    lgrfile::recreate_lgr_if_needed();
+    canvas::recreate_canvases_if_needed();
+}
 
 // Common setup function
 static void setup_gameloop(const char* filename) {

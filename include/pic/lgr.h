@@ -84,6 +84,8 @@ class lgrfile {
     ~lgrfile();
 
   public:
+    static void invalidate_lgr_cache();
+    static void recreate_lgr_if_needed();
     static void load_lgr_file(const char* lgr_name, bool warn_missing);
 
     int picture_count;
@@ -141,7 +143,6 @@ class lgrfile {
 };
 
 extern lgrfile* Lgr;
-void invalidate_lgr_cache();
 
 void create_grass_mask(mask& msk, int* heightmap, int skip_rows);
 

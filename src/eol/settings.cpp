@@ -112,7 +112,7 @@ void eol_settings::set_zoom(double z) {
     if (z != zoom_) {
         zoom_ = z;
         set_zoom_factor();
-        invalidate_lgr_cache();
+        lgrfile::invalidate_lgr_cache();
         init_gravity_arrows();
     }
 }
@@ -128,25 +128,25 @@ void eol_settings::set_minimap_zoom(double z) {
 void eol_settings::set_zoom_textures(bool zoom_textures) {
     zoom_textures_ = zoom_textures;
 
-    invalidate_lgr_cache();
+    lgrfile::invalidate_lgr_cache();
 }
 
 void eol_settings::set_zoom_grass(bool zoom_grass) {
     zoom_grass_ = zoom_grass;
 
-    invalidate_lgr_cache();
+    lgrfile::invalidate_lgr_cache();
 }
 
 void eol_settings::set_default_lgr_name(std::string name) {
     if (default_lgr_name_.value != name) {
         default_lgr_name_ = std::move(name);
-        invalidate_lgr_cache();
+        lgrfile::invalidate_lgr_cache();
     }
 }
 
 void eol_settings::set_fancyboost(bool b) {
     fancyboost_ = b;
-    invalidate_lgr_cache();
+    lgrfile::invalidate_lgr_cache();
 }
 
 void eol_settings::set_cripple_no_throttle(bool b) {

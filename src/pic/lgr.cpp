@@ -3,7 +3,6 @@
 #include "editor/dialog.h"
 #include "editor/editor.h"
 #include "eol/settings.h"
-#include "game/level_load.h"
 #include "level/level.h"
 #include "level/sprite.h"
 #include "main.h"
@@ -66,9 +65,18 @@ constexpr char FANCYBOOST_NAMES[256][10] = {
     "zz281000", "zz2868B4", "zz789CDC", "zz5810D4", "zz303050", "zz5894C4", "zzDC0000", "zzD4D4D4",
     "zz00089C", "zz0094C4", "zz585050", "zz48DC28", "zz1050AC", "zzE48060", "zzCC4018", "zzFCFCFC"};
 
-void invalidate_lgr_cache() {
-    invalidate_level();
-    CurrentLgrName[0] = '\0';
+void lgrfile::invalidate_lgr_cache() { CurrentLgrName[0] = '\0'; }
+
+void lgrfile::recreate_lgr_if_needed() {
+    if (CurrentLgrName[0]) {
+        return;
+    }
+
+    lgrfile::load_lgr_file(Level->lgr_name, false);
+
+    Lgr->pal->set();
+    canvas::invalidate_canvases();
+    reset_game_background();
 }
 
 // If `lgr_name` does not exist, only show a dialog if `backup_lgr` is not NULL.

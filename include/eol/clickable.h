@@ -19,6 +19,7 @@ struct clickable {
     enum class Mode {
         Normal,
         CheckpointEndHeld,
+        CheckpointLineHeld,
     };
     static inline Mode ClickMode = Mode::Normal;
 

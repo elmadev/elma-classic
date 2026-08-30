@@ -1,4 +1,5 @@
 #include "eol/checkpoint.h"
+#include "log.h"
 #include "main.h"
 #include "physics/init.h"
 #include "pic/pic8.h"
@@ -18,12 +19,32 @@ constexpr unsigned char LINE_COLOR = 25;
 } // namespace
 
 void checkpoint::endpoint::left_clicked(int x, int y, vect2 coord) {
+    last_coord = this->click_anchor;
     checkpoint::held_end = this;
     clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
 }
 
 void checkpoint::endpoint::right_clicked(int x, int y, vect2 coord) {
     internal_error("Not implemented");
+}
+
+void checkpoint::endpoint::set_anchor(vect2 coord) {
+    // If line as at least MINIMUM_LENGTH, then set to desired coord
+    vect2 direction = coord - other->click_anchor;
+    double length = direction.length();
+    if (length >= MINIMUM_LENGTH) {
+        click_anchor = coord;
+        return;
+    }
+
+    // Handle divide by 0 case
+    if (length < 0.0001) {
+        direction = vect2{1.0, 0.0};
+    }
+
+    // If line as shorter than MINIMUM_LENGTH, project the line in a straight line
+    direction.normalize();
+    click_anchor = other->click_anchor + direction * MINIMUM_LENGTH;
 }
 
 void checkpoint::editor_update(vect2 coord, bool left_click, bool right_click) {
@@ -37,17 +58,15 @@ void checkpoint::editor_update(vect2 coord, bool left_click, bool right_click) {
         last_coord = held_end->click_anchor;
         clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
     } else if (held_end && left_click) {
-        held_end->click_anchor = coord;
+        held_end->set_anchor(coord);
         held_end = nullptr;
         clickable::ClickMode = clickable::Mode::Normal;
     } else if (held_end && right_click) {
-        internal_error("Not implemented - we need to enforce minimum line length before being able "
-                       "to drop stuff");
-        held_end->click_anchor = last_coord;
+        held_end->set_anchor(last_coord);
         held_end = nullptr;
         clickable::ClickMode = clickable::Mode::Normal;
     } else if (held_end) {
-        held_end->click_anchor = coord;
+        held_end->set_anchor(coord);
     }
 }
 

@@ -16,13 +16,33 @@ vect2 last_coord;
 } // namespace
 
 void checkpoint::endpoint::left_clicked(int x, int y, vect2 coord) {
-    // Pick up checkpoint end
+    // Pick up checkpoint end and remember position in case we cancel
+    last_coord = this->click_anchor;
     checkpoint::held_end = this;
     clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
 }
 
 void checkpoint::endpoint::right_clicked(int x, int y, vect2 coord) {
     internal_error("Not implemented");
+}
+
+void checkpoint::endpoint::set_anchor(vect2 coord) {
+    // If line as at least MINIMUM_LENGTH, then set to desired coord
+    vect2 direction = coord - other->click_anchor;
+    double length = direction.length();
+    if (length >= MINIMUM_LENGTH) {
+        click_anchor = coord;
+        return;
+    }
+
+    // Handle divide by 0 case
+    if (length < 0.0001) {
+        direction = vect2{1.0, 0.0};
+    }
+
+    // If line as shorter than MINIMUM_LENGTH, project the line in a straight line
+    direction.normalize();
+    click_anchor = other->click_anchor + direction * MINIMUM_LENGTH;
 }
 
 void checkpoint::editor_update(vect2 coord, bool left_click, bool right_click) {
@@ -38,15 +58,17 @@ void checkpoint::editor_update(vect2 coord, bool left_click, bool right_click) {
         clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
     } else if (held_end && left_click) {
         // Drop the checkpoint end
-        held_end->click_anchor = coord;
+        held_end->set_anchor(coord);
         held_end = nullptr;
         clickable::ClickMode = clickable::Mode::Normal;
     } else if (held_end && right_click) {
         // Restore the checkpoint end to its previous position
-        internal_error("Not implemented");
+        held_end->set_anchor(last_coord);
+        held_end = nullptr;
+        clickable::ClickMode = clickable::Mode::Normal;
     } else if (held_end) {
         // Update the checkpoint end position
-        held_end->click_anchor = coord;
+        held_end->set_anchor(coord);
     }
 }
 

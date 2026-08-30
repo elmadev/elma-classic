@@ -3,6 +3,7 @@
 #include "physics/init.h"
 #include "pic/pic8.h"
 #include "platform/implementation.h"
+#include <limits>
 #include <list>
 
 namespace {
@@ -12,6 +13,8 @@ constexpr unsigned char LINE_COLOR = 25;
 std::list<checkpoint> linear_checkpoints;
 
 vect2 last_coord;
+vect2 last_start;
+vect2 last_end;
 
 } // namespace
 
@@ -43,6 +46,17 @@ void checkpoint::endpoint::set_anchor(vect2 coord) {
     click_anchor = other->click_anchor + direction * MINIMUM_LENGTH;
 }
 
+void checkpoint::left_clicked(const game_mouse& pos) {
+    ELMA_ASSERT(pos.coord);
+    last_coord = *pos.coord;
+    last_start = start.click_anchor;
+    last_end = end.click_anchor;
+    checkpoint::held_line = this;
+    clickable::ClickMode = clickable::Mode::CheckpointLineHeld;
+}
+
+void checkpoint::right_clicked(const game_mouse& /*pos*/) {}
+
 void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool right_click) {
     if (!Editor) {
         return;
@@ -61,9 +75,10 @@ void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool righ
             clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
         }
     } else if (clickable::ClickMode == clickable::Mode::CheckpointEndHeld) {
+        ELMA_ASSERT(held_end);
         if (left_click) {
             // Drop the checkpoint end
-            held_end->click_anchor = coord;
+            held_end->set_anchor(coord);
             held_end = nullptr;
             clickable::ClickMode = clickable::Mode::Normal;
         } else if (right_click) {
@@ -73,7 +88,26 @@ void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool righ
             clickable::ClickMode = clickable::Mode::Normal;
         } else {
             // Update the checkpoint end position
-            held_end->click_anchor = coord;
+            held_end->set_anchor(coord);
+        }
+    } else if (clickable::ClickMode == clickable::Mode::CheckpointLineHeld) {
+        ELMA_ASSERT(held_line);
+        if (left_click) {
+            // Drop the checkpoint line
+            held_line->start.click_anchor = last_start + (coord - last_coord);
+            held_line->end.click_anchor = last_end + (coord - last_coord);
+            held_line = nullptr;
+            clickable::ClickMode = clickable::Mode::Normal;
+        } else if (right_click) {
+            // Restore the checkpoint line to its previous position
+            held_line->start.click_anchor = last_start;
+            held_line->end.click_anchor = last_end;
+            held_line = nullptr;
+            clickable::ClickMode = clickable::Mode::Normal;
+        } else {
+            // Update the checkpoint line position
+            held_line->start.click_anchor = last_start + (coord - last_coord);
+            held_line->end.click_anchor = last_end + (coord - last_coord);
         }
     }
 }
@@ -99,6 +133,16 @@ void checkpoint::render_all(pic8& screen, vect2 corner) {
     }
 }
 
+int checkpoint::distance(const game_mouse& pos) const {
+    if (!pos.coord) {
+        return std::numeric_limits<int>::max();
+    }
+    vect2 start_pos = start.click_anchor;
+    vect2 end_pos = end.click_anchor;
+    vect2 v = end_pos - start_pos;
+    return (int)(point_segment_distance(*pos.coord, start_pos, v) * MetersToPixels);
+}
+
 void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& closest) {
     if (!Editor) {
         return;
@@ -107,6 +151,7 @@ void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& close
         return;
     }
     ELMA_ASSERT(!held_end);
+    ELMA_ASSERT(!held_line);
 
     for (checkpoint& linear : linear_checkpoints) {
         int start_dist = linear.start.distance(pos);
@@ -119,6 +164,22 @@ void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& close
         if (end_dist < dist) {
             dist = end_dist;
             closest = &linear.end;
+        }
+
+        if (start_dist == std::numeric_limits<int>::max() &&
+            end_dist == std::numeric_limits<int>::max()) {
+            int middle_dist = linear.distance(pos);
+            if (middle_dist > clickable::DEFAULT_RADIUS) {
+                middle_dist = std::numeric_limits<int>::max();
+            } else {
+                // Prioritize checkpoint ends over checkpoint lines by giving lines lower priority
+                middle_dist += clickable::DEFAULT_RADIUS;
+            }
+
+            if (middle_dist < dist) {
+                dist = middle_dist;
+                closest = &linear;
+            }
         }
     }
 }

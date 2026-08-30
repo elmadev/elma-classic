@@ -6,7 +6,7 @@
 
 class pic8;
 
-class checkpoint {
+class checkpoint : clickable {
     static constexpr double MINIMUM_LENGTH = 0.2;
 
     struct endpoint : game_clickable {
@@ -26,9 +26,12 @@ class checkpoint {
     endpoint start;
     endpoint end;
 
+    void left_clicked(int x, int y, vect2 coord) override;
+    void right_clicked(int x, int y, vect2 coord) override;
     void render(pic8& screen, vect2 corner) const;
 
     static inline endpoint* held_end = nullptr;
+    static inline checkpoint* held_line = nullptr;
 
   public:
     checkpoint(vect2 coord)

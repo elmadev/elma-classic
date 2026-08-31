@@ -50,6 +50,7 @@ class eol {
     void process(const flag_owner_changed&);
     void process(const battle_queue_update&);
     void process(const finished_time&);
+    void process(const best_times_update&);
     void process(const restore_apple_battle_progress&);
     void process(const level_download&);
 
@@ -90,6 +91,7 @@ class eol {
     void toggle_finished_times() { set_table(TableType::FinishedTimes); }
     void cycle_finished_times_filter();
     void clear_finished_times();
+    void toggle_best_times() { set_table(TableType::BestTimes); }
 
     const kuski* spy_kuski();
     bool is_spying() const { return spy_kuski_id.has_value(); }
@@ -151,6 +153,7 @@ class eol {
     eol_table battle_results_table;
     eol_table battle_queue_table;
     eol_table finished_times_table;
+    eol_table best_times_table;
     std::optional<unsigned int> spy_kuski_id;
     int min_spy_frames = 3;
     bool is_team_chat = false;

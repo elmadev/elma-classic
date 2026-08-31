@@ -55,7 +55,8 @@ eol::eol()
       players_online_table("Players online"),
       battle_results_table("Battle results"),
       battle_queue_table("Battle queue"),
-      finished_times_table("Finished times") {
+      finished_times_table("Finished times"),
+      best_times_table("Best times") {
     players_online_table.add_column(100, eol_table::Align::Left);
     players_online_table.add_column(100, eol_table::Align::Right);
     battle_results_table.add_column(100, eol_table::Align::Left);
@@ -67,6 +68,11 @@ eol::eol()
     finished_times_table.add_column(60, eol_table::Align::Right);
     finished_times_table.add_column(130, eol_table::Align::Right);
     finished_times_table.set_overflow(eol_table::Overflow::NewestRows);
+    best_times_table.add_column(100, eol_table::Align::Left);
+    best_times_table.add_column(100, eol_table::Align::Right);
+    // Zero width so legacy source labels hang off the right edge, keeping
+    // rank/nick/time centered under the title.
+    best_times_table.add_column(0, eol_table::Align::Left);
 }
 
 void eol::reset() {
@@ -271,6 +277,56 @@ void eol::clear_finished_times() {
 
     finished_times_.clear();
     sync_finished_times_table();
+}
+
+void eol::process(const best_times_update& bt) {
+    best_times_table.set_title(bt.has_accept_bugs ? "Best times (Apple bugs allowed)"
+                                                  : "Best times");
+    best_times_table.clear_rows();
+
+    if (bt.entries.empty()) {
+        return;
+    }
+
+    size_t rank_width = 2;
+
+    // A multi-digit PR position widens the rank column of every row so the dots line up.
+    if (bt.kuski_pr_separately) {
+        rank_width = std::max<size_t>(2, std::to_string(bt.kuski_pr_position).size());
+    }
+
+    auto add_entry = [&](const best_times_entry& e, uint32_t rank) {
+        char time_buf[32] = "";
+        if (e.time <= 0) {
+            // Levels with hidden times but visible positions
+            // report 0 for everyone but yourself.
+            strcpy(time_buf, "hidden");
+        } else {
+            util::text::centiseconds_to_string(e.time, time_buf, true, true);
+        }
+
+        std::string flags;
+        if (!e.legacy_label.empty() || e.is_bug) {
+            flags = std::format(" {}{}{}", e.legacy_label, e.legacy_label.empty() ? "" : " ",
+                                e.is_bug ? "(bug)" : "");
+        }
+
+        best_times_table.add_row(
+            {std::format("{:>{}}. {}", rank, rank_width, e.nick), time_buf, std::move(flags)});
+    };
+
+    size_t top_count = bt.entries.size() - (bt.kuski_pr_separately ? 1 : 0);
+    for (size_t i = 0; i < top_count; i++) {
+        add_entry(bt.entries[i], i + 1);
+    }
+
+    // Kuskis own PR when outside the list, behind a "..." separator if there is a gap.
+    if (bt.kuski_pr_separately) {
+        if (bt.kuski_pr_position > bt.entries.size()) {
+            best_times_table.add_row({std::format("{:>{}}", "...", rank_width + 1), "", ""});
+        }
+        add_entry(bt.entries.back(), bt.kuski_pr_position);
+    }
 }
 
 void eol::process(const chat_message& msg) {
@@ -488,6 +544,9 @@ void eol::set_table(TableType table) {
         break;
     case TableType::FinishedTimes:
         new_table = &finished_times_table;
+        break;
+    case TableType::BestTimes:
+        new_table = &best_times_table;
         break;
     }
 

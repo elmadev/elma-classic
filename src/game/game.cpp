@@ -494,6 +494,10 @@ static void handle_eol_inputs() {
         EolClient->set_table(TableType::PlayersOnline);
     }
 
+    if (was_game_key_just_pressed(State->key_best_times)) {
+        EolClient->toggle_best_times();
+    }
+
     if (was_game_key_just_pressed(State->key_battle_results)) {
         EolClient->toggle_battle_results();
     }

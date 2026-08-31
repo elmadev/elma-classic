@@ -393,6 +393,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(download_battle_level_key)                                                          \
     JSON_FIELD(download_level_key)                                                                 \
     JSON_FIELD(players_online_key)                                                                 \
+    JSON_FIELD(best_times_key)                                                                     \
     JSON_FIELD(battle_results_key)                                                                 \
     JSON_FIELD(finished_times_key)                                                                 \
     JSON_FIELD(cycle_finished_times_filter_key)                                                    \
@@ -539,6 +540,7 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->key_download_battle_level = EolSettings->download_battle_level_key();
     s->key_download_level = EolSettings->download_level_key();
     s->key_players_online = EolSettings->players_online_key();
+    s->key_best_times = EolSettings->best_times_key();
     s->key_battle_results = EolSettings->battle_results_key();
     s->key_finished_times = EolSettings->finished_times_key();
     s->key_cycle_finished_times_filter = EolSettings->cycle_finished_times_filter_key();
@@ -591,6 +593,7 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_download_battle_level_key(s->key_download_battle_level);
     EolSettings->persist_download_level_key(s->key_download_level);
     EolSettings->persist_players_online_key(s->key_players_online);
+    EolSettings->persist_best_times_key(s->key_best_times);
     EolSettings->persist_battle_results_key(s->key_battle_results);
     EolSettings->persist_finished_times_key(s->key_finished_times);
     EolSettings->persist_cycle_finished_times_filter_key(s->key_cycle_finished_times_filter);

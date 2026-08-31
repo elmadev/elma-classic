@@ -99,6 +99,7 @@ class state {
     combo_scancode key_download_battle_level;
     combo_scancode key_download_level;
     combo_scancode key_players_online;
+    combo_scancode key_best_times;
     combo_scancode key_battle_results;
     combo_scancode key_finished_times;
     combo_scancode key_cycle_finished_times_filter;

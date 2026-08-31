@@ -135,6 +135,7 @@ class eol_settings {
     Default<combo_scancode> download_battle_level_key_{combo_scancode{DIK_NONE, DIK_F4}};
     Default<combo_scancode> download_level_key_{combo_scancode{DIK_LCONTROL, DIK_F4}};
     Default<combo_scancode> players_online_key_{combo_scancode{DIK_NONE, DIK_F5}};
+    Default<combo_scancode> best_times_key_{combo_scancode{DIK_LSHIFT, DIK_F5}};
     Default<combo_scancode> battle_results_key_{combo_scancode{DIK_NONE, DIK_F6}};
     Default<combo_scancode> finished_times_key_{combo_scancode{DIK_NONE, DIK_F7}};
     Default<combo_scancode> cycle_finished_times_filter_key_{combo_scancode{DIK_LSHIFT, DIK_F7}};
@@ -255,6 +256,7 @@ class eol_settings {
     DECLARE_SETTING(download_battle_level_key);
     DECLARE_SETTING(download_level_key);
     DECLARE_SETTING(players_online_key);
+    DECLARE_SETTING(best_times_key);
     DECLARE_SETTING(battle_results_key);
     DECLARE_SETTING(finished_times_key);
     DECLARE_SETTING(cycle_finished_times_filter_key);

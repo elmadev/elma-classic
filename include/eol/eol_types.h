@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <optional>
 
-enum class TableType { None, PlayersOnline, BattleResults, BattleQueue, FinishedTimes };
+enum class TableType { None, PlayersOnline, BattleResults, BattleQueue, FinishedTimes, BestTimes };
 
 enum class BattleType : uint8_t {
     Normal = 0,

@@ -6,6 +6,7 @@
 #include "main.h"
 #include <cstdint>
 #include <span>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -183,6 +184,21 @@ struct finished_time {
     unsigned int kuski_id;
     char level[MAX_FILENAME_LEN + 1];
     uint32_t time; // In centiseconds
+};
+
+struct best_times_entry {
+    std::string nick;
+    int32_t time; // In centiseconds, 0 on levels with hidden times
+    bool is_bug;
+    std::string legacy_label; // Empty for EOL times
+};
+
+struct best_times_update {
+    bool has_accept_bugs;
+    // When set, the last entry is our own PR, ranked kuski_pr_position.
+    bool kuski_pr_separately;
+    uint32_t kuski_pr_position;
+    std::vector<best_times_entry> entries;
 };
 
 #endif

@@ -440,8 +440,7 @@ void eol::download_battle_level() {
 }
 
 void eol::enter_level(const char* level_name, const level* lev, EnterMode mode) {
-    struct enter_level el{
-        .lev = lev, .name = level_name, .mode = mode, .spying = mode == EnterMode::Spy};
+    struct enter_level el{.lev = lev, .name = level_name, .mode = mode};
     proto.send(el);
 
     if ((mode == EnterMode::Play || mode == EnterMode::Spy) && in_apple_battle()) {

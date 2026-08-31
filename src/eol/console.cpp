@@ -65,6 +65,20 @@ static std::optional<int> parse_int(std::string_view text) {
     return value;
 }
 
+static std::optional<double> parse_double(std::string_view text) {
+    // strtod() requires a null-terminated string.
+    std::string input{text};
+
+    char* end = nullptr;
+    errno = 0;
+    const double value = std::strtod(input.c_str(), &end);
+    if (errno == ERANGE || end != input.c_str() + input.size()) {
+        return std::nullopt;
+    }
+
+    return value;
+}
+
 static void print_level_info(std::string_view /*text*/) {
     if (!Level) {
         Console->add_line("No level loaded", console::LineType::Info);
@@ -171,6 +185,19 @@ void console::register_console_commands() {
         }
         canvas::invalidate_canvases();
         StatusMessages->add(std::format("Video Detail: {}", State->high_quality ? "High" : "Low"));
+    });
+
+    register_command("zoom", [this](std::string_view text) {
+        if (!text.empty()) {
+            auto zoom = parse_double(text);
+            if (zoom) {
+                EolSettings->set_zoom(*zoom);
+            } else {
+                add_line(std::format("invalid value: {}", text), LineType::System);
+                return;
+            }
+        }
+        StatusMessages->add(std::format("Zoom: {:.2f}", EolSettings->zoom()));
     });
 
     REGISTER_SETTINGS_BOOL(default_ground);

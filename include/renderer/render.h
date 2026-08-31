@@ -24,4 +24,14 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
 
 void render_bike(pic8* dest, bool has_flag, vect2 bottomleft_corner, const motorst* mot,
                  const bike_metadata* metadata, const bike_pics* bike, const pic8* shirt);
+
+// In pixels from the bottom-left corner of screen
+// (defined in render.cpp)
+extern int MinimapWidth;
+extern int MinimapHeight;
+extern int MinimapX;
+extern int MinimapDx;
+
+void render_minimap(bool player1, pic8* pic, double camera_turn_phase, vect2 bike_center,
+                    motorst* other_motor);
 #endif

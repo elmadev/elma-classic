@@ -439,11 +439,12 @@ void eol::download_battle_level() {
     current_battle->download_requested = true;
 }
 
-void eol::enter_level(const char* level_name, const level* lev, bool spying) {
-    struct enter_level el{.lev = lev, .name = level_name, .spying = spying};
+void eol::enter_level(const char* level_name, const level* lev, EnterMode mode) {
+    struct enter_level el{
+        .lev = lev, .name = level_name, .mode = mode, .spying = mode == EnterMode::Spy};
     proto.send(el);
 
-    if (in_apple_battle()) {
+    if ((mode == EnterMode::Play || mode == EnterMode::Spy) && in_apple_battle()) {
         online_apple_battle.apply(*lev);
     }
 }

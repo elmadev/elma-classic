@@ -8,6 +8,9 @@
 
 enum class TableType { None, PlayersOnline, BattleResults, BattleQueue, FinishedTimes, BestTimes };
 
+// How a level is being shown to the kuski
+enum class EnterMode { Play, Spy, Replay, Editor };
+
 enum class BattleType : uint8_t {
     Normal = 0,
     OneLife,

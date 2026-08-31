@@ -60,6 +60,7 @@ struct level_download {
 struct enter_level {
     const level* lev;
     const char* name;
+    EnterMode mode;
     bool spying;
 };
 

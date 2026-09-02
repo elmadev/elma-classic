@@ -82,6 +82,7 @@ elma_sources = files(
     'src/renderer/canvas.cpp',
     'src/renderer/grass.cpp',
     'src/renderer/object_overlay.cpp',
+    'src/renderer/minimap.cpp',
     'src/renderer/render.cpp',
     'src/renderer/timer.cpp',
     'src/sound/engine.cpp',

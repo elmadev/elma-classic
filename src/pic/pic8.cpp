@@ -155,6 +155,10 @@ void pic8::save(const char* filename, const unsigned char* pal, FILE* h) {
                 pcx_save(filename, pal);
                 return;
             }
+            if (strcmpi(filename + i, ".bmp") == 0) {
+                bmp_save(filename, pal);
+                return;
+            }
             internal_error(std::string("pic8::save unknown file extension: ") + filename);
         }
         i--;
@@ -577,6 +581,76 @@ pic8* pic8::from_bmp(const char* filename) {
     delete[] pixels;
 
     return pic;
+}
+
+void pic8::bmp_save(const char* filename, const unsigned char* pal) {
+    ELMA_ASSERT(pal);
+
+    FILE* h = fopen(filename, "wb");
+    if (!h) {
+        external_error(std::string("bmp_save failed to open file: ") + filename);
+    }
+
+    const std::string error_message = std::string("bmp_save failed to write to file: ") + filename;
+    constexpr int color_table_size = 256 * 4;
+
+    int padding = 0;
+    int padded_width = width;
+    if (width % 4) {
+        padding = 4 - width % 4;
+        padded_width += padding;
+    }
+
+    // BITMAPFILEHEADER
+    constexpr short magic = BMP_MAGIC;
+    if (fwrite(&magic, sizeof(magic), 1, h) != 1) {
+        external_error(error_message);
+    }
+    bmp_header header;
+    header.size = sizeof(magic) + BMP_HEADER_SIZE + color_table_size + padded_width * height;
+    header.reserved = 0;
+    header.offset = sizeof(magic) + BMP_HEADER_SIZE + color_table_size;
+
+    // BITMAPINFOHEADER
+    header.dib_size = BMP_HEADER_SIZE - offsetof(bmp_header, dib_size);
+    header.width = width;
+    header.height = height;
+    header.planes = 1;
+    header.bpp = 8;
+    header.compression = 0; // None
+    header.image_size = padded_width * height;
+    header.x_pixels_per_meter = 0;
+    header.y_pixels_per_meter = 0;
+    header.num_colors = 256;
+    header.num_important_colors = 0;
+    if (fwrite(&header, sizeof(header), 1, h) != 1) {
+        external_error(error_message);
+    }
+
+    // Color Table (RGBQUAD[256])
+    unsigned char rgbquads[color_table_size];
+    for (int i = 0; i < 256; ++i) {
+        rgbquads[4 * i + 0] = pal[3 * i + 2];
+        rgbquads[4 * i + 1] = pal[3 * i + 1];
+        rgbquads[4 * i + 2] = pal[3 * i + 0];
+        rgbquads[4 * i + 3] = 0;
+    }
+    if (fwrite(rgbquads, color_table_size, 1, h) != 1) {
+        external_error(error_message);
+    }
+
+    // Pixels, bottom-to-top
+    unsigned char padding_bytes[4] = {0, 0, 0, 0};
+    for (int i = height - 1; i >= 0; i--) {
+        if (fwrite(get_row(i), width, 1, h) != 1) {
+            external_error(error_message);
+        }
+        if (fwrite(padding_bytes, 1, padding, h) != padding) {
+            external_error(error_message);
+        }
+    }
+
+    fclose(h);
 }
 
 // Paste source (x1, y1, x2, y2) into dest at (x, y)

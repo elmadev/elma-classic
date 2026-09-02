@@ -16,6 +16,7 @@ class pic8 {
     void spr_save(const char* filename, FILE* h);
     void pcx_open(const char* filename, FILE* h = nullptr);
     void pcx_save(const char* filename, const unsigned char* pal);
+    void bmp_save(const char* filename, const unsigned char* pal);
 
     int width;
     int height;

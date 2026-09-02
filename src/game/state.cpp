@@ -416,6 +416,7 @@ void state::reset_keys() {
     key_increase_screen_size = DIK_EQUALS;
     key_decrease_screen_size = DIK_MINUS;
     key_screenshot = DIK_I;
+    key_screenshot_level = EolSettings->screenshot_level_key_default();
     key_escape_alias = EolSettings->escape_alias_key_default();
 
     key_replay_fast_2x = EolSettings->replay_fast_2x_key_default();

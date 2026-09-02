@@ -141,12 +141,18 @@ class eol {
     };
     void upsert_leaderboard_entry(const battle_leaderboard_entry& entry, uint16_t rank);
 
+    bool update_battle_rec(const driver& d, const struct exit_level& el);
+
     protocol proto;
     unsigned int id;
     unsigned int id2;
     char short_nick_[4] = {};
     std::vector<kuski> kuskis_;
     std::optional<battle> current_battle;
+    struct {
+        std::optional<double> result;
+        uint32_t apple_count = 0;
+    } battle_pr;
     apple_battle_progress online_apple_battle;
     std::vector<battle_leaderboard_entry> battle_leaderboard_;
     BattleType battle_leaderboard_type_ = BattleType::Normal;

@@ -531,6 +531,20 @@ void eol::exit_level(const driver& d, const level* lev, double time, int level_a
                          .esc = d.finish_time == 0 && !d.dead};
     proto.send(fl);
 
+    if (!spying && update_battle_rec(d, fl)) {
+        std::string_view view;
+        uint32_t battle_id = proto.pending_battle_rec_battle_id();
+        if (battle_id) {
+            view = proto.pending_battle_rec_level();
+        } else {
+            view = fl.name;
+            view.remove_suffix(strlen(".lev"));
+            battle_id = proto.battle_id();
+        }
+        std::string rec_name = battle_rec_name(view, battle_id);
+        recorder::save_rec_file(rec_name.c_str(), lev->level_id);
+    }
+
     if (!spying) {
         struct upload_rec ur{.lev = lev, .name = d.rec->level_filename, .rec = d.rec};
         proto.send(ur);

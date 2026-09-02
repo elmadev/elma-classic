@@ -384,7 +384,9 @@ void eol::download_battle_level() {
 }
 
 void eol::enter_level(const char* level_name, const level* lev, bool spying) {
-    struct enter_level el{.lev = lev, .name = level_name, .spying = spying};
+    struct enter_level el {
+        .lev = lev, .name = level_name, .spying = spying
+    };
     proto.send(el);
 
     if (in_apple_battle()) {
@@ -415,16 +417,16 @@ void eol::exit_level(const driver& d, const level* lev, double time, int level_a
 
     spy_kuski_id.reset();
     int apple_count = d.mot->apple_count - d.mot->apple_bug_count;
-    struct exit_level fl{.name = d.rec->level_filename,
-                         .time = time,
-                         .apple_count = apple_count,
-                         .level_apple_count = level_apple_count,
-                         .dead = d.dead,
-                         .esc = d.finish_time == 0 && !d.dead};
+    struct exit_level fl {
+        .name = d.rec->level_filename, .time = time, .apple_count = apple_count,
+        .level_apple_count = level_apple_count, .dead = d.dead, .esc = d.finish_time == 0 && !d.dead
+    };
     proto.send(fl);
 
     if (!spying) {
-        struct upload_rec ur{.lev = lev, .name = d.rec->level_filename, .rec = d.rec};
+        struct upload_rec ur {
+            .lev = lev, .name = d.rec->level_filename, .rec = d.rec
+        };
         proto.send(ur);
     }
 }
@@ -460,14 +462,17 @@ void eol::send_chat_line(std::string_view message) {
         proto.send(send_pm{
             .from_kuski_id = id, .to_kuski_id = 0, .is_team_chat = true, .message = message});
     } else {
-        struct send_chat sc{.kuski_id = id, .message = message};
+        struct send_chat sc {
+            .kuski_id = id, .message = message
+        };
         proto.send(sc);
     }
 }
 
 void eol::send_kuski_data(double time, driver& d) {
-    const struct send_kuski_data data{
-        .kuski_id = id, .time = time, .mot = d.mot, .metadata = &d.meta};
+    const struct send_kuski_data data {
+        .kuski_id = id, .time = time, .mot = d.mot, .metadata = &d.meta
+    };
     proto.send(data);
 }
 

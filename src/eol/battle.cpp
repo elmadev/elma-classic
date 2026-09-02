@@ -244,6 +244,8 @@ void eol::process(const battle_started& bs) {
     current_battle = bs.bat;
     current_battle->level_exists = std::filesystem::exists(
         std::format("lev/{}.lev", (const char*)current_battle->level_filename));
+    battle_pr.result.reset();
+    battle_pr.apple_count = 0;
     battle_leaderboard_.clear();
     battle_leaderboard_type_ = current_battle->type;
     online_apple_battle.clear();
@@ -489,4 +491,68 @@ void eol::sync_battle_queue_table() {
         battle_queue_table.add_row(
             {std::string(nick), format_battle_type(entry.battle_type), std::move(duration)});
     }
+}
+
+bool eol::update_battle_rec(const driver& d, const struct exit_level& el) {
+    if (proto.pending_battle_rec_battle_id()) {
+        return true;
+    }
+
+    if (!proto.in_battle_level() || !current_battle || current_battle->in_countdown) {
+        return false;
+    }
+
+    switch (current_battle->type) {
+    case BattleType::Normal:
+    case BattleType::FinishCount:
+    case BattleType::FirstFinish:
+    case BattleType::Slowness: {
+        const bool finished = d.finish_time != 0;
+        const bool all_apples = el.level_apple_count == el.apple_count;
+        const bool accept_bugs = current_battle->attributes & BattleAttributes::AcceptBugs;
+        const bool better_result =
+            ((current_battle->type == BattleType::Normal ||
+              current_battle->type == BattleType::FinishCount) &&
+             el.time < battle_pr.result) ||
+            (current_battle->type == BattleType::Slowness && el.time > battle_pr.result);
+        if (finished && (all_apples || accept_bugs) && (!battle_pr.result || better_result)) {
+            battle_pr.result = el.time;
+            battle_pr.apple_count = el.apple_count;
+            return true;
+        }
+
+        if ((!finished || !all_apples) && !battle_pr.result &&
+            el.apple_count > battle_pr.apple_count) {
+            battle_pr.apple_count = el.apple_count;
+            return true;
+        }
+        break;
+    }
+    case BattleType::OneLife:
+        if (!battle_pr.result) {
+            battle_pr.result = el.time;
+            return true;
+        }
+        break;
+    case BattleType::LastCounts:
+        return true;
+    case BattleType::Survivor:
+        if (!battle_pr.result || el.time > battle_pr.result) {
+            battle_pr.result = el.time;
+            return true;
+        }
+        break;
+    case BattleType::Speed:
+        if (!battle_pr.result || d.stats.max_speed > battle_pr.result) {
+            battle_pr.result = d.stats.max_speed;
+            return true;
+        }
+        break;
+    case BattleType::HourTT:
+    case BattleType::FlagTag:
+    case BattleType::Apple:
+        break;
+    }
+
+    return false;
 }

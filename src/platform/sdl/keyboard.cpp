@@ -1,6 +1,9 @@
 #include "platform/sdl/keyboard.h"
-
 #include <cstring>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 // Map numpad keys to navigation equivalents when NumLock is off
 static constexpr struct {
@@ -34,6 +37,17 @@ void begin_frame() {
 
 void end_frame() {
     memcpy(Current, SdlLive, sizeof(Current));
+
+#ifdef _WIN32
+    // Windows appears to only send a WM_KEYUP event for the printscreen button
+    // SDL uses a hack to generate a 0-frame-length key-down + key-up event when the key is
+    // released, so SdlLive[SDL_SCANCODE_PRINTSCREEN] will always evaluate to 0
+    // https://github.com/libsdl-org/SDL/blob/b54c7178b9b7bffc7ba81709a2935ff3f62c2d14/src/video/windows/SDL_windowsevents.c#L1615
+    // Manually check this key directly using the Windows API
+    if (GetAsyncKeyState(VK_SNAPSHOT) & 0x8000) {
+        Current[SDL_SCANCODE_PRINTSCREEN] = 1;
+    }
+#endif
 
 #ifdef __APPLE__
     // macos has no numlock key so we always force numpad navigation off

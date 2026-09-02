@@ -143,15 +143,17 @@ pic8* pic8::clone() {
     return copy;
 }
 
-bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
+void pic8::save(const char* filename, const unsigned char* pal, FILE* h) {
     int i = strlen(filename) - 1;
     while (i >= 0) {
         if (filename[i] == '.') {
             if (strcmpi(filename + i, ".spr") == 0) {
-                return spr_save(filename, h);
+                spr_save(filename, h);
+                return;
             }
             if (strcmpi(filename + i, ".pcx") == 0) {
-                return pcx_save(filename, pal);
+                pcx_save(filename, pal);
+                return;
             }
             internal_error(std::string("pic8::save unknown file extension: ") + filename);
         }
@@ -291,10 +293,9 @@ void pic8::spr_open(const char* filename, FILE* h) {
     }
 }
 
-bool pic8::spr_save(const char* filename, FILE* h) {
+void pic8::spr_save(const char* filename, FILE* h) {
     if (width > SHRT_MAX || height > SHRT_MAX) {
         external_error(std::string("Image is too large to be saved as .spr format!") + filename);
-        return false;
     }
 
     bool h_provided = true;
@@ -321,7 +322,6 @@ bool pic8::spr_save(const char* filename, FILE* h) {
     if (!h_provided) {
         fclose(h);
     }
-    return true;
 }
 
 struct pcxdescriptor {
@@ -407,10 +407,9 @@ static int pcx_count_repeats(pic8* ppic, int x, int y, int width) {
 
 // Strictly respects pcx convention: Only compresses palette IDs 0-63 instead of 0-191
 // Does not enforce the width to be an even number however
-bool pic8::pcx_save(const char* filename, unsigned char* pal) {
+void pic8::pcx_save(const char* filename, const unsigned char* pal) {
     if (width > SHRT_MAX || height > SHRT_MAX) {
         external_error(std::string("Image is too large to be saved as .pcx format!") + filename);
-        return false;
     }
 
     FILE* h = fopen(filename, "wb");
@@ -498,7 +497,6 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
         }
     }
     fclose(h);
-    return true;
 }
 
 constexpr short BMP_MAGIC = 0x4D42;

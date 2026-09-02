@@ -934,3 +934,76 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
 
     unlock_backbuffer_pic();
 }
+
+// Save entire level into a .bmp file
+void level_to_bmp(const char* filename) {
+    double level_x1;
+    double level_y1;
+    double level_x2;
+    double level_y2;
+    Level->get_boundaries(&level_x1, &level_y1, &level_x2, &level_y2, true);
+
+    // Invert y and add buffer zone
+    constexpr int MARGIN = 5.0;
+    double x1 = level_x1 - MARGIN;
+    double x2 = level_x2 + MARGIN;
+    double y1 = -level_y2 - MARGIN;
+    double y2 = -level_y1 + MARGIN;
+
+    vect2 bottomleft_corner(x1, y1);
+    int height = (int)((y2 - y1) * MetersToPixels);
+    int width = (int)((x2 - x1) * MetersToPixels);
+
+    Lgr->reload_default_textures(*Level, width);
+
+    pic8 level_pic(width, height);
+
+    // Draw the background
+    CanvasBack->render(true, &level_pic, bottomleft_corner, 0, 0, width - 1, height - 1);
+
+    // Draw the objects
+    int corner_x;
+    int corner_y;
+    CanvasBack->meters_to_pixels(bottomleft_corner, &corner_x, &corner_y);
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        object* obj = Level->objects[i];
+        if (!obj) {
+            break;
+        }
+
+        if (obj->type == object::Type::Start) {
+            continue;
+        }
+
+        pic8* obj_frame = nullptr;
+        switch (obj->type) {
+        case object::Type::Food:
+            obj_frame = Lgr->food[obj->animation % Lgr->food_count]->get_frame_by_index(0);
+            break;
+        case object::Type::Exit:
+            obj_frame = Lgr->exit->get_frame_by_index(0);
+            break;
+        case object::Type::Killer:
+            obj_frame = Lgr->killer->get_frame_by_index(0);
+            break;
+        default:
+            internal_error("render_view invalid object type");
+        }
+
+        blit8(&level_pic, obj_frame, obj->canvas_x - corner_x, obj->canvas_y - corner_y);
+
+        if (EolSettings->show_gravity_arrows() && obj->type == object::Type::Food &&
+            obj->property != object::Property::None) {
+            draw_gravity_arrow(&level_pic, obj->canvas_x - corner_x, obj->canvas_y - corner_y,
+                               obj->property);
+        }
+    }
+
+    // Draw the foreground
+    if (!EolSettings->pictures_in_background()) {
+        CanvasFront->render(true, &level_pic, bottomleft_corner, 0, 0, width - 1, height - 1);
+    }
+
+    level_pic.vertical_flip();
+    level_pic.save(filename, Lgr->palette_data);
+}

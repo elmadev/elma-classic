@@ -79,6 +79,7 @@ elma_sources = files(
     'src/platform/text_input.cpp',
     'src/platform/utils.cpp',
     'src/renderer/affine.cpp',
+    'src/renderer/bike.cpp',
     'src/renderer/canvas.cpp',
     'src/renderer/grass.cpp',
     'src/renderer/object_overlay.cpp',

@@ -2,6 +2,7 @@
 #define RENDER_H
 
 #include "physics/init.h"
+#include "pic/lgr.h"
 
 class pic8;
 struct bike_metadata;
@@ -30,5 +31,7 @@ extern int MinimapDx;
 
 void render_minimap(bool player1, pic8* pic, double camera_turn_phase, vect2 bike_center,
                     motorst* other_motor);
+void render_bike(pic8* pic, bool has_flag, vect2 bottomleft_corner, const motorst* mot,
+                 const bike_metadata* metadata, const bike_pics* bike, const pic8* shirt);
 
 #endif

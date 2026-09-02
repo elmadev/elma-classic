@@ -185,10 +185,10 @@ void lgrfile::chop_bike(pic8* bike, bike_pics* bp) {
     bike_slice(bike, &bp->bike_part4, &BikeBox4);
 }
 
-// Tile a texture horizontally to fit SCREEN_WIDTH.
-static pic8* generate_default_texture(texture* text) {
+// Tile a texture horizontally to fit width.
+static pic8* generate_default_texture(texture* text, int width) {
     int original_width = text->original_width;
-    int tiles = (SCREEN_WIDTH + original_width - 1) / original_width + 1;
+    int tiles = (width + original_width - 1) / original_width + 1;
 
     pic8* tiled = new pic8(original_width * tiles, text->pic->get_height());
     for (int i = 0; i < tiles; i++) {
@@ -1171,7 +1171,7 @@ void lgrfile::sanitize_default_texture_names(char* fg_name, char* bg_name) {
     }
 }
 
-void lgrfile::reload_default_textures(level& lev, bool force) {
+void lgrfile::reload_default_textures(level& lev, int width) {
     char level_foreground_name[10] = {};
     char level_background_name[10] = {};
     if (EolSettings->default_ground()) {
@@ -1187,7 +1187,8 @@ void lgrfile::reload_default_textures(level& lev, bool force) {
     sanitize_default_texture_names(level_foreground_name, level_background_name);
 
     // Recreate background texture
-    if (force || strcmpi(background_name, level_background_name) != 0) {
+    if (strcmpi(background_name, level_background_name) != 0 || !background ||
+        background->get_width() - background_original_width < width) {
         strcpy(background_name, level_background_name);
         delete background;
         background = nullptr;
@@ -1198,11 +1199,12 @@ void lgrfile::reload_default_textures(level& lev, bool force) {
         }
         texture* text = &textures[index];
         background_original_width = text->original_width;
-        background = generate_default_texture(text);
+        background = generate_default_texture(text, width);
     }
 
     // Recreate foreground texture
-    if (force || strcmpi(foreground_name, level_foreground_name) != 0) {
+    if (strcmpi(foreground_name, level_foreground_name) != 0 || !foreground ||
+        foreground->get_width() - foreground_original_width < width) {
         strcpy(foreground_name, level_foreground_name);
         delete foreground;
         foreground = nullptr;
@@ -1213,7 +1215,7 @@ void lgrfile::reload_default_textures(level& lev, bool force) {
         }
         texture* text = &textures[index];
         foreground_original_width = text->original_width;
-        foreground = generate_default_texture(text);
+        foreground = generate_default_texture(text, width);
     }
 }
 

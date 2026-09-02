@@ -5,6 +5,7 @@
 #include "main.h"
 #include "physics/init.h"
 #include "pic/lgr.h"
+#include "pic/surface.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include "renderer/canvas.h"
@@ -78,13 +79,13 @@ void eol_settings::set_pictures_in_background(bool b) {
 void eol_settings::set_default_ground(bool b) {
     default_ground_ = b;
     if (Level && Lgr) {
-        Lgr->reload_default_textures(*Level, false);
+        Lgr->reload_default_textures(*Level, SCREEN_WIDTH);
     }
 }
 void eol_settings::set_default_sky(bool b) {
     default_sky_ = b;
     if (Level && Lgr) {
-        Lgr->reload_default_textures(*Level, false);
+        Lgr->reload_default_textures(*Level, SCREEN_WIDTH);
     }
 }
 

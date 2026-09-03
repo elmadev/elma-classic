@@ -88,6 +88,12 @@ constexpr int DEFAULT_TCP_PORT = 4470;
 constexpr int DEFAULT_UDP_PORT = 4471;
 #endif
 
+#define SOMETHING_ALL_KEYS(X)                                                                      \
+    X(high_quality)                                                                                \
+    X(default_ground_sky)                                                                          \
+    X(zoom_out)                                                                                    \
+    X(zoom_in)
+
 class eol_settings {
     Clamp<int> screen_width_{640, 800, 10000};
     Clamp<int> screen_height_{480, 600, 10000};
@@ -211,13 +217,11 @@ class eol_settings {
     DECLARE_SETTING(screen_width);
     DECLARE_SETTING(screen_height);
 
-    DECLARE_SETTING(high_quality_key);
+#define DECLARE_KEY_SETTING(X) DECLARE_SETTING(X##_key)
+    SOMETHING_ALL_KEYS(DECLARE_KEY_SETTING);
     DECLARE_SETTING_CUSTOM(pictures_in_background);
     DECLARE_SETTING_CUSTOM(default_ground);
     DECLARE_SETTING_CUSTOM(default_sky);
-    DECLARE_SETTING(default_ground_sky_key);
-    DECLARE_SETTING(zoom_out_key);
-    DECLARE_SETTING(zoom_in_key);
 
     DECLARE_SETTING(center_camera);
     DECLARE_SETTING(center_map);

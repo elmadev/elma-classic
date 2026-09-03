@@ -518,10 +518,9 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->keys2.one_frame_brake = EolSettings->one_frame_brake_key_player_b();
 
     s->key_escape_alias = EolSettings->escape_alias_key();
-    s->key_high_quality = EolSettings->high_quality_key();
-    s->key_default_ground_sky = EolSettings->default_ground_sky_key();
-    s->key_zoom_out = EolSettings->zoom_out_key();
-    s->key_zoom_in = EolSettings->zoom_in_key();
+
+#define STATE_SYNC(X) s->key_##X = EolSettings->X##_key();
+    SOMETHING_ALL_KEYS(STATE_SYNC);
 
     s->key_replay_fast_2x = EolSettings->replay_fast_2x_key();
     s->key_replay_fast_4x = EolSettings->replay_fast_4x_key();

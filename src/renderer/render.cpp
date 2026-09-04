@@ -372,7 +372,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
 
 static void handle_screenshot(pic8* pic) {
     if (VideoRecordingMode) {
-        std::string filename = std::format("snp{:05}.pcx", VideoFrameIndex);
+        std::string filename = std::format("snp{:05}.bmp", VideoFrameIndex);
         std::filesystem::path path = std::filesystem::path(VideoOutputDirectory) / filename;
         pic->vertical_flip();
         pic->save(path.string().c_str(), Lgr->palette_data);

@@ -130,7 +130,12 @@ endif
 gl_dep = dependency('gl', required: true)
 
 libcurl_dep = dependency('libcurl',
-    static: build_machine.system() == 'windows'
+    static: build_machine.system() == 'windows',
+    default_options: {
+        'tests': 'disabled',
+        'unittests': 'disabled',
+        'tool': 'disabled',
+    }
 )
 
 nlohmann_json_dep = dependency('nlohmann_json')

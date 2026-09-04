@@ -48,6 +48,7 @@ std::pair<int, int> platform_get_desktop_resolution();
 void platform_resize_window(int width, int height);
 void platform_recreate_window();
 bool has_window();
+std::string screenshot_filename();
 bool platform_save_screenshot();
 
 #endif

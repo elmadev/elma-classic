@@ -380,9 +380,13 @@ static void handle_screenshot(pic8* pic) {
         return;
     }
 
-    if (ScreenshotRequested) {
-        ScreenshotRequested = false;
+    if (ScreenshotRequested == ScreenshotType::Screen) {
+        ScreenshotRequested = ScreenshotType::None;
         platform_save_screenshot();
+    }
+    if (ScreenshotRequested == ScreenshotType::EntireLevel) {
+        ScreenshotRequested = ScreenshotType::None;
+        level_to_bmp(screenshot_filename().c_str());
     }
 }
 

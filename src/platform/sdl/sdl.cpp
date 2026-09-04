@@ -523,16 +523,18 @@ void init_sound() {
     SDL_PauseAudioDevice(SDLAudioDevice, 0);
 }
 
+std::string screenshot_filename() {
+    std::filesystem::create_directories("screenshots");
+
+    auto now = std::chrono::system_clock::now();
+    auto time = std::chrono::floor<std::chrono::seconds>(now);
+    return std::format("screenshots/{:%Y-%m-%d_%H-%M-%S}.bmp", time);
+}
+
 bool platform_save_screenshot() {
     if (!SDLSurfacePaletted) {
         return false;
     }
 
-    std::filesystem::create_directories("screenshots");
-
-    auto now = std::chrono::system_clock::now();
-    auto time = std::chrono::floor<std::chrono::seconds>(now);
-    std::string filename = std::format("screenshots/{:%Y-%m-%d_%H-%M-%S}.bmp", time);
-
-    return SDL_SaveBMP(SDLSurfacePaletted, filename.c_str()) == 0;
+    return SDL_SaveBMP(SDLSurfacePaletted, screenshot_filename().c_str()) == 0;
 }

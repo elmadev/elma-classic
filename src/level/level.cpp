@@ -19,6 +19,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <filesystem>
 #include <limits>
 #include <optional>
 
@@ -578,6 +579,27 @@ static bool write_encrypted(void* buffer, int length, FILE* h) {
     return true;
 }
 
+static std::optional<std::filesystem::file_time_type> get_file_last_write_time(const char* path) {
+    namespace fs = std::filesystem;
+
+    std::error_code error;
+    fs::file_time_type timestamp = fs::last_write_time(path, error);
+    if (error) {
+        return std::nullopt;
+    }
+    return timestamp;
+}
+
+static std::filesystem::file_time_type get_file_last_write_time_or_error(const char* path) {
+    namespace fs = std::filesystem;
+
+    std::optional<fs::file_time_type> timestamp = get_file_last_write_time(path);
+    if (!timestamp.has_value()) {
+        external_error(std::string("Could not read file last write time: ") + path);
+    }
+    return *timestamp;
+}
+
 void level::from_file(const char* filename, bool internal) {
     objects_flipped = false;
     topology_errors = false;
@@ -599,6 +621,7 @@ void level::from_file(const char* filename, bool internal) {
     } else {
         filepath path;
         sprintf(path, "lev/%s", filename);
+        file_last_write_time = get_file_last_write_time_or_error(path);
         h = fopen(path, "rb");
     }
 
@@ -979,6 +1002,15 @@ void level::save(const char* filename, bool skip_topology) {
     }
 }
 
+bool level::file_has_changed(const char* filename) const {
+    namespace fs = std::filesystem;
+
+    filepath path;
+    sprintf(path, "lev/%s", filename);
+    std::optional<fs::file_time_type> timestamp = get_file_last_write_time(path);
+    return !timestamp.has_value() || *timestamp != file_last_write_time;
+}
+
 // Update top ten of an external level
 void level::save_topten(const char* filename) {
     if (topten_file_offset < 6) {
@@ -1012,6 +1044,7 @@ void level::save_topten(const char* filename) {
     }
 
     fclose(h);
+    file_last_write_time = get_file_last_write_time_or_error(path);
 }
 
 void level::get_boundaries(double* x1, double* y1, double* x2, double* y2,

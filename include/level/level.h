@@ -3,6 +3,7 @@
 
 #include "game/state.h"
 #include "vect2.h"
+#include <filesystem>
 #include <optional>
 
 class lgrfile;
@@ -22,6 +23,7 @@ constexpr int LEVEL_NAME_LENGTH_OLD = 14;
 class level {
     double checksum();
     void from_file(const char* filename, bool internal);
+    std::filesystem::file_time_type file_last_write_time;
 
   public:
     int level_id;
@@ -61,6 +63,7 @@ class level {
                             object** obj, sprite** spr);
 
     void save(const char* filename, bool skip_topology = false);
+    bool file_has_changed(const char* filename) const;
     // Update top ten of an external level
     void save_topten(const char* filename);
     // Render the level in the internal editor.

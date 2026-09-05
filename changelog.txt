@@ -19,6 +19,7 @@
 * Large masks and pictures no longer crash, especially at high zoom
 * Going out-of-bounds kills the player instead of crashing
 * More than 200 apples can be collected in one frame
+* Driving a top ten time no longer corrupts the level file if it was modified after loading
 
 ## Minor Features
 

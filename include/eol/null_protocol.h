@@ -1,6 +1,8 @@
 #ifndef NULL_PROTOCOL_H
 #define NULL_PROTOCOL_H
 
+#include <cstdint>
+
 class eol;
 
 class null_protocol {
@@ -14,6 +16,7 @@ class null_protocol {
     template <typename T> void send(const T&) {}
     bool in_battle_level() const { return false; }
     bool playing_battle_level() const { return false; }
+    uint32_t battle_id() const { return 0; }
 };
 
 #endif

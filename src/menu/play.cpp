@@ -7,6 +7,7 @@
 #include "level/level.h"
 #include "main.h"
 #include "menu/best_times.h"
+#include "menu/dialog.h"
 #include "menu/external.h"
 #include "menu/nav.h"
 #include "menu/pic.h"
@@ -150,6 +151,12 @@ void update_top_ten(int time, char* time_message, int internal_index,
 
     // Not in top ten?
     if (tten->times_count == MAX_TIMES && tten->times[MAX_TIMES - 1] < time) {
+        return;
+    }
+
+    if (external_level && Level->file_has_changed(external_filename)) {
+        menu_dialog("The level file has changed", "after it was loaded!",
+                    "The time was not saved.");
         return;
     }
 

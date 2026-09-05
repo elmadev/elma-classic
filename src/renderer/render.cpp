@@ -7,6 +7,7 @@
 #include "game/driver.h"
 #include "game/fps.h"
 #include "game/game.h"
+#include "game/level_load.h"
 #include "level/level.h"
 #include "level/object.h"
 #include "main.h"
@@ -856,6 +857,10 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
                 info_rows.push_back({"UPS", fps::format_ups()});
             }
         }
+    }
+
+    if (loop == GameLoop::Replay && EolSettings->show_lev_name_in_rec()) {
+        info_rows.push_back({"level", current_level_filename()});
     }
 
     // Apple count/time

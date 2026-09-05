@@ -157,6 +157,7 @@ class eol_settings {
     Default<bool> fancyboost_{true};
 
     Default<bool> show_last_apple_time_{true};
+    Default<bool> show_lev_name_in_rec_{false};
     Default<bool> show_gravity_arrows_{true};
 
     Default<bool> show_fps_{false};
@@ -276,6 +277,7 @@ class eol_settings {
     DECLARE_SETTING_CUSTOM(fancyboost);
 
     DECLARE_SETTING(show_last_apple_time);
+    DECLARE_SETTING(show_lev_name_in_rec);
     DECLARE_SETTING(show_gravity_arrows);
 
     DECLARE_SETTING(show_fps);

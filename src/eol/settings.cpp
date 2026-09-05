@@ -415,6 +415,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(fancyboost)                                                                         \
                                                                                                    \
     JSON_FIELD(show_last_apple_time)                                                               \
+    JSON_FIELD(show_lev_name_in_rec)                                                               \
     JSON_FIELD(show_gravity_arrows)                                                                \
                                                                                                    \
     JSON_FIELD(show_fps)                                                                           \

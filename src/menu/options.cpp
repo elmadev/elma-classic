@@ -434,6 +434,7 @@ void menu_options() {
         BOOL_OPTION("Fancyboost LGRs:", fancyboost);
 
         BOOL_OPTION("Show Apple Time:", show_last_apple_time);
+        BOOL_OPTION("Show Lev Name In Rec:", show_lev_name_in_rec);
         BOOL_OPTION("Gravity Arrows:", show_gravity_arrows);
 
         BOOL_OPTION("Show FPS:", show_fps);

@@ -875,6 +875,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 static void reverse_events(driver& driv, double time) {
     motorst* mot = driv.mot;
     recorder* rec = driv.rec;
+    driv.dead = false;
 
     while (std::optional<event> ev = rec->recall_event_reverse(time)) {
         if (ev->object_id < 0) {

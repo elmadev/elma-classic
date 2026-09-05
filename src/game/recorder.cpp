@@ -390,6 +390,7 @@ MotorGravity recorder::last_gravity(const level& lev) const {
 }
 
 std::optional<event> recorder::recall_event_reverse(double time) {
+    finished = false;
     if (current_event_index > 0 && events[current_event_index - 1].time > time) {
         return events[--current_event_index];
     }

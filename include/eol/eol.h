@@ -27,6 +27,8 @@ class eol {
     void tick() { proto.tick(); }
     void reset();
 
+    const char* short_nick() { return short_nick_; }
+
     bool play_offline() const { return proto.play_offline(); }
 
     void process(const login&);
@@ -140,6 +142,7 @@ class eol {
     protocol proto;
     unsigned int id;
     unsigned int id2;
+    char short_nick_[4] = {};
     std::vector<kuski> kuskis_;
     std::optional<battle> current_battle;
     apple_battle_progress online_apple_battle;

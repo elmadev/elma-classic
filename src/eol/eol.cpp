@@ -86,6 +86,19 @@ void eol::reset() {
     spy_kuski_id.reset();
 }
 
+static void set_short_nick(const std::string& nick, char* short_nick) {
+    size_t j = 0;
+    for (char c : nick) {
+        if (std::isalnum(static_cast<unsigned char>(c))) {
+            short_nick[j++] = c;
+            short_nick[j] = 0;
+            if (j == 3) {
+                break;
+            }
+        }
+    }
+}
+
 void eol::process(const login& l) {
     if (l.success) {
         if (id != l.id || id2 != l.id2) {
@@ -95,7 +108,9 @@ void eol::process(const login& l) {
 
             kuski self{};
             self.id = id;
-            strncpy(self.nick, EolSettings->nick().c_str(), sizeof(self.nick) - 1);
+            std::string nick = EolSettings->nick();
+            set_short_nick(nick, short_nick_);
+            strncpy(self.nick, nick.c_str(), sizeof(self.nick) - 1);
             self.is_player = true;
             self.is_online = true;
             process(new_kuski{self});

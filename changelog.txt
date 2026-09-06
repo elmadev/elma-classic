@@ -12,7 +12,7 @@
 * Steam elma.res and Steam LGR13 files are supported
 
 ## Major Bug Fixes
-* Rewinding in replays correctly shows arm position and restores apples
+* Rewinding replays now correctly reverses apples, arm animations and deaths
 * Wide grass polygons are properly rendered at high zoom (Uphill Battle grass bug)
 * Bike wheels no longer increase in size by 2.5% while turning
 * Wheels no longer spin the wrong way at max speed in replays - the wheel used to spin the wrong way at a speed of 124 (max gas speed is 220) - the glitch now only occurs above a speed of 455

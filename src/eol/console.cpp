@@ -277,6 +277,16 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(show_speedometer);
     register_alias("speedometer", "show_speedometer");
     register_alias("speed", "show_speedometer");
+
+    // Handled server-side, forward as chat
+    auto register_server_command = [this](std::string_view name) {
+        register_command(name, [name = std::string(name)](std::string_view args) {
+            EolClient->send_chat(args.empty() ? std::format("!{}", name)
+                                              : std::format("!{} {}", name, args));
+        });
+    };
+    register_server_command("abort");
+    register_server_command("stop");
 }
 
 void console::add_line(std::string text, LineType type) {

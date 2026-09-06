@@ -125,16 +125,17 @@ bool recorder::recall_frame(motorst* mot, double time, bike_sound* sound) {
     index1 = std::max(index1, 0);
     index2 = std::max(index2, 0);
 
-    if (finished) {
-        sound->motor_frequency = 1.0;
-        sound->gas = 0;
-        sound->friction_volume = 0;
-        return false;
-    }
-
     if (index1 >= frame_count_ - 1) {
+        if (finished) {
+            sound->motor_frequency = 1.0;
+            sound->gas = 0;
+            sound->friction_volume = 0;
+            return false;
+        }
         index1 = frame_count_ - 1;
         finished = true;
+    } else {
+        finished = false;
     }
     index2 = std::min(index2, frame_count_ - 1);
 

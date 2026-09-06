@@ -206,6 +206,7 @@ class eol_settings {
   public:
     static void read_settings();
     static void write_settings();
+    void persist_all();
     static void sync_controls_to_state(state* s);
     static void sync_controls_from_state(state* s);
 

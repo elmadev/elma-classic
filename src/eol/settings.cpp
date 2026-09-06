@@ -469,6 +469,10 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
 FIELD_LIST
 #undef JSON_FIELD
 
+#define JSON_FIELD(name) name##_.mark_persisted();
+void eol_settings::persist_all() { FIELD_LIST; }
+#undef JSON_FIELD
+
 #define JSON_FIELD(name) {#name, s.name##_persisted()},
 void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
 #undef JSON_FIELD

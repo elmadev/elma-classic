@@ -277,6 +277,12 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(show_speedometer);
     register_alias("speedometer", "show_speedometer");
     register_alias("speed", "show_speedometer");
+
+    register_command("persist", [](std::string_view) {
+        EolSettings->persist_all();
+        eol_settings::write_settings();
+        StatusMessages->add("settings saved");
+    });
 }
 
 void console::add_line(std::string text, LineType type) {

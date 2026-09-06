@@ -37,9 +37,9 @@ int main() {
 
     SCREEN_WIDTH = EolSettings->screen_width();
     SCREEN_HEIGHT = EolSettings->screen_height();
-    editor_canvas_update_resolution();
 
     platform_init();
+    editor_canvas_update_resolution();
 
     EolClient = new eol();
     EolClient->connect();

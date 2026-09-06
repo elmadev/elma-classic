@@ -5,6 +5,7 @@
 #include "main.h"
 #include "physics/init.h"
 #include "pic/lgr.h"
+#include "pic/surface.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include "renderer/canvas.h"
@@ -105,8 +106,8 @@ void eol_settings::set_fullscreen(FullscreenMode f) {
     }
 
     fullscreen_ = f;
-    if (has_window()) {
-        platform_apply_fullscreen_mode();
+    if (has_window() && platform_apply_fullscreen_mode()) {
+        on_resolution_change();
     }
 }
 

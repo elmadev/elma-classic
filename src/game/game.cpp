@@ -951,6 +951,20 @@ static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
     return alive;
 }
 
+static void sync_replay_death(driver& driv, bool finished, bool is_motor1) {
+    if (driv.dead == finished) {
+        return;
+    }
+
+    driv.dead = finished;
+
+    if (finished) {
+        stop_motor_sound(is_motor1);
+    } else {
+        start_motor_sound(is_motor1);
+    }
+}
+
 static bool PreviousReplayDrawView1 = true;
 static bool PreviousReplayDrawView2 = true;
 
@@ -1085,14 +1099,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         // Death (or finish)
         if (!Single) {
-            if (!driv1.dead && finished1) {
-                stop_motor_sound(true);
-                driv1.dead = true;
-            }
-            if (!driv2.dead && finished2) {
-                stop_motor_sound(false);
-                driv2.dead = true;
-            }
+            sync_replay_death(driv1, finished1, true);
+            sync_replay_death(driv2, finished2, false);
 
             // Update flagtag time
             flagtag_replay(time);

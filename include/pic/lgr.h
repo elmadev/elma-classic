@@ -125,7 +125,7 @@ class lgrfile {
     int foreground_original_width;
     char foreground_name[10];
     char background_name[10];
-    void reload_default_textures(level& lev, bool force);
+    void reload_default_textures(level& lev, int width);
 
     // From QCOLORS.pcx
     unsigned char minimap_foreground_palette_id;

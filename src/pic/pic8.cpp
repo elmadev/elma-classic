@@ -143,15 +143,21 @@ pic8* pic8::clone() {
     return copy;
 }
 
-bool pic8::save(const char* filename, unsigned char* pal, FILE* h) {
+void pic8::save(const char* filename, const unsigned char* pal, FILE* h) {
     int i = strlen(filename) - 1;
     while (i >= 0) {
         if (filename[i] == '.') {
             if (strcmpi(filename + i, ".spr") == 0) {
-                return spr_save(filename, h);
+                spr_save(filename, h);
+                return;
             }
             if (strcmpi(filename + i, ".pcx") == 0) {
-                return pcx_save(filename, pal);
+                pcx_save(filename, pal);
+                return;
+            }
+            if (strcmpi(filename + i, ".bmp") == 0) {
+                bmp_save(filename, pal);
+                return;
             }
             internal_error(std::string("pic8::save unknown file extension: ") + filename);
         }
@@ -291,10 +297,9 @@ void pic8::spr_open(const char* filename, FILE* h) {
     }
 }
 
-bool pic8::spr_save(const char* filename, FILE* h) {
+void pic8::spr_save(const char* filename, FILE* h) {
     if (width > SHRT_MAX || height > SHRT_MAX) {
         external_error(std::string("Image is too large to be saved as .spr format!") + filename);
-        return false;
     }
 
     bool h_provided = true;
@@ -321,7 +326,6 @@ bool pic8::spr_save(const char* filename, FILE* h) {
     if (!h_provided) {
         fclose(h);
     }
-    return true;
 }
 
 struct pcxdescriptor {
@@ -407,10 +411,9 @@ static int pcx_count_repeats(pic8* ppic, int x, int y, int width) {
 
 // Strictly respects pcx convention: Only compresses palette IDs 0-63 instead of 0-191
 // Does not enforce the width to be an even number however
-bool pic8::pcx_save(const char* filename, unsigned char* pal) {
+void pic8::pcx_save(const char* filename, const unsigned char* pal) {
     if (width > SHRT_MAX || height > SHRT_MAX) {
         external_error(std::string("Image is too large to be saved as .pcx format!") + filename);
-        return false;
     }
 
     FILE* h = fopen(filename, "wb");
@@ -498,7 +501,6 @@ bool pic8::pcx_save(const char* filename, unsigned char* pal) {
         }
     }
     fclose(h);
-    return true;
 }
 
 constexpr short BMP_MAGIC = 0x4D42;
@@ -579,6 +581,76 @@ pic8* pic8::from_bmp(const char* filename) {
     delete[] pixels;
 
     return pic;
+}
+
+void pic8::bmp_save(const char* filename, const unsigned char* pal) {
+    ELMA_ASSERT(pal);
+
+    FILE* h = fopen(filename, "wb");
+    if (!h) {
+        external_error(std::string("bmp_save failed to open file: ") + filename);
+    }
+
+    const std::string error_message = std::string("bmp_save failed to write to file: ") + filename;
+    constexpr int color_table_size = 256 * 4;
+
+    int padding = 0;
+    int padded_width = width;
+    if (width % 4) {
+        padding = 4 - width % 4;
+        padded_width += padding;
+    }
+
+    // BITMAPFILEHEADER
+    constexpr short magic = BMP_MAGIC;
+    if (fwrite(&magic, sizeof(magic), 1, h) != 1) {
+        external_error(error_message);
+    }
+    bmp_header header;
+    header.size = sizeof(magic) + BMP_HEADER_SIZE + color_table_size + padded_width * height;
+    header.reserved = 0;
+    header.offset = sizeof(magic) + BMP_HEADER_SIZE + color_table_size;
+
+    // BITMAPINFOHEADER
+    header.dib_size = BMP_HEADER_SIZE - offsetof(bmp_header, dib_size);
+    header.width = width;
+    header.height = height;
+    header.planes = 1;
+    header.bpp = 8;
+    header.compression = 0; // None
+    header.image_size = padded_width * height;
+    header.x_pixels_per_meter = 0;
+    header.y_pixels_per_meter = 0;
+    header.num_colors = 256;
+    header.num_important_colors = 0;
+    if (fwrite(&header, sizeof(header), 1, h) != 1) {
+        external_error(error_message);
+    }
+
+    // Color Table (RGBQUAD[256])
+    unsigned char rgbquads[color_table_size];
+    for (int i = 0; i < 256; ++i) {
+        rgbquads[4 * i + 0] = pal[3 * i + 2];
+        rgbquads[4 * i + 1] = pal[3 * i + 1];
+        rgbquads[4 * i + 2] = pal[3 * i + 0];
+        rgbquads[4 * i + 3] = 0;
+    }
+    if (fwrite(rgbquads, color_table_size, 1, h) != 1) {
+        external_error(error_message);
+    }
+
+    // Pixels, bottom-to-top
+    unsigned char padding_bytes[4] = {0, 0, 0, 0};
+    for (int i = height - 1; i >= 0; i--) {
+        if (fwrite(get_row(i), width, 1, h) != 1) {
+            external_error(error_message);
+        }
+        if (fwrite(padding_bytes, 1, padding, h) != padding) {
+            external_error(error_message);
+        }
+    }
+
+    fclose(h);
 }
 
 // Paste source (x1, y1, x2, y2) into dest at (x, y)

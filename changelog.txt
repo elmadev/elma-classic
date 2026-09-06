@@ -44,6 +44,7 @@
 ### Console and Shortcuts
 * Ctrl+G: toggle "ground"/"sky" foreground/background textures
 * Ctrl+H: toggle Video Detail (high quality textures)
+* Ctrl+S: save entire level to .bmp file
 
 ### System
 * lev/ and rec/ folders no longer have a maximum file limit

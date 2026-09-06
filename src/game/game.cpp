@@ -33,7 +33,7 @@ int Single = 1;
 int FlagTag = 0;
 bool OutOfBounds = false;
 
-bool ScreenshotRequested = false;
+ScreenshotType ScreenshotRequested = ScreenshotType::None;
 bool VideoRecordingMode = false;
 int VideoFrameIndex = 0;
 std::string VideoOutputDirectory;
@@ -847,7 +847,10 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             decrease_view_size();
         }
         if (was_game_key_just_pressed(State->key_screenshot)) {
-            ScreenshotRequested = true;
+            ScreenshotRequested = ScreenshotType::Screen;
+        }
+        if (was_game_key_just_pressed(State->key_screenshot_level)) {
+            ScreenshotRequested = ScreenshotType::EntireLevel;
         }
 
         handle_eol_inputs();
@@ -1116,7 +1119,10 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             decrease_view_size();
         }
         if (was_game_key_just_pressed(State->key_screenshot)) {
-            ScreenshotRequested = true;
+            ScreenshotRequested = ScreenshotType::Screen;
+        }
+        if (was_game_key_just_pressed(State->key_screenshot_level)) {
+            ScreenshotRequested = ScreenshotType::EntireLevel;
         }
 
         handle_eol_inputs();

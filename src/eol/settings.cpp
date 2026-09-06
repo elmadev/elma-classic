@@ -5,6 +5,7 @@
 #include "main.h"
 #include "physics/init.h"
 #include "pic/lgr.h"
+#include "pic/surface.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include "renderer/canvas.h"
@@ -78,13 +79,13 @@ void eol_settings::set_pictures_in_background(bool b) {
 void eol_settings::set_default_ground(bool b) {
     default_ground_ = b;
     if (Level && Lgr) {
-        Lgr->reload_default_textures(*Level, false);
+        Lgr->reload_default_textures(*Level, SCREEN_WIDTH);
     }
 }
 void eol_settings::set_default_sky(bool b) {
     default_sky_ = b;
     if (Level && Lgr) {
-        Lgr->reload_default_textures(*Level, false);
+        Lgr->reload_default_textures(*Level, SCREEN_WIDTH);
     }
 }
 
@@ -357,6 +358,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(default_ground_sky_key)                                                             \
     JSON_FIELD(zoom_out_key)                                                                       \
     JSON_FIELD(zoom_in_key)                                                                        \
+    JSON_FIELD(screenshot_level_key)                                                               \
                                                                                                    \
     JSON_FIELD(center_camera)                                                                      \
     JSON_FIELD(center_map)                                                                         \
@@ -523,6 +525,7 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->key_default_ground_sky = EolSettings->default_ground_sky_key();
     s->key_zoom_out = EolSettings->zoom_out_key();
     s->key_zoom_in = EolSettings->zoom_in_key();
+    s->key_screenshot_level = EolSettings->screenshot_level_key();
 
     s->key_replay_fast_2x = EolSettings->replay_fast_2x_key();
     s->key_replay_fast_4x = EolSettings->replay_fast_4x_key();
@@ -575,6 +578,7 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_default_ground_sky_key(s->key_default_ground_sky);
     EolSettings->persist_zoom_out_key(s->key_zoom_out);
     EolSettings->persist_zoom_in_key(s->key_zoom_in);
+    EolSettings->persist_screenshot_level_key(s->key_screenshot_level);
 
     EolSettings->persist_replay_fast_2x_key(s->key_replay_fast_2x);
     EolSettings->persist_replay_fast_4x_key(s->key_replay_fast_4x);

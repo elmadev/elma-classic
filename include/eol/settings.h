@@ -99,6 +99,7 @@ class eol_settings {
     Default<combo_scancode> default_ground_sky_key_{combo_scancode{DIK_LCONTROL, DIK_G}};
     Default<combo_scancode> zoom_out_key_{combo_scancode{DIK_NONE, DIK_SUBTRACT}};
     Default<combo_scancode> zoom_in_key_{combo_scancode{DIK_NONE, DIK_ADD}};
+    Default<combo_scancode> screenshot_level_key_{combo_scancode{DIK_LCONTROL, DIK_S}};
 
     Default<bool> center_camera_{false};
     Default<bool> center_map_{false};
@@ -219,6 +220,7 @@ class eol_settings {
     DECLARE_SETTING(default_ground_sky_key);
     DECLARE_SETTING(zoom_out_key);
     DECLARE_SETTING(zoom_in_key);
+    DECLARE_SETTING(screenshot_level_key);
 
     DECLARE_SETTING(center_camera);
     DECLARE_SETTING(center_map);

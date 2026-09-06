@@ -8,7 +8,12 @@ extern int Single;
 extern int FlagTag;
 extern bool OutOfBounds;
 
-extern bool ScreenshotRequested;
+enum class ScreenshotType {
+    None,
+    Screen,
+    EntireLevel,
+};
+extern ScreenshotType ScreenshotRequested;
 extern bool VideoRecordingMode;
 extern int VideoFrameIndex;
 extern std::string VideoOutputDirectory;

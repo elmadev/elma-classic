@@ -1,4 +1,5 @@
 #include "pic/lgr.h"
+#include "api/api.h"
 #include "debug/profiler.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
@@ -103,19 +104,28 @@ static bool lgr_exists(const char* lgr_name, const char* backup_lgr) {
     if (!InEditor) {
         EditorPalette->set();
     }
-    char backup_text[100];
-    sprintf(backup_text, "This file doesn't exist in the LGR directory, so %s will be loaded.",
-            backup_lgr);
-    dialog("LGR file not found!",
-           "The level file uses the pictures that are stored in this LGR file:", filename,
-           backup_text,
-           "This level file will look now different from that it was designed to look.");
+    char text1[100];
+    sprintf(text1, "Try to download %s.lgr from the web?", lgr_name);
+    char text2[100];
+    sprintf(text2, "Otherwise, %s will be loaded.", backup_lgr);
+    int choice = dialog("LGR file not found!", text1, text2, DIALOG_BUTTONS, "Download", "Skip");
+    bool exists = false;
+    if (choice == 0) {
+        dialog("Downloading...", DIALOG_BUTTONS, DIALOG_RETURN);
+        std::optional<std::string> error = eol_api::lgr_get(lgr_name);
+        if (error) {
+            char error_title[100];
+            sprintf(error_title, "Failed to download %s.lgr", lgr_name);
+            dialog(error_title, error.value().c_str());
+        }
+        exists = lgr_exists(lgr_name, nullptr);
+    }
     if (!InEditor) {
         MenuPalette->set();
         blit8(BufferMain, BufferBall);
         blit_to_screen(BufferMain);
     }
-    return false;
+    return exists;
 }
 
 bool lgrfile::try_load_lgr(const char* name, const char* desc) {

@@ -10,7 +10,13 @@ if get_option('profile_performance') == true
     add_project_arguments('-DPROFILE_PERFORMANCE', language: 'cpp')
 endif
 
+if get_option('curl_verbose') == true
+    add_project_arguments('-DCURL_VERBOSE', language: 'cpp')
+endif
+
 elma_sources = files(
+    'src/api/api.cpp',
+    'src/api/curl_wrapper.cpp',
     'src/debug/profiler.cpp',
     'src/editor/canvas.cpp',
     'src/editor/dialog.cpp',
@@ -121,6 +127,19 @@ else
     cpp_args += ['-Wno-deprecated-declarations', '-Wunreachable-code']
 endif
 
+gl_dep = dependency('gl', required: true)
+
+libcurl_dep = dependency('libcurl',
+    static: build_machine.system() == 'windows',
+    default_options: {
+        'tests': 'disabled',
+        'unittests': 'disabled',
+        'tool': 'disabled',
+    }
+)
+
+nlohmann_json_dep = dependency('nlohmann_json')
+
 sdl2_dep = dependency('sdl2',
     static: build_machine.system() == 'windows' or get_option('static_sdl'),
     default_options: {
@@ -129,11 +148,7 @@ sdl2_dep = dependency('sdl2',
     }
 )
 
-gl_dep = dependency('gl', required: true)
-
-nlohmann_json_dep = dependency('nlohmann_json')
-
-deps += [nlohmann_json_dep, gl_dep, sdl2_dep]
+deps += [gl_dep, libcurl_dep, nlohmann_json_dep, sdl2_dep]
 
 executable(
     'elma',

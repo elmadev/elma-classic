@@ -1,4 +1,6 @@
 .vscode
+.zed
+.clangd
 .DS_Store
 /subprojects/*
 !/subprojects/*.wrap

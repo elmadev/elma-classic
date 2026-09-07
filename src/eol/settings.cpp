@@ -514,7 +514,7 @@ void eol_settings::read_overrides(const std::string& file) {
 }
 
 void eol_settings::write_settings() {
-    std::ofstream o("settings.json");
+    std::ofstream o(SETTINGS_JSON);
     json j = *EolSettings;
     o << std::setw(4) << j << std::endl;
 }

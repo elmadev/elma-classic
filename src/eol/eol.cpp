@@ -569,14 +569,7 @@ void eol::render_table(pic8& dest, abc8& title_font, abc8& data_font) const {
     cur_table->render(dest, title_font, data_font, EolSettings->table_alignment(), reserved_lines);
 }
 
-const kuski* eol::spy_kuski() {
-    if (!spy_kuski_id) {
-        return nullptr;
-    }
-
-    const kuski* k = get_kuski(kuskis_, *spy_kuski_id);
-    return k->spy_data() ? k : nullptr;
-}
+const kuski* eol::spy_kuski() { return spy_kuski_id ? get_kuski(kuskis_, *spy_kuski_id) : nullptr; }
 
 template <typename Range>
 static void set_spy_kuski(std::optional<unsigned int>& spy_kuski_id, Range&& range) {

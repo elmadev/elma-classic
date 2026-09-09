@@ -659,15 +659,13 @@ static void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows
 static void render_view(bool player1, bool bottom_player, pic8* pic, double time, driver& driv,
                         driver& other_driv, camera& current_camera, GameLoop loop) {
     // Calculate frame of reference
-    vect2 bike_center = driv.mot->bike.r;
-    if (current_camera.mode == CameraMode::MapViewer) {
-        bike_center = vect2(current_camera.x, current_camera.y);
-    }
-
     const kuski* spy_kuski = EolClient->spy_kuski();
     const spy_data* spy_pose = spy_kuski ? spy_kuski->spy_data() : nullptr;
+    vect2 bike_center = driv.mot->bike.r;
     if (spy_pose) {
         bike_center = spy_pose->mot.bike.r;
+    } else if (!spy_kuski && current_camera.mode == CameraMode::MapViewer) {
+        bike_center = vect2(current_camera.x, current_camera.y);
     }
 
     vect2 bottomleft_corner(bike_center.x -

@@ -824,7 +824,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
             flagtag_time = player1 ? FlagTimeA : FlagTimeB;
         }
         double shown_time = time;
-        if (Single && EolClient->is_spying()) {
+        if (Single && spy_kuski) {
             shown_time = spy_pose && !EolClient->battle_hides_times()
                              ? spy_pose->time * (STOPWATCH_MULTIPLIER * STOPWATCH_TO_PHYS_TIME)
                              : 0.0;

@@ -292,6 +292,7 @@ void console::register_console_commands() {
 
     register_command("snapshot", [](std::string_view arg) {
         std::string name = "screenshots/";
+        std::filesystem::create_directory("screenshots");
         if (arg.empty()) {
             std::string_view level_filename{current_level_filename()};
             level_filename.remove_suffix(strlen(".lev"));

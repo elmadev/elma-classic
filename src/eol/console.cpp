@@ -14,8 +14,10 @@
 #include "platform/text_input.h"
 #include "platform/utils.h"
 #include "renderer/canvas.h"
+#include "renderer/render.h"
 #include "util/util.h"
 #include <charconv>
+#include <cstring>
 #include <format>
 #include <optional>
 #include <ranges>
@@ -287,6 +289,19 @@ void console::register_console_commands() {
     };
     register_server_command("abort");
     register_server_command("stop");
+
+    register_command("snapshot", [](std::string_view arg) {
+        std::string name = "screenshots/";
+        if (arg.empty()) {
+            std::string_view level_filename{current_level_filename()};
+            level_filename.remove_suffix(strlen(".lev"));
+            name.append(level_filename);
+        } else {
+            name.append(arg);
+        }
+        name.append(".bmp");
+        level_to_bmp(name.c_str());
+    });
 }
 
 void console::add_line(std::string text, LineType type) {

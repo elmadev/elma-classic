@@ -1,4 +1,5 @@
 #include "main.h"
+#include "api/api.h"
 #include "editor/canvas.h"
 #include "eol/eol.h"
 #include "eol/settings.h"
@@ -44,10 +45,15 @@ int main() {
     EolClient = new eol();
     EolClient->connect();
 
+    eol_api::init();
+
     menu_intro();
 }
 
-void quit() { exit(0); }
+void quit() {
+    eol_api::cleanup();
+    exit(0);
+}
 
 bool ErrorGraphicsLoaded = false;
 

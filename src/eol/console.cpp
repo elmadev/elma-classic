@@ -122,10 +122,6 @@ static void print_level_info(std::string_view /*text*/) {
                       console::LineType::Info);
 }
 
-#define REGISTER_SETTINGS_STR(field)                                                               \
-    register_command(#field,                                                                       \
-                     [](std::string_view text) { EolSettings->set_##field(std::string(text)); });
-
 #define REGISTER_SETTINGS_BOOL(field)                                                              \
     register_command(#field, [this](std::string_view text) {                                       \
         if (text.empty()) {                                                                        \
@@ -170,7 +166,26 @@ void console::register_console_commands() {
         StatusMessages->add(std::format("log: {}", show_log_lines ? "on" : "off"));
     });
 
-    REGISTER_SETTINGS_STR(default_lgr_name);
+    register_command("lgr", [this](std::string_view text) {
+        if (text.empty()) {
+            StatusMessages->add(std::format("Default LGR: {}", EolSettings->default_lgr_name()));
+            return;
+        }
+
+        std::string name(text);
+        if (!std::filesystem::exists(std::format("lgr/{}.lgr", name))) {
+            add_line(std::format("lgr/{}.lgr not found", name), LineType::System);
+            return;
+        }
+
+        if (strnicmp(Level->lgr_name, "default", sizeof(Level->lgr_name)) == 0) {
+            EolSettings->set_default_lgr_name(name);
+            StatusMessages->add(std::format("Default LGR: {}", name));
+        } else {
+            lgrfile::recreate_lgr_if_needed(name.c_str());
+            StatusMessages->add(std::format("Overriding level LGR: {}", name));
+        }
+    });
     REGISTER_SETTINGS_BOOL(fancyboost);
 
     REGISTER_SETTINGS_BOOL(show_last_apple_time);

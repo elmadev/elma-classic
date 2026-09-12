@@ -248,6 +248,8 @@ To use these configurations:
 
 - **meson: compile** - Build the project (set as default build task)
 - **meson: clean** - Clean build artifacts
+- **clang-tidy: all files** - Run clang-tidy on all source and header files
+- **clang-tidy: current file** - Run clang-tidy on the file open in the editor
 
 ### Debug Configurations
 

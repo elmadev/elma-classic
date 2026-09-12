@@ -25,6 +25,30 @@
             "command": "meson compile -C build --clean",
             "problemMatcher": [],
             "detail": "Clean build artifacts"
+        },
+        {
+            "label": "clang-tidy: all files",
+            "type": "shell",
+            "command": "meson test -C build --suite clang-tidy --print-errorlogs",
+            "problemMatcher": ["$gcc"],
+            "group": "test",
+            "detail": "Run clang-tidy on all source and header files",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "clang-tidy: current file",
+            "type": "shell",
+            "command": "meson test -C build --suite clang-tidy --print-errorlogs '*${fileBasename}'",
+            "problemMatcher": ["$gcc"],
+            "group": "test",
+            "detail": "Run clang-tidy on the file open in the editor",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
         }
     ]
 }

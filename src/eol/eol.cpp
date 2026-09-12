@@ -99,6 +99,10 @@ static void set_short_nick(const std::string& nick, char* short_nick) {
     }
 }
 
+std::string eol::battle_rec_name(std::string_view level_name, uint32_t battle_id) {
+    return std::format("{}_{:03d}{}.rec", level_name, battle_id % 1000, short_nick_);
+}
+
 void eol::process(const login& l) {
     if (l.success) {
         if (id != l.id || id2 != l.id2) {

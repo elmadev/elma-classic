@@ -29,6 +29,8 @@ class eol {
 
     const char* short_nick() { return short_nick_; }
 
+    std::string battle_rec_name(std::string_view level_name, uint32_t battle_id);
+
     bool play_offline() const { return proto.play_offline(); }
 
     void process(const login&);

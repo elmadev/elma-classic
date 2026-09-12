@@ -4,7 +4,7 @@
 #include <SDL_keyboard.h>
 #include <SDL_keycode.h>
 #include <format>
-#include <sdl/scancodes_windows.h>
+#include <vendor/sdl/scancodes_windows.h>
 
 bool is_key_down(DikScancode code) {
     if (code < 0 || code >= MaxKeycode) {

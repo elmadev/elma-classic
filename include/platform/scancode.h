@@ -2,8 +2,8 @@
 #define SCANCODE_H
 
 #include <array>
-#include <directinput/scancodes.h>
 #include <string>
+#include <vendor/directinput/scancodes.h>
 
 constexpr int MaxKeycode = 256;
 

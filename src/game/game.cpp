@@ -725,7 +725,9 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             while (pacer::subframe(&dt)) {
                 ran_subframes = true;
                 if (current_camera.mode == CameraMode::MapViewer) {
-                    update_freecam(dt, current_camera);
+                    if (!EolClient->spy_kuski()) {
+                        update_freecam(dt, current_camera);
+                    }
                     time += dt;
                     continue;
                 }

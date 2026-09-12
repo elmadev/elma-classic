@@ -228,6 +228,14 @@ static void render_minimap_icon(pic8* pic, int x, int y, unsigned char palette_i
     pic->ppixel(x + 1, y + 1, palette_id);
 }
 
+// When spying, apples follow the spy target's state instead of the local one
+static bool apple_taken(const object* obj, int index, const kuski* spy_kuski) {
+    if (spy_kuski) {
+        return spy_kuski->apples_taken[index];
+    }
+    return !obj->active;
+}
+
 // Render the entire minimap
 static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, vect2 bike_center,
                            motorst* other_motor) {
@@ -311,7 +319,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         unsigned char palette_id;
         switch (obj->type) {
         case object::Type::Food:
-            if (!obj->active || (spy_kuski && spy_kuski->apples_taken[i])) {
+            if (apple_taken(obj, i, spy_kuski)) {
                 continue;
             }
             palette_id = Lgr->minimap_food_palette_id;
@@ -651,14 +659,13 @@ static void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows
 static void render_view(bool player1, bool bottom_player, pic8* pic, double time, driver& driv,
                         driver& other_driv, camera& current_camera, GameLoop loop) {
     // Calculate frame of reference
-    vect2 bike_center = driv.mot->bike.r;
-    if (current_camera.mode == CameraMode::MapViewer) {
-        bike_center = vect2(current_camera.x, current_camera.y);
-    }
-
     const kuski* spy_kuski = EolClient->spy_kuski();
-    if (spy_kuski) {
-        bike_center = spy_kuski->spy_data()->mot.bike.r;
+    const spy_data* spy_pose = spy_kuski ? spy_kuski->spy_data() : nullptr;
+    vect2 bike_center = driv.mot->bike.r;
+    if (spy_pose) {
+        bike_center = spy_pose->mot.bike.r;
+    } else if (!spy_kuski && current_camera.mode == CameraMode::MapViewer) {
+        bike_center = vect2(current_camera.x, current_camera.y);
     }
 
     vect2 bottomleft_corner(bike_center.x -
@@ -688,8 +695,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
         if (obj->type == object::Type::Start) {
             continue;
         }
-        if (obj->type == object::Type::Food &&
-            (!obj->active || (spy_kuski && spy_kuski->apples_taken[i]))) {
+        if (obj->type == object::Type::Food && apple_taken(obj, i, spy_kuski)) {
             continue;
         }
         if (obj->type == object::Type::Exit &&
@@ -776,12 +782,9 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
         }
     }
 
-    if (spy_kuski) {
-        const spy_data* k = spy_kuski->spy_data();
-        if (k && bike_in_view(&k->mot, center)) {
-            render_bike(pic, EolClient->kuski_has_flag(spy_kuski->id), bottomleft_corner, &k->mot,
-                        &k->metadata, bike2, spy_kuski->shirt);
-        }
+    if (spy_pose && bike_in_view(&spy_pose->mot, center)) {
+        render_bike(pic, EolClient->kuski_has_flag(spy_kuski->id), bottomleft_corner,
+                    &spy_pose->mot, &spy_pose->metadata, bike2, spy_kuski->shirt);
     }
 
     if (current_camera.mode == CameraMode::Normal) {
@@ -821,11 +824,10 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
             flagtag_time = player1 ? FlagTimeA : FlagTimeB;
         }
         double shown_time = time;
-        if (Single && EolClient->is_spying()) {
-            shown_time =
-                spy_kuski && !EolClient->battle_hides_times()
-                    ? spy_kuski->spy_data()->time * (STOPWATCH_MULTIPLIER * STOPWATCH_TO_PHYS_TIME)
-                    : 0.0;
+        if (Single && spy_kuski) {
+            shown_time = spy_pose && !EolClient->battle_hides_times()
+                             ? spy_pose->time * (STOPWATCH_MULTIPLIER * STOPWATCH_TO_PHYS_TIME)
+                             : 0.0;
         }
         draw_timers(BestTime, flagtag_time, shown_time, pic, GameViewWidth, GameViewHeight);
     }

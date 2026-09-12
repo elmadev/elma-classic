@@ -41,10 +41,12 @@
 * Screenshots are timestamped and saved as .bmp in the screenshots/ subfolder
 * Significantly improved level and lgr loading speeds
 * Front grass in front of the bike is properly zoomed
+* Level filename may be shown while watching replays via Options
 
 ### Console and Shortcuts
 * Ctrl+G: toggle "ground"/"sky" foreground/background textures
 * Ctrl+H: toggle Video Detail (high quality textures)
+* !snapshot to save a .bmp of the entire level to the screenshots/ subfolder
 
 ### System
 * lev/ and rec/ folders no longer have a maximum file limit

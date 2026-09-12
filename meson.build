@@ -121,6 +121,110 @@ else
     cpp_args += ['-Wno-deprecated-declarations', '-Wunreachable-code']
 endif
 
+gl_dep = dependency('gl', required: true)
+
+libcurl_dep = dependency('libcurl',
+    version : '>=8.12.1',
+    static: build_machine.system() == 'windows',
+    default_options: {
+        # See meson_options.txt, meson.build, CURL-DISABLE.md and INSTALL-CMAKE.md in libcurl
+        # See also https://curl.se/libcurl/c/curl_version_info.html
+
+        # In order of meson_options.txt:
+
+        # Build
+        'tests': 'disabled',
+        'unittests': 'disabled',
+        'tool': 'disabled',
+
+        # CA
+        'ca_bundle': 'auto', # Linux
+        'ca_path': 'auto', # Linux
+        'ca_fallback': false,
+
+        # Features
+        'bindlocal': 'disabled', # CURLOPT_INTERFACE
+        'brotli': 'disabled', # CURLOPT_ACCEPT_ENCODING
+        'cookies': 'enabled',
+        'doh': 'disabled', # CURLOPT_DOH_URL
+        'form-api': 'disabled', # deprecated curl_formadd()/curl_formget()
+        'getoptions': 'disabled', # curl_easy_option_by_name()/curl_easy_option_by_id()
+        'gsasl': 'disabled', # IMAP/SMTP auth - https://gitlab.com/gsasl/gsasl
+        'http2': 'auto', # missing .wrap file on Windows https://github.com/nghttp2/nghttp2
+        'ipv6': 'disabled',
+        'libcurl-option': 'disabled', # curl --libcurl file.c https://example.com
+        'libz': 'disabled', # CURLOPT_ACCEPT_ENCODING
+        'mime': 'enabled', # Mime Headers
+        'netrc': 'disabled', # CURLOPT_NETRC
+        'parsedate': 'disabled', # curl_getdate()
+        'progress-meter': 'disabled', # command-line progress meter
+        'proxy': 'disabled', # CURLOPT_PROXY
+        'psl': 'disabled', # https://publicsuffix.org/, https://curl.se/libcurl/security.html
+        'sha512_256': 'disabled', # only used in CURLAUTH_DIGEST
+        'shuffle-dns': 'disabled', # CURLOPT_DNS_SHUFFLE_ADDRESSES
+        'socketpair': 'enabled', # curl_multi_poll()
+        'sspi': build_machine.system() == 'windows' ? 'enabled' : 'disabled', # required for Schannel (SSL)
+        'unixsockets': 'disabled', # CURLOPT_UNIX_SOCKET_PATH
+        'verbose-strings': 'enabled', # Error messages
+        'websockets': 'disabled', # API: Websocket
+        'zstd': 'disabled', # CURLOPT_ACCEPT_ENCODING
+
+        # Asynchronous DNS
+        'asynchdns': 'enabled', # faster multi interface
+
+        # Authentication
+        'aws': 'disabled',
+        'basic-auth': 'disabled',
+        'bearer-auth': 'disabled',
+        'digest-auth': 'disabled',
+        'kerberos-auth': 'disabled',
+        'negotiate-auth': 'disabled',
+
+        # GSS API
+        'gss-api': 'disabled',
+
+        # IDN
+        'idn': 'disabled', # Internationalized domain name
+
+        # HTTP
+        'alt-svc': 'disabled', # elma.online provides HTTP3 via alt-svc, but HTTP3 is not currently supported in 8.12.1 via meson.build
+        'headers-api': 'enabled', # curl_easy_header()
+        'hsts': 'disabled', # CURLOPT_HSTS_CTRL
+        'http-auth': 'disabled', # CURLOPT_HTTPAUTH
+
+        # NTLM
+        'ntlm': 'disabled',
+        
+        # SSH
+        'ssh': 'disabled',
+
+        # SSL
+        'ssl': 'enabled',
+        'tls-srp': 'disabled', # deprecated CURLOPT_TLSAUTH_TYPE
+
+        # Protocols
+        'dict': 'disabled',
+        'file': 'disabled',
+        'ftp': 'disabled',
+        'gopher': 'disabled',
+        'http': 'enabled',
+        'imap': 'disabled',
+        'ipfs': 'disabled',
+        'ldap': 'disabled',
+        'ldaps': 'disabled',
+        'mqtt': 'disabled',
+        'pop3': 'disabled',
+        'rtmp': 'disabled',
+        'rtsp': 'disabled',
+        'smb': 'disabled',
+        'smtp': 'disabled',
+        'telnet': 'disabled',
+        'tftp': 'disabled',
+    }
+)
+
+nlohmann_json_dep = dependency('nlohmann_json')
+
 sdl2_dep = dependency('sdl2',
     static: build_machine.system() == 'windows' or get_option('static_sdl'),
     default_options: {
@@ -129,11 +233,7 @@ sdl2_dep = dependency('sdl2',
     }
 )
 
-gl_dep = dependency('gl', required: true)
-
-nlohmann_json_dep = dependency('nlohmann_json')
-
-deps += [nlohmann_json_dep, gl_dep, sdl2_dep]
+deps += [gl_dep, libcurl_dep, nlohmann_json_dep, sdl2_dep]
 
 executable(
     'elma',

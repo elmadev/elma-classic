@@ -8,7 +8,7 @@
 constexpr int MaxKeycode = 256;
 
 // DIK_ Windows scancode
-typedef int DikScancode;
+using DikScancode = int;
 static_assert(sizeof(DikScancode) <= 4);
 
 constexpr std::array<DikScancode, 8> MODIFIERS{DIK_LSHIFT, DIK_RSHIFT, DIK_LCONTROL, DIK_RCONTROL,

@@ -198,20 +198,27 @@ To catch bugs and improve code quality, use `clang-tidy`.
 - On Linux:
 
   ```
-  $ sudo apt install clang-tidy-19
+  $ sudo apt install clang-tidy-21
   ```
 
 - On Windows:
   ```
-  $ pip install clang-tidy~=19.0
+  $ pip install clang-tidy~=21.0
   ```
 
 ### Running clang-tidy
 
-To run static analysis on all source files, run the following command:
+To run static analysis on all source and header files, run the following command:
 
 ```
-ninja -C build clang-tidy
+meson test -C build --suite clang-tidy --print-errorlogs
+```
+
+Each file is a separate test named after its path. To check individual files,
+pass their paths as test names (wildcards work):
+
+```
+meson test -C build --print-errorlogs include/eol/eol.h 'src/menu/*'
 ```
 
 The checks are configured in the `.clang-tidy` file at the project root.

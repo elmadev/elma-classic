@@ -66,31 +66,14 @@ jobs:
         run: meson setup build
 
       - name: Run clang-tidy
-        run: |
-          ninja -C build clang-tidy > clang-tidy-output.txt 2>&1 || true
-
-      - name: Show summary
-        run: |
-          echo "=== Clang-tidy Summary ==="
-          grep -E "warning:|error:" clang-tidy-output.txt 2>/dev/null || true
-          echo ""
-          echo "Total warnings: $(grep -c "warning:" clang-tidy-output.txt || true)"
-          echo "Total errors: $(grep -c "error:" clang-tidy-output.txt || true)"
-          echo ""
-          echo "Full output available in artifacts"
-
-          if grep -qE "warning:|error:" clang-tidy-output.txt; then
-            echo ""
-            echo "Clang-tidy found issues."
-            exit 1
-          fi
+        run: meson test -C build --suite clang-tidy --print-errorlogs
 
       - name: Upload clang-tidy results
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: clang-tidy-results
-          path: clang-tidy-output.txt
+          path: build/meson-logs/testlog.txt
           retention-days: 5
 
   build:

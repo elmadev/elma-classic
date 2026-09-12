@@ -144,3 +144,34 @@ executable(
     dependencies: deps,
     win_subsystem: win_subsystem,
 )
+
+clang_tidy = find_program('clang-tidy', 'clang-tidy-21', required: false)
+lint_files = run_command('git', '-C', meson.project_source_root(), 'ls-files', '*.cpp', '*.c', 'include/*.h', check: false)
+if clang_tidy.found() and lint_files.returncode() == 0
+    clang_tidy_args = ['--allow-no-checks', '--warnings-as-errors=*', '-quiet', '-p', meson.project_build_root()]
+
+    # clang-cl rejects the debug CRT together with -fsanitize=address, so
+    # analyze with the release CRT (last /M flag wins). Appending extra args
+    # also leaves /c unused, which must not count as a finding.
+    if cpp.get_id() in ['msvc', 'clang-cl']
+        clang_tidy_args += ['--extra-arg=/MD', '--extra-arg=-Qunused-arguments']
+    endif
+
+    # Homebrew clang-tidy doesn't know where the Xcode SDK lives
+    if host_machine.system() == 'darwin'
+        sdk_path = run_command('xcrun', '--show-sdk-path', check: false)
+        if sdk_path.returncode() == 0
+            clang_tidy_args += '--extra-arg=-isysroot' + sdk_path.stdout().strip()
+        endif
+    endif
+
+    foreach f : lint_files.stdout().strip().split('\n')
+        test(
+            f,
+            clang_tidy,
+            args: clang_tidy_args + [meson.project_source_root() / f],
+            suite: 'clang-tidy',
+            timeout: 90,
+        )
+    endforeach
+endif

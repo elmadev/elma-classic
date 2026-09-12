@@ -1,4 +1,5 @@
 #include "eol/eol.h"
+#include "eol/settings.h"
 #include "eol/status_messages.h"
 #include "level/level.h"
 #include "level/object.h"

@@ -1,6 +1,8 @@
 #include "platform/scancode.h"
 #include "main.h"
 #include "platform/sdl/keyboard.h"
+#include <SDL_keyboard.h>
+#include <SDL_keycode.h>
 #include <format>
 #include <sdl/scancodes_windows.h>
 

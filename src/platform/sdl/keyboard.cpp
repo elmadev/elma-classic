@@ -1,8 +1,10 @@
 #include "platform/sdl/keyboard.h"
+#include <SDL_keyboard.h>
 #include <cstring>
 
 #ifdef _WIN32
-#include <windows.h>
+// Umbrella for winuser.h, which must not be included directly
+#include <windows.h> // IWYU pragma: keep
 #endif
 
 // Map numpad keys to navigation equivalents when NumLock is off

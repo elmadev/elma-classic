@@ -1,6 +1,7 @@
 #include "menu/external.h"
 #include "game/game.h"
 #include "game/level_load.h"
+#include "game/recorder.h"
 #include "game/state.h"
 #include "main.h"
 #include "menu/nav.h"

@@ -3,7 +3,6 @@
 
 #include "vect2.h"
 #include <cstdio>
-#include <string>
 
 constexpr int DEFAULT_SPRITE_WIREFRAME = 20;
 

@@ -2,11 +2,14 @@
 #define RENDERER_CANVAS_H
 
 #include "level/sprite.h"
-#include "main.h"
 #include "pic/lgr.h"
 #include "renderer/grass.h"
 #include "vect2.h"
 #include <cstdint>
+
+#ifdef DEBUG
+#include "main.h"
+#endif
 #include <vector>
 
 class canvas;

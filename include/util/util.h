@@ -1,7 +1,7 @@
 #ifndef UTIL_UTIL_H
 #define UTIL_UTIL_H
 
-#include <fstream>
+#include <cstdio>
 #include <optional>
 
 constexpr double PI = 3.141592;

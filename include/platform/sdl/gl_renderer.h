@@ -1,7 +1,7 @@
 #ifndef GL_RENDERER_H
 #define GL_RENDERER_H
 
-#include <SDL.h>
+#include <SDL_video.h>
 
 void gl_init(SDL_Window* sdl_window, int width, int height, int pitch);
 void gl_resize(int width, int height, int pitch);

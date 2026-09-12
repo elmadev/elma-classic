@@ -3,7 +3,6 @@
 
 #include "level/object.h"
 #include "level/polygon.h"
-#include <string>
 
 class sprite;
 

@@ -33,7 +33,6 @@ Checks: >
   readability-use-std-min-max,
   readability-string-compare
 WarningsAsErrors: ''
-HeaderFilterRegex: '^(?!.*(subprojects|include/glad|include/directinput/scancodes\.h|include/sdl/scancodes_windows\.h)).*'
 FormatStyle: file
 CheckOptions:
   misc-include-cleaner.MissingIncludes: 'false'

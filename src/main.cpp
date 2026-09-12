@@ -53,14 +53,17 @@ bool ErrorGraphicsLoaded = false;
 
 [[noreturn]] static void handle_error(const std::string& prefix, const std::string& message,
                                       std::source_location loc) {
-    static bool InError = false;
+    static int error_count = 0;
+    error_count++;
     logger::instance().write(LogLevel::Fatal, loc, std::format("{} {}", prefix, message));
 
-    if (InError) {
+    if (error_count >= 3) {
+        exit(1);
+    }
+    if (error_count == 2) {
         message_box("A fatal error occurred. Details written to eol.log.");
         quit();
     }
-    InError = true;
 
     std::string text = prefix + "\n" + message;
 

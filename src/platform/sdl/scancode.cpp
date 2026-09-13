@@ -1,8 +1,10 @@
 #include "platform/scancode.h"
 #include "main.h"
 #include "platform/sdl/keyboard.h"
+#include <SDL_keyboard.h>
+#include <SDL_keycode.h>
 #include <format>
-#include <sdl/scancodes_windows.h>
+#include <vendor/sdl/scancodes_windows.h>
 
 bool is_key_down(DikScancode code) {
     if (code < 0 || code >= MaxKeycode) {

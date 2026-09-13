@@ -1,4 +1,5 @@
 #include "platform/sdl/keyboard.h"
+#include <SDL_keyboard.h>
 #include <cstring>
 
 #ifdef _WIN32

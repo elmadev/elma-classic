@@ -7,6 +7,7 @@
 #include "editor/window.h"
 #include "game/game.h"
 #include "game/level_load.h"
+#include "game/recorder.h"
 #include "level/level.h"
 #include "level/object.h"
 #include "level/polygon.h"

@@ -1,7 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "game/recorder.h"
 #include <string>
 
 extern int Single;

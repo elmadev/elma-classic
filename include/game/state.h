@@ -20,7 +20,7 @@ struct player {
 };
 static_assert(sizeof(player) == 116);
 
-typedef char player_name[MAX_PLAYERNAME_LENGTH + 1];
+using player_name = char[MAX_PLAYERNAME_LENGTH + 1];
 
 struct topten {
     int times_count;

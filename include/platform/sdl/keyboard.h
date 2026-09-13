@@ -1,7 +1,7 @@
 #ifndef PLATFORM_SDL_KEYBOARD_H
 #define PLATFORM_SDL_KEYBOARD_H
 
-#include <SDL.h>
+#include <SDL_scancode.h>
 
 namespace keyboard {
 

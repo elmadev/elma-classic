@@ -34,7 +34,8 @@ Checks: >
   readability-static-accessed-through-instance,
   readability-use-std-min-max,
   readability-string-compare
-WarningsAsErrors: ''
+WarningsAsErrors: ""
 FormatStyle: file
 CheckOptions:
-  misc-include-cleaner.MissingIncludes: 'false'
+  misc-include-cleaner.MissingIncludes: "false"
+  readability-simplify-boolean-expr.IgnoreMacros: "true"

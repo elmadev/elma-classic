@@ -10,15 +10,11 @@
 #include "platform/utils.h"
 #include "renderer/canvas.h"
 #include "renderer/object_overlay.h"
+#include <filesystem>
 #include <fstream>
 #define JSON_DIAGNOSTICS 1
 #include <nlohmann/json.hpp>
 #include <utility>
-#ifdef _WIN32
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
 
 using json = nlohmann::ordered_json;
 
@@ -478,32 +474,47 @@ void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
 #define JSON_FIELD(name)                                                                           \
     {                                                                                              \
         try {                                                                                      \
-            auto value = j.value(#name, s.name##_persisted());                                     \
-            s.persist_##name(std::move(value));                                                    \
+            auto value = j.value(#name, persist ? s.name##_persisted() : s.name());                \
+            if (persist) {                                                                         \
+                s.persist_##name(std::move(value));                                                \
+            } else {                                                                               \
+                s.set_##name(std::move(value));                                                    \
+            }                                                                                      \
         } catch (json::exception & e) {                                                            \
-            external_error(std::string("Invalid parameter in " SETTINGS_JSON "!\n") + e.what());   \
+            external_error(std::string("Invalid parameter in ") + file + "!\n" + e.what());        \
         } catch (const char* e) {                                                                  \
-            external_error(std::string("Invalid parameter in " SETTINGS_JSON "!\n") + e);          \
+            external_error(std::string("Invalid parameter in ") + file + "!\n" + e);               \
         }                                                                                          \
     }
-void from_json(const json& j, eol_settings& s) { FIELD_LIST }
+static void apply_json(const json& j, eol_settings& s, bool persist, const std::string& file) {
+    FIELD_LIST
+}
 #undef JSON_FIELD
 
-void eol_settings::read_settings() {
-    if (access(SETTINGS_JSON, 0) != 0) {
-        return;
-    }
-    std::ifstream i(SETTINGS_JSON);
+static void read_json(const std::string& file, bool persist) {
+    std::ifstream i(file);
     json j = json::parse(i, nullptr, false);
-    if (!j.is_discarded()) {
-        *EolSettings = j;
-    } else {
-        external_error(SETTINGS_JSON " is corrupt! Please fix this or delete the file!");
+    if (j.is_discarded() || !j.is_object()) {
+        external_error(file + " is corrupt! Please fix this or delete the file!");
+    }
+    apply_json(j, *EolSettings, persist, file);
+}
+
+void eol_settings::read_settings() {
+    if (std::filesystem::exists(SETTINGS_JSON)) {
+        read_json(SETTINGS_JSON, true);
     }
 }
 
+void eol_settings::read_overrides(const std::string& file) {
+    if (!std::filesystem::exists(file)) {
+        external_error(file + " not found!");
+    }
+    read_json(file, false);
+}
+
 void eol_settings::write_settings() {
-    std::ofstream o("settings.json");
+    std::ofstream o(SETTINGS_JSON);
     json j = *EolSettings;
     o << std::setw(4) << j << std::endl;
 }

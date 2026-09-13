@@ -32,6 +32,9 @@ eol* EolClient = nullptr;
 int main() {
     util::random::seed();
 
+    std::filesystem::create_directory("lev");
+    std::filesystem::create_directory("rec");
+
     EolSettings = new eol_settings();
     eol_settings::read_settings();
 

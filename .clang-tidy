@@ -38,4 +38,5 @@ WarningsAsErrors: ""
 FormatStyle: file
 CheckOptions:
   misc-include-cleaner.MissingIncludes: "false"
+  misc-unused-parameters.IgnoreVirtual: "true"
   readability-simplify-boolean-expr.IgnoreMacros: "true"

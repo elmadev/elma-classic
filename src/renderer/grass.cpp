@@ -58,6 +58,7 @@ static void generate_grass_mask(mask& msk, pic8* pic, int target_height, double 
         skip_rows = std::max(0, margin - max_margin);
     }
     create_grass_mask(msk, heightmap, skip_rows);
+    delete[] heightmap;
 }
 
 void grass::add(pic8* pic, bool up, int target_height, double qupdown_zoom, double zoom) {

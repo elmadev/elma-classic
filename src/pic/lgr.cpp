@@ -477,7 +477,7 @@ static void create_mask(mask* dest, pic8* pic, int transparency) {
     delete pic;
 }
 
-void create_grass_mask(mask& msk, int* heightmap, int skip_rows) {
+void create_grass_mask(mask& msk, const int* heightmap, int skip_rows) {
     int width = msk.width;
     int height = msk.height;
 

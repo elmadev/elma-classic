@@ -21,7 +21,7 @@ static void play_external(const std::string& filename, bool map_viewer) {
 
     while (true) {
         loading_screen();
-        if (!load_level_play(filename_str)) {
+        if (load_level_play(filename_str) != LoadLevelResult::Success) {
             return;
         }
         Rec1->erase(filename_str);

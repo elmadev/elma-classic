@@ -5,7 +5,7 @@
 #include "level/level.h"
 #include "level/segments.h"
 #include "main.h"
-#include "menu/pic.h"
+#include "menu/dialog.h"
 #include "physics/init.h"
 #include "pic/lgr.h"
 #include "platform/utils.h"
@@ -47,19 +47,17 @@ static bool load_level(const char* levelname) {
     return true;
 }
 
-bool load_level_play(const char* levelname) {
+LoadLevelResult load_level_play(const char* levelname) {
     if (!Segments) {
         invalidate_level();
     }
     if (load_level(levelname)) {
         if (Level->topology_errors) {
-            menu_pic menu;
-            menu.add_line_centered("Level file has some topology errors!", 320, 190);
-            menu.add_line_centered("Use the editor to fix them!", 320, 240);
-            menu.loop();
             delete Level;
             Level = nullptr;
-            return false;
+            DikScancode key =
+                menu_dialog("Level file has some topology errors!", "Use the editor to fix them!");
+            return key == DIK_ESCAPE ? LoadLevelResult::Abort : LoadLevelResult::Fail;
         }
 
         lgrfile::load_lgr_file(Level->lgr_name, true);
@@ -77,7 +75,7 @@ bool load_level_play(const char* levelname) {
 
         canvas::create_canvases();
     }
-    return true;
+    return LoadLevelResult::Success;
 }
 
 bool load_level_editor(const char* levelname) {

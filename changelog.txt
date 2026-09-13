@@ -116,6 +116,7 @@
 ### Menu
 * Background balls no longer vanish at high resolution on the "Please do not distribute" screen
 * Red helmet animation is now smooth after the intro scrolling animation
+* Vertical centering of some menus is slightly improved
 
 ### State
 * Disallow duplicate players with identical names

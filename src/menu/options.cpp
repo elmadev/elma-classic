@@ -45,6 +45,7 @@ void menu_about() {
     // Alphabetical
     nav.add_row("amarshalov", "", NAV_FUNC(){});
     nav.add_row("Smibu", "", NAV_FUNC(){});
+    nav.add_row("Zweq", "", NAV_FUNC(){});
 
     nav.navigate();
 

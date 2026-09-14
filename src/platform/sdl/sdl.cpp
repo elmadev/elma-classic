@@ -505,7 +505,7 @@ void init_sound() {
     SDL_AudioSpec desired_spec;
     memset(&desired_spec, 0, sizeof(desired_spec));
     desired_spec.callback = audio_callback;
-    desired_spec.freq = 11025;
+    desired_spec.freq = SOUND_SAMPLE_RATE;
     desired_spec.channels = 1;
     desired_spec.samples = 512;
     desired_spec.format = AUDIO_S16LSB;

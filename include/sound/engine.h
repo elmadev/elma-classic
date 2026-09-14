@@ -12,6 +12,9 @@ enum class WavEvent : char {
     LeftVolt = 7,
 };
 
+// Sample rate of the sound mixer, in Hz (mono, signed 16-bit)
+constexpr int SOUND_SAMPLE_RATE = 11025;
+
 extern bool Mute;
 
 void sound_engine_init();

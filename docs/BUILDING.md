@@ -192,7 +192,11 @@ To catch bugs and improve code quality, use `clang-tidy`.
 - On macOS:
 
   ```
-  $ brew install clang-tidy
+  $ brew install llvm
+  # Export llvm to your path (brew install command tells you how to do this)
+  $ echo 'export PATH="/opt/homebrew/opt/llvm/bin:$PATH"' >> ~/.zshrc
+  # reconfigure meson
+  $ meson setup build --reconfigure
   ```
 
 - On Linux:

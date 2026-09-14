@@ -1074,8 +1074,8 @@ lgrfile::~lgrfile() {
         internal_error("lgrfile::~lgrfile !palette || !pal_data || !timer_palette_map!");
     }
     delete pal;
-    delete palette_data;
-    delete timer_palette_map;
+    delete[] palette_data;
+    delete[] timer_palette_map;
     pal = nullptr;
     palette_data = nullptr;
     timer_palette_map = nullptr;

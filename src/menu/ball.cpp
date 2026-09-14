@@ -90,10 +90,10 @@ void balls_init() {
         if (CollisionTimeGrid) {
             for (int i = 0; i < BallCount + 4; i++) {
                 if (CollisionTimeGrid[i]) {
-                    delete CollisionTimeGrid[i];
+                    delete[] CollisionTimeGrid[i];
                 }
             }
-            delete CollisionTimeGrid;
+            delete[] CollisionTimeGrid;
             CollisionTimeGrid = nullptr;
         }
         internal_error("Out of memory!");

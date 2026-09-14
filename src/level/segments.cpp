@@ -64,8 +64,8 @@ segments::segments(level* lev) {
 }
 
 segments::~segments() {
-    delete seg_list;
-    delete collision_grid;
+    delete[] seg_list;
+    delete[] collision_grid;
     delete_all_nodes();
 }
 

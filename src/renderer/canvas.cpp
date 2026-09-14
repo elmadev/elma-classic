@@ -1186,7 +1186,7 @@ canvas::~canvas() {
     if (!chunk_array) {
         internal_error("canvas::~canvas !chunk_array!");
     }
-    delete chunk_array;
+    delete[] chunk_array;
     chunk_array = nullptr;
 }
 

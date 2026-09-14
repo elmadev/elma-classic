@@ -94,7 +94,6 @@ void internal_error(const std::string& message, std::source_location loc) {
 void external_error(const std::string& message, std::source_location loc) {
     if (message.find("memory") != std::string::npos) {
         handle_error("Sorry, out of memory!", message, loc);
-    } else {
-        handle_error("External error encountered:", message, loc);
     }
+    handle_error("External error encountered:", message, loc);
 }

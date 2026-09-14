@@ -17,7 +17,6 @@ endif
 elma_sources = files(
     'src/api/api.cpp',
     'src/api/curl_wrapper.cpp',
-    'src/runtime.cpp',
     'src/debug/profiler.cpp',
     'src/editor/canvas.cpp',
     'src/editor/dialog.cpp',
@@ -252,7 +251,7 @@ elma_core = static_library(
 
 executable(
     'elma',
-    'src/main.cpp',
+    ['src/main.cpp', 'src/runtime.cpp'],
     include_directories: inc,
     cpp_args: cpp_args,
     link_args: link_args,

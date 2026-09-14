@@ -21,6 +21,10 @@
 #include <format>
 #include <string>
 
+#ifdef CLI_MODE
+#include <cstdio>
+#endif
+
 static double StopwatchStartTime = 0.0;
 
 double stopwatch() { return get_milliseconds() * STOPWATCH_MULTIPLIER - StopwatchStartTime; }
@@ -93,9 +97,13 @@ bool ErrorGraphicsLoaded = false;
 
 [[noreturn]] static void handle_error(const std::string& prefix, const std::string& message,
                                       std::source_location loc) {
-    static bool InError = false;
     logger::instance().write(LogLevel::Fatal, loc, std::format("{} {}", prefix, message));
 
+#ifdef CLI_MODE
+    fprintf(stderr, "%s %s\n", prefix.c_str(), message.c_str());
+    exit(1);
+#else
+    static bool InError = false;
     if (InError) {
         message_box("A fatal error occurred. Details written to eol.log.");
         quit();
@@ -122,6 +130,7 @@ bool ErrorGraphicsLoaded = false;
     }
 
     quit();
+#endif
 }
 
 void internal_error(const std::string& message, std::source_location loc) {

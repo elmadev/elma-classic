@@ -17,6 +17,7 @@ endif
 elma_sources = files(
     'src/api/api.cpp',
     'src/api/curl_wrapper.cpp',
+    'src/runtime.cpp',
     'src/debug/profiler.cpp',
     'src/editor/canvas.cpp',
     'src/editor/dialog.cpp',
@@ -47,7 +48,6 @@ elma_sources = files(
     'src/level/segments.cpp',
     'src/level/sprite.cpp',
     'src/log.cpp',
-    'src/main.cpp',
     'src/menu/ball_collision.cpp',
     'src/menu/ball_handler.cpp',
     'src/menu/ball.cpp',
@@ -242,12 +242,21 @@ sdl2_dep = dependency('sdl2',
 
 deps += [gl_dep, libcurl_dep, nlohmann_json_dep, sdl2_dep]
 
-executable(
-    'elma',
+elma_core = static_library(
+    'elma_core',
     elma_sources,
     include_directories: inc,
     cpp_args: cpp_args,
+    dependencies: deps,
+)
+
+executable(
+    'elma',
+    'src/main.cpp',
+    include_directories: inc,
+    cpp_args: cpp_args,
     link_args: link_args,
+    link_whole: elma_core,
     dependencies: deps,
     win_subsystem: win_subsystem,
 )

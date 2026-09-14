@@ -1,5 +1,6 @@
 #include "renderer/render.h"
 #include "editor/editor.h"
+#include "eol/checkpoint.h"
 #include "eol/console.h"
 #include "eol/eol.h"
 #include "eol/settings.h"
@@ -25,6 +26,7 @@
 #include "renderer/object_overlay.h"
 #include "renderer/timer.h"
 #include "util/util.h"
+#include "vect2.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -73,6 +75,8 @@ int GameViewHeight;
 static double CameraY;
 static double CameraX;
 static double CameraDx;
+vect2 CameraBottomLeft1;
+vect2 CameraBottomLeft2;
 
 // In pixels from the bottom-left corner of screen
 double AffinePicScreenLeft;
@@ -112,6 +116,8 @@ static void calculate_viewpoints(bool splitscreen) {
     GameViewBottom1 = (SCREEN_HEIGHT - GameViewHeight) / 2;
     GameViewRight = GameViewLeft + GameViewWidth - 1;
     GameViewTop1 = GameViewBottom1 + GameViewHeight - 1;
+    GameViewBottom2 = -1;
+    GameViewTop2 = -1;
     if (splitscreen) {
         GameViewHeight = (SCREEN_HEIGHT / 2) - 6;
         GameViewBottom1 = (SCREEN_HEIGHT / 2) + 6;
@@ -656,7 +662,7 @@ static void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows
 }
 
 // Render the view for one player
-static void render_view(bool player1, bool bottom_player, pic8* pic, double time, driver& driv,
+static void render_view(bool player1, bool splitscreen, pic8* pic, double time, driver& driv,
                         driver& other_driv, camera& current_camera, GameLoop loop) {
     // Calculate frame of reference
     const kuski* spy_kuski = EolClient->spy_kuski();
@@ -671,12 +677,21 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     vect2 bottomleft_corner(bike_center.x -
                                 (CameraX + driv.meta.camera_turning.turn_phase * CameraDx),
                             bike_center.y - CameraY);
+    if (player1 || !splitscreen) {
+        CameraBottomLeft1 = bottomleft_corner;
+    } else {
+        CameraBottomLeft2 = bottomleft_corner;
+    }
+
     vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
                  bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
 
     // Draw the background
     CanvasBack->render(player1, pic, bottomleft_corner, 0, 0, GameViewWidth - 1,
                        GameViewHeight - 1);
+
+    // Draw the checkpoints
+    checkpoint::render_all(*pic, bottomleft_corner);
 
     // Draw the objects
     int corner_x;
@@ -848,7 +863,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
             }
         }
 
-        if (bottom_player) {
+        if (!splitscreen || !player1) {
             // FPS
             if (EolSettings->show_fps()) {
                 info_rows.push_back({"FPS", fps::format_fps() + pacer::format_fps_limit()});
@@ -915,16 +930,16 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     static pic8 player_view = pic8();
     if (splitscreen) {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
-        render_view(true, false, &player_view, time, driv1, driv2, current_camera, loop);
+        render_view(true, true, &player_view, time, driv1, driv2, current_camera, loop);
 
         player_view.subview(GameViewLeft, GameViewBottom2, GameViewRight, GameViewTop2, pic);
         render_view(false, true, &player_view, time, driv2, driv1, current_camera, loop);
     } else {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
         if (draw_player1) {
-            render_view(true, true, &player_view, time, driv1, driv2, current_camera, loop);
+            render_view(true, false, &player_view, time, driv1, driv2, current_camera, loop);
         } else {
-            render_view(false, true, &player_view, time, driv2, driv1, current_camera, loop);
+            render_view(false, false, &player_view, time, driv2, driv1, current_camera, loop);
         }
     }
 
@@ -1013,4 +1028,33 @@ void level_to_bmp(const char* filename) {
 
     level_pic.vertical_flip();
     level_pic.save(filename, Lgr->palette_data);
+}
+
+std::optional<vect2> get_mouse_position_game() {
+    // screen is rendered upside-down so we need to invert the y position
+    int mou_x;
+    int mou_y;
+    get_mouse_position(&mou_x, &mou_y);
+    mou_y = SCREEN_HEIGHT - mou_y;
+
+    if (mou_x < GameViewLeft || mou_x > GameViewRight) {
+        return std::nullopt;
+    }
+    // Player 1 subview
+    if (mou_y >= GameViewBottom1 && mou_y <= GameViewTop1) {
+        mou_x -= GameViewLeft;
+        mou_y -= GameViewBottom1;
+        double x = CameraBottomLeft1.x + mou_x * PixelsToMeters;
+        double y = CameraBottomLeft1.y + mou_y * PixelsToMeters;
+        return vect2{x, y};
+    }
+    // Player 2 subview
+    if (mou_y >= GameViewBottom2 && mou_y <= GameViewTop2) {
+        mou_x -= GameViewLeft;
+        mou_y -= GameViewBottom2;
+        double x = CameraBottomLeft2.x + mou_x * PixelsToMeters;
+        double y = CameraBottomLeft2.y + mou_y * PixelsToMeters;
+        return vect2{x, y};
+    }
+    return std::nullopt;
 }

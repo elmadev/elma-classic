@@ -1,5 +1,6 @@
 #include "game/game.h"
 #include "editor/editor.h"
+#include "eol/checkpoint.h"
 #include "eol/console.h"
 #include "eol/eol.h"
 #include "eol/settings.h"
@@ -23,6 +24,7 @@
 #include "renderer/timer.h"
 #include "sound/engine.h"
 #include <algorithm>
+#include <climits>
 #include <cmath>
 #include <filesystem>
 #include <format>
@@ -598,6 +600,37 @@ static void handle_eol_inputs() {
     }
 }
 
+static void handle_mouse() {
+    int mou_x;
+    int mou_y;
+    get_mouse_position(&mou_x, &mou_y);
+
+    std::optional<vect2> coord = get_mouse_position_game();
+    if (!coord) {
+        return;
+    }
+
+    bool left_click = was_left_mouse_just_clicked();
+    bool right_click = was_right_mouse_just_clicked();
+    if (clickable::ClickMode == clickable::Mode::Normal && (left_click || right_click)) {
+        int dist = INT_MAX;
+        clickable* closest = nullptr;
+        checkpoint::get_closest(coord.value(), dist, closest);
+
+        if (closest) {
+            if (left_click) {
+                closest->left_clicked(mou_x, mou_y, coord.value());
+            } else {
+                closest->right_clicked(mou_x, mou_y, coord.value());
+            }
+            left_click = false;
+            right_click = false;
+        }
+    }
+
+    checkpoint::editor_update(coord.value(), left_click, right_click);
+}
+
 void reload_graphic_assets() {
     lgrfile::recreate_lgr_if_needed();
     canvas::recreate_canvases_if_needed();
@@ -857,6 +890,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         }
 
         handle_eol_inputs();
+        handle_mouse();
 
         if (!console_was_active &&
             (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {

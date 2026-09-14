@@ -32,6 +32,7 @@ Checks: >
   readability-static-accessed-through-instance,
   readability-use-std-min-max,
   readability-string-compare
+HeaderFilterRegex: ''
 WarningsAsErrors: ''
 FormatStyle: file
 CheckOptions:

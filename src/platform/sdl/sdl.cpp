@@ -13,6 +13,7 @@
 #include <SDL.h>
 #include <algorithm>
 #include <chrono>
+#include <cstring>
 #include <filesystem>
 #include <format>
 

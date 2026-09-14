@@ -5,6 +5,7 @@
 #include "menu/intro.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
+#include "runtime.h"
 #include "util/util.h"
 
 int main() {
@@ -25,9 +26,9 @@ int main() {
 
     platform_init();
 
-    EolClient = new eol();
-    EolClient->connect();
+    runtime::init_data();
 
+    EolClient->connect();
     eol_api::init();
 
     menu_intro();

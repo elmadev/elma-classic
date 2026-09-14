@@ -1,11 +1,19 @@
+#include "runtime.h"
 #include "api/api.h"
+#include "editor/editor.h"
 #include "eol/eol.h"
 #include "eol/settings.h"
+#include "game/qopen.h"
+#include "game/recorder.h"
+#include "game/state.h"
 #include "log.h"
 #include "main.h"
 #include "menu/pic.h"
+#include "physics/init.h"
+#include "pic/abc8.h"
 #include "platform/implementation.h"
 #include "platform/scancode.h"
+#include "renderer/render.h"
 #include <cstdlib>
 #include <format>
 #include <string>
@@ -26,6 +34,38 @@ void delay(int milliseconds) {
 
 eol_settings* EolSettings = nullptr;
 eol* EolClient = nullptr;
+
+void runtime::init_data() {
+    EolClient = new eol();
+
+    init_qopen();
+
+    init_menu_pictures();
+
+    State = new state;
+    if (!State) {
+        external_error("memory");
+    }
+
+    merge_states();
+    eol_settings::sync_controls_to_state(State);
+
+    init_physics_data();
+
+    // Load globals
+    EditorWhiteFont = new abc8("kisbetu1.abc", 1, 19); // "small letter 1"
+    EditorBlackFont = new abc8("kisbetu2.abc", 1, 19); // "small letter 2"
+
+    init_renderer();
+
+    Rec1 = new recorder;
+    Rec2 = new recorder;
+
+    create_editor_palette();
+
+    // Initialize stopwatch, just in case
+    stopwatch_reset();
+}
 
 void quit() {
     eol_api::cleanup();

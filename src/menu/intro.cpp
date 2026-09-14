@@ -1,8 +1,5 @@
 #include "menu/intro.h"
-#include "editor/editor.h"
 #include "eol/settings.h"
-#include "game/qopen.h"
-#include "game/recorder.h"
 #include "game/state.h"
 #include "main.h"
 #include "menu/ball_collision.h"
@@ -10,13 +7,10 @@
 #include "menu/pic.h"
 #include "menu/player.h"
 #include "menu/rec_list.h"
-#include "physics/init.h"
-#include "pic/abc8.h"
 #include "pic/pic8.h"
 #include "pic/surface.h"
 #include "platform/implementation.h"
 #include "platform/scancode.h"
-#include "renderer/render.h"
 
 static void show_intro_screen() {
     pic8* intro_screen = lock_backbuffer_pic(false);
@@ -27,20 +21,6 @@ static void show_intro_screen() {
 }
 
 void menu_intro() {
-    init_qopen();
-
-    init_menu_pictures();
-
-    State = new state;
-    if (!State) {
-        external_error("memory");
-    }
-
-    merge_states();
-    eol_settings::sync_controls_to_state(State);
-
-    init_physics_data();
-
     rec_list::build_cache();
 
     // test_player();
@@ -59,20 +39,6 @@ void menu_intro() {
     }
 
     init_sound();
-
-    // Load globals
-    EditorWhiteFont = new abc8("kisbetu1.abc", 1, 19); // "small letter 1"
-    EditorBlackFont = new abc8("kisbetu2.abc", 1, 19); // "small letter 2"
-
-    init_renderer();
-
-    Rec1 = new recorder;
-    Rec2 = new recorder;
-
-    create_editor_palette();
-
-    // Initialize stopwatch, just in case
-    stopwatch_reset();
 
     // Await for key input before scrolling intro.pcx
     if (!EolSettings->skip_intro()) {

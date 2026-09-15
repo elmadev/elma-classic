@@ -18,6 +18,7 @@ Checks: >
   modernize-redundant-void-arg,
   performance-inefficient-vector-operation,
   performance-unnecessary-value-param,
+  performance-for-range-copy,
   readability-braces-around-statements,
   readability-container-size-empty,
   readability-delete-null-pointer,

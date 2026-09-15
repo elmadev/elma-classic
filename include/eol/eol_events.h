@@ -183,6 +183,7 @@ struct battle_queue_update {
 
 struct finished_time {
     unsigned int kuski_id;
+    unsigned int kuski_id2; // 0 when the finish was single-player
     char level[MAX_FILENAME_LEN + 1];
     uint32_t time; // In centiseconds
 };

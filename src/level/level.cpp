@@ -22,6 +22,7 @@
 #include <filesystem>
 #include <limits>
 #include <optional>
+#include <string_view>
 
 constexpr int TOP_TEN_HEADER = 6754362;
 constexpr int TOP_TEN_FOOTER = 8674642;
@@ -391,9 +392,11 @@ bool level::is_sky(polygon* poly, vect2* point) {
     return intersections % 2;
 }
 
-std::optional<int> get_internal_index(const char* filename) {
-    if ((strlen(filename) != 12) || (strnicmp(filename, "QWQUU", 5) != 0) ||
-        (strnicmp(&filename[8], ".lev", 4) != 0)) {
+std::optional<int> get_internal_index(std::string_view filename) {
+    if (filename.size() == 12 && strnicmp(filename.data() + 8, ".lev", 4) == 0) {
+        filename.remove_suffix(4);
+    }
+    if (filename.size() != 8 || strnicmp(filename.data(), "QWQUU", 5) != 0) {
         return std::nullopt;
     }
 

@@ -5,6 +5,7 @@
 #include "vect2.h"
 #include <filesystem>
 #include <optional>
+#include <string_view>
 
 class lgrfile;
 struct motorst;
@@ -99,8 +100,8 @@ extern char BestTime[30];
 // Store the best time of the level to display while doing a run
 void load_best_time(const char* filename, int single);
 
-// Get the internal index (1-55) of a filename if it has the form "QWQUU###.LEV", case
-// insensitive, ### can be any digits.
-std::optional<int> get_internal_index(const char* filename);
+// Get the internal index (1-55) of a filename if it has the form "QWQUU###", with or without a
+// ".LEV" extension, case insensitive, ### can be any digits.
+std::optional<int> get_internal_index(std::string_view filename);
 
 #endif

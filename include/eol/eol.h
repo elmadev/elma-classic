@@ -108,6 +108,8 @@ class eol {
     static pic8* load_shirt(std::string_view nick);
 
   private:
+    eol_table* table_for(TableType);
+    void select_table(TableType);
     void sync_players_online_table();
     void sync_battle_results_table();
     void sync_battle_queue_table();

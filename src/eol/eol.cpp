@@ -535,37 +535,31 @@ void eol::send_kuski_data(double time, driver& d) {
     proto.send(data);
 }
 
-void eol::set_table(TableType table) {
-    eol_table* new_table = nullptr;
+eol_table* eol::table_for(TableType table) {
     switch (table) {
     case TableType::None:
-        cur_table = nullptr;
-        break;
+        return nullptr;
     case TableType::PlayersOnline:
-        new_table = &players_online_table;
-        break;
+        return &players_online_table;
     case TableType::BattleResults:
-        new_table = &battle_results_table;
-        break;
+        return &battle_results_table;
     case TableType::BattleQueue:
-        new_table = &battle_queue_table;
-        break;
+        return &battle_queue_table;
     case TableType::FinishedTimes:
-        new_table = &finished_times_table;
-        break;
+        return &finished_times_table;
     case TableType::BestTimes:
-        new_table = &best_times_table;
-        break;
+        return &best_times_table;
     }
+    return nullptr;
+}
 
-    if (cur_table != new_table) {
-        cur_table = new_table;
-    } else {
-        cur_table = nullptr;
-        table = TableType::None;
-    }
-
+void eol::select_table(TableType table) {
+    cur_table = table_for(table);
     proto.send(show_table{.table = table});
+}
+
+void eol::set_table(TableType table) {
+    select_table(cur_table == table_for(table) ? TableType::None : table);
 }
 
 void eol::render_table(pic8& dest, abc8& title_font, abc8& data_font) const {

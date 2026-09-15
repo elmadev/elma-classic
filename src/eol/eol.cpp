@@ -243,7 +243,7 @@ void eol::sync_finished_times_table() {
     finished_times_table.clear_rows();
     for (const finished_time& ft : finished_times_) {
         if (finished_times_filter_ != FinishedTimesFilter::All) {
-            bool internal = get_internal_index(std::format("{}.lev", ft.level).c_str()).has_value();
+            bool internal = get_internal_index(ft.level).has_value();
             if (internal != (finished_times_filter_ == FinishedTimesFilter::Internal)) {
                 continue;
             }

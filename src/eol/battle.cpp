@@ -112,13 +112,11 @@ static std::string format_type_with_cripples(BattleType t, BattleAttributes::Kin
 }
 
 std::string eol::format_level(std::string_view level) {
-    std::string with_ext = std::format("{}.lev", level);
-    auto idx = get_internal_index(with_ext.c_str());
-
+    auto idx = get_internal_index(level);
     if (idx.has_value()) {
         return std::format("internal {:02}", *idx);
     }
-    return with_ext;
+    return std::format("{}.lev", level);
 }
 
 // First Finish battle results in Sju250.lev (apple bugs, see others)

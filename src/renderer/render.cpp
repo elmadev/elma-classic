@@ -666,7 +666,9 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     vect2 bike_center = driv.mot->bike.r;
     if (spy_pose) {
         bike_center = spy_pose->mot.bike.r;
-    } else if (!spy_kuski && current_camera.mode == CameraMode::MapViewer) {
+    } else if (spy_kuski) {
+        bike_center = vect2(current_camera.start_x, current_camera.start_y);
+    } else if (current_camera.mode == CameraMode::MapViewer) {
         bike_center = vect2(current_camera.x, current_camera.y);
     }
 

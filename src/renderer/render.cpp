@@ -228,9 +228,11 @@ static void render_minimap_icon(pic8* pic, int x, int y, unsigned char palette_i
     pic->ppixel(x + 1, y + 1, palette_id);
 }
 
-// When spying, apples follow the spy target's state instead of the local one
-static bool apple_taken(const object* obj, int index, const kuski* spy_kuski) {
-    if (spy_kuski) {
+// When spying, apples follow the spy target's state instead of the local one,
+// but only in f1-enter because otherwise local apples take priority.
+static bool apple_taken(const object* obj, int index, const kuski* spy_kuski,
+                        CameraMode camera_mode) {
+    if (spy_kuski && camera_mode == CameraMode::MapViewer) {
         return spy_kuski->apples_taken[index];
     }
     return !obj->active;
@@ -238,7 +240,7 @@ static bool apple_taken(const object* obj, int index, const kuski* spy_kuski) {
 
 // Render the entire minimap
 static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, vect2 bike_center,
-                           motorst* other_motor) {
+                           motorst* other_motor, CameraMode camera_mode) {
     // Calculate minimap size and minimap frame of reference
     double minimap_width = MinimapWidth * MinimapScaleFactor * PixelsToMeters;
     double minimap_height = MinimapHeight * MinimapScaleFactor * PixelsToMeters;
@@ -319,7 +321,7 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         unsigned char palette_id;
         switch (obj->type) {
         case object::Type::Food:
-            if (apple_taken(obj, i, spy_kuski)) {
+            if (apple_taken(obj, i, spy_kuski, camera_mode)) {
                 continue;
             }
             palette_id = Lgr->minimap_food_palette_id;
@@ -695,7 +697,8 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
         if (obj->type == object::Type::Start) {
             continue;
         }
-        if (obj->type == object::Type::Food && apple_taken(obj, i, spy_kuski)) {
+        if (obj->type == object::Type::Food &&
+            apple_taken(obj, i, spy_kuski, current_camera.mode)) {
             continue;
         }
         if (obj->type == object::Type::Exit &&
@@ -810,10 +813,11 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     // Draw the minimap
     if (driv.hud->minimap) {
         if (Single) {
-            render_minimap(player1, pic, driv.meta.camera_turning.turn_phase, bike_center, nullptr);
+            render_minimap(player1, pic, driv.meta.camera_turning.turn_phase, bike_center, nullptr,
+                           current_camera.mode);
         } else {
             render_minimap(player1, pic, driv.meta.camera_turning.turn_phase, bike_center,
-                           other_driv.mot);
+                           other_driv.mot, current_camera.mode);
         }
     }
 

@@ -171,7 +171,7 @@ int menu_nav::prompt_choice(bool render_only) {
             menu->clear();
 
             // Overlays
-            for (nav_overlay overlay : overlays) {
+            for (const nav_overlay& overlay : overlays) {
                 switch (overlay.alignment) {
                 case OverlayAlignment::Centered:
                     menu->add_line_centered(overlay.text, overlay.x, overlay.y, overlay.anchor);

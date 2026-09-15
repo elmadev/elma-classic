@@ -237,7 +237,7 @@ void menu_pic::render(bool skip_balls_helmet) {
             y += BackgroundTileMain->get_height();
         }
 
-        for (text_line line : lines) {
+        for (const text_line& line : lines) {
             int x = anchored_x_position(line.x, line.position);
             int y = line.y;
             if (center_vertically) {
@@ -400,7 +400,7 @@ bool menu_pic::render_intro_anim(double time) {
     }
 
     // The text moves down from -SCREEN_HEIGHT to 0
-    for (text_line line : lines) {
+    for (const text_line& line : lines) {
         int x = anchored_x_position(line.x, line.position);
         if (center_vertically) {
             internal_error("menu_pic::render_intro_anim should not center vertically!");

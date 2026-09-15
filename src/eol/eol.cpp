@@ -64,7 +64,7 @@ eol::eol()
     battle_queue_table.add_column(80, eol_table::Align::Left);
     battle_queue_table.add_column(160, eol_table::Align::Center);
     battle_queue_table.add_column(80, eol_table::Align::Right);
-    finished_times_table.add_column(80, eol_table::Align::Left);
+    finished_times_table.add_column(130, eol_table::Align::Left);
     finished_times_table.add_column(160, eol_table::Align::Center);
     finished_times_table.add_column(80, eol_table::Align::Right);
     finished_times_table.set_overflow(eol_table::Overflow::NewestRows);
@@ -231,6 +231,9 @@ void eol::process(const finished_time& ft) {
     if (!get_kuski(kuskis_, ft.kuski_id)) {
         return;
     }
+    if (ft.kuski_id2 != 0 && !get_kuski(kuskis_, ft.kuski_id2)) {
+        return;
+    }
 
     finished_times_.push_back(ft);
     if (finished_times_.size() > MAX_FINISHED_TIMES) {
@@ -240,13 +243,16 @@ void eol::process(const finished_time& ft) {
 }
 
 bool eol::in_finished_times_view(const finished_time& ft) const {
+    bool multi_finish = ft.kuski_id2 != 0;
     switch (finished_times_filter_) {
     case FinishedTimesFilter::All:
-        return true;
+        return !multi_finish;
     case FinishedTimesFilter::Internal:
-        return get_internal_index(ft.level).has_value();
+        return !multi_finish && get_internal_index(ft.level).has_value();
     case FinishedTimesFilter::External:
-        return !get_internal_index(ft.level).has_value();
+        return !multi_finish && !get_internal_index(ft.level).has_value();
+    case FinishedTimesFilter::Multi:
+        return multi_finish;
     }
     return false;
 }
@@ -258,10 +264,13 @@ void eol::sync_finished_times_table() {
             continue;
         }
 
+        std::string nick(lookup_nick(ft.kuski_id));
+        if (ft.kuski_id2 != 0) {
+            nick += std::format(" & {}", lookup_nick(ft.kuski_id2));
+        }
         char time_buf[32] = "";
         util::text::centiseconds_to_string(int(ft.time), time_buf, true, true);
-        finished_times_table.add_row(
-            {std::string(lookup_nick(ft.kuski_id)), format_level(ft.level), time_buf});
+        finished_times_table.add_row({nick, format_level(ft.level), time_buf});
     }
 }
 
@@ -280,10 +289,17 @@ void eol::cycle_finished_times_filter() {
         finished_times_table.set_title("Finished external times");
         break;
     case FinishedTimesFilter::External:
+        finished_times_filter_ = FinishedTimesFilter::Multi;
+        finished_times_table.set_title("Finished multi times");
+        finished_times_table.set_column_width(0, 130);
+        break;
+    case FinishedTimesFilter::Multi:
         finished_times_filter_ = FinishedTimesFilter::All;
         finished_times_table.set_title("Finished times");
+        finished_times_table.set_column_width(0, 80);
         break;
     }
+    select_table(finished_times_table_type());
     sync_finished_times_table();
 }
 
@@ -555,6 +571,7 @@ eol_table* eol::table_for(TableType table) {
     case TableType::BattleQueue:
         return &battle_queue_table;
     case TableType::FinishedTimes:
+    case TableType::FinishedMultiTimes:
         return &finished_times_table;
     case TableType::BestTimes:
         return &best_times_table;

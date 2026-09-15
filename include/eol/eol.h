@@ -87,7 +87,7 @@ class eol {
 
     void toggle_battle_results() { set_table(TableType::BattleResults); }
     void toggle_battle_queue() { set_table(TableType::BattleQueue); }
-    void toggle_finished_times() { set_table(TableType::FinishedTimes); }
+    void toggle_finished_times() { set_table(finished_times_table_type()); }
     void cycle_finished_times_filter();
     void clear_finished_times();
     void toggle_best_times() { set_table(TableType::BestTimes); }
@@ -146,8 +146,12 @@ class eol {
     std::vector<battle_leaderboard_entry> battle_leaderboard_;
     BattleType battle_leaderboard_type_ = BattleType::Normal;
     std::vector<battle_queue_entry> battle_queue_;
-    enum class FinishedTimesFilter { All, Internal, External };
+    enum class FinishedTimesFilter { All, Internal, External, Multi };
     FinishedTimesFilter finished_times_filter_ = FinishedTimesFilter::All;
+    TableType finished_times_table_type() const {
+        return finished_times_filter_ == FinishedTimesFilter::Multi ? TableType::FinishedMultiTimes
+                                                                    : TableType::FinishedTimes;
+    }
     std::vector<finished_time> finished_times_;
     eol_table* cur_table;
     eol_table players_online_table;

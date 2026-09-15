@@ -405,7 +405,7 @@ std::optional<int> get_internal_index(const char* filename) {
     }
 
     int index = 100 * hundreds.value() + 10 * tens.value() + ones.value();
-    if (index > INTERNAL_LEVEL_COUNT) {
+    if (index < 1 || index > INTERNAL_LEVEL_COUNT) {
         return std::nullopt;
     }
 

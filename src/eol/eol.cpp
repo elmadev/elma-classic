@@ -239,14 +239,23 @@ void eol::process(const finished_time& ft) {
     sync_finished_times_table();
 }
 
+bool eol::in_finished_times_view(const finished_time& ft) const {
+    switch (finished_times_filter_) {
+    case FinishedTimesFilter::All:
+        return true;
+    case FinishedTimesFilter::Internal:
+        return get_internal_index(ft.level).has_value();
+    case FinishedTimesFilter::External:
+        return !get_internal_index(ft.level).has_value();
+    }
+    return false;
+}
+
 void eol::sync_finished_times_table() {
     finished_times_table.clear_rows();
     for (const finished_time& ft : finished_times_) {
-        if (finished_times_filter_ != FinishedTimesFilter::All) {
-            bool internal = get_internal_index(ft.level).has_value();
-            if (internal != (finished_times_filter_ == FinishedTimesFilter::Internal)) {
-                continue;
-            }
+        if (!in_finished_times_view(ft)) {
+            continue;
         }
 
         char time_buf[32] = "";

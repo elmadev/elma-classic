@@ -113,6 +113,7 @@ class eol {
     void sync_players_online_table();
     void sync_battle_results_table();
     void sync_battle_queue_table();
+    bool in_finished_times_view(const finished_time&) const;
     void sync_finished_times_table();
 
     void set_battle_results_title(const char* label);

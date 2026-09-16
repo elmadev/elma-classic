@@ -1,5 +1,6 @@
 #include "api/api.h"
 #include "api/curl_wrapper.h"
+#include "api/deserialize.h"
 #include "eol/settings.h"
 #include <format>
 
@@ -63,6 +64,20 @@ std::optional<std::string> lgr_get(const std::string& lgr_name) {
     curl.setopt(CURLOPT_URL, url.c_str());
     curl.setopt_write_to_filesystem(std::format("lgr/{}.lgr", lgr_name));
     return curl.perform_to_filesystem();
+}
+
+// https://api.elma.online/api/lgr/info
+std::pair<api_type::lgr_info, std::string> lgr_info() {
+    easy_handle curl = easy_handle(sequential_handle, share);
+    std::string url = std::format("https://{}/api/lgr/info", EolSettings->api_name());
+    curl.setopt(CURLOPT_URL, url.c_str());
+    curl.setopt_write_to_buffer();
+
+    auto [data, error] = curl.perform_to_buffer();
+    if (!error.empty()) {
+        return {{}, error};
+    }
+    return deserialize<api_type::lgr_info>(data);
 }
 
 } // namespace eol_api

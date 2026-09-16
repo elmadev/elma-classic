@@ -3,6 +3,7 @@
 
 namespace runtime {
 
+void init_settings();
 void init_data();
 
 } // namespace runtime

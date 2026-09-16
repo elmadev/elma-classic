@@ -6,6 +6,7 @@
 namespace eol_api {
 
 // Share connection data between all sequential curl-easy handles
+// Should not be used with curl-multi
 share_interface* share;
 
 easy_handle* sequential_handle;
@@ -21,6 +22,7 @@ void init() {
     }
 
     share = new share_interface();
+    share->setopt(CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
     share->setopt(CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
     share->setopt(CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
     share->setopt(CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT);

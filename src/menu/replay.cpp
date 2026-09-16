@@ -51,7 +51,9 @@ static LoadReplayResult validate_replay_level(int level_id, const std::string& f
                         filename.c_str(), Rec1->level_filename);
         return key == DIK_ESCAPE ? LoadReplayResult::Abort : LoadReplayResult::Fail;
     }
-    load_level_play(Rec1->level_filename);
+    if (!load_level_play(Rec1->level_filename)) {
+        return LoadReplayResult::Fail;
+    }
 
     if (Level->level_id != level_id) {
         DikScancode key =

@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string>
 
@@ -19,6 +20,18 @@ class share_interface {
     friend class easy_handle;
 
     CURLSH* share = nullptr;
+
+    struct {
+        std::mutex share;
+        std::mutex cookie;
+        std::mutex dns;
+        std::mutex ssl;
+        std::mutex connect;
+    } locks;
+
+    static void lock_callback_function(CURL* handle, curl_lock_data data, curl_lock_access access,
+                                       void* clientp);
+    static void unlock_callback_function(CURL* handle, curl_lock_data data, void* clientp);
 
     static std::string error_message(CURLSHcode code);
 

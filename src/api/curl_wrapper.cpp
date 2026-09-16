@@ -12,6 +12,58 @@ std::string url_encode(const std::string& text) {
     return encoded_string;
 }
 
+void share_interface::lock_callback_function(CURL* /*handle*/, curl_lock_data data,
+                                             curl_lock_access access, void* clientp) {
+    share_interface* this_ = (share_interface*)clientp;
+
+    ELMA_ASSERT(access == CURL_LOCK_ACCESS_SINGLE);
+
+    switch (data) {
+    case CURL_LOCK_DATA_SHARE:
+        this_->locks.share.lock();
+        break;
+    case CURL_LOCK_DATA_COOKIE:
+        this_->locks.cookie.lock();
+        break;
+    case CURL_LOCK_DATA_DNS:
+        this_->locks.dns.lock();
+        break;
+    case CURL_LOCK_DATA_SSL_SESSION:
+        this_->locks.ssl.lock();
+        break;
+    case CURL_LOCK_DATA_CONNECT:
+        this_->locks.connect.lock();
+        break;
+    default:
+        internal_error(std::format("Unsupported lock data type: {}", (int)data));
+    }
+}
+
+void share_interface::unlock_callback_function(CURL* /*handle*/, curl_lock_data data,
+                                               void* clientp) {
+    share_interface* this_ = (share_interface*)clientp;
+
+    switch (data) {
+    case CURL_LOCK_DATA_SHARE:
+        this_->locks.share.unlock();
+        break;
+    case CURL_LOCK_DATA_COOKIE:
+        this_->locks.cookie.unlock();
+        break;
+    case CURL_LOCK_DATA_DNS:
+        this_->locks.dns.unlock();
+        break;
+    case CURL_LOCK_DATA_SSL_SESSION:
+        this_->locks.ssl.unlock();
+        break;
+    case CURL_LOCK_DATA_CONNECT:
+        this_->locks.connect.unlock();
+        break;
+    default:
+        internal_error(std::format("Unsupported unlock data type: {}", (int)data));
+    }
+}
+
 std::string share_interface::error_message(CURLSHcode code) {
     return std::string(curl_share_strerror(code));
 }
@@ -19,6 +71,13 @@ std::string share_interface::error_message(CURLSHcode code) {
 share_interface::share_interface() {
     share = curl_share_init();
     ELMA_ASSERT(share);
+
+    // Pass a reference to self in lock callback functions
+    setopt(CURLSHOPT_USERDATA, this);
+
+    // Multithreaded support
+    setopt(CURLSHOPT_LOCKFUNC, lock_callback_function);
+    setopt(CURLSHOPT_UNLOCKFUNC, unlock_callback_function);
 }
 
 share_interface::~share_interface() {

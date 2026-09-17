@@ -9,7 +9,7 @@ void invalidate_level();
 const char* current_level_filename();
 
 enum class LoadLevelResult { Success, Fail, Abort };
-bool load_level_play(const char* levelname);
+LoadLevelResult load_level_play(const char* levelname);
 
 bool load_level_editor(const char* levelname);
 

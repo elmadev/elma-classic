@@ -48,7 +48,11 @@ static LoadLevelResult validate_replay_level(int level_id, const std::string& fi
                         filename.c_str(), Rec1->level_filename);
         return key == DIK_ESCAPE ? LoadLevelResult::Abort : LoadLevelResult::Fail;
     }
-    load_level_play(Rec1->level_filename);
+    LoadLevelResult level_loaded = load_level_play(Rec1->level_filename);
+    if (level_loaded != LoadLevelResult::Success) {
+        // Topology error in level file
+        return level_loaded;
+    }
 
     if (Level->level_id != level_id) {
         DikScancode key =

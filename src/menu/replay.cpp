@@ -21,8 +21,6 @@
 #include <string>
 #include <vector>
 
-enum class LoadReplayResult { Success, Fail, Abort };
-
 static void replay_time(const std::string& filename) {
     MenuPalette->set();
     loading_screen();
@@ -44,28 +42,26 @@ static void replay_time(const std::string& filename) {
     menu_dialog(filename.c_str(), "The time of this replay file is:", time_str);
 }
 
-static LoadReplayResult validate_replay_level(int level_id, const std::string& filename) {
+static bool validate_replay_level(int level_id, const std::string& filename) {
     if (!level_file_exists(Rec1->level_filename)) {
-        DikScancode key =
-            menu_dialog("Cannot find the lev file that corresponds", "to the record file!",
-                        filename.c_str(), Rec1->level_filename);
-        return key == DIK_ESCAPE ? LoadReplayResult::Abort : LoadReplayResult::Fail;
+        menu_dialog("Cannot find the lev file that corresponds", "to the record file!",
+                    filename.c_str(), Rec1->level_filename);
+        return false;
     }
     if (!load_level_play(Rec1->level_filename)) {
-        return LoadReplayResult::Fail;
+        return false;
     }
 
     if (Level->level_id != level_id) {
-        DikScancode key =
-            menu_dialog("The level file has changed since the", "saving of the record file!",
-                        filename.c_str(), Rec1->level_filename);
-        return key == DIK_ESCAPE ? LoadReplayResult::Abort : LoadReplayResult::Fail;
+        menu_dialog("The level file has changed since the", "saving of the record file!",
+                    filename.c_str(), Rec1->level_filename);
+        return false;
     }
 
-    return LoadReplayResult::Success;
+    return true;
 }
 
-static LoadReplayResult load_replay(const std::string& filename) {
+static bool load_replay(const std::string& filename) {
     MenuPalette->set();
     loading_screen();
 
@@ -91,8 +87,8 @@ static void merge_play(const std::string& file1, const std::string& file2) {
         }
     }
 
-    LoadReplayResult loaded = validate_replay_level(result.level_id, file1);
-    if (loaded != LoadReplayResult::Success) {
+    bool loaded = validate_replay_level(result.level_id, file1);
+    if (!loaded) {
         return;
     }
 
@@ -100,7 +96,7 @@ static void merge_play(const std::string& file1, const std::string& file2) {
 }
 
 static void replay_play(const std::string& filename) {
-    if (load_replay(filename) == LoadReplayResult::Success) {
+    if (load_replay(filename)) {
         replay_from_file(Rec1->level_filename);
     }
 }
@@ -112,7 +108,7 @@ static void replay_render(const std::string& filename) {
     DikScancode c = menu_dialog("Render replay to video frames?", msg.c_str(),
                                 "Press Enter to continue, ESC to cancel");
     if (c == DIK_RETURN) {
-        if (load_replay(filename) == LoadReplayResult::Success) {
+        if (load_replay(filename)) {
             Rec1->rewind();
             Rec2->rewind();
             render_replay(Rec1->level_filename);
@@ -134,8 +130,8 @@ static void replay_randomizer(std::vector<std::string>& filenames) {
         second_last_played = last_played;
         last_played = index;
 
-        LoadReplayResult loaded = load_replay(filenames[indices[index]]);
-        if (loaded == LoadReplayResult::Success) {
+        bool loaded = load_replay(filenames[indices[index]]);
+        if (loaded) {
             Rec1->rewind();
             Rec2->rewind();
             if (replay_loop(Rec1->level_filename, false)) {

@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cstring>
 #include <format>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -119,9 +120,11 @@ static void replay_render(const std::string& filename) {
 
 static void replay_randomizer(std::vector<std::string>& filenames) {
     int count = static_cast<int>(filenames.size());
+    std::vector<int> indices(count);
+    std::iota(indices.begin(), indices.end(), 0);
     int last_played = -1;
     int second_last_played = -1;
-    while (true) {
+    while (!indices.empty()) {
         int index = util::random::uint32() % count;
         while ((index == last_played && count > 1) || (index == second_last_played && count > 2)) {
             index = util::random::uint32() % count;
@@ -129,15 +132,16 @@ static void replay_randomizer(std::vector<std::string>& filenames) {
         second_last_played = last_played;
         last_played = index;
 
-        LoadReplayResult loaded = load_replay(filenames[index]);
+        LoadReplayResult loaded = load_replay(filenames[indices[index]]);
         if (loaded == LoadReplayResult::Success) {
             Rec1->rewind();
             Rec2->rewind();
             if (replay_loop(Rec1->level_filename, false)) {
                 return;
             }
-        } else if (loaded == LoadReplayResult::Abort) {
-            return;
+        } else {
+            indices.erase(indices.begin() + index);
+            count = static_cast<int>(indices.size());
         }
     }
 }

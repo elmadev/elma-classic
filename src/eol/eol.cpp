@@ -61,12 +61,12 @@ eol::eol()
     players_online_table.add_column(100, eol_table::Align::Right);
     battle_results_table.add_column(100, eol_table::Align::Left);
     battle_results_table.add_column(100, eol_table::Align::Right);
-    battle_queue_table.add_column(100, eol_table::Align::Left);
-    battle_queue_table.add_column(60, eol_table::Align::Right);
-    battle_queue_table.add_column(130, eol_table::Align::Right);
-    finished_times_table.add_column(100, eol_table::Align::Left);
-    finished_times_table.add_column(60, eol_table::Align::Right);
-    finished_times_table.add_column(130, eol_table::Align::Right);
+    battle_queue_table.add_column(80, eol_table::Align::Left);
+    battle_queue_table.add_column(160, eol_table::Align::Center);
+    battle_queue_table.add_column(80, eol_table::Align::Right);
+    finished_times_table.add_column(80, eol_table::Align::Left);
+    finished_times_table.add_column(160, eol_table::Align::Center);
+    finished_times_table.add_column(80, eol_table::Align::Right);
     finished_times_table.set_overflow(eol_table::Overflow::NewestRows);
     best_times_table.add_column(100, eol_table::Align::Left);
     best_times_table.add_column(100, eol_table::Align::Right);

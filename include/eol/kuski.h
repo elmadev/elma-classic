@@ -50,6 +50,7 @@ class kuski {
     unsigned int id;
     char nick[16];
     char level[MAX_FILENAME_LEN + 1];
+    bool multi = false;
     bool is_player = true;
     bool is_online = true;
     pic8* shirt;

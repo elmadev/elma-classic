@@ -32,6 +32,7 @@ struct kuski_logout {
 struct kuski_set_level {
     unsigned int id;
     char level[MAX_FILENAME_LEN + 1];
+    bool multi;
 };
 
 struct kuski_new_shirt {

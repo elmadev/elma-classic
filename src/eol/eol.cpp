@@ -150,6 +150,12 @@ void eol::process(const kuski_logout& kl) {
         }
     }
 
+    if (spy_kuski_id && (*spy_kuski_id == kl.id || *spy_kuski_id == kl.id2)) {
+        StatusMessages->add(
+            std::format("{} logged out, cancelling spy", lookup_nick(*spy_kuski_id)));
+        spy_kuski_id.reset();
+    }
+
     for (kuski& k : kuskis_) {
         if (k.id == kl.id || k.id == kl.id2) {
             k.is_online = false;

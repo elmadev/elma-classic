@@ -141,7 +141,7 @@ class eol {
     };
     void upsert_leaderboard_entry(const battle_leaderboard_entry& entry, uint16_t rank);
 
-    bool update_battle_rec(const driver& d, const struct exit_level& el);
+    bool update_battle_rec(const struct exit_level& el);
 
     protocol proto;
     unsigned int id;

@@ -33,7 +33,7 @@ struct bike_metadata {
     turning_data camera_turning;
 };
 
-struct motor_stats {
+struct run_stats {
     double speed = 0.0;
     std::string format_speed() const;
 
@@ -48,7 +48,7 @@ struct driver {
     player_keys* keys;
     HudSlot hud_slot;
     bike_sound sound;
-    motor_stats stats;
+    run_stats stats;
 
     bool dead = false;
     int finish_time = 0;

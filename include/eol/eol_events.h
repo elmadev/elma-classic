@@ -66,13 +66,9 @@ struct enter_level {
 };
 
 struct exit_level {
-    const char* name;
     const driver& driv;
     double time;
-    int apple_count;
     int level_apple_count;
-    bool dead;
-    bool esc;
 };
 
 struct upload_rec {

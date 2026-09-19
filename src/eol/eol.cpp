@@ -522,14 +522,7 @@ void eol::exit_level(const driver& d, const level* lev, double time, int level_a
     }
 
     spy_kuski_id.reset();
-    int apple_count = d.mot->apple_count - d.mot->apple_bug_count;
-    struct exit_level fl{.name = d.rec->level_filename,
-                         .driv = d,
-                         .time = time,
-                         .apple_count = apple_count,
-                         .level_apple_count = level_apple_count,
-                         .dead = d.dead,
-                         .esc = d.finish_time == 0 && !d.dead};
+    struct exit_level fl{.driv = d, .time = time, .level_apple_count = level_apple_count};
     proto.send(fl);
 
     if (!spying && update_battle_rec(fl)) {
@@ -538,7 +531,7 @@ void eol::exit_level(const driver& d, const level* lev, double time, int level_a
         if (battle_id) {
             view = proto.pending_battle_rec_level();
         } else {
-            view = fl.name;
+            view = d.rec->level_filename;
             view.remove_suffix(strlen(".lev"));
             battle_id = proto.battle_id();
         }

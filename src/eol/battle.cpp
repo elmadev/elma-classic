@@ -510,7 +510,8 @@ bool eol::update_battle_rec(const struct exit_level& el) {
     case BattleType::FirstFinish:
     case BattleType::Slowness: {
         const bool finished = d.finish_time != 0;
-        const bool all_apples = el.level_apple_count == el.apple_count;
+        const int apple_count = d.mot->apple_count - d.mot->apple_bug_count;
+        const bool all_apples = el.level_apple_count == apple_count;
         const bool accept_bugs = current_battle->attributes & BattleAttributes::AcceptBugs;
         const bool better_result =
             ((current_battle->type == BattleType::Normal ||
@@ -519,13 +520,13 @@ bool eol::update_battle_rec(const struct exit_level& el) {
             (current_battle->type == BattleType::Slowness && el.time > battle_pr.result);
         if (finished && (all_apples || accept_bugs) && (!battle_pr.result || better_result)) {
             battle_pr.result = el.time;
-            battle_pr.apple_count = el.apple_count;
+            battle_pr.apple_count = apple_count;
             return true;
         }
 
         if ((!finished || !all_apples) && !battle_pr.result &&
-            el.apple_count > battle_pr.apple_count) {
-            battle_pr.apple_count = el.apple_count;
+            apple_count > battle_pr.apple_count) {
+            battle_pr.apple_count = apple_count;
             return true;
         }
         break;

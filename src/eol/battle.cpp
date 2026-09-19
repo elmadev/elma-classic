@@ -493,7 +493,7 @@ void eol::sync_battle_queue_table() {
     }
 }
 
-bool eol::update_battle_rec(const driver& d, const struct exit_level& el) {
+bool eol::update_battle_rec(const struct exit_level& el) {
     if (proto.pending_battle_rec_battle_id()) {
         return true;
     }
@@ -501,6 +501,8 @@ bool eol::update_battle_rec(const driver& d, const struct exit_level& el) {
     if (!proto.in_battle_level() || !current_battle || current_battle->in_countdown) {
         return false;
     }
+
+    const driver& d = el.driv;
 
     switch (current_battle->type) {
     case BattleType::Normal:

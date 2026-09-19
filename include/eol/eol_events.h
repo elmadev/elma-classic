@@ -11,6 +11,7 @@
 #include <vector>
 
 class recorder;
+struct driver;
 
 constexpr int MAX_MESSAGE_LEN = 65;
 
@@ -66,6 +67,7 @@ struct enter_level {
 
 struct exit_level {
     const char* name;
+    const driver& driv;
     double time;
     int apple_count;
     int level_apple_count;

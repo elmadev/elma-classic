@@ -252,6 +252,9 @@ static void physics_subframe(driver& driv, double time, double dt) {
 
     using namespace BattleAttributes;
     const Kind cripples = active_cripples();
+    if (!(cripples & Drunk)) {
+        driv.stats.drunk = false;
+    }
     if ((cripples & Drunk) && ((mot->apple_count - mot->apple_bug_count) & 1)) {
         std::swap(is_gas_down, is_brake_down);
         std::swap(is_right_volt_down, is_left_volt_down);
@@ -265,6 +268,19 @@ static void physics_subframe(driver& driv, double time, double dt) {
     if (cripples & AlwaysThrottle) {
         is_gas_down = true;
         is_brake_down = false;
+    }
+
+    // Brake wins over gas, so gas held under brake is not throttling
+    const bool throttling = is_gas_down && !is_brake_down;
+    if (throttling) {
+        driv.stats.throttle_time += dt;
+    } else {
+        driv.stats.throttle_released = true;
+    }
+    if (is_brake_down) {
+        driv.stats.brake_time += dt;
+    } else {
+        driv.stats.brake_released = true;
     }
 
     bool right_volt = false;
@@ -281,6 +297,13 @@ static void physics_subframe(driver& driv, double time, double dt) {
             metadata->volt_time = time;
             metadata->volt_is_right = false;
             add_event_buffer(WavEvent::LeftVolt, 0.99, -1);
+        }
+        if (right_volt && left_volt) {
+            driv.stats.super_volt_count++;
+        } else if (right_volt) {
+            driv.stats.right_volt_count++;
+        } else if (left_volt) {
+            driv.stats.left_volt_count++;
         }
     }
 
@@ -461,6 +484,7 @@ static void physics_frame_turn(driver& driv) {
             mot->flipped_bike = !mot->flipped_bike;
             set_head_position(mot);
             metadata->one_turn_used = true;
+            driv.stats.turn_count++;
         }
         metadata->turn_key_previous = is_turn_down;
     }
@@ -696,6 +720,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Game1);
     driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Game2);
+    driv1.stats.drunk = driv2.stats.drunk = active_cripples() & BattleAttributes::Drunk;
 
     camera current_camera;
     current_camera.mode = camera_mode;

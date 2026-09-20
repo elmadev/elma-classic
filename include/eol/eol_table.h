@@ -18,6 +18,7 @@ class eol_table {
         : title(std::move(title_)) {}
 
     void add_column(int width, Align alignment = Align::Left);
+    void set_column_width(int column, int width);
     void clear_columns();
 
     void add_row(std::vector<std::string> values);

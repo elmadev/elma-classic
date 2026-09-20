@@ -9,6 +9,8 @@ constexpr int GROUP_GAP = 40;
 
 void eol_table::add_column(int width, Align alignment) { columns.push_back({width, alignment}); }
 
+void eol_table::set_column_width(int column, int width) { columns[column].width = width; }
+
 void eol_table::clear_columns() { columns.clear(); }
 
 void eol_table::add_row(std::vector<std::string> values) { rows.push_back(std::move(values)); }

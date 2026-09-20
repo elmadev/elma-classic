@@ -58,7 +58,9 @@ void menu_intro() {
         show_intro_screen();
     }
 
-    open_sound_device();
+    if (State->sound_on) {
+        open_sound_device();
+    }
 
     // Load globals
     EditorWhiteFont = new abc8("kisbetu1.abc", 1, 19); // "small letter 1"

@@ -238,8 +238,15 @@ void menu_options() {
         nav.add_row("Player B:", State->player2, NAV_FUNC() { menu_player_choose(false, true); });
 
         nav.add_row(
-            "Sound:", State->sound_on ? "Enabled" : "Disabled",
-            NAV_FUNC() { State->sound_on = !State->sound_on; });
+            "Sound:", State->sound_on ? "Enabled" : "Disabled", NAV_FUNC() {
+                if (State->sound_on) {
+                    close_sound_device();
+                    State->sound_on = 0;
+                } else {
+                    open_sound_device();
+                    State->sound_on = 1;
+                }
+            });
 
         nav.add_row(
             "Animated Menus:", State->animated_menus ? "Yes" : "No",

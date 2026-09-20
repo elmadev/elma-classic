@@ -107,6 +107,7 @@
 * Bike and wheel rotation positions are no longer briefly incorrect when rotating through an angle of 0 degrees (upright position)
 
 ### System
+* The audio device is opened in the menu, instead of when entering a level for the first time and lagging the start of the level
 * Enforce lowercase LGR filenames to fix loading issues on case-sensitive filesystems
 * Level and replay filenames may have multiple dots (e.g. pack.01.lev)
 * Some minor grammatical and spelling mistakes are fixed

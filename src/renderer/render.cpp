@@ -951,7 +951,7 @@ void level_to_bmp(const char* filename) {
     Level->get_boundaries(&level_x1, &level_y1, &level_x2, &level_y2, true);
 
     // Invert y and add buffer zone
-    constexpr int MARGIN = 5.0;
+    constexpr double MARGIN = 5.0;
     double x1 = level_x1 - MARGIN;
     double x2 = level_x2 + MARGIN;
     double y1 = -level_y2 - MARGIN;

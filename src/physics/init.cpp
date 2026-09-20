@@ -78,6 +78,14 @@ void motorst::init() {
     set_head_position(this);
 }
 
+void motorst::spawn(vect2 start_position) {
+    bike.r = bike.r + start_position;
+    left_wheel.r = left_wheel.r + start_position;
+    right_wheel.r = right_wheel.r + start_position;
+    body_r = body_r + start_position;
+    head_r = head_r + start_position;
+}
+
 void set_zoom_factor() {
     double zoom_factor = 0.48 * EolSettings->zoom();
     MetersToPixels = 100.0 * zoom_factor;

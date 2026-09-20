@@ -1103,8 +1103,6 @@ double level::checksum() {
     return CHECKSUM_MULTIPLIER * sum;
 }
 
-vect2 BikeStartOffset;
-
 int level::initialize_objects(motorst* mot) {
     int apple_count = 0;
     bool start_found = false;
@@ -1126,7 +1124,7 @@ int level::initialize_objects(motorst* mot) {
                 start_found = true;
                 // Hide start object. Store the bike position to respawn in flag tag mode
                 obj->active = false;
-                BikeStartOffset = obj->r - mot->left_wheel.r;
+                start_position = obj->r - mot->left_wheel.r;
             }
         }
     }

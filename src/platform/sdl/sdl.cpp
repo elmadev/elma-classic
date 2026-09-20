@@ -490,17 +490,15 @@ std::string get_clipboard_text() {
 int get_mouse_wheel_delta() { return MouseWheelDelta; }
 
 static SDL_AudioDeviceID SDLAudioDevice;
-static bool SDLSoundInitialized = false;
 
 static void audio_callback(void* /*udata*/, Uint8* stream, int len) {
     sound_mixer((short*)stream, len / 2);
 }
 
-void init_sound() {
-    if (SDLSoundInitialized) {
-        internal_error("Sound already initialized!");
+void open_sound_device() {
+    if (SDLAudioDevice) {
+        internal_error("Sound device already open!");
     }
-    SDLSoundInitialized = true;
 
     SDL_AudioSpec desired_spec;
     memset(&desired_spec, 0, sizeof(desired_spec));
@@ -522,6 +520,15 @@ void init_sound() {
         internal_error("Failed to get correct audio format");
     }
     SDL_PauseAudioDevice(SDLAudioDevice, 0);
+}
+
+void close_sound_device() {
+    if (!SDLAudioDevice) {
+        return;
+    }
+    SDL_CloseAudioDevice(SDLAudioDevice);
+    SDLAudioDevice = 0;
+    SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
 bool platform_save_screenshot() {

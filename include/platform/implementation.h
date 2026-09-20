@@ -22,7 +22,8 @@ bool platform_render_error(pic8* buffer);
 void handle_events();
 
 void platform_init();
-void init_sound();
+void open_sound_device();
+void close_sound_device();
 
 void lock_backbuffer(pic8& view, bool flipped);
 void unlock_backbuffer();

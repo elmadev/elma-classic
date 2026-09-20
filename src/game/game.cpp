@@ -695,8 +695,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     current_camera.mode = camera_mode;
     current_camera.x = Motor1->bike.r.x;
     current_camera.y = Motor1->bike.r.y;
-    current_camera.start_x = Motor1->bike.r.x;
-    current_camera.start_y = Motor1->bike.r.y;
 
     double level_min_y;
     double level_max_y;

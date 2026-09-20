@@ -1121,9 +1121,8 @@ int level::initialize_objects(motorst* mot) {
                     internal_error("Level can only have one Start object!");
                 }
                 start_found = true;
-                // Hide start object. Store the bike position to respawn in flag tag mode
                 obj->active = false;
-                BikeStartOffset = obj->r - mot->left_wheel.r;
+                BikeStartOffset = obj->r;
                 mot->bike.r = mot->bike.r + BikeStartOffset;
                 mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
                 mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;

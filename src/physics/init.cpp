@@ -47,32 +47,32 @@ void motorst::init() {
     bike.rotation = 0.0;
     bike.angular_velocity = 0.0;
     bike.radius = 0.3;
-    bike.mass = 200;
+    bike.mass = 200.0;
     // inertia = mass * radius * radius
     // although radius = 0.55 is used instead of 0.3, as set above.
     bike.inertia = 200.0 * 0.55 * 0.55;
-    bike.r = vect2(2.75, 3.6);
-    bike.v = vect2(0, 0);
+    bike.r = vect2(0.85, 0.6);
+    bike.v = vect2(0.0, 0.0);
 
     left_wheel.rotation = 0.0;
     left_wheel.angular_velocity = 0.0;
     left_wheel.radius = 0.4;
-    left_wheel.mass = 10;
+    left_wheel.mass = 10.0;
     left_wheel.inertia = 0.32;
-    left_wheel.r = vect2(1.9, 3.0);
-    left_wheel.v = vect2(0, 0);
+    left_wheel.r = vect2(0.0, 0.0);
+    left_wheel.v = vect2(0.0, 0.0);
     left_wheel.touching_edge = false;
 
     right_wheel.rotation = 0.0;
     right_wheel.angular_velocity = 0.0;
     right_wheel.radius = 0.4;
-    right_wheel.mass = 10;
+    right_wheel.mass = 10.0;
     right_wheel.inertia = 0.32;
-    right_wheel.r = vect2(3.6, 3.0);
-    right_wheel.v = vect2(0, 0);
+    right_wheel.r = vect2(1.7, 0.0);
+    right_wheel.v = vect2(0.0, 0.0);
     right_wheel.touching_edge = false;
 
-    body_r = vect2(2.75, 4.04);
+    body_r = vect2(0.85, 1.04);
     body_v = vect2(0.0, 0.0);
 
     set_head_position(this);

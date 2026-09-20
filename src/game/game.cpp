@@ -301,7 +301,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
         }
 
         // Flag Tag respawn
-        init_motor(mot);
+        mot->init();
         mot->bike.r = mot->bike.r + BikeStartOffset;
         mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
         mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;

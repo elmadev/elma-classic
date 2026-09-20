@@ -73,6 +73,8 @@ struct motorst {
     double left_volt_time;
     double angular_velocity_pre_right_volt;
     double angular_velocity_pre_left_volt;
+
+    void init();
 };
 
 extern motorst *Motor1, *Motor2;
@@ -80,6 +82,5 @@ extern motorst *Motor1, *Motor2;
 void set_zoom_factor();
 void set_minimap_zoom_factor();
 void init_physics_data();
-void init_motor(motorst* motor);
 
 #endif

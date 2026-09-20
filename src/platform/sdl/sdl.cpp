@@ -199,6 +199,8 @@ void platform_apply_fullscreen_mode() {
 }
 
 void platform_init() {
+    SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "1");
+
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         internal_error(SDL_GetError());
     }

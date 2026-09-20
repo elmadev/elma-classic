@@ -1100,8 +1100,6 @@ double level::checksum() {
     return CHECKSUM_MULTIPLIER * sum;
 }
 
-vect2 BikeStartOffset;
-
 int level::initialize_objects() {
     int apple_count = 0;
     bool start_found = false;
@@ -1122,7 +1120,7 @@ int level::initialize_objects() {
                 }
                 start_found = true;
                 obj->active = false;
-                BikeStartOffset = obj->r;
+                start_position = obj->r;
             }
         }
     }

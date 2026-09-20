@@ -302,7 +302,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
 
         // Flag Tag respawn
         mot->init();
-        mot->spawn(BikeStartOffset);
+        mot->spawn(Level->start_position);
 
         driv.reset_metadata();
 
@@ -620,8 +620,8 @@ static void setup_gameloop(const char* filename) {
 
     init_physics_data();
 
-    Motor1->spawn(BikeStartOffset);
-    Motor2->spawn(BikeStartOffset);
+    Motor1->spawn(Level->start_position);
+    Motor2->spawn(Level->start_position);
 
     Motor1->apple_count = 0;
     Motor2->apple_count = 0;

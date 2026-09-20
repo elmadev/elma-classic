@@ -39,6 +39,8 @@ class level {
     topten_set toptens;
     int topten_file_offset; // 0 if internal level
 
+    vect2 start_position;
+
     // Create a default level
     level();
     // Load level from file
@@ -86,8 +88,6 @@ class level {
     vect2 midpoint() const;
     int crc() const;
 };
-
-extern vect2 BikeStartOffset;
 
 // Return true if level exists. Internal levels always exist.
 bool level_file_exists(const char* filename);

@@ -75,6 +75,7 @@ struct motorst {
     double angular_velocity_pre_left_volt;
 
     void init();
+    void spawn(vect2 start_position);
 };
 
 extern motorst *Motor1, *Motor2;

@@ -1127,11 +1127,6 @@ int level::initialize_objects(motorst* mot) {
                 // Hide start object. Store the bike position to respawn in flag tag mode
                 obj->active = false;
                 BikeStartOffset = obj->r - mot->left_wheel.r;
-                mot->bike.r = mot->bike.r + BikeStartOffset;
-                mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
-                mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;
-                mot->body_r = mot->body_r + BikeStartOffset;
-                mot->head_r = mot->head_r + BikeStartOffset;
             }
         }
     }

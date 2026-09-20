@@ -302,11 +302,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
 
         // Flag Tag respawn
         mot->init();
-        mot->bike.r = mot->bike.r + BikeStartOffset;
-        mot->left_wheel.r = mot->left_wheel.r + BikeStartOffset;
-        mot->right_wheel.r = mot->right_wheel.r + BikeStartOffset;
-        mot->body_r = mot->body_r + BikeStartOffset;
-        mot->head_r = mot->head_r + BikeStartOffset;
+        mot->spawn(BikeStartOffset);
 
         driv.reset_metadata();
 
@@ -610,16 +606,16 @@ static void setup_gameloop(const char* filename) {
 
     load_best_time(filename, Single);
 
-    init_physics_data();
-
     if (!Level) {
         internal_error("setup_gameloop() !Level!");
     }
     Level->flip_objects();
     Level->sort_objects();
 
+    init_physics_data();
     TotalApples = Level->initialize_objects(Motor1);
-    Level->initialize_objects(Motor2);
+    Motor1->spawn(BikeStartOffset);
+    Motor2->spawn(BikeStartOffset);
 
     reset_game_background();
 

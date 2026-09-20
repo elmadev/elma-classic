@@ -643,12 +643,20 @@ struct NumpadNavGuard {
     NumpadNavGuard() { keyboard::set_numpad_nav(false); }
     ~NumpadNavGuard() { keyboard::set_numpad_nav(true); }
 };
+
+struct ScreensaverSuspend {
+    ScreensaverSuspend() { disable_screensaver(); }
+    ~ScreensaverSuspend() { enable_screensaver(); }
+};
 } // namespace
 
 int game_loop(const char* filename, CameraMode camera_mode) {
     // Bindings during gameplay must be honored by raw scancode: numpad-6
     // is right-volt, not "Right Arrow when NumLock is off".
     NumpadNavGuard numpad_nav_guard;
+
+    // Disable screensaver during gameplay.
+    ScreensaverSuspend screensaver_suspend;
 
     WhoDiedFirst = 0;
     Player1Finished = false;
@@ -986,6 +994,9 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
     // is right-volt, not "Right Arrow when NumLock is off".
     NumpadNavGuard numpad_nav_guard;
 
+    // Disable screensaver during gameplay.
+    ScreensaverSuspend screensaver_suspend;
+
     // Refuse to play zero-length replays (from map-viewer mode)
     if (Rec1->is_empty()) {
         return -2;
@@ -1180,6 +1191,9 @@ void setup_render_directory(const std::string& replay_filename) {
 }
 
 void render_replay(const char* level_filename) {
+    // Disable screensaver during gameplay.
+    ScreensaverSuspend screensaver_suspend;
+
     Single = !MultiplayerRec;
     FlagTag = Rec1->flagtag();
     setup_gameloop(level_filename);

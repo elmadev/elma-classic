@@ -50,4 +50,7 @@ void platform_recreate_window();
 bool has_window();
 bool platform_save_screenshot();
 
+void enable_screensaver();
+void disable_screensaver();
+
 #endif

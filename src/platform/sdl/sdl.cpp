@@ -537,3 +537,7 @@ bool platform_save_screenshot() {
 
     return SDL_SaveBMP(SDLSurfacePaletted, filename.c_str()) == 0;
 }
+
+void enable_screensaver() { SDL_EnableScreenSaver(); }
+
+void disable_screensaver() { SDL_DisableScreenSaver(); }

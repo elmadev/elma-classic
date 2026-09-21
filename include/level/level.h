@@ -40,6 +40,8 @@ class level {
     topten_set toptens;
     int topten_file_offset; // 0 if internal level
 
+    vect2 start_position;
+
     // Create a default level
     level();
     // Load level from file
@@ -75,7 +77,7 @@ class level {
     void get_boundaries(double* x1, double* y1, double* x2, double* y2,
                         bool check_objects_and_sprites);
     // Returns apple count.
-    int initialize_objects(motorst* mot);
+    int initialize_objects();
     void sort_objects();
     object* get_object(int index);
 
@@ -87,8 +89,6 @@ class level {
     vect2 midpoint() const;
     int crc() const;
 };
-
-extern vect2 BikeStartOffset;
 
 // Return true if level exists. Internal levels always exist.
 bool level_file_exists(const char* filename);

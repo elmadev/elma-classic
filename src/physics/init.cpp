@@ -38,44 +38,52 @@ double PixelsToMeters;
 int MinimapScaleFactor = 10;
 double MetersToMinimapPixels;
 
-void init_motor(motorst* motor) {
-    motor->flipped_bike = 0;
-    motor->gravity_direction = MotorGravity::Down;
-    motor->prev_brake = false;
-    motor->one_wheel_failed = false;
+void motorst::init() {
+    flipped_bike = 0;
+    gravity_direction = MotorGravity::Down;
+    prev_brake = false;
+    one_wheel_failed = false;
 
-    motor->bike.rotation = 0.0;
-    motor->bike.angular_velocity = 0.0;
-    motor->bike.radius = 0.3;
-    motor->bike.mass = 200;
+    bike.rotation = 0.0;
+    bike.angular_velocity = 0.0;
+    bike.radius = 0.3;
+    bike.mass = 200.0;
     // inertia = mass * radius * radius
     // although radius = 0.55 is used instead of 0.3, as set above.
-    motor->bike.inertia = 200.0 * 0.55 * 0.55;
-    motor->bike.r = vect2(2.75, 3.6);
-    motor->bike.v = vect2(0, 0);
+    bike.inertia = 200.0 * 0.55 * 0.55;
+    bike.r = vect2(0.85, 0.6);
+    bike.v = vect2(0.0, 0.0);
 
-    motor->left_wheel.rotation = 0.0;
-    motor->left_wheel.angular_velocity = 0.0;
-    motor->left_wheel.radius = 0.4;
-    motor->left_wheel.mass = 10;
-    motor->left_wheel.inertia = 0.32;
-    motor->left_wheel.r = vect2(1.9, 3.0);
-    motor->left_wheel.v = vect2(0, 0);
-    motor->left_wheel.touching_edge = false;
+    left_wheel.rotation = 0.0;
+    left_wheel.angular_velocity = 0.0;
+    left_wheel.radius = 0.4;
+    left_wheel.mass = 10.0;
+    left_wheel.inertia = 0.32;
+    left_wheel.r = vect2(0.0, 0.0);
+    left_wheel.v = vect2(0.0, 0.0);
+    left_wheel.touching_edge = false;
 
-    motor->right_wheel.rotation = 0.0;
-    motor->right_wheel.angular_velocity = 0.0;
-    motor->right_wheel.radius = 0.4;
-    motor->right_wheel.mass = 10;
-    motor->right_wheel.inertia = 0.32;
-    motor->right_wheel.r = vect2(3.6, 3.0);
-    motor->right_wheel.v = vect2(0, 0);
-    motor->right_wheel.touching_edge = false;
+    right_wheel.rotation = 0.0;
+    right_wheel.angular_velocity = 0.0;
+    right_wheel.radius = 0.4;
+    right_wheel.mass = 10.0;
+    right_wheel.inertia = 0.32;
+    right_wheel.r = vect2(1.7, 0.0);
+    right_wheel.v = vect2(0.0, 0.0);
+    right_wheel.touching_edge = false;
 
-    motor->body_r = vect2(2.75, 4.04);
-    motor->body_v = vect2(0.0, 0.0);
+    body_r = vect2(0.85, 1.04);
+    body_v = vect2(0.0, 0.0);
 
-    set_head_position(motor);
+    set_head_position(this);
+}
+
+void motorst::spawn(vect2 start_position) {
+    bike.r = bike.r + start_position;
+    left_wheel.r = left_wheel.r + start_position;
+    right_wheel.r = right_wheel.r + start_position;
+    body_r = body_r + start_position;
+    head_r = head_r + start_position;
 }
 
 void set_zoom_factor() {
@@ -92,8 +100,8 @@ void set_minimap_zoom_factor() {
 }
 
 void init_physics_data() {
-    init_motor(Motor1);
-    init_motor(Motor2);
+    Motor1->init();
+    Motor2->init();
 
     set_zoom_factor();
 

@@ -17,6 +17,8 @@ class null_protocol {
     bool in_battle_level() const { return false; }
     bool playing_battle_level() const { return false; }
     uint32_t battle_id() const { return 0; }
+    uint32_t pending_battle_rec_battle_id() const { return 0; }
+    const char* pending_battle_rec_level() const { return nullptr; }
 };
 
 #endif

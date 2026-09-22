@@ -85,7 +85,7 @@ class lgrfile {
 
   public:
     static void invalidate_lgr_cache();
-    static void recreate_lgr_if_needed();
+    static void recreate_lgr_if_needed(const char* lgr_name = nullptr);
     static void load_lgr_file(const char* lgr_name, bool warn_missing);
     static const char* current_lgr_name();
 

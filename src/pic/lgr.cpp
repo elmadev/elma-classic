@@ -68,12 +68,12 @@ constexpr char FANCYBOOST_NAMES[256][10] = {
 
 void lgrfile::invalidate_lgr_cache() { CurrentLgrName[0] = '\0'; }
 
-void lgrfile::recreate_lgr_if_needed() {
-    if (CurrentLgrName[0]) {
+void lgrfile::recreate_lgr_if_needed(const char* lgr_name) {
+    if (CurrentLgrName[0] && (!lgr_name || (strcmp(CurrentLgrName, lgr_name) == 0))) {
         return;
     }
 
-    lgrfile::load_lgr_file(Level->lgr_name, false);
+    lgrfile::load_lgr_file(lgr_name ? lgr_name : Level->lgr_name, false);
 
     Lgr->pal->set();
     canvas::invalidate_canvases();

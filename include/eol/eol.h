@@ -41,6 +41,7 @@ class eol {
     void process(const chat_message&);
     void process(const private_message&);
     void process(const team_message&);
+    void process(const info_message&);
     void process(const spy_data&);
     void process(const spy_apple_data&);
     void process(const stop_spy_data&);

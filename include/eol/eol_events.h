@@ -143,6 +143,10 @@ struct team_message {
     char message[MAX_MESSAGE_LEN + 1];
 };
 
+struct info_message {
+    std::string message;
+};
+
 struct battle_started {
     battle bat;
 };

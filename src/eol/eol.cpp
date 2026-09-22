@@ -406,6 +406,8 @@ void eol::process(const team_message& msg) {
     Console->add_line(line, console::LineType::Team);
 }
 
+void eol::process(const info_message& msg) { StatusMessages->add(msg.message); }
+
 void eol::process(const spy_data& sd) {
     kuski* k = get_kuski(kuskis_, sd.kuski_id);
     if (k) {

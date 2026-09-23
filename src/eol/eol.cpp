@@ -666,6 +666,26 @@ void eol::toggle_team_chat() {
                                      : "Team chat off");
 }
 
+void eol::announce_shown_to() { proto.send(shown_to{.to = EolSettings->shown_to()}); }
+
+void eol::cycle_shown_to() {
+    switch (EolSettings->shown_to()) {
+    case ShownTo::Everyone:
+        EolSettings->set_shown_to(ShownTo::Team);
+        StatusMessages->add("only players of your team can see you");
+        break;
+    case ShownTo::Team:
+        EolSettings->set_shown_to(ShownTo::Nobody);
+        StatusMessages->add("other players can't see you");
+        break;
+    case ShownTo::Nobody:
+        EolSettings->set_shown_to(ShownTo::Everyone);
+        StatusMessages->add("other players can see you");
+        break;
+    }
+    announce_shown_to();
+}
+
 template <typename Range>
 static void cycle_pm_kuski(std::optional<unsigned int>& pm_kuski_id, Range&& range) {
     bool found_current = !pm_kuski_id;

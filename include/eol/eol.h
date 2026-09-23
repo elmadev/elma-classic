@@ -103,6 +103,8 @@ class eol {
     void update_spy_kuskis();
 
     void toggle_team_chat();
+    void cycle_shown_to();
+    void announce_shown_to();
 
     void pm_next_kuski();
     void pm_prev_kuski();

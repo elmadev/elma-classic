@@ -473,6 +473,10 @@ static void handle_eol_inputs() {
                                                        : "other players hidden");
     }
 
+    if (was_game_key_just_pressed(State->key_shown_to)) {
+        EolClient->cycle_shown_to();
+    }
+
     if (was_game_key_just_pressed(State->key_spy_next_kuski)) {
         EolClient->spy_next_kuski();
     }

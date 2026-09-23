@@ -1,6 +1,7 @@
 #ifndef EOL_SETTINGS
 #define EOL_SETTINGS
 
+#include "eol/eol_events.h"
 #include "eol_table.h"
 #include "platform/scancode.h"
 #include <string>
@@ -209,6 +210,7 @@ class eol_settings {
 
     Default<eol_table::Align> table_alignment_{eol_table::Align::Center};
     Default<ChatVisibility> chat_visibility_{ChatVisibility::Shown};
+    Default<ShownTo> shown_to_{ShownTo::Everyone};
 
   public:
     static void read_settings();
@@ -336,6 +338,7 @@ class eol_settings {
 
     DECLARE_SETTING(table_alignment);
     DECLARE_SETTING(chat_visibility);
+    DECLARE_SETTING(shown_to);
 };
 
 #undef SETTING_VALUE_TYPE

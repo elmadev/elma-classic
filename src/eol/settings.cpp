@@ -57,6 +57,7 @@ template struct Default<MapAlignment>;
 template struct Default<RendererType>;
 template struct Default<FullscreenMode>;
 template struct Default<ChatVisibility>;
+template struct Default<ShownTo>;
 template struct Default<DikScancode>;
 template struct Default<combo_scancode>;
 template struct Default<std::string>;

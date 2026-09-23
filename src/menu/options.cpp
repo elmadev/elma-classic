@@ -1,4 +1,5 @@
 #include "menu/options.h"
+#include "eol/eol.h"
 #include "eol/settings.h"
 #include "game/state.h"
 #include "main.h"
@@ -518,6 +519,34 @@ void menu_options() {
                     EolSettings->persist_chat_visibility(ChatVisibility::Shown);
                     return;
                 }
+            });
+
+        nav.add_row(
+            "Shown to:",
+            [] {
+                switch (EolSettings->shown_to_persisted()) {
+                case ShownTo::Everyone:
+                    return "Everyone";
+                case ShownTo::Team:
+                    return "Team";
+                case ShownTo::Nobody:
+                    return "Nobody";
+                }
+                return "";
+            }(),
+            NAV_FUNC() {
+                switch (EolSettings->shown_to_persisted()) {
+                case ShownTo::Everyone:
+                    EolSettings->persist_shown_to(ShownTo::Team);
+                    break;
+                case ShownTo::Team:
+                    EolSettings->persist_shown_to(ShownTo::Nobody);
+                    break;
+                case ShownTo::Nobody:
+                    EolSettings->persist_shown_to(ShownTo::Everyone);
+                    break;
+                }
+                EolClient->announce_shown_to();
             });
 
         nav.add_row(

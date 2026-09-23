@@ -112,6 +112,8 @@ struct show_table {
     TableType table;
 };
 
+enum class ShownTo : uint8_t { Everyone = 0, Team, Nobody };
+
 struct chat_message {
     unsigned int kuski_id;
     uint64_t unix_timestamp;

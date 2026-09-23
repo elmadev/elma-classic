@@ -93,6 +93,7 @@ class state {
     DikScancode key_replay_rewind;
 
     combo_scancode key_show_others;
+    combo_scancode key_shown_to;
     combo_scancode key_spy_next_kuski;
     combo_scancode key_spy_prev_kuski;
     combo_scancode key_battle_queue;

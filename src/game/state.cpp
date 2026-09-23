@@ -427,6 +427,7 @@ void state::reset_keys() {
     key_replay_rewind = EolSettings->replay_rewind_key_default();
 
     key_show_others = EolSettings->show_others_key_default();
+    key_shown_to = EolSettings->shown_to_key_default();
     key_spy_next_kuski = EolSettings->spy_next_kuski_key_default();
     key_spy_prev_kuski = EolSettings->spy_prev_kuski_key_default();
     key_battle_queue = EolSettings->battle_queue_key_default();

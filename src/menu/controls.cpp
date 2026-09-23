@@ -165,6 +165,7 @@ static void load_player_controls(menu_nav* nav, key_pointers& keys, player_keys*
 static void load_function_controls(menu_nav* nav) {
     FunctionKeys.resize(0);
     load_control(nav, FunctionKeys, "Show Others", &State->key_show_others);
+    load_control(nav, FunctionKeys, "Shown To", &State->key_shown_to);
     load_control(nav, FunctionKeys, "Spy Next Kuski", &State->key_spy_next_kuski);
     load_control(nav, FunctionKeys, "Spy Prev Kuski", &State->key_spy_prev_kuski);
     load_control(nav, FunctionKeys, "Battle Queue", &State->key_battle_queue);

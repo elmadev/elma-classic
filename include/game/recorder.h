@@ -35,6 +35,13 @@ struct event {
 };
 static_assert(sizeof(event) == 0x10);
 
+struct event_stats {
+    int turn;
+    int left_volt;
+    int right_volt;
+    int super_volt;
+};
+
 struct frame_data {
     float bike_x;
     float bike_y;
@@ -116,6 +123,8 @@ class recorder {
     // Currently applicable gravity at the current event cursor (from the last
     // gravity apple). Returns MotorGravity::Down if none.
     MotorGravity last_gravity(const level& lev) const;
+    // Get the number of turns and volts in the replay
+    event_stats get_event_stats() const;
 
     // Find frame time of the last direction change at or before `time`,
     // detected from the flipped_bike flag in frame data.

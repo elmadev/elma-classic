@@ -880,6 +880,12 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
              apple_time});
     }
 
+    event_stats rec_stats = driv.rec->get_event_stats();
+    info_rows.push_back({"turn", std::to_string(rec_stats.turn)});
+    info_rows.push_back({"left volt", std::to_string(rec_stats.left_volt)});
+    info_rows.push_back({"right volt", std::to_string(rec_stats.right_volt)});
+    info_rows.push_back({"super volt", std::to_string(rec_stats.super_volt)});
+
     if (!EolClient->play_offline() && !EolClient->connected()) {
         MediumFont->write_right_align(
             pic, GameViewWidth - 10, GameViewHeight - MediumFont->line_height() * 2,

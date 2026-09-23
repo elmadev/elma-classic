@@ -390,6 +390,26 @@ MotorGravity recorder::last_gravity(const level& lev) const {
     return MotorGravity::Down;
 }
 
+event_stats recorder::get_event_stats() const {
+    event_stats stats = {};
+    for (int i = 0; i < event_count; i++) {
+        if (events[i].event_id == WavEvent::RightVolt) {
+            if (i + 1 < event_count && events[i + 1].event_id == WavEvent::LeftVolt &&
+                events[i].time == events[i + 1].time) {
+                stats.super_volt++;
+                i++;
+                continue;
+            }
+            stats.right_volt++;
+        } else if (events[i].event_id == WavEvent::LeftVolt) {
+            stats.left_volt++;
+        } else if (events[i].event_id == WavEvent::Turn) {
+            stats.turn++;
+        }
+    }
+    return stats;
+}
+
 std::optional<event> recorder::recall_event_reverse(double time) {
     if (current_event_index > 0 && events[current_event_index - 1].time > time) {
         return events[--current_event_index];

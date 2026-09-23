@@ -384,6 +384,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(replay_rewind_key)                                                                  \
                                                                                                    \
     JSON_FIELD(show_others_key)                                                                    \
+    JSON_FIELD(shown_to_key)                                                                       \
     JSON_FIELD(spy_next_kuski_key)                                                                 \
     JSON_FIELD(spy_prev_kuski_key)                                                                 \
     JSON_FIELD(battle_queue_key)                                                                   \
@@ -549,6 +550,7 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->key_replay_rewind = EolSettings->replay_rewind_key();
 
     s->key_show_others = EolSettings->show_others_key();
+    s->key_shown_to = EolSettings->shown_to_key();
     s->key_spy_next_kuski = EolSettings->spy_next_kuski_key();
     s->key_spy_prev_kuski = EolSettings->spy_prev_kuski_key();
     s->key_battle_queue = EolSettings->battle_queue_key();
@@ -602,6 +604,7 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_replay_rewind_key(s->key_replay_rewind);
 
     EolSettings->persist_show_others_key(s->key_show_others);
+    EolSettings->persist_shown_to_key(s->key_shown_to);
     EolSettings->persist_spy_next_kuski_key(s->key_spy_next_kuski);
     EolSettings->persist_spy_prev_kuski_key(s->key_spy_prev_kuski);
     EolSettings->persist_battle_queue_key(s->key_battle_queue);

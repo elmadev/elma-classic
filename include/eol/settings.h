@@ -131,6 +131,7 @@ class eol_settings {
     Default<DikScancode> replay_rewind_key_{DIK_LEFT};
 
     Default<combo_scancode> show_others_key_{combo_scancode{DIK_NONE, DIK_F1}};
+    Default<combo_scancode> shown_to_key_{combo_scancode{DIK_LSHIFT, DIK_F1}};
     Default<combo_scancode> spy_next_kuski_key_{combo_scancode{DIK_NONE, DIK_F2}};
     Default<combo_scancode> spy_prev_kuski_key_{combo_scancode{DIK_LSHIFT, DIK_F2}};
     Default<combo_scancode> battle_queue_key_{combo_scancode{DIK_NONE, DIK_F3}};
@@ -257,6 +258,7 @@ class eol_settings {
     DECLARE_SETTING(replay_rewind_key);
 
     DECLARE_SETTING(show_others_key);
+    DECLARE_SETTING(shown_to_key);
     DECLARE_SETTING(spy_next_kuski_key);
     DECLARE_SETTING(spy_prev_kuski_key);
     DECLARE_SETTING(battle_queue_key);

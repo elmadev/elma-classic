@@ -340,6 +340,32 @@ void from_json(const json& j, ChatVisibility& c) {
     }
 }
 
+void to_json(json& j, const ShownTo& h) {
+    switch (h) {
+    case ShownTo::Everyone:
+        j = "everyone";
+        break;
+    case ShownTo::Team:
+        j = "team";
+        break;
+    case ShownTo::Nobody:
+        j = "nobody";
+        break;
+    }
+}
+
+void from_json(const json& j, ShownTo& h) {
+    if (j == "everyone") {
+        h = ShownTo::Everyone;
+    } else if (j == "team") {
+        h = ShownTo::Team;
+    } else if (j == "nobody") {
+        h = ShownTo::Nobody;
+    } else {
+        throw("[json.exception.type_error.302] (/shown_to) invalid value");
+    }
+}
+
 void to_json(json& j, const combo_scancode& r) { j = (unsigned long long)(r); }
 
 void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned long long)(j)); }
@@ -462,7 +488,8 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(show_speedometer)                                                                   \
                                                                                                    \
     JSON_FIELD(table_alignment)                                                                    \
-    JSON_FIELD(chat_visibility)
+    JSON_FIELD(chat_visibility)                                                                    \
+    JSON_FIELD(shown_to)
 
 #define JSON_FIELD(name)                                                                           \
     void eol_settings::persist_##name(decltype(eol_settings::name##_.value) v) {                   \

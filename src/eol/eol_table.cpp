@@ -1,9 +1,11 @@
 #include "eol/eol_table.h"
+#include "eol/settings.h"
 #include "pic/abc8.h"
 #include "pic/pic8.h"
 #include <algorithm>
 
 constexpr int TITLE_GAP = 22;
+constexpr int LARGE_FONT_TITLE_GAP = 36;
 constexpr int TITLE_OFFSET = 4;
 constexpr int GROUP_GAP = 40;
 
@@ -24,6 +26,12 @@ int eol_table::table_y_offset(pic8& dest, abc8& data_font) {
 void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alignment,
                        int reserved_lines) const {
     int y_top = eol_table::table_y_offset(dest, data_font);
+    const bool large_font = EolSettings->large_font();
+    const int title_gap = large_font ? LARGE_FONT_TITLE_GAP : TITLE_GAP;
+
+    auto column_width = [large_font](const column& col) {
+        return large_font ? col.width * 3 / 2 : col.width;
+    };
 
     int x_center;
     switch (alignment) {
@@ -60,7 +68,7 @@ void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alig
     // Total width of one column group
     int total_col_width = 0;
     for (const auto& col : columns) {
-        total_col_width += col.width;
+        total_col_width += column_width(col);
     }
 
     // Column group layout: each group is total_col_width wide with GROUP_GAP between them.
@@ -89,14 +97,14 @@ void eol_table::render(pic8& dest, abc8& title_font, abc8& data_font, Align alig
         int group = (i - first_row_index) / screen_max_rows;
         int row_in_group = (i - first_row_index) % screen_max_rows;
 
-        int y = y_top - data_font.line_height() * row_in_group - TITLE_GAP;
+        int y = y_top - data_font.line_height() * row_in_group - title_gap;
         int group_x = groups_base_x + group * group_stride;
 
         const auto& row = rows[i];
         int col_x = group_x;
         for (int c = 0; c < static_cast<int>(columns.size()); c++) {
             const char* text = (c < static_cast<int>(row.size())) ? row[c].c_str() : "";
-            int w = columns[c].width;
+            int w = column_width(columns[c]);
 
             switch (columns[c].alignment) {
             case Align::Left:

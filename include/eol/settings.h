@@ -183,6 +183,7 @@ class eol_settings {
     Clamp<int> minimap_height_{70, 70, 210};
     Clamp<int> minimap_opacity_{25, 100, 100};
     Clamp<int> chat_lines_{1, 10, 50};
+    Default<bool> large_font_{false};
     Default<bool> cripple_no_brake_{false};
     Default<bool> cripple_no_throttle_{false};
     Default<bool> cripple_always_throttle_{false};
@@ -311,6 +312,7 @@ class eol_settings {
     DECLARE_SETTING(minimap_height);
     DECLARE_SETTING(minimap_opacity);
     DECLARE_SETTING(chat_lines);
+    DECLARE_SETTING(large_font);
     DECLARE_SETTING(cripple_no_brake);
     DECLARE_SETTING_CUSTOM(cripple_no_throttle);
     DECLARE_SETTING_CUSTOM(cripple_always_throttle);

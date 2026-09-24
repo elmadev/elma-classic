@@ -98,7 +98,6 @@ void init_renderer() {
 
     Console = new console();
     Console->register_console_commands();
-    Console->set_font(SmallFont);
 
     StatusMessages = new status_messages();
 }
@@ -631,29 +630,34 @@ struct info_panel_row {
     std::string value;
 };
 
+// Font for chat, status messages, tables and the info panel
+static abc8& overlay_font() { return EolSettings->large_font() ? *MediumFont : *SmallFont; }
+
 // Render the bottom-right info panel: rows[0] is the bottom row, each later row stacks above it
 // (the backbuffer is upside-down, so larger y is higher on screen).
 static void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows) {
     constexpr int RIGHT_MARGIN = 10;
     constexpr int BOTTOM_MARGIN = 10;
-    constexpr int LABEL_OFFSET = 180;
-    constexpr int EXTRA_SPACE_PER_CHAR = 6;
+    const bool large_font = EolSettings->large_font();
+    const int label_offset_base = large_font ? 280 : 180;
+    const int extra_space_per_char = large_font ? 12 : 6;
 
     int max_value_length = 0;
     for (const info_panel_row& row : rows) {
         max_value_length = std::max(max_value_length, (int)row.value.size());
     }
-    int label_offset = LABEL_OFFSET;
+    int label_offset = label_offset_base;
     if (max_value_length > 10) {
-        label_offset += (max_value_length - 10) * EXTRA_SPACE_PER_CHAR;
+        label_offset += (max_value_length - 10) * extra_space_per_char;
     }
 
+    abc8& font = overlay_font();
     int value_x = GameViewWidth - RIGHT_MARGIN;
     int label_x = GameViewWidth - label_offset;
     for (size_t i = 0; i < rows.size(); i++) {
-        int y = BOTTOM_MARGIN + (int)i * SmallFont->line_height();
-        SmallFont->write(pic, label_x, y, rows[i].label.c_str());
-        SmallFont->write_right_align(pic, value_x, y, rows[i].value.c_str());
+        int y = BOTTOM_MARGIN + (int)i * font.line_height();
+        font.write(pic, label_x, y, rows[i].label.c_str());
+        font.write_right_align(pic, value_x, y, rows[i].value.c_str());
     }
 }
 
@@ -935,12 +939,14 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     }
 
     // Draw EOL overlays
+    abc8& font = overlay_font();
+    Console->set_font(&font);
     Console->render(*pic);
-    StatusMessages->render(*pic, *SmallFont);
-    EolClient->render_table(*pic, *MediumFont, *SmallFont);
-    EolClient->render_battle_status(*pic, *SmallFont);
-    EolClient->render_battle_leader(*pic, *SmallFont);
-    EolClient->render_battle_countdown(*pic, *LargeFont, *SmallFont);
+    StatusMessages->render(*pic, font);
+    EolClient->render_table(*pic, *MediumFont, font);
+    EolClient->render_battle_status(*pic, font);
+    EolClient->render_battle_leader(*pic, font);
+    EolClient->render_battle_countdown(*pic, *LargeFont, font);
 
     // Conditionally save screenshot
     handle_screenshot(pic);

@@ -521,6 +521,8 @@ void menu_options() {
                 }
             });
 
+        BOOL_OPTION("Large Font:", large_font);
+
         nav.add_row(
             "Shown to:",
             [] {

@@ -462,6 +462,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(minimap_height)                                                                     \
     JSON_FIELD(minimap_opacity)                                                                    \
     JSON_FIELD(chat_lines)                                                                         \
+    JSON_FIELD(large_font)                                                                         \
     JSON_FIELD(cripple_no_brake)                                                                   \
     JSON_FIELD(cripple_no_throttle)                                                                \
     JSON_FIELD(cripple_always_throttle)                                                            \

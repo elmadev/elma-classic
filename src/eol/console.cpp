@@ -209,6 +209,7 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(still_objects);
 
     REGISTER_SETTINGS_INT(chat_lines);
+    REGISTER_SETTINGS_BOOL(large_font);
 
     REGISTER_SETTINGS_BOOL(show_fps);
 

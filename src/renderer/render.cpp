@@ -93,7 +93,7 @@ void init_renderer() {
     init_gravity_arrows();
 
     SmallFont = new abc8("small.abc", 1, 12);
-    MediumFont = new abc8("medium.abc", 1, 18);
+    MediumFont = new abc8("medium.abc", 1, 24);
     LargeFont = new abc8("large.abc", 2, 90);
 
     Console = new console();

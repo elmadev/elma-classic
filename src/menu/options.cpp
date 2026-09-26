@@ -283,6 +283,11 @@ void menu_options() {
         BOOL_OPTION("Centered Camera:", center_camera);
         BOOL_OPTION("Centered Minimap:", center_map);
 
+        BOOL_OPTION("Show Timer:", show_timer_player_a);
+        BOOL_OPTION("Show Minimap:", show_minimap_player_a);
+        BOOL_OPTION("Show Replay Timer:", show_replay_timer_player_a);
+        BOOL_OPTION("Show Replay Minimap:", show_replay_minimap_player_a);
+
         nav.add_row(
             "Minimap Alignment:",
             [] {

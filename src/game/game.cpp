@@ -190,11 +190,6 @@ static void update_freecam(double dt, camera& current_camera) {
     current_camera.y = std::clamp(current_camera.y, current_camera.min_y, current_camera.max_y);
 }
 
-static hud_visibility HudGame1 = {true, true};
-static hud_visibility HudReplay1 = {false, true};
-static hud_visibility HudGame2 = {true, true};
-static hud_visibility HudReplay2 = {false, true};
-
 static void sound_init() {
     static bool SoundInitialized = false;
     if (State->sound_on && !SoundInitialized) {
@@ -369,11 +364,11 @@ static void update_view_settings(driver& driv, bool* other_draw_view) {
     }
 
     if (was_game_key_just_pressed(keys->toggle_minimap)) {
-        driv.hud->minimap = !driv.hud->minimap;
+        driv.toggle_minimap();
     }
 
     if (was_game_key_just_pressed(keys->toggle_timer)) {
-        driv.hud->timer = !driv.hud->timer;
+        driv.toggle_timer();
     }
 }
 
@@ -694,8 +689,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     pacer::reset();
 
-    driver driv1(Motor1, Rec1, &State->keys1, &HudGame1);
-    driver driv2(Motor2, Rec2, &State->keys2, &HudGame2);
+    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Game1);
+    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Game2);
 
     camera current_camera;
     current_camera.mode = camera_mode;
@@ -1024,8 +1019,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
     EolClient->enter_level(filename, Level, EnterMode::Replay);
 
-    driver driv1(Motor1, Rec1, &State->keys1, &HudReplay1);
-    driver driv2(Motor2, Rec2, &State->keys2, &HudReplay2);
+    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Replay1);
+    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Replay2);
 
     driv2.draw_view = !MergedRec;
     if (restore_player_visibility) {
@@ -1212,8 +1207,8 @@ void render_replay(const char* level_filename) {
     VideoRecordingMode = true;
     VideoFrameIndex = 0;
 
-    driver driv1(Motor1, Rec1, &State->keys1, &HudReplay1);
-    driver driv2(Motor2, Rec2, &State->keys2, &HudReplay2);
+    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Replay1);
+    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Replay2);
 
     fps::reset();
     while (true) {

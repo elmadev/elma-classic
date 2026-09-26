@@ -7,9 +7,11 @@
 struct motorst;
 struct player_keys;
 
-struct hud_visibility {
-    bool minimap;
-    bool timer;
+enum class HudSlot {
+    Game1,
+    Game2,
+    Replay1,
+    Replay2,
 };
 
 struct turning_data {
@@ -44,7 +46,7 @@ struct driver {
     bike_metadata meta;
     recorder* rec;
     player_keys* keys;
-    hud_visibility* hud;
+    HudSlot hud_slot;
     bike_sound sound;
     motor_stats stats;
 
@@ -53,9 +55,13 @@ struct driver {
     bool draw_view = true;
     bool one_frame_brake_pending = false;
 
-    driver(motorst* mot, recorder* rec, player_keys* keys, hud_visibility* hud);
+    driver(motorst* mot, recorder* rec, player_keys* keys, HudSlot hud_slot);
     void reset_metadata();
     void update_speed();
+    bool show_minimap() const;
+    bool show_timer() const;
+    void toggle_minimap() const;
+    void toggle_timer() const;
 };
 
 #endif

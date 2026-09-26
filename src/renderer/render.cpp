@@ -813,7 +813,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     }
 
     // Draw the minimap
-    if (driv.hud->minimap) {
+    if (driv.show_minimap()) {
         if (Single) {
             render_minimap(player1, pic, driv.meta.camera_turning.turn_phase, bike_center, nullptr,
                            current_camera.mode);
@@ -824,7 +824,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     }
 
     // Draw the timers
-    if (driv.hud->timer) {
+    if (driv.show_timer()) {
         double flagtag_time = -1.0;
         if (!Single && FlagTag) {
             flagtag_time = player1 ? FlagTimeA : FlagTimeB;

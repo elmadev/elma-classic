@@ -458,6 +458,14 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(still_objects)                                                                      \
     JSON_FIELD(all_internals_accessible)                                                           \
     JSON_FIELD(show_total_time)                                                                    \
+    JSON_FIELD(show_timer_player_a)                                                                \
+    JSON_FIELD(show_timer_player_b)                                                                \
+    JSON_FIELD(show_minimap_player_a)                                                              \
+    JSON_FIELD(show_minimap_player_b)                                                              \
+    JSON_FIELD(show_replay_timer_player_a)                                                         \
+    JSON_FIELD(show_replay_timer_player_b)                                                         \
+    JSON_FIELD(show_replay_minimap_player_a)                                                       \
+    JSON_FIELD(show_replay_minimap_player_b)                                                       \
     JSON_FIELD(minimap_width)                                                                      \
     JSON_FIELD(minimap_height)                                                                     \
     JSON_FIELD(minimap_opacity)                                                                    \

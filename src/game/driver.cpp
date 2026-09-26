@@ -1,4 +1,5 @@
 #include "game/driver.h"
+#include "eol/settings.h"
 #include "physics/forces.h"
 #include <format>
 
@@ -36,11 +37,75 @@ void driver::reset_metadata() {
     meta.camera_turning.turn_phase = 0.0;
 }
 
-driver::driver(motorst* mot, recorder* rec, player_keys* keys, hud_visibility* hud)
+driver::driver(motorst* mot, recorder* rec, player_keys* keys, HudSlot hud_slot)
     : mot(mot),
       rec(rec),
       keys(keys),
-      hud(hud) {
+      hud_slot(hud_slot) {
     reset_metadata();
     reset_motor_forces(mot);
+}
+
+bool driver::show_minimap() const {
+    switch (hud_slot) {
+    case HudSlot::Game1:
+        return EolSettings->show_minimap_player_a();
+    case HudSlot::Game2:
+        return EolSettings->show_minimap_player_b();
+    case HudSlot::Replay1:
+        return EolSettings->show_replay_minimap_player_a();
+    case HudSlot::Replay2:
+        return EolSettings->show_replay_minimap_player_b();
+    }
+    return false;
+}
+
+bool driver::show_timer() const {
+    switch (hud_slot) {
+    case HudSlot::Game1:
+        return EolSettings->show_timer_player_a();
+    case HudSlot::Game2:
+        return EolSettings->show_timer_player_b();
+    case HudSlot::Replay1:
+        return EolSettings->show_replay_timer_player_a();
+    case HudSlot::Replay2:
+        return EolSettings->show_replay_timer_player_b();
+    }
+    return false;
+}
+
+void driver::toggle_minimap() const {
+    bool show = !show_minimap();
+    switch (hud_slot) {
+    case HudSlot::Game1:
+        EolSettings->set_show_minimap_player_a(show);
+        return;
+    case HudSlot::Game2:
+        EolSettings->set_show_minimap_player_b(show);
+        return;
+    case HudSlot::Replay1:
+        EolSettings->set_show_replay_minimap_player_a(show);
+        return;
+    case HudSlot::Replay2:
+        EolSettings->set_show_replay_minimap_player_b(show);
+        return;
+    }
+}
+
+void driver::toggle_timer() const {
+    bool show = !show_timer();
+    switch (hud_slot) {
+    case HudSlot::Game1:
+        EolSettings->set_show_timer_player_a(show);
+        return;
+    case HudSlot::Game2:
+        EolSettings->set_show_timer_player_b(show);
+        return;
+    case HudSlot::Replay1:
+        EolSettings->set_show_replay_timer_player_a(show);
+        return;
+    case HudSlot::Replay2:
+        EolSettings->set_show_replay_timer_player_b(show);
+        return;
+    }
 }

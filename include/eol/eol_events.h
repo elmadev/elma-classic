@@ -59,6 +59,8 @@ struct level_download {
     DownloadResult result;
 };
 
+struct battle_win_rec_download_request {};
+
 struct battle_win_rec_download {
     char rec[MAX_REPLAY_NAME_LEN + 1];
     std::span<const uint8_t> data;

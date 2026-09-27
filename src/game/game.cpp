@@ -516,6 +516,7 @@ static void handle_eol_inputs() {
     if (was_game_key_just_pressed(State->key_download_battle_level)) {
         EolClient->download_battle_level();
     }
+
     if (was_game_key_just_pressed(State->key_download_level)) {
         toggle_download_prompt();
     }
@@ -552,6 +553,10 @@ static void handle_eol_inputs() {
         EolSettings->set_show_speedometer(!EolSettings->show_speedometer());
         StatusMessages->add(EolSettings->show_speedometer() ? "speedometer shown"
                                                             : "speedometer hidden");
+    }
+
+    if (was_game_key_just_pressed(State->key_download_battle_rec)) {
+        EolClient->download_battle_win_rec();
     }
 
     if (was_game_key_just_pressed(State->key_show_chat)) {

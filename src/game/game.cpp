@@ -67,7 +67,7 @@ static void push_chat_prompt() {
     }
 }
 
-static void handle_pm_target_keys() {
+static void handle_chat_target_keys() {
     if (!Console->in_chat_mode() || Console->in_command_prompt()) {
         return;
     }
@@ -85,6 +85,11 @@ static void handle_pm_target_keys() {
 
     if (was_key_just_pressed(State->key_pm_clear_kuski)) {
         EolClient->clear_pm_kuski();
+        target_changed = true;
+    }
+
+    if (was_key_just_pressed(State->key_team_chat)) {
+        EolClient->toggle_team_chat();
         target_changed = true;
     }
 
@@ -140,7 +145,7 @@ static bool handle_console_input() {
         if (was_key_just_pressed(State->key_download_level)) {
             toggle_download_prompt();
         } else {
-            handle_pm_target_keys();
+            handle_chat_target_keys();
             Console->handle_input();
         }
     }

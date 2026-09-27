@@ -61,6 +61,8 @@ class eol {
 
     void download_level(std::string_view name);
     void download_battle_level();
+    void download_battle_win_rec() { proto.send(battle_win_rec_download_request{}); }
+
     void enter_level(const char* level_name, const level* lev, EnterMode mode);
     void exit_level(const driver& d, const level* lev, double time, int level_apple_count,
                     bool spying);

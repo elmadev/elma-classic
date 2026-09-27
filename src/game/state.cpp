@@ -448,6 +448,7 @@ void state::reset_keys() {
     key_battle_status = EolSettings->battle_status_key_default();
     key_battle_leader = EolSettings->battle_leader_key_default();
     key_speedometer = EolSettings->speedometer_key_default();
+    key_download_battle_rec = EolSettings->download_battle_rec_key_default();
     key_reconnect = EolSettings->reconnect_key_default();
     key_disconnect = EolSettings->disconnect_key_default();
     key_toggle_one_wheel_status = EolSettings->toggle_one_wheel_status_key_default();

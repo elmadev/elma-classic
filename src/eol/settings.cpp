@@ -432,6 +432,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(battle_status_key)                                                                  \
     JSON_FIELD(battle_leader_key)                                                                  \
     JSON_FIELD(speedometer_key)                                                                    \
+    JSON_FIELD(download_battle_rec_key)                                                            \
     JSON_FIELD(reconnect_key)                                                                      \
     JSON_FIELD(disconnect_key)                                                                     \
     JSON_FIELD(toggle_one_wheel_status_key)                                                        \
@@ -608,6 +609,7 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->key_battle_status = EolSettings->battle_status_key();
     s->key_battle_leader = EolSettings->battle_leader_key();
     s->key_speedometer = EolSettings->speedometer_key();
+    s->key_download_battle_rec = EolSettings->download_battle_rec_key();
     s->key_reconnect = EolSettings->reconnect_key();
     s->key_disconnect = EolSettings->disconnect_key();
     s->key_toggle_one_wheel_status = EolSettings->toggle_one_wheel_status_key();
@@ -662,6 +664,7 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_battle_status_key(s->key_battle_status);
     EolSettings->persist_battle_leader_key(s->key_battle_leader);
     EolSettings->persist_speedometer_key(s->key_speedometer);
+    EolSettings->persist_download_battle_rec_key(s->key_download_battle_rec);
     EolSettings->persist_reconnect_key(s->key_reconnect);
     EolSettings->persist_disconnect_key(s->key_disconnect);
     EolSettings->persist_toggle_one_wheel_status_key(s->key_toggle_one_wheel_status);

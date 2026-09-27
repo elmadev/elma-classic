@@ -153,6 +153,7 @@ class eol_settings {
     Default<combo_scancode> battle_status_key_{combo_scancode{DIK_NONE, DIK_F10}};
     Default<combo_scancode> battle_leader_key_{combo_scancode{DIK_LSHIFT, DIK_F10}};
     Default<combo_scancode> speedometer_key_{combo_scancode{DIK_LCONTROL, DIK_F10}};
+    Default<combo_scancode> download_battle_rec_key_{combo_scancode{DIK_NONE, DIK_F11}};
     Default<combo_scancode> reconnect_key_{combo_scancode{DIK_NONE, DIK_F12}};
     Default<combo_scancode> disconnect_key_{combo_scancode{DIK_LSHIFT, DIK_F12}};
     Default<combo_scancode> toggle_one_wheel_status_key_{combo_scancode{DIK_LCONTROL, DIK_F11}};
@@ -290,6 +291,7 @@ class eol_settings {
     DECLARE_SETTING(battle_status_key);
     DECLARE_SETTING(battle_leader_key);
     DECLARE_SETTING(speedometer_key);
+    DECLARE_SETTING(download_battle_rec_key);
     DECLARE_SETTING(reconnect_key);
     DECLARE_SETTING(disconnect_key);
     DECLARE_SETTING(toggle_one_wheel_status_key);

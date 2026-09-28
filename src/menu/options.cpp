@@ -283,6 +283,23 @@ void menu_options() {
         BOOL_OPTION("Centered Camera:", center_camera);
         BOOL_OPTION("Centered Minimap:", center_map);
 
+// macro to keep the player A and player B default show_X settings in sync
+#define SHOW_X_OPTION(name, setting)                                                               \
+    nav.add_row(                                                                                   \
+        name, EolSettings->setting##_player_a_persisted() ? "Yes" : "No", NAV_FUNC() {             \
+            EolSettings->persist_##setting##_player_a(                                             \
+                !EolSettings->setting##_player_a_persisted());                                     \
+            EolSettings->persist_##setting##_player_b(                                             \
+                EolSettings->setting##_player_a_persisted());                                      \
+        });
+
+        SHOW_X_OPTION("Show Timer", show_timer);
+        SHOW_X_OPTION("Show Minimap", show_minimap);
+        SHOW_X_OPTION("Show Replay Timer", show_replay_timer);
+        SHOW_X_OPTION("Show Replay Minimap", show_replay_minimap);
+
+#undef SHOW_X_OPTION
+
         nav.add_row(
             "Minimap Alignment:",
             [] {

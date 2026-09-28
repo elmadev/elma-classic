@@ -44,3 +44,11 @@ driver::driver(motorst* mot, recorder* rec, player_keys* keys, hud_visibility* h
     reset_metadata();
     reset_motor_forces(mot);
 }
+
+bool driver::show_minimap() const { return hud->minimap; }
+
+bool driver::show_timer() const { return hud->timer; }
+
+void driver::toggle_minimap() const { hud->minimap = !hud->minimap; }
+
+void driver::toggle_timer() const { hud->timer = !hud->timer; }

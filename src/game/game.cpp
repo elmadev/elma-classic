@@ -369,11 +369,11 @@ static void update_view_settings(driver& driv, bool* other_draw_view) {
     }
 
     if (was_game_key_just_pressed(keys->toggle_minimap)) {
-        driv.hud->minimap = !driv.hud->minimap;
+        driv.toggle_minimap();
     }
 
     if (was_game_key_just_pressed(keys->toggle_timer)) {
-        driv.hud->timer = !driv.hud->timer;
+        driv.toggle_timer();
     }
 }
 

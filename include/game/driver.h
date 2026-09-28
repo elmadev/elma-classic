@@ -56,6 +56,10 @@ struct driver {
     driver(motorst* mot, recorder* rec, player_keys* keys, hud_visibility* hud);
     void reset_metadata();
     void update_speed();
+    bool show_minimap() const;
+    bool show_timer() const;
+    void toggle_minimap() const;
+    void toggle_timer() const;
 };
 
 #endif

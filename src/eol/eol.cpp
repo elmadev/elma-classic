@@ -470,6 +470,37 @@ void eol::process(const level_download& ld) {
     }
 }
 
+void eol::process(const battle_win_rec_download& rd) {
+    const char* rec_name = (const char*)rd.rec;
+    switch (rd.result) {
+    case DownloadResult::Success: {
+        for (char c : rd.rec) {
+            if (c && !util::text::is_filename_char(c)) {
+                StatusMessages->add(
+                    std::format("error: rec {}.rec has invalid characters", rec_name));
+                return;
+            }
+        }
+        std::string path = std::format("rec/{}.rec", rec_name);
+        std::ofstream file(path, std::ios::binary);
+        if (file) {
+            file.write((const char*)rd.data.data(), rd.data.size());
+            StatusMessages->add(std::format("replay {}.rec downloaded", rec_name));
+        } else {
+            StatusMessages->add(std::format("error: failed to write {}.rec", rec_name));
+        }
+        break;
+    }
+    case DownloadResult::Fail:
+        StatusMessages->add(std::format("error: rec {}.rec failed download", rec_name));
+        break;
+    case DownloadResult::NotFound:
+        /* unreachable for battle win rec */
+        LOG_ERROR("battle win rec not found!");
+        break;
+    }
+}
+
 void eol::download_level(std::string_view name) {
     level_download_request req{};
     int size = std::min(name.size(), sizeof(req.level) - 1);

@@ -57,6 +57,7 @@ class eol {
     void process(const best_times_update&);
     void process(const restore_apple_battle_progress&);
     void process(const level_download&);
+    void process(const battle_win_rec_download&);
 
     void download_level(std::string_view name);
     void download_battle_level();

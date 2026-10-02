@@ -78,6 +78,9 @@ eol::eol()
 void eol::reset() {
     id = 0;
     id2 = 0;
+    for (kuski& k : kuskis_) {
+        delete k.shirt;
+    }
     kuskis_.clear();
     current_battle.reset();
     online_apple_battle.clear();

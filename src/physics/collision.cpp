@@ -1,6 +1,5 @@
 #include "physics/collision.h"
 #include "editor/editor.h"
-#include "eol/eol.h"
 #include "game/game.h"
 #include "level/level.h"
 #include "level/object.h"
@@ -100,11 +99,8 @@ int get_touching_object(vect2 r, double radius) {
             continue;
         }
 
-        // Skip Exit in flagtag or apple-battle mode
-        if (obj->type == object::Type::Exit) {
-            if ((!Single && FlagTag) || EolClient->battle_hides_exit()) {
-                continue;
-            }
+        if (obj->type == object::Type::Exit && ExitHidden) {
+            continue;
         }
 
         vect2 diff = r - obj->r;

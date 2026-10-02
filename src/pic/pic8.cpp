@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <climits>
 #include <cstring>
+#include <memory>
 
 void pic8::allocate(int w, int h) {
     if (rows || pixels) {
@@ -529,18 +530,18 @@ struct bmp_header {
 static_assert(sizeof(bmp_header) == BMP_HEADER_SIZE);
 
 pic8* pic8::from_bmp(const char* filename) {
-    FILE* h = fopen(filename, "rb");
+    std::unique_ptr<FILE, decltype(&fclose)> h(fopen(filename, "rb"), fclose);
     if (!h) {
         return nullptr;
     }
 
     short magic;
-    if (fread(&magic, 1, sizeof(magic), h) != 2 || magic != BMP_MAGIC) {
+    if (fread(&magic, 1, sizeof(magic), h.get()) != 2 || magic != BMP_MAGIC) {
         return nullptr;
     }
 
     bmp_header header;
-    if (fread(&header, 1, sizeof(header), h) != BMP_HEADER_SIZE) {
+    if (fread(&header, 1, sizeof(header), h.get()) != BMP_HEADER_SIZE) {
         return nullptr;
     }
 
@@ -559,26 +560,25 @@ pic8* pic8::from_bmp(const char* filename) {
     int width = header.width;
     int height = header.height;
 
-    pic8* pic = new pic8(width, height);
-
     // BMP rows are padded.
     int padded_width = width;
     if (width % 4) {
         padded_width += 4 - width % 4;
     }
 
-    unsigned char* pixels = new unsigned char[padded_width * height];
-    fseek(h, header.offset, SEEK_SET);
-    if (fread(pixels, 1, padded_width * height, h) != padded_width * height) {
+    size_t pixels_size = padded_width * height;
+    auto pixels = std::make_unique<unsigned char[]>(pixels_size);
+    fseek(h.get(), header.offset, SEEK_SET);
+    if (fread(pixels.get(), 1, pixels_size, h.get()) != pixels_size) {
         return nullptr;
     }
 
-    for (int h = 0; h < height; h++) {
+    pic8* pic = new pic8(width, height);
+    for (int row = 0; row < height; row++) {
         // BMP rows are bottom up.
-        int src_row = height - 1 - h;
-        memcpy(pic->get_row(h), &pixels[src_row * padded_width], width);
+        int src_row = height - 1 - row;
+        memcpy(pic->get_row(row), pixels.get() + (src_row * padded_width), width);
     }
-    delete[] pixels;
 
     return pic;
 }

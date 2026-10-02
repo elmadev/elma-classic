@@ -5,11 +5,10 @@
 #include "level/level.h"
 #include "main.h"
 #include "physics/init.h"
+#include "pic/pic8.h"
 #include <cstdint>
 #include <deque>
 #include <optional>
-
-class pic8;
 
 struct spy_data {
     unsigned int kuski_id;
@@ -47,13 +46,14 @@ class spy_playback {
 
 class kuski {
   public:
+    ~kuski() { delete shirt; }
     unsigned int id;
     char nick[16];
     char level[MAX_FILENAME_LEN + 1];
     bool multi = false;
     bool is_player = true;
     bool is_online = true;
-    pic8* shirt;
+    pic8* shirt = nullptr;
     bool apples_taken[MAX_OBJECTS];
     void clear_apple_data();
     const struct spy_data* spy_data() const { return spy.spy_data(); }

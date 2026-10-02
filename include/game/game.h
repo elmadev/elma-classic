@@ -5,6 +5,7 @@
 
 extern int Single;
 extern int FlagTag;
+extern bool ExitHidden;
 extern bool OutOfBounds;
 
 extern bool ScreenshotRequested;

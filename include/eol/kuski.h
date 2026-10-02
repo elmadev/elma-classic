@@ -53,7 +53,7 @@ class kuski {
     bool multi = false;
     bool is_player = true;
     bool is_online = true;
-    pic8* shirt;
+    pic8* shirt = nullptr;
     bool apples_taken[MAX_OBJECTS];
     void clear_apple_data();
     const struct spy_data* spy_data() const { return spy.spy_data(); }

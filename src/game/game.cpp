@@ -32,6 +32,7 @@
 
 int Single = 1;
 int FlagTag = 0;
+bool ExitHidden = false;
 bool OutOfBounds = false;
 
 bool ScreenshotRequested = false;
@@ -715,6 +716,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     if (Single && camera_mode != CameraMode::MapViewer) {
         BattleRunCripples = EolClient->battle_cripples();
     }
+    ExitHidden = (!Single && FlagTag) || EolClient->battle_hides_exit();
 
     pacer::reset();
 
@@ -1041,6 +1043,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
     Single = !MultiplayerRec;
     FlagTag = Rec1->flagtag();
+    ExitHidden = !Single && FlagTag;
 
     setup_gameloop(filename);
 
@@ -1227,6 +1230,7 @@ void render_replay(const char* level_filename) {
 
     Single = !MultiplayerRec;
     FlagTag = Rec1->flagtag();
+    ExitHidden = !Single && FlagTag;
     setup_gameloop(level_filename);
 
     EolClient->enter_level(level_filename, Level, EnterMode::Replay);

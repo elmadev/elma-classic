@@ -611,16 +611,15 @@ static void setup_gameloop(const char* filename) {
     }
     Level->flip_objects();
     Level->sort_objects();
-
-    init_physics_data();
-    TotalApples = Level->initialize_objects(Motor1);
-    Motor1->spawn(Level->start_position);
-    Motor2->spawn(Level->start_position);
+    TotalApples = Level->initialize_objects();
 
     reset_game_background();
 
     flagtag_reset();
 
+    init_physics_data();
+    Motor1->spawn(Level->start_position);
+    Motor2->spawn(Level->start_position);
     Motor1->apple_count = 0;
     Motor2->apple_count = 0;
     Motor1->apple_bug_count = 0;

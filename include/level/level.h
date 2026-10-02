@@ -8,7 +8,6 @@
 #include <string_view>
 
 class lgrfile;
-struct motorst;
 class object;
 class polygon;
 class sprite;
@@ -77,7 +76,7 @@ class level {
     void get_boundaries(double* x1, double* y1, double* x2, double* y2,
                         bool check_objects_and_sprites);
     // Returns apple count.
-    int initialize_objects(motorst* mot);
+    int initialize_objects();
     void sort_objects();
     object* get_object(int index);
 

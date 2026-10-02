@@ -1103,7 +1103,7 @@ double level::checksum() {
     return CHECKSUM_MULTIPLIER * sum;
 }
 
-int level::initialize_objects(motorst* mot) {
+int level::initialize_objects() {
     int apple_count = 0;
     bool start_found = false;
     for (int i = 0; i < MAX_OBJECTS; i++) {
@@ -1124,7 +1124,7 @@ int level::initialize_objects(motorst* mot) {
                 start_found = true;
                 // Hide start object. Store the bike position to respawn in flag tag mode
                 obj->active = false;
-                start_position = obj->r - mot->left_wheel.r;
+                start_position = obj->r - motorst::DEFAULT_LEFT_WHEEL.r;
             }
         }
     }

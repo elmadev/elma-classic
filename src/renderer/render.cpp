@@ -671,7 +671,8 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     if (spy_pose) {
         bike_center = spy_pose->mot.bike.r;
     } else if (spy_kuski) {
-        bike_center = vect2(current_camera.start_x, current_camera.start_y);
+        // Target player has no data (i.e. not in level), so focus on the start position
+        bike_center = Level->start_position + motorst::DEFAULT_BIKE.r;
     } else if (current_camera.mode == CameraMode::MapViewer) {
         bike_center = vect2(current_camera.x, current_camera.y);
     }

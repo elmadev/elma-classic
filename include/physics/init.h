@@ -76,6 +76,10 @@ struct motorst {
 
     void init();
     void spawn(vect2 start_position);
+
+    static const rigidbody DEFAULT_BIKE;
+    static const rigidbody DEFAULT_LEFT_WHEEL;
+    static const rigidbody DEFAULT_RIGHT_WHEEL;
 };
 
 extern motorst *Motor1, *Motor2;

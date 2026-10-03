@@ -456,7 +456,7 @@ static void play_internal(int internal_index) {
         finame filename;
         sprintf(filename, "QWQUU%03d.LEV", internal_index + 1);
 
-        bool map_viewer = is_key_down(DIK_F1);
+        bool map_viewer = configure_game();
         loading_screen();
 
         load_level_play(filename);

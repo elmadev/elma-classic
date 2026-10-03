@@ -187,6 +187,8 @@ void console::register_console_commands() {
         StatusMessages->add(std::format("Default LGR: {}", name));
     });
 
+    REGISTER_SETTINGS_BOOL(default_lgr_only);
+    register_alias("default_lgr", "default_lgr_only");
     REGISTER_SETTINGS_BOOL(fancyboost);
 
     REGISTER_SETTINGS_BOOL(show_last_apple_time);

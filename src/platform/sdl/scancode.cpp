@@ -96,7 +96,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_EQUALS:
         return "=";
     case DIK_BACK:
-        return "<-";
+        return "BACKSPACE";
     case DIK_TAB:
         return "TAB";
     case DIK_Q:
@@ -148,7 +148,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_SEMICOLON:
         return ";";
     case DIK_APOSTROPHE:
-        return "\"";
+        return "\""; // The character ' does not exist in menu.abc so cannot currently be used
     case DIK_GRAVE:
         return "`";
     case DIK_LSHIFT:
@@ -174,7 +174,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_PERIOD:
         return ".";
     case DIK_SLASH:
-        return "SLASH";
+        return "/";
     case DIK_RSHIFT:
         return "R SHIFT";
     case DIK_MULTIPLY:
@@ -280,7 +280,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_DIVIDE:
         return "PAD_/";
     case DIK_SYSRQ:
-        return "SYSRQ";
+        return "PRINTSCREEN";
     case DIK_RMENU:
         return "R ALT";
     case DIK_HOME:
@@ -288,7 +288,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_UP:
         return "UP ARROW";
     case DIK_PRIOR:
-        return "PAGEUP";
+        return "PAGE UP";
     case DIK_LEFT:
         return "LEFT ARROW";
     case DIK_RIGHT:
@@ -300,9 +300,9 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_NEXT:
         return "PAGE DOWN";
     case DIK_INSERT:
-        return "INS";
+        return "INSERT";
     case DIK_DELETE:
-        return "DEL";
+        return "DELETE";
     case DIK_LWIN:
         return "L WIN";
     case DIK_RWIN:

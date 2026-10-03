@@ -423,7 +423,7 @@ bool level_file_exists(const char* filename) {
     // For externals, normal access function call
     filepath tmp;
     sprintf(tmp, "lev/%s", filename);
-    return access(tmp, 0) == 0;
+    return std::filesystem::exists(tmp);
 }
 
 char BestTime[30] = "";
@@ -531,7 +531,7 @@ level::level(const char* filename) {
         filepath lgrpath;
         const char* lgrname = InternalLevelLgrs[internal_index.value()];
         sprintf(lgrpath, "lgr/%s.lgr", lgrname);
-        if (access(lgrpath, 0) == 0) {
+        if (std::filesystem::exists(lgrpath)) {
             strcpy(lgr_name, lgrname);
         }
     } else {

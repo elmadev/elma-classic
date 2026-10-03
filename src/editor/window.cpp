@@ -472,7 +472,7 @@ bool editor_window_save_as() {
                 char path[40];
                 strcpy(path, "lev/");
                 strcat(path, filename_input);
-                if (access(path, 0) == 0) {
+                if (std::filesystem::exists(path)) {
                     if (dialog("File exists, overwrite?", filename_input, DIALOG_BUTTONS, "Yes",
                                "No") == 1) {
                         return false;

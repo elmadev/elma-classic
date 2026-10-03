@@ -12,7 +12,6 @@
 #define strcmpi _strcmpi
 #define strncmpi _strncmpi
 #define strlwr _strlwr
-#define access _access
 #endif
 
 #ifndef _WIN32

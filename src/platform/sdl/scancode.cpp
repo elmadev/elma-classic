@@ -128,30 +128,10 @@ std::string dik_to_string(DikScancode keycode) {
         return "NOCONVERT";
     case DIK_YEN:
         return "YEN";
-    case DIK_NUMPADEQUALS:
-        return "PAD =";
-    case DIK_PREVTRACK:
-        return "CIRCUMFLEX";
-    case DIK_AT:
-        return "AT";
-    case DIK_COLON:
-        return "COLON";
-    case DIK_UNDERLINE:
-        return "UNDERLINE";
-    case DIK_KANJI:
-        return "KANJI";
-    case DIK_STOP:
-        return "STOP";
-    case DIK_AX:
-        return "AX";
-    case DIK_UNLABELED:
-        return "UNLABELED";
     case DIK_NUMPADENTER:
         return "PAD ENTER";
     case DIK_RCONTROL:
         return "R CTRL";
-    case DIK_NUMPADCOMMA:
-        return "COMMA";
     case DIK_DIVIDE:
         return "PAD /";
     case DIK_RMENU:

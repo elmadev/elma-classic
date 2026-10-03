@@ -605,6 +605,19 @@ int recorder::load_rec_file(const char* filename, bool demo) {
     return level_id;
 }
 
+int recorder::load_single(const std::string& path, recorder& into) {
+    FILE* h = fopen(path.c_str(), "rb");
+    if (!h) {
+        internal_error("Failed to open rec file: " + path);
+    }
+
+    std::string name = std::filesystem::path(path).filename().string();
+    int level_id = into.load(name.c_str(), h, false);
+    fclose(h);
+
+    return level_id;
+}
+
 recorder::merge_result recorder::load_merge(const std::string& filename1,
                                             const std::string& filename2) {
     std::string path = "rec/" + filename1;

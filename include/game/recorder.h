@@ -92,6 +92,8 @@ class recorder {
 
     // Load a singleplayer or multiplayer replay
     static int load_rec_file(const char* filename, bool demo);
+    // Load the first bike of a rec into `into`, leaving Rec1/Rec2 untouched
+    static int load_single(const std::string& path, recorder& into);
     // Save a singleplayer or multiplayer replay
     static void save_rec_file(const char* filename, int level_id);
     // Load two replay files and merge them into a multiplayer replay

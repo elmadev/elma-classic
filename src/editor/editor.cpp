@@ -544,7 +544,8 @@ static void select_tool(int tool) {
     invalidate_editor_gui();
 }
 
-static void editor_play(bool view_map) {
+static void editor_play() {
+    bool map_viewer = is_key_down(DIK_F1);
     invalidate_editor_gui();
     if (LevelChanged || State->editor_filename[0] == 0 || Level->topology_errors) {
         if (!editor_window_save()) {
@@ -560,7 +561,7 @@ static void editor_play(bool view_map) {
 
     Rec1->erase(State->editor_filename);
     Rec2->erase(State->editor_filename);
-    game_loop(State->editor_filename, view_map ? CameraMode::MapViewer : CameraMode::Normal);
+    game_loop(State->editor_filename, map_viewer ? CameraMode::MapViewer : CameraMode::Normal);
 
     empty_keypress_buffer();
 
@@ -732,7 +733,7 @@ void editor() {
         } else if (i == 4 && right_click) {
             editor_help_save();
         } else if ((i == 5 && left_click) || editor_shortcut(DIK_P)) {
-            editor_play(is_key_down(DIK_F1));
+            editor_play();
             SelectedTool = Tool::Move;
         } else if (i == 5 && right_click) {
             editor_help_save_and_play();

@@ -72,110 +72,14 @@ std::string dik_to_string(DikScancode keycode) {
     switch (keycode) {
     case DIK_NONE:
         return "NONE";
-    case DIK_1:
-        return "1";
-    case DIK_2:
-        return "2";
-    case DIK_3:
-        return "3";
-    case DIK_4:
-        return "4";
-    case DIK_5:
-        return "5";
-    case DIK_6:
-        return "6";
-    case DIK_7:
-        return "7";
-    case DIK_8:
-        return "8";
-    case DIK_9:
-        return "9";
-    case DIK_0:
-        return "0";
-    case DIK_MINUS:
-        return "-";
-    case DIK_EQUALS:
-        return "=";
-    case DIK_BACK:
-        return "BACKSPACE";
-    case DIK_TAB:
-        return "TAB";
-    case DIK_Q:
-        return "Q";
-    case DIK_W:
-        return "W";
-    case DIK_E:
-        return "E";
-    case DIK_R:
-        return "R";
-    case DIK_T:
-        return "T";
-    case DIK_Y:
-        return "Y";
-    case DIK_U:
-        return "U";
-    case DIK_I:
-        return "I";
-    case DIK_O:
-        return "O";
-    case DIK_P:
-        return "P";
-    case DIK_LBRACKET:
-        return "[";
-    case DIK_RBRACKET:
-        return "]";
     case DIK_RETURN:
         return "ENTER";
     case DIK_LCONTROL:
         return "L CTRL";
-    case DIK_A:
-        return "A";
-    case DIK_S:
-        return "S";
-    case DIK_D:
-        return "D";
-    case DIK_F:
-        return "F";
-    case DIK_G:
-        return "G";
-    case DIK_H:
-        return "H";
-    case DIK_J:
-        return "J";
-    case DIK_K:
-        return "K";
-    case DIK_L:
-        return "L";
-    case DIK_SEMICOLON:
-        return ";";
     case DIK_APOSTROPHE:
         return "\""; // The character ' does not exist in menu.abc so cannot currently be used
-    case DIK_GRAVE:
-        return "`";
     case DIK_LSHIFT:
         return "L SHIFT";
-    case DIK_BACKSLASH:
-        return "\\";
-    case DIK_Z:
-        return "Z";
-    case DIK_X:
-        return "X";
-    case DIK_C:
-        return "C";
-    case DIK_V:
-        return "V";
-    case DIK_B:
-        return "B";
-    case DIK_N:
-        return "N";
-    case DIK_M:
-        return "M";
-    case DIK_COMMA:
-        return ",";
-    case DIK_PERIOD:
-        return ".";
-    case DIK_SLASH:
-        return "/";
     case DIK_RSHIFT:
         return "R SHIFT";
     case DIK_MULTIPLY:
@@ -186,26 +90,6 @@ std::string dik_to_string(DikScancode keycode) {
         return "SPACEBAR";
     case DIK_CAPITAL:
         return "CAPS LOCK";
-    case DIK_F1:
-        return "F1";
-    case DIK_F2:
-        return "F2";
-    case DIK_F3:
-        return "F3";
-    case DIK_F4:
-        return "F4";
-    case DIK_F5:
-        return "F5";
-    case DIK_F6:
-        return "F6";
-    case DIK_F7:
-        return "F7";
-    case DIK_F8:
-        return "F8";
-    case DIK_F9:
-        return "F9";
-    case DIK_F10:
-        return "F10";
     case DIK_NUMLOCK:
         return "NUM LOCK";
     case DIK_SCROLL:
@@ -236,16 +120,6 @@ std::string dik_to_string(DikScancode keycode) {
         return "PAD INS";
     case DIK_DECIMAL:
         return "PAD DEL";
-    case DIK_F11:
-        return "F11";
-    case DIK_F12:
-        return "F12";
-    case DIK_F13:
-        return "F13";
-    case DIK_F14:
-        return "F14";
-    case DIK_F15:
-        return "F15";
     case DIK_KANA:
         return "KANA";
     case DIK_CONVERT:
@@ -280,12 +154,8 @@ std::string dik_to_string(DikScancode keycode) {
         return "COMMA";
     case DIK_DIVIDE:
         return "PAD /";
-    case DIK_SYSRQ:
-        return "PRINTSCREEN";
     case DIK_RMENU:
         return "R ALT";
-    case DIK_HOME:
-        return "HOME";
     case DIK_UP:
         return "UP ARROW";
     case DIK_PRIOR:
@@ -294,16 +164,10 @@ std::string dik_to_string(DikScancode keycode) {
         return "LEFT ARROW";
     case DIK_RIGHT:
         return "RIGHT ARROW";
-    case DIK_END:
-        return "END";
     case DIK_DOWN:
         return "DOWN ARROW";
     case DIK_NEXT:
         return "PAGE DOWN";
-    case DIK_INSERT:
-        return "INSERT";
-    case DIK_DELETE:
-        return "DELETE";
     case DIK_LWIN:
         return "L WIN";
     case DIK_RWIN:

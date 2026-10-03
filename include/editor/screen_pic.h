@@ -1,5 +1,5 @@
-#ifndef SCREEN_PIC_H
-#define SCREEN_PIC_H
+#ifndef EDITOR_SCREEN_PIC_H
+#define EDITOR_SCREEN_PIC_H
 
 #include <memory>
 

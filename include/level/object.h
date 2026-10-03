@@ -1,5 +1,5 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef LEVEL_OBJECT_H
+#define LEVEL_OBJECT_H
 
 #include "physics/init.h"
 #include "vect2.h"

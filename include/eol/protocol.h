@@ -1,5 +1,5 @@
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#ifndef EOL_PROTOCOL_H
+#define EOL_PROTOCOL_H
 
 #include "eol/null_protocol.h"
 

@@ -1,5 +1,5 @@
-#ifndef REPLAY_MENU_H
-#define REPLAY_MENU_H
+#ifndef MENU_REPLAY_H
+#define MENU_REPLAY_H
 
 #include <string>
 

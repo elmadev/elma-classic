@@ -1,5 +1,5 @@
-#ifndef BALL_H
-#define BALL_H
+#ifndef MENU_BALL_H
+#define MENU_BALL_H
 
 #include "vect2.h"
 

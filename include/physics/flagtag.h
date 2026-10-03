@@ -1,5 +1,5 @@
-#ifndef FLAGTAG_H
-#define FLAGTAG_H
+#ifndef PHYSICS_FLAGTAG_H
+#define PHYSICS_FLAGTAG_H
 
 extern bool FlagTagAHasFlag;
 extern bool FlagTagImmunity;

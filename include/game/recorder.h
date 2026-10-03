@@ -1,5 +1,5 @@
-#ifndef RECORDER_H
-#define RECORDER_H
+#ifndef GAME_RECORDER_H
+#define GAME_RECORDER_H
 
 #include "physics/init.h"
 #include "sound/engine.h"

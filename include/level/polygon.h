@@ -1,5 +1,5 @@
-#ifndef GYURU_H
-#define GYURU_H
+#ifndef LEVEL_POLYGON_H
+#define LEVEL_POLYGON_H
 
 #include "vect2.h"
 #include <cstdio>

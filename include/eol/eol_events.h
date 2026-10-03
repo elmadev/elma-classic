@@ -1,5 +1,5 @@
-#ifndef EOL_EVENTS_H
-#define EOL_EVENTS_H
+#ifndef EOL_EOL_EVENTS_H
+#define EOL_EOL_EVENTS_H
 
 #include "eol/eol_types.h"
 #include "eol/kuski.h"

@@ -1,5 +1,5 @@
-#ifndef SPRITE_H
-#define SPRITE_H
+#ifndef LEVEL_SPRITE_H
+#define LEVEL_SPRITE_H
 
 #include "vect2.h"
 #include <cstdio>

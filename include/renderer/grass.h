@@ -1,5 +1,5 @@
-#ifndef GRASS_H
-#define GRASS_H
+#ifndef RENDERER_GRASS_H
+#define RENDERER_GRASS_H
 
 #include "pic/lgr.h"
 #include <memory>

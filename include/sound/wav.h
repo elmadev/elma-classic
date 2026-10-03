@@ -1,5 +1,5 @@
-#ifndef WAV_H
-#define WAV_H
+#ifndef SOUND_WAV_H
+#define SOUND_WAV_H
 
 #include <vector>
 

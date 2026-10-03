@@ -1,5 +1,5 @@
-#ifndef DRIVER_H
-#define DRIVER_H
+#ifndef GAME_DRIVER_H
+#define GAME_DRIVER_H
 
 #include "game/recorder.h"
 #include <string>

@@ -1,5 +1,5 @@
-#ifndef ANIM_H
-#define ANIM_H
+#ifndef PIC_ANIM_H
+#define PIC_ANIM_H
 
 class pic8;
 

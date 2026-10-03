@@ -1,5 +1,5 @@
-#ifndef REC_LIST_H
-#define REC_LIST_H
+#ifndef MENU_REC_LIST_H
+#define MENU_REC_LIST_H
 
 #include <string>
 #include <vector>

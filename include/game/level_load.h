@@ -1,5 +1,5 @@
-#ifndef LEVEL_LOAD_H
-#define LEVEL_LOAD_H
+#ifndef GAME_LEVEL_LOAD_H
+#define GAME_LEVEL_LOAD_H
 
 #define DEFAULT_LEVEL_FILENAME "_uj_topol_"
 

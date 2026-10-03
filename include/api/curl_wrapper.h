@@ -1,5 +1,5 @@
-#ifndef API_CURL_WRAPPER
-#define API_CURL_WRAPPER
+#ifndef API_CURL_WRAPPER_H
+#define API_CURL_WRAPPER_H
 
 #include "main.h"
 #include <memory>

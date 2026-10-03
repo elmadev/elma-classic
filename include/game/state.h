@@ -1,5 +1,5 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef GAME_STATE_H
+#define GAME_STATE_H
 
 #include "platform/scancode.h"
 #include <cstdio>

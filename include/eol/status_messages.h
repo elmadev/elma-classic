@@ -1,5 +1,5 @@
-#ifndef STATUS_MESSAGES_H
-#define STATUS_MESSAGES_H
+#ifndef EOL_STATUS_MESSAGES_H
+#define EOL_STATUS_MESSAGES_H
 
 #include <deque>
 #include <string>

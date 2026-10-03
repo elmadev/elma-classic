@@ -1,5 +1,5 @@
-#ifndef NULL_PROTOCOL_H
-#define NULL_PROTOCOL_H
+#ifndef EOL_NULL_PROTOCOL_H
+#define EOL_NULL_PROTOCOL_H
 
 #include <cstdint>
 

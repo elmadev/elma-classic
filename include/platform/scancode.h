@@ -1,5 +1,5 @@
-#ifndef SCANCODE_H
-#define SCANCODE_H
+#ifndef PLATFORM_SCANCODE_H
+#define PLATFORM_SCANCODE_H
 
 #include <array>
 #include <string>

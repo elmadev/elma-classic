@@ -1,5 +1,5 @@
-#ifndef ABC8_H
-#define ABC8_H
+#ifndef PIC_ABC8_H
+#define PIC_ABC8_H
 
 class pic8;
 

@@ -1,5 +1,5 @@
-#ifndef EOL_H
-#define EOL_H
+#ifndef EOL_EOL_H
+#define EOL_EOL_H
 
 #include "eol/eol_events.h"
 #include "eol/eol_table.h"

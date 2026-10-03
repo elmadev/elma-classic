@@ -1,5 +1,5 @@
-#ifndef QOPEN_H
-#define QOPEN_H
+#ifndef GAME_QOPEN_H
+#define GAME_QOPEN_H
 
 #include <cstdio>
 

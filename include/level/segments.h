@@ -1,5 +1,5 @@
-#ifndef SEGMENTS_H
-#define SEGMENTS_H
+#ifndef LEVEL_SEGMENTS_H
+#define LEVEL_SEGMENTS_H
 
 #include "vect2.h"
 

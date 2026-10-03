@@ -1,5 +1,5 @@
-#ifndef EOL_PACER_H
-#define EOL_PACER_H
+#ifndef PHYSICS_PACER_H
+#define PHYSICS_PACER_H
 
 #include "main.h"
 

@@ -1,5 +1,5 @@
-#ifndef PIC8_H
-#define PIC8_H
+#ifndef PIC_PIC8_H
+#define PIC_PIC8_H
 
 #include <cstdio>
 

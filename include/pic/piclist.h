@@ -1,5 +1,5 @@
-#ifndef PICLIST_H
-#define PICLIST_H
+#ifndef PIC_PICLIST_H
+#define PIC_PICLIST_H
 
 #include "level/sprite.h"
 #include <cstdio>

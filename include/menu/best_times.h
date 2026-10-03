@@ -1,5 +1,5 @@
-#ifndef BEST_TIMES_H
-#define BEST_TIMES_H
+#ifndef MENU_BEST_TIMES_H
+#define MENU_BEST_TIMES_H
 
 class level;
 

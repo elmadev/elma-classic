@@ -1,5 +1,5 @@
-#ifndef API_API
-#define API_API
+#ifndef API_API_H
+#define API_API_H
 
 #include <optional>
 #include <string>

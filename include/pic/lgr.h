@@ -1,5 +1,5 @@
-#ifndef LGRFILE_H
-#define LGRFILE_H
+#ifndef PIC_LGR_H
+#define PIC_LGR_H
 
 #include "level/sprite.h"
 

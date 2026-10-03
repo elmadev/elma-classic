@@ -1,5 +1,5 @@
-#ifndef BALL_COLLISION_H
-#define BALL_COLLISION_H
+#ifndef MENU_BALL_COLLISION_H
+#define MENU_BALL_COLLISION_H
 
 struct ball;
 

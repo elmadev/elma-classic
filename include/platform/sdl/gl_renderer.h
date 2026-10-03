@@ -1,5 +1,5 @@
-#ifndef GL_RENDERER_H
-#define GL_RENDERER_H
+#ifndef PLATFORM_SDL_GL_RENDERER_H
+#define PLATFORM_SDL_GL_RENDERER_H
 
 #include <SDL_video.h>
 

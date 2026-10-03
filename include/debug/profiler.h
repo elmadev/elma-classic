@@ -1,5 +1,5 @@
-#ifndef PROFILER_H
-#define PROFILER_H
+#ifndef DEBUG_PROFILER_H
+#define DEBUG_PROFILER_H
 
 #ifdef PROFILE_PERFORMANCE
 

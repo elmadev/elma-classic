@@ -1,5 +1,5 @@
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef RENDERER_TIMER_H
+#define RENDERER_TIMER_H
 
 #include "main.h"
 

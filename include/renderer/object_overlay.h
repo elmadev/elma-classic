@@ -1,5 +1,5 @@
-#ifndef OBJECT_OVERLAY_H
-#define OBJECT_OVERLAY_H
+#ifndef RENDERER_OBJECT_OVERLAY_H
+#define RENDERER_OBJECT_OVERLAY_H
 
 #include "level/object.h"
 

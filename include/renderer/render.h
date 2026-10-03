@@ -1,5 +1,5 @@
-#ifndef RENDER_H
-#define RENDER_H
+#ifndef RENDERER_RENDER_H
+#define RENDERER_RENDER_H
 
 class pic8;
 struct bike_metadata;

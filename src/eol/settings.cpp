@@ -522,9 +522,9 @@ void to_json(json& j, const eol_settings& s) { j = json{FIELD_LIST}; }
                 s.set_##name(std::move(value));                                                    \
             }                                                                                      \
         } catch (json::exception & e) {                                                            \
-            external_error(std::string("Invalid parameter in ") + file + "!\n" + e.what());        \
+            internal_error(std::string("Invalid parameter in ") + file + "!\n" + e.what());        \
         } catch (const char* e) {                                                                  \
-            external_error(std::string("Invalid parameter in ") + file + "!\n" + e);               \
+            internal_error(std::string("Invalid parameter in ") + file + "!\n" + e);               \
         }                                                                                          \
     }
 static void apply_json(const json& j, eol_settings& s, bool persist, const std::string& file) {
@@ -536,7 +536,7 @@ static void read_json(const std::string& file, bool persist) {
     std::ifstream i(file);
     json j = json::parse(i, nullptr, false);
     if (j.is_discarded() || !j.is_object()) {
-        external_error(file + " is corrupt! Please fix this or delete the file!");
+        internal_error(file + " is corrupt! Please fix this or delete the file!");
     }
     apply_json(j, *EolSettings, persist, file);
 }
@@ -549,7 +549,7 @@ void eol_settings::read_settings() {
 
 void eol_settings::read_overrides(const std::string& file) {
     if (!std::filesystem::exists(file)) {
-        external_error(file + " not found!");
+        internal_error(file + " not found!");
     }
     read_json(file, false);
 }

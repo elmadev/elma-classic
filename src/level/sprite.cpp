@@ -119,16 +119,16 @@ void sprite::save(FILE* h) {
     util::text::fwrite_array(texture_name, 10, h);
     util::text::fwrite_array(mask_name, 10, h);
     if (fwrite(&r.x, 1, sizeof(r.x), h) != 8) {
-        external_error("Failed to write to file!");
+        internal_error("Failed to write to file!");
     }
     if (fwrite(&r.y, 1, sizeof(r.y), h) != 8) {
-        external_error("Failed to write to file!");
+        internal_error("Failed to write to file!");
     }
     if (fwrite(&distance, 1, sizeof(distance), h) != 4) {
-        external_error("Failed to write to file!");
+        internal_error("Failed to write to file!");
     }
     if (fwrite(&clipping, 1, sizeof(clipping), h) != 4) {
-        external_error("Failed to write to file!");
+        internal_error("Failed to write to file!");
     }
 }
 

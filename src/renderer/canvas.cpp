@@ -52,7 +52,7 @@ constexpr double OUT_OF_BOUNDS_BOTTOM =
     (CANVAS_SAFETY_RENDER + 480.0 / 2.0) / ZOOM1_METERS_TO_PIXELS;
 
 static void memory_error() {
-    external_error("You do not have enough memory to load this level!\n"
+    internal_error("You do not have enough memory to load this level!\n"
                    "Try to set the graphic detail to low at the options.");
 }
 
@@ -374,7 +374,7 @@ void canvas::textures_to_pointers() {
                     cur_node->pixels = canvas_pixels::pointer(pic->get_row(y % pic->get_height()) +
                                                               texture_x_offset);
                     if (!cur_node->pixels.is_pointer()) {
-                        external_error("textures_to_pointers pointer has invalid memory address!");
+                        internal_error("textures_to_pointers pointer has invalid memory address!");
                     }
 
                     texture_x_offset += node_width;
@@ -769,7 +769,7 @@ void canvas::draw_sprites(Clipping clipping) {
 
         unsigned char* pixeldata = pict->data;
         if (!canvas_pixels::pointer(pixeldata).is_pointer()) {
-            external_error("draw_sprites pointer has invalid memory address!");
+            internal_error("draw_sprites pointer has invalid memory address!");
         }
 
         // Draw the picture

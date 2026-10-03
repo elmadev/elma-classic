@@ -19,7 +19,7 @@ state* State = nullptr;
 
 static void read_encrypted(void* buffer, int length, FILE* h, const char* filename) {
     if (fread(buffer, 1, length, h) != length) {
-        external_error(std::string("Corrupt file, please delete it! ") + filename);
+        internal_error(std::string("Corrupt file, please delete it! ") + filename);
     }
     unsigned char* pc = (unsigned char*)buffer;
     short a = 23;
@@ -97,7 +97,7 @@ state::state(const char* filename) {
     int version = 0;
     read_encrypted(&version, sizeof(version), h, filename);
     if (version != STATE_VERSION) {
-        external_error(std::string("File version is incorrect! Please rename it! ") + filename);
+        internal_error(std::string("File version is incorrect! Please rename it! ") + filename);
     }
     read_encrypted(toptens, sizeof(toptens), h, filename);
     read_encrypted(players, sizeof(players), h, filename);
@@ -122,11 +122,11 @@ state::state(const char* filename) {
 
     int magic_number = 0;
     if (fread(&magic_number, 1, sizeof(magic_number), h) != sizeof(magic_number)) {
-        external_error(std::string("Corrupt file, please rename it! ") + filename);
+        internal_error(std::string("Corrupt file, please rename it! ") + filename);
     }
     if (magic_number != STATE_MAGICNUMBER_SHAREWARE &&
         magic_number != STATE_MAGICNUMBER_REGISTERED) {
-        external_error(std::string("Corrupt file, please rename it! ") + filename);
+        internal_error(std::string("Corrupt file, please rename it! ") + filename);
     }
     fclose(h);
 }
@@ -144,7 +144,7 @@ void state::reload_toptens() {
     int version = 0;
     read_encrypted(&version, 4, h, filename);
     if (version != STATE_VERSION) {
-        external_error(std::string("File version is incorrect! Please rename it! ") + filename);
+        internal_error(std::string("File version is incorrect! Please rename it! ") + filename);
     }
 
     read_encrypted(toptens, sizeof(toptens), h, filename);
@@ -155,7 +155,7 @@ void state::reload_toptens() {
 void state::save() {
     FILE* h = fopen(STATE_FILENAME, "wb");
     if (!h) {
-        external_error(std::string("Could not open for write file!: ") + STATE_FILENAME);
+        internal_error(std::string("Could not open for write file!: ") + STATE_FILENAME);
     }
 
     int version = STATE_VERSION;
@@ -322,7 +322,7 @@ void state::write_stats_player_total_time(FILE* h, const char* player_name, bool
 void state::write_stats() {
     FILE* h = fopen("stats.txt", "w");
     if (!h) {
-        external_error("Could not open STATS.TXT for writing!");
+        internal_error("Could not open STATS.TXT for writing!");
     }
 
     fprintf(h, "This text file is generated automatically each time you quit the\n");
@@ -625,7 +625,7 @@ void merge_states() {
 
     state* mrg = new state(MERGE_DAT);
     if (!mrg) {
-        external_error("memory");
+        internal_error("memory");
     }
 
     State->reload_toptens();

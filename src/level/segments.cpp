@@ -26,7 +26,7 @@ segments::segments(level* lev) {
 
     seg_list = new segment[MAX_SEGMENTS];
     if (!seg_list) {
-        external_error("segments::segments out of memory!");
+        internal_error("segments::segments out of memory!");
     }
     memset(seg_list, 0, sizeof(segment) * MAX_SEGMENTS);
     seg_list_allocated_length = MAX_SEGMENTS;
@@ -75,7 +75,7 @@ segment_node* segments::new_node() {
     if (!node_array) {
         node_array = new segment_node_array;
         if (!node_array) {
-            external_error("segments::new_node out of memory!");
+            internal_error("segments::new_node out of memory!");
         }
         node_array->next = nullptr;
         node_array_index = 0;
@@ -90,7 +90,7 @@ segment_node* segments::new_node() {
         cur_array->next = new segment_node_array;
         cur_array = cur_array->next;
         if (!cur_array) {
-            external_error("segments::new_node out of memory!");
+            internal_error("segments::new_node out of memory!");
         }
         cur_array->next = nullptr;
         node_array_index = 0;
@@ -298,7 +298,7 @@ void segments::setup_collision_grid(double max_radius) {
     int grid_size = collision_grid_width * collision_grid_height;
     collision_grid = new segment_node*[grid_size];
     if (!collision_grid) {
-        external_error("segments::setup_collision_grid out of memory!");
+        internal_error("segments::setup_collision_grid out of memory!");
     }
     for (int i = 0; i < grid_size; i++) {
         collision_grid[i] = nullptr;

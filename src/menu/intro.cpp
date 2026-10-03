@@ -33,7 +33,7 @@ void menu_intro() {
 
     State = new state;
     if (!State) {
-        external_error("memory");
+        internal_error("memory");
     }
 
     merge_states();

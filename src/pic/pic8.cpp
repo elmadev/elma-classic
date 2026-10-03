@@ -24,7 +24,7 @@ void pic8::allocate(int w, int h) {
     pixels = new unsigned char[w * h];
     rows = new unsigned char*[(unsigned int)(h)];
     if (!rows || !pixels) {
-        external_error("pic8::alloc memory!");
+        internal_error("pic8::alloc memory!");
     }
     memset(pixels, 0, sizeof(unsigned char) * w * h);
     // Map the pixel array to the array of rows
@@ -299,7 +299,7 @@ void pic8::spr_open(const char* filename, FILE* h) {
 
 void pic8::spr_save(const char* filename, FILE* h) {
     if (width > SHRT_MAX || height > SHRT_MAX) {
-        external_error(std::string("Image is too large to be saved as .spr format!") + filename);
+        internal_error(std::string("Image is too large to be saved as .spr format!") + filename);
     }
 
     bool h_provided = true;
@@ -413,7 +413,7 @@ static int pcx_count_repeats(pic8* ppic, int x, int y, int width) {
 // Does not enforce the width to be an even number however
 void pic8::pcx_save(const char* filename, const unsigned char* pal) {
     if (width > SHRT_MAX || height > SHRT_MAX) {
-        external_error(std::string("Image is too large to be saved as .pcx format!") + filename);
+        internal_error(std::string("Image is too large to be saved as .pcx format!") + filename);
     }
 
     FILE* h = fopen(filename, "wb");
@@ -588,7 +588,7 @@ void pic8::bmp_save(const char* filename, const unsigned char* pal) {
 
     FILE* h = fopen(filename, "wb");
     if (!h) {
-        external_error(std::string("bmp_save failed to open file: ") + filename);
+        internal_error(std::string("bmp_save failed to open file: ") + filename);
     }
 
     const std::string error_message = std::string("bmp_save failed to write to file: ") + filename;
@@ -604,7 +604,7 @@ void pic8::bmp_save(const char* filename, const unsigned char* pal) {
     // BITMAPFILEHEADER
     constexpr short magic = BMP_MAGIC;
     if (fwrite(&magic, sizeof(magic), 1, h) != 1) {
-        external_error(error_message);
+        internal_error(error_message);
     }
     bmp_header header;
     header.size = sizeof(magic) + BMP_HEADER_SIZE + color_table_size + padded_width * height;
@@ -624,7 +624,7 @@ void pic8::bmp_save(const char* filename, const unsigned char* pal) {
     header.num_colors = 256;
     header.num_important_colors = 0;
     if (fwrite(&header, sizeof(header), 1, h) != 1) {
-        external_error(error_message);
+        internal_error(error_message);
     }
 
     // Color Table (RGBQUAD[256])
@@ -636,17 +636,17 @@ void pic8::bmp_save(const char* filename, const unsigned char* pal) {
         rgbquads[4 * i + 3] = 0;
     }
     if (fwrite(rgbquads, color_table_size, 1, h) != 1) {
-        external_error(error_message);
+        internal_error(error_message);
     }
 
     // Pixels, bottom-to-top
     unsigned char padding_bytes[4] = {0, 0, 0, 0};
     for (int i = height - 1; i >= 0; i--) {
         if (fwrite(get_row(i), width, 1, h) != 1) {
-            external_error(error_message);
+            internal_error(error_message);
         }
         if (fwrite(padding_bytes, 1, padding, h) != padding) {
-            external_error(error_message);
+            internal_error(error_message);
         }
     }
 
@@ -993,7 +993,7 @@ void pic8::add_transparency(int transparency) {
     unsigned char* buffer = nullptr;
     buffer = new unsigned char[SPRITE_MAX_BUFFER];
     if (!buffer) {
-        external_error("add_transparency memory!");
+        internal_error("add_transparency memory!");
     }
 
     // Transparency data format:
@@ -1025,7 +1025,7 @@ void pic8::add_transparency(int transparency) {
     // Copy data to new buffer of appropriate size
     transparency_data = new unsigned char[buffer_length];
     if (!transparency_data) {
-        external_error("add_transparency memory!");
+        internal_error("add_transparency memory!");
     }
     memcpy(transparency_data, buffer, buffer_length);
     transparency_data_length = buffer_length;

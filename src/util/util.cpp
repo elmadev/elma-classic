@@ -123,7 +123,7 @@ void fwrite_array(const char* buffer, size_t size, FILE* h) {
     char clean_buffer[MAX_SIZE];
     strncpy(clean_buffer, buffer, size);
     if (fwrite(clean_buffer, 1, size, h) != size) {
-        external_error("Failed to write to file!");
+        internal_error("Failed to write to file!");
     }
 }
 

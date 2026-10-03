@@ -945,7 +945,7 @@ bool editor_window_choose_lgr(pic8* dest, char* lgrname) {
     int list_length = populate_list("lgr/*.lgr", MAX_FILENAME_LEN);
 
     if (list_length < 1) {
-        external_error("There are no LGR files (*.lgr) in the LGR directory!");
+        internal_error("There are no LGR files (*.lgr) in the LGR directory!");
     }
 
     int selected_index = list_index(lgrname);

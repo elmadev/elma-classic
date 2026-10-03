@@ -65,7 +65,7 @@ void init_qopen() {
 
     FILE* h = fopen(RES_FILENAME, "rb");
     if (!h) {
-        external_error(std::string("Missing file!: ") + RES_FILENAME);
+        internal_error(std::string("Missing file!: ") + RES_FILENAME);
     }
 
     // There are two different .res formats, with no explicit versioning.
@@ -88,7 +88,7 @@ void init_qopen() {
 
     ResFiles = new res_file[ResMaxFiles];
     if (!ResFiles) {
-        external_error("init_qopen() out of memory!");
+        internal_error("init_qopen() out of memory!");
     }
 
     int size = sizeof(res_file) * ResMaxFiles;

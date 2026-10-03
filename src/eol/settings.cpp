@@ -170,6 +170,31 @@ void eol_settings::set_default_lgr_name(std::string name) {
     default_lgr_name_ = std::move(name);
 }
 
+void eol_settings::set_default_lgr_only(bool value) {
+    if (default_lgr_only_ == value) {
+        return;
+    }
+
+    if (!Level || !Lgr || strcmpi(Level->lgr_name, "default") == 0) {
+        default_lgr_only_ = value;
+        return;
+    }
+
+    if (value) {
+        if (strcmpi(lgrfile::current_lgr_name(), default_lgr_name_.value.c_str()) != 0) {
+            // Default isn't loaded, invalidate
+            lgrfile::invalidate_lgr_cache();
+        }
+    } else {
+        if (strnicmp(Level->lgr_name, lgrfile::current_lgr_name(), sizeof(Level->lgr_name)) != 0) {
+            // Level's LGR doesn't match currently loaded LGR
+            lgrfile::invalidate_lgr_cache();
+        }
+    }
+
+    default_lgr_only_ = value;
+}
+
 void eol_settings::set_fancyboost(bool b) {
     fancyboost_ = b;
     lgrfile::invalidate_lgr_cache();
@@ -442,6 +467,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(toggle_last_apple_time_key)                                                         \
                                                                                                    \
     JSON_FIELD(default_lgr_name)                                                                   \
+    JSON_FIELD(default_lgr_only)                                                                   \
     JSON_FIELD(fancyboost)                                                                         \
                                                                                                    \
     JSON_FIELD(show_last_apple_time)                                                               \

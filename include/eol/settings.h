@@ -159,6 +159,7 @@ class eol_settings {
     Default<combo_scancode> toggle_last_apple_time_key_{combo_scancode{DIK_LCONTROL, DIK_F8}};
 
     Default<std::string> default_lgr_name_{"default"};
+    Default<bool> default_lgr_only_{false};
     Default<bool> fancyboost_{true};
 
     Default<bool> show_last_apple_time_{true};
@@ -296,6 +297,7 @@ class eol_settings {
     DECLARE_SETTING(toggle_last_apple_time_key);
 
     DECLARE_SETTING_CUSTOM(default_lgr_name);
+    DECLARE_SETTING_CUSTOM(default_lgr_only);
     DECLARE_SETTING_CUSTOM(fancyboost);
 
     DECLARE_SETTING(show_last_apple_time);

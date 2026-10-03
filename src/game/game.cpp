@@ -664,6 +664,21 @@ void reload_graphic_assets() {
     canvas::recreate_canvases_if_needed();
 }
 
+bool configure_game() {
+    bool map_viewer = false;
+    if (is_key_down(DIK_F1)) {
+        map_viewer = true;
+    }
+    if (is_key_down(DIK_F2)) {
+        map_viewer = true;
+        checkpoint::Editor = true;
+        StatusMessages->add("Checkpoint editor enabled: click to add checkpoints");
+    } else {
+        checkpoint::Editor = false;
+    }
+    return map_viewer;
+}
+
 // Common setup function
 static void setup_gameloop(const char* filename) {
     reload_graphic_assets();

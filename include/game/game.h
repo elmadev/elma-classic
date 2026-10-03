@@ -29,6 +29,8 @@ struct camera {
 
 void reload_graphic_assets();
 
+bool configure_game();
+
 int game_loop(const char* filename, CameraMode camera_mode);
 int replay_loop(const char* filename, bool restore_player_visibility);
 

@@ -35,8 +35,8 @@ class checkpoint : clickable {
     static inline checkpoint* held_line = nullptr;
 
   public:
-    static inline bool Editor = true;
-    static inline bool Render = true;
+    static inline bool Editor = false;
+    static inline bool Render = false;
 
     checkpoint(vect2 coord)
         : start(&end, coord),

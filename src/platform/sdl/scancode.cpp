@@ -178,7 +178,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_RSHIFT:
         return "R SHIFT";
     case DIK_MULTIPLY:
-        return "PAD_*";
+        return "PAD *";
     case DIK_LMENU:
         return "L ALT";
     case DIK_SPACE:
@@ -210,31 +210,31 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_SCROLL:
         return "SCROLL LOCK";
     case DIK_NUMPAD7:
-        return "PAD_HOME";
+        return "PAD HOME";
     case DIK_NUMPAD8:
-        return "PAD_UP";
+        return "PAD UP";
     case DIK_NUMPAD9:
-        return "PAD_PGUP";
+        return "PAD PGUP";
     case DIK_SUBTRACT:
-        return "PAD_-";
+        return "PAD -";
     case DIK_NUMPAD4:
-        return "PAD_LEFT";
+        return "PAD LEFT";
     case DIK_NUMPAD5:
-        return "PAD_5";
+        return "PAD 5";
     case DIK_NUMPAD6:
-        return "PAD_RIGHT";
+        return "PAD RIGHT";
     case DIK_ADD:
-        return "PAD_+";
+        return "PAD +";
     case DIK_NUMPAD1:
-        return "PAD_END";
+        return "PAD END";
     case DIK_NUMPAD2:
-        return "PAD_DOWN";
+        return "PAD DOWN";
     case DIK_NUMPAD3:
-        return "PAD_PGDOWN";
+        return "PAD PGDOWN";
     case DIK_NUMPAD0:
-        return "PAD_INS";
+        return "PAD INS";
     case DIK_DECIMAL:
-        return "PAD_DEL";
+        return "PAD DEL";
     case DIK_F11:
         return "F11";
     case DIK_F12:
@@ -254,7 +254,7 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_YEN:
         return "YEN";
     case DIK_NUMPADEQUALS:
-        return "PAD_=";
+        return "PAD =";
     case DIK_PREVTRACK:
         return "CIRCUMFLEX";
     case DIK_AT:
@@ -272,13 +272,13 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_UNLABELED:
         return "UNLABELED";
     case DIK_NUMPADENTER:
-        return "PAD_ENTER";
+        return "PAD ENTER";
     case DIK_RCONTROL:
         return "R CTRL";
     case DIK_NUMPADCOMMA:
         return "COMMA";
     case DIK_DIVIDE:
-        return "PAD_/";
+        return "PAD /";
     case DIK_SYSRQ:
         return "PRINTSCREEN";
     case DIK_RMENU:

@@ -63,10 +63,10 @@ void quit() {
 
 bool ErrorGraphicsLoaded = false;
 
-[[noreturn]] static void handle_error(const std::string& prefix, const std::string& message,
-                                      std::source_location loc) {
+void internal_error(const std::string& message, std::source_location loc) {
     static bool InError = false;
-    logger::instance().write(LogLevel::Fatal, loc, std::format("{} {}", prefix, message));
+    logger::instance().write(LogLevel::Fatal, loc,
+                             std::format("Sorry, internal error. {}", message));
 
     if (InError) {
         message_box("A fatal error occurred. Details written to eol.log.");
@@ -74,7 +74,7 @@ bool ErrorGraphicsLoaded = false;
     }
     InError = true;
 
-    std::string text = prefix + "\n" + message;
+    std::string text = "Sorry, internal error.\n" + message;
 
     bool rendered = false;
     if (ErrorGraphicsLoaded) {
@@ -94,15 +94,4 @@ bool ErrorGraphicsLoaded = false;
     }
 
     quit();
-}
-
-void internal_error(const std::string& message, std::source_location loc) {
-    handle_error("Sorry, internal error.", message, loc);
-}
-
-void external_error(const std::string& message, std::source_location loc) {
-    if (message.find("memory") != std::string::npos) {
-        handle_error("Sorry, out of memory!", message, loc);
-    }
-    handle_error("External error encountered:", message, loc);
 }

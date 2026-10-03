@@ -72,6 +72,7 @@
 
 ### Errors
 * message.inf is no longer required to view error messages, and error messages are in English
+* All errors are displayed as internal errors
 * error.txt is replaced with eol.log
 * Error and warning messages are vertically centered on the screen
 

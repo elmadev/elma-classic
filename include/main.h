@@ -29,8 +29,6 @@ void delay(int milliseconds);
 
 [[noreturn]] void internal_error(const std::string& message,
                                  std::source_location loc = std::source_location::current());
-[[noreturn]] void external_error(const std::string& message,
-                                 std::source_location loc = std::source_location::current());
 
 #define ELMA_ASSERT(condition)                                                                     \
     do {                                                                                           \

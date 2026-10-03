@@ -3,6 +3,7 @@
 #include "platform/sdl/keyboard.h"
 #include <SDL_keyboard.h>
 #include <SDL_keycode.h>
+#include <algorithm>
 #include <format>
 #include <vendor/sdl/scancodes_windows.h>
 
@@ -310,6 +311,26 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_APPS:
         return "APPLICATION";
     }
+
+    // Use SDL key names.
+    //
+    // SDL2 key-name table:
+    // https://github.com/libsdl-org/SDL/blob/release-2.32.x/src/events/SDL_keyboard.c#L56
+    //
+    // In SDL3, the table has moved to:
+    // https://github.com/libsdl-org/SDL/blob/main/src/events/SDL_keymap.c
+    //
+    // Platform-specific names can be identified by searching for
+    // SDL_SetScancodeName. For example:
+    //   - DIK_APPS maps to "Menu" on Windows vs. "Application" elsewhere.
+    //   - DIK_LWIN maps to "Left Windows" on Windows vs. "Left GUI" elsewhere.
+    std::string sdl_name = std::string(SDL_GetScancodeName(windows_scancode_table[keycode]));
+    if (!sdl_name.empty()) {
+        std::transform(sdl_name.begin(), sdl_name.end(), sdl_name.begin(), ::toupper);
+        return sdl_name;
+    }
+
+    // Fallback
     return std::format("Key code: {}", keycode);
 }
 

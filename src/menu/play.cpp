@@ -450,12 +450,13 @@ void loading_screen() {
     menu.render(true);
 }
 
-static void play_internal(int internal_index, bool map_viewer) {
+static void play_internal(int internal_index) {
     player* cur_player = State->get_player(State->player1);
     while (true) {
         finame filename;
         sprintf(filename, "QWQUU%03d.LEV", internal_index + 1);
 
+        bool map_viewer = is_key_down(DIK_F1);
         loading_screen();
 
         load_level_play(filename);
@@ -495,11 +496,9 @@ static void play_internal(int internal_index, bool map_viewer) {
             return;
         }
         if (choice == MenuLevel::PlayAgain) {
-            map_viewer = is_key_down(DIK_F1);
             continue;
         }
         if (choice == MenuLevel::PlayNext) {
-            map_viewer = is_key_down(DIK_F1);
             internal_index++;
             cur_player->selected_level = internal_index;
         }
@@ -563,7 +562,7 @@ void menu_play() {
                             player1->skipped[i] && !EolSettings->all_internals_accessible()
                                 ? "SKIPPED!"
                                 : get_internal_level_name(i));
-            nav.add_row(level_name, NAV_FUNC() { play_internal(choice - 1, is_key_down(DIK_F1)); });
+            nav.add_row(level_name, NAV_FUNC() { play_internal(choice - 1); });
         }
 
         int choice = nav.navigate();

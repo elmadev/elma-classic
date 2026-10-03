@@ -8,7 +8,6 @@
 #include "menu/pic.h"
 #include "menu/play.h"
 #include "platform/implementation.h"
-#include "platform/scancode.h"
 #include "util/file_iter.h"
 #include <cstring>
 #include <string>
@@ -21,7 +20,7 @@ static void play_external(const std::string& filename) {
     strcpy(State->external_filename, filename_str);
 
     while (true) {
-        bool map_viewer = is_key_down(DIK_F1);
+        bool map_viewer = configure_game();
         loading_screen();
         if (!load_level_play(filename_str)) {
             return;

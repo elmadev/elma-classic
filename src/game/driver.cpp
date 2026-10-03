@@ -260,3 +260,39 @@ void replay_driver::advance(double time, bool rewinding) {
 
 replay_driver::replay_driver(motorst* mot, recorder* rec)
     : driver(mot, rec) {}
+
+bool replay_list::add(const std::string& path, int level_id) {
+    replay_driver& driv = drivers.emplace_back(&mots.emplace_back(), &recs.emplace_back());
+    if (recorder::load_single(path, *driv.rec) != level_id || driv.rec->is_empty()) {
+        recs.pop_back();
+        mots.pop_back();
+        drivers.pop_back();
+        return false;
+    }
+    driv.name = std::filesystem::path(path).stem().string();
+    return true;
+}
+
+void replay_list::add(recorder* rec) {
+    replay_driver& driv = drivers.emplace_back(&mots.emplace_back(), rec);
+}
+
+void replay_list::rewind() {
+    for (replay_driver& driv : drivers) {
+        init_motor(driv.mot);
+        driv.mot->apple_count = 0;
+        driv.mot->apple_bug_count = 0;
+        driv.reset_metadata();
+        reset_motor_forces(driv.mot);
+        driv.rec->rewind();
+    }
+}
+
+bool replay_list::advance(double time, bool rewinding) {
+    bool all_finished = true;
+    for (replay_driver& driv : drivers) {
+        driv.advance(time, rewinding);
+        all_finished &= driv.dead;
+    }
+    return all_finished;
+}

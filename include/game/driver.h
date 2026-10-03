@@ -4,6 +4,7 @@
 #include "game/recorder.h"
 #include "physics/forces.h"
 #include <cstdint>
+#include <list>
 #include <string>
 
 struct motorst;
@@ -90,9 +91,34 @@ struct replay_driver : driver {
     void replay_frame(double time);
 
   public:
+    std::string name;
+
     void advance(double time, bool rewinding);
 
     replay_driver(motorst* mot, recorder* rec);
+};
+
+class replay_list {
+  public:
+    void clear() { drivers.clear(); }
+    // Load the first driver of `path` if it is a replay of `level_id`
+    bool add(const std::string& path, int level_id);
+    // Load Rec1 or Rec2
+    void add(recorder* rec);
+    bool empty() const { return drivers.empty(); }
+
+    void rewind();
+    // Returns true once every driver has run out of frames
+    bool advance(double time, bool rewinding);
+
+    std::list<replay_driver>& all() { return drivers; }
+
+  private:
+    std::list<replay_driver> drivers;
+
+    // Temporary memory until driver is refactored to no longer use these as pointers
+    std::list<motorst> mots;
+    std::list<recorder> recs;
 };
 
 #endif

@@ -240,13 +240,8 @@ void replay_previous_run() {
     }
 }
 
-void replay_from_file(const char* filename) {
+void replay_from_file(replay_list& replays, const char* filename) {
     bool reset_play_visibility = true;
-    replay_list replays;
-    replays.add(Rec1);
-    if (MultiplayerRec) {
-        replays.add(Rec2);
-    }
     while (true) {
         if (replay_loop(replays, filename, !reset_play_visibility)) {
             if (Level->objects_flipped) {

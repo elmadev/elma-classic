@@ -62,6 +62,7 @@
 * About menu updated
 * Background menu balls start centered in the screen
 * state.dat is updated after using the Options menu
+* Merge Replays and Merge with can merge multiple replays: Shift+Enter marks any number of them, F2 / Shift+F2 switch which replay is followed
 
 ### Key Input
 * Many non-alphanumeric symbols can now be typed in the menu and editor, such as `!`

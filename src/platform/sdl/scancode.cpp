@@ -149,9 +149,17 @@ std::string dik_to_string(DikScancode keycode) {
     case DIK_NEXT:
         return "PAGE DOWN";
     case DIK_LWIN:
+#ifdef _WIN32
         return "L WIN";
+#else
+        return "L GUI";
+#endif
     case DIK_RWIN:
+#ifdef _WIN32
         return "R WIN";
+#else
+        return "R GUI";
+#endif
     }
 
     // Use SDL key names.

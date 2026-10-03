@@ -172,8 +172,6 @@ std::string dik_to_string(DikScancode keycode) {
         return "L WIN";
     case DIK_RWIN:
         return "R WIN";
-    case DIK_APPS:
-        return "APPLICATION";
     }
 
     // Use SDL key names.

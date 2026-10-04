@@ -339,30 +339,6 @@ static void physics_subframe(driver& driv, double time, double dt) {
     }
 }
 
-static void update_view_settings(driver& driv, bool* other_draw_view) {
-    player_keys* keys = driv.keys;
-
-    // Visibility of player viewpoint
-    if (was_game_key_just_pressed(keys->toggle_visibility)) {
-        reset_game_background();
-        if (!*other_draw_view) {
-            // You cannot have 0 players visible, so make both players visible instead
-            *other_draw_view = true;
-            driv.draw_view = true;
-        } else {
-            driv.draw_view = !driv.draw_view;
-        }
-    }
-
-    if (was_game_key_just_pressed(keys->toggle_minimap)) {
-        driv.toggle_minimap();
-    }
-
-    if (was_game_key_just_pressed(keys->toggle_timer)) {
-        driv.toggle_timer();
-    }
-}
-
 // The `rec` argument is only used for game play, not when playing a replay.
 static void update_bike_turn_phase(driver& driv, bool update_rec, double time, int flipped) {
     turning_data* data = &driv.meta.bike_turning;
@@ -681,12 +657,11 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     pacer::reset();
 
-    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Game1);
-    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Game2);
+    driver driv1(Motor1, Rec1, &State->keys1);
+    driver driv2(Motor2, Rec2, &State->keys2);
     driv1.stats.drunk = driv2.stats.drunk = active_cripples() & BattleAttributes::Drunk;
 
-    camera current_camera;
-    current_camera.mode = camera_mode;
+    camera current_camera(camera_mode, false, State);
     current_camera.init_freecam(Level, Motor1);
 
     sound_init();
@@ -835,11 +810,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         }
         EolClient->update_spy_kuskis();
 
-        // Update the hud and player visibility
-        update_view_settings(driv1, &driv2.draw_view);
-        if (!Single) {
-            update_view_settings(driv2, &driv1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
         render_game(time, driv1, driv2, current_camera, GameLoop::Game);
 
@@ -998,17 +969,16 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
     EolClient->enter_level(filename, Level, EnterMode::Replay);
 
-    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Replay1);
-    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Replay2);
+    driver driv1(Motor1, Rec1, &State->keys1);
+    driver driv2(Motor2, Rec2, &State->keys2);
 
-    driv2.draw_view = !MergedRec;
+    camera current_camera(CameraMode::Normal, true, State);
+
+    current_camera.player2.draw_view = !MergedRec;
     if (restore_player_visibility) {
-        driv1.draw_view = PreviousReplayDrawView1;
-        driv2.draw_view = PreviousReplayDrawView2;
+        current_camera.player1.draw_view = PreviousReplayDrawView1;
+        current_camera.player2.draw_view = PreviousReplayDrawView2;
     }
-
-    camera current_camera;
-    current_camera.mode = CameraMode::Normal;
 
     sound_init();
     Mute = false;
@@ -1062,11 +1032,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         double time = current_replay_time;
 
-        // Update the hud and player visibility
-        update_view_settings(driv1, &driv2.draw_view);
-        if (!Single) {
-            update_view_settings(driv2, &driv1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
         // Load replay data
         bool finished1 = !replay_frame(driv1, time);
@@ -1102,8 +1068,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             Mute = true;
             Level->unflip_objects();
 
-            PreviousReplayDrawView1 = driv1.draw_view;
-            PreviousReplayDrawView2 = driv2.draw_view;
+            PreviousReplayDrawView1 = current_camera.player1.draw_view;
+            PreviousReplayDrawView2 = current_camera.player2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return 0;
@@ -1153,8 +1119,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
             Level->unflip_objects();
 
-            PreviousReplayDrawView1 = driv1.draw_view;
-            PreviousReplayDrawView2 = driv2.draw_view;
+            PreviousReplayDrawView1 = current_camera.player1.draw_view;
+            PreviousReplayDrawView2 = current_camera.player2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return -1;
@@ -1186,14 +1152,13 @@ void render_replay(const char* level_filename) {
 
     EolClient->enter_level(level_filename, Level, EnterMode::Replay);
 
-    camera current_camera;
-    current_camera.mode = CameraMode::Normal;
-
     VideoRecordingMode = true;
     VideoFrameIndex = 0;
 
-    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Replay1);
-    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Replay2);
+    driver driv1(Motor1, Rec1, &State->keys1);
+    driver driv2(Motor2, Rec2, &State->keys2);
+
+    camera current_camera(CameraMode::Normal, true, State);
 
     fps::reset();
     while (true) {
@@ -1205,11 +1170,7 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (pacer::MILLISECONDS_TO_PHYS_TIME * 1000.0) /
                       EolSettings->recording_fps();
 
-        // Update the hud and player visibility
-        update_view_settings(driv1, &driv2.draw_view);
-        if (!Single) {
-            update_view_settings(driv2, &driv1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
         bool finished1 = !replay_frame(driv1, time);
         bool finished2 = false;

@@ -8,6 +8,7 @@
 #include "eol/status_messages.h"
 #include "game/driver.h"
 #include "game/fps.h"
+#include "game/input.h"
 #include "level/level.h"
 #include "level/object.h"
 #include "level/segments.h"
@@ -153,20 +154,6 @@ static bool handle_console_input() {
         }
     }
     return was_active;
-}
-
-static bool is_game_key_down(DikScancode code) {
-    if (Console->is_input_active()) {
-        return false;
-    }
-    return is_key_down(code);
-}
-
-template <typename Scancode> static bool was_game_key_just_pressed(Scancode code) {
-    if (Console->is_input_active()) {
-        return false;
-    }
-    return was_key_just_pressed(code);
 }
 
 static void latch_one_frame_brake(driver& driv) {

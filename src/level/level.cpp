@@ -1051,7 +1051,7 @@ void level::save_topten(const char* filename) {
 }
 
 void level::get_boundaries(double* x1, double* y1, double* x2, double* y2,
-                           bool check_objects_and_sprites) {
+                           bool check_objects_and_sprites) const {
     *x1 = 100000000000.0;
     *y1 = 100000000000.0;
     *x2 = -100000000000.0;

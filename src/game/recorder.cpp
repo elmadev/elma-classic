@@ -1,4 +1,5 @@
 #include "game/recorder.h"
+#include "game/ghost_list.h"
 #include "game/qopen.h"
 #include "level/level.h"
 #include "level/object.h"
@@ -43,8 +44,6 @@ recorder::recorder() {
     frames.reserve(INITIAL_FRAMES);
     events.reserve(INITIAL_EVENTS);
 }
-
-recorder::~recorder() = default;
 
 void recorder::erase(const char* lev_filename) {
     if (strlen(lev_filename) > MAX_FILENAME_LEN + 4) {
@@ -430,6 +429,7 @@ int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
     if (is_first_replay) {
         MultiplayerRec = multiplayer_rec;
         MergedRec = false;
+        Ghosts.reset_to(std::filesystem::path(filename).stem().string());
     }
     if (fread(&flagtag_, 1, sizeof(flagtag_), h) != 4) {
         read_error(filename);
@@ -601,6 +601,19 @@ int recorder::load_rec_file(const char* filename, bool demo) {
     } else {
         fclose(h);
     }
+
+    return level_id;
+}
+
+int recorder::load_single(const std::string& path, recorder& into) {
+    FILE* h = fopen(path.c_str(), "rb");
+    if (!h) {
+        internal_error("Failed to open rec file: " + path);
+    }
+
+    std::string name = std::filesystem::path(path).filename().string();
+    int level_id = into.load(name.c_str(), h, false);
+    fclose(h);
 
     return level_id;
 }

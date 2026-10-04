@@ -7,6 +7,7 @@
 #include "game/driver.h"
 #include "game/fps.h"
 #include "game/game.h"
+#include "game/ghost_list.h"
 #include "game/level_load.h"
 #include "level/level.h"
 #include "level/object.h"
@@ -359,6 +360,13 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
             int k_y = (int)(k_pos.y * MetersToMinimapPixels);
             render_minimap_icon(&minimap_view, k_x, k_y, bike2_id);
         }
+    }
+
+    for (const replay_bike& g : Ghosts.all()) {
+        vect2 g_pos = g.bike.mot.bike.r - bottomleft_corner;
+        int g_x = (int)(g_pos.x * MetersToMinimapPixels);
+        int g_y = (int)(g_pos.y * MetersToMinimapPixels);
+        render_minimap_icon(&minimap_view, g_x, g_y, bike2_id);
     }
 
     // Draw the other bike
@@ -794,6 +802,12 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     if (spy_pose && bike_in_view(&spy_pose->mot, center)) {
         render_bike(pic, EolClient->kuski_has_flag(spy_kuski->id), bottomleft_corner,
                     &spy_pose->mot, &spy_pose->metadata, bike2, spy_kuski->shirt);
+    }
+
+    for (const replay_bike& g : Ghosts.all()) {
+        if (bike_in_view(&g.bike.mot, center)) {
+            render_bike(pic, false, bottomleft_corner, &g.bike.mot, &g.bike.meta, bike2, nullptr);
+        }
     }
 
     if (current_camera.mode == CameraMode::Normal) {

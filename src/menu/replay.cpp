@@ -2,6 +2,7 @@
 #include "editor/editor.h"
 #include "eol/settings.h"
 #include "game/game.h"
+#include "game/ghost_list.h"
 #include "game/level_load.h"
 #include "game/recorder.h"
 #include "level/level.h"
@@ -69,26 +70,47 @@ static bool load_replay(const std::string& filename) {
     return validate_replay_level(level_id, filename);
 }
 
-static void merge_play(const std::string& file1, const std::string& file2) {
+// Selected replays are marked left of the names, clear of the helmet cursor
+constexpr int MARK_X = 110;
+constexpr const char MARK[] = "X";
+
+static bool shift_held() { return is_key_down(DIK_LSHIFT) || is_key_down(DIK_RSHIFT); }
+
+static bool any_marked(menu_nav& nav) {
+    for (size_t i = 0; i < nav.row_count(); i++) {
+        if (!nav.entry_right((int)i).empty()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void clear_marks(menu_nav& nav) {
+    for (size_t i = 0; i < nav.row_count(); i++) {
+        nav.entry_right((int)i).clear();
+    }
+}
+
+// Play `focused` with every marked row drawn as a ghost. `skip_row` is the
+// followed replay's own row, or -1.
+static void ghost_play(menu_nav& nav, const std::string& focused, int skip_row) {
     MenuPalette->set();
     loading_screen();
 
-    recorder::merge_result result = recorder::load_merge(file1, file2);
+    int level_id = recorder::load_rec_file(focused.c_str(), false);
 
-    if (result.rec1_was_multi || result.rec2_was_multi) {
-        menu_dialog("Note: Only player 1 used from multiplayer replays.");
-    }
-
-    if (result.level_id_mismatch) {
-        DikScancode key = menu_dialog("Warning: Replays are from different levels!",
-                                      "Press Enter to continue, ESC to cancel.");
-        if (key == DIK_ESCAPE) {
+    for (size_t i = 0; i < nav.row_count(); i++) {
+        if ((int)i == skip_row || nav.entry_right((int)i).empty()) {
+            continue;
+        }
+        std::string filename = nav.entry_left((int)i) + ".rec";
+        if (!Ghosts.add("rec/" + filename, level_id)) {
+            menu_dialog(filename.c_str(), "is not a replay of this level!");
             return;
         }
     }
 
-    bool loaded = validate_replay_level(result.level_id, file1);
-    if (!loaded) {
+    if (!validate_replay_level(level_id, focused)) {
         return;
     }
 
@@ -184,41 +206,59 @@ void menu_replay_all() {
     }
 }
 
-void menu_merge_replays() {
-    std::string picked_file;
-    std::vector<std::string> replay_names = rec_list::get_replays();
-
-    menu_nav nav("Select first replay");
-
+static void add_replay_rows(menu_nav& nav, const std::vector<std::string>& replay_names,
+                            const nav_func& handler) {
     for (const std::string& filename : replay_names) {
         constexpr int EXT_LEN = 4;
-        std::string short_name = filename.substr(0, filename.size() - EXT_LEN);
-        nav.add_row(short_name, NAV_FUNC(&picked_file, filename) { picked_file = filename; });
+        nav.add_row(filename.substr(0, filename.size() - EXT_LEN), handler);
     }
 
     nav.search_pattern = SearchPattern::Sorted;
     nav.max_search_len = MAX_REPLAY_NAME_LEN;
     nav.sort_rows();
+    nav.x_right = MARK_X;
+}
+
+// The first replay picked is followed. Shift+Enter toggles a ghost, Enter adds
+// one and plays, ESC starts over and leaves once nothing is picked.
+void menu_merge_replays() {
+    menu_nav nav("Merge replays");
+    int followed = -1;
+
+    add_replay_rows(nav, rec_list::get_replays(),
+                    [&nav, &followed](int choice, const std::string&, const std::string&) {
+                        if (followed < 0) {
+                            followed = choice;
+                            nav.entry_right(choice) = MARK;
+                            return;
+                        }
+                        if (choice == followed) {
+                            return;
+                        }
+                        std::string& mark = nav.entry_right(choice);
+                        if (shift_held()) {
+                            mark = mark.empty() ? MARK : "";
+                            return;
+                        }
+                        mark = MARK;
+                        ghost_play(nav, nav.entry_left(followed) + ".rec", followed);
+                    });
 
     if (nav.row_count() == 0) {
         return;
     }
 
     while (true) {
-        nav.title = "Select first replay";
         MenuPalette->set();
-        if (nav.navigate() < 0) {
-            return;
-        }
-        std::string file1 = picked_file;
-
-        nav.title = "Select second replay";
-        MenuPalette->set();
-        if (nav.navigate() < 0) {
+        if (nav.navigate() >= 0) {
             continue;
         }
-
-        merge_play(file1, picked_file);
+        if (followed < 0) {
+            Ghosts.clear();
+            return;
+        }
+        followed = -1;
+        clear_marks(nav);
     }
 }
 
@@ -270,6 +310,7 @@ void menu_replay_level(int level_id) {
     }
 }
 
+// Like menu_merge_replays(), but `merge_file` is followed
 void menu_merge_level(int level_id, const std::string& merge_file) {
     if (!wait_for_cache()) {
         return;
@@ -284,21 +325,26 @@ void menu_merge_level(int level_id, const std::string& merge_file) {
 
     menu_nav nav("Merge with");
 
-    for (const std::string& filename : replay_names) {
-        constexpr int EXT_LEN = 4;
-        std::string short_name = filename.substr(0, filename.size() - EXT_LEN);
-        nav.add_row(
-            short_name, NAV_FUNC(&merge_file, filename) { merge_play(merge_file, filename); });
-    }
-
-    nav.search_pattern = SearchPattern::Sorted;
-    nav.max_search_len = MAX_REPLAY_NAME_LEN;
-    nav.sort_rows();
+    add_replay_rows(nav, replay_names,
+                    [&nav, &merge_file](int choice, const std::string&, const std::string&) {
+                        std::string& mark = nav.entry_right(choice);
+                        if (shift_held()) {
+                            mark = mark.empty() ? MARK : "";
+                            return;
+                        }
+                        mark = MARK;
+                        ghost_play(nav, merge_file, -1);
+                    });
 
     while (true) {
         MenuPalette->set();
-        if (nav.navigate() < 0) {
+        if (nav.navigate() >= 0) {
+            continue;
+        }
+        if (!any_marked(nav)) {
+            Ghosts.clear();
             return;
         }
+        clear_marks(nav);
     }
 }

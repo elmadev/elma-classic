@@ -1,9 +1,9 @@
 #include "game/driver.h"
 #include "eol/settings.h"
 #include "physics/forces.h"
+#include "physics/init.h"
 #include "renderer/timer.h"
 #include <algorithm>
-#include <cstdint>
 #include <format>
 
 constexpr double PHYSICS_SPEED_TO_EOL_SPEED = 5.0;
@@ -58,21 +58,7 @@ void driver::reset_metadata() {
     sound.gas = 0;
     sound.friction_volume = 0.0;
 
-    meta.volt_time = -100.0;
-    meta.volt_is_right = false;
-
-    meta.turn_key_previous = false;
-    meta.one_turn_used = false;
-
-    meta.arm_position = 0.0;
-
-    meta.bike_turning.flipped = 0;
-    meta.bike_turning.turn_time = -1000.0;
-    meta.bike_turning.turn_phase = 0.0;
-
-    meta.camera_turning.flipped = 0;
-    meta.camera_turning.turn_time = -1000.0;
-    meta.camera_turning.turn_phase = 0.0;
+    meta.reset();
 }
 
 driver::driver(motorst* mot, recorder* rec, player_keys* keys, HudSlot hud_slot)

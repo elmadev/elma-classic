@@ -920,13 +920,10 @@ static void rewind_override_animations(driver& driv, double time) {
 }
 
 // Load replay data (instead of simulating bike physics)
-static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
+static bool replay_frame(driver& driv, double time) {
     motorst* mot = driv.mot;
     bike_metadata* metadata = &driv.meta;
     recorder* rec = driv.rec;
-
-    // Update the hud and player visibility
-    update_view_settings(driv, other_draw_view);
 
     // Load replay data
     bool alive = rec->recall_frame(mot, time, &driv.sound);
@@ -1065,11 +1062,17 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         double time = current_replay_time;
 
+        // Update the hud and player visibility
+        update_view_settings(driv1, &driv2.draw_view);
+        if (!Single) {
+            update_view_settings(driv2, &driv1.draw_view);
+        }
+
         // Load replay data
-        bool finished1 = !replay_frame(driv1, time, &driv2.draw_view);
+        bool finished1 = !replay_frame(driv1, time);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &driv1.draw_view);
+            finished2 = !replay_frame(driv2, time);
         }
 
         // Reverse events if rewinding
@@ -1202,10 +1205,16 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (pacer::MILLISECONDS_TO_PHYS_TIME * 1000.0) /
                       EolSettings->recording_fps();
 
-        bool finished1 = !replay_frame(driv1, time, &driv2.draw_view);
+        // Update the hud and player visibility
+        update_view_settings(driv1, &driv2.draw_view);
+        if (!Single) {
+            update_view_settings(driv2, &driv1.draw_view);
+        }
+
+        bool finished1 = !replay_frame(driv1, time);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &driv1.draw_view);
+            finished2 = !replay_frame(driv2, time);
         }
 
         update_graphical_metadata(driv1, false, time);

@@ -13,6 +13,8 @@ struct camera {
     double min_y;
     double max_x;
     double max_y;
+
+    void update_freecam(double dt);
 };
 
 #endif

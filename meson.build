@@ -33,6 +33,7 @@ elma_sources = files(
     'src/eol/kuski.cpp',
     'src/eol/settings.cpp',
     'src/eol/status_messages.cpp',
+    'src/game/camera.cpp',
     'src/game/driver.cpp',
     'src/game/fps.cpp',
     'src/game/game.cpp',

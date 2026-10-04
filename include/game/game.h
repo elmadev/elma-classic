@@ -1,6 +1,7 @@
 #ifndef GAME_GAME_H
 #define GAME_GAME_H
 
+#include "game/camera.h"
 #include <string>
 
 extern int Single;
@@ -11,20 +12,6 @@ extern bool ScreenshotRequested;
 extern bool VideoRecordingMode;
 extern int VideoFrameIndex;
 extern std::string VideoOutputDirectory;
-
-enum class CameraMode { Normal, MapViewer };
-
-struct camera {
-    CameraMode mode;
-    double x;
-    double y;
-    double start_x;
-    double start_y;
-    double min_x;
-    double min_y;
-    double max_x;
-    double max_y;
-};
 
 void reload_graphic_assets();
 

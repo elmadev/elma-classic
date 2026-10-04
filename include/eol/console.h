@@ -1,6 +1,7 @@
 #ifndef EOL_CONSOLE_H
 #define EOL_CONSOLE_H
 
+#include "platform/scancode.h"
 #include <functional>
 #include <string>
 #include <unordered_map>
@@ -8,6 +9,9 @@
 
 class abc8;
 class pic8;
+
+bool is_game_key_down(DikScancode code);
+template <typename Scancode> bool was_game_key_just_pressed(Scancode code);
 
 class console {
   public:

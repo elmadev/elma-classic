@@ -687,18 +687,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     camera current_camera;
     current_camera.mode = camera_mode;
-    current_camera.x = Motor1->bike.r.x;
-    current_camera.y = Motor1->bike.r.y;
-    current_camera.start_x = Motor1->bike.r.x;
-    current_camera.start_y = Motor1->bike.r.y;
-
-    double level_min_y;
-    double level_max_y;
-    Level->get_boundaries(&current_camera.min_x, &level_min_y, &current_camera.max_x, &level_max_y,
-                          false);
-    // Convert level y-coordinates to camera y-coordinates
-    current_camera.min_y = -level_max_y;
-    current_camera.max_y = -level_min_y;
+    current_camera.init_freecam(Level, Motor1);
 
     sound_init();
     // Stay muted if no bike is visible.

@@ -1,6 +1,9 @@
 #ifndef GAME_CAMERA_H
 #define GAME_CAMERA_H
 
+class level;
+struct motorst;
+
 enum class CameraMode { Normal, MapViewer };
 
 struct camera {
@@ -15,6 +18,7 @@ struct camera {
     double max_y;
 
     void update_freecam(double dt);
+    void init_freecam(const level* lev, const motorst* mot);
 };
 
 #endif

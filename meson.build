@@ -36,9 +36,12 @@ elma_sources = files(
     'src/game/driver.cpp',
     'src/game/fps.cpp',
     'src/game/game.cpp',
+    'src/game/ghost_list.cpp',
     'src/game/level_load.cpp',
     'src/game/qopen.cpp',
+    'src/game/recorded_bike.cpp',
     'src/game/recorder.cpp',
+    'src/game/replay_bike.cpp',
     'src/game/state.cpp',
     'src/glad/glad.c',
     'src/level/level.cpp',
@@ -47,7 +50,6 @@ elma_sources = files(
     'src/level/segments.cpp',
     'src/level/sprite.cpp',
     'src/log.cpp',
-    'src/main.cpp',
     'src/menu/ball_collision.cpp',
     'src/menu/ball_handler.cpp',
     'src/menu/ball.cpp',
@@ -242,14 +244,33 @@ sdl2_dep = dependency('sdl2',
 
 deps += [gl_dep, libcurl_dep, nlohmann_json_dep, sdl2_dep]
 
-executable(
-    'elma',
+elma_core = static_library(
+    'elma_core',
     elma_sources,
     include_directories: inc,
     cpp_args: cpp_args,
+    dependencies: deps,
+)
+
+executable(
+    'elma',
+    ['src/main.cpp', 'src/runtime.cpp'],
+    include_directories: inc,
+    cpp_args: cpp_args,
     link_args: link_args,
+    link_whole: elma_core,
     dependencies: deps,
     win_subsystem: win_subsystem,
+)
+
+executable(
+    'rec2vid',
+    ['src/tools/rec2vid.cpp', 'src/tools/ffmpeg_encoder.cpp', 'src/runtime.cpp'],
+    include_directories: inc,
+    cpp_args: cpp_args + ['-DCLI_MODE'],
+    link_whole: elma_core,
+    dependencies: deps,
+    win_subsystem: 'console',
 )
 
 clang_tidy = find_program('clang-tidy', 'clang-tidy-21', required: false)

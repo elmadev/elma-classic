@@ -449,6 +449,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(fps_limit_enabled)                                                                  \
     JSON_FIELD(fps_limit)                                                                          \
     JSON_FIELD(recording_fps)                                                                      \
+    JSON_FIELD(pause_replay_for_1s)                                                                \
                                                                                                    \
     JSON_FIELD(show_demo_menu)                                                                     \
     JSON_FIELD(show_help_menu)                                                                     \

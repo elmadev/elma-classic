@@ -1,4 +1,5 @@
 #include "game/recorder.h"
+#include "game/ghost_list.h"
 #include "game/qopen.h"
 #include "level/level.h"
 #include "level/object.h"
@@ -9,16 +10,15 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <filesystem>
 #include <memory>
 
 recorder* Rec1 = nullptr;
 recorder* Rec2 = nullptr;
 int MultiplayerRec = 0;
-bool MergedRec = false;
 
 constexpr int MAGIC_NUMBER = 4796277;
 
-constexpr int FRAME_RATE = 30;
 constexpr double TIME_TO_FRAME_INDEX =
     FRAME_RATE / (STOPWATCH_MULTIPLIER * 1000.0 * STOPWATCH_TO_PHYS_TIME);
 constexpr double FRAME_INDEX_TO_TIME = 1.0 / TIME_TO_FRAME_INDEX;
@@ -43,8 +43,6 @@ recorder::recorder() {
     frames.reserve(INITIAL_FRAMES);
     events.reserve(INITIAL_EVENTS);
 }
-
-recorder::~recorder() = default;
 
 void recorder::erase(const char* lev_filename) {
     if (strlen(lev_filename) > MAX_FILENAME_LEN + 4) {
@@ -429,7 +427,7 @@ int recorder::load(const char* filename, FILE* h, bool is_first_replay) {
     }
     if (is_first_replay) {
         MultiplayerRec = multiplayer_rec;
-        MergedRec = false;
+        Ghosts.reset_to(std::filesystem::path(filename).stem().string());
     }
     if (fread(&flagtag_, 1, sizeof(flagtag_), h) != 4) {
         read_error(filename);
@@ -576,19 +574,13 @@ std::vector<uint8_t> recorder::to_bytes(int level_id) const {
 }
 
 int recorder::load_rec_file(const char* filename, bool demo) {
-    FILE* h = nullptr;
-    if (demo) {
-        h = qopen(filename, "rb");
-        if (!h) {
-            internal_error(std::string("Failed to open demo file: ") + filename);
-        }
-    } else {
-        recpath path;
-        sprintf(path, "rec/%s", filename);
-        h = fopen(path, "rb");
-        if (!h) {
-            internal_error(std::string("Failed to open rec file: ") + path);
-        }
+    if (!demo) {
+        return load_rec_path(std::string("rec/") + filename);
+    }
+
+    FILE* h = qopen(filename, "rb");
+    if (!h) {
+        internal_error(std::string("Failed to open demo file: ") + filename);
     }
 
     int level_id = Rec1->load(filename, h, true);
@@ -596,41 +588,41 @@ int recorder::load_rec_file(const char* filename, bool demo) {
         Rec2->load(filename, h, false);
     }
 
-    if (demo) {
-        qclose(h);
-    } else {
-        fclose(h);
-    }
+    qclose(h);
 
     return level_id;
 }
 
-recorder::merge_result recorder::load_merge(const std::string& filename1,
-                                            const std::string& filename2) {
-    std::string path = "rec/" + filename1;
-    FILE* h1 = fopen(path.c_str(), "rb");
-    if (!h1) {
+int recorder::load_rec_path(const std::string& path) {
+    FILE* h = fopen(path.c_str(), "rb");
+    if (!h) {
         internal_error("Failed to open rec file: " + path);
     }
-    int level_id1 = Rec1->load(filename1.c_str(), h1, true);
-    bool was_multi = MultiplayerRec != 0;
-    fclose(h1);
 
-    path = "rec/" + filename2;
-    FILE* h2 = fopen(path.c_str(), "rb");
-    if (!h2) {
+    // load() stores the name in a fixed size buffer, so only pass the file name
+    std::string name = std::filesystem::path(path).filename().string();
+
+    int level_id = Rec1->load(name.c_str(), h, true);
+    if (MultiplayerRec) {
+        Rec2->load(name.c_str(), h, false);
+    }
+
+    fclose(h);
+
+    return level_id;
+}
+
+int recorder::load_single(const std::string& path, recorder& into) {
+    FILE* h = fopen(path.c_str(), "rb");
+    if (!h) {
         internal_error("Failed to open rec file: " + path);
     }
-    int level_id2 = Rec2->load(filename2.c_str(), h2, true);
-    bool was_multi2 = MultiplayerRec != 0;
-    fclose(h2);
 
-    MultiplayerRec = 1;
-    MergedRec = true;
-    Rec1->set_flagtag(false);
-    Rec2->set_flagtag(false);
+    std::string name = std::filesystem::path(path).filename().string();
+    int level_id = into.load(name.c_str(), h, false);
+    fclose(h);
 
-    return {level_id1, was_multi, was_multi2, level_id1 != level_id2};
+    return level_id;
 }
 
 std::optional<rec_header> recorder::read_header(const std::string& filename) {

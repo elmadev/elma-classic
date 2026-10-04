@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "main"
+      - "rec2vid-multi-merge"
     paths-ignore:
       - "**.md"
       - "**/docs/**"
@@ -148,5 +149,7 @@ jobs:
           path: |
             build/elma
             build/elma.exe
+            build/rec2vid
+            build/rec2vid.exe
           retention-days: 5
           if-no-files-found: ignore

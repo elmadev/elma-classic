@@ -115,6 +115,52 @@ You only need to configure the build directory once.
    ./elma
    ```
 
+The build produces two executables: `elma`, the game, and `rec2vid`, a command line
+tool that renders a replay to a video file. Both read their data from the current
+working directory, so run them from the folder you copied the game files into.
+
+### Rendering a replay to a video
+
+`rec2vid` needs [ffmpeg](https://ffmpeg.org/) on your `PATH`.
+
+```
+cd build
+./rec2vid rec/blabla.rec out/video.avi
+```
+
+Anything after `--` is passed on to ffmpeg and overrides the built-in encoding
+defaults (`-c:v libx264 -pix_fmt yuv420p -crf 18`):
+
+```
+./rec2vid rec/blabla.rec out/video.mp4 -- -crf 22 -preset slow
+```
+
+Resolution, zoom and frame rate come from `settings.json`. To change them for one
+render without touching the file, point `EOL_SETTINGS_OVERRIDES` at a json file with
+just the keys to override:
+
+```
+echo '{"recording_fps": 60, "screen_width": 1920, "screen_height": 1080}' > hd.json
+EOL_SETTINGS_OVERRIDES=hd.json ./rec2vid rec/blabla.rec out/video.mp4
+```
+
+`--headless` renders without opening a window, for machines without a display such
+as a server or CI runner:
+
+```
+./rec2vid rec/blabla.rec out/video.mp4 --headless
+```
+
+`--merge` draws another replay of the same level as a ghost and can be repeated.
+`--nick` gives the replay named before it a shirt, read from `bmp/<nick>.bmp` in the
+working directory like EOL does. Before any `--merge` it applies to the main replay:
+
+```
+./rec2vid rec/a.rec out/a.mp4 --nick Bene --merge rec/b.rec --nick Zweq --merge rec/c.rec
+```
+
+Run `./rec2vid --help` for the remaining options.
+
 ### Configuration
 
 You can list all of the options using `meson configure build` and set an option using `meson configure build -Doption=value`

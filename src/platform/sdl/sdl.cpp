@@ -221,6 +221,13 @@ void platform_init() {
     LastMouseMotionTime = get_milliseconds();
 }
 
+void platform_init_headless() {
+    create_palette_surface();
+
+    keyboard::init();
+    LastMouseMotionTime = get_milliseconds();
+}
+
 void platform_resize_window(int width, int height) {
     if (!SDLWindow) {
         internal_error("platform_resize_window no window!");
@@ -333,6 +340,10 @@ void unlock_backbuffer() {
     }
     SurfaceLocked = false;
 
+    if (!SDLWindow) {
+        return;
+    }
+
     if (EolSettings->renderer() == RendererType::OpenGL) {
         gl_upload_frame((unsigned char*)SDLSurfacePaletted->pixels, SDLSurfacePaletted->pitch);
         gl_present();
@@ -372,7 +383,7 @@ palette::~palette() { delete[] (SDL_Color*)data; }
 void palette::set() {
     CurrentPalette = this;
     SDL_SetPaletteColors(SDLSurfacePaletted->format->palette, (const SDL_Color*)data, 0, 256);
-    if (EolSettings->renderer() == RendererType::OpenGL) {
+    if (SDLWindow && EolSettings->renderer() == RendererType::OpenGL) {
         gl_update_palette(data);
     }
 }

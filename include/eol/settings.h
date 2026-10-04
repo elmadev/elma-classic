@@ -170,6 +170,7 @@ class eol_settings {
     Default<bool> fps_limit_enabled_{false};
     Clamp<int> fps_limit_{30, 100, 1000};
     Clamp<int> recording_fps_{30, 30, 120};
+    Default<bool> pause_replay_for_1s_{false};
 
     Default<bool> show_demo_menu_{true};
     Default<bool> show_help_menu_{true};
@@ -307,6 +308,7 @@ class eol_settings {
     DECLARE_SETTING(fps_limit_enabled);
     DECLARE_SETTING(fps_limit);
     DECLARE_SETTING(recording_fps);
+    DECLARE_SETTING(pause_replay_for_1s);
 
     DECLARE_SETTING(show_demo_menu);
     DECLARE_SETTING(show_help_menu);

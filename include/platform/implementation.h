@@ -22,6 +22,8 @@ bool platform_render_error(pic8* buffer);
 void handle_events();
 
 void platform_init();
+// Backbuffer only: no window, no OpenGL, nothing is ever presented
+void platform_init_headless();
 void open_sound_device();
 void close_sound_device();
 

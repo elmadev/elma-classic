@@ -504,6 +504,8 @@ void menu_options() {
                 EolSettings->persist_recording_fps(new_fps);
             });
 
+        BOOL_OPTION("Pause Render At End:", pause_replay_for_1s);
+
         BOOL_OPTION("Show Total Time:", show_total_time);
         BOOL_OPTION("Demo menu:", show_demo_menu);
         BOOL_OPTION("Help menu:", show_help_menu);

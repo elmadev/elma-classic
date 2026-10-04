@@ -32,7 +32,8 @@ int game_loop(const char* filename, CameraMode camera_mode);
 int replay_loop(const char* filename, bool restore_player_visibility);
 
 void setup_render_directory(const std::string& replay_filename);
-void render_replay(const char* level_filename);
+// Renders the loaded replay frame by frame. Returns false if aborted by the user.
+bool render_replay(const char* level_filename);
 
 extern int WhoDiedFirst;
 extern bool Player1Finished;

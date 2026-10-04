@@ -142,6 +142,10 @@ void eol_settings::set_default_lgr_name(std::string name) {
         return;
     }
 
+    if (name.size() > sizeof(level::lgr_name)) {
+        return;
+    }
+
     if (!Level || !Lgr) {
         default_lgr_name_ = std::move(name);
         return;

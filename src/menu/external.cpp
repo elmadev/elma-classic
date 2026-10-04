@@ -1,8 +1,10 @@
 #include "menu/external.h"
+#include "editor/editor.h"
 #include "game/game.h"
 #include "game/level_load.h"
 #include "game/recorder.h"
 #include "game/state.h"
+#include "level/level.h"
 #include "main.h"
 #include "menu/nav.h"
 #include "menu/pic.h"
@@ -22,6 +24,9 @@ static void play_external(const std::string& filename, bool map_viewer) {
 
     while (true) {
         loading_screen();
+        if (Level && level_file_exists(filename_str) && Level->file_has_changed(filename_str)) {
+            invalidate_level();
+        }
         if (!load_level_play(filename_str)) {
             return;
         }

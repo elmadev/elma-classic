@@ -32,6 +32,7 @@
 * F6 table title now shows the battle attributes Allow starter, Others Shown and Apple Bugs
 * Speedometer works in 2-player mode
 * Timer and minimap default visibility for player A may be toggled via Options
+* The currently loaded external level is reloaded on enter if it was modified after loading
 
 ### Game Rendering
 * Bike turn time is configurable

@@ -152,20 +152,6 @@ static bool handle_console_input() {
     return was_active;
 }
 
-static bool is_game_key_down(DikScancode code) {
-    if (Console->is_input_active()) {
-        return false;
-    }
-    return is_key_down(code);
-}
-
-template <typename Scancode> static bool was_game_key_just_pressed(Scancode code) {
-    if (Console->is_input_active()) {
-        return false;
-    }
-    return was_key_just_pressed(code);
-}
-
 static void latch_one_frame_brake(driver& driv) {
     if (was_game_key_just_pressed(driv.keys->one_frame_brake)) {
         driv.one_frame_brake_pending = true;

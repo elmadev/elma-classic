@@ -158,29 +158,6 @@ static void latch_one_frame_brake(driver& driv) {
     }
 }
 
-static void update_freecam(double dt, camera& current_camera) {
-    double speed = 30.0;
-    if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
-        speed *= 4.0;
-    }
-    double move = speed * dt;
-    if (is_game_key_down(DIK_UP)) {
-        current_camera.y += move;
-    }
-    if (is_game_key_down(DIK_DOWN)) {
-        current_camera.y -= move;
-    }
-    if (is_game_key_down(DIK_LEFT)) {
-        current_camera.x -= move;
-    }
-    if (is_game_key_down(DIK_RIGHT)) {
-        current_camera.x += move;
-    }
-
-    current_camera.x = std::clamp(current_camera.x, current_camera.min_x, current_camera.max_x);
-    current_camera.y = std::clamp(current_camera.y, current_camera.min_y, current_camera.max_y);
-}
-
 static void sound_init() {
     static bool SoundInitialized = false;
     if (State->sound_on && !SoundInitialized) {
@@ -758,7 +735,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                 ran_subframes = true;
                 if (current_camera.mode == CameraMode::MapViewer) {
                     if (!EolClient->spy_kuski()) {
-                        update_freecam(dt, current_camera);
+                        current_camera.update_freecam(dt);
                     }
                     time += dt;
                     continue;

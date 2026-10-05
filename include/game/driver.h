@@ -56,17 +56,27 @@ struct driver {
     motorst* mot;
     bike_metadata meta;
     recorder* rec;
-    player_keys* keys;
     bike_sound sound;
     run_stats stats;
 
     bool dead = false;
     int finish_time = 0;
-    bool one_frame_brake_pending = false;
 
-    driver(motorst* mot, recorder* rec, player_keys* keys);
+    driver(motorst* mot, recorder* rec);
     void reset_metadata();
     void update_speed();
+};
+
+struct game_driver : driver {
+    player_keys* keys;
+
+    bool one_frame_brake_pending = false;
+
+    game_driver(motorst* mot, recorder* rec, player_keys* keys);
+};
+
+struct replay_driver : driver {
+    replay_driver(motorst* mot, recorder* rec);
 };
 
 #endif

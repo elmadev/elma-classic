@@ -152,7 +152,7 @@ static bool handle_console_input() {
     return was_active;
 }
 
-static void latch_one_frame_brake(driver& driv) {
+static void latch_one_frame_brake(game_driver& driv) {
     if (was_game_key_just_pressed(driv.keys->one_frame_brake)) {
         driv.one_frame_brake_pending = true;
     }
@@ -200,7 +200,7 @@ static BikeState handle_object_interaction(driver& driv, int object_id) {
 }
 
 // Subframe physics calculation. Contains all the physics calculations except for bike turning
-static void physics_subframe(driver& driv, double time, double dt) {
+static void physics_subframe(game_driver& driv, double time, double dt) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
     bike_metadata* metadata = &driv.meta;
@@ -404,7 +404,7 @@ static void update_graphical_metadata(driver& driv, bool update_rec, double time
     metadata.arm_position = std::max(0.0, 1.0 - (time - metadata.volt_time) / VoltDelay);
 }
 
-static void physics_frame_turn(driver& driv) {
+static void physics_frame_turn(game_driver& driv) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
     bike_metadata* metadata = &driv.meta;
@@ -657,8 +657,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     pacer::reset();
 
-    driver driv1(Motor1, Rec1, &State->keys1);
-    driver driv2(Motor2, Rec2, &State->keys2);
+    game_driver driv1(Motor1, Rec1, &State->keys1);
+    game_driver driv2(Motor2, Rec2, &State->keys2);
     driv1.stats.drunk = driv2.stats.drunk = active_cripples() & BattleAttributes::Drunk;
 
     camera current_camera(camera_mode, false, State);
@@ -847,7 +847,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     }
 }
 
-static void reverse_events(driver& driv, double time) {
+static void reverse_events(replay_driver& driv, double time) {
     motorst* mot = driv.mot;
     recorder* rec = driv.rec;
 
@@ -871,7 +871,7 @@ static void reverse_events(driver& driv, double time) {
 
 // During rewind, compute animation state from the recorder's event list
 // instead of relying on the forward-only state machine.
-static void rewind_override_animations(driver& driv, double time) {
+static void rewind_override_animations(replay_driver& driv, double time) {
     bike_metadata* metadata = &driv.meta;
     motorst* mot = driv.mot;
     recorder* rec = driv.rec;
@@ -891,7 +891,7 @@ static void rewind_override_animations(driver& driv, double time) {
 }
 
 // Load replay data (instead of simulating bike physics)
-static bool replay_frame(driver& driv, double time) {
+static bool replay_frame(replay_driver& driv, double time) {
     motorst* mot = driv.mot;
     bike_metadata* metadata = &driv.meta;
     recorder* rec = driv.rec;
@@ -969,8 +969,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
     EolClient->enter_level(filename, Level, EnterMode::Replay);
 
-    driver driv1(Motor1, Rec1, &State->keys1);
-    driver driv2(Motor2, Rec2, &State->keys2);
+    replay_driver driv1(Motor1, Rec1);
+    replay_driver driv2(Motor2, Rec2);
 
     camera current_camera(CameraMode::Normal, true, State);
 
@@ -1155,8 +1155,8 @@ void render_replay(const char* level_filename) {
     VideoRecordingMode = true;
     VideoFrameIndex = 0;
 
-    driver driv1(Motor1, Rec1, &State->keys1);
-    driver driv2(Motor2, Rec2, &State->keys2);
+    replay_driver driv1(Motor1, Rec1);
+    replay_driver driv2(Motor2, Rec2);
 
     camera current_camera(CameraMode::Normal, true, State);
 

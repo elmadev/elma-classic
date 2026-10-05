@@ -75,10 +75,16 @@ void driver::reset_metadata() {
     meta.camera_turning.turn_phase = 0.0;
 }
 
-driver::driver(motorst* mot, recorder* rec, player_keys* keys)
+driver::driver(motorst* mot, recorder* rec)
     : mot(mot),
-      rec(rec),
-      keys(keys) {
+      rec(rec) {
     reset_metadata();
     reset_motor_forces(mot);
 }
+
+game_driver::game_driver(motorst* mot, recorder* rec, player_keys* keys)
+    : driver(mot, rec),
+      keys(keys) {}
+
+replay_driver::replay_driver(motorst* mot, recorder* rec)
+    : driver(mot, rec) {}

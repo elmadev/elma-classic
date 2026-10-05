@@ -173,6 +173,9 @@ void start_wav(WavEvent event, double volume) {
 // Initialize motor sound struct
 void start_motor_sound(bool is_motor1) {
     motor_sound* mot = is_motor1 ? &MotorSound1 : &MotorSound2;
+    if (mot->enabled == 1) {
+        return;
+    }
     mot->enabled = 1;
     mot->motor_state = MotorState::Ignition;
     mot->playback_index_ignition = 0;
@@ -183,6 +186,9 @@ void start_motor_sound(bool is_motor1) {
 // Turn off motor sound struct
 void stop_motor_sound(bool is_motor1) {
     motor_sound* mot = is_motor1 ? &MotorSound1 : &MotorSound2;
+    if (mot->enabled == 0) {
+        return;
+    }
     mot->enabled = 0;
     mot->motor_state = MotorState::Ignition;
     mot->playback_index_ignition = 0;

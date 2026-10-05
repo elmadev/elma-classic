@@ -891,13 +891,13 @@ static void rewind_override_animations(replay_driver& driv, double time) {
 }
 
 // Load replay data (instead of simulating bike physics)
-static bool replay_frame(replay_driver& driv, double time) {
+static void replay_frame(replay_driver& driv, double time) {
     motorst* mot = driv.mot;
     bike_metadata* metadata = &driv.meta;
     recorder* rec = driv.rec;
 
     // Load replay data
-    bool alive = rec->recall_frame(mot, time, &driv.sound);
+    driv.dead = !rec->recall_frame(mot, time, &driv.sound);
     set_head_position(mot);
 
     // Play events
@@ -920,17 +920,10 @@ static bool replay_frame(replay_driver& driv, double time) {
             }
         }
     }
-    return alive;
 }
 
-static void sync_replay_death(driver& driv, bool finished, bool is_motor1) {
-    if (driv.dead == finished) {
-        return;
-    }
-
-    driv.dead = finished;
-
-    if (finished) {
+static void sync_replay_motor_sound(driver& driv, bool is_motor1) {
+    if (driv.dead) {
         stop_motor_sound(is_motor1);
     } else {
         start_motor_sound(is_motor1);
@@ -1035,10 +1028,9 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
         current_camera.update_view_settings(Single);
 
         // Load replay data
-        bool finished1 = !replay_frame(driv1, time);
-        bool finished2 = false;
+        replay_frame(driv1, time);
         if (!Single) {
-            finished2 = !replay_frame(driv2, time);
+            replay_frame(driv2, time);
         }
 
         // Reverse events if rewinding
@@ -1057,7 +1049,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
         }
 
         // End of replay
-        if ((Single && finished1) || (!Single && finished1 && finished2)) {
+        if ((Single && driv1.dead) || (!Single && driv1.dead && driv2.dead)) {
             set_motor_frequency(true, 1.0, 0);
             set_motor_frequency(false, 1.0, 0);
             stop_motor_sound(true);
@@ -1077,8 +1069,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         // Death (or finish)
         if (!Single) {
-            sync_replay_death(driv1, finished1, true);
-            sync_replay_death(driv2, finished2, false);
+            sync_replay_motor_sound(driv1, true);
+            sync_replay_motor_sound(driv2, false);
 
             // Update flagtag time
             flagtag_replay(time);
@@ -1172,10 +1164,9 @@ void render_replay(const char* level_filename) {
 
         current_camera.update_view_settings(Single);
 
-        bool finished1 = !replay_frame(driv1, time);
-        bool finished2 = false;
+        replay_frame(driv1, time);
         if (!Single) {
-            finished2 = !replay_frame(driv2, time);
+            replay_frame(driv2, time);
         }
 
         update_graphical_metadata(driv1, false, time);
@@ -1183,7 +1174,7 @@ void render_replay(const char* level_filename) {
             update_graphical_metadata(driv2, false, time);
         }
 
-        if ((Single && finished1) || (!Single && finished1 && finished2)) {
+        if ((Single && driv1.dead) || (!Single && driv1.dead && driv2.dead)) {
             break;
         }
 

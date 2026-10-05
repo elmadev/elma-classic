@@ -62,9 +62,15 @@ struct driver {
     bool dead = false;
     int finish_time = 0;
 
+  private:
+    void update_bike_turn_phase(bool update_rec, double time, int flipped);
+    void update_camera_turn_phase(double time, int flipped);
+
+  public:
     driver(motorst* mot, recorder* rec);
     void reset_metadata();
     void update_speed();
+    void update_graphical_metadata(bool update_rec, double time);
 };
 
 struct game_driver : driver {

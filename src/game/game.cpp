@@ -39,8 +39,6 @@ bool VideoRecordingMode = false;
 int VideoFrameIndex = 0;
 std::string VideoOutputDirectory;
 
-static int TotalApples;
-
 static std::optional<BattleAttributes::Kind> BattleRunCripples;
 
 static BattleAttributes::Kind active_cripples() {
@@ -192,7 +190,7 @@ static BikeState handle_object_interaction(driver& driv, int object_id) {
         return BikeState::Normal;
     }
     if (type == object::Type::Exit) {
-        if (Motor1->apple_count + Motor2->apple_count >= TotalApples) {
+        if (Motor1->apple_count + Motor2->apple_count >= Level->total_apples) {
             return BikeState::Finish;
         }
     }
@@ -520,7 +518,7 @@ static void setup_gameloop(const char* filename) {
     Level->flip_objects();
     Level->sort_objects();
 
-    TotalApples = Level->initialize_objects(Motor1);
+    Level->initialize_objects(Motor1);
     Level->initialize_objects(Motor2);
 
     reset_game_background();
@@ -692,7 +690,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                     Rec2->encode_frame_count();
                     if (Single && !InEditor) {
                         EolClient->exit_level(driv1, Level, time * TIME_TO_CENTISECONDS,
-                                              TotalApples, camera_mode == CameraMode::MapViewer);
+                                              Level->total_apples,
+                                              camera_mode == CameraMode::MapViewer);
                     }
 
                     Level->unflip_objects();
@@ -774,8 +773,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
             if (Single && !InEditor) {
-                EolClient->exit_level(driv1, Level, time * TIME_TO_CENTISECONDS, TotalApples,
-                                      camera_mode == CameraMode::MapViewer);
+                EolClient->exit_level(driv1, Level, time * TIME_TO_CENTISECONDS,
+                                      Level->total_apples, camera_mode == CameraMode::MapViewer);
             }
             return -1;
         }

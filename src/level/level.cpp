@@ -1105,8 +1105,8 @@ double level::checksum() {
 
 vect2 BikeStartOffset;
 
-int level::initialize_objects(motorst* mot) {
-    int apple_count = 0;
+void level::initialize_objects(motorst* mot) {
+    total_apples = 0;
     bool start_found = false;
     for (int i = 0; i < MAX_OBJECTS; i++) {
         object* obj = objects[i];
@@ -1115,7 +1115,7 @@ int level::initialize_objects(motorst* mot) {
             obj->floating_phase = util::random::range(1000) * 2.0 * PI / 1000.0;
             obj->active = true;
             if (obj->type == object::Type::Food) {
-                apple_count++;
+                total_apples++;
             }
 
             if (obj->type == object::Type::Start) {
@@ -1139,8 +1139,6 @@ int level::initialize_objects(motorst* mot) {
     if (!start_found) {
         internal_error("Start object not found in level file!");
     }
-
-    return apple_count;
 }
 
 inline static int object_order(object::Type type) {

@@ -4,8 +4,6 @@
 #include "pic/surface.h"
 #include <cmath>
 
-bool WallsDisabled = false;
-
 // Update ball keyframe time to current time
 static void update_keyframe(ball* ball, double time) {
     ball->keyframe_r = ball->keyframe_r + ((time - ball->keyframe_time) * ball->v);
@@ -177,9 +175,6 @@ static int wall_bottom() { return SCREEN_HEIGHT; }
 
 // Get collision time between a ball and wall
 double ball_wall_collision_time(ball* ball, WallId wall) {
-    if (WallsDisabled) {
-        return NO_COLLISION_TIME;
-    }
     switch (wall) {
     case WallId::Top:
         if (ball->v.y >= 0) {
@@ -224,9 +219,6 @@ double ball_wall_collision_time(ball* ball, WallId wall) {
 
 // Simulate a collision between a ball and wall
 void simulate_ball_wall_collision(ball* ball, WallId wall, double time) {
-    if (WallsDisabled) {
-        return;
-    }
     update_keyframe(ball, time);
     switch (wall) {
     case WallId::Top:

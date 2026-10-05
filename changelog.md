@@ -118,7 +118,6 @@
 * Replays no longer crash loading levels with topology errors
 
 ### Menu
-* Background balls no longer vanish at high resolution on the "Please do not distribute" screen
 * Red helmet animation is now smooth after the intro scrolling animation
 
 ### State
@@ -158,3 +157,4 @@
 * Disabled f_rate.inf (average run FPS)
 * Disabled debug function to generate desclist.txt
 * Disabled secret 1997 Action SuperCross watermark in Save Play
+* Disabled "Thank you for registering the game!" screen when quitting

@@ -18,6 +18,4 @@ void simulate_ball_wall_collision(ball* ball, WallId wall, double time);
 
 void clamp_ball_position(ball& ball);
 
-extern bool WallsDisabled;
-
 #endif

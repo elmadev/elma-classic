@@ -164,39 +164,6 @@ static void sound_init() {
     }
 }
 
-static BikeState handle_object_interaction(driver& driv, int object_id) {
-    if (object_id < 0 || object_id >= MAX_OBJECTS) {
-        internal_error("handle_object_interaction object_id < 0 || object_id >= MAX_OBJECTS!");
-    }
-    if (!Level->objects[object_id]) {
-        internal_error("handle_object_interaction !Level->objects[object_id]!");
-    }
-
-    motorst* mot = driv.mot;
-
-    object::Type type = Level->objects[object_id]->type;
-
-    if (type == object::Type::Killer) {
-        return BikeState::Dead;
-    }
-    if (type == object::Type::Food) {
-        Level->objects[object_id]->active = false;
-        mot->apple_count++;
-        add_event_buffer(WavEvent::Food, 0.99, -1);
-        std::optional<MotorGravity> gravity = Level->objects[object_id]->gravity();
-        if (gravity.has_value()) {
-            mot->gravity_direction = gravity.value();
-        }
-        return BikeState::Normal;
-    }
-    if (type == object::Type::Exit) {
-        if (Motor1->apple_count + Motor2->apple_count >= Level->total_apples) {
-            return BikeState::Finish;
-        }
-    }
-    return BikeState::Normal;
-}
-
 // Subframe physics calculation. Contains all the physics calculations except for bike turning
 static void physics_subframe(game_driver& driv, double time, double dt) {
     motorst* mot = driv.mot;
@@ -316,7 +283,7 @@ static void physics_subframe(game_driver& driv, double time, double dt) {
     while (get_event_buffer(&wav_id, &volume, &object_id)) {
         if (object_id >= 0) {
             int prev_apple_count = mot->apple_count;
-            BikeState bike_state = handle_object_interaction(driv, object_id);
+            BikeState bike_state = driv.handle_object_interaction(object_id);
             if (bike_state == BikeState::Dead) {
                 driv.dead = true;
             }
@@ -781,81 +748,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     }
 }
 
-static void reverse_events(replay_driver& driv, double time) {
-    motorst* mot = driv.mot;
-    recorder* rec = driv.rec;
-
-    while (std::optional<event> ev = rec->recall_event_reverse(time)) {
-        if (ev->object_id < 0) {
-            continue;
-        }
-        object* obj = Level->objects[ev->object_id];
-        if (obj && obj->type == object::Type::Food) {
-            obj->active = true;
-            mot->apple_count--;
-
-            mot->last_apple_time = (int)(rec->last_apple_time().value_or(0) * TIME_TO_CENTISECONDS);
-
-            if (obj->gravity()) {
-                mot->gravity_direction = rec->last_gravity(*Level);
-            }
-        }
-    }
-}
-
-// During rewind, compute animation state from the recorder's event list
-// instead of relying on the forward-only state machine.
-static void rewind_override_animations(replay_driver& driv, double time) {
-    bike_metadata* metadata = &driv.meta;
-    motorst* mot = driv.mot;
-    recorder* rec = driv.rec;
-
-    double turn_time = rec->find_last_turn_frame_time(time).value_or(-1000.0);
-    metadata->bike_turning.flipped = mot->flipped_bike;
-    metadata->bike_turning.turn_time = turn_time;
-
-    metadata->camera_turning.turn_time = -1000.0;
-    int flipped_camera = mot->flipped_bike;
-    if (mot->gravity_direction == MotorGravity::Up) {
-        flipped_camera = !flipped_camera;
-    }
-    metadata->camera_turning.flipped = flipped_camera;
-
-    metadata->volt_time = rec->last_volt_time(&metadata->volt_is_right).value_or(-1000.0);
-}
-
-// Load replay data (instead of simulating bike physics)
-static void replay_frame(replay_driver& driv, double time) {
-    motorst* mot = driv.mot;
-    bike_metadata* metadata = &driv.meta;
-    recorder* rec = driv.rec;
-
-    // Load replay data
-    driv.dead = !rec->recall_frame(mot, time, &driv.sound);
-    set_head_position(mot);
-
-    // Play events
-    while (std::optional<event> ev = rec->recall_event(time)) {
-        if (ev->object_id >= 0) {
-            int prev_apple_count = mot->apple_count;
-            handle_object_interaction(driv, ev->object_id);
-            if (prev_apple_count < mot->apple_count) {
-                mot->last_apple_time = (int)(ev->time * TIME_TO_CENTISECONDS);
-            }
-        } else {
-            start_wav(ev->event_id, ev->volume);
-            if (ev->event_id == WavEvent::RightVolt) {
-                metadata->volt_is_right = true;
-                metadata->volt_time = time;
-            }
-            if (ev->event_id == WavEvent::LeftVolt) {
-                metadata->volt_is_right = false;
-                metadata->volt_time = time;
-            }
-        }
-    }
-}
-
 static void sync_replay_motor_sound(driver& driv, bool is_motor1) {
     if (driv.dead) {
         stop_motor_sound(is_motor1);
@@ -962,18 +854,18 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
         current_camera.update_view_settings(Single);
 
         // Load replay data
-        replay_frame(driv1, time);
+        driv1.replay_frame(time);
         if (!Single) {
-            replay_frame(driv2, time);
+            driv2.replay_frame(time);
         }
 
         // Reverse events if rewinding
         if (rewinding) {
-            reverse_events(driv1, time);
-            rewind_override_animations(driv1, time);
+            driv1.reverse_events(time);
+            driv1.rewind_override_animations(time);
             if (!Single) {
-                reverse_events(driv2, time);
-                rewind_override_animations(driv2, time);
+                driv2.reverse_events(time);
+                driv2.rewind_override_animations(time);
             }
         }
 
@@ -1098,9 +990,9 @@ void render_replay(const char* level_filename) {
 
         current_camera.update_view_settings(Single);
 
-        replay_frame(driv1, time);
+        driv1.replay_frame(time);
         if (!Single) {
-            replay_frame(driv2, time);
+            driv2.replay_frame(time);
         }
 
         driv1.update_graphical_metadata(false, time);

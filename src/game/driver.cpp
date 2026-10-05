@@ -1,5 +1,8 @@
 #include "game/driver.h"
+#include "editor/editor.h"
 #include "eol/settings.h"
+#include "level/level.h"
+#include "level/object.h"
 #include "physics/forces.h"
 #include "renderer/timer.h"
 #include <algorithm>
@@ -139,6 +142,37 @@ void driver::update_graphical_metadata(bool update_rec, double time) {
     meta.arm_position = std::max(0.0, 1.0 - (time - meta.volt_time) / VoltDelay);
 }
 
+BikeState driver::handle_object_interaction(int object_id) {
+    if (object_id < 0 || object_id >= MAX_OBJECTS) {
+        internal_error("handle_object_interaction object_id < 0 || object_id >= MAX_OBJECTS!");
+    }
+    if (!Level->objects[object_id]) {
+        internal_error("handle_object_interaction !Level->objects[object_id]!");
+    }
+
+    object::Type type = Level->objects[object_id]->type;
+
+    if (type == object::Type::Killer) {
+        return BikeState::Dead;
+    }
+    if (type == object::Type::Food) {
+        Level->objects[object_id]->active = false;
+        mot->apple_count++;
+        add_event_buffer(WavEvent::Food, 0.99, -1);
+        std::optional<MotorGravity> gravity = Level->objects[object_id]->gravity();
+        if (gravity.has_value()) {
+            mot->gravity_direction = gravity.value();
+        }
+        return BikeState::Normal;
+    }
+    if (type == object::Type::Exit) {
+        if (Motor1->apple_count + Motor2->apple_count >= Level->total_apples) {
+            return BikeState::Finish;
+        }
+    }
+    return BikeState::Normal;
+}
+
 driver::driver(motorst* mot, recorder* rec)
     : mot(mot),
       rec(rec) {
@@ -149,6 +183,71 @@ driver::driver(motorst* mot, recorder* rec)
 game_driver::game_driver(motorst* mot, recorder* rec, player_keys* keys)
     : driver(mot, rec),
       keys(keys) {}
+
+void replay_driver::reverse_events(double time) {
+    while (std::optional<event> ev = rec->recall_event_reverse(time)) {
+        if (ev->object_id < 0) {
+            continue;
+        }
+        object* obj = Level->objects[ev->object_id];
+        if (obj && obj->type == object::Type::Food) {
+            obj->active = true;
+            mot->apple_count--;
+
+            mot->last_apple_time = (int)(rec->last_apple_time().value_or(0) * TIME_TO_CENTISECONDS);
+
+            if (obj->gravity()) {
+                mot->gravity_direction = rec->last_gravity(*Level);
+            }
+        }
+    }
+}
+
+// During rewind, compute animation state from the recorder's event list
+// instead of relying on the forward-only state machine.
+void replay_driver::rewind_override_animations(double time) {
+    double turn_time = rec->find_last_turn_frame_time(time).value_or(-1000.0);
+    meta.bike_turning.flipped = mot->flipped_bike;
+    meta.bike_turning.turn_time = turn_time;
+
+    meta.camera_turning.turn_time = -1000.0;
+    int flipped_camera = mot->flipped_bike;
+    if (mot->gravity_direction == MotorGravity::Up) {
+        flipped_camera = !flipped_camera;
+    }
+    meta.camera_turning.flipped = flipped_camera;
+
+    meta.volt_time = rec->last_volt_time(&meta.volt_is_right).value_or(-1000.0);
+}
+
+// Load replay data (instead of simulating bike physics)
+void replay_driver::replay_frame(double time) {
+    // Load replay data
+    dead = !rec->recall_frame(mot, time, &sound);
+    set_head_position(mot);
+
+    // Play events
+    while (std::optional<event> ev = rec->recall_event(time)) {
+        if (ev->object_id >= 0) {
+            int prev_apple_count = mot->apple_count;
+            handle_object_interaction(ev->object_id);
+            if (prev_apple_count < mot->apple_count) {
+                mot->last_apple_time = (int)(ev->time * TIME_TO_CENTISECONDS);
+            }
+        } else {
+            start_wav(ev->event_id, ev->volume);
+            if (ev->event_id == WavEvent::RightVolt) {
+                meta.volt_is_right = true;
+                meta.volt_time = time;
+            }
+            if (ev->event_id == WavEvent::LeftVolt) {
+                meta.volt_is_right = false;
+                meta.volt_time = time;
+            }
+        }
+    }
+    return;
+}
 
 replay_driver::replay_driver(motorst* mot, recorder* rec)
     : driver(mot, rec) {}

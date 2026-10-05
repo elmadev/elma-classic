@@ -2,6 +2,7 @@
 #define GAME_DRIVER_H
 
 #include "game/recorder.h"
+#include "physics/forces.h"
 #include <cstdint>
 #include <string>
 
@@ -71,6 +72,7 @@ struct driver {
     void reset_metadata();
     void update_speed();
     void update_graphical_metadata(bool update_rec, double time);
+    BikeState handle_object_interaction(int object_id);
 };
 
 struct game_driver : driver {
@@ -82,6 +84,10 @@ struct game_driver : driver {
 };
 
 struct replay_driver : driver {
+    void reverse_events(double time);
+    void rewind_override_animations(double time);
+    void replay_frame(double time);
+
     replay_driver(motorst* mot, recorder* rec);
 };
 

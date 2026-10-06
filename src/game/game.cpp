@@ -29,6 +29,7 @@
 #include <format>
 #include <optional>
 #include <utility>
+#include <vector>
 
 int Single = 1;
 int FlagTag = 0;
@@ -564,6 +565,12 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     camera current_camera(camera_mode, false, State);
     current_camera.init_freecam(Level, Motor1);
 
+    std::vector<driver*> drivers;
+    drivers.push_back(&driv1);
+    if (!Single && current_camera.mode != CameraMode::MapViewer) {
+        drivers.push_back(&driv2);
+    }
+
     sound_init();
     // Stay muted if no bike is visible.
     Mute = !(current_camera.mode != CameraMode::MapViewer);
@@ -713,7 +720,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
         current_camera.update_view_settings(Single);
 
-        render_game(time, driv1, driv2, current_camera, GameLoop::Game);
+        render_game(time, drivers, current_camera, GameLoop::Game);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -790,6 +797,12 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
     replay_driver driv1(Motor1, Rec1);
     replay_driver driv2(Motor2, Rec2);
+
+    std::vector<driver*> drivers;
+    drivers.push_back(&driv1);
+    if (!Single) {
+        drivers.push_back(&driv2);
+    }
 
     camera current_camera(CameraMode::Normal, true, State);
 
@@ -894,7 +907,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             set_friction_volume(driv1.sound.friction_volume + driv2.sound.friction_volume);
         }
 
-        render_game(time, driv1, driv2, current_camera, GameLoop::Replay);
+        render_game(time, drivers, current_camera, GameLoop::Replay);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -960,6 +973,12 @@ void render_replay(const char* level_filename) {
     replay_driver driv1(Motor1, Rec1);
     replay_driver driv2(Motor2, Rec2);
 
+    std::vector<driver*> drivers;
+    drivers.push_back(&driv1);
+    if (!Single) {
+        drivers.push_back(&driv2);
+    }
+
     camera current_camera(CameraMode::Normal, true, State);
 
     fps::reset();
@@ -987,7 +1006,7 @@ void render_replay(const char* level_filename) {
             flagtag_replay(time);
         }
 
-        render_game(time, driv1, driv2, current_camera, GameLoop::Render);
+        render_game(time, drivers, current_camera, GameLoop::Render);
 
         VideoFrameIndex++;
     }

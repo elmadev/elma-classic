@@ -238,12 +238,13 @@ static bool apple_taken(const object* obj, int index, const kuski* spy_kuski,
 }
 
 // Render the entire minimap
-static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, vect2 bike_center,
-                           motorst* other_motor, CameraMode camera_mode) {
+static void render_minimap(bool player1, pic8* pic, const driver* driv, vect2 bike_center,
+                           const std::vector<driver*>& drivers, CameraMode camera_mode) {
     // Calculate minimap size and minimap frame of reference
     double minimap_width = MinimapWidth * MinimapScaleFactor * PixelsToMeters;
     double minimap_height = MinimapHeight * MinimapScaleFactor * PixelsToMeters;
 
+    double camera_turn_phase = driv->meta.camera_turning.turn_phase;
     double camera_x = EolSettings->center_map() ? 0.5 : 0.2;
     double camera_dx = 1.0 - 2.0 * camera_x;
     vect2 camera_pos(minimap_width * (camera_x + camera_turn_phase * camera_dx),
@@ -361,9 +362,12 @@ static void render_minimap(bool player1, pic8* pic, double camera_turn_phase, ve
         }
     }
 
-    // Draw the other bike
-    if (other_motor) {
-        vect2 other_pos = other_motor->bike.r - bottomleft_corner;
+    // Draw the other local bikes
+    for (const driver* other_driv : drivers) {
+        if (other_driv == driv) {
+            continue;
+        }
+        vect2 other_pos = other_driv->mot->bike.r - bottomleft_corner;
         int other_x = (int)(other_pos.x * MetersToMinimapPixels);
         int other_y = (int)(other_pos.y * MetersToMinimapPixels);
         render_minimap_icon(&minimap_view, other_x, other_y, bike2_id);
@@ -662,12 +666,13 @@ static void render_info_panel(pic8* pic, const std::vector<info_panel_row>& rows
 }
 
 // Render the view for one player
-static void render_view(bool player1, bool bottom_player, pic8* pic, double time, driver& driv,
-                        driver& other_driv, view& hud_data, camera& current_camera, GameLoop loop) {
+static void render_view(bool player1, bool bottom_player, pic8* pic, double time,
+                        const driver* driv, const std::vector<driver*>& drivers, view& hud_data,
+                        camera& current_camera, GameLoop loop) {
     // Calculate frame of reference
     const kuski* spy_kuski = EolClient->spy_kuski();
     const spy_data* spy_pose = spy_kuski ? spy_kuski->spy_data() : nullptr;
-    vect2 bike_center = driv.mot->bike.r;
+    vect2 bike_center = driv->mot->bike.r;
     if (spy_pose) {
         bike_center = spy_pose->mot.bike.r;
     } else if (spy_kuski) {
@@ -677,7 +682,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     }
 
     vect2 bottomleft_corner(bike_center.x -
-                                (CameraX + driv.meta.camera_turning.turn_phase * CameraDx),
+                                (CameraX + driv->meta.camera_turning.turn_phase * CameraDx),
                             bike_center.y - CameraY);
     vect2 center(bottomleft_corner.x + (SCREEN_WIDTH / 2.0) * PixelsToMeters,
                  bottomleft_corner.y + (SCREEN_HEIGHT / 2.0) * PixelsToMeters);
@@ -796,18 +801,21 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
                     &spy_pose->mot, &spy_pose->metadata, bike2, spy_kuski->shirt);
     }
 
-    if (current_camera.mode == CameraMode::Normal) {
-        if (!Single) {
-            // Draw the other bike if it's on-screen
-            if (bike_in_view(other_driv.mot, center)) {
-                render_bike(pic, local_flag_tag_has_flag(!player1, time), bottomleft_corner,
-                            other_driv.mot, &other_driv.meta, bike2, nullptr);
-            }
+    // Draw the other local bikes
+    for (const driver* other_driv : drivers) {
+        if (other_driv == driv) {
+            continue;
         }
+        if (bike_in_view(other_driv->mot, center)) {
+            render_bike(pic, local_flag_tag_has_flag(!player1, time), bottomleft_corner,
+                        other_driv->mot, &other_driv->meta, bike2, nullptr);
+        }
+    }
 
+    if (current_camera.mode == CameraMode::Normal) {
         // Draw the current player's bike
         render_bike(pic, local_flag_tag_has_flag(player1, time) || EolClient->own_bike_has_flag(),
-                    bottomleft_corner, driv.mot, &driv.meta, bike1, shirt);
+                    bottomleft_corner, driv->mot, &driv->meta, bike1, shirt);
     }
 
     // Draw the foreground
@@ -818,13 +826,7 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
 
     // Draw the minimap
     if (hud_data.show_minimap()) {
-        if (Single) {
-            render_minimap(player1, pic, driv.meta.camera_turning.turn_phase, bike_center, nullptr,
-                           current_camera.mode);
-        } else {
-            render_minimap(player1, pic, driv.meta.camera_turning.turn_phase, bike_center,
-                           other_driv.mot, current_camera.mode);
-        }
+        render_minimap(player1, pic, driv, bike_center, drivers, current_camera.mode);
     }
 
     // Draw the timers
@@ -849,12 +851,12 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     if (loop == GameLoop::Game) {
         if (current_camera.mode != CameraMode::MapViewer) {
             if (EolSettings->show_speedometer()) {
-                info_rows.push_back({"max speed", driv.stats.format_max_speed()});
-                info_rows.push_back({"speed", driv.stats.format_speed()});
+                info_rows.push_back({"max speed", driv->stats.format_max_speed()});
+                info_rows.push_back({"speed", driv->stats.format_speed()});
             }
 
             if (EolSettings->show_one_wheel_status()) {
-                info_rows.push_back({"one wheel", driv.mot->one_wheel_failed ? "no" : "yes"});
+                info_rows.push_back({"one wheel", driv->mot->one_wheel_failed ? "no" : "yes"});
             }
         }
 
@@ -876,11 +878,11 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     }
 
     // Apple count/time
-    if (driv.mot->apple_count && EolSettings->show_last_apple_time()) {
+    if (driv->mot->apple_count && EolSettings->show_last_apple_time()) {
         char apple_time[32];
-        util::text::centiseconds_to_string(driv.mot->last_apple_time, apple_time, true, true);
+        util::text::centiseconds_to_string(driv->mot->last_apple_time, apple_time, true, true);
         info_rows.push_back(
-            {std::format("last apple ({})", driv.mot->apple_count - driv.mot->apple_bug_count),
+            {std::format("last apple ({})", driv->mot->apple_count - driv->mot->apple_bug_count),
              apple_time});
     }
 
@@ -894,17 +896,18 @@ static void render_view(bool player1, bool bottom_player, pic8* pic, double time
     render_info_panel(pic, info_rows);
 }
 
-void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop) {
+void render_game(double time, const std::vector<driver*>& drivers, camera& current_camera,
+                 GameLoop loop) {
     reload_graphic_assets();
 
     fps::update();
 
     // Determine who we are going to draw (player 1, player 2 or both)
-    bool draw_player1 = current_camera.player1.draw_view;
-    bool draw_player2 = current_camera.player2.draw_view;
-    if (Single || current_camera.mode == CameraMode::MapViewer) {
-        draw_player1 = true;
-        draw_player2 = false;
+    bool draw_player1 = true;
+    bool draw_player2 = false;
+    if (!Single && drivers.size() == 2) {
+        draw_player1 = current_camera.player1.draw_view;
+        draw_player2 = current_camera.player2.draw_view;
     }
     if (!draw_player1 && !draw_player2) {
         internal_error("render_game nobody visible!");
@@ -925,20 +928,20 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     static pic8 player_view = pic8();
     if (splitscreen) {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
-        render_view(true, false, &player_view, time, driv1, driv2, current_camera.player1,
+        render_view(true, false, &player_view, time, drivers[0], drivers, current_camera.player1,
                     current_camera, loop);
 
         player_view.subview(GameViewLeft, GameViewBottom2, GameViewRight, GameViewTop2, pic);
-        render_view(false, true, &player_view, time, driv2, driv1, current_camera.player2,
+        render_view(false, true, &player_view, time, drivers[1], drivers, current_camera.player2,
                     current_camera, loop);
     } else {
         player_view.subview(GameViewLeft, GameViewBottom1, GameViewRight, GameViewTop1, pic);
         if (draw_player1) {
-            render_view(true, true, &player_view, time, driv1, driv2, current_camera.player1,
+            render_view(true, true, &player_view, time, drivers[0], drivers, current_camera.player1,
                         current_camera, loop);
         } else {
-            render_view(false, true, &player_view, time, driv2, driv1, current_camera.player2,
-                        current_camera, loop);
+            render_view(false, true, &player_view, time, drivers[1], drivers,
+                        current_camera.player2, current_camera, loop);
         }
     }
 

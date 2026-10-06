@@ -815,7 +815,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
     sound_init();
     Mute = false;
     start_motor_sound(true);
-    if (!Single) {
+    if (drivers.size() == 2) {
         start_motor_sound(false);
     }
 
@@ -890,21 +890,19 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             return 0;
         }
 
-        // Death (or finish)
-        if (!Single) {
-            sync_replay_motor_sound(driv1, true);
-            sync_replay_motor_sound(driv2, false);
-
-            // Update flagtag time
+        if (drivers.size() == 2) {
             flagtag_replay(time);
-        }
 
-        set_motor_frequency(true, driv1.sound.motor_frequency, driv1.sound.gas);
-        if (Single) {
-            set_friction_volume(driv1.sound.friction_volume);
+            sync_replay_motor_sound(*drivers[0], true);
+            sync_replay_motor_sound(*drivers[1], false);
+
+            set_motor_frequency(true, drivers[0]->sound.motor_frequency, drivers[0]->sound.gas);
+            set_motor_frequency(false, drivers[1]->sound.motor_frequency, drivers[1]->sound.gas);
+            set_friction_volume(drivers[0]->sound.friction_volume +
+                                drivers[1]->sound.friction_volume);
         } else {
-            set_motor_frequency(false, driv2.sound.motor_frequency, driv2.sound.gas);
-            set_friction_volume(driv1.sound.friction_volume + driv2.sound.friction_volume);
+            set_motor_frequency(true, drivers[0]->sound.motor_frequency, drivers[0]->sound.gas);
+            set_friction_volume(drivers[0]->sound.friction_volume);
         }
 
         render_game(time, drivers, current_camera, GameLoop::Replay);

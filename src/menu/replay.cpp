@@ -109,9 +109,12 @@ static void replay_render(const std::string& filename) {
                                 "Press Enter to continue, ESC to cancel");
     if (c == DIK_RETURN) {
         if (load_replay(filename)) {
-            Rec1->rewind();
-            Rec2->rewind();
-            render_replay(Rec1->level_filename);
+            replay_list replays;
+            replays.add(Rec1);
+            if (MultiplayerRec) {
+                replays.add(Rec2);
+            }
+            render_replay(replays, Rec1->level_filename);
         }
     }
 }
@@ -132,9 +135,12 @@ static void replay_randomizer(std::vector<std::string>& filenames) {
 
         bool loaded = load_replay(filenames[indices[index]]);
         if (loaded) {
-            Rec1->rewind();
-            Rec2->rewind();
-            if (replay_loop(Rec1->level_filename, false)) {
+            replay_list replays;
+            replays.add(Rec1);
+            if (MultiplayerRec) {
+                replays.add(Rec2);
+            }
+            if (replay_loop(replays, Rec1->level_filename, false)) {
                 return;
             }
         } else {

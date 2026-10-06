@@ -224,10 +224,13 @@ void update_top_ten(int time, char* time_message, int internal_index,
 void replay_previous_run() {
     load_level_play(Rec1->level_filename);
     bool reset_player_visibility = true;
+    replay_list replays;
+    replays.add(Rec1);
+    if (MultiplayerRec) {
+        replays.add(Rec2);
+    }
     while (true) {
-        Rec1->rewind();
-        Rec2->rewind();
-        if (replay_loop(Rec1->level_filename, !reset_player_visibility)) {
+        if (replay_loop(replays, Rec1->level_filename, !reset_player_visibility)) {
             if (Level->objects_flipped) {
                 internal_error("replay_previous_run flipped!");
             }
@@ -239,10 +242,13 @@ void replay_previous_run() {
 
 void replay_from_file(const char* filename) {
     bool reset_play_visibility = true;
+    replay_list replays;
+    replays.add(Rec1);
+    if (MultiplayerRec) {
+        replays.add(Rec2);
+    }
     while (true) {
-        Rec1->rewind();
-        Rec2->rewind();
-        if (replay_loop(filename, !reset_play_visibility)) {
+        if (replay_loop(replays, filename, !reset_play_visibility)) {
             if (Level->objects_flipped) {
                 internal_error("replay_from_file flipped!");
             }

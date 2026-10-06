@@ -5,7 +5,6 @@
 #include "eol/eol.h"
 #include "eol/settings.h"
 #include "eol/status_messages.h"
-#include "game/driver.h"
 #include "game/fps.h"
 #include "level/level.h"
 #include "level/object.h"
@@ -766,7 +765,7 @@ static void sync_replay_motor_sound(driver& driv, bool is_motor1) {
 static bool PreviousReplayDrawView1 = true;
 static bool PreviousReplayDrawView2 = true;
 
-int replay_loop(const char* filename, bool restore_player_visibility) {
+int replay_loop(replay_list& replays, const char* filename, bool restore_player_visibility) {
     // Bindings during gameplay must be honored by raw scancode: numpad-6
     // is right-volt, not "Right Arrow when NumLock is off".
     NumpadNavGuard numpad_nav_guard;
@@ -775,12 +774,10 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
     ScreensaverSuspend screensaver_suspend;
 
     // Refuse to play zero-length replays (from map-viewer mode)
-    if (Rec1->is_empty()) {
+    if (replays.empty()) {
         return -2;
     }
-    if (MultiplayerRec && Rec2->is_empty()) {
-        return -2;
-    }
+    replays.rewind();
 
     int saved_single = Single;
     int saved_tag = FlagTag;
@@ -795,13 +792,9 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
     EolClient->enter_level(filename, Level, EnterMode::Replay);
 
-    replay_driver driv1(Motor1, Rec1);
-    replay_driver driv2(Motor2, Rec2);
-
     std::vector<driver*> drivers;
-    drivers.push_back(&driv1);
-    if (!Single) {
-        drivers.push_back(&driv2);
+    for (driver& driv : replays.all()) {
+        drivers.push_back(&driv);
     }
 
     camera current_camera(CameraMode::Normal, true, State);
@@ -866,13 +859,9 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         current_camera.update_view_settings(Single);
 
-        driv1.advance(time, rewinding);
-        if (!Single) {
-            driv2.advance(time, rewinding);
-        }
-
-        // End of replay
-        if ((Single && driv1.dead) || (!Single && driv1.dead && driv2.dead)) {
+        bool all_finished = replays.advance(time, rewinding);
+        if (all_finished) {
+            // End of replay
             set_motor_frequency(true, 1.0, 0);
             set_motor_frequency(false, 1.0, 0);
             stop_motor_sound(true);
@@ -955,9 +944,15 @@ void setup_render_directory(const std::string& replay_filename) {
     VideoOutputDirectory = out_dir.string();
 }
 
-void render_replay(const char* level_filename) {
+void render_replay(replay_list& replays, const char* level_filename) {
     // Disable screensaver during gameplay.
     ScreensaverSuspend screensaver_suspend;
+
+    // Refuse to play zero-length replays (from map-viewer mode)
+    if (replays.empty()) {
+        return;
+    }
+    replays.rewind();
 
     Single = !MultiplayerRec;
     FlagTag = Rec1->flagtag();
@@ -968,13 +963,9 @@ void render_replay(const char* level_filename) {
     VideoRecordingMode = true;
     VideoFrameIndex = 0;
 
-    replay_driver driv1(Motor1, Rec1);
-    replay_driver driv2(Motor2, Rec2);
-
     std::vector<driver*> drivers;
-    drivers.push_back(&driv1);
-    if (!Single) {
-        drivers.push_back(&driv2);
+    for (driver& driv : replays.all()) {
+        drivers.push_back(&driv);
     }
 
     camera current_camera(CameraMode::Normal, true, State);
@@ -991,16 +982,12 @@ void render_replay(const char* level_filename) {
 
         current_camera.update_view_settings(Single);
 
-        driv1.advance(time, false);
-        if (!Single) {
-            driv2.advance(time, false);
-        }
-
-        if ((Single && driv1.dead) || (!Single && driv1.dead && driv2.dead)) {
+        bool all_finished = replays.advance(time, false);
+        if (all_finished) {
             break;
         }
 
-        if (!Single) {
+        if (drivers.size() == 2) {
             flagtag_replay(time);
         }
 

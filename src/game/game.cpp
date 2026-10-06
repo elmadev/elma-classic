@@ -853,25 +853,9 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         current_camera.update_view_settings(Single);
 
-        // Load replay data
-        driv1.replay_frame(time);
+        driv1.advance(time, rewinding);
         if (!Single) {
-            driv2.replay_frame(time);
-        }
-
-        // Reverse events if rewinding
-        if (rewinding) {
-            driv1.reverse_events(time);
-            driv1.rewind_override_animations(time);
-            if (!Single) {
-                driv2.reverse_events(time);
-                driv2.rewind_override_animations(time);
-            }
-        }
-
-        driv1.update_graphical_metadata(false, time);
-        if (!Single) {
-            driv2.update_graphical_metadata(false, time);
+            driv2.advance(time, rewinding);
         }
 
         // End of replay
@@ -990,14 +974,9 @@ void render_replay(const char* level_filename) {
 
         current_camera.update_view_settings(Single);
 
-        driv1.replay_frame(time);
+        driv1.advance(time, false);
         if (!Single) {
-            driv2.replay_frame(time);
-        }
-
-        driv1.update_graphical_metadata(false, time);
-        if (!Single) {
-            driv2.update_graphical_metadata(false, time);
+            driv2.advance(time, false);
         }
 
         if ((Single && driv1.dead) || (!Single && driv1.dead && driv2.dead)) {

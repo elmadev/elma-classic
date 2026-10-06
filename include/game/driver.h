@@ -84,9 +84,13 @@ struct game_driver : driver {
 };
 
 struct replay_driver : driver {
+  private:
     void reverse_events(double time);
     void rewind_override_animations(double time);
     void replay_frame(double time);
+
+  public:
+    void advance(double time, bool rewinding);
 
     replay_driver(motorst* mot, recorder* rec);
 };

@@ -249,5 +249,14 @@ void replay_driver::replay_frame(double time) {
     return;
 }
 
+void replay_driver::advance(double time, bool rewinding) {
+    replay_frame(time);
+    if (rewinding) {
+        reverse_events(time);
+        rewind_override_animations(time);
+    }
+    update_graphical_metadata(false, time);
+}
+
 replay_driver::replay_driver(motorst* mot, recorder* rec)
     : driver(mot, rec) {}

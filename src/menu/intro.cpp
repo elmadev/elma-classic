@@ -87,13 +87,13 @@ void menu_intro() {
     }
 
     if (State->player_count == 0) {
-        if (!menu_player_create(true)) {
-            quit();
+        while (!menu_player_create(true)) {
+            menu_prompt_exit();
         }
     } else {
         if (!EolSettings->skip_intro()) {
-            if (!menu_player_choose(true, false)) {
-                quit();
+            while (!menu_player_choose(true, false)) {
+                menu_prompt_exit();
             }
         }
     }

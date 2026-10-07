@@ -40,6 +40,8 @@ class level {
     topten_set toptens;
     int topten_file_offset; // 0 if internal level
 
+    int total_apples = 0;
+
     // Create a default level
     level();
     // Load level from file
@@ -73,9 +75,9 @@ class level {
     bool is_sky(polygon* poly, vect2* point = nullptr);
     // Get the min/max dimensions of level, optionally including objects/sprites
     void get_boundaries(double* x1, double* y1, double* x2, double* y2,
-                        bool check_objects_and_sprites);
+                        bool check_objects_and_sprites) const;
     // Returns apple count.
-    int initialize_objects(motorst* mot);
+    void initialize_objects(motorst* mot);
     void sort_objects();
     object* get_object(int index);
 

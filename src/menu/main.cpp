@@ -43,9 +43,12 @@ static void menu_demo() {
                 std::string("menu_demo: level file changed since demo replay was made: ") +
                 Rec1->level_filename);
         }
-        Rec1->rewind();
-        Rec2->rewind();
-        if (replay_loop(Rec1->level_filename, false)) {
+        replay_list replays;
+        replays.add(Rec1);
+        if (MultiplayerRec) {
+            replays.add(Rec2);
+        }
+        if (replay_loop(replays, Rec1->level_filename, false)) {
             MenuPalette->set();
             return;
         }

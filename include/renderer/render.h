@@ -1,6 +1,8 @@
 #ifndef RENDERER_RENDER_H
 #define RENDERER_RENDER_H
 
+#include <vector>
+
 class pic8;
 struct bike_metadata;
 struct camera;
@@ -18,7 +20,8 @@ void increase_view_size();
 void decrease_view_size();
 
 enum class GameLoop { Game, Replay, Render };
-void render_game(double time, driver& driv1, driver& driv2, camera& current_camera, GameLoop loop);
+void render_game(double time, const std::vector<driver*>& drivers, camera& current_camera,
+                 GameLoop loop);
 
 void level_to_bmp(const char* filename);
 

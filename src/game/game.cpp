@@ -5,7 +5,6 @@
 #include "eol/eol.h"
 #include "eol/settings.h"
 #include "eol/status_messages.h"
-#include "game/driver.h"
 #include "game/fps.h"
 #include "level/level.h"
 #include "level/object.h"
@@ -29,6 +28,7 @@
 #include <format>
 #include <optional>
 #include <utility>
+#include <vector>
 
 int Single = 1;
 int FlagTag = 0;
@@ -38,8 +38,6 @@ bool ScreenshotRequested = false;
 bool VideoRecordingMode = false;
 int VideoFrameIndex = 0;
 std::string VideoOutputDirectory;
-
-static int TotalApples;
 
 static std::optional<BattleAttributes::Kind> BattleRunCripples;
 
@@ -152,47 +150,10 @@ static bool handle_console_input() {
     return was_active;
 }
 
-static bool is_game_key_down(DikScancode code) {
-    if (Console->is_input_active()) {
-        return false;
-    }
-    return is_key_down(code);
-}
-
-template <typename Scancode> static bool was_game_key_just_pressed(Scancode code) {
-    if (Console->is_input_active()) {
-        return false;
-    }
-    return was_key_just_pressed(code);
-}
-
-static void latch_one_frame_brake(driver& driv) {
+static void latch_one_frame_brake(game_driver& driv) {
     if (was_game_key_just_pressed(driv.keys->one_frame_brake)) {
         driv.one_frame_brake_pending = true;
     }
-}
-
-static void update_freecam(double dt, camera& current_camera) {
-    double speed = 30.0;
-    if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
-        speed *= 4.0;
-    }
-    double move = speed * dt;
-    if (is_game_key_down(DIK_UP)) {
-        current_camera.y += move;
-    }
-    if (is_game_key_down(DIK_DOWN)) {
-        current_camera.y -= move;
-    }
-    if (is_game_key_down(DIK_LEFT)) {
-        current_camera.x -= move;
-    }
-    if (is_game_key_down(DIK_RIGHT)) {
-        current_camera.x += move;
-    }
-
-    current_camera.x = std::clamp(current_camera.x, current_camera.min_x, current_camera.max_x);
-    current_camera.y = std::clamp(current_camera.y, current_camera.min_y, current_camera.max_y);
 }
 
 static void sound_init() {
@@ -203,41 +164,8 @@ static void sound_init() {
     }
 }
 
-static BikeState handle_object_interaction(driver& driv, int object_id) {
-    if (object_id < 0 || object_id >= MAX_OBJECTS) {
-        internal_error("handle_object_interaction object_id < 0 || object_id >= MAX_OBJECTS!");
-    }
-    if (!Level->objects[object_id]) {
-        internal_error("handle_object_interaction !Level->objects[object_id]!");
-    }
-
-    motorst* mot = driv.mot;
-
-    object::Type type = Level->objects[object_id]->type;
-
-    if (type == object::Type::Killer) {
-        return BikeState::Dead;
-    }
-    if (type == object::Type::Food) {
-        Level->objects[object_id]->active = false;
-        mot->apple_count++;
-        add_event_buffer(WavEvent::Food, 0.99, -1);
-        std::optional<MotorGravity> gravity = Level->objects[object_id]->gravity();
-        if (gravity.has_value()) {
-            mot->gravity_direction = gravity.value();
-        }
-        return BikeState::Normal;
-    }
-    if (type == object::Type::Exit) {
-        if (Motor1->apple_count + Motor2->apple_count >= TotalApples) {
-            return BikeState::Finish;
-        }
-    }
-    return BikeState::Normal;
-}
-
 // Subframe physics calculation. Contains all the physics calculations except for bike turning
-static void physics_subframe(driver& driv, double time, double dt) {
+static void physics_subframe(game_driver& driv, double time, double dt) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
     bike_metadata* metadata = &driv.meta;
@@ -355,7 +283,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
     while (get_event_buffer(&wav_id, &volume, &object_id)) {
         if (object_id >= 0) {
             int prev_apple_count = mot->apple_count;
-            BikeState bike_state = handle_object_interaction(driv, object_id);
+            BikeState bike_state = driv.handle_object_interaction(object_id);
             if (bike_state == BikeState::Dead) {
                 driv.dead = true;
             }
@@ -376,96 +304,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
     }
 }
 
-static void update_view_settings(driver& driv, bool* other_draw_view) {
-    player_keys* keys = driv.keys;
-
-    // Visibility of player viewpoint
-    if (was_game_key_just_pressed(keys->toggle_visibility)) {
-        reset_game_background();
-        if (!*other_draw_view) {
-            // You cannot have 0 players visible, so make both players visible instead
-            *other_draw_view = true;
-            driv.draw_view = true;
-        } else {
-            driv.draw_view = !driv.draw_view;
-        }
-    }
-
-    if (was_game_key_just_pressed(keys->toggle_minimap)) {
-        driv.toggle_minimap();
-    }
-
-    if (was_game_key_just_pressed(keys->toggle_timer)) {
-        driv.toggle_timer();
-    }
-}
-
-// The `rec` argument is only used for game play, not when playing a replay.
-static void update_bike_turn_phase(driver& driv, bool update_rec, double time, int flipped) {
-    turning_data* data = &driv.meta.bike_turning;
-
-    if (data->flipped != flipped) {
-        // New flip this frame
-        data->flipped = flipped;
-        data->turn_time = time;
-        if (update_rec) {
-            start_wav(WavEvent::Turn, 0.99);
-            driv.rec->store_event(time, WavEvent::Turn, 0.99, -1);
-        }
-    }
-
-    double turn_time = EolSettings->turn_time();
-    if (turn_time == 0.0) {
-        // Instant turn
-        data->turn_phase = 1.0;
-    } else {
-        data->turn_phase = (time - data->turn_time) / turn_time;
-        data->turn_phase = std::clamp(data->turn_phase, 0.0, 1.0);
-    }
-}
-
-static void update_camera_turn_phase(turning_data* data, double time, int flipped) {
-    double camera_flip_time = EolSettings->turn_time() + 0.15;
-    if (data->flipped != flipped) {
-        // New flip this frame
-        data->flipped = flipped;
-        double time_since_prev_turn = time - data->turn_time;
-        if (camera_flip_time > 0.0 && time_since_prev_turn < camera_flip_time) {
-            // If camera is mid-turn, calculate camera start time so it seamlessly continues from
-            // the mid-turn position
-            data->turn_time = time + time_since_prev_turn - camera_flip_time;
-        } else {
-            // Camera is not mid-turn, so just set the camera turn time normally
-            data->turn_time = time;
-        }
-    }
-
-    double elapsed_time = std::max(0.0, time - data->turn_time);
-    data->turn_phase = std::min(1.0, elapsed_time / camera_flip_time);
-    if (flipped) {
-        data->turn_phase = 1.0 - data->turn_phase;
-    }
-}
-
-static void update_graphical_metadata(driver& driv, bool update_rec, double time) {
-    motorst& mot = *driv.mot;
-    bike_metadata& metadata = driv.meta;
-
-    // Update bike turn data
-    update_bike_turn_phase(driv, update_rec, time, mot.flipped_bike);
-
-    // Update camera position
-    int flipped_camera = mot.flipped_bike;
-    if (mot.gravity_direction == MotorGravity::Up) {
-        flipped_camera = !flipped_camera;
-    }
-    update_camera_turn_phase(&metadata.camera_turning, time, flipped_camera);
-
-    // Update arm position
-    metadata.arm_position = std::max(0.0, 1.0 - (time - metadata.volt_time) / VoltDelay);
-}
-
-static void physics_frame_turn(driver& driv) {
+static void physics_frame_turn(game_driver& driv) {
     motorst* mot = driv.mot;
     player_keys* keys = driv.keys;
     bike_metadata* metadata = &driv.meta;
@@ -646,7 +485,7 @@ static void setup_gameloop(const char* filename) {
     Level->flip_objects();
     Level->sort_objects();
 
-    TotalApples = Level->initialize_objects(Motor1);
+    Level->initialize_objects(Motor1);
     Level->initialize_objects(Motor2);
 
     reset_game_background();
@@ -718,24 +557,18 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     pacer::reset();
 
-    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Game1);
-    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Game2);
+    game_driver driv1(Motor1, Rec1, &State->keys1);
+    game_driver driv2(Motor2, Rec2, &State->keys2);
     driv1.stats.drunk = driv2.stats.drunk = active_cripples() & BattleAttributes::Drunk;
 
-    camera current_camera;
-    current_camera.mode = camera_mode;
-    current_camera.x = Motor1->bike.r.x;
-    current_camera.y = Motor1->bike.r.y;
-    current_camera.start_x = Motor1->bike.r.x;
-    current_camera.start_y = Motor1->bike.r.y;
+    camera current_camera(camera_mode, false, State);
+    current_camera.init_freecam(Level, Motor1);
 
-    double level_min_y;
-    double level_max_y;
-    Level->get_boundaries(&current_camera.min_x, &level_min_y, &current_camera.max_x, &level_max_y,
-                          false);
-    // Convert level y-coordinates to camera y-coordinates
-    current_camera.min_y = -level_max_y;
-    current_camera.max_y = -level_min_y;
+    std::vector<driver*> drivers;
+    drivers.push_back(&driv1);
+    if (!Single && current_camera.mode != CameraMode::MapViewer) {
+        drivers.push_back(&driv2);
+    }
 
     sound_init();
     // Stay muted if no bike is visible.
@@ -772,7 +605,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                 ran_subframes = true;
                 if (current_camera.mode == CameraMode::MapViewer) {
                     if (!EolClient->spy_kuski()) {
-                        update_freecam(dt, current_camera);
+                        current_camera.update_freecam(dt);
                     }
                     time += dt;
                     continue;
@@ -830,7 +663,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                     Rec2->encode_frame_count();
                     if (Single && !InEditor) {
                         EolClient->exit_level(driv1, Level, time * TIME_TO_CENTISECONDS,
-                                              TotalApples, camera_mode == CameraMode::MapViewer);
+                                              Level->total_apples,
+                                              camera_mode == CameraMode::MapViewer);
                     }
 
                     Level->unflip_objects();
@@ -877,19 +711,15 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         }
 
         // Turn phase and arm position
-        update_graphical_metadata(driv1, true, time);
+        driv1.update_graphical_metadata(true, time);
         if (!Single) {
-            update_graphical_metadata(driv2, true, time);
+            driv2.update_graphical_metadata(true, time);
         }
         EolClient->update_spy_kuskis();
 
-        // Update the hud and player visibility
-        update_view_settings(driv1, &driv2.draw_view);
-        if (!Single) {
-            update_view_settings(driv2, &driv1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
-        render_game(time, driv1, driv2, current_camera, GameLoop::Game);
+        render_game(time, drivers, current_camera, GameLoop::Game);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -916,101 +746,16 @@ int game_loop(const char* filename, CameraMode camera_mode) {
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
             if (Single && !InEditor) {
-                EolClient->exit_level(driv1, Level, time * TIME_TO_CENTISECONDS, TotalApples,
-                                      camera_mode == CameraMode::MapViewer);
+                EolClient->exit_level(driv1, Level, time * TIME_TO_CENTISECONDS,
+                                      Level->total_apples, camera_mode == CameraMode::MapViewer);
             }
             return -1;
         }
     }
 }
 
-static void reverse_events(driver& driv, double time) {
-    motorst* mot = driv.mot;
-    recorder* rec = driv.rec;
-
-    while (std::optional<event> ev = rec->recall_event_reverse(time)) {
-        if (ev->object_id < 0) {
-            continue;
-        }
-        object* obj = Level->objects[ev->object_id];
-        if (obj && obj->type == object::Type::Food) {
-            obj->active = true;
-            mot->apple_count--;
-
-            mot->last_apple_time = (int)(rec->last_apple_time().value_or(0) * TIME_TO_CENTISECONDS);
-
-            if (obj->gravity()) {
-                mot->gravity_direction = rec->last_gravity(*Level);
-            }
-        }
-    }
-}
-
-// During rewind, compute animation state from the recorder's event list
-// instead of relying on the forward-only state machine.
-static void rewind_override_animations(driver& driv, double time) {
-    bike_metadata* metadata = &driv.meta;
-    motorst* mot = driv.mot;
-    recorder* rec = driv.rec;
-
-    double turn_time = rec->find_last_turn_frame_time(time).value_or(-1000.0);
-    metadata->bike_turning.flipped = mot->flipped_bike;
-    metadata->bike_turning.turn_time = turn_time;
-
-    metadata->camera_turning.turn_time = -1000.0;
-    int flipped_camera = mot->flipped_bike;
-    if (mot->gravity_direction == MotorGravity::Up) {
-        flipped_camera = !flipped_camera;
-    }
-    metadata->camera_turning.flipped = flipped_camera;
-
-    metadata->volt_time = rec->last_volt_time(&metadata->volt_is_right).value_or(-1000.0);
-}
-
-// Load replay data (instead of simulating bike physics)
-static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
-    motorst* mot = driv.mot;
-    bike_metadata* metadata = &driv.meta;
-    recorder* rec = driv.rec;
-
-    // Update the hud and player visibility
-    update_view_settings(driv, other_draw_view);
-
-    // Load replay data
-    bool alive = rec->recall_frame(mot, time, &driv.sound);
-    set_head_position(mot);
-
-    // Play events
-    while (std::optional<event> ev = rec->recall_event(time)) {
-        if (ev->object_id >= 0) {
-            int prev_apple_count = mot->apple_count;
-            handle_object_interaction(driv, ev->object_id);
-            if (prev_apple_count < mot->apple_count) {
-                mot->last_apple_time = (int)(ev->time * TIME_TO_CENTISECONDS);
-            }
-        } else {
-            start_wav(ev->event_id, ev->volume);
-            if (ev->event_id == WavEvent::RightVolt) {
-                metadata->volt_is_right = true;
-                metadata->volt_time = time;
-            }
-            if (ev->event_id == WavEvent::LeftVolt) {
-                metadata->volt_is_right = false;
-                metadata->volt_time = time;
-            }
-        }
-    }
-    return alive;
-}
-
-static void sync_replay_death(driver& driv, bool finished, bool is_motor1) {
-    if (driv.dead == finished) {
-        return;
-    }
-
-    driv.dead = finished;
-
-    if (finished) {
+static void sync_replay_motor_sound(driver& driv, bool is_motor1) {
+    if (driv.dead) {
         stop_motor_sound(is_motor1);
     } else {
         start_motor_sound(is_motor1);
@@ -1020,7 +765,7 @@ static void sync_replay_death(driver& driv, bool finished, bool is_motor1) {
 static bool PreviousReplayDrawView1 = true;
 static bool PreviousReplayDrawView2 = true;
 
-int replay_loop(const char* filename, bool restore_player_visibility) {
+int replay_loop(replay_list& replays, const char* filename, bool restore_player_visibility) {
     // Bindings during gameplay must be honored by raw scancode: numpad-6
     // is right-volt, not "Right Arrow when NumLock is off".
     NumpadNavGuard numpad_nav_guard;
@@ -1029,12 +774,10 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
     ScreensaverSuspend screensaver_suspend;
 
     // Refuse to play zero-length replays (from map-viewer mode)
-    if (Rec1->is_empty()) {
+    if (replays.empty()) {
         return -2;
     }
-    if (MultiplayerRec && Rec2->is_empty()) {
-        return -2;
-    }
+    replays.rewind();
 
     int saved_single = Single;
     int saved_tag = FlagTag;
@@ -1049,22 +792,23 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
     EolClient->enter_level(filename, Level, EnterMode::Replay);
 
-    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Replay1);
-    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Replay2);
-
-    driv2.draw_view = !MergedRec;
-    if (restore_player_visibility) {
-        driv1.draw_view = PreviousReplayDrawView1;
-        driv2.draw_view = PreviousReplayDrawView2;
+    std::vector<driver*> drivers;
+    for (driver& driv : replays.all()) {
+        drivers.push_back(&driv);
     }
 
-    camera current_camera;
-    current_camera.mode = CameraMode::Normal;
+    camera current_camera(CameraMode::Normal, true, State);
+
+    current_camera.player2.draw_view = !MergedRec;
+    if (restore_player_visibility) {
+        current_camera.player1.draw_view = PreviousReplayDrawView1;
+        current_camera.player2.draw_view = PreviousReplayDrawView2;
+    }
 
     sound_init();
     Mute = false;
     start_motor_sound(true);
-    if (!Single) {
+    if (drivers.size() == 2) {
         start_motor_sound(false);
     }
 
@@ -1113,30 +857,11 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         double time = current_replay_time;
 
-        // Load replay data
-        bool finished1 = !replay_frame(driv1, time, &driv2.draw_view);
-        bool finished2 = false;
-        if (!Single) {
-            finished2 = !replay_frame(driv2, time, &driv1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
-        // Reverse events if rewinding
-        if (rewinding) {
-            reverse_events(driv1, time);
-            rewind_override_animations(driv1, time);
-            if (!Single) {
-                reverse_events(driv2, time);
-                rewind_override_animations(driv2, time);
-            }
-        }
-
-        update_graphical_metadata(driv1, false, time);
-        if (!Single) {
-            update_graphical_metadata(driv2, false, time);
-        }
-
-        // End of replay
-        if ((Single && finished1) || (!Single && finished1 && finished2)) {
+        bool all_finished = replays.advance(time, rewinding);
+        if (all_finished) {
+            // End of replay
             set_motor_frequency(true, 1.0, 0);
             set_motor_frequency(false, 1.0, 0);
             stop_motor_sound(true);
@@ -1147,31 +872,29 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             Mute = true;
             Level->unflip_objects();
 
-            PreviousReplayDrawView1 = driv1.draw_view;
-            PreviousReplayDrawView2 = driv2.draw_view;
+            PreviousReplayDrawView1 = current_camera.player1.draw_view;
+            PreviousReplayDrawView2 = current_camera.player2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return 0;
         }
 
-        // Death (or finish)
-        if (!Single) {
-            sync_replay_death(driv1, finished1, true);
-            sync_replay_death(driv2, finished2, false);
-
-            // Update flagtag time
+        if (drivers.size() == 2) {
             flagtag_replay(time);
-        }
 
-        set_motor_frequency(true, driv1.sound.motor_frequency, driv1.sound.gas);
-        if (Single) {
-            set_friction_volume(driv1.sound.friction_volume);
+            sync_replay_motor_sound(*drivers[0], true);
+            sync_replay_motor_sound(*drivers[1], false);
+
+            set_motor_frequency(true, drivers[0]->sound.motor_frequency, drivers[0]->sound.gas);
+            set_motor_frequency(false, drivers[1]->sound.motor_frequency, drivers[1]->sound.gas);
+            set_friction_volume(drivers[0]->sound.friction_volume +
+                                drivers[1]->sound.friction_volume);
         } else {
-            set_motor_frequency(false, driv2.sound.motor_frequency, driv2.sound.gas);
-            set_friction_volume(driv1.sound.friction_volume + driv2.sound.friction_volume);
+            set_motor_frequency(true, drivers[0]->sound.motor_frequency, drivers[0]->sound.gas);
+            set_friction_volume(drivers[0]->sound.friction_volume);
         }
 
-        render_game(time, driv1, driv2, current_camera, GameLoop::Replay);
+        render_game(time, drivers, current_camera, GameLoop::Replay);
 
         // Universal controls
         if (was_game_key_just_pressed(State->key_increase_screen_size)) {
@@ -1198,8 +921,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
             Level->unflip_objects();
 
-            PreviousReplayDrawView1 = driv1.draw_view;
-            PreviousReplayDrawView2 = driv2.draw_view;
+            PreviousReplayDrawView1 = current_camera.player1.draw_view;
+            PreviousReplayDrawView2 = current_camera.player2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return -1;
@@ -1221,9 +944,15 @@ void setup_render_directory(const std::string& replay_filename) {
     VideoOutputDirectory = out_dir.string();
 }
 
-void render_replay(const char* level_filename) {
+void render_replay(replay_list& replays, const char* level_filename) {
     // Disable screensaver during gameplay.
     ScreensaverSuspend screensaver_suspend;
+
+    // Refuse to play zero-length replays (from map-viewer mode)
+    if (replays.empty()) {
+        return;
+    }
+    replays.rewind();
 
     Single = !MultiplayerRec;
     FlagTag = Rec1->flagtag();
@@ -1231,14 +960,15 @@ void render_replay(const char* level_filename) {
 
     EolClient->enter_level(level_filename, Level, EnterMode::Replay);
 
-    camera current_camera;
-    current_camera.mode = CameraMode::Normal;
-
     VideoRecordingMode = true;
     VideoFrameIndex = 0;
 
-    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Replay1);
-    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Replay2);
+    std::vector<driver*> drivers;
+    for (driver& driv : replays.all()) {
+        drivers.push_back(&driv);
+    }
+
+    camera current_camera(CameraMode::Normal, true, State);
 
     fps::reset();
     while (true) {
@@ -1250,26 +980,18 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (pacer::MILLISECONDS_TO_PHYS_TIME * 1000.0) /
                       EolSettings->recording_fps();
 
-        bool finished1 = !replay_frame(driv1, time, &driv2.draw_view);
-        bool finished2 = false;
-        if (!Single) {
-            finished2 = !replay_frame(driv2, time, &driv1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
-        update_graphical_metadata(driv1, false, time);
-        if (!Single) {
-            update_graphical_metadata(driv2, false, time);
-        }
-
-        if ((Single && finished1) || (!Single && finished1 && finished2)) {
+        bool all_finished = replays.advance(time, false);
+        if (all_finished) {
             break;
         }
 
-        if (!Single) {
+        if (drivers.size() == 2) {
             flagtag_replay(time);
         }
 
-        render_game(time, driv1, driv2, current_camera, GameLoop::Render);
+        render_game(time, drivers, current_camera, GameLoop::Render);
 
         VideoFrameIndex++;
     }

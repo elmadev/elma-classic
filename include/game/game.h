@@ -1,6 +1,8 @@
 #ifndef GAME_GAME_H
 #define GAME_GAME_H
 
+#include "game/camera.h"
+#include "game/driver.h"
 #include <string>
 
 extern int Single;
@@ -12,27 +14,13 @@ extern bool VideoRecordingMode;
 extern int VideoFrameIndex;
 extern std::string VideoOutputDirectory;
 
-enum class CameraMode { Normal, MapViewer };
-
-struct camera {
-    CameraMode mode;
-    double x;
-    double y;
-    double start_x;
-    double start_y;
-    double min_x;
-    double min_y;
-    double max_x;
-    double max_y;
-};
-
 void reload_graphic_assets();
 
 int game_loop(const char* filename, CameraMode camera_mode);
-int replay_loop(const char* filename, bool restore_player_visibility);
+int replay_loop(replay_list& replays, const char* filename, bool restore_player_visibility);
 
 void setup_render_directory(const std::string& replay_filename);
-void render_replay(const char* level_filename);
+void render_replay(replay_list& replays, const char* level_filename);
 
 extern int WhoDiedFirst;
 extern bool Player1Finished;

@@ -1,9 +1,11 @@
 #ifndef MENU_PLAY_H
 #define MENU_PLAY_H
 
+#include "game/driver.h"
+
 void menu_play();
 
-void replay_from_file(const char* filename);
+void replay_from_file(replay_list& replays, const char* filename);
 
 // Pass either the internal_index or the external_filename
 // Update top ten and show finish message

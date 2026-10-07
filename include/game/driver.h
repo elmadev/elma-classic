@@ -2,18 +2,13 @@
 #define GAME_DRIVER_H
 
 #include "game/recorder.h"
+#include "physics/forces.h"
 #include <cstdint>
+#include <list>
 #include <string>
 
 struct motorst;
 struct player_keys;
-
-enum class HudSlot {
-    Game1,
-    Game2,
-    Replay1,
-    Replay2,
-};
 
 struct turning_data {
     int flipped;
@@ -63,23 +58,67 @@ struct driver {
     motorst* mot;
     bike_metadata meta;
     recorder* rec;
-    player_keys* keys;
-    HudSlot hud_slot;
     bike_sound sound;
     run_stats stats;
 
     bool dead = false;
     int finish_time = 0;
-    bool draw_view = true;
-    bool one_frame_brake_pending = false;
 
-    driver(motorst* mot, recorder* rec, player_keys* keys, HudSlot hud_slot);
+  private:
+    void update_bike_turn_phase(bool update_rec, double time, int flipped);
+    void update_camera_turn_phase(double time, int flipped);
+
+  public:
+    driver(motorst* mot, recorder* rec);
     void reset_metadata();
     void update_speed();
-    bool show_minimap() const;
-    bool show_timer() const;
-    void toggle_minimap() const;
-    void toggle_timer() const;
+    void update_graphical_metadata(bool update_rec, double time);
+    BikeState handle_object_interaction(int object_id);
+};
+
+struct game_driver : driver {
+    player_keys* keys;
+
+    bool one_frame_brake_pending = false;
+
+    game_driver(motorst* mot, recorder* rec, player_keys* keys);
+};
+
+struct replay_driver : driver {
+  private:
+    void reverse_events(double time);
+    void rewind_override_animations(double time);
+    void replay_frame(double time);
+
+  public:
+    std::string name;
+
+    void advance(double time, bool rewinding);
+
+    replay_driver(motorst* mot, recorder* rec);
+};
+
+class replay_list {
+  public:
+    void clear() { drivers.clear(); }
+    // Load the first driver of `path` if it is a replay of `level_id`
+    bool add(const std::string& path, int level_id);
+    // Load Rec1 or Rec2
+    void add(recorder* rec);
+    bool empty() const { return drivers.empty(); }
+
+    void rewind();
+    // Returns true once every driver has run out of frames
+    bool advance(double time, bool rewinding);
+
+    std::list<replay_driver>& all() { return drivers; }
+
+  private:
+    std::list<replay_driver> drivers;
+
+    // Temporary memory until driver is refactored to no longer use these as pointers
+    std::list<motorst> mots;
+    std::list<recorder> recs;
 };
 
 #endif

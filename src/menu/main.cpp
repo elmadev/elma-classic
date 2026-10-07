@@ -52,7 +52,7 @@ static void menu_demo() {
     }
 }
 
-static void menu_prompt_exit() {
+void menu_prompt_exit() {
     menu_nav nav("Do you want to quit?");
     nav.x_left = 300;
     nav.y_entries = 200;

@@ -119,6 +119,7 @@
 
 ### Menu
 * Red helmet animation is now smooth after the intro scrolling animation
+* Pressing Esc at the startup player creation/selection menu asks to quit instead of quitting immediately
 
 ### State
 * Disallow duplicate players with identical names

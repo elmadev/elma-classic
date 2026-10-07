@@ -149,7 +149,7 @@ void lgrfile::load_lgr_file(const char* lgr_name, bool warn_missing) {
     }
 
     char lgr_load_name[MAX_FILENAME_LEN + 1] = {};
-    strcpy(lgr_load_name, lgr_name);
+    strcpy(lgr_load_name, EolSettings->default_lgr_only() ? "default" : lgr_name);
     strlwr(lgr_load_name);
 
     // There are 3 possible LGRs this function will try to load in order:

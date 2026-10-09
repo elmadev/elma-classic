@@ -73,6 +73,13 @@ struct motorst {
     double left_volt_time;
     double angular_velocity_pre_right_volt;
     double angular_velocity_pre_left_volt;
+
+    void init();
+    void spawn(vect2 start_position);
+
+    static const rigidbody DEFAULT_BIKE;
+    static const rigidbody DEFAULT_LEFT_WHEEL;
+    static const rigidbody DEFAULT_RIGHT_WHEEL;
 };
 
 extern motorst *Motor1, *Motor2;
@@ -80,6 +87,5 @@ extern motorst *Motor1, *Motor2;
 void set_zoom_factor();
 void set_minimap_zoom_factor();
 void init_physics_data();
-void init_motor(motorst* motor);
 
 #endif

@@ -68,11 +68,7 @@ bool load_level_play(const char* levelname) {
         START_TIME(segments_timer);
         delete Segments;
         Segments = new segments(Level);
-        if (HeadRadius > Motor1->left_wheel.radius) {
-            Segments->setup_collision_grid(HeadRadius);
-        } else {
-            Segments->setup_collision_grid(Motor1->left_wheel.radius);
-        }
+        Segments->setup_collision_grid(std::max(motorst::DEFAULT_LEFT_WHEEL.radius, HeadRadius));
         END_TIME(segments_timer, std::format("{} Segments", levelname))
 
         canvas::create_canvases();

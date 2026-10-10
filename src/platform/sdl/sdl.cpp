@@ -23,10 +23,12 @@ static SDL_Surface* SDLSurfacePaletted = nullptr;
 static palette* CurrentPalette = nullptr;
 
 static bool LeftMouseDown = false;
+static bool MiddleMouseDown = false;
 static bool RightMouseDown = false;
 
 // Per-frame mouse state for was_left/right_mouse_just_clicked()
 static bool LeftMouseDownPrevFrame = false;
+static bool MiddleMouseDownPrevFrame = false;
 static bool RightMouseDownPrevFrame = false;
 
 static int MouseWheelDelta = 0;
@@ -381,6 +383,7 @@ void handle_events() {
     keyboard::begin_frame();
     MouseWheelDelta = 0;
     LeftMouseDownPrevFrame = LeftMouseDown;
+    MiddleMouseDownPrevFrame = MiddleMouseDown;
     RightMouseDownPrevFrame = RightMouseDown;
 
     SDL_Event event;
@@ -445,7 +448,16 @@ void handle_events() {
             break;
         case SDL_MOUSEBUTTONDOWN:
             if (event.button.button == SDL_BUTTON_LEFT) {
-                LeftMouseDown = true;
+                SDL_Keymod mod = SDL_GetModState();
+                if (mod & KMOD_CTRL) {
+                    // Ctrl+Click is middle click in case the user has no middle button
+                    MiddleMouseDown = true;
+                } else {
+                    LeftMouseDown = true;
+                }
+            }
+            if (event.button.button == SDL_BUTTON_MIDDLE) {
+                MiddleMouseDown = true;
             }
             if (event.button.button == SDL_BUTTON_RIGHT) {
                 RightMouseDown = true;
@@ -453,7 +465,14 @@ void handle_events() {
             break;
         case SDL_MOUSEBUTTONUP:
             if (event.button.button == SDL_BUTTON_LEFT) {
-                LeftMouseDown = false;
+                if (LeftMouseDown) {
+                    LeftMouseDown = false;
+                } else {
+                    MiddleMouseDown = false;
+                }
+            }
+            if (event.button.button == SDL_BUTTON_MIDDLE) {
+                MiddleMouseDown = false;
             }
             if (event.button.button == SDL_BUTTON_RIGHT) {
                 RightMouseDown = false;
@@ -485,6 +504,8 @@ void get_mouse_position(int* x, int* y) { SDL_GetMouseState(x, y); }
 void set_mouse_position(int x, int y) { SDL_WarpMouseInWindow(nullptr, x, y); }
 
 bool was_left_mouse_just_clicked() { return LeftMouseDown && !LeftMouseDownPrevFrame; }
+
+bool was_middle_mouse_just_clicked() { return MiddleMouseDown && !MiddleMouseDownPrevFrame; }
 
 bool was_right_mouse_just_clicked() { return RightMouseDown && !RightMouseDownPrevFrame; }
 

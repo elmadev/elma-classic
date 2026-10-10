@@ -42,7 +42,7 @@ class checkpoint : clickable {
         : start(&end, coord),
           end(&start, coord + vect2{MINIMUM_LENGTH, 0.0}) {}
 
-    static void editor_update(const game_mouse& pos, bool left_click, bool right_click);
+    static void editor_update(const game_mouse& pos, const mouse_input& input);
     static void render_all(pic8& screen, vect2 corner);
     static void get_closest(const game_mouse& pos, int& dist, clickable*& closest);
 };

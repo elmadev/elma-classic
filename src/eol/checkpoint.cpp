@@ -12,6 +12,7 @@ constexpr unsigned char LINE_COLOR = 25;
 
 std::list<checkpoint> linear_checkpoints;
 
+bool delete_endpoint_if_dropped;
 vect2 last_coord;
 vect2 last_start;
 vect2 last_end;
@@ -21,6 +22,7 @@ vect2 last_end;
 void checkpoint::endpoint::left_clicked(const game_mouse& pos) {
     // Pick up checkpoint end and remember position in case we cancel
     last_coord = this->click_anchor;
+    delete_endpoint_if_dropped = false;
     checkpoint::held_end = this;
     clickable::set_callback(held_callback, pos);
 }
@@ -63,10 +65,17 @@ void checkpoint::endpoint::held_callback(const game_mouse& pos, const mouse_inpu
         held_end = nullptr;
         clickable::reset_callback();
     } else if (input.right_click) {
-        // Restore the checkpoint end to its previous position
-        held_end->set_anchor(last_coord);
-        held_end = nullptr;
-        clickable::reset_callback();
+        if (delete_endpoint_if_dropped) {
+            // Delete a partially created new checkpoint
+            held_end->right_clicked(pos);
+            held_end = nullptr;
+            clickable::reset_callback();
+        } else {
+            // Restore the checkpoint end to its previous position
+            held_end->set_anchor(last_coord);
+            held_end = nullptr;
+            clickable::reset_callback();
+        }
     } else {
         // Update the checkpoint end position
         held_end->set_anchor(coord);
@@ -134,6 +143,7 @@ void checkpoint::editor_click(const game_mouse& pos, const mouse_input& input) {
         // Create a new checkpoint line and hold the end
         linear_checkpoints.emplace_back(coord);
         held_end = &linear_checkpoints.back().end;
+        delete_endpoint_if_dropped = true;
         last_coord = held_end->click_anchor;
         clickable::set_callback(endpoint::held_callback, pos);
     }

@@ -31,6 +31,7 @@ void unlock_backbuffer();
 void get_mouse_position(int* x, int* y);
 void set_mouse_position(int x, int y);
 bool was_left_mouse_just_clicked();
+bool was_middle_mouse_just_clicked();
 bool was_right_mouse_just_clicked();
 void show_cursor();
 void hide_cursor();

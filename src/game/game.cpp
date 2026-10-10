@@ -714,6 +714,11 @@ static void setup_gameloop(const char* filename) {
     Lgr->pal->set();
 }
 
+static void cleanup_gameloop() {
+    Mute = true;
+    Level->unflip_objects();
+}
+
 int WhoDiedFirst = 0;
 bool Player1Finished = false;
 
@@ -876,7 +881,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
                     stop_motor_sound(true);
                     stop_motor_sound(false);
-                    Mute = true;
+
+                    cleanup_gameloop();
 
                     Rec1->encode_frame_count();
                     Rec2->encode_frame_count();
@@ -885,7 +891,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                                               TotalApples, camera_mode == CameraMode::MapViewer);
                     }
 
-                    Level->unflip_objects();
                     if (finish_time) {
                         return finish_time;
                     }
@@ -963,9 +968,9 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
             stop_motor_sound(true);
             stop_motor_sound(false);
-            Mute = true;
 
-            Level->unflip_objects();
+            cleanup_gameloop();
+
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
             if (Single && !InEditor) {
@@ -1198,8 +1203,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             set_friction_volume(0.0);
             delay((int)(LevelEndDelay * 400.0));
 
-            Mute = true;
-            Level->unflip_objects();
+            cleanup_gameloop();
 
             PreviousReplayDrawView1 = driv1.draw_view;
             PreviousReplayDrawView2 = driv2.draw_view;
@@ -1248,9 +1252,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             set_friction_volume(0.0);
             delay((int)(LevelEndDelay * 400.0));
 
-            Mute = true;
-
-            Level->unflip_objects();
+            cleanup_gameloop();
 
             PreviousReplayDrawView1 = driv1.draw_view;
             PreviousReplayDrawView2 = driv2.draw_view;
@@ -1330,5 +1332,5 @@ void render_replay(const char* level_filename) {
     }
 
     VideoRecordingMode = false;
-    Level->unflip_objects();
+    cleanup_gameloop();
 }

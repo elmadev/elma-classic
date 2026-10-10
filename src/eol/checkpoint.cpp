@@ -3,8 +3,10 @@
 #include "physics/init.h"
 #include "pic/pic8.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
 #include <limits>
 #include <list>
+#include <numbers>
 
 namespace {
 
@@ -33,9 +35,30 @@ void checkpoint::endpoint::right_clicked(const game_mouse& pos) {
 }
 
 void checkpoint::endpoint::set_anchor(vect2 coord) {
-    // If line as at least MINIMUM_LENGTH, then set to desired coord
     vect2 direction = coord - other->click_anchor;
     double length = direction.length();
+
+    if (is_key_down(DIK_LSHIFT) || is_key_down(DIK_LSHIFT)) {
+        // Snap to one of 8 cardinal directions
+
+        // Enforce minimum length
+        length = std::max(length, MINIMUM_LENGTH);
+
+        // Round the angle to one of 8 cardinal directions
+        double angle = std::atan2(direction.y, direction.x);
+        constexpr double tau = 2.0 * std::numbers::pi;
+        constexpr double fraction = tau / 8.0;
+        angle = std::round(angle / fraction) * fraction;
+
+        // Set the line along the angle with the correct distance from the other end
+        click_anchor =
+            other->click_anchor + vect2{std::cos(angle) * length, std::sin(angle) * length};
+        return;
+    }
+
+    // No snap (default case)
+
+    // If line as at least MINIMUM_LENGTH, then set to desired coord
     if (length >= MINIMUM_LENGTH) {
         click_anchor = coord;
         return;
@@ -72,7 +95,7 @@ void checkpoint::endpoint::held_callback(const game_mouse& pos, const mouse_inpu
             clickable::reset_callback();
         } else {
             // Restore the checkpoint end to its previous position
-            held_end->set_anchor(last_coord);
+            held_end->click_anchor = last_coord;
             held_end = nullptr;
             clickable::reset_callback();
         }

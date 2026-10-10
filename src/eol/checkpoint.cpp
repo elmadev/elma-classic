@@ -57,7 +57,7 @@ void checkpoint::left_clicked(const game_mouse& pos) {
 
 void checkpoint::right_clicked(const game_mouse& /*pos*/) {}
 
-void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool right_click) {
+void checkpoint::editor_update(const game_mouse& pos, const mouse_input& input) {
     if (!Editor) {
         return;
     }
@@ -67,7 +67,7 @@ void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool righ
     const vect2& coord = *pos.coord;
 
     if (clickable::ClickMode == clickable::Mode::Normal) {
-        if (left_click) {
+        if (input.left_click) {
             // Create a new checkpoint line and hold the end
             linear_checkpoints.emplace_back(coord);
             held_end = &linear_checkpoints.back().end;
@@ -76,12 +76,12 @@ void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool righ
         }
     } else if (clickable::ClickMode == clickable::Mode::CheckpointEndHeld) {
         ELMA_ASSERT(held_end);
-        if (left_click) {
+        if (input.left_click) {
             // Drop the checkpoint end
             held_end->set_anchor(coord);
             held_end = nullptr;
             clickable::ClickMode = clickable::Mode::Normal;
-        } else if (right_click) {
+        } else if (input.right_click) {
             // Restore the checkpoint end to its previous position
             held_end->set_anchor(last_coord);
             held_end = nullptr;
@@ -92,13 +92,13 @@ void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool righ
         }
     } else if (clickable::ClickMode == clickable::Mode::CheckpointLineHeld) {
         ELMA_ASSERT(held_line);
-        if (left_click) {
+        if (input.left_click) {
             // Drop the checkpoint line
             held_line->start.click_anchor = last_start + (coord - last_coord);
             held_line->end.click_anchor = last_end + (coord - last_coord);
             held_line = nullptr;
             clickable::ClickMode = clickable::Mode::Normal;
-        } else if (right_click) {
+        } else if (input.right_click) {
             // Restore the checkpoint line to its previous position
             held_line->start.click_anchor = last_start;
             held_line->end.click_anchor = last_end;

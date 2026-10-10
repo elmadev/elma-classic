@@ -12,6 +12,11 @@ struct game_mouse {
     std::optional<vect2> coord;
 };
 
+struct mouse_input {
+    bool left_click = false;
+    bool right_click = false;
+};
+
 // A clickable item
 struct clickable {
     static constexpr int DEFAULT_RADIUS = 10;

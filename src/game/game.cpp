@@ -637,26 +637,26 @@ static void handle_eol_inputs() {
 
 static void handle_mouse() {
     game_mouse pos = get_mouse_position_game();
-    bool left_click = was_left_mouse_just_clicked();
-    bool right_click = was_right_mouse_just_clicked();
+    mouse_input input = {was_left_mouse_just_clicked(), was_right_mouse_just_clicked()};
 
-    if (clickable::ClickMode == clickable::Mode::Normal && (left_click || right_click)) {
+    if (clickable::ClickMode == clickable::Mode::Normal &&
+        (input.left_click || input.right_click)) {
         int dist = std::numeric_limits<int>::max();
         clickable* closest = nullptr;
         checkpoint::get_closest(pos, dist, closest);
 
         if (closest) {
-            if (left_click) {
+            if (input.left_click) {
                 closest->left_clicked(pos);
             } else {
                 closest->right_clicked(pos);
             }
-            left_click = false;
-            right_click = false;
+            input.left_click = false;
+            input.right_click = false;
         }
     }
 
-    checkpoint::editor_update(pos, left_click, right_click);
+    checkpoint::editor_update(pos, input);
 }
 
 void reload_graphic_assets() {

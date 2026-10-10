@@ -959,7 +959,7 @@ void pic8::line(double x1, double y1, double x2, double y2, unsigned char index)
     int start = std::max(0, (int)std::round(x1));
     int end = std::min(major_axis_length - 1, (int)std::round(x2));
 
-    if (slope == 0.0) {
+    if (std::abs(slope) < 0.00000000001) {
         // Draw straight line
         int j = (int)std::round(intercept);
         if (j < 0 || j >= minor_axis_length) {

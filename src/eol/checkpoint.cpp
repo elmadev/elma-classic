@@ -30,6 +30,8 @@ void checkpoint::endpoint::left_clicked(const game_mouse& pos) {
     clickable::set_callback(held_callback, pos);
 }
 
+void checkpoint::endpoint::middle_clicked(const game_mouse& /*pos*/) {}
+
 void checkpoint::endpoint::right_clicked(const game_mouse& pos) {
     // Delete checkpoint
     parent->right_clicked(pos);
@@ -112,6 +114,8 @@ void checkpoint::left_clicked(const game_mouse& pos) {
     checkpoint::held_line = this;
     clickable::set_callback(held_callback, pos);
 }
+
+void checkpoint::middle_clicked(const game_mouse& /*pos*/) {}
 
 void checkpoint::right_clicked(const game_mouse& /*pos*/) {
     // Delete checkpoint

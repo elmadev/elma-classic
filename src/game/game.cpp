@@ -633,12 +633,13 @@ static void handle_eol_inputs() {
 
 static void handle_mouse() {
     game_mouse pos = get_mouse_position_game();
-    mouse_input input = {was_left_mouse_just_clicked(), was_right_mouse_just_clicked(), false};
+    mouse_input input = {was_left_mouse_just_clicked(), was_middle_mouse_just_clicked(),
+                         was_right_mouse_just_clicked(), false};
 
     if (clickable::callback) {
         // We are holding something - use the callback
         clickable::callback(pos, input);
-    } else if (input.left_click || input.right_click) {
+    } else if (input.left_click || input.middle_click || input.right_click) {
         // No callback - default behaviour
 
         // Click on something
@@ -648,7 +649,9 @@ static void handle_mouse() {
         if (closest) {
             if (input.left_click) {
                 closest->left_clicked(pos);
-            } else {
+            } else if (input.middle_click) {
+                closest->middle_clicked(pos);
+            } else if (input.right_click) {
                 closest->right_clicked(pos);
             }
             return;

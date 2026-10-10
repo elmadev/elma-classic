@@ -15,6 +15,7 @@ struct game_mouse {
 
 struct mouse_input {
     bool left_click = false;
+    bool middle_click = false;
     bool right_click = false;
     bool abort = false;
 };
@@ -32,6 +33,7 @@ struct clickable {
     static void reset_callback() { callback = {}; }
 
     virtual void left_clicked(const game_mouse& pos) = 0;
+    virtual void middle_clicked(const game_mouse& pos) = 0;
     virtual void right_clicked(const game_mouse& pos) = 0;
     virtual int distance(const game_mouse& pos) const = 0;
 

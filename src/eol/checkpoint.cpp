@@ -46,6 +46,26 @@ void checkpoint::endpoint::set_anchor(vect2 coord) {
     click_anchor = other->click_anchor + direction * MINIMUM_LENGTH;
 }
 
+void checkpoint::endpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
+    const vect2& coord = *pos.coord;
+
+    ELMA_ASSERT(held_end);
+    if (input.left_click) {
+        // Drop the checkpoint end
+        held_end->set_anchor(coord);
+        held_end = nullptr;
+        clickable::ClickMode = clickable::Mode::Normal;
+    } else if (input.right_click) {
+        // Restore the checkpoint end to its previous position
+        held_end->set_anchor(last_coord);
+        held_end = nullptr;
+        clickable::ClickMode = clickable::Mode::Normal;
+    } else {
+        // Update the checkpoint end position
+        held_end->set_anchor(coord);
+    }
+}
+
 void checkpoint::left_clicked(const game_mouse& pos) {
     ELMA_ASSERT(pos.coord);
     last_coord = *pos.coord;
@@ -56,6 +76,29 @@ void checkpoint::left_clicked(const game_mouse& pos) {
 }
 
 void checkpoint::right_clicked(const game_mouse& /*pos*/) {}
+
+void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
+    const vect2& coord = *pos.coord;
+
+    ELMA_ASSERT(held_line);
+    if (input.left_click) {
+        // Drop the checkpoint line
+        held_line->start.click_anchor = last_start + (coord - last_coord);
+        held_line->end.click_anchor = last_end + (coord - last_coord);
+        held_line = nullptr;
+        clickable::ClickMode = clickable::Mode::Normal;
+    } else if (input.right_click) {
+        // Restore the checkpoint line to its previous position
+        held_line->start.click_anchor = last_start;
+        held_line->end.click_anchor = last_end;
+        held_line = nullptr;
+        clickable::ClickMode = clickable::Mode::Normal;
+    } else {
+        // Update the checkpoint line position
+        held_line->start.click_anchor = last_start + (coord - last_coord);
+        held_line->end.click_anchor = last_end + (coord - last_coord);
+    }
+}
 
 void checkpoint::editor_update(const game_mouse& pos, const mouse_input& input) {
     if (!Editor) {
@@ -75,40 +118,9 @@ void checkpoint::editor_update(const game_mouse& pos, const mouse_input& input) 
             clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
         }
     } else if (clickable::ClickMode == clickable::Mode::CheckpointEndHeld) {
-        ELMA_ASSERT(held_end);
-        if (input.left_click) {
-            // Drop the checkpoint end
-            held_end->set_anchor(coord);
-            held_end = nullptr;
-            clickable::ClickMode = clickable::Mode::Normal;
-        } else if (input.right_click) {
-            // Restore the checkpoint end to its previous position
-            held_end->set_anchor(last_coord);
-            held_end = nullptr;
-            clickable::ClickMode = clickable::Mode::Normal;
-        } else {
-            // Update the checkpoint end position
-            held_end->set_anchor(coord);
-        }
+        endpoint::held_callback(pos, input);
     } else if (clickable::ClickMode == clickable::Mode::CheckpointLineHeld) {
-        ELMA_ASSERT(held_line);
-        if (input.left_click) {
-            // Drop the checkpoint line
-            held_line->start.click_anchor = last_start + (coord - last_coord);
-            held_line->end.click_anchor = last_end + (coord - last_coord);
-            held_line = nullptr;
-            clickable::ClickMode = clickable::Mode::Normal;
-        } else if (input.right_click) {
-            // Restore the checkpoint line to its previous position
-            held_line->start.click_anchor = last_start;
-            held_line->end.click_anchor = last_end;
-            held_line = nullptr;
-            clickable::ClickMode = clickable::Mode::Normal;
-        } else {
-            // Update the checkpoint line position
-            held_line->start.click_anchor = last_start + (coord - last_coord);
-            held_line->end.click_anchor = last_end + (coord - last_coord);
-        }
+        held_callback(pos, input);
     }
 }
 

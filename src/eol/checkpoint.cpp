@@ -25,7 +25,10 @@ void checkpoint::endpoint::left_clicked(const game_mouse& pos) {
     clickable::set_callback(held_callback, pos);
 }
 
-void checkpoint::endpoint::right_clicked(const game_mouse& /*pos*/) {}
+void checkpoint::endpoint::right_clicked(const game_mouse& pos) {
+    // Delete checkpoint
+    parent->right_clicked(pos);
+}
 
 void checkpoint::endpoint::set_anchor(vect2 coord) {
     // If line as at least MINIMUM_LENGTH, then set to desired coord
@@ -79,7 +82,17 @@ void checkpoint::left_clicked(const game_mouse& pos) {
     clickable::set_callback(held_callback, pos);
 }
 
-void checkpoint::right_clicked(const game_mouse& /*pos*/) {}
+void checkpoint::right_clicked(const game_mouse& /*pos*/) {
+    // Delete checkpoint
+    remove(this);
+}
+
+void checkpoint::remove(checkpoint* target) {
+    auto it = std::find_if(linear_checkpoints.begin(), linear_checkpoints.end(),
+                           [target](const checkpoint& element) { return target == &element; });
+    ELMA_ASSERT(it != linear_checkpoints.end());
+    linear_checkpoints.erase(it);
+}
 
 void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
     ELMA_ASSERT(Editor);

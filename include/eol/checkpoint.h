@@ -31,6 +31,9 @@ class checkpoint : clickable {
     endpoint start;
     endpoint end;
 
+    enum class Polarity { Both, Positive, Negative };
+    Polarity polarity;
+
     void left_clicked(const game_mouse& pos) override;
     void middle_clicked(const game_mouse& pos) override;
     void right_clicked(const game_mouse& pos) override;
@@ -46,7 +49,8 @@ class checkpoint : clickable {
 
     checkpoint(vect2 coord)
         : start(this, &end, coord),
-          end(this, &start, coord + vect2{MINIMUM_LENGTH, 0.0}) {}
+          end(this, &start, coord + vect2{MINIMUM_LENGTH, 0.0}),
+          polarity(Polarity::Both) {}
 
     // Remove a checkpoint from the checkpoint list
     static void remove(checkpoint* target);

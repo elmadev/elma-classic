@@ -30,7 +30,10 @@ void checkpoint::endpoint::left_clicked(const game_mouse& pos) {
     clickable::set_callback(held_callback, pos);
 }
 
-void checkpoint::endpoint::middle_clicked(const game_mouse& /*pos*/) {}
+void checkpoint::endpoint::middle_clicked(const game_mouse& pos) {
+    // Toggle polarity
+    parent->middle_clicked(pos);
+}
 
 void checkpoint::endpoint::right_clicked(const game_mouse& pos) {
     // Delete checkpoint
@@ -115,7 +118,20 @@ void checkpoint::left_clicked(const game_mouse& pos) {
     clickable::set_callback(held_callback, pos);
 }
 
-void checkpoint::middle_clicked(const game_mouse& /*pos*/) {}
+void checkpoint::middle_clicked(const game_mouse& /*pos*/) {
+    // Toggle polarity
+    switch (polarity) {
+    case Polarity::Both:
+        polarity = Polarity::Positive;
+        break;
+    case Polarity::Positive:
+        polarity = Polarity::Negative;
+        break;
+    case Polarity::Negative:
+        polarity = Polarity::Both;
+        break;
+    }
+}
 
 void checkpoint::right_clicked(const game_mouse& /*pos*/) {
     // Delete checkpoint

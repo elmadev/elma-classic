@@ -639,24 +639,28 @@ static void handle_mouse() {
     game_mouse pos = get_mouse_position_game();
     mouse_input input = {was_left_mouse_just_clicked(), was_right_mouse_just_clicked()};
 
-    if (clickable::ClickMode == clickable::Mode::Normal &&
-        (input.left_click || input.right_click)) {
+    if (clickable::callback) {
+        // We are holding something - use the callback
+        (*clickable::callback)(pos, input);
+    } else if (input.left_click || input.right_click) {
+        // No callback - default behaviour
+
+        // Click on something
         int dist = std::numeric_limits<int>::max();
         clickable* closest = nullptr;
         checkpoint::get_closest(pos, dist, closest);
-
         if (closest) {
             if (input.left_click) {
                 closest->left_clicked(pos);
             } else {
                 closest->right_clicked(pos);
             }
-            input.left_click = false;
-            input.right_click = false;
+            return;
         }
-    }
 
-    checkpoint::editor_update(pos, input);
+        // We didn't find anything. Click in thin air
+        checkpoint::editor_click(pos, input);
+    }
 }
 
 void reload_graphic_assets() {

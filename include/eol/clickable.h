@@ -2,6 +2,7 @@
 #define EOL_CLICKABLE_H
 
 #include "vect2.h"
+#include <functional>
 #include <optional>
 
 struct game_mouse {
@@ -21,12 +22,13 @@ struct mouse_input {
 struct clickable {
     static constexpr int DEFAULT_RADIUS = 10;
 
-    enum class Mode {
-        Normal,
-        CheckpointEndHeld,
-        CheckpointLineHeld,
+    using clickable_callback = std::function<void(const game_mouse& pos, const mouse_input& input)>;
+    static inline std::optional<clickable_callback> callback;
+    static inline void set_callback(clickable_callback new_callback, const game_mouse& pos) {
+        callback = new_callback;
+        (*callback)(pos, {}); // Immediately run the callback once with no inputs
     };
-    static inline Mode ClickMode = Mode::Normal;
+    static inline void reset_callback() { callback.reset(); }
 
     virtual void left_clicked(const game_mouse& pos) = 0;
     virtual void right_clicked(const game_mouse& pos) = 0;

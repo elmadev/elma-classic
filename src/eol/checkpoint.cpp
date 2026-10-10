@@ -18,11 +18,11 @@ vect2 last_end;
 
 } // namespace
 
-void checkpoint::endpoint::left_clicked(const game_mouse& /*pos*/) {
+void checkpoint::endpoint::left_clicked(const game_mouse& pos) {
     // Pick up checkpoint end and remember position in case we cancel
     last_coord = this->click_anchor;
     checkpoint::held_end = this;
-    clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
+    clickable::set_callback(held_callback, pos);
 }
 
 void checkpoint::endpoint::right_clicked(const game_mouse& /*pos*/) {}
@@ -47,19 +47,23 @@ void checkpoint::endpoint::set_anchor(vect2 coord) {
 }
 
 void checkpoint::endpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
+    ELMA_ASSERT(Editor);
+    ELMA_ASSERT(held_end);
+    if (!pos.coord) {
+        return;
+    }
     const vect2& coord = *pos.coord;
 
-    ELMA_ASSERT(held_end);
     if (input.left_click) {
         // Drop the checkpoint end
         held_end->set_anchor(coord);
         held_end = nullptr;
-        clickable::ClickMode = clickable::Mode::Normal;
+        clickable::reset_callback();
     } else if (input.right_click) {
         // Restore the checkpoint end to its previous position
         held_end->set_anchor(last_coord);
         held_end = nullptr;
-        clickable::ClickMode = clickable::Mode::Normal;
+        clickable::reset_callback();
     } else {
         // Update the checkpoint end position
         held_end->set_anchor(coord);
@@ -72,27 +76,31 @@ void checkpoint::left_clicked(const game_mouse& pos) {
     last_start = start.click_anchor;
     last_end = end.click_anchor;
     checkpoint::held_line = this;
-    clickable::ClickMode = clickable::Mode::CheckpointLineHeld;
+    clickable::set_callback(held_callback, pos);
 }
 
 void checkpoint::right_clicked(const game_mouse& /*pos*/) {}
 
 void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
+    ELMA_ASSERT(Editor);
+    ELMA_ASSERT(held_line);
+    if (!pos.coord) {
+        return;
+    }
     const vect2& coord = *pos.coord;
 
-    ELMA_ASSERT(held_line);
     if (input.left_click) {
         // Drop the checkpoint line
         held_line->start.click_anchor = last_start + (coord - last_coord);
         held_line->end.click_anchor = last_end + (coord - last_coord);
         held_line = nullptr;
-        clickable::ClickMode = clickable::Mode::Normal;
+        clickable::reset_callback();
     } else if (input.right_click) {
         // Restore the checkpoint line to its previous position
         held_line->start.click_anchor = last_start;
         held_line->end.click_anchor = last_end;
         held_line = nullptr;
-        clickable::ClickMode = clickable::Mode::Normal;
+        clickable::reset_callback();
     } else {
         // Update the checkpoint line position
         held_line->start.click_anchor = last_start + (coord - last_coord);
@@ -100,7 +108,7 @@ void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) 
     }
 }
 
-void checkpoint::editor_update(const game_mouse& pos, const mouse_input& input) {
+void checkpoint::editor_click(const game_mouse& pos, const mouse_input& input) {
     if (!Editor) {
         return;
     }
@@ -109,18 +117,12 @@ void checkpoint::editor_update(const game_mouse& pos, const mouse_input& input) 
     }
     const vect2& coord = *pos.coord;
 
-    if (clickable::ClickMode == clickable::Mode::Normal) {
-        if (input.left_click) {
-            // Create a new checkpoint line and hold the end
-            linear_checkpoints.emplace_back(coord);
-            held_end = &linear_checkpoints.back().end;
-            last_coord = held_end->click_anchor;
-            clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
-        }
-    } else if (clickable::ClickMode == clickable::Mode::CheckpointEndHeld) {
-        endpoint::held_callback(pos, input);
-    } else if (clickable::ClickMode == clickable::Mode::CheckpointLineHeld) {
-        held_callback(pos, input);
+    if (input.left_click) {
+        // Create a new checkpoint line and hold the end
+        linear_checkpoints.emplace_back(coord);
+        held_end = &linear_checkpoints.back().end;
+        last_coord = held_end->click_anchor;
+        clickable::set_callback(endpoint::held_callback, pos);
     }
 }
 

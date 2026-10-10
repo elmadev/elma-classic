@@ -86,7 +86,7 @@ void checkpoint::endpoint::held_callback(const game_mouse& pos, const mouse_inpu
         held_end->set_anchor(coord);
         held_end = nullptr;
         clickable::reset_callback();
-    } else if (input.right_click) {
+    } else if (input.right_click || input.abort) {
         if (delete_endpoint_if_dropped) {
             // Delete a partially created new checkpoint
             held_end->right_clicked(pos);
@@ -139,7 +139,7 @@ void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) 
         held_line->end.click_anchor = last_end + (coord - last_coord);
         held_line = nullptr;
         clickable::reset_callback();
-    } else if (input.right_click) {
+    } else if (input.right_click || input.abort) {
         // Restore the checkpoint line to its previous position
         held_line->start.click_anchor = last_start;
         held_line->end.click_anchor = last_end;

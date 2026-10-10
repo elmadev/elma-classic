@@ -16,6 +16,7 @@ struct game_mouse {
 struct mouse_input {
     bool left_click = false;
     bool right_click = false;
+    bool abort = false;
 };
 
 // A clickable item

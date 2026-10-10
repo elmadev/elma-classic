@@ -633,7 +633,7 @@ static void handle_eol_inputs() {
 
 static void handle_mouse() {
     game_mouse pos = get_mouse_position_game();
-    mouse_input input = {was_left_mouse_just_clicked(), was_right_mouse_just_clicked()};
+    mouse_input input = {was_left_mouse_just_clicked(), was_right_mouse_just_clicked(), false};
 
     if (clickable::callback) {
         // We are holding something - use the callback
@@ -657,6 +657,18 @@ static void handle_mouse() {
         // We didn't find anything. Click in thin air
         checkpoint::editor_click(pos, input);
     }
+}
+
+static void abort_mouse() {
+    if (!clickable::callback) {
+        return;
+    }
+
+    // Drop whatever we are holding
+    game_mouse pos = get_mouse_position_game();
+    mouse_input input;
+    input.abort = true;
+    clickable::callback(pos, input);
 }
 
 void reload_graphic_assets() {
@@ -712,6 +724,8 @@ static void setup_gameloop(const char* filename) {
 static void cleanup_game_loop() {
     Mute = true;
     Level->unflip_objects();
+
+    abort_mouse();
 }
 
 int WhoDiedFirst = 0;

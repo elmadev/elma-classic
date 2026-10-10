@@ -5,6 +5,7 @@
 #include "platform/implementation.h"
 #include "platform/scancode.h"
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <list>
 #include <numbers>
@@ -192,6 +193,7 @@ void checkpoint::editor_click(const game_mouse& pos, const mouse_input& input) {
 }
 
 void checkpoint::render(pic8& screen, vect2 corner) const {
+    // Draw line
     double x1 = start.click_anchor.x - corner.x;
     double y1 = start.click_anchor.y - corner.y;
     double x2 = end.click_anchor.x - corner.x;
@@ -201,6 +203,48 @@ void checkpoint::render(pic8& screen, vect2 corner) const {
     x2 *= MetersToPixels;
     y2 *= MetersToPixels;
     screen.line(x1, y1, x2, y2, LINE_COLOR);
+
+    // Draw polarity
+    if (polarity == Polarity::Both) {
+        return;
+    }
+    // Get polarity direction (orthogonal to checkpoint line)
+    double direction_x = x2 - x1;
+    double direction_y = y2 - y1;
+    double angle = std::atan2(direction_y, direction_x);
+    angle += std::numbers::pi / 2.0;
+    if (polarity == Polarity::Negative) {
+        angle += std::numbers::pi;
+    }
+
+    // Draw an arrow starting at the centerpoint of the checkpoint, scaled based on the length
+    double x_middle = (x1 + x2) / 2.0;
+    double y_middle = (y1 + y2) / 2.0;
+    constexpr double LENGTH = 25.0;
+
+    // Describe arrow in vector space
+    const double TIP = std::sqrt(0.125);
+    vect2 arrow[] = {
+        {-1.5, 0.0}, {-0.5 - TIP, 0.0}, {-0.5, 0.0}, {-0.5 - TIP, TIP}, {-0.5 - TIP, -TIP}};
+
+    // Apply matrix transformation
+    // https://upload.wikimedia.org/wikipedia/commons/2/2c/2D_affine_transformation_matrix.svg
+    // Translate + Scale + Rotate
+    // [1 0 X] [len 0  0] [cos -sin 0] [x] [len*cos -len*sin X][x] [len*cos*x - len*sin*y + X]
+    // [0 1 Y]*[ 0 len 0]*[sin cos  0]*[y]=[len*sin len*cos  Y][y]=[len*sin*x + len*cos*y + Y]
+    // [0 0 1] [ 0  0  1] [ 0   0   1] [1] [   0       0     1][1] [          1              ]
+    for (vect2& point : arrow) {
+        double x = point.x;
+        double y = point.y;
+        point.x = LENGTH * std::cos(angle) * x - LENGTH * std::sin(angle) * y + x_middle;
+        point.y = LENGTH * std::sin(angle) * x + LENGTH * std::cos(angle) * y + y_middle;
+    }
+
+    // Draw arrow
+    screen.line(arrow[0].x, arrow[0].y, arrow[1].x, arrow[1].y, LINE_COLOR);
+    screen.line(arrow[2].x, arrow[2].y, arrow[3].x, arrow[3].y, LINE_COLOR);
+    screen.line(arrow[3].x, arrow[3].y, arrow[4].x, arrow[4].y, LINE_COLOR);
+    screen.line(arrow[4].x, arrow[4].y, arrow[2].x, arrow[2].y, LINE_COLOR);
 }
 
 void checkpoint::render_all(pic8& screen, vect2 corner) {

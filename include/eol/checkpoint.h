@@ -14,6 +14,7 @@ class checkpoint : clickable {
         endpoint* other;
 
         void left_clicked(const game_mouse& pos) override;
+        void middle_clicked(const game_mouse& pos) override;
         void right_clicked(const game_mouse& pos) override;
 
         // Set position while also enforcing the minimum line length
@@ -31,6 +32,7 @@ class checkpoint : clickable {
     endpoint end;
 
     void left_clicked(const game_mouse& pos) override;
+    void middle_clicked(const game_mouse& pos) override;
     void right_clicked(const game_mouse& pos) override;
     int distance(const game_mouse& pos) const override;
     void render(pic8& screen, vect2 corner) const;

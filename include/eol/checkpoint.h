@@ -10,6 +10,7 @@ class checkpoint : clickable {
     static constexpr double MINIMUM_LENGTH = 0.2;
 
     struct endpoint : game_clickable {
+        checkpoint* parent;
         endpoint* other;
 
         void left_clicked(const game_mouse& pos) override;
@@ -20,8 +21,9 @@ class checkpoint : clickable {
 
         static void held_callback(const game_mouse& pos, const mouse_input& input);
 
-        endpoint(endpoint* other, vect2 coord)
+        endpoint(checkpoint* parent, endpoint* other, vect2 coord)
             : game_clickable(coord),
+              parent(parent),
               other(other) {}
     };
 
@@ -41,8 +43,11 @@ class checkpoint : clickable {
     static inline bool Render = false;
 
     checkpoint(vect2 coord)
-        : start(&end, coord),
-          end(&start, coord + vect2{MINIMUM_LENGTH, 0.0}) {}
+        : start(this, &end, coord),
+          end(this, &start, coord + vect2{MINIMUM_LENGTH, 0.0}) {}
+
+    // Remove a checkpoint from the checkpoint list
+    static void remove(checkpoint* target);
 
     static void held_callback(const game_mouse& pos, const mouse_input& input);
     static void editor_click(const game_mouse& pos, const mouse_input& input);

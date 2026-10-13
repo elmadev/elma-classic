@@ -5,9 +5,9 @@
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include <algorithm>
-#include <climits>
 #include <cmath>
 #include <cstring>
+#include <limits>
 #include <memory>
 
 void pic8::allocate(int w, int h) {
@@ -300,7 +300,7 @@ void pic8::spr_open(const char* filename, FILE* h) {
 }
 
 void pic8::spr_save(const char* filename, FILE* h) {
-    if (width > SHRT_MAX || height > SHRT_MAX) {
+    if (width > std::numeric_limits<short>::max() || height > std::numeric_limits<short>::max()) {
         internal_error(std::string("Image is too large to be saved as .spr format!") + filename);
     }
 

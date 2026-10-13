@@ -21,9 +21,9 @@
 #include "platform/implementation.h"
 #include "platform/scancode.h"
 #include "platform/text_input.h"
-#include <climits>
 #include <cstring>
 #include <format>
+#include <limits>
 
 level* Level = nullptr;
 
@@ -695,8 +695,8 @@ void editor() {
 
         bool left_click = was_left_mouse_just_clicked();
         bool right_click = was_right_mouse_just_clicked();
-        int click_x = INT_MAX;
-        int click_y = INT_MAX;
+        int click_x = std::numeric_limits<int>::max();
+        int click_y = std::numeric_limits<int>::max();
         if (left_click || right_click) {
             get_mouse_position_editor(&click_x, &click_y);
             MouseX = click_x;

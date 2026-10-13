@@ -15,9 +15,9 @@
 #include "pic/surface.h"
 #include "renderer/grass.h"
 #include <algorithm>
-#include <climits>
 #include <cmath>
 #include <cstring>
+#include <limits>
 #include <memory>
 
 canvas* CanvasBack = nullptr;
@@ -926,7 +926,7 @@ void canvas::draw_grass_polygon(grass* gr, int* heightmap, int heightmap_length,
         }
 
         // Let's pick the best matching QUP/QDOWN
-        int best_score = INT_MAX;
+        int best_score = std::numeric_limits<int>::max();
         updown* best_qupdown = nullptr;
         int best_slope = 0;
         for (updown& qupdown : gr->elements) {

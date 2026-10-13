@@ -237,8 +237,26 @@ nlohmann_json_dep = dependency('nlohmann_json')
 sdl2_dep = dependency('sdl2',
     static: build_machine.system() == 'windows' or get_option('static_sdl'),
     default_options: {
+        # See this overview: https://wiki.libsdl.org/SDL3/QuickReference
+        # Also see SDL's meson_options.txt
         'test': false,
         'with_main': false,
+
+        # Uninitialized subsystems (https://wiki.libsdl.org/SDL2/SDL_Init)
+        'use_sensor': 'disabled',
+        'use_haptic': 'disabled',
+        'use_joystick': 'disabled',
+        'use_joystick_dinput': 'disabled',
+        'use_joystick_virtual': 'disabled',
+        'use_joystick_wgi': 'disabled',
+        'use_joystick_xinput': 'disabled',
+
+        # Unused hidden subsystems (#define SDL_SUBSYSTEM_DISABLED)
+        'use_cpuinfo': 'disabled', # https://wiki.libsdl.org/SDL2/CategoryCPUInfo
+        'use_filesystem': 'disabled', # https://wiki.libsdl.org/SDL2/CategoryFilesystem
+        'use_hidapi': 'disabled', # Bluetooth, https://wiki.libsdl.org/SDL2/CategoryHIDAPI
+        'use_locale': 'disabled', # https://wiki.libsdl.org/SDL2/CategoryLocale
+        'use_power': 'disabled', # https://wiki.libsdl.org/SDL2/CategoryPower
     }
 )
 

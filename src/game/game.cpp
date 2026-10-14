@@ -633,26 +633,45 @@ static void handle_eol_inputs() {
 
 static void handle_mouse() {
     game_mouse pos = get_mouse_position_game();
-    bool left_click = was_left_mouse_just_clicked();
-    bool right_click = was_right_mouse_just_clicked();
+    mouse_input input = {was_left_mouse_just_clicked(), was_middle_mouse_just_clicked(),
+                         was_right_mouse_just_clicked(), false};
 
-    if (clickable::ClickMode == clickable::Mode::Normal && (left_click || right_click)) {
+    if (clickable::callback) {
+        // We are holding something - use the callback
+        (*clickable::callback)(pos, input);
+    } else if (input.left_click || input.middle_click || input.right_click) {
+        // No callback - default behaviour
+
+        // Click on something
         int dist = std::numeric_limits<int>::max();
         clickable* closest = nullptr;
         checkpoint::get_closest(pos, dist, closest);
-
         if (closest) {
-            if (left_click) {
+            if (input.left_click) {
                 closest->left_clicked(pos);
-            } else {
+            } else if (input.middle_click) {
+                closest->middle_clicked(pos);
+            } else if (input.right_click) {
                 closest->right_clicked(pos);
             }
-            left_click = false;
-            right_click = false;
+            return;
         }
+
+        // We didn't find anything. Click in thin air
+        checkpoint::editor_click(pos, input);
+    }
+}
+
+static void abort_mouse() {
+    if (!clickable::callback) {
+        return;
     }
 
-    checkpoint::editor_update(pos, left_click, right_click);
+    // Drop whatever we are holding
+    game_mouse pos = get_mouse_position_game();
+    mouse_input input;
+    input.abort = true;
+    (*clickable::callback)(pos, input);
 }
 
 void reload_graphic_assets() {
@@ -703,6 +722,13 @@ static void setup_gameloop(const char* filename) {
     OutOfBounds = false;
 
     Lgr->pal->set();
+}
+
+static void cleanup_gameloop() {
+    Mute = true;
+    Level->unflip_objects();
+
+    abort_mouse();
 }
 
 int WhoDiedFirst = 0;
@@ -865,7 +891,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
                     stop_motor_sound(true);
                     stop_motor_sound(false);
-                    Mute = true;
+
+                    cleanup_gameloop();
 
                     Rec1->encode_frame_count();
                     Rec2->encode_frame_count();
@@ -874,7 +901,6 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                                               TotalApples, camera_mode == CameraMode::MapViewer);
                     }
 
-                    Level->unflip_objects();
                     if (finish_time) {
                         return finish_time;
                     }
@@ -952,9 +978,9 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
             stop_motor_sound(true);
             stop_motor_sound(false);
-            Mute = true;
 
-            Level->unflip_objects();
+            cleanup_gameloop();
+
             Rec1->encode_frame_count();
             Rec2->encode_frame_count();
             if (Single && !InEditor) {
@@ -1187,8 +1213,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             set_friction_volume(0.0);
             delay((int)(LevelEndDelay * 400.0));
 
-            Mute = true;
-            Level->unflip_objects();
+            cleanup_gameloop();
 
             PreviousReplayDrawView1 = driv1.draw_view;
             PreviousReplayDrawView2 = driv2.draw_view;
@@ -1237,9 +1262,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
             set_friction_volume(0.0);
             delay((int)(LevelEndDelay * 400.0));
 
-            Mute = true;
-
-            Level->unflip_objects();
+            cleanup_gameloop();
 
             PreviousReplayDrawView1 = driv1.draw_view;
             PreviousReplayDrawView2 = driv2.draw_view;
@@ -1319,5 +1342,5 @@ void render_replay(const char* level_filename) {
     }
 
     VideoRecordingMode = false;
-    Level->unflip_objects();
+    cleanup_gameloop();
 }

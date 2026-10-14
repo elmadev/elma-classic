@@ -3,8 +3,12 @@
 #include "physics/init.h"
 #include "pic/pic8.h"
 #include "platform/implementation.h"
+#include "platform/scancode.h"
+#include <algorithm>
+#include <cmath>
 #include <limits>
 #include <list>
+#include <numbers>
 
 namespace {
 
@@ -12,25 +16,56 @@ constexpr unsigned char LINE_COLOR = 25;
 
 std::list<checkpoint> linear_checkpoints;
 
+bool delete_endpoint_if_dropped;
 vect2 last_coord;
 vect2 last_start;
 vect2 last_end;
 
 } // namespace
 
-void checkpoint::endpoint::left_clicked(const game_mouse& /*pos*/) {
+void checkpoint::endpoint::left_clicked(const game_mouse& pos) {
     // Pick up checkpoint end and remember position in case we cancel
     last_coord = this->click_anchor;
+    delete_endpoint_if_dropped = false;
     checkpoint::held_end = this;
-    clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
+    clickable::set_callback(held_callback, pos);
 }
 
-void checkpoint::endpoint::right_clicked(const game_mouse& /*pos*/) {}
+void checkpoint::endpoint::middle_clicked(const game_mouse& pos) {
+    // Toggle polarity
+    parent->middle_clicked(pos);
+}
+
+void checkpoint::endpoint::right_clicked(const game_mouse& pos) {
+    // Delete checkpoint
+    parent->right_clicked(pos);
+}
 
 void checkpoint::endpoint::set_anchor(vect2 coord) {
-    // If line as at least MINIMUM_LENGTH, then set to desired coord
     vect2 direction = coord - other->click_anchor;
     double length = direction.length();
+
+    if (is_key_down(DIK_LSHIFT) || is_key_down(DIK_LSHIFT)) {
+        // Snap to one of 8 cardinal directions
+
+        // Enforce minimum length
+        length = std::max(length, MINIMUM_LENGTH);
+
+        // Round the angle to one of 8 cardinal directions
+        double angle = std::atan2(direction.y, direction.x);
+        constexpr double tau = 2.0 * std::numbers::pi;
+        constexpr double fraction = tau / 8.0;
+        angle = std::round(angle / fraction) * fraction;
+
+        // Set the line along the angle with the correct distance from the other end
+        click_anchor =
+            other->click_anchor + vect2{std::cos(angle) * length, std::sin(angle) * length};
+        return;
+    }
+
+    // No snap (default case)
+
+    // If line as at least MINIMUM_LENGTH, then set to desired coord
     if (length >= MINIMUM_LENGTH) {
         click_anchor = coord;
         return;
@@ -46,18 +81,101 @@ void checkpoint::endpoint::set_anchor(vect2 coord) {
     click_anchor = other->click_anchor + direction * MINIMUM_LENGTH;
 }
 
+void checkpoint::endpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
+    ELMA_ASSERT(Editor);
+    ELMA_ASSERT(held_end);
+    if (!pos.coord) {
+        return;
+    }
+    const vect2& coord = *pos.coord;
+
+    if (input.left_click) {
+        // Drop the checkpoint end
+        held_end->set_anchor(coord);
+        held_end = nullptr;
+        clickable::reset_callback();
+    } else if (input.right_click || input.abort) {
+        if (delete_endpoint_if_dropped) {
+            // Delete a partially created new checkpoint
+            held_end->right_clicked(pos);
+            held_end = nullptr;
+            clickable::reset_callback();
+        } else {
+            // Restore the checkpoint end to its previous position
+            held_end->click_anchor = last_coord;
+            held_end = nullptr;
+            clickable::reset_callback();
+        }
+    } else {
+        // Update the checkpoint end position
+        held_end->set_anchor(coord);
+    }
+}
+
 void checkpoint::left_clicked(const game_mouse& pos) {
     ELMA_ASSERT(pos.coord);
     last_coord = *pos.coord;
     last_start = start.click_anchor;
     last_end = end.click_anchor;
     checkpoint::held_line = this;
-    clickable::ClickMode = clickable::Mode::CheckpointLineHeld;
+    clickable::set_callback(held_callback, pos);
 }
 
-void checkpoint::right_clicked(const game_mouse& /*pos*/) {}
+void checkpoint::middle_clicked(const game_mouse& /*pos*/) {
+    // Toggle polarity
+    switch (polarity) {
+    case Polarity::Both:
+        polarity = Polarity::Positive;
+        break;
+    case Polarity::Positive:
+        polarity = Polarity::Negative;
+        break;
+    case Polarity::Negative:
+        polarity = Polarity::Both;
+        break;
+    }
+}
 
-void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool right_click) {
+void checkpoint::right_clicked(const game_mouse& /*pos*/) {
+    // Delete checkpoint
+    remove(this);
+}
+
+void checkpoint::remove(checkpoint* target) {
+    auto it = std::find_if(linear_checkpoints.begin(), linear_checkpoints.end(),
+                           [target](const checkpoint& element) { return target == &element; });
+    ELMA_ASSERT(it != linear_checkpoints.end());
+    linear_checkpoints.erase(it);
+}
+
+void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
+    ELMA_ASSERT(Editor);
+    ELMA_ASSERT(held_line);
+    if (!pos.coord) {
+        return;
+    }
+    const vect2& coord = *pos.coord;
+
+    if (input.left_click) {
+        // Drop the checkpoint line
+        held_line->start.click_anchor = last_start + (coord - last_coord);
+        held_line->end.click_anchor = last_end + (coord - last_coord);
+        held_line = nullptr;
+        clickable::reset_callback();
+    } else if (input.right_click || input.abort) {
+        // Restore the checkpoint line to its previous position
+        held_line->start.click_anchor = last_start;
+        held_line->end.click_anchor = last_end;
+        held_line = nullptr;
+        clickable::reset_callback();
+    } else {
+        // Update the checkpoint line position
+        held_line->start.click_anchor = last_start + (coord - last_coord);
+        held_line->end.click_anchor = last_end + (coord - last_coord);
+    }
+}
+
+void checkpoint::editor_click(const game_mouse& pos, const mouse_input& input) {
     if (!Editor) {
         return;
     }
@@ -66,53 +184,18 @@ void checkpoint::editor_update(const game_mouse& pos, bool left_click, bool righ
     }
     const vect2& coord = *pos.coord;
 
-    if (clickable::ClickMode == clickable::Mode::Normal) {
-        if (left_click) {
-            // Create a new checkpoint line and hold the end
-            linear_checkpoints.emplace_back(coord);
-            held_end = &linear_checkpoints.back().end;
-            last_coord = held_end->click_anchor;
-            clickable::ClickMode = clickable::Mode::CheckpointEndHeld;
-        }
-    } else if (clickable::ClickMode == clickable::Mode::CheckpointEndHeld) {
-        ELMA_ASSERT(held_end);
-        if (left_click) {
-            // Drop the checkpoint end
-            held_end->set_anchor(coord);
-            held_end = nullptr;
-            clickable::ClickMode = clickable::Mode::Normal;
-        } else if (right_click) {
-            // Restore the checkpoint end to its previous position
-            held_end->set_anchor(last_coord);
-            held_end = nullptr;
-            clickable::ClickMode = clickable::Mode::Normal;
-        } else {
-            // Update the checkpoint end position
-            held_end->set_anchor(coord);
-        }
-    } else if (clickable::ClickMode == clickable::Mode::CheckpointLineHeld) {
-        ELMA_ASSERT(held_line);
-        if (left_click) {
-            // Drop the checkpoint line
-            held_line->start.click_anchor = last_start + (coord - last_coord);
-            held_line->end.click_anchor = last_end + (coord - last_coord);
-            held_line = nullptr;
-            clickable::ClickMode = clickable::Mode::Normal;
-        } else if (right_click) {
-            // Restore the checkpoint line to its previous position
-            held_line->start.click_anchor = last_start;
-            held_line->end.click_anchor = last_end;
-            held_line = nullptr;
-            clickable::ClickMode = clickable::Mode::Normal;
-        } else {
-            // Update the checkpoint line position
-            held_line->start.click_anchor = last_start + (coord - last_coord);
-            held_line->end.click_anchor = last_end + (coord - last_coord);
-        }
+    if (input.left_click) {
+        // Create a new checkpoint line and hold the end
+        linear_checkpoints.emplace_back(coord);
+        held_end = &linear_checkpoints.back().end;
+        delete_endpoint_if_dropped = true;
+        last_coord = held_end->click_anchor;
+        clickable::set_callback(endpoint::held_callback, pos);
     }
 }
 
 void checkpoint::render(pic8& screen, vect2 corner) const {
+    // Draw line
     double x1 = start.click_anchor.x - corner.x;
     double y1 = start.click_anchor.y - corner.y;
     double x2 = end.click_anchor.x - corner.x;
@@ -122,6 +205,48 @@ void checkpoint::render(pic8& screen, vect2 corner) const {
     x2 *= MetersToPixels;
     y2 *= MetersToPixels;
     screen.line(x1, y1, x2, y2, LINE_COLOR);
+
+    // Draw polarity
+    if (polarity == Polarity::Both) {
+        return;
+    }
+    // Get polarity direction (orthogonal to checkpoint line)
+    double direction_x = x2 - x1;
+    double direction_y = y2 - y1;
+    double angle = std::atan2(direction_y, direction_x);
+    angle += std::numbers::pi / 2.0;
+    if (polarity == Polarity::Negative) {
+        angle += std::numbers::pi;
+    }
+
+    // Draw an arrow starting at the centerpoint of the checkpoint, scaled based on the length
+    double x_middle = (x1 + x2) / 2.0;
+    double y_middle = (y1 + y2) / 2.0;
+    constexpr double LENGTH = 25.0;
+
+    // Describe arrow in vector space
+    const double TIP = std::sqrt(0.125);
+    vect2 arrow[] = {
+        {-1.5, 0.0}, {-0.5 - TIP, 0.0}, {-0.5, 0.0}, {-0.5 - TIP, TIP}, {-0.5 - TIP, -TIP}};
+
+    // Apply matrix transformation
+    // https://upload.wikimedia.org/wikipedia/commons/2/2c/2D_affine_transformation_matrix.svg
+    // Translate + Scale + Rotate
+    // [1 0 X]*[len 0  0] [cos -sin 0] [x] [len*cos -len*sin X][x] [len*cos*x - len*sin*y + X]
+    // [0 1 Y]*[ 0 len 0]*[sin cos  0]*[y]=[len*sin len*cos  Y][y]=[len*sin*x + len*cos*y + Y]
+    // [0 0 1]*[ 0  0  1] [ 0   0   1] [1] [   0       0     1][1] [          1              ]
+    for (vect2& point : arrow) {
+        double x = point.x;
+        double y = point.y;
+        point.x = LENGTH * std::cos(angle) * x - LENGTH * std::sin(angle) * y + x_middle;
+        point.y = LENGTH * std::sin(angle) * x + LENGTH * std::cos(angle) * y + y_middle;
+    }
+
+    // Draw arrow
+    screen.line(arrow[0].x, arrow[0].y, arrow[1].x, arrow[1].y, LINE_COLOR);
+    screen.line(arrow[2].x, arrow[2].y, arrow[3].x, arrow[3].y, LINE_COLOR);
+    screen.line(arrow[3].x, arrow[3].y, arrow[4].x, arrow[4].y, LINE_COLOR);
+    screen.line(arrow[4].x, arrow[4].y, arrow[2].x, arrow[2].y, LINE_COLOR);
 }
 
 void checkpoint::render_all(pic8& screen, vect2 corner) {

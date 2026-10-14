@@ -10,23 +10,32 @@ class checkpoint : clickable {
     static constexpr double MINIMUM_LENGTH = 0.2;
 
     struct endpoint : game_clickable {
+        checkpoint* parent;
         endpoint* other;
 
         void left_clicked(const game_mouse& pos) override;
+        void middle_clicked(const game_mouse& pos) override;
         void right_clicked(const game_mouse& pos) override;
 
         // Set position while also enforcing the minimum line length
         void set_anchor(vect2 coord);
 
-        endpoint(endpoint* other, vect2 coord)
+        static void held_callback(const game_mouse& pos, const mouse_input& input);
+
+        endpoint(checkpoint* parent, endpoint* other, vect2 coord)
             : game_clickable(coord),
+              parent(parent),
               other(other) {}
     };
 
     endpoint start;
     endpoint end;
 
+    enum class Polarity { Both, Positive, Negative };
+    Polarity polarity;
+
     void left_clicked(const game_mouse& pos) override;
+    void middle_clicked(const game_mouse& pos) override;
     void right_clicked(const game_mouse& pos) override;
     int distance(const game_mouse& pos) const override;
     void render(pic8& screen, vect2 corner) const;
@@ -39,10 +48,15 @@ class checkpoint : clickable {
     static inline bool Render = false;
 
     checkpoint(vect2 coord)
-        : start(&end, coord),
-          end(&start, coord + vect2{MINIMUM_LENGTH, 0.0}) {}
+        : start(this, &end, coord),
+          end(this, &start, coord + vect2{MINIMUM_LENGTH, 0.0}),
+          polarity(Polarity::Both) {}
 
-    static void editor_update(const game_mouse& pos, bool left_click, bool right_click);
+    // Remove a checkpoint from the checkpoint list
+    static void remove(checkpoint* target);
+
+    static void held_callback(const game_mouse& pos, const mouse_input& input);
+    static void editor_click(const game_mouse& pos, const mouse_input& input);
     static void render_all(pic8& screen, vect2 corner);
     static void get_closest(const game_mouse& pos, int& dist, clickable*& closest);
 };

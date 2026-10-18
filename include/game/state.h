@@ -78,47 +78,6 @@ class state {
     DikScancode key_increase_screen_size;
     DikScancode key_decrease_screen_size;
     DikScancode key_screenshot;
-    DikScancode key_escape_alias;
-    combo_scancode key_high_quality;
-    combo_scancode key_default_ground_sky;
-    combo_scancode key_zoom_out;
-    combo_scancode key_zoom_in;
-
-    DikScancode key_replay_fast_2x;
-    DikScancode key_replay_fast_4x;
-    DikScancode key_replay_fast_8x;
-    DikScancode key_replay_slow_2x;
-    DikScancode key_replay_slow_4x;
-    DikScancode key_replay_pause;
-    DikScancode key_replay_rewind;
-
-    combo_scancode key_show_others;
-    combo_scancode key_shown_to;
-    combo_scancode key_spy_next_kuski;
-    combo_scancode key_spy_prev_kuski;
-    combo_scancode key_battle_queue;
-    combo_scancode key_download_battle_level;
-    combo_scancode key_download_level;
-    combo_scancode key_players_online;
-    combo_scancode key_best_times;
-    combo_scancode key_battle_results;
-    combo_scancode key_finished_times;
-    combo_scancode key_cycle_finished_times_filter;
-    combo_scancode key_clear_finished_times;
-    combo_scancode key_chat;
-    combo_scancode key_show_chat;
-    combo_scancode key_team_chat;
-    combo_scancode key_pm_next_kuski;
-    combo_scancode key_pm_prev_kuski;
-    combo_scancode key_pm_clear_kuski;
-    combo_scancode key_battle_status;
-    combo_scancode key_battle_leader;
-    combo_scancode key_speedometer;
-    combo_scancode key_download_battle_rec;
-    combo_scancode key_reconnect;
-    combo_scancode key_disconnect;
-    combo_scancode key_toggle_one_wheel_status;
-    combo_scancode key_toggle_last_apple_time;
 
     char editor_filename[20];
     char external_filename[20];

@@ -693,7 +693,7 @@ void eol::spy_prev_kuski() { set_spy_kuski(spy_kuski_id, std::views::reverse(kus
 void eol::toggle_team_chat() {
     is_team_chat = !is_team_chat;
     StatusMessages->add(is_team_chat ? std::format("Team chat on (press {} to chat)",
-                                                   dik_to_string(State->key_chat))
+                                                   dik_to_string(EolSettings->chat_key()))
                                      : "Team chat off");
 }
 

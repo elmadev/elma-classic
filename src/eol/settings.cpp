@@ -572,48 +572,6 @@ void eol_settings::sync_controls_to_state(state* s) {
     s->keys2.brake_alias = EolSettings->brake_alias_key_player_b();
     s->keys1.one_frame_brake = EolSettings->one_frame_brake_key_player_a();
     s->keys2.one_frame_brake = EolSettings->one_frame_brake_key_player_b();
-
-    s->key_escape_alias = EolSettings->escape_alias_key();
-    s->key_high_quality = EolSettings->high_quality_key();
-    s->key_default_ground_sky = EolSettings->default_ground_sky_key();
-    s->key_zoom_out = EolSettings->zoom_out_key();
-    s->key_zoom_in = EolSettings->zoom_in_key();
-
-    s->key_replay_fast_2x = EolSettings->replay_fast_2x_key();
-    s->key_replay_fast_4x = EolSettings->replay_fast_4x_key();
-    s->key_replay_fast_8x = EolSettings->replay_fast_8x_key();
-    s->key_replay_slow_2x = EolSettings->replay_slow_2x_key();
-    s->key_replay_slow_4x = EolSettings->replay_slow_4x_key();
-    s->key_replay_pause = EolSettings->replay_pause_key();
-    s->key_replay_rewind = EolSettings->replay_rewind_key();
-
-    s->key_show_others = EolSettings->show_others_key();
-    s->key_shown_to = EolSettings->shown_to_key();
-    s->key_spy_next_kuski = EolSettings->spy_next_kuski_key();
-    s->key_spy_prev_kuski = EolSettings->spy_prev_kuski_key();
-    s->key_battle_queue = EolSettings->battle_queue_key();
-    s->key_download_battle_level = EolSettings->download_battle_level_key();
-    s->key_download_level = EolSettings->download_level_key();
-    s->key_players_online = EolSettings->players_online_key();
-    s->key_best_times = EolSettings->best_times_key();
-    s->key_battle_results = EolSettings->battle_results_key();
-    s->key_finished_times = EolSettings->finished_times_key();
-    s->key_cycle_finished_times_filter = EolSettings->cycle_finished_times_filter_key();
-    s->key_clear_finished_times = EolSettings->clear_finished_times_key();
-    s->key_chat = EolSettings->chat_key();
-    s->key_show_chat = EolSettings->show_chat_key();
-    s->key_team_chat = EolSettings->team_chat_key();
-    s->key_pm_next_kuski = EolSettings->pm_next_kuski_key();
-    s->key_pm_prev_kuski = EolSettings->pm_prev_kuski_key();
-    s->key_pm_clear_kuski = EolSettings->pm_clear_kuski_key();
-    s->key_battle_status = EolSettings->battle_status_key();
-    s->key_battle_leader = EolSettings->battle_leader_key();
-    s->key_speedometer = EolSettings->speedometer_key();
-    s->key_download_battle_rec = EolSettings->download_battle_rec_key();
-    s->key_reconnect = EolSettings->reconnect_key();
-    s->key_disconnect = EolSettings->disconnect_key();
-    s->key_toggle_one_wheel_status = EolSettings->toggle_one_wheel_status_key();
-    s->key_toggle_last_apple_time = EolSettings->toggle_last_apple_time_key();
 }
 
 void eol_settings::sync_controls_from_state(state* s) {
@@ -627,46 +585,4 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_brake_alias_key_player_b(s->keys2.brake_alias);
     EolSettings->persist_one_frame_brake_key_player_a(s->keys1.one_frame_brake);
     EolSettings->persist_one_frame_brake_key_player_b(s->keys2.one_frame_brake);
-
-    EolSettings->persist_escape_alias_key(s->key_escape_alias);
-    EolSettings->persist_high_quality_key(s->key_high_quality);
-    EolSettings->persist_default_ground_sky_key(s->key_default_ground_sky);
-    EolSettings->persist_zoom_out_key(s->key_zoom_out);
-    EolSettings->persist_zoom_in_key(s->key_zoom_in);
-
-    EolSettings->persist_replay_fast_2x_key(s->key_replay_fast_2x);
-    EolSettings->persist_replay_fast_4x_key(s->key_replay_fast_4x);
-    EolSettings->persist_replay_fast_8x_key(s->key_replay_fast_8x);
-    EolSettings->persist_replay_slow_2x_key(s->key_replay_slow_2x);
-    EolSettings->persist_replay_slow_4x_key(s->key_replay_slow_4x);
-    EolSettings->persist_replay_pause_key(s->key_replay_pause);
-    EolSettings->persist_replay_rewind_key(s->key_replay_rewind);
-
-    EolSettings->persist_show_others_key(s->key_show_others);
-    EolSettings->persist_shown_to_key(s->key_shown_to);
-    EolSettings->persist_spy_next_kuski_key(s->key_spy_next_kuski);
-    EolSettings->persist_spy_prev_kuski_key(s->key_spy_prev_kuski);
-    EolSettings->persist_battle_queue_key(s->key_battle_queue);
-    EolSettings->persist_download_battle_level_key(s->key_download_battle_level);
-    EolSettings->persist_download_level_key(s->key_download_level);
-    EolSettings->persist_players_online_key(s->key_players_online);
-    EolSettings->persist_best_times_key(s->key_best_times);
-    EolSettings->persist_battle_results_key(s->key_battle_results);
-    EolSettings->persist_finished_times_key(s->key_finished_times);
-    EolSettings->persist_cycle_finished_times_filter_key(s->key_cycle_finished_times_filter);
-    EolSettings->persist_clear_finished_times_key(s->key_clear_finished_times);
-    EolSettings->persist_chat_key(s->key_chat);
-    EolSettings->persist_show_chat_key(s->key_show_chat);
-    EolSettings->persist_team_chat_key(s->key_team_chat);
-    EolSettings->persist_pm_next_kuski_key(s->key_pm_next_kuski);
-    EolSettings->persist_pm_prev_kuski_key(s->key_pm_prev_kuski);
-    EolSettings->persist_pm_clear_kuski_key(s->key_pm_clear_kuski);
-    EolSettings->persist_battle_status_key(s->key_battle_status);
-    EolSettings->persist_battle_leader_key(s->key_battle_leader);
-    EolSettings->persist_speedometer_key(s->key_speedometer);
-    EolSettings->persist_download_battle_rec_key(s->key_download_battle_rec);
-    EolSettings->persist_reconnect_key(s->key_reconnect);
-    EolSettings->persist_disconnect_key(s->key_disconnect);
-    EolSettings->persist_toggle_one_wheel_status_key(s->key_toggle_one_wheel_status);
-    EolSettings->persist_toggle_last_apple_time_key(s->key_toggle_last_apple_time);
 }

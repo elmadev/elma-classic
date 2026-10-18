@@ -76,22 +76,22 @@ static void handle_chat_target_keys() {
     }
 
     bool target_changed = false;
-    if (was_key_just_pressed(State->key_pm_next_kuski)) {
+    if (was_key_just_pressed(EolSettings->pm_next_kuski_key())) {
         EolClient->pm_next_kuski();
         target_changed = true;
     }
 
-    if (was_key_just_pressed(State->key_pm_prev_kuski)) {
+    if (was_key_just_pressed(EolSettings->pm_prev_kuski_key())) {
         EolClient->pm_prev_kuski();
         target_changed = true;
     }
 
-    if (was_key_just_pressed(State->key_pm_clear_kuski)) {
+    if (was_key_just_pressed(EolSettings->pm_clear_kuski_key())) {
         EolClient->clear_pm_kuski();
         target_changed = true;
     }
 
-    if (was_key_just_pressed(State->key_team_chat)) {
+    if (was_key_just_pressed(EolSettings->team_chat_key())) {
         EolClient->toggle_team_chat();
         target_changed = true;
     }
@@ -138,14 +138,14 @@ static void toggle_download_prompt() {
 // to prevent key presses from affecting the gameplay.
 static bool handle_console_input() {
     bool was_active = Console->is_input_active();
-    if (was_key_just_pressed(State->key_chat)) {
+    if (was_key_just_pressed(EolSettings->chat_key())) {
         if (Console->is_input_active() ||
             EolSettings->chat_visibility() != ChatVisibility::Hidden) {
             Console->toggle_active();
             push_chat_prompt();
         }
     } else if (Console->is_input_active()) {
-        if (was_key_just_pressed(State->key_download_level)) {
+        if (was_key_just_pressed(EolSettings->download_level_key())) {
             toggle_download_prompt();
         } else {
             handle_chat_target_keys();
@@ -490,99 +490,99 @@ static void physics_frame_turn(driver& driv) {
 }
 
 static void handle_eol_inputs() {
-    if (was_game_key_just_pressed(State->key_show_others)) {
+    if (was_game_key_just_pressed(EolSettings->show_others_key())) {
         EolSettings->set_show_others(!EolSettings->show_others());
         StatusMessages->add(EolSettings->show_others() ? "other players shown"
                                                        : "other players hidden");
     }
 
-    if (was_game_key_just_pressed(State->key_shown_to)) {
+    if (was_game_key_just_pressed(EolSettings->shown_to_key())) {
         EolClient->cycle_shown_to();
     }
 
-    if (was_game_key_just_pressed(State->key_spy_next_kuski)) {
+    if (was_game_key_just_pressed(EolSettings->spy_next_kuski_key())) {
         EolClient->spy_next_kuski();
     }
-    if (was_game_key_just_pressed(State->key_spy_prev_kuski)) {
+    if (was_game_key_just_pressed(EolSettings->spy_prev_kuski_key())) {
         EolClient->spy_prev_kuski();
     }
 
-    if (was_game_key_just_pressed(State->key_battle_queue)) {
+    if (was_game_key_just_pressed(EolSettings->battle_queue_key())) {
         EolClient->toggle_battle_queue();
     }
 
-    if (was_game_key_just_pressed(State->key_download_battle_level)) {
+    if (was_game_key_just_pressed(EolSettings->download_battle_level_key())) {
         EolClient->download_battle_level();
     }
 
-    if (was_game_key_just_pressed(State->key_download_level)) {
+    if (was_game_key_just_pressed(EolSettings->download_level_key())) {
         toggle_download_prompt();
     }
 
-    if (was_game_key_just_pressed(State->key_players_online)) {
+    if (was_game_key_just_pressed(EolSettings->players_online_key())) {
         EolClient->set_table(TableType::PlayersOnline);
     }
 
-    if (was_game_key_just_pressed(State->key_best_times)) {
+    if (was_game_key_just_pressed(EolSettings->best_times_key())) {
         EolClient->toggle_best_times();
     }
 
-    if (was_game_key_just_pressed(State->key_battle_results)) {
+    if (was_game_key_just_pressed(EolSettings->battle_results_key())) {
         EolClient->toggle_battle_results();
     }
 
-    if (was_game_key_just_pressed(State->key_finished_times)) {
+    if (was_game_key_just_pressed(EolSettings->finished_times_key())) {
         EolClient->toggle_finished_times();
     }
-    if (was_game_key_just_pressed(State->key_cycle_finished_times_filter)) {
+    if (was_game_key_just_pressed(EolSettings->cycle_finished_times_filter_key())) {
         EolClient->cycle_finished_times_filter();
     }
-    if (was_game_key_just_pressed(State->key_clear_finished_times)) {
+    if (was_game_key_just_pressed(EolSettings->clear_finished_times_key())) {
         EolClient->clear_finished_times();
     }
 
-    if (was_game_key_just_pressed(State->key_battle_status)) {
+    if (was_game_key_just_pressed(EolSettings->battle_status_key())) {
         EolClient->toggle_battle_status();
     }
-    if (was_game_key_just_pressed(State->key_battle_leader)) {
+    if (was_game_key_just_pressed(EolSettings->battle_leader_key())) {
         EolClient->toggle_show_battle_leader();
     }
-    if (was_game_key_just_pressed(State->key_speedometer)) {
+    if (was_game_key_just_pressed(EolSettings->speedometer_key())) {
         EolSettings->set_show_speedometer(!EolSettings->show_speedometer());
         StatusMessages->add(EolSettings->show_speedometer() ? "speedometer shown"
                                                             : "speedometer hidden");
     }
 
-    if (was_game_key_just_pressed(State->key_download_battle_rec)) {
+    if (was_game_key_just_pressed(EolSettings->download_battle_rec_key())) {
         EolClient->download_battle_win_rec();
     }
 
-    if (was_game_key_just_pressed(State->key_show_chat)) {
+    if (was_game_key_just_pressed(EolSettings->show_chat_key())) {
         Console->cycle_show_chat();
     }
-    if (was_game_key_just_pressed(State->key_team_chat)) {
+    if (was_game_key_just_pressed(EolSettings->team_chat_key())) {
         EolClient->toggle_team_chat();
     }
 
-    if (was_game_key_just_pressed(State->key_reconnect)) {
+    if (was_game_key_just_pressed(EolSettings->reconnect_key())) {
         EolSettings->set_play_offline(false);
         EolClient->disconnect();
         EolClient->connect();
     }
 
-    if (was_game_key_just_pressed(State->key_disconnect)) {
+    if (was_game_key_just_pressed(EolSettings->disconnect_key())) {
         EolSettings->set_play_offline(true);
         EolClient->disconnect();
         StatusMessages->add("disconnected from the server");
     }
 
-    if (was_game_key_just_pressed(State->key_high_quality)) {
+    if (was_game_key_just_pressed(EolSettings->high_quality_key())) {
         State->high_quality = !State->high_quality;
         canvas::invalidate_canvases();
         StatusMessages->add(std::format("Video Detail: {}", State->high_quality ? "High" : "Low"));
     }
 
-    if (was_game_key_just_pressed(State->key_default_ground_sky)) {
+    if (was_game_key_just_pressed(EolSettings->default_ground_sky_key())) {
         int permutation = (EolSettings->default_ground() << 1) | (EolSettings->default_sky() << 0);
         permutation = (permutation + 3) % 4;
         bool ground = (permutation & 0b10) != 0;
@@ -606,25 +606,25 @@ static void handle_eol_inputs() {
         }
     }
 
-    if (was_game_key_just_pressed(State->key_zoom_out)) {
+    if (was_game_key_just_pressed(EolSettings->zoom_out_key())) {
         const double zoom = EolSettings->zoom() - 0.25;
         EolSettings->set_zoom(zoom);
         StatusMessages->add(std::format("Zoom: {:.2f}", EolSettings->zoom()));
     }
 
-    if (was_game_key_just_pressed(State->key_zoom_in)) {
+    if (was_game_key_just_pressed(EolSettings->zoom_in_key())) {
         const double zoom = EolSettings->zoom() + 0.25;
         EolSettings->set_zoom(zoom);
         StatusMessages->add(std::format("Zoom: {:.2f}", EolSettings->zoom()));
     }
 
-    if (was_game_key_just_pressed(State->key_toggle_one_wheel_status)) {
+    if (was_game_key_just_pressed(EolSettings->toggle_one_wheel_status_key())) {
         EolSettings->set_show_one_wheel_status(!EolSettings->show_one_wheel_status());
         StatusMessages->add(EolSettings->show_one_wheel_status() ? "one-wheel status shown"
                                                                  : "one-wheel status hidden");
     }
 
-    if (was_game_key_just_pressed(State->key_toggle_last_apple_time)) {
+    if (was_game_key_just_pressed(EolSettings->toggle_last_apple_time_key())) {
         EolSettings->set_show_last_apple_time(!EolSettings->show_last_apple_time());
         StatusMessages->add(EolSettings->show_last_apple_time() ? "last apple time shown"
                                                                 : "last apple time hidden");
@@ -972,8 +972,8 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         handle_eol_inputs();
         handle_mouse();
 
-        if (!console_was_active &&
-            (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(State->key_escape_alias))) {
+        if (!console_was_active && (was_key_just_pressed(DIK_ESCAPE) ||
+                                    was_key_just_pressed(EolSettings->escape_alias_key()))) {
             WhoDiedFirst = 0;
 
             stop_motor_sound(true);
@@ -1152,24 +1152,24 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
         last_stopwatch = now;
 
         double speed = 1.0;
-        if (is_game_key_down(State->key_replay_fast_2x)) {
+        if (is_game_key_down(EolSettings->replay_fast_2x_key())) {
             speed *= 2.0;
         }
-        if (is_game_key_down(State->key_replay_fast_4x)) {
+        if (is_game_key_down(EolSettings->replay_fast_4x_key())) {
             speed *= 4.0;
         }
-        if (is_game_key_down(State->key_replay_fast_8x)) {
+        if (is_game_key_down(EolSettings->replay_fast_8x_key())) {
             speed *= 8.0;
         }
-        if (is_game_key_down(State->key_replay_slow_2x)) {
+        if (is_game_key_down(EolSettings->replay_slow_2x_key())) {
             speed *= 0.5;
         }
-        if (is_game_key_down(State->key_replay_slow_4x)) {
+        if (is_game_key_down(EolSettings->replay_slow_4x_key())) {
             speed *= 0.25;
         }
 
-        bool rewinding = is_game_key_down(State->key_replay_rewind);
-        bool paused = is_game_key_down(State->key_replay_pause);
+        bool rewinding = is_game_key_down(EolSettings->replay_rewind_key());
+        bool paused = is_game_key_down(EolSettings->replay_pause_key());
 
         if (!paused) {
             if (rewinding) {

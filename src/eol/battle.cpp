@@ -285,7 +285,7 @@ void eol::process(const battle_ended& be) {
     online_apple_battle.clear();
     StatusMessages->add(be.aborted ? "battle aborted"
                                    : std::format("battle over ({} for results)",
-                                                 dik_to_string(State->key_battle_results)));
+                                                 dik_to_string(EolSettings->battle_results_key())));
 }
 
 void eol::toggle_battle_status() const {
@@ -385,7 +385,7 @@ std::string eol::battle_status_line() const {
 
     if ((current_battle->attributes & BattleAttributes::Uploaded) &&
         !current_battle->download_requested) {
-        out += std::format(" ({} to {})", dik_to_string(State->key_download_battle_level),
+        out += std::format(" ({} to {})", dik_to_string(EolSettings->download_battle_level_key()),
                            current_battle->level_exists ? "rewrite" : "download");
     }
 

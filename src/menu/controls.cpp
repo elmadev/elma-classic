@@ -6,46 +6,74 @@
 #include "platform/implementation.h"
 #include "platform/scancode.h"
 #include <format>
+#include <functional>
+#include <optional>
 #include <ranges>
 #include <vector>
 
-// A list of pointers to where the keys are stored (somewhere in a state class object)
-struct scancode_pointer {
-    DikScancode* dik;
-    combo_scancode* combo;
+struct control {
+    bool combo;
+    std::function<combo_scancode()> getter;
+    std::function<void(combo_scancode)> setter;
+
+    control()
+        : getter([]() { return DIK_NONE; }) {}
+    control(bool combo, std::function<combo_scancode()> getter,
+            std::function<void(combo_scancode)> setter)
+        : combo(combo),
+          getter(std::move(getter)),
+          setter(std::move(setter)) {}
 };
-using key_pointers = std::vector<scancode_pointer>;
 
+using controls = std::vector<control>;
 constexpr int UNIVERSAL_KEYS_START = 5;
-static key_pointers UniversalKeys; // +/- and Screenshot
-static key_pointers Player1Keys;
-static key_pointers Player2Keys;
-static key_pointers ReplayKeys;
-static key_pointers FunctionKeys;
+static controls UniversalKeys;
+static controls Player1Keys;
+static controls Player2Keys;
+static controls ReplayKeys;
+static controls FunctionKeys;
 
-// Setup the menu to display one control key
-template <typename Scancode>
-static void load_control(menu_nav* nav, key_pointers& keys, std::string label, Scancode* key) {
-    if constexpr (std::is_same_v<Scancode, DikScancode>) {
-        keys.emplace_back(scancode_pointer{key, nullptr});
-    } else {
-        keys.emplace_back(scancode_pointer{nullptr, key});
-    }
+static void load_control(menu_nav* nav, controls& keys, std::string label, bool combo,
+                         const std::function<combo_scancode()>& getter,
+                         const std::function<void(combo_scancode)>& setter) {
+    control& ctrl = keys.emplace_back(combo, getter, setter);
     if (!nav) {
         return;
     }
-    nav->add_row(std::move(label), dik_to_string(*key));
+    nav->add_row(std::move(label), dik_to_string(ctrl.getter()));
     if (keys.size() != nav->row_count()) {
-        internal_error("load_control key_pointers desynced from menu_nav!");
+        internal_error("load_control controls desynced from menu_nav!");
     }
 }
 
+static void load_control_state(menu_nav* nav, controls& keys, std::string label, DikScancode* key) {
+    load_control(
+        nav, keys, std::move(label), false, [key]() { return combo_scancode(*key); },
+        [key](combo_scancode new_key) { *key = new_key.key; });
+}
+
+#define LOAD_SETTING_DIK(nav, keys, label, setting)                                                \
+    do {                                                                                           \
+        static_assert(std::is_same_v<decltype(EolSettings->setting()), DikScancode>);              \
+        load_control(                                                                              \
+            nav, keys, label, false, []() { return combo_scancode(EolSettings->setting()); },      \
+            [](combo_scancode new_key) { EolSettings->persist_##setting(new_key.key); });          \
+    } while (0)
+
+#define LOAD_SETTING_COMBO(nav, keys, label, setting)                                              \
+    do {                                                                                           \
+        static_assert(std::is_same_v<decltype(EolSettings->setting()), combo_scancode>);           \
+        load_control(                                                                              \
+            nav, keys, label, true, []() { return EolSettings->setting(); },                       \
+            [](combo_scancode new_key) { EolSettings->persist_##setting(new_key); });              \
+    } while (0)
+
 // Disallow multiple controls being mapped to the same key
-static void deduplicate_controls(DikScancode keycode) {
-    auto clear_matches = [keycode](const key_pointers& keys) {
-        for (const scancode_pointer& key : keys) {
-            if (key.dik && *key.dik == keycode) {
-                *key.dik = DIK_NONE;
+static void deduplicate_controls(combo_scancode keycode) {
+    auto clear_matches = [keycode](const controls& keys) {
+        for (const control& key : keys) {
+            if (key.getter() == keycode) {
+                key.setter(DIK_NONE);
             }
         }
     };
@@ -54,15 +82,15 @@ static void deduplicate_controls(DikScancode keycode) {
     clear_matches(Player2Keys);
 }
 
-static void prompt_control_dik(menu_nav& nav, DikScancode* key) {
+static std::optional<DikScancode> prompt_control_dik(menu_nav& nav) {
     // Render only!
     nav.navigate(true);
     while (true) {
         handle_events();
+        if (is_key_down(DIK_ESCAPE)) {
+            return std::nullopt;
+        }
         for (DikScancode keycode = 1; keycode < MaxKeycode; keycode++) {
-            if (is_key_down(DIK_ESCAPE)) {
-                return;
-            }
             if (keycode == DIK_RETURN || keycode == DIK_ESCAPE) {
                 continue;
             }
@@ -70,8 +98,7 @@ static void prompt_control_dik(menu_nav& nav, DikScancode* key) {
                 continue;
             }
             deduplicate_controls(keycode);
-            *key = keycode;
-            return;
+            return keycode;
         }
         nav.render();
     }
@@ -81,15 +108,15 @@ static bool is_valid_modifier(DikScancode key) {
     return std::ranges::find(MODIFIERS, key) != std::ranges::end(MODIFIERS);
 }
 
-static void prompt_control_combo(menu_nav& nav, combo_scancode* key) {
+static std::optional<combo_scancode> prompt_control_combo(menu_nav& nav) {
     // Render only!
     nav.navigate(true);
     while (true) {
         handle_events();
+        if (is_key_down(DIK_ESCAPE)) {
+            return std::nullopt;
+        }
         for (DikScancode keycode = 1; keycode < MaxKeycode; keycode++) {
-            if (is_key_down(DIK_ESCAPE)) {
-                return;
-            }
             if (keycode == DIK_RETURN || keycode == DIK_ESCAPE) {
                 continue;
             }
@@ -99,103 +126,109 @@ static void prompt_control_combo(menu_nav& nav, combo_scancode* key) {
             if (!is_key_down(keycode)) {
                 continue;
             }
-            *key = keycode;
+            combo_scancode key = keycode;
             auto modifier = std::ranges::find_if(MODIFIERS, is_key_down);
             if (modifier != MODIFIERS.end()) {
-                key->modifier = *modifier;
+                key.modifier = *modifier;
             }
-            return;
+            return key;
         }
         nav.render();
     }
 }
 
 // Await keypress to choose a new key for one control
-static void prompt_control(menu_nav& nav, key_pointers& keys, int index) {
+static void prompt_control(menu_nav& nav, controls& keys, int index) {
     nav.entry_right(index) = "_";
-    if (keys[index].dik) {
-        prompt_control_dik(nav, keys[index].dik);
+    control& ctrl = keys[index];
+    if (ctrl.combo) {
+        std::optional<combo_scancode> new_key = prompt_control_combo(nav);
+        if (new_key) {
+            ctrl.setter(*new_key);
+        }
     } else {
-        prompt_control_combo(nav, keys[index].combo);
+        std::optional<DikScancode> new_key = prompt_control_dik(nav);
+        if (new_key) {
+            ctrl.setter(*new_key);
+        }
     }
 }
 
 // Setup the menu to display the universal controls
 static void load_universal_controls(menu_nav* nav) {
     UniversalKeys.resize(UNIVERSAL_KEYS_START);
-    load_control(nav, UniversalKeys, "Inc. Screen Size", &State->key_increase_screen_size);
-    load_control(nav, UniversalKeys, "Dec. Screen Size", &State->key_decrease_screen_size);
-    load_control(nav, UniversalKeys, "Make a Screenshot", &State->key_screenshot);
-    load_control(nav, UniversalKeys, "Escape Alias", &State->key_escape_alias);
-    load_control(nav, UniversalKeys, "Toggle Video Detail", &State->key_high_quality);
-    load_control(nav, UniversalKeys, "Toggle Ground/Sky", &State->key_default_ground_sky);
-    load_control(nav, UniversalKeys, "Zoom Out", &State->key_zoom_out);
-    load_control(nav, UniversalKeys, "Zoom In", &State->key_zoom_in);
+    load_control_state(nav, UniversalKeys, "Inc. Screen Size", &State->key_increase_screen_size);
+    load_control_state(nav, UniversalKeys, "Dec. Screen Size", &State->key_decrease_screen_size);
+    load_control_state(nav, UniversalKeys, "Make a Screenshot", &State->key_screenshot);
+    LOAD_SETTING_DIK(nav, UniversalKeys, "Escape Alias", escape_alias_key);
+    LOAD_SETTING_COMBO(nav, UniversalKeys, "Toggle Video Detail", high_quality_key);
+    LOAD_SETTING_COMBO(nav, UniversalKeys, "Toggle Ground/Sky", default_ground_sky_key);
+    LOAD_SETTING_COMBO(nav, UniversalKeys, "Zoom Out", zoom_out_key);
+    LOAD_SETTING_COMBO(nav, UniversalKeys, "Zoom In", zoom_in_key);
 }
 
 // Setup the menu to display the replay controls
 static void load_replay_controls(menu_nav* nav) {
     ReplayKeys.resize(0);
-    load_control(nav, ReplayKeys, "Fast forward 2x", &State->key_replay_fast_2x);
-    load_control(nav, ReplayKeys, "Fast forward 4x", &State->key_replay_fast_4x);
-    load_control(nav, ReplayKeys, "Fast forward 8x", &State->key_replay_fast_8x);
-    load_control(nav, ReplayKeys, "Slow motion 2x", &State->key_replay_slow_2x);
-    load_control(nav, ReplayKeys, "Slow motion 4x", &State->key_replay_slow_4x);
-    load_control(nav, ReplayKeys, "Pause", &State->key_replay_pause);
-    load_control(nav, ReplayKeys, "Rewind", &State->key_replay_rewind);
+    LOAD_SETTING_DIK(nav, ReplayKeys, "Fast forward 2x", replay_fast_2x_key);
+    LOAD_SETTING_DIK(nav, ReplayKeys, "Fast forward 4x", replay_fast_4x_key);
+    LOAD_SETTING_DIK(nav, ReplayKeys, "Fast forward 8x", replay_fast_8x_key);
+    LOAD_SETTING_DIK(nav, ReplayKeys, "Slow motion 2x", replay_slow_2x_key);
+    LOAD_SETTING_DIK(nav, ReplayKeys, "Slow motion 4x", replay_slow_4x_key);
+    LOAD_SETTING_DIK(nav, ReplayKeys, "Pause", replay_pause_key);
+    LOAD_SETTING_DIK(nav, ReplayKeys, "Rewind", replay_rewind_key);
 }
 
 // Setup the menu to display one player's controls
-static void load_player_controls(menu_nav* nav, key_pointers& keys, player_keys* player_controls) {
+static void load_player_controls(menu_nav* nav, controls& keys, player_keys* player_controls) {
     keys.resize(0);
-    load_control(nav, keys, "Throttle", &player_controls->gas);
-    load_control(nav, keys, "Brake", &player_controls->brake);
-    load_control(nav, keys, "Brake Alias", &player_controls->brake_alias);
-    load_control(nav, keys, "One Frame Brake", &player_controls->one_frame_brake);
-    load_control(nav, keys, "Rotate left", &player_controls->left_volt);
-    load_control(nav, keys, "Rotate right", &player_controls->right_volt);
-    load_control(nav, keys, "Alovolt", &player_controls->alovolt);
-    load_control(nav, keys, "Change direction", &player_controls->turn);
-    load_control(nav, keys, "Toggle Minimap", &player_controls->toggle_minimap);
-    load_control(nav, keys, "Toggle Time", &player_controls->toggle_timer);
-    load_control(nav, keys, "Toggle Show/Hide", &player_controls->toggle_visibility);
+    load_control_state(nav, keys, "Throttle", &player_controls->gas);
+    load_control_state(nav, keys, "Brake", &player_controls->brake);
+    load_control_state(nav, keys, "Brake Alias", &player_controls->brake_alias);
+    load_control_state(nav, keys, "One Frame Brake", &player_controls->one_frame_brake);
+    load_control_state(nav, keys, "Rotate left", &player_controls->left_volt);
+    load_control_state(nav, keys, "Rotate right", &player_controls->right_volt);
+    load_control_state(nav, keys, "Alovolt", &player_controls->alovolt);
+    load_control_state(nav, keys, "Change direction", &player_controls->turn);
+    load_control_state(nav, keys, "Toggle Minimap", &player_controls->toggle_minimap);
+    load_control_state(nav, keys, "Toggle Time", &player_controls->toggle_timer);
+    load_control_state(nav, keys, "Toggle Show/Hide", &player_controls->toggle_visibility);
 }
 
 // Setup the menu to display EOL function key controls
 static void load_function_controls(menu_nav* nav) {
     FunctionKeys.resize(0);
-    load_control(nav, FunctionKeys, "Show Others", &State->key_show_others);
-    load_control(nav, FunctionKeys, "Shown To", &State->key_shown_to);
-    load_control(nav, FunctionKeys, "Spy Next Kuski", &State->key_spy_next_kuski);
-    load_control(nav, FunctionKeys, "Spy Prev Kuski", &State->key_spy_prev_kuski);
-    load_control(nav, FunctionKeys, "Battle Queue", &State->key_battle_queue);
-    load_control(nav, FunctionKeys, "Download Battle Level", &State->key_download_battle_level);
-    load_control(nav, FunctionKeys, "Download Level", &State->key_download_level);
-    load_control(nav, FunctionKeys, "Players Online", &State->key_players_online);
-    load_control(nav, FunctionKeys, "Best Times", &State->key_best_times);
-    load_control(nav, FunctionKeys, "Battle Results", &State->key_battle_results);
-    load_control(nav, FunctionKeys, "Finished Times", &State->key_finished_times);
-    load_control(nav, FunctionKeys, "Finished Times Filter",
-                 &State->key_cycle_finished_times_filter);
-    load_control(nav, FunctionKeys, "Clear Finished Times", &State->key_clear_finished_times);
-    load_control(nav, FunctionKeys, "Chat", &State->key_chat);
-    load_control(nav, FunctionKeys, "Show Chat", &State->key_show_chat);
-    load_control(nav, FunctionKeys, "Team Chat", &State->key_team_chat);
-    load_control(nav, FunctionKeys, "PM Next Kuski", &State->key_pm_next_kuski);
-    load_control(nav, FunctionKeys, "PM Prev Kuski", &State->key_pm_prev_kuski);
-    load_control(nav, FunctionKeys, "PM Clear", &State->key_pm_clear_kuski);
-    load_control(nav, FunctionKeys, "Hide Battle Status", &State->key_battle_status);
-    load_control(nav, FunctionKeys, "Hide Battle Leader", &State->key_battle_leader);
-    load_control(nav, FunctionKeys, "Show Speedometer", &State->key_speedometer);
-    load_control(nav, FunctionKeys, "Download Battle Rec", &State->key_download_battle_rec);
-    load_control(nav, FunctionKeys, "Reconnect", &State->key_reconnect);
-    load_control(nav, FunctionKeys, "Disconnect", &State->key_disconnect);
-    load_control(nav, FunctionKeys, "Show Last Apple Time", &State->key_toggle_last_apple_time);
-    load_control(nav, FunctionKeys, "Show One-Wheel Status", &State->key_toggle_one_wheel_status);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Show Others", show_others_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Shown To", shown_to_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Spy Next Kuski", spy_next_kuski_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Spy Prev Kuski", spy_prev_kuski_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Battle Queue", battle_queue_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Download Battle Level", download_battle_level_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Download Level", download_level_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Players Online", players_online_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Best Times", best_times_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Battle Results", battle_results_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Finished Times", finished_times_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Finished Times Filter", cycle_finished_times_filter_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Clear Finished Times", clear_finished_times_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Chat", chat_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Show Chat", show_chat_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Team Chat", team_chat_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "PM Next Kuski", pm_next_kuski_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "PM Prev Kuski", pm_prev_kuski_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "PM Clear", pm_clear_kuski_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Hide Battle Status", battle_status_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Hide Battle Leader", battle_leader_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Show Speedometer", speedometer_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Download Battle Rec", download_battle_rec_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Reconnect", reconnect_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Disconnect", disconnect_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Show Last Apple Time", toggle_last_apple_time_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Show One-Wheel Status", toggle_one_wheel_status_key);
 }
 
 // Menu to change controls for one player
-static void menu_customize_player(key_pointers& keys, player_keys* player_controls,
+static void menu_customize_player(controls& keys, player_keys* player_controls,
                                   char player_letter) {
     int choice = 0;
     while (true) {

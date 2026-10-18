@@ -144,6 +144,7 @@ class eol_settings {
     Default<combo_scancode> finished_times_key_{combo_scancode{DIK_NONE, DIK_F7}};
     Default<combo_scancode> cycle_finished_times_filter_key_{combo_scancode{DIK_LSHIFT, DIK_F7}};
     Default<combo_scancode> clear_finished_times_key_{combo_scancode{DIK_LCONTROL, DIK_F7}};
+    Default<combo_scancode> toggle_last_apple_time_key_{combo_scancode{DIK_LCONTROL, DIK_F8}};
     Default<combo_scancode> chat_key_{combo_scancode{DIK_NONE, DIK_F9}};
     Default<combo_scancode> show_chat_key_{combo_scancode{DIK_LSHIFT, DIK_F9}};
     Default<combo_scancode> team_chat_key_{combo_scancode{DIK_LCONTROL, DIK_F9}};
@@ -154,10 +155,9 @@ class eol_settings {
     Default<combo_scancode> battle_leader_key_{combo_scancode{DIK_LSHIFT, DIK_F10}};
     Default<combo_scancode> speedometer_key_{combo_scancode{DIK_LCONTROL, DIK_F10}};
     Default<combo_scancode> download_battle_rec_key_{combo_scancode{DIK_NONE, DIK_F11}};
+    Default<combo_scancode> toggle_one_wheel_status_key_{combo_scancode{DIK_LCONTROL, DIK_F11}};
     Default<combo_scancode> reconnect_key_{combo_scancode{DIK_NONE, DIK_F12}};
     Default<combo_scancode> disconnect_key_{combo_scancode{DIK_LSHIFT, DIK_F12}};
-    Default<combo_scancode> toggle_one_wheel_status_key_{combo_scancode{DIK_LCONTROL, DIK_F11}};
-    Default<combo_scancode> toggle_last_apple_time_key_{combo_scancode{DIK_LCONTROL, DIK_F8}};
 
     Default<std::string> default_lgr_name_{"default"};
     Default<bool> fancyboost_{true};

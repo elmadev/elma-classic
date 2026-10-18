@@ -211,6 +211,7 @@ static void load_function_controls(menu_nav* nav) {
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Finished Times", finished_times_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Finished Times Filter", cycle_finished_times_filter_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Clear Finished Times", clear_finished_times_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Show Last Apple Time", toggle_last_apple_time_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Chat", chat_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Show Chat", show_chat_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Team Chat", team_chat_key);
@@ -221,10 +222,9 @@ static void load_function_controls(menu_nav* nav) {
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Hide Battle Leader", battle_leader_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Show Speedometer", speedometer_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Download Battle Rec", download_battle_rec_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Show One-Wheel Status", toggle_one_wheel_status_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Reconnect", reconnect_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Disconnect", disconnect_key);
-    LOAD_SETTING_COMBO(nav, FunctionKeys, "Show Last Apple Time", toggle_last_apple_time_key);
-    LOAD_SETTING_COMBO(nav, FunctionKeys, "Show One-Wheel Status", toggle_one_wheel_status_key);
 }
 
 // Menu to change controls for one player

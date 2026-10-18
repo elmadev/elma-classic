@@ -586,3 +586,11 @@ void eol_settings::sync_controls_from_state(state* s) {
     EolSettings->persist_one_frame_brake_key_player_a(s->keys1.one_frame_brake);
     EolSettings->persist_one_frame_brake_key_player_b(s->keys2.one_frame_brake);
 }
+
+#define JSON_FIELD(name)                                                                           \
+    if constexpr (std::is_same_v<decltype(EolSettings->name()), DikScancode> ||                    \
+                  std::is_same_v<decltype(EolSettings->name()), combo_scancode>) {                 \
+        persist_##name(name##_default());                                                          \
+    }
+void eol_settings::reset_keys() { FIELD_LIST }
+#undef JSON_FIELD

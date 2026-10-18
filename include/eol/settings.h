@@ -229,6 +229,7 @@ class eol_settings {
     static void write_settings();
     static void sync_controls_to_state(state* s);
     static void sync_controls_from_state(state* s);
+    void reset_keys();
 
     DECLARE_SETTING(screen_width);
     DECLARE_SETTING(screen_height);

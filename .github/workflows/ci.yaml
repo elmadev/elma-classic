@@ -124,6 +124,17 @@ jobs:
             libegl-dev libgbm-dev \
             libpulse-dev libasound2-dev libdbus-1-dev libudev-dev libibus-1.0-dev
 
+      - name: Configure system dependencies (macos-26)
+        if: matrix.os == 'macos-26'
+        run: |
+          # latest libcurl port to meson is curl-8.12.1
+          # curl-8.12.1 only supports openssl 3
+          # curl-8.20.0 supports openssl 4.0
+          # curl-8.23.0 supports openssl 4.1
+          # downgrade openssl from 4 to 3
+          OPENSSL_PREFIX="$(brew --prefix openssl@3)"
+          echo "PKG_CONFIG_PATH=$OPENSSL_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" >> "$GITHUB_ENV"
+
       - name: Visual Studio
         if: runner.os == 'windows'
         uses: microsoft/setup-msbuild@v3

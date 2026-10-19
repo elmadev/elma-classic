@@ -117,6 +117,9 @@ class eol {
 
     static pic8* load_shirt(std::string_view nick);
 
+    bool levels_locked() { return levels_locked_; }
+    void toggle_levels_locked() { levels_locked_ = !levels_locked_; }
+
   private:
     eol_table* table_for(TableType);
     void select_table(TableType);
@@ -180,6 +183,7 @@ class eol {
     int min_spy_frames = 3;
     bool is_team_chat = false;
     std::optional<unsigned int> pm_kuski_id;
+    bool levels_locked_ = true;
 };
 
 extern eol* EolClient;

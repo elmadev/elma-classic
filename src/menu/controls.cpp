@@ -83,6 +83,9 @@ static void deduplicate_controls(combo_scancode keycode) {
 }
 
 static std::optional<DikScancode> prompt_control_dik(menu_nav& nav) {
+    if (is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU)) {
+        return DIK_NONE;
+    }
     // Render only!
     nav.navigate(true);
     while (true) {
@@ -109,6 +112,9 @@ static bool is_valid_modifier(DikScancode key) {
 }
 
 static std::optional<combo_scancode> prompt_control_combo(menu_nav& nav) {
+    if (is_key_down(DIK_LCONTROL) && is_key_down(DIK_LMENU)) {
+        return DIK_NONE;
+    }
     // Render only!
     nav.navigate(true);
     while (true) {

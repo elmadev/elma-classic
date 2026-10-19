@@ -70,6 +70,7 @@
 * Numpad NumLock is supported (bike controls linked to numpad always work regardless of NumLock)
 * Key repeat can be used for typing and for scrolling up/down the menu
 * Mouse wheel scrolls up/down the menu and in the editor
+* Keys can be unbound via Ctrl+Alt+Enter in the Customize Controls menu
 
 ### Errors
 * message.inf is no longer required to view error messages, and error messages are in English

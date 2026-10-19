@@ -136,6 +136,7 @@ class eol_settings {
     Default<combo_scancode> spy_next_kuski_key_{combo_scancode{DIK_NONE, DIK_F2}};
     Default<combo_scancode> spy_prev_kuski_key_{combo_scancode{DIK_LSHIFT, DIK_F2}};
     Default<combo_scancode> battle_queue_key_{combo_scancode{DIK_NONE, DIK_F3}};
+    Default<combo_scancode> toggle_locked_levels_key_{combo_scancode{DIK_LSHIFT, DIK_F3}};
     Default<combo_scancode> download_battle_level_key_{combo_scancode{DIK_NONE, DIK_F4}};
     Default<combo_scancode> download_level_key_{combo_scancode{DIK_LCONTROL, DIK_F4}};
     Default<combo_scancode> players_online_key_{combo_scancode{DIK_NONE, DIK_F5}};
@@ -275,6 +276,7 @@ class eol_settings {
     DECLARE_SETTING(spy_next_kuski_key);
     DECLARE_SETTING(spy_prev_kuski_key);
     DECLARE_SETTING(battle_queue_key);
+    DECLARE_SETTING(toggle_locked_levels_key);
     DECLARE_SETTING(download_battle_level_key);
     DECLARE_SETTING(download_level_key);
     DECLARE_SETTING(players_online_key);

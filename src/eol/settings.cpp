@@ -423,6 +423,7 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(spy_next_kuski_key)                                                                 \
     JSON_FIELD(spy_prev_kuski_key)                                                                 \
     JSON_FIELD(battle_queue_key)                                                                   \
+    JSON_FIELD(toggle_locked_levels_key)                                                           \
     JSON_FIELD(download_battle_level_key)                                                          \
     JSON_FIELD(download_level_key)                                                                 \
     JSON_FIELD(players_online_key)                                                                 \
@@ -599,6 +600,7 @@ void eol_settings::reset_keys() {
     RESET_KEY(spy_next_kuski_key);
     RESET_KEY(spy_prev_kuski_key);
     RESET_KEY(battle_queue_key);
+    RESET_KEY(toggle_locked_levels_key);
     RESET_KEY(download_battle_level_key);
     RESET_KEY(download_level_key);
     RESET_KEY(players_online_key);

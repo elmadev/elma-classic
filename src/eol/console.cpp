@@ -25,6 +25,22 @@
 
 console* Console = nullptr;
 
+bool is_game_key_down(DikScancode code) {
+    if (Console->is_input_active()) {
+        return false;
+    }
+    return is_key_down(code);
+}
+
+template <typename Scancode> bool was_game_key_just_pressed(Scancode code) {
+    if (Console->is_input_active()) {
+        return false;
+    }
+    return was_key_just_pressed(code);
+}
+template bool was_game_key_just_pressed<DikScancode>(DikScancode code);
+template bool was_game_key_just_pressed<combo_scancode>(combo_scancode code);
+
 static std::optional<bool> parse_bool(std::string_view text) {
     if (text.empty()) {
         return std::nullopt;

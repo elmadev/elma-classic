@@ -155,47 +155,10 @@ static bool handle_console_input() {
     return was_active;
 }
 
-static bool is_game_key_down(DikScancode code) {
-    if (Console->is_input_active()) {
-        return false;
-    }
-    return is_key_down(code);
-}
-
-template <typename Scancode> static bool was_game_key_just_pressed(Scancode code) {
-    if (Console->is_input_active()) {
-        return false;
-    }
-    return was_key_just_pressed(code);
-}
-
 static void latch_one_frame_brake(driver& driv) {
     if (was_game_key_just_pressed(driv.keys->one_frame_brake)) {
         driv.one_frame_brake_pending = true;
     }
-}
-
-static void update_freecam(double dt, camera& current_camera) {
-    double speed = 30.0;
-    if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {
-        speed *= 4.0;
-    }
-    double move = speed * dt;
-    if (is_game_key_down(DIK_UP)) {
-        current_camera.y += move;
-    }
-    if (is_game_key_down(DIK_DOWN)) {
-        current_camera.y -= move;
-    }
-    if (is_game_key_down(DIK_LEFT)) {
-        current_camera.x -= move;
-    }
-    if (is_game_key_down(DIK_RIGHT)) {
-        current_camera.x += move;
-    }
-
-    current_camera.x = std::clamp(current_camera.x, current_camera.min_x, current_camera.max_x);
-    current_camera.y = std::clamp(current_camera.y, current_camera.min_y, current_camera.max_y);
 }
 
 static void sound_init() {
@@ -372,30 +335,6 @@ static void physics_subframe(driver& driv, double time, double dt) {
 
     if (cripples & OneWheel && driv.mot->one_wheel_failed) {
         driv.dead = true;
-    }
-}
-
-static void update_view_settings(driver& driv, bool* other_draw_view) {
-    player_keys* keys = driv.keys;
-
-    // Visibility of player viewpoint
-    if (was_game_key_just_pressed(keys->toggle_visibility)) {
-        reset_game_background();
-        if (!*other_draw_view) {
-            // You cannot have 0 players visible, so make both players visible instead
-            *other_draw_view = true;
-            driv.draw_view = true;
-        } else {
-            driv.draw_view = !driv.draw_view;
-        }
-    }
-
-    if (was_game_key_just_pressed(keys->toggle_minimap)) {
-        driv.toggle_minimap();
-    }
-
-    if (was_game_key_just_pressed(keys->toggle_timer)) {
-        driv.toggle_timer();
     }
 }
 
@@ -787,22 +726,12 @@ int game_loop(const char* filename, CameraMode camera_mode) {
 
     pacer::reset();
 
-    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Game1);
-    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Game2);
+    driver driv1(Motor1, Rec1, &State->keys1);
+    driver driv2(Motor2, Rec2, &State->keys2);
     driv1.stats.drunk = driv2.stats.drunk = active_cripples() & BattleAttributes::Drunk;
 
-    camera current_camera;
-    current_camera.mode = camera_mode;
-    current_camera.x = Motor1->bike.r.x;
-    current_camera.y = Motor1->bike.r.y;
-
-    double level_min_y;
-    double level_max_y;
-    Level->get_boundaries(&current_camera.min_x, &level_min_y, &current_camera.max_x, &level_max_y,
-                          false);
-    // Convert level y-coordinates to camera y-coordinates
-    current_camera.min_y = -level_max_y;
-    current_camera.max_y = -level_min_y;
+    camera current_camera(camera_mode, false, State);
+    current_camera.init_freecam(Level, Motor1);
 
     sound_init();
     // Stay muted if no bike is visible.
@@ -839,7 +768,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                 ran_subframes = true;
                 if (current_camera.mode == CameraMode::MapViewer) {
                     if (!EolClient->spy_kuski()) {
-                        update_freecam(dt, current_camera);
+                        current_camera.update_freecam(dt);
                     }
                     time += dt;
                     continue;
@@ -950,11 +879,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         }
         EolClient->update_spy_kuskis();
 
-        // Update the hud and player visibility
-        update_view_settings(driv1, &driv2.draw_view);
-        if (!Single) {
-            update_view_settings(driv2, &driv1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
         render_game(time, driv1, driv2, current_camera, GameLoop::Game);
 
@@ -1036,13 +961,10 @@ static void rewind_override_animations(driver& driv, double time) {
 }
 
 // Load replay data (instead of simulating bike physics)
-static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
+static bool replay_frame(driver& driv, double time) {
     motorst* mot = driv.mot;
     bike_metadata* metadata = &driv.meta;
     recorder* rec = driv.rec;
-
-    // Update the hud and player visibility
-    update_view_settings(driv, other_draw_view);
 
     // Load replay data
     bool alive = rec->recall_frame(mot, time, &driv.sound);
@@ -1118,17 +1040,16 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
     EolClient->enter_level(filename, Level, EnterMode::Replay);
 
-    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Replay1);
-    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Replay2);
+    driver driv1(Motor1, Rec1, &State->keys1);
+    driver driv2(Motor2, Rec2, &State->keys2);
 
-    driv2.draw_view = !MergedRec;
+    camera current_camera(CameraMode::Normal, true, State);
+
+    current_camera.player2.draw_view = !MergedRec;
     if (restore_player_visibility) {
-        driv1.draw_view = PreviousReplayDrawView1;
-        driv2.draw_view = PreviousReplayDrawView2;
+        current_camera.player1.draw_view = PreviousReplayDrawView1;
+        current_camera.player2.draw_view = PreviousReplayDrawView2;
     }
-
-    camera current_camera;
-    current_camera.mode = CameraMode::Normal;
 
     sound_init();
     Mute = false;
@@ -1182,11 +1103,13 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         double time = current_replay_time;
 
+        current_camera.update_view_settings(Single);
+
         // Load replay data
-        bool finished1 = !replay_frame(driv1, time, &driv2.draw_view);
+        bool finished1 = !replay_frame(driv1, time);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &driv1.draw_view);
+            finished2 = !replay_frame(driv2, time);
         }
 
         // Reverse events if rewinding
@@ -1215,8 +1138,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
             cleanup_game_loop();
 
-            PreviousReplayDrawView1 = driv1.draw_view;
-            PreviousReplayDrawView2 = driv2.draw_view;
+            PreviousReplayDrawView1 = current_camera.player1.draw_view;
+            PreviousReplayDrawView2 = current_camera.player2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return 0;
@@ -1264,8 +1187,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
             cleanup_game_loop();
 
-            PreviousReplayDrawView1 = driv1.draw_view;
-            PreviousReplayDrawView2 = driv2.draw_view;
+            PreviousReplayDrawView1 = current_camera.player1.draw_view;
+            PreviousReplayDrawView2 = current_camera.player2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return -1;
@@ -1298,14 +1221,13 @@ void render_replay(const char* level_filename) {
 
     EolClient->enter_level(level_filename, Level, EnterMode::Replay);
 
-    camera current_camera;
-    current_camera.mode = CameraMode::Normal;
-
     VideoRecordingMode = true;
     VideoFrameIndex = 0;
 
-    driver driv1(Motor1, Rec1, &State->keys1, HudSlot::Replay1);
-    driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Replay2);
+    driver driv1(Motor1, Rec1, &State->keys1);
+    driver driv2(Motor2, Rec2, &State->keys2);
+
+    camera current_camera(CameraMode::Normal, true, State);
 
     fps::reset();
     while (true) {
@@ -1317,10 +1239,12 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (pacer::MILLISECONDS_TO_PHYS_TIME * 1000.0) /
                       EolSettings->recording_fps();
 
-        bool finished1 = !replay_frame(driv1, time, &driv2.draw_view);
+        current_camera.update_view_settings(Single);
+
+        bool finished1 = !replay_frame(driv1, time);
         bool finished2 = false;
         if (!Single) {
-            finished2 = !replay_frame(driv2, time, &driv1.draw_view);
+            finished2 = !replay_frame(driv2, time);
         }
 
         update_graphical_metadata(driv1, false, time);

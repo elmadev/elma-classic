@@ -21,27 +21,30 @@ vect2 last_coord;
 vect2 last_start;
 vect2 last_end;
 
+endpoint* held_end = nullptr;
+checkpoint* held_line = nullptr;
+
 } // namespace
 
-void checkpoint::endpoint::left_clicked(const game_mouse& pos) {
+void endpoint::left_clicked(const game_mouse& pos) {
     // Pick up checkpoint end and remember position in case we cancel
     last_coord = this->click_anchor;
     delete_endpoint_if_dropped = false;
-    checkpoint::held_end = this;
+    held_end = this;
     clickable::set_callback(held_callback, pos);
 }
 
-void checkpoint::endpoint::middle_clicked(const game_mouse& pos) {
+void endpoint::middle_clicked(const game_mouse& pos) {
     // Toggle polarity
     parent->middle_clicked(pos);
 }
 
-void checkpoint::endpoint::right_clicked(const game_mouse& pos) {
+void endpoint::right_clicked(const game_mouse& pos) {
     // Delete checkpoint
     parent->right_clicked(pos);
 }
 
-void checkpoint::endpoint::set_anchor(vect2 coord) {
+void endpoint::set_anchor(vect2 coord) {
     vect2 direction = coord - other->click_anchor;
     double length = direction.length();
 
@@ -79,8 +82,8 @@ void checkpoint::endpoint::set_anchor(vect2 coord) {
     click_anchor = other->click_anchor + direction * MINIMUM_LENGTH;
 }
 
-void checkpoint::endpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
-    ELMA_ASSERT(Editor);
+void endpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
+    ELMA_ASSERT(checkpoint::Editor);
     ELMA_ASSERT(held_end);
     if (!pos.coord) {
         return;
@@ -115,7 +118,7 @@ void checkpoint::left_clicked(const game_mouse& pos) {
     last_coord = *pos.coord;
     last_start = start.click_anchor;
     last_end = end.click_anchor;
-    checkpoint::held_line = this;
+    held_line = this;
     clickable::set_callback(held_callback, pos);
 }
 

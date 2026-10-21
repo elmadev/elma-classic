@@ -76,6 +76,7 @@ struct motorst {
 
     void init();
     void spawn(vect2 start_position);
+    double speed() const;
 
     static const rigidbody DEFAULT_BIKE;
     static const rigidbody DEFAULT_LEFT_WHEEL;

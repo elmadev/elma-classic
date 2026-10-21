@@ -585,7 +585,7 @@ static void handle_mouse() {
         // Click on something
         int dist = std::numeric_limits<int>::max();
         clickable* closest = nullptr;
-        checkpoint::get_closest(pos, dist, closest);
+        Checkpoints->get_closest(pos, dist, closest);
         if (closest) {
             if (input.left_click) {
                 closest->left_clicked(pos);
@@ -598,7 +598,7 @@ static void handle_mouse() {
         }
 
         // We didn't find anything. Click in thin air
-        checkpoint::editor_click(pos, input);
+        Checkpoints->editor_click(pos, input);
     }
 }
 
@@ -626,10 +626,10 @@ bool configure_game() {
     }
     if (is_key_down(DIK_F2)) {
         map_viewer = true;
-        checkpoint::Editor = true;
+        checkpoints::Editor = true;
         StatusMessages->add("Checkpoint editor enabled: click to add checkpoints");
     } else {
-        checkpoint::Editor = false;
+        checkpoints::Editor = false;
     }
     return map_viewer;
 }

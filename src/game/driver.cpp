@@ -5,8 +5,6 @@
 #include <cstdint>
 #include <format>
 
-constexpr double PHYSICS_SPEED_TO_EOL_SPEED = 5.0;
-
 static std::string format_value(double value) { return std::format("{:.2f}", value); }
 
 std::string run_stats::format_speed() const { return format_value(speed); }
@@ -48,7 +46,7 @@ uint32_t run_stats::brake_centiseconds(uint32_t run_time) const {
 }
 
 void driver::update_speed() {
-    stats.speed = mot->bike.v.length() * PHYSICS_SPEED_TO_EOL_SPEED;
+    stats.speed = mot->speed();
     stats.max_speed = std::max(stats.max_speed, stats.speed);
 }
 

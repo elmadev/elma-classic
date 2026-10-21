@@ -7,14 +7,13 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
-#include <list>
 #include <numbers>
+
+std::unique_ptr<checkpoints> Checkpoints = std::make_unique<checkpoints>();
 
 namespace {
 
 constexpr unsigned char LINE_COLOR = 25;
-
-std::list<checkpoint> linear_checkpoints;
 
 bool delete_endpoint_if_dropped;
 vect2 last_coord;
@@ -83,7 +82,7 @@ void endpoint::set_anchor(vect2 coord) {
 }
 
 void endpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
-    ELMA_ASSERT(checkpoint::Editor);
+    ELMA_ASSERT(checkpoints::Editor);
     ELMA_ASSERT(held_end);
     if (!pos.coord) {
         return;
@@ -139,18 +138,18 @@ void checkpoint::middle_clicked(const game_mouse& /*pos*/) {
 
 void checkpoint::right_clicked(const game_mouse& /*pos*/) {
     // Delete checkpoint
-    remove(this);
+    Checkpoints->remove(this);
 }
 
-void checkpoint::remove(checkpoint* target) {
-    auto it = std::find_if(linear_checkpoints.begin(), linear_checkpoints.end(),
+void checkpoints::remove(checkpoint* target) {
+    auto it = std::find_if(linear.begin(), linear.end(),
                            [target](const checkpoint& element) { return target == &element; });
-    ELMA_ASSERT(it != linear_checkpoints.end());
-    linear_checkpoints.erase(it);
+    ELMA_ASSERT(it != linear.end());
+    linear.erase(it);
 }
 
 void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
-    ELMA_ASSERT(Editor);
+    ELMA_ASSERT(checkpoints::Editor);
     ELMA_ASSERT(held_line);
     if (!pos.coord) {
         return;
@@ -176,7 +175,7 @@ void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) 
     }
 }
 
-void checkpoint::editor_click(const game_mouse& pos, const mouse_input& input) {
+void checkpoints::editor_click(const game_mouse& pos, const mouse_input& input) {
     if (!Editor) {
         return;
     }
@@ -187,8 +186,8 @@ void checkpoint::editor_click(const game_mouse& pos, const mouse_input& input) {
 
     if (input.left_click) {
         // Create a new checkpoint line and hold the end
-        linear_checkpoints.emplace_back(coord);
-        held_end = &linear_checkpoints.back().end;
+        linear.emplace_back(coord);
+        held_end = &linear.back().end;
         delete_endpoint_if_dropped = true;
         last_coord = held_end->click_anchor;
         clickable::set_callback(endpoint::held_callback, pos);
@@ -250,12 +249,12 @@ void checkpoint::render(pic8& screen, vect2 corner) const {
     screen.line(arrow[4].x, arrow[4].y, arrow[2].x, arrow[2].y, LINE_COLOR);
 }
 
-void checkpoint::render_all(pic8& screen, vect2 corner) {
+void checkpoints::render_all(pic8& screen, vect2 corner) {
     if (!Editor && !Render) {
         return;
     }
-    for (const checkpoint& linear : linear_checkpoints) {
-        linear.render(screen, corner);
+    for (const checkpoint& line : linear) {
+        line.render(screen, corner);
     }
 }
 
@@ -269,7 +268,7 @@ int checkpoint::distance(const game_mouse& pos) const {
     return (int)(point_segment_distance(*pos.coord, start_pos, v) * MetersToPixels);
 }
 
-void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& closest) {
+void checkpoints::get_closest(const game_mouse& pos, int& dist, clickable*& closest) {
     if (!Editor) {
         return;
     }
@@ -279,22 +278,22 @@ void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& close
     ELMA_ASSERT(!held_end);
     ELMA_ASSERT(!held_line);
 
-    for (checkpoint& linear : linear_checkpoints) {
-        int start_dist = linear.start.distance(pos);
+    for (checkpoint& line : linear) {
+        int start_dist = line.start.distance(pos);
         if (start_dist < dist) {
             dist = start_dist;
-            closest = &linear.start;
+            closest = &line.start;
         }
 
-        int end_dist = linear.end.distance(pos);
+        int end_dist = line.end.distance(pos);
         if (end_dist < dist) {
             dist = end_dist;
-            closest = &linear.end;
+            closest = &line.end;
         }
 
         if (start_dist == std::numeric_limits<int>::max() &&
             end_dist == std::numeric_limits<int>::max()) {
-            int middle_dist = linear.distance(pos);
+            int middle_dist = line.distance(pos);
             if (middle_dist > clickable::DEFAULT_RADIUS) {
                 middle_dist = std::numeric_limits<int>::max();
             } else {
@@ -304,7 +303,7 @@ void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& close
 
             if (middle_dist < dist) {
                 dist = middle_dist;
-                closest = &linear;
+                closest = &line;
             }
         }
     }

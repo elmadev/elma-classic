@@ -141,13 +141,6 @@ void checkpoint::right_clicked(const game_mouse& /*pos*/) {
     Checkpoints->remove(this);
 }
 
-void checkpoints::remove(checkpoint* target) {
-    auto it = std::find_if(linear.begin(), linear.end(),
-                           [target](const checkpoint& element) { return target == &element; });
-    ELMA_ASSERT(it != linear.end());
-    linear.erase(it);
-}
-
 void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
     ELMA_ASSERT(checkpoints::Editor);
     ELMA_ASSERT(held_line);
@@ -172,25 +165,6 @@ void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) 
         // Update the checkpoint line position
         held_line->start.click_anchor = last_start + (coord - last_coord);
         held_line->end.click_anchor = last_end + (coord - last_coord);
-    }
-}
-
-void checkpoints::editor_click(const game_mouse& pos, const mouse_input& input) {
-    if (!Editor) {
-        return;
-    }
-    if (!pos.coord) {
-        return;
-    }
-    const vect2& coord = *pos.coord;
-
-    if (input.left_click) {
-        // Create a new checkpoint line and hold the end
-        linear.emplace_back(coord);
-        held_end = &linear.back().end;
-        delete_endpoint_if_dropped = true;
-        last_coord = held_end->click_anchor;
-        clickable::set_callback(endpoint::held_callback, pos);
     }
 }
 
@@ -249,15 +223,6 @@ void checkpoint::render(pic8& screen, vect2 corner) const {
     screen.line(arrow[4].x, arrow[4].y, arrow[2].x, arrow[2].y, LINE_COLOR);
 }
 
-void checkpoints::render_all(pic8& screen, vect2 corner) {
-    if (!Editor && !Render) {
-        return;
-    }
-    for (const checkpoint& line : linear) {
-        line.render(screen, corner);
-    }
-}
-
 int checkpoint::distance(const game_mouse& pos) const {
     if (!pos.coord) {
         return std::numeric_limits<int>::max();
@@ -266,6 +231,41 @@ int checkpoint::distance(const game_mouse& pos) const {
     vect2 end_pos = end.click_anchor;
     vect2 v = end_pos - start_pos;
     return (int)(point_segment_distance(*pos.coord, start_pos, v) * MetersToPixels);
+}
+
+void checkpoints::remove(checkpoint* target) {
+    auto it = std::find_if(linear.begin(), linear.end(),
+                           [target](const checkpoint& element) { return target == &element; });
+    ELMA_ASSERT(it != linear.end());
+    linear.erase(it);
+}
+
+void checkpoints::editor_click(const game_mouse& pos, const mouse_input& input) {
+    if (!Editor) {
+        return;
+    }
+    if (!pos.coord) {
+        return;
+    }
+    const vect2& coord = *pos.coord;
+
+    if (input.left_click) {
+        // Create a new checkpoint line and hold the end
+        linear.emplace_back(coord);
+        held_end = &linear.back().end;
+        delete_endpoint_if_dropped = true;
+        last_coord = held_end->click_anchor;
+        clickable::set_callback(endpoint::held_callback, pos);
+    }
+}
+
+void checkpoints::render_all(pic8& screen, vect2 corner) {
+    if (!Editor && !Render) {
+        return;
+    }
+    for (const checkpoint& line : linear) {
+        line.render(screen, corner);
+    }
 }
 
 void checkpoints::get_closest(const game_mouse& pos, int& dist, clickable*& closest) {

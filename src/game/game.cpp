@@ -455,6 +455,12 @@ static void handle_eol_inputs() {
         EolClient->toggle_battle_queue();
     }
 
+    if (was_game_key_just_pressed(EolSettings->toggle_locked_levels_key())) {
+        EolClient->toggle_levels_locked();
+        StatusMessages->add(EolClient->levels_locked() ? "new levels are now locked"
+                                                       : "new levels are now not locked");
+    }
+
     if (was_game_key_just_pressed(EolSettings->download_battle_level_key())) {
         EolClient->download_battle_level();
     }

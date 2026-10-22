@@ -347,7 +347,10 @@ static void physics_subframe(driver& driv, double time, double dt) {
     // Update replay
     rec->store_frames(mot, time, &driv.sound);
 
-    // Handle object ineractions
+    // Update checkpoints
+    Checkpoints->update_touching(*mot, time, true);
+
+    // Handle object interactions
     WavEvent wav_id;
     double volume;
     int object_id;
@@ -721,6 +724,8 @@ static void setup_gameloop(const char* filename) {
 
     OutOfBounds = false;
 
+    Checkpoints->setup();
+
     Lgr->pal->set();
 }
 
@@ -1047,6 +1052,9 @@ static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
     // Load replay data
     bool alive = rec->recall_frame(mot, time, &driv.sound);
     set_head_position(mot);
+
+    // Update checkpoints
+    Checkpoints->update_touching(*mot, time, false);
 
     // Play events
     while (std::optional<event> ev = rec->recall_event(time)) {

@@ -5,9 +5,31 @@
 #include "vect2.h"
 #include <list>
 #include <memory>
+#include <optional>
+#include <string>
 
 struct checkpoint;
+struct motorst;
 class pic8;
+
+struct checkpoint_state {
+    bool active;
+    std::optional<int> latest_centiseconds;
+    std::optional<int> diff_centiseconds;
+    std::optional<int> best_centiseconds;
+    std::optional<double> latest_speed;
+    std::optional<double> best_speed;
+
+    std::string format_latest_centiseconds();
+    std::string format_diff_centiseconds();
+    std::string format_best_time();
+    std::string format_latest_speed();
+    std::string format_best_speed();
+
+    void trigger(const motorst& mot, double time, bool is_game);
+    void reset();
+    checkpoint_state();
+};
 
 struct endpoint : game_clickable {
   private:
@@ -39,11 +61,14 @@ struct checkpoint : clickable {
     enum class Polarity { Both, Positive, Negative };
     Polarity polarity;
 
+    checkpoint_state state;
+
     void left_clicked(const game_mouse& pos) override;
     void middle_clicked(const game_mouse& pos) override;
     void right_clicked(const game_mouse& pos) override;
     int distance(const game_mouse& pos) const override;
     void render(pic8& screen, vect2 corner) const;
+    bool is_touching(const motorst& mot) const;
 
     checkpoint(vect2 coord)
         : start(this, &end, coord),
@@ -63,9 +88,20 @@ class checkpoints {
     // Remove a checkpoint from the checkpoint list
     void remove(checkpoint* target);
 
+    // Handle click with checkpoint editor open
     void editor_click(const game_mouse& pos, const mouse_input& input);
+
+    // Render checkpoints
     void render_all(pic8& screen, vect2 corner);
+
+    // Return checkpoint closest to pos within grabbing distance
     void get_closest(const game_mouse& pos, int& dist, clickable*& closest);
+
+    // Trigger linear checkpoints touched by the bike
+    void update_touching(const motorst& mot, double time, bool is_game);
+
+    // Prepare checkpoints for a new game loop
+    void setup();
 };
 
 extern std::unique_ptr<checkpoints> Checkpoints;

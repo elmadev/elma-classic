@@ -735,6 +735,8 @@ static void cleanup_game_loop() {
     Level->unflip_objects();
 
     abort_mouse();
+
+    Checkpoints->save_json();
 }
 
 int WhoDiedFirst = 0;

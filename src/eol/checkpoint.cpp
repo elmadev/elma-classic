@@ -1,8 +1,11 @@
 #include "eol/checkpoint.h"
+#include "editor/dialog.h"
+#include "editor/editor.h"
 #include "level/level.h"
 #include "level/object.h"
 #include "log.h"
 #include "main.h"
+#include "menu/pic.h"
 #include "physics/init.h"
 #include "pic/pic8.h"
 #include "platform/implementation.h"
@@ -15,7 +18,7 @@
 #include <limits>
 #include <numbers>
 
-std::unique_ptr<checkpoints> Checkpoints = std::make_unique<checkpoints>();
+std::unique_ptr<checkpoints> Checkpoints;
 
 namespace {
 
@@ -108,6 +111,11 @@ void checkpoint_state::reset() {
     latest_centiseconds.reset();
     diff_centiseconds.reset();
     latest_speed.reset();
+};
+
+void checkpoint_state::reset_best() {
+    best_centiseconds.reset();
+    best_speed.reset();
 };
 
 checkpoint_state::checkpoint_state() { reset(); }
@@ -483,8 +491,9 @@ void checkpoints::setup() {
     }
 }
 
-void checkpoints::load_level(const level& lev) {
+void checkpoints::load_level(const std::string& filename, const level& lev) {
     // Get level properties
+    int crc = lev.crc();
     int food_index_offset = 0;
     int apple_count = 0;
     for (int i = 0; i < MAX_OBJECTS; i++) {
@@ -500,10 +509,46 @@ void checkpoints::load_level(const level& lev) {
         }
     }
 
-    // Default checkpoint data
-    Checkpoints = std::make_unique<checkpoints>();
-    Checkpoints->food_index_offset = food_index_offset;
-    Checkpoints->objects.resize(apple_count);
+    // Try to load checkpoint data from file
+    std::unique_ptr<checkpoints> file_cp = load_json(filename);
+    bool load_from_file = (bool)(file_cp);
+    bool data_expired = false;
+    if (load_from_file) {
+        data_expired = file_cp->crc != crc || file_cp->food_index_offset != food_index_offset ||
+                       file_cp->objects.size() != apple_count;
+        if (data_expired) {
+            dialog_switch_palette();
+            int choice = dialog("Checkpoint data is no longer valid!",
+                                "Level has changed since checkpoints were created!", DIALOG_BUTTONS,
+                                "Delete", "Use Anyways");
+            dialog_restore_palette();
+            if (choice == 0) {
+                load_from_file = false;
+            }
+        }
+    }
 
+    if (load_from_file) {
+        // Load checkpoint data from file
+        Checkpoints = std::move(file_cp);
+        if (data_expired) {
+            // Only keep linear checkpoint coordinates - reset everything else
+            Checkpoints->crc = crc;
+            Checkpoints->food_index_offset = food_index_offset;
+            Checkpoints->objects.clear();
+            Checkpoints->objects.resize(apple_count);
+            for (checkpoint& line : Checkpoints->linear) {
+                line.state.reset_best();
+            }
+        }
+    } else {
+        // Default checkpoint data
+        Checkpoints = std::make_unique<checkpoints>();
+        Checkpoints->crc = crc;
+        Checkpoints->food_index_offset = food_index_offset;
+        Checkpoints->objects.resize(apple_count);
+    }
+
+    Checkpoints->level_filename = filename;
     Checkpoints->enumerate();
 }

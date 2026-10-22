@@ -8,6 +8,10 @@
 #include <optional>
 #include <string>
 
+#define JSON_DIAGNOSTICS 1
+#include <nlohmann/json_fwd.hpp>
+using json = nlohmann::ordered_json;
+
 struct checkpoint;
 class level;
 struct motorst;
@@ -30,6 +34,7 @@ struct checkpoint_state {
 
     void trigger(const motorst& mot, double time, bool is_game);
     void reset();
+    void reset_best();
     checkpoint_state();
 };
 
@@ -76,6 +81,10 @@ struct checkpoint : clickable {
         : start(this, &end, coord),
           end(this, &start, coord),
           polarity(Polarity::Both) {}
+    checkpoint()
+        : start(this, &end, {0.0, 0.0}),
+          end(this, &start, {0.0, 0.0}),
+          polarity(Polarity::Both) {}
 
     static void held_callback(const game_mouse& pos, const mouse_input& input);
 };
@@ -84,7 +93,9 @@ class checkpoints {
     std::list<checkpoint> linear;
     std::vector<checkpoint_state> objects;
 
+    std::string level_filename;
     int food_index_offset = 0;
+    int crc = 0;
 
   public:
     static inline bool Editor = false;
@@ -115,7 +126,12 @@ class checkpoints {
     void setup();
 
     // Load checkpoint data for a specific level
-    static void load_level(const level& lev);
+    static void load_level(const std::string& filename, const level& lev);
+
+    void save_json();
+    std::unique_ptr<checkpoints> static load_json(const std::string& level_filename);
+    friend void to_json(json& j, const checkpoints& v);
+    friend void from_json(const json& j, checkpoints& v);
 };
 
 extern std::unique_ptr<checkpoints> Checkpoints;

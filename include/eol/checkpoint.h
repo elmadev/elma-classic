@@ -31,6 +31,7 @@ struct checkpoint_state {
 
     void trigger(const motorst& mot, double time, bool is_game);
     void reset();
+    void reset_best();
     checkpoint_state();
 };
 
@@ -77,6 +78,10 @@ struct checkpoint : clickable {
         : start(this, &end, coord),
           end(this, &start, coord),
           polarity(Polarity::Both) {}
+    checkpoint()
+        : start(this, &end, {0.0, 0.0}),
+          end(this, &start, {0.0, 0.0}),
+          polarity(Polarity::Both) {}
 
     static void held_callback(const game_mouse& pos, const mouse_input& input);
 };
@@ -85,7 +90,9 @@ struct checkpoints {
     std::list<checkpoint> linear;
     std::vector<checkpoint_state> objects;
 
+    std::string level_filename;
     int food_index_offset = 0;
+    int crc = 0;
 
     static inline bool Editor = false;
     static inline bool Render = false;
@@ -115,7 +122,10 @@ struct checkpoints {
     void setup();
 
     // Load checkpoint data for a specific level
-    static void load_level(const level& lev);
+    static void load_level(const std::string& filename, const level& lev);
+
+    void save_json();
+    std::unique_ptr<checkpoints> static load_json(const std::string& level_filename);
 };
 
 extern std::unique_ptr<checkpoints> Checkpoints;

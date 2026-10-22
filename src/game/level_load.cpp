@@ -74,7 +74,7 @@ bool load_level_play(const char* levelname) {
 
         canvas::create_canvases();
 
-        checkpoints::load_level(*Level);
+        checkpoints::load_level(levelname, *Level);
     }
     return true;
 }

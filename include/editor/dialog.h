@@ -18,6 +18,11 @@ int dialog(const char* text1, const char* text2 = nullptr, const char* text3 = n
            const char* text22 = nullptr, const char* text23 = nullptr,
            const char* text24 = nullptr);
 
+// Use dialog from menu
+void dialog_switch_palette();
+// Restore dialog from menu
+void dialog_restore_palette();
+
 struct box {
     int x1, y1, x2, y2;
 };

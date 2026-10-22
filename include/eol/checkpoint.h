@@ -104,6 +104,9 @@ struct checkpoints {
     // Trigger linear checkpoints touched by the bike
     void update_touching(const motorst& mot, double time, bool is_game);
 
+    // Trigger one object collected by the bike
+    void update_object(int object_id, const motorst& mot, double time, bool is_game);
+
     // Prepare checkpoints for a new game loop
     void setup();
 

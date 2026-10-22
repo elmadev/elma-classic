@@ -1,11 +1,15 @@
 #include "eol/checkpoint.h"
+#include "log.h"
 #include "main.h"
 #include "physics/init.h"
 #include "pic/pic8.h"
 #include "platform/implementation.h"
 #include "platform/scancode.h"
+#include "renderer/timer.h"
+#include "util/util.h"
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <limits>
 #include <numbers>
 
@@ -24,6 +28,88 @@ endpoint* held_end = nullptr;
 checkpoint* held_line = nullptr;
 
 } // namespace
+
+static std::string format_centiseconds(int centiseconds) {
+    char text[64];
+    util::text::centiseconds_to_string(centiseconds, text, true, true);
+    return text;
+}
+
+std::string checkpoint_state::format_latest_centiseconds() const {
+    if (!latest_centiseconds) {
+        return "";
+    }
+    return format_centiseconds(*latest_centiseconds);
+}
+
+std::string checkpoint_state::format_diff_centiseconds() const {
+    if (!diff_centiseconds) {
+        return "";
+    }
+
+    if (*diff_centiseconds > 0) {
+        return std::format("+{}", format_centiseconds(*diff_centiseconds));
+    }
+    if (*diff_centiseconds < 0) {
+        return std::format("-{}", format_centiseconds((-1) * (*diff_centiseconds)));
+    }
+
+    return "0:00";
+}
+
+std::string checkpoint_state::format_best_time() const {
+    if (!best_centiseconds) {
+        return "";
+    }
+    return format_centiseconds(*best_centiseconds);
+}
+
+static std::string format_speed(double speed) { return std::format("{:.2f}", speed); }
+
+std::string checkpoint_state::format_latest_speed() const {
+    if (!latest_speed) {
+        return "";
+    }
+    return format_speed(*latest_speed);
+}
+
+std::string checkpoint_state::format_best_speed() const {
+    if (!best_speed) {
+        return "";
+    }
+    return format_speed(*best_speed);
+}
+
+void checkpoint_state::trigger(const motorst& mot, double time, bool is_game) {
+    if (!active) {
+        return;
+    }
+    active = false;
+
+    latest_centiseconds = (int)(time * TIME_TO_CENTISECONDS);
+    if (best_centiseconds) {
+        diff_centiseconds = *latest_centiseconds - *best_centiseconds;
+    }
+    if (is_game) {
+        latest_speed = mot.speed();
+        if (*latest_centiseconds < best_centiseconds.value_or(std::numeric_limits<int>::max())) {
+            best_centiseconds = latest_centiseconds;
+            best_speed = latest_speed;
+        }
+    }
+
+    LOG_DEBUG("Checkpoint time: {}, diff {}, speed: {}", format_latest_centiseconds(),
+              format_diff_centiseconds(), format_latest_speed());
+}
+
+void checkpoint_state::reset() {
+    active = true;
+    latest_centiseconds.reset();
+    diff_centiseconds.reset();
+    latest_speed.reset();
+};
+
+checkpoint_state::checkpoint_state() { reset(); }
 
 void endpoint::left_clicked(const game_mouse& pos) {
     // Pick up checkpoint end and remember position in case we cancel
@@ -306,5 +392,64 @@ void checkpoints::get_closest(const game_mouse& pos, int& dist, clickable*& clos
                 closest = &line;
             }
         }
+    }
+}
+
+bool checkpoint::is_touching(const motorst& mot) const {
+    vect2 checkpoint_v = end.click_anchor - start.click_anchor;
+
+    // We check the bike itself to avoid triggering a checkpoint with rotation-induced backwards
+    // motion of a wheel
+    if (polarity != Polarity::Both) {
+        double bike_polarity = rotate_90deg(checkpoint_v) * mot.bike.v;
+        if (polarity == Polarity::Positive && bike_polarity < 0.0) {
+            return false;
+        }
+        if (polarity == Polarity::Negative && bike_polarity > 0.0) {
+            return false;
+        }
+    }
+
+    auto rigidbody_distance = [&](const vect2 rb_r) {
+        // Optimized implementation of vect2::point_segment_distance()
+        vect2 rr = rb_r - start.click_anchor;
+        double scalar = checkpoint_v * rr;
+        if (scalar <= 0.0) {
+            return rr.length();
+        }
+        double checkpoint_length_squared = checkpoint_v * checkpoint_v;
+        if (scalar >= checkpoint_length_squared) {
+            return (rb_r - end.click_anchor).length();
+        }
+        vect2 n = rotate_90deg(checkpoint_v * (1.0 / std::sqrt(checkpoint_length_squared)));
+        return fabs(n * rr);
+    };
+    if (rigidbody_distance(mot.left_wheel.r) <= mot.left_wheel.radius) {
+        return true;
+    }
+    if (rigidbody_distance(mot.right_wheel.r) <= mot.right_wheel.radius) {
+        return true;
+    }
+    if (rigidbody_distance(mot.head_r) <= HeadRadius) {
+        return true;
+    }
+    return false;
+}
+
+void checkpoints::update_touching(const motorst& mot, double time, bool is_game) {
+    for (checkpoint& line : linear) {
+        if (!line.state.active) {
+            continue;
+        }
+        if (!line.is_touching(mot)) {
+            continue;
+        }
+        line.state.trigger(mot, time, is_game);
+    }
+}
+
+void checkpoints::setup() {
+    for (checkpoint& line : linear) {
+        line.state.reset();
     }
 }

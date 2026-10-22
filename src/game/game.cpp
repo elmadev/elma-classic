@@ -347,7 +347,10 @@ static void physics_subframe(driver& driv, double time, double dt) {
     // Update replay
     rec->store_frames(mot, time, &driv.sound);
 
-    // Handle object ineractions
+    // Update checkpoints
+    Checkpoints->update_touching(*mot, time, true);
+
+    // Handle object interactions
     WavEvent wav_id;
     double volume;
     int object_id;
@@ -355,6 +358,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
         if (object_id >= 0) {
             int prev_apple_count = mot->apple_count;
             BikeState bike_state = handle_object_interaction(driv, object_id);
+            Checkpoints->update_object(object_id, *mot, time, true);
             if (bike_state == BikeState::Dead) {
                 driv.dead = true;
             }
@@ -645,7 +649,7 @@ static void handle_mouse() {
         // Click on something
         int dist = std::numeric_limits<int>::max();
         clickable* closest = nullptr;
-        checkpoint::get_closest(pos, dist, closest);
+        Checkpoints->get_closest(pos, dist, closest);
         if (closest) {
             if (input.left_click) {
                 closest->left_clicked(pos);
@@ -658,7 +662,7 @@ static void handle_mouse() {
         }
 
         // We didn't find anything. Click in thin air
-        checkpoint::editor_click(pos, input);
+        Checkpoints->editor_click(pos, input);
     }
 }
 
@@ -686,10 +690,10 @@ bool configure_game() {
     }
     if (is_key_down(DIK_F2)) {
         map_viewer = true;
-        checkpoint::Editor = true;
+        checkpoints::Editor = true;
         StatusMessages->add("Checkpoint editor enabled: click to add checkpoints");
     } else {
-        checkpoint::Editor = false;
+        checkpoints::Editor = false;
     }
     return map_viewer;
 }
@@ -721,6 +725,8 @@ static void setup_gameloop(const char* filename) {
 
     OutOfBounds = false;
 
+    Checkpoints->setup();
+
     Lgr->pal->set();
 }
 
@@ -729,6 +735,8 @@ static void cleanup_game_loop() {
     Level->unflip_objects();
 
     abort_mouse();
+
+    Checkpoints->save_json();
 }
 
 int WhoDiedFirst = 0;
@@ -1048,11 +1056,15 @@ static bool replay_frame(driver& driv, double time, bool* other_draw_view) {
     bool alive = rec->recall_frame(mot, time, &driv.sound);
     set_head_position(mot);
 
+    // Update checkpoints
+    Checkpoints->update_touching(*mot, time, false);
+
     // Play events
     while (std::optional<event> ev = rec->recall_event(time)) {
         if (ev->object_id >= 0) {
             int prev_apple_count = mot->apple_count;
             handle_object_interaction(driv, ev->object_id);
+            Checkpoints->update_object(ev->object_id, *mot, ev->time, false);
             if (prev_apple_count < mot->apple_count) {
                 mot->last_apple_time = (int)(ev->time * TIME_TO_CENTISECONDS);
             }

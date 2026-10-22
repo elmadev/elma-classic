@@ -38,6 +38,8 @@ double PixelsToMeters;
 int MinimapScaleFactor = 10;
 double MetersToMinimapPixels;
 
+constexpr double PHYSICS_SPEED_TO_EOL_SPEED = 5.0;
+
 const rigidbody motorst::DEFAULT_BIKE = {
     .rotation = 0.0,
     .angular_velocity = 0.0,
@@ -96,6 +98,8 @@ void motorst::spawn(vect2 start_position) {
     body_r = body_r + start_position;
     head_r = head_r + start_position;
 }
+
+double motorst::speed() const { return bike.v.length() * PHYSICS_SPEED_TO_EOL_SPEED; }
 
 void set_zoom_factor() {
     double zoom_factor = 0.48 * EolSettings->zoom();

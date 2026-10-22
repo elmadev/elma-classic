@@ -699,7 +699,7 @@ static void render_view(bool player1, bool splitscreen, pic8* pic, double time, 
                        GameViewHeight - 1);
 
     // Draw the checkpoints
-    checkpoint::render_all(*pic, bottomleft_corner);
+    Checkpoints->render_all(*pic, bottomleft_corner);
 
     // Draw the objects
     int corner_x;

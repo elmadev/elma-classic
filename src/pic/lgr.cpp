@@ -98,12 +98,7 @@ static bool lgr_exists(const char* lgr_name, const char* backup_lgr) {
     finame filename;
     strcpy(filename, lgr_name);
     strcat(filename, ".lgr");
-    blit8(BufferBall, BufferMain);
-    BufferMain->fill_box(EditorPaletteId::BACKGROUND);
-    blit_to_screen(BufferMain);
-    if (!InEditor) {
-        EditorPalette->set();
-    }
+    dialog_switch_palette();
     char text1[100];
     sprintf(text1, "Try to download %s.lgr from the web?", lgr_name);
     char text2[100];
@@ -120,11 +115,7 @@ static bool lgr_exists(const char* lgr_name, const char* backup_lgr) {
         }
         exists = lgr_exists(lgr_name, nullptr);
     }
-    if (!InEditor) {
-        MenuPalette->set();
-        blit8(BufferMain, BufferBall);
-        blit_to_screen(BufferMain);
-    }
+    dialog_restore_palette();
     return exists;
 }
 

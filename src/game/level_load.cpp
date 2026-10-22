@@ -2,6 +2,7 @@
 #include "debug/profiler.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
+#include "eol/checkpoint.h"
 #include "level/level.h"
 #include "level/segments.h"
 #include "main.h"
@@ -72,6 +73,8 @@ bool load_level_play(const char* levelname) {
         END_TIME(segments_timer, std::format("{} Segments", levelname))
 
         canvas::create_canvases();
+
+        checkpoints::load_level(levelname, *Level);
     }
     return true;
 }

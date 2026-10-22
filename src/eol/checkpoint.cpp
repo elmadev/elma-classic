@@ -1,47 +1,144 @@
 #include "eol/checkpoint.h"
+#include "editor/dialog.h"
+#include "editor/editor.h"
+#include "level/level.h"
+#include "level/object.h"
+#include "log.h"
 #include "main.h"
+#include "menu/pic.h"
 #include "physics/init.h"
 #include "pic/pic8.h"
 #include "platform/implementation.h"
 #include "platform/scancode.h"
+#include "renderer/timer.h"
+#include "util/util.h"
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <limits>
-#include <list>
 #include <numbers>
+
+std::unique_ptr<checkpoints> Checkpoints;
 
 namespace {
 
 constexpr unsigned char LINE_COLOR = 25;
-
-std::list<checkpoint> linear_checkpoints;
 
 bool delete_endpoint_if_dropped;
 vect2 last_coord;
 vect2 last_start;
 vect2 last_end;
 
+endpoint* held_end = nullptr;
+checkpoint* held_line = nullptr;
+
 } // namespace
 
-void checkpoint::endpoint::left_clicked(const game_mouse& pos) {
+static std::string format_centiseconds(int centiseconds) {
+    char text[64];
+    util::text::centiseconds_to_string(centiseconds, text, true, true);
+    return text;
+}
+
+std::string checkpoint_state::format_latest_centiseconds() {
+    if (!latest_centiseconds) {
+        return "";
+    }
+    return format_centiseconds(*latest_centiseconds);
+}
+
+std::string checkpoint_state::format_diff_centiseconds() {
+    if (!diff_centiseconds) {
+        return "";
+    }
+
+    if (*diff_centiseconds > 0) {
+        return std::format("+{}", format_centiseconds(*diff_centiseconds));
+    }
+    if (*diff_centiseconds < 0) {
+        return std::format("-{}", format_centiseconds((-1) * (*diff_centiseconds)));
+    }
+    return std::format("0:00");
+}
+
+std::string checkpoint_state::format_best_time() {
+    if (!best_centiseconds) {
+        return "";
+    }
+    return format_centiseconds(*best_centiseconds);
+}
+
+static std::string format_speed(double speed) { return std::format("{:.2f}", speed); }
+
+std::string checkpoint_state::format_latest_speed() {
+    if (!latest_speed) {
+        return "";
+    }
+    return format_speed(*latest_speed);
+}
+
+std::string checkpoint_state::format_best_speed() {
+    if (!best_speed) {
+        return "";
+    }
+    return format_speed(*best_speed);
+}
+
+void checkpoint_state::trigger(const motorst& mot, double time, bool is_game) {
+    if (!active) {
+        return;
+    }
+    active = false;
+
+    latest_centiseconds = (int)(time * TIME_TO_CENTISECONDS);
+    if (best_centiseconds) {
+        diff_centiseconds = *latest_centiseconds - *best_centiseconds;
+    }
+    if (is_game) {
+        latest_speed = mot.speed();
+        if (*latest_centiseconds < best_centiseconds.value_or(std::numeric_limits<int>::max())) {
+            best_centiseconds = latest_centiseconds;
+            best_speed = latest_speed;
+        }
+    }
+
+    LOG_DEBUG("{} - time: {}, diff {}, speed: {}", label, format_latest_centiseconds(),
+              format_diff_centiseconds(), format_latest_speed());
+}
+
+void checkpoint_state::reset() {
+    active = true;
+    latest_centiseconds.reset();
+    diff_centiseconds.reset();
+    latest_speed.reset();
+};
+
+void checkpoint_state::reset_best() {
+    best_centiseconds.reset();
+    best_speed.reset();
+};
+
+checkpoint_state::checkpoint_state() { reset(); }
+
+void endpoint::left_clicked(const game_mouse& pos) {
     // Pick up checkpoint end and remember position in case we cancel
     last_coord = this->click_anchor;
     delete_endpoint_if_dropped = false;
-    checkpoint::held_end = this;
+    held_end = this;
     clickable::set_callback(held_callback, pos);
 }
 
-void checkpoint::endpoint::middle_clicked(const game_mouse& pos) {
+void endpoint::middle_clicked(const game_mouse& pos) {
     // Toggle polarity
     parent->middle_clicked(pos);
 }
 
-void checkpoint::endpoint::right_clicked(const game_mouse& pos) {
+void endpoint::right_clicked(const game_mouse& pos) {
     // Delete checkpoint
     parent->right_clicked(pos);
 }
 
-void checkpoint::endpoint::set_anchor(vect2 coord) {
+void endpoint::set_anchor(vect2 coord) {
     vect2 direction = coord - other->click_anchor;
     double length = direction.length();
 
@@ -79,8 +176,8 @@ void checkpoint::endpoint::set_anchor(vect2 coord) {
     click_anchor = other->click_anchor + direction * MINIMUM_LENGTH;
 }
 
-void checkpoint::endpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
-    ELMA_ASSERT(Editor);
+void endpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
+    ELMA_ASSERT(checkpoints::Editor);
     ELMA_ASSERT(held_end);
     if (!pos.coord) {
         return;
@@ -115,7 +212,7 @@ void checkpoint::left_clicked(const game_mouse& pos) {
     last_coord = *pos.coord;
     last_start = start.click_anchor;
     last_end = end.click_anchor;
-    checkpoint::held_line = this;
+    held_line = this;
     clickable::set_callback(held_callback, pos);
 }
 
@@ -136,18 +233,11 @@ void checkpoint::middle_clicked(const game_mouse& /*pos*/) {
 
 void checkpoint::right_clicked(const game_mouse& /*pos*/) {
     // Delete checkpoint
-    remove(this);
-}
-
-void checkpoint::remove(checkpoint* target) {
-    auto it = std::find_if(linear_checkpoints.begin(), linear_checkpoints.end(),
-                           [target](const checkpoint& element) { return target == &element; });
-    ELMA_ASSERT(it != linear_checkpoints.end());
-    linear_checkpoints.erase(it);
+    Checkpoints->remove(this);
 }
 
 void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) {
-    ELMA_ASSERT(Editor);
+    ELMA_ASSERT(checkpoints::Editor);
     ELMA_ASSERT(held_line);
     if (!pos.coord) {
         return;
@@ -170,25 +260,6 @@ void checkpoint::held_callback(const game_mouse& pos, const mouse_input& input) 
         // Update the checkpoint line position
         held_line->start.click_anchor = last_start + (coord - last_coord);
         held_line->end.click_anchor = last_end + (coord - last_coord);
-    }
-}
-
-void checkpoint::editor_click(const game_mouse& pos, const mouse_input& input) {
-    if (!Editor) {
-        return;
-    }
-    if (!pos.coord) {
-        return;
-    }
-    const vect2& coord = *pos.coord;
-
-    if (input.left_click) {
-        // Create a new checkpoint line and hold the end
-        linear_checkpoints.emplace_back(coord);
-        held_end = &linear_checkpoints.back().end;
-        delete_endpoint_if_dropped = true;
-        last_coord = held_end->click_anchor;
-        clickable::set_callback(endpoint::held_callback, pos);
     }
 }
 
@@ -247,15 +318,6 @@ void checkpoint::render(pic8& screen, vect2 corner) const {
     screen.line(arrow[4].x, arrow[4].y, arrow[2].x, arrow[2].y, LINE_COLOR);
 }
 
-void checkpoint::render_all(pic8& screen, vect2 corner) {
-    if (!Editor && !Render) {
-        return;
-    }
-    for (const checkpoint& linear : linear_checkpoints) {
-        linear.render(screen, corner);
-    }
-}
-
 int checkpoint::distance(const game_mouse& pos) const {
     if (!pos.coord) {
         return std::numeric_limits<int>::max();
@@ -266,7 +328,47 @@ int checkpoint::distance(const game_mouse& pos) const {
     return (int)(point_segment_distance(*pos.coord, start_pos, v) * MetersToPixels);
 }
 
-void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& closest) {
+void checkpoints::remove(checkpoint* target) {
+    auto it = std::find_if(linear.begin(), linear.end(),
+                           [target](const checkpoint& element) { return target == &element; });
+    ELMA_ASSERT(it != linear.end());
+    linear.erase(it);
+
+    enumerate();
+}
+
+void checkpoints::editor_click(const game_mouse& pos, const mouse_input& input) {
+    if (!Editor) {
+        return;
+    }
+    if (!pos.coord) {
+        return;
+    }
+    const vect2& coord = *pos.coord;
+
+    if (input.left_click) {
+        // Create a new checkpoint line and hold the end
+        linear.emplace_back(coord);
+        held_end = &linear.back().end;
+        delete_endpoint_if_dropped = true;
+        last_coord = held_end->click_anchor;
+
+        enumerate();
+
+        clickable::set_callback(endpoint::held_callback, pos);
+    }
+}
+
+void checkpoints::render_all(pic8& screen, vect2 corner) {
+    if (!Editor && !Render) {
+        return;
+    }
+    for (const checkpoint& line : linear) {
+        line.render(screen, corner);
+    }
+}
+
+void checkpoints::get_closest(const game_mouse& pos, int& dist, clickable*& closest) {
     if (!Editor) {
         return;
     }
@@ -276,22 +378,22 @@ void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& close
     ELMA_ASSERT(!held_end);
     ELMA_ASSERT(!held_line);
 
-    for (checkpoint& linear : linear_checkpoints) {
-        int start_dist = linear.start.distance(pos);
+    for (checkpoint& line : linear) {
+        int start_dist = line.start.distance(pos);
         if (start_dist < dist) {
             dist = start_dist;
-            closest = &linear.start;
+            closest = &line.start;
         }
 
-        int end_dist = linear.end.distance(pos);
+        int end_dist = line.end.distance(pos);
         if (end_dist < dist) {
             dist = end_dist;
-            closest = &linear.end;
+            closest = &line.end;
         }
 
         if (start_dist == std::numeric_limits<int>::max() &&
             end_dist == std::numeric_limits<int>::max()) {
-            int middle_dist = linear.distance(pos);
+            int middle_dist = line.distance(pos);
             if (middle_dist > clickable::DEFAULT_RADIUS) {
                 middle_dist = std::numeric_limits<int>::max();
             } else {
@@ -301,8 +403,152 @@ void checkpoint::get_closest(const game_mouse& pos, int& dist, clickable*& close
 
             if (middle_dist < dist) {
                 dist = middle_dist;
-                closest = &linear;
+                closest = &line;
             }
         }
     }
+}
+
+bool checkpoint::is_touching(const motorst& mot) const {
+    vect2 checkpoint_v = end.click_anchor - start.click_anchor;
+
+    // We check the bike itself to avoid triggering a checkpoint with rotation-induced backwards
+    // motion of a wheel
+    if (polarity != Polarity::Both) {
+        double bike_polarity = rotate_90deg(checkpoint_v) * mot.bike.v;
+        if (polarity == Polarity::Positive && bike_polarity < 0.0) {
+            return false;
+        }
+        if (polarity == Polarity::Negative && bike_polarity > 0.0) {
+            return false;
+        }
+    }
+
+    auto rigidbody_distance = [&](const vect2 rb_r) {
+        // Optimized implementation of vect2::point_segment_distance()
+        vect2 rr = rb_r - start.click_anchor;
+        double scalar = checkpoint_v * rr;
+        if (scalar <= 0.0) {
+            return rr.length();
+        }
+        double checkpoint_length_squared = checkpoint_v * checkpoint_v;
+        if (scalar >= checkpoint_length_squared) {
+            return (rb_r - end.click_anchor).length();
+        }
+        vect2 n = rotate_90deg(checkpoint_v * (1.0 / std::sqrt(checkpoint_length_squared)));
+        return fabs(n * rr);
+    };
+    if (rigidbody_distance(mot.left_wheel.r) <= mot.left_wheel.radius) {
+        return true;
+    }
+    if (rigidbody_distance(mot.right_wheel.r) <= mot.right_wheel.radius) {
+        return true;
+    }
+    if (rigidbody_distance(mot.head_r) <= HeadRadius) {
+        return true;
+    }
+    return false;
+}
+
+void checkpoints::update_touching(const motorst& mot, double time, bool is_game) {
+    for (checkpoint& line : linear) {
+        if (!line.state.active) {
+            continue;
+        }
+        if (!line.is_touching(mot)) {
+            continue;
+        }
+        line.state.trigger(mot, time, is_game);
+    }
+}
+
+void checkpoints::update_object(int object_id, const motorst& mot, double time, bool is_game) {
+    int checkpoint_id = object_id - food_index_offset;
+    if (checkpoint_id < 0 || checkpoint_id >= objects.size()) {
+        // Killer or Start object
+        return;
+    }
+    objects[checkpoint_id].trigger(mot, time, is_game);
+}
+
+void checkpoints::enumerate() {
+    int line_i = 1;
+    for (checkpoint& line : linear) {
+        line.state.label = std::format("Checkpoint {}", line_i++);
+    }
+    int obj_i = 1;
+    for (checkpoint_state& obj : objects) {
+        obj.label = std::format("Apple {}", obj_i++);
+    }
+}
+
+void checkpoints::setup() {
+    for (checkpoint& line : linear) {
+        line.state.reset();
+    }
+    for (checkpoint_state& obj : objects) {
+        obj.reset();
+    }
+}
+
+void checkpoints::load_level(const std::string& filename, const level& lev) {
+    // Get level properties
+    int crc = lev.crc();
+    int food_index_offset = 0;
+    int apple_count = 0;
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        const object* obj = lev.objects[i];
+        if (!obj) {
+            continue;
+        }
+        if (obj->type == object::Type::Killer) {
+            food_index_offset++;
+        }
+        if (obj->type == object::Type::Food) {
+            apple_count++;
+        }
+    }
+
+    // Try to load checkpoint data from file
+    std::unique_ptr<checkpoints> file_cp = load_json(filename);
+    bool load_from_file = (bool)(file_cp);
+    bool data_expired = false;
+    if (load_from_file) {
+        data_expired = file_cp->crc != crc || file_cp->food_index_offset != food_index_offset ||
+                       file_cp->objects.size() != apple_count;
+        if (data_expired) {
+            dialog_switch_palette();
+            int choice = dialog("Checkpoint data is no longer valid!",
+                                "Level has changed since checkpoints were created!", DIALOG_BUTTONS,
+                                "Delete", "Use Anyways");
+            dialog_restore_palette();
+            if (choice == 0) {
+                load_from_file = false;
+            }
+        }
+    }
+
+    if (load_from_file) {
+        // Load checkpoint data from file
+        Checkpoints = std::move(file_cp);
+        if (data_expired) {
+            // Only keep linear checkpoint coordinates - reset everything else
+            Checkpoints->crc = crc;
+            Checkpoints->food_index_offset = food_index_offset;
+            Checkpoints->objects.clear();
+            Checkpoints->objects.resize(apple_count);
+            for (checkpoint& line : Checkpoints->linear) {
+                line.state.reset_best();
+            }
+        }
+    } else {
+        // Default checkpoint data
+        Checkpoints = std::make_unique<checkpoints>();
+        Checkpoints->crc = crc;
+        Checkpoints->food_index_offset = food_index_offset;
+        Checkpoints->objects.resize(apple_count);
+    }
+
+    Checkpoints->level_filename = filename;
+    Checkpoints->enumerate();
 }

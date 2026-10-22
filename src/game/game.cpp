@@ -322,6 +322,7 @@ static void physics_subframe(driver& driv, double time, double dt) {
         if (object_id >= 0) {
             int prev_apple_count = mot->apple_count;
             BikeState bike_state = handle_object_interaction(driv, object_id);
+            Checkpoints->update_object(object_id, *mot, time, true);
             if (bike_state == BikeState::Dead) {
                 driv.dead = true;
             }
@@ -984,6 +985,7 @@ static bool replay_frame(driver& driv, double time) {
         if (ev->object_id >= 0) {
             int prev_apple_count = mot->apple_count;
             handle_object_interaction(driv, ev->object_id);
+            Checkpoints->update_object(ev->object_id, *mot, ev->time, false);
             if (prev_apple_count < mot->apple_count) {
                 mot->last_apple_time = (int)(ev->time * TIME_TO_CENTISECONDS);
             }

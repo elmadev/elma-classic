@@ -220,3 +220,20 @@ exit:
     }
     return choice;
 }
+
+void dialog_switch_palette() {
+    blit8(BufferBall, BufferMain);
+    BufferMain->fill_box(EditorPaletteId::BACKGROUND);
+    blit_to_screen(BufferMain);
+    if (!InEditor) {
+        EditorPalette->set();
+    }
+}
+
+void dialog_restore_palette() {
+    if (!InEditor) {
+        MenuPalette->set();
+        blit8(BufferMain, BufferBall);
+        blit_to_screen(BufferMain);
+    }
+}

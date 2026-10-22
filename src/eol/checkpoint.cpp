@@ -100,7 +100,7 @@ void checkpoint_state::trigger(const motorst& mot, double time, bool is_game) {
         }
     }
 
-    LOG_DEBUG("Checkpoint time: {}, diff {}, speed: {}", format_latest_centiseconds(),
+    LOG_DEBUG("{} - time: {}, diff {}, speed: {}", label, format_latest_centiseconds(),
               format_diff_centiseconds(), format_latest_speed());
 }
 
@@ -326,6 +326,8 @@ void checkpoints::remove(checkpoint* target) {
                            [target](const checkpoint& element) { return target == &element; });
     ELMA_ASSERT(it != linear.end());
     linear.erase(it);
+
+    enumerate();
 }
 
 void checkpoints::editor_click(const game_mouse& pos, const mouse_input& input) {
@@ -343,6 +345,9 @@ void checkpoints::editor_click(const game_mouse& pos, const mouse_input& input) 
         held_end = &linear.back().end;
         delete_endpoint_if_dropped = true;
         last_coord = held_end->click_anchor;
+
+        enumerate();
+
         clickable::set_callback(endpoint::held_callback, pos);
     }
 }
@@ -459,6 +464,17 @@ void checkpoints::update_object(int object_id, const motorst& mot, double time, 
     objects[checkpoint_id].trigger(mot, time, is_game);
 }
 
+void checkpoints::enumerate() {
+    int line_i = 1;
+    for (checkpoint& line : linear) {
+        line.state.label = std::format("Checkpoint {}", line_i++);
+    }
+    int obj_i = 1;
+    for (checkpoint_state& obj : objects) {
+        obj.label = std::format("Apple {}", obj_i++);
+    }
+}
+
 void checkpoints::setup() {
     for (checkpoint& line : linear) {
         line.state.reset();
@@ -489,4 +505,6 @@ void checkpoints::load_level(const level& lev) {
     Checkpoints = std::make_unique<checkpoints>();
     Checkpoints->food_index_offset = food_index_offset;
     Checkpoints->objects.resize(apple_count);
+
+    Checkpoints->enumerate();
 }

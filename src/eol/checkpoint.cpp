@@ -449,6 +449,15 @@ void checkpoints::update_touching(const motorst& mot, double time, bool is_game)
     }
 }
 
+void checkpoints::update_object(int object_id, const motorst& mot, double time, bool is_game) {
+    int checkpoint_id = object_id - food_index_offset;
+    if (checkpoint_id < 0 || checkpoint_id >= objects.size()) {
+        // Killer or Start object
+        return;
+    }
+    objects[checkpoint_id].trigger(mot, time, is_game);
+}
+
 void checkpoints::setup() {
     for (checkpoint& line : linear) {
         line.state.reset();

@@ -9,6 +9,7 @@
 #include <string>
 
 struct checkpoint;
+class level;
 struct motorst;
 class pic8;
 
@@ -80,6 +81,9 @@ struct checkpoint : clickable {
 
 class checkpoints {
     std::list<checkpoint> linear;
+    std::vector<checkpoint_state> objects;
+
+    int food_index_offset = 0;
 
   public:
     static inline bool Editor = false;
@@ -102,6 +106,9 @@ class checkpoints {
 
     // Prepare checkpoints for a new game loop
     void setup();
+
+    // Load checkpoint data for a specific level
+    static void load_level(const level& lev);
 };
 
 extern std::unique_ptr<checkpoints> Checkpoints;

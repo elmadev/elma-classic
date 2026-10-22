@@ -1,4 +1,6 @@
 #include "eol/checkpoint.h"
+#include "level/level.h"
+#include "level/object.h"
 #include "log.h"
 #include "main.h"
 #include "physics/init.h"
@@ -451,4 +453,30 @@ void checkpoints::setup() {
     for (checkpoint& line : linear) {
         line.state.reset();
     }
+    for (checkpoint_state& obj : objects) {
+        obj.reset();
+    }
+}
+
+void checkpoints::load_level(const level& lev) {
+    // Get level properties
+    int food_index_offset = 0;
+    int apple_count = 0;
+    for (int i = 0; i < MAX_OBJECTS; i++) {
+        const object* obj = lev.objects[i];
+        if (!obj) {
+            continue;
+        }
+        if (obj->type == object::Type::Killer) {
+            food_index_offset++;
+        }
+        if (obj->type == object::Type::Food) {
+            apple_count++;
+        }
+    }
+
+    // Default checkpoint data
+    Checkpoints = std::make_unique<checkpoints>();
+    Checkpoints->food_index_offset = food_index_offset;
+    Checkpoints->objects.resize(apple_count);
 }

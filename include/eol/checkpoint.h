@@ -15,6 +15,7 @@ struct motorst;
 class pic8;
 
 struct checkpoint_state {
+    std::string label;
     bool active;
     std::optional<int> latest_centiseconds;
     std::optional<int> diff_centiseconds;
@@ -106,6 +107,9 @@ struct checkpoints {
 
     // Trigger one object collected by the bike
     void update_object(int object_id, const motorst& mot, double time, bool is_game);
+
+    // Label checkpoints from 1 to N
+    void enumerate();
 
     // Prepare checkpoints for a new game loop
     void setup();

@@ -339,30 +339,6 @@ static void physics_subframe(driver& driv, double time, double dt) {
     }
 }
 
-static void update_view_settings(driver& driv, bool* other_draw_view, view& hud_data) {
-    player_keys* keys = driv.keys;
-
-    // Visibility of player viewpoint
-    if (was_game_key_just_pressed(keys->toggle_visibility)) {
-        reset_game_background();
-        if (!*other_draw_view) {
-            // You cannot have 0 players visible, so make both players visible instead
-            *other_draw_view = true;
-            driv.draw_view = true;
-        } else {
-            driv.draw_view = !driv.draw_view;
-        }
-    }
-
-    if (was_game_key_just_pressed(keys->toggle_minimap)) {
-        hud_data.toggle_minimap();
-    }
-
-    if (was_game_key_just_pressed(keys->toggle_timer)) {
-        hud_data.toggle_timer();
-    }
-}
-
 // The `rec` argument is only used for game play, not when playing a replay.
 static void update_bike_turn_phase(driver& driv, bool update_rec, double time, int flipped) {
     turning_data* data = &driv.meta.bike_turning;
@@ -905,9 +881,9 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         EolClient->update_spy_kuskis();
 
         // Update the hud and player visibility
-        update_view_settings(driv1, &driv2.draw_view, current_camera.player1);
+        current_camera.player1.update_view_settings(driv1, &driv2.draw_view);
         if (!Single) {
-            update_view_settings(driv2, &driv1.draw_view, current_camera.player2);
+            current_camera.player2.update_view_settings(driv2, &driv1.draw_view);
         }
 
         render_game(time, driv1, driv2, current_camera, GameLoop::Game);
@@ -1133,9 +1109,9 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
         double time = current_replay_time;
 
         // Update the hud and player visibility
-        update_view_settings(driv1, &driv2.draw_view, current_camera.player1);
+        current_camera.player1.update_view_settings(driv1, &driv2.draw_view);
         if (!Single) {
-            update_view_settings(driv2, &driv1.draw_view, current_camera.player2);
+            current_camera.player2.update_view_settings(driv2, &driv1.draw_view);
         }
 
         // Load replay data
@@ -1273,9 +1249,9 @@ void render_replay(const char* level_filename) {
                       EolSettings->recording_fps();
 
         // Update the hud and player visibility
-        update_view_settings(driv1, &driv2.draw_view, current_camera.player1);
+        current_camera.player1.update_view_settings(driv1, &driv2.draw_view);
         if (!Single) {
-            update_view_settings(driv2, &driv1.draw_view, current_camera.player2);
+            current_camera.player2.update_view_settings(driv2, &driv1.draw_view);
         }
 
         bool finished1 = !replay_frame(driv1, time);

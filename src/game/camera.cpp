@@ -1,9 +1,11 @@
 #include "game/camera.h"
 #include "eol/settings.h"
+#include "game/driver.h"
 #include "game/input.h"
 #include "level/level.h"
 #include "physics/init.h"
 #include "platform/scancode.h"
+#include "renderer/render.h"
 #include <algorithm>
 
 bool view::show_minimap() const {
@@ -67,6 +69,30 @@ void view::toggle_timer() const {
     case HudSlot::Replay2:
         EolSettings->set_show_replay_timer_player_b(show);
         return;
+    }
+}
+
+void view::update_view_settings(driver& driv, bool* other_draw_view) {
+    player_keys* keys = driv.keys;
+
+    // Visibility of player viewpoint
+    if (was_game_key_just_pressed(keys->toggle_visibility)) {
+        reset_game_background();
+        if (!*other_draw_view) {
+            // You cannot have 0 players visible, so make both players visible instead
+            *other_draw_view = true;
+            driv.draw_view = true;
+        } else {
+            driv.draw_view = !driv.draw_view;
+        }
+    }
+
+    if (was_game_key_just_pressed(keys->toggle_minimap)) {
+        toggle_minimap();
+    }
+
+    if (was_game_key_just_pressed(keys->toggle_timer)) {
+        toggle_timer();
     }
 }
 

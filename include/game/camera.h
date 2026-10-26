@@ -1,6 +1,7 @@
 #ifndef GAME_CAMERA_H
 #define GAME_CAMERA_H
 
+struct driver;
 class level;
 struct motorst;
 
@@ -20,6 +21,8 @@ struct view {
     bool show_timer() const;
     void toggle_minimap() const;
     void toggle_timer() const;
+
+    void update_view_settings(driver& driv, bool* other_draw_view);
 };
 
 struct camera {

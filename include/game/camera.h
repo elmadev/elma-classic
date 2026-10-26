@@ -1,9 +1,10 @@
 #ifndef GAME_CAMERA_H
 #define GAME_CAMERA_H
 
-struct driver;
 class level;
 struct motorst;
+struct player_keys;
+class state;
 
 enum class CameraMode { Normal, MapViewer };
 
@@ -17,13 +18,14 @@ struct view {
 
     HudSlot hud_slot;
     bool draw_view = true;
+    player_keys* keys;
 
     bool show_minimap() const;
     bool show_timer() const;
     void toggle_minimap() const;
     void toggle_timer() const;
 
-    void update_view_settings(driver& driv, bool* other_draw_view);
+    void update_view_settings(bool* other_draw_view);
 };
 
 struct camera {
@@ -38,7 +40,7 @@ struct camera {
     view player1;
     view player2;
 
-    camera(CameraMode mode, bool is_replay);
+    camera(CameraMode mode, bool is_replay, state* stat);
     void update_freecam(double dt);
     void init_freecam(const level* lev, const motorst* mot);
 };

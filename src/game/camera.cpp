@@ -1,7 +1,7 @@
 #include "game/camera.h"
 #include "eol/settings.h"
-#include "game/driver.h"
 #include "game/input.h"
+#include "game/state.h"
 #include "level/level.h"
 #include "physics/init.h"
 #include "platform/scancode.h"
@@ -72,9 +72,7 @@ void view::toggle_timer() const {
     }
 }
 
-void view::update_view_settings(driver& driv, bool* other_draw_view) {
-    player_keys* keys = driv.keys;
-
+void view::update_view_settings(bool* other_draw_view) {
     // Visibility of player viewpoint
     if (was_game_key_just_pressed(keys->toggle_visibility)) {
         reset_game_background();
@@ -96,7 +94,7 @@ void view::update_view_settings(driver& driv, bool* other_draw_view) {
     }
 }
 
-camera::camera(CameraMode mode, bool is_replay)
+camera::camera(CameraMode mode, bool is_replay, state* stat)
     : mode(mode) {
     if (is_replay) {
         player1.hud_slot = view::HudSlot::Replay1;
@@ -105,6 +103,9 @@ camera::camera(CameraMode mode, bool is_replay)
         player1.hud_slot = view::HudSlot::Game1;
         player2.hud_slot = view::HudSlot::Game2;
     }
+
+    player1.keys = &stat->keys1;
+    player2.keys = &stat->keys2;
 }
 
 void camera::update_freecam(double dt) {

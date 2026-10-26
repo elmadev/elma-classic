@@ -5,6 +5,9 @@
 #include "platform/scancode.h"
 #include <algorithm>
 
+camera::camera(CameraMode mode)
+    : mode(mode) {}
+
 void camera::update_freecam(double dt) {
     double speed = 30.0;
     if (is_game_key_down(DIK_LSHIFT) || is_game_key_down(DIK_RSHIFT)) {

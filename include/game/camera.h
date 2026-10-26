@@ -15,6 +15,7 @@ struct camera {
     double max_x;
     double max_y;
 
+    camera(CameraMode mode);
     void update_freecam(double dt);
     void init_freecam(const level* lev, const motorst* mot);
 };

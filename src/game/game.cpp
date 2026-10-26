@@ -755,8 +755,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
     driver driv2(Motor2, Rec2, &State->keys2, HudSlot::Game2);
     driv1.stats.drunk = driv2.stats.drunk = active_cripples() & BattleAttributes::Drunk;
 
-    camera current_camera;
-    current_camera.mode = camera_mode;
+    camera current_camera(camera_mode);
     current_camera.init_freecam(Level, Motor1);
 
     sound_init();
@@ -1079,8 +1078,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
         driv2.draw_view = PreviousReplayDrawView2;
     }
 
-    camera current_camera;
-    current_camera.mode = CameraMode::Normal;
+    camera current_camera(CameraMode::Normal);
 
     sound_init();
     Mute = false;
@@ -1256,8 +1254,7 @@ void render_replay(const char* level_filename) {
 
     EolClient->enter_level(level_filename, Level, EnterMode::Replay);
 
-    camera current_camera;
-    current_camera.mode = CameraMode::Normal;
+    camera current_camera(CameraMode::Normal);
 
     VideoRecordingMode = true;
     VideoFrameIndex = 0;

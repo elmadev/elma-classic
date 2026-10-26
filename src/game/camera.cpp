@@ -142,3 +142,10 @@ void camera::init_freecam(const level* lev, const motorst* mot) {
     min_y = -level_max_y;
     max_y = -level_min_y;
 }
+
+void camera::update_view_settings(bool single) {
+    player1.update_view_settings(&player2.draw_view);
+    if (!single) {
+        player2.update_view_settings(&player1.draw_view);
+    }
+}

@@ -880,11 +880,7 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         }
         EolClient->update_spy_kuskis();
 
-        // Update the hud and player visibility
-        current_camera.player1.update_view_settings(&current_camera.player2.draw_view);
-        if (!Single) {
-            current_camera.player2.update_view_settings(&current_camera.player1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
         render_game(time, driv1, driv2, current_camera, GameLoop::Game);
 
@@ -1107,11 +1103,7 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
         double time = current_replay_time;
 
-        // Update the hud and player visibility
-        current_camera.player1.update_view_settings(&current_camera.player2.draw_view);
-        if (!Single) {
-            current_camera.player2.update_view_settings(&current_camera.player1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
         // Load replay data
         bool finished1 = !replay_frame(driv1, time);
@@ -1247,11 +1239,7 @@ void render_replay(const char* level_filename) {
         double time = (double)VideoFrameIndex * (pacer::MILLISECONDS_TO_PHYS_TIME * 1000.0) /
                       EolSettings->recording_fps();
 
-        // Update the hud and player visibility
-        current_camera.player1.update_view_settings(&current_camera.player2.draw_view);
-        if (!Single) {
-            current_camera.player2.update_view_settings(&current_camera.player1.draw_view);
-        }
+        current_camera.update_view_settings(Single);
 
         bool finished1 = !replay_frame(driv1, time);
         bool finished2 = false;

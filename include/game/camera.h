@@ -43,6 +43,7 @@ struct camera {
     camera(CameraMode mode, bool is_replay, state* stat);
     void update_freecam(double dt);
     void init_freecam(const level* lev, const motorst* mot);
+    void update_view_settings(bool single);
 };
 
 #endif

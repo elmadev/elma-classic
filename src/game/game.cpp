@@ -881,9 +881,9 @@ int game_loop(const char* filename, CameraMode camera_mode) {
         EolClient->update_spy_kuskis();
 
         // Update the hud and player visibility
-        current_camera.player1.update_view_settings(driv1, &driv2.draw_view);
+        current_camera.player1.update_view_settings(driv1, &current_camera.player2.draw_view);
         if (!Single) {
-            current_camera.player2.update_view_settings(driv2, &driv1.draw_view);
+            current_camera.player2.update_view_settings(driv2, &current_camera.player1.draw_view);
         }
 
         render_game(time, driv1, driv2, current_camera, GameLoop::Game);
@@ -1048,13 +1048,12 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
     driver driv1(Motor1, Rec1, &State->keys1);
     driver driv2(Motor2, Rec2, &State->keys2);
 
-    driv2.draw_view = !MergedRec;
-    if (restore_player_visibility) {
-        driv1.draw_view = PreviousReplayDrawView1;
-        driv2.draw_view = PreviousReplayDrawView2;
-    }
-
     camera current_camera(CameraMode::Normal, true);
+    current_camera.player2.draw_view = !MergedRec;
+    if (restore_player_visibility) {
+        current_camera.player1.draw_view = PreviousReplayDrawView1;
+        current_camera.player2.draw_view = PreviousReplayDrawView2;
+    }
 
     sound_init();
     Mute = false;
@@ -1109,9 +1108,9 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
         double time = current_replay_time;
 
         // Update the hud and player visibility
-        current_camera.player1.update_view_settings(driv1, &driv2.draw_view);
+        current_camera.player1.update_view_settings(driv1, &current_camera.player2.draw_view);
         if (!Single) {
-            current_camera.player2.update_view_settings(driv2, &driv1.draw_view);
+            current_camera.player2.update_view_settings(driv2, &current_camera.player1.draw_view);
         }
 
         // Load replay data
@@ -1147,8 +1146,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
             cleanup_game_loop();
 
-            PreviousReplayDrawView1 = driv1.draw_view;
-            PreviousReplayDrawView2 = driv2.draw_view;
+            PreviousReplayDrawView1 = current_camera.player1.draw_view;
+            PreviousReplayDrawView2 = current_camera.player2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return 0;
@@ -1196,8 +1195,8 @@ int replay_loop(const char* filename, bool restore_player_visibility) {
 
             cleanup_game_loop();
 
-            PreviousReplayDrawView1 = driv1.draw_view;
-            PreviousReplayDrawView2 = driv2.draw_view;
+            PreviousReplayDrawView1 = current_camera.player1.draw_view;
+            PreviousReplayDrawView2 = current_camera.player2.draw_view;
             Single = saved_single;
             FlagTag = saved_tag;
             return -1;
@@ -1249,9 +1248,9 @@ void render_replay(const char* level_filename) {
                       EolSettings->recording_fps();
 
         // Update the hud and player visibility
-        current_camera.player1.update_view_settings(driv1, &driv2.draw_view);
+        current_camera.player1.update_view_settings(driv1, &current_camera.player2.draw_view);
         if (!Single) {
-            current_camera.player2.update_view_settings(driv2, &driv1.draw_view);
+            current_camera.player2.update_view_settings(driv2, &current_camera.player1.draw_view);
         }
 
         bool finished1 = !replay_frame(driv1, time);

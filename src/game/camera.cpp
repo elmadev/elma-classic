@@ -81,9 +81,9 @@ void view::update_view_settings(driver& driv, bool* other_draw_view) {
         if (!*other_draw_view) {
             // You cannot have 0 players visible, so make both players visible instead
             *other_draw_view = true;
-            driv.draw_view = true;
+            draw_view = true;
         } else {
-            driv.draw_view = !driv.draw_view;
+            draw_view = !draw_view;
         }
     }
 

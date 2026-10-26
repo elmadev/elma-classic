@@ -16,6 +16,7 @@ struct view {
     };
 
     HudSlot hud_slot;
+    bool draw_view = true;
 
     bool show_minimap() const;
     bool show_timer() const;

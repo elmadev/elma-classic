@@ -87,6 +87,10 @@ jobs:
           - os: macos-26
           - os: macos-15-intel
             arch: x86_64
+          - os: ubuntu-26.04
+            emscripten: true
+          - os: windows-2025
+            emscripten: true
 
     steps:
       - name: Checkout repository
@@ -96,13 +100,13 @@ jobs:
         uses: actions/cache@v5
         with:
           path: subprojects/packagecache
-          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}-meson-${{ hashFiles('subprojects/*.wrap') }}
+          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}${{ matrix.emscripten && '-emscripten' || '' }}-meson-${{ hashFiles('subprojects/*.wrap') }}
 
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2.22
         with:
           variant: sccache
-          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}
+          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}${{ matrix.emscripten && '-emscripten' || '' }}
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -136,23 +140,47 @@ jobs:
           echo "PKG_CONFIG_PATH=$OPENSSL_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" >> "$GITHUB_ENV"
 
       - name: Visual Studio
-        if: runner.os == 'windows'
+        if: runner.os == 'windows' && !matrix.emscripten
         uses: microsoft/setup-msbuild@v3
         with:
           vs-version: "[17.1,19.0)"
 
+      - name: Emscripten (Windows)
+        if: runner.os == 'windows' && matrix.emscripten
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk.bat install latest
+          ./emsdk.bat activate latest
+
+      - name: Emscripten (Linux)
+        if: runner.os != 'windows' && matrix.emscripten
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install latest
+          ./emsdk activate latest
+
       - name: Configure
-        if: runner.os == 'windows'
+        if: runner.os == 'windows' && !matrix.emscripten
         run: meson setup build -Dbuildtype=release --vsenv
 
       - name: Configure
-        if: runner.os != 'windows'
+        if: runner.os != 'windows' && !matrix.emscripten
         run: meson setup build -Dbuildtype=release -Dstatic_sdl=true
+
+      - name: Configure
+        if: matrix.emscripten
+        shell: cmd
+        run: |
+          set "PATH=%CD%\emsdk\upstream\emscripten;%PATH%"
+          meson setup build -Dbuildtype=release --cross-file emscripten.ini
 
       - name: Build
         run: meson compile -C build
 
       - name: Upload build artifacts
+        if: ${{ !matrix.emscripten }}
         uses: actions/upload-artifact@v7
         with:
           name: elma-${{ runner.os }}-${{ matrix.arch || 'default' }}

@@ -14,6 +14,8 @@ if get_option('curl_verbose') == true
     add_project_arguments('-DCURL_VERBOSE', language: 'cpp')
 endif
 
+cpp = meson.get_compiler('cpp')
+
 elma_sources = files(
     'src/debug/profiler.cpp',
     'src/editor/canvas.cpp',
@@ -80,8 +82,6 @@ elma_sources = files(
     'src/pic/pic8.cpp',
     'src/pic/piclist.cpp',
     'src/pic/surface.cpp',
-    'src/platform/native/api/api.cpp',
-    'src/platform/native/api/wrapper.cpp',
     'src/platform/sdl/gl_renderer.cpp',
     'src/platform/sdl/keyboard.cpp',
     'src/platform/sdl/scancode.cpp',
@@ -101,9 +101,19 @@ elma_sources = files(
     'src/vect2.cpp',
 )
 
+if cpp.get_id() != 'emscripten'
+    elma_sources += files(
+        'src/platform/native/api/api.cpp',
+        'src/platform/native/api/wrapper.cpp',
+    )
+else
+    elma_sources += files(
+        'src/platform/emscripten/api/api.cpp',
+    )
+endif
+
 inc = include_directories('include')
 
-cpp = meson.get_compiler('cpp')
 link_args = []
 cpp_args = []
 deps = []

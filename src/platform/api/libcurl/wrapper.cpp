@@ -1,4 +1,4 @@
-#include "api/curl_wrapper.h"
+#include "platform/api/libcurl/wrapper.h"
 #include "log.h"
 #include "main.h"
 #include <filesystem>

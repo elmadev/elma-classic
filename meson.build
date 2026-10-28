@@ -15,8 +15,6 @@ if get_option('curl_verbose') == true
 endif
 
 elma_sources = files(
-    'src/api/api.cpp',
-    'src/api/curl_wrapper.cpp',
     'src/debug/profiler.cpp',
     'src/editor/canvas.cpp',
     'src/editor/dialog.cpp',
@@ -82,6 +80,8 @@ elma_sources = files(
     'src/pic/pic8.cpp',
     'src/pic/piclist.cpp',
     'src/pic/surface.cpp',
+    'src/platform/api/libcurl/api.cpp',
+    'src/platform/api/libcurl/wrapper.cpp',
     'src/platform/sdl/gl_renderer.cpp',
     'src/platform/sdl/keyboard.cpp',
     'src/platform/sdl/scancode.cpp',

@@ -20,7 +20,6 @@
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
-#include <limits>
 #include <optional>
 #include <string_view>
 
@@ -1219,10 +1218,11 @@ void level::unflip_objects() {
 }
 
 vect2 level::midpoint() const {
-    double min_x = std::numeric_limits<double>::infinity();
-    double min_y = std::numeric_limits<double>::infinity();
-    double max_x = -std::numeric_limits<double>::infinity();
-    double max_y = -std::numeric_limits<double>::infinity();
+    vect2 bike_start = motorst::DEFAULT_BIKE.r + start_position;
+    double min_x = bike_start.x;
+    double min_y = bike_start.y;
+    double max_x = bike_start.x;
+    double max_y = bike_start.y;
 
     for (int i = 0; i < MAX_POLYGONS; i++) {
         const polygon* poly = polygons[i];

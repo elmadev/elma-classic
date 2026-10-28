@@ -18,7 +18,6 @@ double target_time = 0.0;
 
 // In milliseconds
 long long start_time = 0;
-long long last_real_frame_time = 0;
 long long real_frame_count = 0;
 
 } // namespace
@@ -70,7 +69,6 @@ void reset() {
     target_time = 0.0;
 
     start_time = get_milliseconds();
-    last_real_frame_time = start_time;
     real_frame_count = 0;
 
     FpsLimitEnabled = EolSettings->fps_limit_enabled();
@@ -92,7 +90,6 @@ void new_frame() {
     }
 
     real_frame_count++;
-    last_real_frame_time = now;
     fps::count_fps();
 
     target_time = std::max(elapsed * MILLISECONDS_TO_PHYS_TIME, 0.000001);

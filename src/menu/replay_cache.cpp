@@ -18,7 +18,9 @@ void replay_cache::start() {
     }
 
     // Read metadata of all replay files on different thread
+#ifndef __EMSCRIPTEN__
     worker = std::thread([this] {
+#endif
         START_TIME(cache_timer);
         std::unordered_map<int, std::vector<std::string>> level_id_to_filenames_;
         std::unordered_map<std::string, int> filename_to_level_id_;
@@ -68,7 +70,9 @@ void replay_cache::start() {
             ready.store(true, std::memory_order_release);
         }
         END_TIME(cache_timer, "Replay cache")
+#ifndef __EMSCRIPTEN__
     });
+#endif
 }
 
 bool replay_cache::is_ready() const { return ready.load(std::memory_order_acquire); }

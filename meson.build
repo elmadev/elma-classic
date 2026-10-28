@@ -137,8 +137,11 @@ if cpp.get_id() == 'msvc'
         # Override windows subsystem entrypoint to main instead of WinMain
         link_args += ['/ENTRY:mainCRTStartup']
     endif
-else
+elif cpp.get_id() == 'clang'
     cpp_args += ['-Wno-deprecated-declarations', '-Wunreachable-code']
+elif cpp.get_id() == 'emscripten'
+    cpp_args += ['-sUSE_SDL=2']
+    link_args += ['-sUSE_SDL=2', '-ooutput.html', '--emrun', '--embed-file','../data@/', '-sASYNCIFY', '-sEXCEPTION_DEBUG', '-sDISABLE_EXCEPTION_CATCHING=0', '-sALLOW_MEMORY_GROWTH', '-sFETCH', '-sASYNCIFY_STACK_SIZE=16384']
 endif
 
 gl_dep = dependency('gl', required: true)
@@ -146,7 +149,8 @@ gl_dep = dependency('gl', required: true)
 libcurl_dep = dependency('libcurl',
     version : '>=8.12.1',
     include_type: 'system',
-    static: build_machine.system() == 'windows',
+    static: host_machine.system() == 'windows',
+    required: cpp.get_id() != 'emscripten',
     default_options: {
         # See meson_options.txt, meson.build, CURL-DISABLE.md and INSTALL-CMAKE.md in libcurl
         # See also https://curl.se/libcurl/c/curl_version_info.html
@@ -184,7 +188,7 @@ libcurl_dep = dependency('libcurl',
         'sha512_256': 'disabled', # only used in CURLAUTH_DIGEST
         'shuffle-dns': 'disabled', # CURLOPT_DNS_SHUFFLE_ADDRESSES
         'socketpair': 'enabled', # curl_multi_poll()
-        'sspi': build_machine.system() == 'windows' ? 'enabled' : 'disabled', # required for Schannel (SSL)
+        'sspi': host_machine.system() == 'windows' ? 'enabled' : 'disabled', # required for Schannel (SSL)
         'unixsockets': 'disabled', # CURLOPT_UNIX_SOCKET_PATH
         'verbose-strings': 'enabled', # Error messages
         'websockets': 'disabled', # API: Websocket
@@ -247,7 +251,8 @@ libcurl_dep = dependency('libcurl',
 nlohmann_json_dep = dependency('nlohmann_json')
 
 sdl2_dep = dependency('sdl2',
-    static: build_machine.system() == 'windows' or get_option('static_sdl'),
+    static: host_machine.system() == 'windows' or get_option('static_sdl'),
+    required: cpp.get_id() != 'emscripten',
     default_options: {
         # See this overview: https://wiki.libsdl.org/SDL3/QuickReference
         # Also see SDL's meson_options.txt

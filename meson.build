@@ -137,8 +137,18 @@ if cpp.get_id() == 'msvc'
         # Override windows subsystem entrypoint to main instead of WinMain
         link_args += ['/ENTRY:mainCRTStartup']
     endif
-else
+elif cpp.get_id() == 'clang'
     cpp_args += ['-Wno-deprecated-declarations', '-Wunreachable-code']
+elif cpp.get_id() == 'emscripten'
+    cpp_args += ['-sUSE_SDL=2']
+    link_args += ['-sUSE_SDL=2', '-ooutput.html', '--emrun', '--embed-file','../data@/', '-sENVIRONMENT=web', '-sALLOW_MEMORY_GROWTH', '-sASYNCIFY', '-sASYNCIFY_STACK_SIZE=16384', '-sDISABLE_EXCEPTION_CATCHING=0']
+    if get_option('buildtype') == 'debug' or get_option('buildtype') == 'debugoptimized'
+        cpp_args += ['-g']
+        link_args += ['-sEXCEPTION_DEBUG', '-g']
+    else
+        cpp_args += ['-O3', '-flto']
+        link_args += ['-flto', '-g2']
+    endif
 endif
 
 gl_dep = dependency('gl', required: true)
@@ -146,7 +156,8 @@ gl_dep = dependency('gl', required: true)
 libcurl_dep = dependency('libcurl',
     version : '>=8.12.1',
     include_type: 'system',
-    static: build_machine.system() == 'windows',
+    static: host_machine.system() == 'windows',
+    required: cpp.get_id() != 'emscripten',
     default_options: {
         # See meson_options.txt, meson.build, CURL-DISABLE.md and INSTALL-CMAKE.md in libcurl
         # See also https://curl.se/libcurl/c/curl_version_info.html
@@ -184,7 +195,7 @@ libcurl_dep = dependency('libcurl',
         'sha512_256': 'disabled', # only used in CURLAUTH_DIGEST
         'shuffle-dns': 'disabled', # CURLOPT_DNS_SHUFFLE_ADDRESSES
         'socketpair': 'enabled', # curl_multi_poll()
-        'sspi': build_machine.system() == 'windows' ? 'enabled' : 'disabled', # required for Schannel (SSL)
+        'sspi': host_machine.system() == 'windows' ? 'enabled' : 'disabled', # required for Schannel (SSL)
         'unixsockets': 'disabled', # CURLOPT_UNIX_SOCKET_PATH
         'verbose-strings': 'enabled', # Error messages
         'websockets': 'disabled', # API: Websocket
@@ -247,7 +258,8 @@ libcurl_dep = dependency('libcurl',
 nlohmann_json_dep = dependency('nlohmann_json')
 
 sdl2_dep = dependency('sdl2',
-    static: build_machine.system() == 'windows' or get_option('static_sdl'),
+    static: host_machine.system() == 'windows' or get_option('static_sdl'),
+    required: cpp.get_id() != 'emscripten',
     default_options: {
         # See this overview: https://wiki.libsdl.org/SDL3/QuickReference
         # Also see SDL's meson_options.txt
@@ -287,6 +299,13 @@ executable(
 clang_tidy = find_program('clang-tidy', 'clang-tidy-21', required: false)
 lint_files = run_command('git', '-C', meson.project_source_root(), 'ls-files', '*.cpp', '*.c', 'include/*.h', check: false)
 if clang_tidy.found() and lint_files.returncode() == 0
+    filtered_files = []
+    foreach f : lint_files.stdout().strip().split('\n')
+        if not f.contains('emscripten')
+            filtered_files += f
+        endif
+    endforeach
+
     clang_tidy_args = ['--allow-no-checks', '--warnings-as-errors=*', '-quiet', '-p', meson.project_build_root()]
 
     # clang-cl rejects the debug CRT together with -fsanitize=address, so
@@ -304,7 +323,7 @@ if clang_tidy.found() and lint_files.returncode() == 0
         endif
     endif
 
-    foreach f : lint_files.stdout().strip().split('\n')
+    foreach f : filtered_files
         test(
             f,
             clang_tidy,

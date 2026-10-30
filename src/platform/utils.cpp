@@ -34,10 +34,15 @@ int strnicmp(const char* a, const char* b, size_t len) {
     return v;
 }
 
+#ifndef __EMSCRIPTEN__
+
 void strlwr(char* str) {
     while (*str) {
         *str = std::tolower((unsigned char)*str);
         str++;
     }
 }
+
+#endif
+
 #endif

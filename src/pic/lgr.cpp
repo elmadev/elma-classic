@@ -1,5 +1,4 @@
 #include "pic/lgr.h"
-#include "api/api.h"
 #include "debug/profiler.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
@@ -12,6 +11,7 @@
 #include "pic/pic8.h"
 #include "pic/piclist.h"
 #include "pic/surface.h"
+#include "platform/api.h"
 #include "platform/implementation.h"
 #include "platform/utils.h"
 #include "renderer/canvas.h"

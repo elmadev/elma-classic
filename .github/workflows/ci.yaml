@@ -14,6 +14,10 @@ on:
       - "**/docs/**"
       - "**.txt"
 
+env:
+  EMSCRIPTEN_VERSION: 6.0.13
+  EMSCRIPTEN_CACHE: "emsdk-cache"
+
 jobs:
   clang-format:
     runs-on: ubuntu-26.04
@@ -87,6 +91,10 @@ jobs:
           - os: macos-26
           - os: macos-15-intel
             arch: x86_64
+          - os: ubuntu-26.04
+            emscripten: true
+          - os: windows-2025
+            emscripten: true
 
     steps:
       - name: Checkout repository
@@ -96,13 +104,14 @@ jobs:
         uses: actions/cache@v5
         with:
           path: subprojects/packagecache
-          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}-meson-${{ hashFiles('subprojects/*.wrap') }}
+          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}${{ matrix.emscripten && '-emscripten' || '' }}-meson-${{ hashFiles('subprojects/*.wrap') }}
 
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2.22
+        if: ${{ !matrix.emscripten }}
         with:
           variant: sccache
-          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}
+          key: ${{ runner.os }}-${{ matrix.arch || 'default' }}${{ matrix.emscripten && '-emscripten' || '' }}
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -136,18 +145,30 @@ jobs:
           echo "PKG_CONFIG_PATH=$OPENSSL_PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" >> "$GITHUB_ENV"
 
       - name: Visual Studio
-        if: runner.os == 'windows'
+        if: runner.os == 'windows' && !matrix.emscripten
         uses: microsoft/setup-msbuild@v3
         with:
           vs-version: "[17.1,19.0)"
 
-      - name: Configure
-        if: runner.os == 'windows'
-        run: meson setup build -Dbuildtype=release --vsenv
+      - name: Emscripten
+        uses: emscripten-core/setup-emsdk@v15
+        if: matrix.emscripten
+        with:
+          version: ${{env.EMSCRIPTEN_VERSION}}
+          actions-cache-folder: ${{env.EMSCRIPTEN_CACHE}}
 
       - name: Configure
-        if: runner.os != 'windows'
-        run: meson setup build -Dbuildtype=release -Dstatic_sdl=true
+        shell: bash
+        run: |
+          args=()
+          if [[ "${{ matrix.emscripten }}" == "true" ]]; then
+            args+=(--cross-file emscripten.ini)
+          elif [[ "${{ runner.os }}" == "windows" ]]; then
+            args+=(--vsenv)
+          else
+            args+=(-Dstatic_sdl=true)
+          fi
+          meson setup build -Dbuildtype=release "${args[@]}"
 
       - name: Build
         run: meson compile -C build
@@ -155,9 +176,12 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: elma-${{ runner.os }}-${{ matrix.arch || 'default' }}
+          name: elma-${{ runner.os }}-${{ matrix.arch || 'default' }}${{ matrix.emscripten && '-emscripten' || '' }}
           path: |
             build/elma
             build/elma.exe
+            build/output.html
+            build/output.js
+            build/output.wasm
           retention-days: 5
           if-no-files-found: ignore

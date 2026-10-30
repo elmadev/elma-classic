@@ -564,6 +564,18 @@ void eol_settings::write_settings() {
 #define RESET_KEY(name) EolSettings->persist_##name(EolSettings->name##_default());
 
 void eol_settings::reset_keys() {
+    RESET_KEY(high_quality_key);
+
+    RESET_KEY(default_ground_sky_key);
+    RESET_KEY(zoom_out_key);
+    RESET_KEY(zoom_in_key);
+
+    RESET_KEY(alovolt_key_player_a);
+    RESET_KEY(alovolt_key_player_b);
+    RESET_KEY(brake_alias_key_player_a);
+    RESET_KEY(brake_alias_key_player_b);
+    RESET_KEY(one_frame_brake_key_player_a);
+    RESET_KEY(one_frame_brake_key_player_b);
     RESET_KEY(escape_alias_key);
 
     RESET_KEY(replay_fast_2x_key);

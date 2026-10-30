@@ -305,3 +305,15 @@ if clang_tidy.found() and lint_files.returncode() == 0
         )
     endforeach
 endif
+
+python = import('python').find_installation()
+test(
+    'settings::reset_keys()',
+    python,
+    args: [files(
+        'tests/test_reset_keys.py',
+        'include/eol/settings.h',
+        'src/eol/settings.cpp'
+    )],
+    suite: 'tests'
+)

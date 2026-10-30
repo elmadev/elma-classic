@@ -561,6 +561,52 @@ void eol_settings::write_settings() {
     o << std::setw(4) << j << std::endl;
 }
 
+void eol_settings::reset_keys() {
+    EolSettings->persist_escape_alias_key(EolSettings->escape_alias_key_default());
+
+    EolSettings->persist_replay_fast_2x_key(EolSettings->replay_fast_2x_key_default());
+    EolSettings->persist_replay_fast_4x_key(EolSettings->replay_fast_4x_key_default());
+    EolSettings->persist_replay_fast_8x_key(EolSettings->replay_fast_8x_key_default());
+    EolSettings->persist_replay_slow_2x_key(EolSettings->replay_slow_2x_key_default());
+    EolSettings->persist_replay_slow_4x_key(EolSettings->replay_slow_4x_key_default());
+    EolSettings->persist_replay_pause_key(EolSettings->replay_pause_key_default());
+    EolSettings->persist_replay_rewind_key(EolSettings->replay_rewind_key_default());
+
+    EolSettings->persist_show_others_key(EolSettings->show_others_key_default());
+    EolSettings->persist_shown_to_key(EolSettings->shown_to_key_default());
+    EolSettings->persist_spy_next_kuski_key(EolSettings->spy_next_kuski_key_default());
+    EolSettings->persist_spy_prev_kuski_key(EolSettings->spy_prev_kuski_key_default());
+    EolSettings->persist_battle_queue_key(EolSettings->battle_queue_key_default());
+    EolSettings->persist_download_battle_level_key(
+        EolSettings->download_battle_level_key_default());
+    EolSettings->persist_download_level_key(EolSettings->download_level_key_default());
+    EolSettings->persist_players_online_key(EolSettings->players_online_key_default());
+    EolSettings->persist_best_times_key(EolSettings->best_times_key_default());
+    EolSettings->persist_battle_results_key(EolSettings->battle_results_key_default());
+    EolSettings->persist_finished_times_key(EolSettings->finished_times_key_default());
+    EolSettings->persist_cycle_finished_times_filter_key(
+        EolSettings->cycle_finished_times_filter_key_default());
+    EolSettings->persist_clear_finished_times_key(EolSettings->clear_finished_times_key_default());
+    EolSettings->persist_chat_key(EolSettings->chat_key_default());
+    EolSettings->persist_show_chat_key(EolSettings->show_chat_key_default());
+    EolSettings->persist_team_chat_key(EolSettings->team_chat_key_default());
+    EolSettings->persist_pm_next_kuski_key(EolSettings->pm_next_kuski_key_default());
+    EolSettings->persist_pm_prev_kuski_key(EolSettings->pm_prev_kuski_key_default());
+    EolSettings->persist_pm_clear_kuski_key(EolSettings->pm_clear_kuski_key_default());
+    EolSettings->persist_battle_status_key(EolSettings->battle_status_key_default());
+    EolSettings->persist_battle_leader_key(EolSettings->battle_leader_key_default());
+    EolSettings->persist_speedometer_key(EolSettings->speedometer_key_default());
+    EolSettings->persist_download_battle_rec_key(EolSettings->download_battle_rec_key_default());
+    EolSettings->persist_reconnect_key(EolSettings->reconnect_key_default());
+    EolSettings->persist_disconnect_key(EolSettings->disconnect_key_default());
+    EolSettings->persist_toggle_one_wheel_status_key(
+        EolSettings->toggle_one_wheel_status_key_default());
+    EolSettings->persist_toggle_last_apple_time_key(
+        EolSettings->toggle_last_apple_time_key_default());
+
+    State->reset_keys();
+}
+
 void eol_settings::sync_controls_to_state(state* s) {
     if (!s) {
         return;

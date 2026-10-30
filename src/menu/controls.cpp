@@ -312,7 +312,7 @@ void menu_customize_controls() {
         nav.y_entries = 86;
         nav.dy = 40;
 
-        nav.add_row("Reset all controls to default", NAV_FUNC() { State->reset_keys(); });
+        nav.add_row("Reset all controls to default", NAV_FUNC() { eol_settings::reset_keys(); });
 
         nav.add_row(
             "Customize Player A",

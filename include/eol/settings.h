@@ -227,6 +227,7 @@ class eol_settings {
     // Applies a JSON file on top of settings.json for this session only, nothing is persisted.
     static void read_overrides(const std::string& file);
     static void write_settings();
+    static void reset_keys();
     static void sync_controls_to_state(state* s);
     static void sync_controls_from_state(state* s);
 

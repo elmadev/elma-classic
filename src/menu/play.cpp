@@ -17,8 +17,6 @@
 #include "physics/init.h"
 #include "pic/abc8.h"
 #include "platform/implementation.h"
-#include "platform/scancode.h"
-#include "platform/text_input.h"
 #include "renderer/timer.h"
 #include "util/util.h"
 #include <algorithm>
@@ -26,9 +24,7 @@
 #include <format>
 #include <optional>
 
-// Prompt for replay filename and return true if enter, false if esc
-static bool menu_prompt_replay_name(int internal_index, const char* external_filename,
-                                    char* filename) {
+static void menu_save_play(int internal_index, const char* external_filename, int level_id) {
     std::string level_name;
     if (external_filename) {
         level_name = external_filename;
@@ -36,64 +32,15 @@ static bool menu_prompt_replay_name(int internal_index, const char* external_fil
         level_name =
             std::format("{}: {}", internal_index + 1, get_internal_level_name(internal_index));
     }
+    std::string prompt = std::format("{}\nPlease enter the filename:", level_name);
 
-    menu_pic menu;
-    int i = 0;
-    empty_keypress_buffer();
-    bool rerender = true;
-    filename[0] = 0;
-    while (true) {
-        handle_events();
-        if (was_key_just_pressed(DIK_ESCAPE)) {
-            return false;
-        }
-        if (was_key_just_pressed(DIK_RETURN)) {
-            if (i > 0) {
-                return true;
-            }
-        }
-        if (was_key_down(DIK_BACK)) {
-            if (i > 0) {
-                i--;
-                filename[i] = 0;
-                rerender = true;
-            }
-        }
-        while (has_text_input()) {
-            char c = pop_text_input();
-            if (MenuFont->has_char(c) && util::text::is_filename_char(c)) {
-                if (i >= MAX_REPLAY_NAME_LEN) {
-                    continue;
-                }
-                filename[i] = c;
-                filename[i + 1] = 0;
-                i++;
-                rerender = true;
-            }
-        }
-        if (rerender) {
-            rerender = false;
-            menu.clear();
-
-            menu.add_line_centered(level_name, 320, 120);
-            menu.add_line_centered("Please enter the filename:", 320, 180);
-
-            filename[i] = '_';
-            filename[i + 1] = 0;
-            menu.add_line_centered(filename, 320, 240);
-            filename[i] = 0;
-        }
-        menu.render();
-    }
-}
-
-static void menu_save_play(int internal_index, const char* external_filename, int level_id) {
-    recname tmp = "";
-    if (!menu_prompt_replay_name(internal_index, external_filename, tmp)) {
+    std::optional<std::string> filename = menu_prompt_filename(prompt, "", MAX_REPLAY_NAME_LEN);
+    if (!filename) {
         return;
     }
-    strcat(tmp, ".rec");
-    recorder::save_rec_file(tmp, level_id);
+
+    std::string path = *filename + ".rec";
+    recorder::save_rec_file(path.c_str(), level_id);
 }
 
 void update_top_ten(int time, char* time_message, int internal_index,

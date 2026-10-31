@@ -24,7 +24,8 @@
 #include <format>
 #include <optional>
 
-static void menu_save_play(int internal_index, const char* external_filename, int level_id) {
+static void menu_save_play(int internal_index, const char* external_filename, int level_id,
+                           int time) {
     std::string level_name;
     if (external_filename) {
         level_name = external_filename;
@@ -32,6 +33,13 @@ static void menu_save_play(int internal_index, const char* external_filename, in
         level_name =
             std::format("{}: {}", internal_index + 1, get_internal_level_name(internal_index));
     }
+
+    if (time > 0) {
+        char time_text[64];
+        util::text::centiseconds_to_string(time, time_text, true, true);
+        level_name = std::format("{} ({})", level_name, (const char*)time_text);
+    }
+
     std::string prompt = std::format("{}\nPlease enter the filename:", level_name);
 
     std::optional<std::string> filename = menu_prompt_filename(prompt, "", MAX_REPLAY_NAME_LEN);
@@ -204,7 +212,7 @@ void replay_from_file(const char* filename) {
 
 static text_line ExtraTimeText[14];
 
-MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time_message,
+MenuLevel menu_level(int internal_index, bool nav_on_play_next, int time, const char* time_message,
                      const char* external_filename) {
     bool external_level = external_filename != nullptr;
 
@@ -338,8 +346,8 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, const char* time
             });
 
         nav.add_row(
-            "Save play", NAV_FUNC(&internal_index, &external_filename) {
-                menu_save_play(internal_index, external_filename, Level->level_id);
+            "Save play", NAV_FUNC(&internal_index, &external_filename, &time) {
+                menu_save_play(internal_index, external_filename, Level->level_id, time);
             });
 
         nav.add_row(
@@ -434,7 +442,8 @@ static void play_internal(int internal_index) {
             State->save();
         }
 
-        MenuLevel choice = menu_level(internal_index, unlocked_new_level, time_message, nullptr);
+        MenuLevel choice =
+            menu_level(internal_index, unlocked_new_level, time, time_message, nullptr);
         Rec1->erase(filename);
         Rec2->erase(filename);
 

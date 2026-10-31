@@ -36,7 +36,7 @@ static void play_external(const std::string& filename) {
         MenuPalette->set();
         char finish_msg[100] = "";
         update_top_ten(time, finish_msg, 0, filename_str);
-        if (menu_level(0, false, finish_msg, filename_str) == MenuLevel::Esc) {
+        if (menu_level(0, false, time, finish_msg, filename_str) == MenuLevel::Esc) {
             Rec1->erase(filename_str);
             Rec2->erase(filename_str);
             return;

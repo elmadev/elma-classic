@@ -67,6 +67,7 @@
 - Intro scrolling animation is now skippable by pressing Enter or Esc, instead of being a setting
 - Maximum rows increased from 29 to 200 for high resolutions
 - About menu updated
+- Save play shows finish time while typing filename
 - Background menu balls start centered in the screen
 - state.dat is updated after using the Options menu
 

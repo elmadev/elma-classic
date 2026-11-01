@@ -185,6 +185,17 @@ static void menu_fullscreen() {
         text, EolSettings->setting##_persisted() ? "Yes" : "No",                                   \
         NAV_FUNC() { EolSettings->persist_##setting(!EolSettings->setting##_persisted()); });
 
+#define DOUBLE_OPTION(text, setting, prompt, form, max_len)                                        \
+    nav.add_row(                                                                                   \
+        text, std::format(form, EolSettings->setting##_persisted()), NAV_FUNC() {                  \
+            auto val = menu_prompt_double(                                                         \
+                prompt, std::format(form, EolSettings->setting##_persisted()), max_len);           \
+            if (!val) {                                                                            \
+                return;                                                                            \
+            }                                                                                      \
+            EolSettings->persist_##setting(*val);                                                  \
+        });
+
 static void menu_cripples() {
     int choice = 0;
     while (true) {
@@ -386,24 +397,9 @@ void menu_options() {
                 menu_resolution();
             });
 
-        nav.add_row(
-            "Zoom:", std::format("{:.2f}", EolSettings->zoom_persisted()), NAV_FUNC() {
-                double old_zoom = EolSettings->zoom_persisted();
-                EolSettings->persist_zoom(old_zoom + 0.25);
-                if (old_zoom == EolSettings->zoom_persisted()) {
-                    EolSettings->persist_zoom(0.25);
-                }
-            });
+        DOUBLE_OPTION("Zoom:", zoom, "Enter Zoom", "{:.2f}", 5);
 
-        nav.add_row(
-            "Minimap Zoom:", std::format("{:.2f}", EolSettings->minimap_zoom_persisted()),
-            NAV_FUNC() {
-                double old_zoom = EolSettings->minimap_zoom_persisted();
-                EolSettings->persist_minimap_zoom(old_zoom + 0.25);
-                if (old_zoom == EolSettings->minimap_zoom_persisted()) {
-                    EolSettings->persist_minimap_zoom(0.25);
-                }
-            });
+        DOUBLE_OPTION("Minimap Zoom:", minimap_zoom, "Enter Minimap Zoom", "{:.2f}", 5);
 
         BOOL_OPTION("Zoom Textures:", zoom_textures);
 

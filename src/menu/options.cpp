@@ -211,6 +211,12 @@ static void menu_cripples() {
     }
 }
 
+static void menu_set_nick() {
+    char nick[17];
+    prompt_text_input("Enter your EOL nick:", nick, sizeof(nick) - 1, EolSettings->nick().c_str());
+    EolSettings->persist_nick(nick);
+}
+
 void menu_options() {
     menu_nav nav("Options");
     nav.x_left = 0;
@@ -223,6 +229,8 @@ void menu_options() {
     while (true) {
         nav.clear_entries();
         nav.select_row(choice);
+
+        nav.add_row("Nick:", EolSettings->nick(), NAV_FUNC() { menu_set_nick(); });
 
         nav.add_row(
             "Play mode:", State->single ? "Single Player" : "Multiplayer",

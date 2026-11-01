@@ -379,3 +379,55 @@ void menu_nav::update_filter() {
     }
     selected_index = std::min(selected_index, std::max(0, (int)filter_indices.size() - 1));
 }
+
+bool prompt_text_input(const char* prompt, char* text, int max_len, const char* default_text) {
+    menu_pic menu(false);
+
+    int i = 0;
+    empty_keypress_buffer();
+    bool needs_update = true;
+    text[0] = 0;
+    while (true) {
+        handle_events();
+        if (was_key_just_pressed(DIK_ESCAPE)) {
+            return false;
+        }
+        if (was_key_just_pressed(DIK_RETURN)) {
+            if (i > 0) {
+                return true;
+            }
+        }
+        if (was_key_down(DIK_BACK)) {
+            if (i > 0) {
+                i--;
+                text[i] = 0;
+                needs_update = true;
+            }
+        }
+        while (has_text_input()) {
+            char c = pop_text_input();
+            if (MenuFont->has_char(c) && util::text::is_filename_char(c)) {
+                if (i >= max_len) {
+                    continue;
+                }
+                text[i] = c;
+                text[i + 1] = 0;
+                i++;
+                needs_update = true;
+            }
+        }
+        if (needs_update) {
+            needs_update = false;
+
+            menu.clear();
+
+            text[i] = '_';
+            text[i + 1] = 0;
+            menu.add_line_centered(text, 320, 240);
+            text[i] = 0;
+
+            menu.add_line_centered(prompt, 320, 180);
+        }
+        menu.render();
+    }
+}

@@ -84,4 +84,6 @@ class menu_nav {
     void update_filter();
 };
 
+bool prompt_text_input(const char* prompt, char* text, int max_len);
+
 #endif

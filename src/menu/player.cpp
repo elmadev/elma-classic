@@ -15,55 +15,7 @@ static_assert(MAX_PLAYERNAME_INPUT < MAX_PLAYERNAME_LENGTH);
 
 // Prompt for a new player name. Return true if name successfully selected
 static bool prompt_new_name(char* player_name) {
-    menu_pic menu(false);
-
-    int i = 0;
-    empty_keypress_buffer();
-    bool needs_update = true;
-    player_name[0] = 0;
-    while (true) {
-        handle_events();
-        if (was_key_just_pressed(DIK_ESCAPE)) {
-            return false;
-        }
-        if (was_key_just_pressed(DIK_RETURN)) {
-            if (i > 0) {
-                return true;
-            }
-        }
-        if (was_key_down(DIK_BACK)) {
-            if (i > 0) {
-                i--;
-                player_name[i] = 0;
-                needs_update = true;
-            }
-        }
-        while (has_text_input()) {
-            char c = pop_text_input();
-            if (MenuFont->has_char(c) && util::text::is_filename_char(c)) {
-                if (i >= MAX_PLAYERNAME_INPUT) {
-                    continue;
-                }
-                player_name[i] = c;
-                player_name[i + 1] = 0;
-                i++;
-                needs_update = true;
-            }
-        }
-        if (needs_update) {
-            needs_update = false;
-
-            menu.clear();
-
-            player_name[i] = '_';
-            player_name[i + 1] = 0;
-            menu.add_line_centered(player_name, 320, 240);
-            player_name[i] = 0;
-
-            menu.add_line_centered("Please enter your name:", 320, 180);
-        }
-        menu.render();
-    }
+    return prompt_text_input("Please enter your name:", player_name, MAX_PLAYERNAME_INPUT);
 }
 
 bool menu_player_create(bool change_player1) {

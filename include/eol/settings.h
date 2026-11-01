@@ -170,7 +170,7 @@ class eol_settings {
     Default<bool> show_ups_{false};
     Default<bool> fps_limit_enabled_{false};
     Clamp<int> fps_limit_{30, 100, 1000};
-    Clamp<int> recording_fps_{30, 30, 120};
+    Clamp<int> recording_fps_{30, 30, 1000};
 
     Default<bool> show_demo_menu_{true};
     Default<bool> show_help_menu_{true};

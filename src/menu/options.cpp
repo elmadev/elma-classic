@@ -185,6 +185,17 @@ static void menu_fullscreen() {
         text, EolSettings->setting##_persisted() ? "Yes" : "No",                                   \
         NAV_FUNC() { EolSettings->persist_##setting(!EolSettings->setting##_persisted()); });
 
+#define INT_OPTION(text, setting, prompt, max_len)                                                 \
+    nav.add_row(                                                                                   \
+        text, std::to_string(EolSettings->setting##_persisted()), NAV_FUNC() {                     \
+            auto val = menu_prompt_int(prompt, std::to_string(EolSettings->setting##_persisted()), \
+                                       max_len);                                                   \
+            if (!val) {                                                                            \
+                return;                                                                            \
+            }                                                                                      \
+            EolSettings->persist_##setting(*val);                                                  \
+        });
+
 #define DOUBLE_OPTION(text, setting, prompt, form, max_len)                                        \
     nav.add_row(                                                                                   \
         text, std::format(form, EolSettings->setting##_persisted()), NAV_FUNC() {                  \
@@ -485,20 +496,7 @@ void menu_options() {
                 EolSettings->persist_fps_limit(steps[0]);
             });
 
-        nav.add_row(
-            "Record Replay FPS:", std::to_string(EolSettings->recording_fps_persisted()),
-            NAV_FUNC() {
-                int old_fps = EolSettings->recording_fps_persisted();
-                int new_fps;
-                if (old_fps == 30) {
-                    new_fps = 60;
-                } else if (old_fps == 60) {
-                    new_fps = 120;
-                } else {
-                    new_fps = 30;
-                }
-                EolSettings->persist_recording_fps(new_fps);
-            });
+        INT_OPTION("Record Replay FPS", recording_fps, "Enter Record Replay FPS", 4);
 
         BOOL_OPTION("Show Total Time:", show_total_time);
         BOOL_OPTION("Demo menu:", show_demo_menu);
@@ -564,14 +562,7 @@ void menu_options() {
                 EolClient->announce_shown_to();
             });
 
-        nav.add_row(
-            "Num Chat Lines:", std::format("{}", EolSettings->chat_lines_persisted()), NAV_FUNC() {
-                int old_chat_lines = EolSettings->chat_lines_persisted();
-                EolSettings->persist_chat_lines(old_chat_lines + 1);
-                if (old_chat_lines == EolSettings->chat_lines_persisted()) {
-                    EolSettings->persist_chat_lines(1);
-                }
-            });
+        INT_OPTION("Num Chat Lines:", chat_lines, "Enter Number of Chat Lines", 2);
 
         BOOL_OPTION("Show others:", show_others);
         BOOL_OPTION("Show battle status:", show_battle_status);

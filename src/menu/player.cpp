@@ -15,7 +15,7 @@ static_assert(MAX_PLAYERNAME_INPUT < MAX_PLAYERNAME_LENGTH);
 
 // Prompt for a new player name. Return true if name successfully selected
 static bool prompt_new_name(char* player_name) {
-    return prompt_text_input("Please enter your name:", player_name, MAX_PLAYERNAME_INPUT);
+    return prompt_text_input("Please enter your name:", player_name, MAX_PLAYERNAME_INPUT, nullptr);
 }
 
 bool menu_player_create(bool change_player1) {

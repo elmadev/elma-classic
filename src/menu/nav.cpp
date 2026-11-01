@@ -383,10 +383,16 @@ void menu_nav::update_filter() {
 bool prompt_text_input(const char* prompt, char* text, int max_len, const char* default_text) {
     menu_pic menu(false);
 
-    int i = 0;
+    if (default_text) {
+        strcpy(text, default_text);
+    } else {
+        text[0] = 0;
+    }
+
     empty_keypress_buffer();
     bool needs_update = true;
-    text[0] = 0;
+    int i = strlen(text);
+
     while (true) {
         handle_events();
         if (was_key_just_pressed(DIK_ESCAPE)) {

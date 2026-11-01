@@ -2,69 +2,10 @@
 #include "game/state.h"
 #include "menu/dialog.h"
 #include "menu/nav.h"
-#include "menu/pic.h"
-#include "pic/abc8.h"
-#include "platform/implementation.h"
-#include "platform/scancode.h"
-#include "platform/text_input.h"
-#include "util/util.h"
 #include <cstring>
 
 constexpr int MAX_PLAYERNAME_INPUT = 8;
 static_assert(MAX_PLAYERNAME_INPUT < MAX_PLAYERNAME_LENGTH);
-
-// Prompt for a new player name. Return true if name successfully selected
-static bool prompt_new_name(char* player_name) {
-    menu_pic menu(false);
-
-    int i = 0;
-    empty_keypress_buffer();
-    bool needs_update = true;
-    player_name[0] = 0;
-    while (true) {
-        handle_events();
-        if (was_key_just_pressed(DIK_ESCAPE)) {
-            return false;
-        }
-        if (was_key_just_pressed(DIK_RETURN)) {
-            if (i > 0) {
-                return true;
-            }
-        }
-        if (was_key_down(DIK_BACK)) {
-            if (i > 0) {
-                i--;
-                player_name[i] = 0;
-                needs_update = true;
-            }
-        }
-        while (has_text_input()) {
-            char c = pop_text_input();
-            if (MenuFont->has_char(c) && util::text::is_filename_char(c)) {
-                if (i >= MAX_PLAYERNAME_INPUT) {
-                    continue;
-                }
-                player_name[i] = c;
-                player_name[i + 1] = 0;
-                i++;
-                needs_update = true;
-            }
-        }
-        if (needs_update) {
-            needs_update = false;
-
-            menu.clear();
-
-            player_name[i] = '_';
-            player_name[i + 1] = 0;
-            menu.add_line_centered(player_name, 320, 240);
-            player_name[i] = 0;
-
-            menu.add_line_centered("Please enter your name:", 320, 180);
-        }
-        menu.render();
-    }
-}
 
 bool menu_player_create(bool change_player1) {
     if (State->player_count >= MAX_PLAYERS - 1) {
@@ -73,32 +14,35 @@ bool menu_player_create(bool change_player1) {
         return false;
     }
 
-    char* player_name = State->players[int(State->player_count)].name;
-    if (prompt_new_name(player_name)) {
-        for (int i = 0; i < State->player_count; i++) {
-            if (strcmp(State->players[i].name, player_name) == 0) {
-                memset(player_name, 0, MAX_PLAYERNAME_LENGTH);
-                menu_dialog("This player name already exists!");
-                return false;
-            }
-        }
-
-        if (change_player1) {
-            strcpy(State->player1, player_name);
-            State->player_count++;
-            if (State->player_count == 1) {
-                strcpy(State->player2, State->player1);
-            }
-        } else {
-            strcpy(State->player2, player_name);
-            State->player_count++;
-            if (State->player_count == 1) {
-                strcpy(State->player1, State->player2);
-            }
-        }
-        return true;
+    std::optional<std::string> new_name =
+        menu_prompt_string("Please enter your name:", "", MAX_PLAYERNAME_INPUT);
+    if (!new_name) {
+        return false;
     }
-    return false;
+    for (int i = 0; i < State->player_count; i++) {
+        if (strcmp(State->players[i].name, new_name->c_str()) == 0) {
+            menu_dialog("This player name already exists!");
+            return false;
+        }
+    }
+
+    char* player_name = State->players[int(State->player_count)].name;
+    strcpy(player_name, new_name->c_str());
+
+    if (change_player1) {
+        strcpy(State->player1, player_name);
+        State->player_count++;
+        if (State->player_count == 1) {
+            strcpy(State->player2, State->player1);
+        }
+    } else {
+        strcpy(State->player2, player_name);
+        State->player_count++;
+        if (State->player_count == 1) {
+            strcpy(State->player1, State->player2);
+        }
+    }
+    return true;
 }
 
 bool menu_player_choose(bool change_player1, bool allow_delete) {

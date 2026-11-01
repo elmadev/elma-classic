@@ -21,11 +21,24 @@
 #include "util/util.h"
 #include <algorithm>
 #include <cstring>
+#include <filesystem>
 #include <format>
 #include <optional>
 
+static bool menu_overwrite(const std::string& filename) {
+    menu_nav nav(filename + " already exists!");
+    nav.y_entries = 200;
+    nav.dy = 40;
+    nav.y_title = 100;
+
+    nav.add_row("Overwrite " + filename);
+    nav.add_row("Cancel");
+    return nav.navigate() == 0;
+}
+
 static void menu_save_play(int internal_index, const char* external_filename, int level_id,
                            int time) {
+    // Get level name
     std::string level_name;
     if (external_filename) {
         level_name = external_filename;
@@ -34,21 +47,37 @@ static void menu_save_play(int internal_index, const char* external_filename, in
             std::format("{}: {}", internal_index + 1, get_internal_level_name(internal_index));
     }
 
+    // Add level time
     if (time > 0) {
         char time_text[64];
         util::text::centiseconds_to_string(time, time_text, true, true);
         level_name = std::format("{} ({})", level_name, (const char*)time_text);
     }
 
+    // Prompt for filename
     std::string prompt = std::format("{}\nPlease enter the filename:", level_name);
+    std::string input = "";
+    while (true) {
+        std::optional<std::string> filename =
+            menu_prompt_filename(prompt, input, MAX_REPLAY_NAME_LEN);
+        if (!filename) {
+            return;
+        }
 
-    std::optional<std::string> filename = menu_prompt_filename(prompt, "", MAX_REPLAY_NAME_LEN);
-    if (!filename) {
+        // Confirm overwrite if file already exists
+        input = *filename;
+        std::string path = input + ".rec";
+        std::string full_path = "rec/" + path;
+        if (std::filesystem::exists(full_path)) {
+            if (!menu_overwrite(path)) {
+                continue;
+            }
+        }
+
+        // Save file
+        recorder::save_rec_file(path.c_str(), level_id);
         return;
     }
-
-    std::string path = *filename + ".rec";
-    recorder::save_rec_file(path.c_str(), level_id);
 }
 
 void update_top_ten(int time, char* time_message, int internal_index,

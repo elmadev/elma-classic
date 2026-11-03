@@ -21,7 +21,7 @@ void itoa(int value, char* str, int base);
 int strcmpi(const char* a, const char* b);
 int strnicmp(const char* a, const char* b, size_t len);
 
-void strlwr(char* str);
+char* strlwr(char* str);
 
 #endif
 

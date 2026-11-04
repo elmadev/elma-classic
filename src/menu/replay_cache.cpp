@@ -12,63 +12,65 @@ replay_cache::~replay_cache() {
     }
 }
 
+void replay_cache::scan_recs() {
+    START_TIME(cache_timer);
+    std::unordered_map<int, std::vector<std::string>> level_id_to_filenames_;
+    std::unordered_map<std::string, int> filename_to_level_id_;
+
+    std::filesystem::directory_iterator it;
+    try {
+        it = std::filesystem::directory_iterator("rec");
+    } catch (const std::filesystem::filesystem_error&) {
+        // rec/ directory doesn't exist - nothing to scan
+        ready.store(true, std::memory_order_release);
+        return;
+    }
+
+    for (const auto& entry : it) {
+        if (stop_requested.load(std::memory_order_relaxed)) {
+            return;
+        }
+        if (!entry.is_regular_file()) {
+            continue;
+        }
+        const std::filesystem::path& path = entry.path();
+        if (path.extension() != ".rec") {
+            continue;
+        }
+        std::string stem = path.stem().string();
+        if (stem.size() > MAX_REPLAY_NAME_LEN) {
+            continue;
+        }
+
+        std::string filename = path.filename().string();
+        auto header = recorder::read_header(filename);
+        if (!header) {
+            continue;
+        }
+
+        level_id_to_filenames_[header->level_id].push_back(filename);
+        filename_to_level_id_[filename] = header->level_id;
+    }
+
+    {
+        std::scoped_lock lock(mutex);
+        // Initialize replay data from initial scan
+        level_id_to_filenames = std::move(level_id_to_filenames_);
+        filename_to_level_id = std::move(filename_to_level_id_);
+        // Update data for any replays that were saved during the initial scan
+        flush_pending_upserts();
+        ready.store(true, std::memory_order_release);
+    }
+    END_TIME(cache_timer, "Replay cache")
+}
+
 void replay_cache::start() {
     if (worker.joinable()) {
         internal_error("replay_cache::start called more than once");
     }
 
     // Read metadata of all replay files on different thread
-    worker = std::thread([this] {
-        START_TIME(cache_timer);
-        std::unordered_map<int, std::vector<std::string>> level_id_to_filenames_;
-        std::unordered_map<std::string, int> filename_to_level_id_;
-
-        std::filesystem::directory_iterator it;
-        try {
-            it = std::filesystem::directory_iterator("rec");
-        } catch (const std::filesystem::filesystem_error&) {
-            // rec/ directory doesn't exist - nothing to scan
-            ready.store(true, std::memory_order_release);
-            return;
-        }
-
-        for (const auto& entry : it) {
-            if (stop_requested.load(std::memory_order_relaxed)) {
-                return;
-            }
-            if (!entry.is_regular_file()) {
-                continue;
-            }
-            const std::filesystem::path& path = entry.path();
-            if (path.extension() != ".rec") {
-                continue;
-            }
-            std::string stem = path.stem().string();
-            if (stem.size() > MAX_REPLAY_NAME_LEN) {
-                continue;
-            }
-
-            std::string filename = path.filename().string();
-            auto header = recorder::read_header(filename);
-            if (!header) {
-                continue;
-            }
-
-            level_id_to_filenames_[header->level_id].push_back(filename);
-            filename_to_level_id_[filename] = header->level_id;
-        }
-
-        {
-            std::scoped_lock lock(mutex);
-            // Initialize replay data from initial scan
-            level_id_to_filenames = std::move(level_id_to_filenames_);
-            filename_to_level_id = std::move(filename_to_level_id_);
-            // Update data for any replays that were saved during the initial scan
-            flush_pending_upserts();
-            ready.store(true, std::memory_order_release);
-        }
-        END_TIME(cache_timer, "Replay cache")
-    });
+    worker = std::thread([this] { scan_recs(); });
 }
 
 bool replay_cache::is_ready() const { return ready.load(std::memory_order_acquire); }

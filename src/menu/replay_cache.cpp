@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <unordered_set>
 
+constexpr bool threaded_replay_cache = true;
+
 replay_cache::~replay_cache() {
     stop_requested.store(true, std::memory_order_relaxed);
     if (worker.joinable()) {
@@ -69,8 +71,12 @@ void replay_cache::start() {
         internal_error("replay_cache::start called more than once");
     }
 
-    // Read metadata of all replay files on different thread
-    worker = std::thread([this] { scan_recs(); });
+    if constexpr (threaded_replay_cache) {
+        // Read metadata of all replay files on different thread
+        worker = std::thread([this] { scan_recs(); });
+    } else {
+        scan_recs();
+    }
 }
 
 bool replay_cache::is_ready() const { return ready.load(std::memory_order_acquire); }

@@ -29,6 +29,7 @@ class replay_cache {
   public:
     ~replay_cache();
 
+    void scan_recs();
     // Start background scan of rec/ directory
     void start();
 

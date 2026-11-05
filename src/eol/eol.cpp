@@ -714,7 +714,6 @@ void eol::cycle_shown_to() {
         StatusMessages->add("other players can see you");
         break;
     }
-    announce_shown_to();
 }
 
 template <typename Range>

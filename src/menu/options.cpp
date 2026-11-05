@@ -1,5 +1,4 @@
 #include "menu/options.h"
-#include "eol/eol.h"
 #include "eol/settings.h"
 #include "game/state.h"
 #include "main.h"
@@ -559,7 +558,6 @@ void menu_options() {
                     EolSettings->persist_shown_to(ShownTo::Everyone);
                     break;
                 }
-                EolClient->announce_shown_to();
             });
 
         INT_OPTION("Num Chat Lines:", chat_lines, "Enter Number of Chat Lines", 2);

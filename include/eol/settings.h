@@ -359,7 +359,7 @@ class eol_settings {
 
     DECLARE_SETTING(table_alignment);
     DECLARE_SETTING(chat_visibility);
-    DECLARE_SETTING(shown_to);
+    DECLARE_SETTING_CUSTOM(shown_to);
 };
 
 #undef SETTING_VALUE_TYPE

@@ -1,5 +1,6 @@
 #include "eol/settings.h"
 #include "editor/editor.h"
+#include "eol/eol.h"
 #include "game/state.h"
 #include "level/level.h"
 #include "main.h"
@@ -196,6 +197,13 @@ void eol_settings::set_cripple_one_turn(bool b) {
     cripple_one_turn_ = b;
     if (b) {
         cripple_no_turn_ = false;
+    }
+}
+
+void eol_settings::set_shown_to(ShownTo s) {
+    shown_to_ = s;
+    if (EolClient) {
+        EolClient->announce_shown_to();
     }
 }
 

@@ -206,6 +206,35 @@ static void menu_fullscreen() {
             EolSettings->persist_##setting(*val);                                                  \
         });
 
+template <typename Enum, std::size_t N>
+const char* enum_name(Enum value, const std::array<std::pair<Enum, const char*>, N>& options) {
+    for (const auto& [option, name] : options) {
+        if (option == value) {
+            return name;
+        }
+    }
+    return "?";
+}
+
+template <typename Enum, std::size_t N, typename Persist>
+void cycle_enum(Enum current, const std::array<std::pair<Enum, const char*>, N>& options,
+                const Persist& persist) {
+    for (std::size_t i = 0; i < N; ++i) {
+        if (options[i].first == current) {
+            persist(options[(i + 1) % N].first);
+            return;
+        }
+    }
+    persist(options[0].first);
+}
+
+#define ENUM_OPTION(text, setting, options)                                                        \
+    nav.add_row(                                                                                   \
+        text, enum_name(EolSettings->setting##_persisted(), options), NAV_FUNC() {                 \
+            cycle_enum(EolSettings->setting##_persisted(), options,                                \
+                       [](auto val) { EolSettings->persist_##setting(val); });                     \
+        });
+
 static void menu_cripples() {
     int choice = 0;
     while (true) {
@@ -321,37 +350,13 @@ void menu_options() {
 
 #undef SHOW_X_OPTION
 
-        nav.add_row(
-            "Minimap Alignment:",
-            [] {
-                switch (EolSettings->map_alignment_persisted()) {
-                case MapAlignment::None:
-                    return "None";
-                case MapAlignment::Left:
-                    return "Left";
-                case MapAlignment::Middle:
-                    return "Middle";
-                case MapAlignment::Right:
-                    return "Right";
-                }
-                return "";
-            }(),
-            NAV_FUNC() {
-                switch (EolSettings->map_alignment_persisted()) {
-                case MapAlignment::None:
-                    EolSettings->persist_map_alignment(MapAlignment::Left);
-                    return;
-                case MapAlignment::Left:
-                    EolSettings->persist_map_alignment(MapAlignment::Middle);
-                    return;
-                case MapAlignment::Middle:
-                    EolSettings->persist_map_alignment(MapAlignment::Right);
-                    return;
-                case MapAlignment::Right:
-                    EolSettings->persist_map_alignment(MapAlignment::None);
-                    return;
-                }
-            });
+        static constexpr std::array MAP_ALIGNMENT{
+            std::pair{MapAlignment::None, "None"},
+            std::pair{MapAlignment::Left, "Left"},
+            std::pair{MapAlignment::Middle, "Middle"},
+            std::pair{MapAlignment::Right, "Right"},
+        };
+        ENUM_OPTION("Minimap Alignment:", map_alignment, MAP_ALIGNMENT);
 
         nav.add_row(
             "Minimap Size:",
@@ -415,27 +420,11 @@ void menu_options() {
 
         BOOL_OPTION("Zoom Grass:", zoom_grass);
 
-        nav.add_row(
-            "Renderer:",
-            [] {
-                switch (EolSettings->renderer_persisted()) {
-                case RendererType::Software:
-                    return "Software";
-                case RendererType::OpenGL:
-                    return "OpenGL";
-                }
-                return "";
-            }(),
-            NAV_FUNC() {
-                switch (EolSettings->renderer_persisted()) {
-                case RendererType::Software:
-                    EolSettings->persist_renderer(RendererType::OpenGL);
-                    return;
-                case RendererType::OpenGL:
-                    EolSettings->persist_renderer(RendererType::Software);
-                    return;
-                }
-            });
+        static constexpr std::array RENDERER{
+            std::pair{RendererType::Software, "Software"},
+            std::pair{RendererType::OpenGL, "OpenGL"},
+        };
+        ENUM_OPTION("Renderer:", renderer, RENDERER);
 
         nav.add_row(
             "Fullscreen:", fullscreen_mode_label(EolSettings->fullscreen_persisted()),
@@ -504,61 +493,21 @@ void menu_options() {
         BOOL_OPTION("Best Times menu:", show_best_times_menu);
         BOOL_OPTION("Skip Intro:", skip_intro);
 
-        nav.add_row(
-            "Show chat:",
-            [] {
-                switch (EolSettings->chat_visibility_persisted()) {
-                case ChatVisibility::Shown:
-                    return "Yes";
-                case ChatVisibility::PublicHidden:
-                    return "Public hidden";
-                case ChatVisibility::Hidden:
-                    return "No";
-                }
-                return "";
-            }(),
-            NAV_FUNC() {
-                switch (EolSettings->chat_visibility_persisted()) {
-                case ChatVisibility::Shown:
-                    EolSettings->persist_chat_visibility(ChatVisibility::PublicHidden);
-                    return;
-                case ChatVisibility::PublicHidden:
-                    EolSettings->persist_chat_visibility(ChatVisibility::Hidden);
-                    return;
-                case ChatVisibility::Hidden:
-                    EolSettings->persist_chat_visibility(ChatVisibility::Shown);
-                    return;
-                }
-            });
+        static constexpr std::array SHOW_CHAT{
+            std::pair{ChatVisibility::Shown, "Shown"},
+            std::pair{ChatVisibility::PublicHidden, "Public hidden"},
+            std::pair{ChatVisibility::Hidden, "No"},
+        };
+        ENUM_OPTION("Show chat:", chat_visibility, SHOW_CHAT);
 
         BOOL_OPTION("Large Font:", large_font);
 
-        nav.add_row(
-            "Shown to:",
-            [] {
-                switch (EolSettings->shown_to_persisted()) {
-                case ShownTo::Everyone:
-                    return "Everyone";
-                case ShownTo::Team:
-                    return "Team";
-                case ShownTo::Nobody:
-                    return "Nobody";
-                }
-                return "";
-            }(),
-            NAV_FUNC() {
-                switch (EolSettings->shown_to_persisted()) {
-                case ShownTo::Everyone:
-                    EolSettings->persist_shown_to(ShownTo::Team);
-                    break;
-                case ShownTo::Team:
-                    EolSettings->persist_shown_to(ShownTo::Nobody);
-                    break;
-                case ShownTo::Nobody:
-                    EolSettings->persist_shown_to(ShownTo::Everyone);
-                    break;
-                }
-            });
+        static constexpr std::array SHOWN_TO{
+            std::pair{ShownTo::Everyone, "Everyone"},
+            std::pair{ShownTo::Team, "Team"},
+            std::pair{ShownTo::Nobody, "Nobody"},
+        };
+        ENUM_OPTION("Shown to:", shown_to, SHOWN_TO);
 
         INT_OPTION("Num Chat Lines:", chat_lines, "Enter Number of Chat Lines", 2);
 
@@ -567,32 +516,12 @@ void menu_options() {
         BOOL_OPTION("Show battle leader:", show_battle_leader);
         BOOL_OPTION("Show speedometer:", show_speedometer);
 
-        nav.add_row(
-            "Table Alignment:",
-            [] {
-                switch (EolSettings->table_alignment_persisted()) {
-                case eol_table::Align::Left:
-                    return "Left";
-                case eol_table::Align::Center:
-                    return "Center";
-                case eol_table::Align::Right:
-                    return "Right";
-                }
-                return "";
-            }(),
-            NAV_FUNC() {
-                switch (EolSettings->table_alignment_persisted()) {
-                case eol_table::Align::Left:
-                    EolSettings->persist_table_alignment(eol_table::Align::Center);
-                    return;
-                case eol_table::Align::Center:
-                    EolSettings->persist_table_alignment(eol_table::Align::Right);
-                    return;
-                case eol_table::Align::Right:
-                    EolSettings->persist_table_alignment(eol_table::Align::Left);
-                    return;
-                }
-            });
+        static constexpr std::array TABLE_ALIGNMENT{
+            std::pair{eol_table::Align::Left, "Left"},
+            std::pair{eol_table::Align::Center, "Center"},
+            std::pair{eol_table::Align::Right, "Right"},
+        };
+        ENUM_OPTION("Table Alignment:", table_alignment, TABLE_ALIGNMENT);
 
         choice = nav.navigate();
 

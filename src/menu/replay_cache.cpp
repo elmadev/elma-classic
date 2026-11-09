@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <unordered_set>
 
-constexpr bool threaded_replay_cache = true;
+constexpr bool threaded_replay_cache = THREADED_REPLAY_CACHE;
 
 replay_cache::~replay_cache() {
     stop_requested.store(true, std::memory_order_relaxed);

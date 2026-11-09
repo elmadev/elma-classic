@@ -1,6 +1,6 @@
-#include "api/api.h"
-#include "api/curl_wrapper.h"
+#include "platform/api.h"
 #include "eol/settings.h"
+#include "platform/native/api/wrapper.h"
 #include <format>
 
 namespace eol_api {

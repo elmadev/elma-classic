@@ -17,6 +17,7 @@ endif
 elma_sources = files(
     'src/api/api.cpp',
     'src/api/curl_wrapper.cpp',
+    'src/box.cpp',
     'src/debug/profiler.cpp',
     'src/editor/canvas.cpp',
     'src/editor/dialog.cpp',

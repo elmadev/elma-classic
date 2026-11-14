@@ -433,6 +433,12 @@ static void physics_frame_turn(driver& driv) {
     }
 }
 
+static void adjust_fps_limit(int delta) {
+    int limit = EolSettings->fps_limit() + delta;
+    limit = std::max(30, std::min(1000, limit));
+    pacer::request_fps_limit(true, limit);
+}
+
 static void handle_eol_inputs() {
     if (was_game_key_just_pressed(EolSettings->show_others_key())) {
         EolSettings->set_show_others(!EolSettings->show_others());
@@ -578,6 +584,14 @@ static void handle_eol_inputs() {
         EolSettings->set_show_last_apple_time(!EolSettings->show_last_apple_time());
         StatusMessages->add(EolSettings->show_last_apple_time() ? "last apple time shown"
                                                                 : "last apple time hidden");
+    }
+
+    if (was_game_key_just_pressed(EolSettings->decrement_fps_limit_key())) {
+        adjust_fps_limit(-EolSettings->fps_limit_step());
+    }
+
+    if (was_game_key_just_pressed(EolSettings->increment_fps_limit_key())) {
+        adjust_fps_limit(EolSettings->fps_limit_step());
     }
 }
 

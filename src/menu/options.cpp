@@ -484,7 +484,12 @@ void menu_options() {
                 EolSettings->persist_fps_limit(steps[0]);
             });
 
-        INT_OPTION("Record Replay FPS", recording_fps, "Enter Record Replay FPS", 4);
+        INT_OPTION("FPS Limit Key +/-:", increment_fps_amount,
+                   "Every time you press the -/+ FPS keys,\n"
+                   "the FPS will change by this amount on the next run.",
+                   3);
+
+        INT_OPTION("Record Replay FPS:", recording_fps, "Enter Record Replay FPS", 4);
 
         BOOL_OPTION("Show Total Time:", show_total_time);
         BOOL_OPTION("Demo menu:", show_demo_menu);

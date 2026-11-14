@@ -457,6 +457,9 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
     JSON_FIELD(show_ups)                                                                           \
     JSON_FIELD(fps_limit_enabled)                                                                  \
     JSON_FIELD(fps_limit)                                                                          \
+    JSON_FIELD(increment_fps_amount)                                                               \
+    JSON_FIELD(decrement_fps_key)                                                                  \
+    JSON_FIELD(increment_fps_key)                                                                  \
     JSON_FIELD(recording_fps)                                                                      \
                                                                                                    \
     JSON_FIELD(show_demo_menu)                                                                     \
@@ -577,6 +580,8 @@ void eol_settings::reset_keys() {
     RESET_KEY(default_ground_sky_key);
     RESET_KEY(zoom_out_key);
     RESET_KEY(zoom_in_key);
+    RESET_KEY(decrement_fps_key);
+    RESET_KEY(increment_fps_key);
 
     RESET_KEY(alovolt_key_player_a);
     RESET_KEY(alovolt_key_player_b);

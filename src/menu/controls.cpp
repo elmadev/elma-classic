@@ -171,6 +171,8 @@ static void load_universal_controls(menu_nav* nav) {
     LOAD_SETTING_COMBO(nav, UniversalKeys, "Toggle Ground/Sky", default_ground_sky_key);
     LOAD_SETTING_COMBO(nav, UniversalKeys, "Zoom Out", zoom_out_key);
     LOAD_SETTING_COMBO(nav, UniversalKeys, "Zoom In", zoom_in_key);
+    LOAD_SETTING_COMBO(nav, UniversalKeys, "Decrement Fps Limit", decrement_fps_key);
+    LOAD_SETTING_COMBO(nav, UniversalKeys, "Increment Fps Limit", increment_fps_key);
 }
 
 // Setup the menu to display the replay controls

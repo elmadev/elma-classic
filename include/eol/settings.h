@@ -170,6 +170,9 @@ class eol_settings {
     Default<bool> show_ups_{false};
     Default<bool> fps_limit_enabled_{false};
     Clamp<int> fps_limit_{30, 100, 1000};
+    Clamp<int> increment_fps_amount_{1, 1, 1000};
+    Default<combo_scancode> decrement_fps_key_{combo_scancode{DIK_NONE, DIK_NONE}};
+    Default<combo_scancode> increment_fps_key_{combo_scancode{DIK_NONE, DIK_NONE}};
     Clamp<int> recording_fps_{30, 30, 1000};
 
     Default<bool> show_demo_menu_{true};
@@ -309,6 +312,9 @@ class eol_settings {
     DECLARE_SETTING(show_ups);
     DECLARE_SETTING(fps_limit_enabled);
     DECLARE_SETTING(fps_limit);
+    DECLARE_SETTING(increment_fps_amount);
+    DECLARE_SETTING(decrement_fps_key);
+    DECLARE_SETTING(increment_fps_key);
     DECLARE_SETTING(recording_fps);
 
     DECLARE_SETTING(show_demo_menu);

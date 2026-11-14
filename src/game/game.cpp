@@ -573,6 +573,18 @@ static void handle_eol_inputs() {
         StatusMessages->add(EolSettings->show_last_apple_time() ? "last apple time shown"
                                                                 : "last apple time hidden");
     }
+
+    if (was_game_key_just_pressed(EolSettings->decrement_fps_key())) {
+        int limit = EolSettings->fps_limit() - EolSettings->increment_fps_amount();
+        limit = std::max(30, std::min(1000, limit));
+        pacer::request_fps_limit(true, limit);
+    }
+
+    if (was_game_key_just_pressed(EolSettings->increment_fps_key())) {
+        int limit = EolSettings->fps_limit() + EolSettings->increment_fps_amount();
+        limit = std::max(30, std::min(1000, limit));
+        pacer::request_fps_limit(true, limit);
+    }
 }
 
 static void handle_mouse() {

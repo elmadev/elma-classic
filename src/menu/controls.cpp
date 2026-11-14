@@ -209,6 +209,7 @@ static void load_function_controls(menu_nav* nav) {
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Spy Next Kuski", spy_next_kuski_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Spy Prev Kuski", spy_prev_kuski_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Battle Queue", battle_queue_key);
+    LOAD_SETTING_COMBO(nav, FunctionKeys, "Toggle Locked Levels", toggle_locked_levels_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Download Battle Level", download_battle_level_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Download Level", download_level_key);
     LOAD_SETTING_COMBO(nav, FunctionKeys, "Players Online", players_online_key);

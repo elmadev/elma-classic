@@ -30,6 +30,7 @@ elma_sources = files(
     'src/eol/battle.cpp',
     'src/eol/checkpoint.cpp',
     'src/eol/checkpoint_json.cpp',
+    'src/eol/checkpoint_table.cpp',
     'src/eol/clickable.cpp',
     'src/eol/console.cpp',
     'src/eol/eol_table.cpp',

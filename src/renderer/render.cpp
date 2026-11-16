@@ -36,9 +36,9 @@
 
 static bool GameBackgroundRender = false;
 
-static abc8* SmallFont = nullptr;
-static abc8* MediumFont = nullptr;
-static abc8* LargeFont = nullptr;
+abc8* SmallFont = nullptr;
+abc8* MediumFont = nullptr;
+abc8* LargeFont = nullptr;
 
 // Percentage of the screen used to render the game (QFRAME drawn on the edge)
 static double VisibleFraction = 1.0;

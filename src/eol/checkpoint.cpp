@@ -1,6 +1,7 @@
 #include "eol/checkpoint.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
+#include "eol/settings.h"
 #include "level/level.h"
 #include "level/object.h"
 #include "log.h"
@@ -452,6 +453,11 @@ bool checkpoint::is_touching(const motorst& mot) const {
 }
 
 void checkpoints::update_touching(const motorst& mot, double time, bool is_game) {
+    CheckpointsEnabled enabled = EolSettings->checkpoints_enabled();
+    if (enabled == CheckpointsEnabled::Never) {
+        return;
+    }
+
     for (checkpoint& line : linear) {
         if (!line.state.active) {
             continue;
@@ -464,6 +470,14 @@ void checkpoints::update_touching(const motorst& mot, double time, bool is_game)
 }
 
 void checkpoints::update_object(int object_id, const motorst& mot, double time, bool is_game) {
+    CheckpointsEnabled enabled = EolSettings->checkpoints_enabled();
+    if (enabled == CheckpointsEnabled::Never || enabled == CheckpointsEnabled::OnlyLinear) {
+        return;
+    }
+    if (enabled == CheckpointsEnabled::BothIfLinear && linear.empty()) {
+        return;
+    }
+
     int checkpoint_id = object_id - food_index_offset;
     if (checkpoint_id < 0 || checkpoint_id >= objects.size()) {
         // Killer or Start object

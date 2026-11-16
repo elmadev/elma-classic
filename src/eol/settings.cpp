@@ -55,9 +55,13 @@ template <typename T> void Clamp<T>::reset_to_default() {
 
 template struct Default<bool>;
 template struct Default<MapAlignment>;
+template struct Default<HorizontalAlign>;
+template struct Default<VerticalAlign>;
 template struct Default<RendererType>;
 template struct Default<FullscreenMode>;
 template struct Default<ChatVisibility>;
+template struct Default<CheckpointsEnabled>;
+template struct Default<CheckpointSpeed>;
 template struct Default<ShownTo>;
 template struct Default<DikScancode>;
 template struct Default<combo_scancode>;
@@ -275,6 +279,54 @@ void from_json(const json& j, eol_table::Align& a) {
     }
 }
 
+void to_json(json& j, const HorizontalAlign& a) {
+    switch (a) {
+    case HorizontalAlign::Left:
+        j = "left";
+        break;
+    case HorizontalAlign::Center:
+        j = "center";
+        break;
+    case HorizontalAlign::Right:
+        j = "right";
+        break;
+    }
+}
+
+void from_json(const json& j, HorizontalAlign& a) {
+    if (j == "left") {
+        a = HorizontalAlign::Left;
+    } else if (j == "center") {
+        a = HorizontalAlign::Center;
+    } else if (j == "right") {
+        a = HorizontalAlign::Right;
+    }
+}
+
+void to_json(json& j, const VerticalAlign& a) {
+    switch (a) {
+    case VerticalAlign::Top:
+        j = "top";
+        break;
+    case VerticalAlign::Center:
+        j = "center";
+        break;
+    case VerticalAlign::Bottom:
+        j = "bottom";
+        break;
+    }
+}
+
+void from_json(const json& j, VerticalAlign& a) {
+    if (j == "top") {
+        a = VerticalAlign::Top;
+    } else if (j == "center") {
+        a = VerticalAlign::Center;
+    } else if (j == "bottom") {
+        a = VerticalAlign::Bottom;
+    }
+}
+
 void to_json(json& j, const RendererType& r) {
     switch (r) {
     case RendererType::Software:
@@ -345,6 +397,59 @@ void from_json(const json& j, ChatVisibility& c) {
         c = ChatVisibility::Hidden;
     } else {
         throw("[json.exception.type_error.302] (/chat_visibility) invalid value");
+    }
+}
+
+void to_json(json& j, const CheckpointsEnabled& a) {
+    switch (a) {
+    case CheckpointsEnabled::Never:
+        j = "never";
+        break;
+    case CheckpointsEnabled::OnlyLinear:
+        j = "no apples";
+        break;
+    case CheckpointsEnabled::BothIfLinear:
+        j = "if lines exist";
+        break;
+    case CheckpointsEnabled::Both:
+        j = "both";
+        break;
+    }
+}
+
+void from_json(const json& j, CheckpointsEnabled& a) {
+    if (j == "never") {
+        a = CheckpointsEnabled::Never;
+    } else if (j == "no apples") {
+        a = CheckpointsEnabled::OnlyLinear;
+    } else if (j == "if lines exist") {
+        a = CheckpointsEnabled::BothIfLinear;
+    } else if (j == "both") {
+        a = CheckpointsEnabled::Both;
+    }
+}
+
+void to_json(json& j, const CheckpointSpeed& a) {
+    switch (a) {
+    case CheckpointSpeed::Off:
+        j = "off";
+        break;
+    case CheckpointSpeed::IfSpeedometer:
+        j = "if speedometer";
+        break;
+    case CheckpointSpeed::On:
+        j = "on";
+        break;
+    }
+}
+
+void from_json(const json& j, CheckpointSpeed& a) {
+    if (j == "off") {
+        a = CheckpointSpeed::Off;
+    } else if (j == "if speedometer") {
+        a = CheckpointSpeed::IfSpeedometer;
+    } else if (j == "on") {
+        a = CheckpointSpeed::On;
     }
 }
 
@@ -511,7 +616,16 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
                                                                                                    \
     JSON_FIELD(table_alignment)                                                                    \
     JSON_FIELD(chat_visibility)                                                                    \
-    JSON_FIELD(shown_to)
+    JSON_FIELD(shown_to)                                                                           \
+                                                                                                   \
+    JSON_FIELD(checkpoints_enabled)                                                                \
+    JSON_FIELD(checkpoint_table_vertical_pos)                                                      \
+    JSON_FIELD(checkpoint_table_horizontal_pos)                                                    \
+    JSON_FIELD(checkpoint_table_dx)                                                                \
+    JSON_FIELD(checkpoint_table_dy)                                                                \
+    JSON_FIELD(checkpoint_table_height)                                                            \
+    JSON_FIELD(checkpoint_table_diff)                                                              \
+    JSON_FIELD(checkpoint_table_speed)
 
 #define JSON_FIELD(name)                                                                           \
     void eol_settings::persist_##name(decltype(eol_settings::name##_.value) v) {                   \

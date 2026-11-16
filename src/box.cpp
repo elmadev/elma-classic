@@ -3,14 +3,22 @@
 #include "pic/pic8.h"
 #include "platform/implementation.h"
 
-// Draw a box with a 1-pixel border
-void render_box(pic8* pic, int x1, int y1, int x2, int y2, unsigned char fill_id,
-                unsigned char border_id) {
-    pic->fill_box(x1, y1, x2, y2, fill_id);
+void render_outline(pic8* pic, int x1, int y1, int x2, int y2, unsigned char border_id) {
     pic->line(x1, y1, x2, y1, border_id);
     pic->line(x1, y2, x2, y2, border_id);
     pic->line(x1, y1, x1, y2, border_id);
     pic->line(x2, y1, x2, y2, border_id);
+}
+
+void render_outline(pic8* pic, box bx, unsigned char border_id) {
+    render_outline(pic, bx.x1, bx.y1, bx.x2, bx.y2, border_id);
+}
+
+// Draw a box with a 1-pixel border
+void render_box(pic8* pic, int x1, int y1, int x2, int y2, unsigned char fill_id,
+                unsigned char border_id) {
+    pic->fill_box(x1, y1, x2, y2, fill_id);
+    render_outline(pic, x1, y1, x2, y2, border_id);
 }
 
 // Draw a box with a 1-pixel border

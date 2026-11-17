@@ -489,7 +489,7 @@ void menu_options() {
                    "the FPS will change by this amount on the next run.",
                    3);
 
-        INT_OPTION("Record Replay FPS", recording_fps, "Enter Record Replay FPS", 4);
+        INT_OPTION("Record Replay FPS:", recording_fps, "Enter Record Replay FPS", 4);
 
         BOOL_OPTION("Show Total Time:", show_total_time);
         BOOL_OPTION("Demo menu:", show_demo_menu);

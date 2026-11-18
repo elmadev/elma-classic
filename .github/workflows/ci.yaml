@@ -24,9 +24,12 @@ jobs:
       - name: Install clang-format
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-format-21 libgl1-mesa-dev
-          sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-21 100
-          sudo update-alternatives --set clang-format /usr/bin/clang-format-21
+          sudo apt-get install -y libgl1-mesa-dev
+          curl -OL https://apt.llvm.org/llvm.sh
+          sudo bash ./llvm.sh 23
+          sudo apt install -y clang-format-23
+          sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-23 100
+          sudo update-alternatives --set clang-format /usr/bin/clang-format-23
           clang-format --version
 
       - name: Set up Python

@@ -49,8 +49,8 @@ enum Kind : uint16_t {
     Uploaded = 1 << 11,
     OneWheel = 1 << 12,
     Multi = 1 << 13,
-    CrippleMask =
-        NoVolt | NoTurn | OneTurn | NoBrake | NoThrottle | AlwaysThrottle | Drunk | OneWheel,
+    CrippleMask = NoVolt | NoTurn | OneTurn | NoBrake | NoThrottle | AlwaysThrottle | Drunk |
+        OneWheel,
 };
 }
 

@@ -55,7 +55,10 @@ jobs:
       - name: Install clang-tidy
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-tidy-21 libgl1-mesa-dev
+          sudo apt-get install -y libgl1-mesa-dev
+          curl -OL https://apt.llvm.org/llvm.sh
+          sudo bash ./llvm.sh 23
+          sudo apt install -y clang-tidy-23
 
       - name: Set up Python
         uses: actions/setup-python@v6

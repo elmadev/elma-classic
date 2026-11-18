@@ -217,12 +217,12 @@ To catch bugs and improve code quality, use `clang-tidy`.
 - On Linux:
 
   ```
-  $ sudo apt install clang-tidy-21
+  $ sudo apt install clang-tidy-23
   ```
 
 - On Windows:
   ```
-  $ pip install clang-tidy~=21.0
+  $ pip install clang-tidy~=23.0
   ```
 
 ### Running clang-tidy

@@ -1,6 +1,7 @@
 #include "eol/checkpoint.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"
+#include "eol/checkpoint_table.h"
 #include "eol/settings.h"
 #include "level/level.h"
 #include "level/object.h"
@@ -106,6 +107,8 @@ void checkpoint_state::trigger(const motorst& mot, double time, bool is_game) {
 
     LOG_DEBUG("{} - time: {}, diff {}, speed: {}", label, format_latest_centiseconds(),
               format_diff_centiseconds(), format_latest_speed());
+    CheckpointTable.add_line(
+        {label, format_latest_centiseconds(), format_diff_centiseconds(), format_latest_speed()});
 }
 
 void checkpoint_state::reset() {
@@ -504,6 +507,8 @@ void checkpoints::setup() {
     for (checkpoint_state& obj : objects) {
         obj.reset();
     }
+
+    CheckpointTable.reset_lines();
 }
 
 void checkpoints::load_level(const std::string& filename, const level& lev) {

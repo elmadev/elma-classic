@@ -180,12 +180,12 @@ To ensure consistent code formatting, use `clang-format`.
 - On Linux:
 
   ```
-  $ sudo apt install clang-format-19
+  $ sudo apt install clang-format-23
   ```
 
 - On Windows:
   ```
-  $ pip install clang-format~=19.0
+  $ pip install clang-format~=23.0
   ```
 
 ### Running clang-format

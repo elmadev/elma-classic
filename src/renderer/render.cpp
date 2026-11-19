@@ -1050,13 +1050,12 @@ game_mouse get_mouse_position_game() {
     int mouse_x;
     int mouse_y;
     get_mouse_position(&mouse_x, &mouse_y);
+    // screen is rendered upside-down so we need to invert the y position
+    mouse_y = SCREEN_HEIGHT - mouse_y;
 
     game_mouse pos;
     pos.x = mouse_x;
     pos.y = mouse_y;
-
-    // screen is rendered upside-down so we need to invert the y position
-    mouse_y = SCREEN_HEIGHT - mouse_y;
 
     if (mouse_x < GameViewLeft || mouse_x > GameViewRight) {
         return pos;

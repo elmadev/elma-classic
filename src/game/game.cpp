@@ -4,6 +4,7 @@
 #include "eol/checkpoint.h"
 #include "eol/console.h"
 #include "eol/eol.h"
+#include "eol/overlays.h"
 #include "eol/settings.h"
 #include "eol/status_messages.h"
 #include "game/driver.h"
@@ -609,7 +610,10 @@ static void handle_mouse() {
         // Click on something
         int dist = std::numeric_limits<int>::max();
         clickable* closest = nullptr;
-        Checkpoints->get_closest(pos, dist, closest);
+        overlays::get_closest(pos, dist, closest);
+        if (!closest) {
+            Checkpoints->get_closest(pos, dist, closest);
+        }
         if (closest) {
             if (input.left_click) {
                 closest->left_clicked(pos);
@@ -651,9 +655,11 @@ bool configure_game() {
     if (is_key_down(DIK_F2)) {
         map_viewer = true;
         checkpoints::Editor = true;
+        overlays::Editor = true;
         StatusMessages->add("Checkpoint editor enabled: click to add checkpoints");
     } else {
         checkpoints::Editor = false;
+        overlays::Editor = false;
     }
     return map_viewer;
 }

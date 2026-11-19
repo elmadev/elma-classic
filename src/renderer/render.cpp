@@ -3,6 +3,7 @@
 #include "eol/checkpoint.h"
 #include "eol/console.h"
 #include "eol/eol.h"
+#include "eol/overlays.h"
 #include "eol/settings.h"
 #include "eol/status_messages.h"
 #include "game/driver.h"
@@ -963,6 +964,7 @@ void render_game(double time, driver& driv1, driver& driv2, camera& current_came
     Console->render(*pic);
     StatusMessages->render(*pic, font);
     EolClient->render_table(*pic, *MediumFont, font);
+    overlays::render(*pic);
     EolClient->render_battle_status(*pic, font);
     EolClient->render_battle_leader(*pic, font);
     EolClient->render_battle_countdown(*pic, *LargeFont, font);

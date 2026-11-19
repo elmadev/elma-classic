@@ -1,4 +1,5 @@
 #include "editor/window.h"
+#include "box.h"
 #include "editor/canvas.h"
 #include "editor/dialog.h"
 #include "editor/editor.h"

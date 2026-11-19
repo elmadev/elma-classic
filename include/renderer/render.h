@@ -3,6 +3,7 @@
 
 #include "eol/clickable.h"
 
+class abc8;
 class pic8;
 class vect2;
 struct bike_metadata;
@@ -13,6 +14,10 @@ struct driver;
 extern double AffinePicScreenLeft, AffinePicScreenRight, AffinePicScreenBottom, AffinePicScreenTop;
 
 extern int GameViewWidth, GameViewHeight;
+
+extern abc8* SmallFont;
+extern abc8* MediumFont;
+extern abc8* LargeFont;
 
 void init_renderer();
 void reset_game_background();

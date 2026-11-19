@@ -1,9 +1,12 @@
 #ifndef EOL_CLICKABLE_H
 #define EOL_CLICKABLE_H
 
+#include "box.h"
 #include "vect2.h"
 #include <functional>
 #include <optional>
+
+class pic8;
 
 struct game_mouse {
     // Mouse position in pixels
@@ -40,18 +43,6 @@ struct clickable {
     virtual ~clickable() = default;
 };
 
-struct overlay_clickable : clickable {
-    int click_anchor_x;                           // pixels
-    int click_anchor_y;                           // pixels
-    int click_radius = clickable::DEFAULT_RADIUS; // pixels
-
-    int distance(const game_mouse& pos) const override;
-
-    overlay_clickable(int anchor_x, int anchor_y)
-        : click_anchor_x(anchor_x),
-          click_anchor_y(anchor_y) {}
-};
-
 struct game_clickable : clickable {
     vect2 click_anchor;                           // meters
     int click_radius = clickable::DEFAULT_RADIUS; // pixels
@@ -60,6 +51,35 @@ struct game_clickable : clickable {
 
     game_clickable(vect2 anchor)
         : click_anchor(anchor) {}
+};
+
+struct box_overlay_clickable : clickable {
+  private:
+    static constexpr int EDGE = clickable::DEFAULT_RADIUS / 2;
+
+    bool horizontal_stretch;
+    bool vertical_stretch;
+
+    void grab_box(const game_mouse& pos) const;
+
+  public:
+    virtual box click_box() const = 0;
+    virtual void set_box(const box& new_box) = 0;
+    virtual void reset_box() = 0;
+
+    int distance(const game_mouse& pos) const override;
+    void get_closest(const game_mouse& pos, int& dist, clickable*& closest);
+
+    void left_clicked(const game_mouse& pos) override;
+    void right_clicked(const game_mouse& pos) override;
+
+    static void held_callback(const game_mouse& pos, const mouse_input& input);
+
+    void render_outline(pic8& screen) const;
+
+    box_overlay_clickable(bool horizontal, bool vertical)
+        : horizontal_stretch(horizontal),
+          vertical_stretch(vertical) {}
 };
 
 #endif

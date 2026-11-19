@@ -528,6 +528,23 @@ void menu_options() {
         };
         ENUM_OPTION("Table Alignment:", table_alignment, TABLE_ALIGNMENT);
 
+        static constexpr std::array CHECKPOINTS_ENABLED{
+            std::pair{CheckpointsEnabled::Never, "Never"},
+            std::pair{CheckpointsEnabled::OnlyLinear, "Lines Enabled, Apples Disabled"},
+            std::pair{CheckpointsEnabled::BothIfLinear, "Enabled if Lines Exist"},
+            std::pair{CheckpointsEnabled::Both, "Always"},
+        };
+        ENUM_OPTION("Checkpoints Enabled:", checkpoints_enabled, CHECKPOINTS_ENABLED);
+
+        BOOL_OPTION("Checkpoints Time Diff:", checkpoint_table_diff);
+
+        static constexpr std::array CHECKPOINT_TABLE_SPEED{
+            std::pair{CheckpointSpeed::Off, "Off"},
+            std::pair{CheckpointSpeed::IfSpeedometer, "If Speedometer"},
+            std::pair{CheckpointSpeed::On, "On"},
+        };
+        ENUM_OPTION("Checkpoints Speed:", checkpoint_table_speed, CHECKPOINT_TABLE_SPEED);
+
         choice = nav.navigate();
 
         if (choice < 0) {

@@ -9,9 +9,13 @@
 class state;
 
 enum class MapAlignment { None, Left, Middle, Right };
+enum class HorizontalAlign { Left, Center, Right };
+enum class VerticalAlign { Top, Center, Bottom };
 enum class RendererType { Software, OpenGL };
 enum class FullscreenMode { Windowed, Fullscreen, FullscreenDesktop };
 enum class ChatVisibility { Shown, PublicHidden, Hidden };
+enum class CheckpointsEnabled { Never, OnlyLinear, BothIfLinear, Both };
+enum class CheckpointSpeed { Off, IfSpeedometer, On };
 
 template <typename T> struct Default {
     T value;
@@ -226,6 +230,15 @@ class eol_settings {
     Default<ChatVisibility> chat_visibility_{ChatVisibility::Shown};
     Default<ShownTo> shown_to_{ShownTo::Everyone};
 
+    Default<CheckpointsEnabled> checkpoints_enabled_{CheckpointsEnabled::BothIfLinear};
+    Default<VerticalAlign> checkpoint_table_vertical_pos_{VerticalAlign::Bottom};
+    Default<HorizontalAlign> checkpoint_table_horizontal_pos_{HorizontalAlign::Right};
+    Clamp<int> checkpoint_table_dx_{-10000, -10, 10000};
+    Clamp<int> checkpoint_table_dy_{-10000, 120, 10000};
+    Clamp<int> checkpoint_table_height_{24, 132, 10000};
+    Default<bool> checkpoint_table_diff_{true};
+    Default<CheckpointSpeed> checkpoint_table_speed_{CheckpointSpeed::IfSpeedometer};
+
   public:
     static void read_settings();
     // Applies a JSON file on top of settings.json for this session only, nothing is persisted.
@@ -368,6 +381,15 @@ class eol_settings {
     DECLARE_SETTING(table_alignment);
     DECLARE_SETTING(chat_visibility);
     DECLARE_SETTING_CUSTOM(shown_to);
+
+    DECLARE_SETTING(checkpoints_enabled);
+    DECLARE_SETTING(checkpoint_table_vertical_pos);
+    DECLARE_SETTING(checkpoint_table_horizontal_pos);
+    DECLARE_SETTING(checkpoint_table_dx);
+    DECLARE_SETTING(checkpoint_table_dy);
+    DECLARE_SETTING(checkpoint_table_height);
+    DECLARE_SETTING(checkpoint_table_diff);
+    DECLARE_SETTING(checkpoint_table_speed);
 };
 
 #undef SETTING_VALUE_TYPE

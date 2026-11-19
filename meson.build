@@ -17,6 +17,7 @@ endif
 elma_sources = files(
     'src/api/api.cpp',
     'src/api/curl_wrapper.cpp',
+    'src/box.cpp',
     'src/debug/profiler.cpp',
     'src/editor/canvas.cpp',
     'src/editor/dialog.cpp',
@@ -29,6 +30,7 @@ elma_sources = files(
     'src/eol/battle.cpp',
     'src/eol/checkpoint.cpp',
     'src/eol/checkpoint_json.cpp',
+    'src/eol/checkpoint_table.cpp',
     'src/eol/clickable.cpp',
     'src/eol/console.cpp',
     'src/eol/eol_table.cpp',
@@ -36,6 +38,7 @@ elma_sources = files(
     'src/eol/kuski.cpp',
     'src/eol/settings.cpp',
     'src/eol/status_messages.cpp',
+    'src/eol/overlays.cpp',
     'src/game/camera.cpp',
     'src/game/driver.cpp',
     'src/game/fps.cpp',

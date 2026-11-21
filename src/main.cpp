@@ -1,5 +1,4 @@
 #include "main.h"
-#include "api/api.h"
 #include "editor/canvas.h"
 #include "eol/eol.h"
 #include "eol/settings.h"
@@ -7,6 +6,7 @@
 #include "menu/intro.h"
 #include "menu/pic.h"
 #include "pic/surface.h"
+#include "platform/api.h"
 #include "platform/implementation.h"
 #include "platform/scancode.h"
 #include "util/util.h"

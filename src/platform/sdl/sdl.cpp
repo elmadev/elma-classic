@@ -17,6 +17,10 @@
 #include <filesystem>
 #include <format>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 static SDL_Window* SDLWindow = nullptr;
 static SDL_Surface* SDLSurfaceMain = nullptr;
 static SDL_Surface* SDLSurfacePaletted = nullptr;
@@ -380,6 +384,10 @@ void palette::set() {
 }
 
 void handle_events() {
+#ifdef __EMSCRIPTEN__
+    emscripten_sleep(0);
+#endif
+
     keyboard::begin_frame();
     MouseWheelDelta = 0;
     LeftMouseDownPrevFrame = LeftMouseDown;

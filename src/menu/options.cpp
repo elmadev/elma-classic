@@ -121,9 +121,63 @@ static constexpr resolution RESOLUTIONS[] = {
     {1600, 900}, {1600, 1200}, {1920, 1080}, {1920, 1200}, {2560, 1440}, {3840, 1600}, {3840, 2160},
 };
 
-static void menu_resolution() {
-    menu_nav nav("Pick a resolution!");
+struct resolution_parameters {
+    int width;
+    int height;
+    FullscreenMode mode;
 
+    resolution_parameters() {
+        width = EolSettings->screen_width_persisted();
+        height = EolSettings->screen_height_persisted();
+        mode = EolSettings->fullscreen_persisted();
+    }
+
+    bool operator==(const resolution_parameters&) const = default;
+};
+
+static void menu_confirm_resolution(const resolution_parameters& old) {
+    resolution_parameters current;
+    if (old == current) {
+        // No resolution change
+        return;
+    }
+
+    // Confirmation prompt
+    menu_pic menu;
+    long long start_time = get_milliseconds();
+    constexpr long long COUNTDOWN = 10000 - 1;
+    long long remaining_time = COUNTDOWN;
+    while (remaining_time > 0) {
+        menu.clear();
+        menu.add_line_centered("Press Enter to keep resolution", 320, 180);
+        menu.add_line_centered("Press Esc to revert", 320, 220);
+        menu.add_line_centered("Display will be reverted in", 320, 260);
+        int seconds = 1 + remaining_time / 1000;
+        menu.add_line_centered(std::format("{} second{}", seconds, seconds == 1 ? "" : "s"), 320,
+                               300);
+        handle_events();
+        DikScancode code = get_any_key_just_pressed();
+        if (code != DIK_NONE) {
+            if (code == DIK_RETURN) {
+                return;
+            }
+            break;
+        }
+        menu.render();
+        remaining_time = COUNTDOWN - (get_milliseconds() - start_time);
+    }
+
+    // Revert resolution
+    EolSettings->persist_fullscreen(old.mode);
+    update_resolution(old.width, old.height);
+}
+
+static void menu_resolution() {
+    // Back up old resolution settings
+    resolution_parameters old_resolution;
+
+    // Prompt resolution
+    menu_nav nav("Pick a resolution!");
     if (EolSettings->fullscreen_persisted() == FullscreenMode::Fullscreen) {
         auto display_modes = platform_get_display_modes();
         for (const auto& [w, h] : display_modes) {
@@ -144,8 +198,9 @@ static void menu_resolution() {
     std::string current = std::format("{}x{}", EolSettings->screen_width_persisted(),
                                       EolSettings->screen_height_persisted());
     nav.select_row(current);
-
     nav.navigate();
+
+    menu_confirm_resolution(old_resolution);
 }
 
 static const char* fullscreen_mode_label(FullscreenMode mode) {
@@ -161,6 +216,10 @@ static const char* fullscreen_mode_label(FullscreenMode mode) {
 }
 
 static void menu_fullscreen() {
+    // Back up old resolution settings
+    resolution_parameters old_resolution;
+
+    // Prompt resolution settings
     menu_nav nav("Pick a fullscreen mode!");
 
     constexpr FullscreenMode MODES[] = {
@@ -177,6 +236,8 @@ static void menu_fullscreen() {
     nav.select_row(fullscreen_mode_label(EolSettings->fullscreen_persisted()));
 
     nav.navigate();
+
+    menu_confirm_resolution(old_resolution);
 }
 
 #define BOOL_OPTION(text, setting)                                                                 \

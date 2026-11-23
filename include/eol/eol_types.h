@@ -2,7 +2,7 @@
 #define EOL_TYPES_H
 
 #include "level/level.h"
-#include "main.h"
+#include "util/util.h"
 #include <cstdint>
 #include <optional>
 

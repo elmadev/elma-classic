@@ -11,6 +11,7 @@
 #include "pic/lgr.h"
 #include "platform/utils.h"
 #include "renderer/canvas.h"
+#include "util/util.h"
 #include <cstring>
 
 static bool ReloadLevel = false;

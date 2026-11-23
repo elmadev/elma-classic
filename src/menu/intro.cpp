@@ -16,6 +16,7 @@
 #include "platform/implementation.h"
 #include "platform/scancode.h"
 #include "renderer/render.h"
+#include "util/stopwatch.h"
 
 static void show_intro_screen() {
     pic8* intro_screen = lock_backbuffer_pic(false);

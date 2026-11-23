@@ -9,6 +9,7 @@
 #include "platform/implementation.h"
 #include "platform/scancode.h"
 #include "renderer/render.h"
+#include "util/stopwatch.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>

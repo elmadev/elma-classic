@@ -5,6 +5,7 @@
 #include "main.h"
 #include "menu/rec_list.h"
 #include "physics/flagtag.h"
+#include "util/stopwatch.h"
 #include "util/util.h"
 #include <algorithm>
 #include <cmath>

@@ -17,15 +17,9 @@ using filepath = char[MAX_FILE_PATH_LEN + 1];
 using recname = char[MAX_REPLAY_EXT_LEN + 1];
 using recpath = char[MAX_REPLAY_PATH_LEN + 1];
 
-constexpr double STOPWATCH_MULTIPLIER = 0.182;
-constexpr double STOPWATCH_TO_PHYS_TIME = 0.0024;
 extern bool ErrorGraphicsLoaded;
 
 [[noreturn]] void quit();
-
-double stopwatch();
-void stopwatch_reset();
-void delay(int milliseconds);
 
 [[noreturn]] void internal_error(const std::string& message,
                                  std::source_location loc = std::source_location::current());

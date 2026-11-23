@@ -56,6 +56,6 @@ class menu_pic {
 
 void init_menu_pictures();
 void reinit_menu_pictures();
-void render_error(const std::string& text);
+bool render_error(const std::string& text);
 
 #endif

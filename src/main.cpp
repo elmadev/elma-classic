@@ -44,8 +44,6 @@ void quit() {
     exit(0);
 }
 
-bool ErrorGraphicsLoaded = false;
-
 void internal_error(const std::string& message, std::source_location loc) {
     static bool InError = false;
     logger::instance().write(LogLevel::Fatal, loc,
@@ -59,12 +57,7 @@ void internal_error(const std::string& message, std::source_location loc) {
 
     std::string text = "Sorry, internal error.\n" + message;
 
-    bool rendered = false;
-    if (ErrorGraphicsLoaded) {
-        render_error(text);
-        rendered = platform_render_error(BufferMain);
-    }
-    if (rendered) {
+    if (render_error(text) && platform_render_error(BufferMain)) {
         while (true) {
             handle_events();
             if (was_key_just_pressed(DIK_ESCAPE) || was_key_just_pressed(DIK_RETURN) ||

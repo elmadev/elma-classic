@@ -4,8 +4,6 @@
 #include <source_location>
 #include <string>
 
-extern bool ErrorGraphicsLoaded;
-
 [[noreturn]] void quit();
 
 [[noreturn]] void internal_error(const std::string& message,

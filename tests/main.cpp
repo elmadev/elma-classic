@@ -1,6 +1,7 @@
 #include "main.h"
 #include "api/api.h"
 #include "log.h"
+#include "meson_test_list.h"
 #include "tests.h"
 #include <cstring>
 
@@ -32,6 +33,8 @@ int main(int argc, char* argv[]) {
         LOG_FATAL("Invalid commandline");
         exit(2);
     }
+
+    MESON_TEST_LIST;
 
     LOG_FATAL("Test not found: {}", argv[1]);
     exit(2);

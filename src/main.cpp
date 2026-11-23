@@ -5,14 +5,10 @@
 #include "menu/pic.h"
 #include "platform/implementation.h"
 #include "platform/scancode.h"
-#include "systems_init.h"
 #include <cstdlib>
 #include <string>
 
-int main() {
-    systems_init::init_pre_intro();
-    menu_intro();
-}
+int main() { menu_intro(); }
 
 void quit() {
     eol_api::cleanup();

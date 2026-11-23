@@ -4,6 +4,7 @@
 namespace systems_init {
 
 void init_pre_intro();
+void init_post_intro();
 
 } // namespace systems_init
 

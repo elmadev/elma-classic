@@ -20,11 +20,6 @@
 namespace systems_init {
 
 void init_pre_intro() {
-    util::random::seed();
-
-    std::filesystem::create_directory("lev");
-    std::filesystem::create_directory("rec");
-
     EolSettings = new eol_settings();
     eol_settings::read_settings();
     if (const char* overrides = std::getenv("EOL_SETTINGS_OVERRIDES")) {
@@ -35,17 +30,21 @@ void init_pre_intro() {
     SCREEN_HEIGHT = EolSettings->screen_height();
 
     platform_init();
-    editor_canvas_update_resolution();
+
+    init_qopen();
+    init_menu_pictures();
+}
+
+void init_post_intro() {
+    util::random::seed();
+
+    std::filesystem::create_directory("lev");
+    std::filesystem::create_directory("rec");
 
     EolClient = new eol();
     EolClient->connect();
 
     eol_api::init();
-
-    init_qopen();
-
-    init_menu_pictures();
-
     State = new state;
     if (!State) {
         internal_error("memory");
@@ -59,14 +58,11 @@ void init_pre_intro() {
     rec_list::build_cache();
 
     // test_player();
-}
 
-void init_post_intro() {
     if (State->sound_on) {
         open_sound_device();
     }
 
-    // Load globals
     EditorWhiteFont = new abc8("kisbetu1.abc", 1, 19); // "small letter 1"
     EditorBlackFont = new abc8("kisbetu2.abc", 1, 19); // "small letter 2"
 
@@ -75,9 +71,9 @@ void init_post_intro() {
     Rec1 = new recorder;
     Rec2 = new recorder;
 
+    editor_canvas_update_resolution();
     create_editor_palette();
 
-    // Initialize stopwatch, just in case
     stopwatch_reset();
 }
 

@@ -20,6 +20,8 @@
 #include <string>
 #include <string_view>
 
+eol* EolClient = nullptr;
+
 static tm local_tm(uint64_t unix_timestamp) {
     time_t t = static_cast<time_t>(unix_timestamp);
     tm tm{};

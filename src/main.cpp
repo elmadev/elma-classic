@@ -27,9 +27,6 @@ void delay(int milliseconds) {
     }
 }
 
-eol_settings* EolSettings = nullptr;
-eol* EolClient = nullptr;
-
 int main() {
     util::random::seed();
 

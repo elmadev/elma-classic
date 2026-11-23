@@ -21,6 +21,8 @@ using json = nlohmann::ordered_json;
 
 #define SETTINGS_JSON "settings.json"
 
+eol_settings* EolSettings = nullptr;
+
 template <typename T> Default<T>::operator T() const { return value; }
 
 template <typename T> Default<T>& Default<T>::operator=(T v) {

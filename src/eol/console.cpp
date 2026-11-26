@@ -174,6 +174,7 @@ void console::register_console_commands() {
     REGISTER_SETTINGS_BOOL(fancyboost);
 
     REGISTER_SETTINGS_BOOL(show_last_apple_time);
+    REGISTER_SETTINGS_BOOL(show_wheel_distance);
     REGISTER_SETTINGS_BOOL(show_gravity_arrows);
 
     register_command("hq", [this](std::string_view text) {

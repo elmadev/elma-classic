@@ -872,6 +872,11 @@ static void render_view(bool player1, bool splitscreen, pic8* pic, double time, 
             }
         }
 
+        if (EolSettings->show_wheel_distance()) {
+            info_rows.push_back({"min distance", driv.stats.format_min_wheel_distance()});
+            info_rows.push_back({"distance", driv.stats.format_wheel_distance()});
+        }
+
         if (!splitscreen || !player1) {
             // FPS
             if (EolSettings->show_fps()) {

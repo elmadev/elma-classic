@@ -811,6 +811,11 @@ int game_loop(const char* filename, CameraMode camera_mode) {
                     physics_subframe(driv2, time, dt);
                 }
 
+                driv1.update_wheel_distance();
+                if (!Single) {
+                    driv2.update_wheel_distance();
+                }
+
                 if (!Single && both_bikes_alive) {
                     // If both die at same time, player 1 is considered to have died first
                     if (driv1.dead) {

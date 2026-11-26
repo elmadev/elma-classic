@@ -3,6 +3,7 @@
 
 #include "game/recorder.h"
 #include <cstdint>
+#include <limits>
 #include <string>
 
 struct motorst;
@@ -33,6 +34,11 @@ struct run_stats {
 
     double max_speed = 0.0;
     std::string format_max_speed() const;
+
+    double wheel_distance = 0.0;
+    std::string format_wheel_distance() const;
+    double min_wheel_distance = std::numeric_limits<double>::infinity();
+    std::string format_min_wheel_distance() const;
 
     // Physics time, counted from the inputs the bike actually got after cripples
     double throttle_time = 0.0;
@@ -67,6 +73,7 @@ struct driver {
     driver(motorst* mot, recorder* rec, player_keys* keys);
     void reset_metadata();
     void update_speed();
+    void update_wheel_distance();
 };
 
 #endif

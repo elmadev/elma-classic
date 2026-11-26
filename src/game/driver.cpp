@@ -5,10 +5,16 @@
 #include <cstdint>
 #include <format>
 
-static std::string format_value(double value) { return std::format("{:.2f}", value); }
+static std::string format2_value(double value) { return std::format("{:.2f}", value); }
+static std::string format5_value(double value) { return std::format("{:.5f}", value); }
 
-std::string run_stats::format_speed() const { return format_value(speed); }
-std::string run_stats::format_max_speed() const { return format_value(max_speed); }
+std::string run_stats::format_speed() const { return format2_value(speed); }
+std::string run_stats::format_max_speed() const { return format2_value(max_speed); }
+
+std::string run_stats::format_wheel_distance() const { return format5_value(wheel_distance); }
+std::string run_stats::format_min_wheel_distance() const {
+    return format5_value(min_wheel_distance);
+}
 
 namespace {
 
@@ -48,6 +54,11 @@ uint32_t run_stats::brake_centiseconds(uint32_t run_time) const {
 void driver::update_speed() {
     stats.speed = mot->speed();
     stats.max_speed = std::max(stats.max_speed, stats.speed);
+}
+
+void driver::update_wheel_distance() {
+    stats.wheel_distance = mot->wheel_distance();
+    stats.min_wheel_distance = std::min(stats.min_wheel_distance, stats.wheel_distance);
 }
 
 void driver::reset_metadata() {

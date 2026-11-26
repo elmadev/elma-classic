@@ -101,6 +101,10 @@ void motorst::spawn(vect2 start_position) {
 
 double motorst::speed() const { return bike.v.length() * PHYSICS_SPEED_TO_EOL_SPEED; }
 
+double motorst::wheel_distance() const {
+    return std::min((bike.r - left_wheel.r).length(), (bike.r - right_wheel.r).length());
+}
+
 void set_zoom_factor() {
     double zoom_factor = 0.48 * EolSettings->zoom();
     MetersToPixels = 100.0 * zoom_factor;

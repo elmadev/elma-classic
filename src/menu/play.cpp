@@ -134,7 +134,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
     }
 
     // Not in top ten?
-    if (tten->times_count == MAX_TIMES && tten->times[MAX_TIMES - 1] < time) {
+    if (tten->times_count == MAX_TIMES && tten->times[MAX_TIMES - 1] <= time) {
         return;
     }
 

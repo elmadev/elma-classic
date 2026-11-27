@@ -144,6 +144,7 @@
 - Disallow duplicate players with identical names
 - Warn instead of crash when reaching the max number of players
 - When state.dat cannot be opened, show a dialog to give a second chance to save a run's time instead of freezing
+- In case of a time tie, the tenth entry in the top ten no longer gets overwritten by the most recent run
 
 ### Internal Editor
 

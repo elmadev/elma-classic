@@ -91,3 +91,25 @@ void test_menu_play_update_top_ten() {
     update_and_test(n, std::array{&b, &f, &g, &h, &i, &j, &k, &l, &a, &d});
     update_and_test(o, std::array{&o, &b, &f, &g, &h, &i, &j, &k, &l, &a});
 }
+
+// Test the numbering scheme used in replay autosave
+// https://stackoverflow.com/questions/181596/how-to-convert-a-column-number-e-g-127-into-an-excel-column-e-g-aa/182924
+extern std::string format_rec_name(const std::string& level_name, char player, int time, int i);
+void test_menu_play_format_rec_name() {
+    // 3-5 digits if < 10 minutes
+    // test numbering scheme "", "b", "c", ..., "z", "aa", "ab", ...
+    // truncate the digits if we run out of space due to numbering scheme being >= "aa"
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 5, 1) == "LEVELNAM_005.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 500, 2) == "LEVELNAM_500b.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 5500, 26) == "LEVELNAM_5500z.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 5500, 27) == "LEVELNAM_5500aa.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 5500, 28) == "LEVELNAM_5500ab.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 5500, 703) == "LEVELNAM_550aaa.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 6000 + 1500, 1) == "LEVELNAM_11500.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 6000 + 1500, 2) == "LEVELNAM_11500b.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 6000 + 1500, 27) == "LEVELNAM_1150aa.rec");
+    // Remove centiseconds if >= 10 minutes
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 10 * 6000, 1) == "LEVELNAM_1000.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 10 * 6000 + 3500, 1) == "LEVELNAM_1035.rec");
+    ELMA_ASSERT(format_rec_name("LEVELNAM", '_', 61 * 6000, 1) == "LEVELNAM_10100.rec");
+}

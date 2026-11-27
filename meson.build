@@ -335,6 +335,7 @@ test_sources = base_sources + files(
 
 test_list = [
     'test_main_internal_error',
+    'test_menu_play_format_rec_name',
     'test_menu_play_update_top_ten',
     'test_util_util_text_parse_ascii_digit',
 ]

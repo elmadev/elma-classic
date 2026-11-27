@@ -14,7 +14,7 @@ if get_option('curl_verbose') == true
     add_project_arguments('-DCURL_VERBOSE', language: 'cpp')
 endif
 
-elma_sources = files(
+base_sources = files(
     'src/api/api.cpp',
     'src/api/curl_wrapper.cpp',
     'src/debug/profiler.cpp',
@@ -52,7 +52,6 @@ elma_sources = files(
     'src/level/segments.cpp',
     'src/level/sprite.cpp',
     'src/log.cpp',
-    'src/main.cpp',
     'src/menu/ball_collision.cpp',
     'src/menu/ball_handler.cpp',
     'src/menu/ball.cpp',
@@ -97,12 +96,19 @@ elma_sources = files(
     'src/renderer/timer.cpp',
     'src/sound/engine.cpp',
     'src/sound/wav.cpp',
+    'src/systems_init.cpp',
     'src/util/file_iter.cpp',
+    'src/util/stopwatch.cpp',
     'src/util/util.cpp',
     'src/vect2.cpp',
 )
 
-inc = include_directories('include')
+elma_sources = base_sources + files(
+    'src/main.cpp',
+)
+
+elma_inc = include_directories('include')
+test_inc = include_directories('include', 'tests')
 
 cpp = meson.get_compiler('cpp')
 link_args = []
@@ -268,7 +274,7 @@ deps += [gl_dep, libcurl_dep, nlohmann_json_dep, sdl2_dep]
 executable(
     'elma',
     elma_sources,
-    include_directories: inc,
+    include_directories: elma_inc,
     cpp_args: cpp_args,
     link_args: link_args,
     dependencies: deps,
@@ -306,6 +312,8 @@ if clang_tidy.found() and lint_files.returncode() == 0
     endforeach
 endif
 
+# Test Suite
+
 python = import('python').find_installation()
 test(
     'settings::reset_keys()',
@@ -317,3 +325,50 @@ test(
     )],
     suite: 'tests'
 )
+
+test_sources = base_sources + files(
+    'tests/main.cpp',
+    'tests/test_main.cpp',
+    'tests/test_menu_play.cpp',
+    'tests/test_util_util.cpp',
+)
+
+test_list = [
+    'test_main_internal_error',
+    'test_menu_play_format_rec_name',
+    'test_menu_play_update_top_ten',
+    'test_util_util_text_parse_ascii_digit',
+]
+
+test_macro = ''
+foreach test_name : test_list
+    test_macro += 'TEST(' + test_name + ');'
+endforeach
+
+test_conf = configuration_data()
+test_conf.set('MESON_TEST_LIST', test_macro)
+test_header = configure_file(
+    output: 'meson_test_list.h',
+    configuration: test_conf,
+)
+
+test_exec = executable(
+    'tests',
+    test_sources,
+    test_header,
+    include_directories: test_inc,
+    cpp_args: cpp_args,
+    link_args: link_args,
+    dependencies: deps,
+    win_subsystem: win_subsystem,
+    build_by_default: false,
+)
+
+foreach test_name : test_list
+    test(
+        test_name,
+        test_exec,
+        args: [test_name],
+        suite: 'tests',
+    )
+endforeach

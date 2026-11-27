@@ -5,6 +5,7 @@
 #include "game/level_load.h"
 #include "game/recorder.h"
 #include "level/level.h"
+#include "log.h"
 #include "main.h"
 #include "menu/best_times.h"
 #include "menu/dialog.h"
@@ -80,8 +81,8 @@ static void menu_save_play(int internal_index, const char* external_filename, in
     }
 }
 
-void update_top_ten(int time, char* time_message, int internal_index,
-                    const char* external_filename) {
+int update_top_ten(int time, char* time_message, int internal_index,
+                   const char* external_filename) {
     // Check if internal or external
     bool external_level = external_filename != nullptr;
 
@@ -89,7 +90,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
 
     if (OutOfBounds) {
         strcpy(time_message, "You Went Out of Bounds!");
-        return;
+        return -1;
     }
 
     // Dead
@@ -101,7 +102,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
         if (WhoDiedFirst == 2) {
             strcat(time_message, "    (B died first)");
         }
-        return;
+        return -1;
     }
 
     if (!external_level) {
@@ -133,76 +134,53 @@ void update_top_ten(int time, char* time_message, int internal_index,
         tten = &tten_set->multi;
     }
 
-    // Not in top ten?
-    if (tten->times_count == MAX_TIMES && tten->times[MAX_TIMES - 1] < time) {
-        return;
-    }
-
     if (external_level && Level->file_has_changed(external_filename)) {
         menu_dialog("The level file has changed", "after it was loaded!",
                     "The time was not saved.");
-        return;
+        return 10;
     }
 
-    // First and only time?
-    if (tten->times_count == 0) {
-        tten->times_count = 1;
-        tten->times[0] = time;
-        strncpy(tten->names1[0], State->player1, sizeof(player_name));
-        strncpy(tten->names2[0], State->player2, sizeof(player_name));
+    // Calculate top ten position
+    int rank = 0;
+    while (rank < tten->times_count) {
+        if (tten->times[rank] > time) {
+            break;
+        }
+        rank++;
+    }
+
+    if (rank >= MAX_TIMES) {
+        // Not in top ten
+        return rank;
+    }
+    if (rank == 0) {
         strcat(time_message, "     Best Time!");
-        if (external_level) {
-            Level->save_topten(external_filename);
+    } else if (rank != tten->times_count) {
+        strcat(time_message, "     You Made the Top Ten");
+    }
+
+    // Shift existing times over by 1 rank
+    for (int i = tten->times_count - 1; i >= rank; i--) {
+        if (i >= MAX_TIMES - 1) {
+            continue;
         }
-        return;
+        tten->times[i + 1] = tten->times[i];
+        strncpy(tten->names1[i + 1], tten->names1[i], sizeof(player_name));
+        strncpy(tten->names2[i + 1], tten->names2[i], sizeof(player_name));
     }
 
-    // Check Best Time, middle time, or last time
-    bool not_last = tten->times[tten->times_count - 1] > time;
-    if (tten->times[0] > time) {
-        strcat(time_message, "     Best Time!");
-    } else {
-        if (not_last) {
-            strcat(time_message, "     You Made the Top Ten");
-        }
-    }
-
-    // Add your time to the end of the best time list
-    if (tten->times_count == MAX_TIMES) {
-        tten->times[MAX_TIMES - 1] = time;
-        strncpy(tten->names1[MAX_TIMES - 1], State->player1, sizeof(player_name));
-        strncpy(tten->names2[MAX_TIMES - 1], State->player2, sizeof(player_name));
-    } else {
-        tten->times[int(tten->times_count)] = time;
-        strncpy(tten->names1[int(tten->times_count)], State->player1, sizeof(player_name));
-        strncpy(tten->names2[int(tten->times_count)], State->player2, sizeof(player_name));
-        tten->times_count++;
-    }
-
-    // Bubble sort your time to the right position
-    for (int i = 0; i < MAX_TIMES + 1; i++) {
-        for (int j = 0; j < tten->times_count - 1; j++) {
-            if (tten->times[j] > tten->times[j + 1]) {
-                int tmp = tten->times[j];
-                tten->times[j] = tten->times[j + 1];
-                tten->times[j + 1] = tmp;
-
-                player_name tmp_name;
-                strncpy(tmp_name, tten->names1[j], sizeof(player_name));
-                strncpy(tten->names1[j], tten->names1[j + 1], sizeof(player_name));
-                strncpy(tten->names1[j + 1], tmp_name, sizeof(player_name));
-
-                strncpy(tmp_name, tten->names2[j], sizeof(player_name));
-                strncpy(tten->names2[j], tten->names2[j + 1], sizeof(player_name));
-                strncpy(tten->names2[j + 1], tmp_name, sizeof(player_name));
-            }
-        }
-    }
+    // Add new time
+    tten->times[rank] = time;
+    strncpy(tten->names1[rank], State->player1, sizeof(player_name));
+    strncpy(tten->names2[rank], State->player2, sizeof(player_name));
+    tten->times_count = std::min(MAX_TIMES, tten->times_count + 1);
 
     // Save external levels (state.dat is not saved)
     if (external_level) {
         Level->save_topten(external_filename);
     }
+
+    return rank;
 }
 
 void replay_previous_run() {
@@ -239,15 +217,121 @@ void replay_from_file(const char* filename) {
     }
 }
 
+std::string format_rec_name(const std::string& level_name, char player, int time, int i) {
+    // Excel column style numbering, except "a" is ""
+    // "", "b", "c", ..., "z", "aa", "ab"
+    const auto base26 = [](int value) -> std::string {
+        if (value == 1) {
+            return "";
+        }
+        std::string result = "";
+        while (value > 0) {
+            int mod = (value - 1) % 26;
+            result.insert(result.begin(), static_cast<char>('a' + mod));
+            value = (value - mod) / 26;
+        }
+        return result;
+    };
+
+    const auto format_time = [](int time) -> std::string {
+        char text[100];
+        util::text::centiseconds_to_string(time, text, true, true);
+        std::string result = text;
+        if (time >= 60000) {
+            // Drop centiseconds if time is over 10 minutes
+            result.erase(result.size() - 3);
+        }
+        // Remove colons
+        std::erase(result, ':');
+        return result;
+    };
+
+    std::string version = base26(i);
+    std::string time_str = format_time(time);
+
+    // Trim down the length of the replay file to fit within the maximum length
+    int len = level_name.length() + sizeof(player) + time_str.length() +
+              std::max(1, (int)version.length());
+    int overflow = len - MAX_REPLAY_NAME_LEN;
+    if (overflow > 0 && overflow < time_str.size()) {
+        time_str.erase(time_str.size() - overflow);
+    }
+
+    std::string ret = std::format("{}{}{}{}.rec", level_name, player, time_str, version);
+    if (ret.length() > MAX_REPLAY_EXT_LEN) {
+        LOG_ERROR("Unable to auto save replay filename {}", ret);
+        return "";
+    }
+    return ret;
+}
+
+std::optional<std::string> auto_save_rec(level& lev, int rank, int internal_index,
+                                         const char* external_filename, int time) {
+    if (Rec1->is_empty()) {
+        return std::nullopt;
+    }
+    recorder::save_rec_file(LAST_REC_FILENAME, lev.level_id);
+
+    // Check if we should auto save replay
+    switch (EolSettings->automatically_save_replay()) {
+    case AutoSaveReplay::Never:
+        return std::nullopt;
+    case AutoSaveReplay::Finished:
+        if (rank < 0) {
+            return std::nullopt;
+        }
+        break;
+    case AutoSaveReplay::TopTen:
+        if (rank < 0 || rank > 9) {
+            return std::nullopt;
+        }
+        break;
+    case AutoSaveReplay::BestTime:
+        if (rank != 0) {
+            return std::nullopt;
+        }
+    }
+    ELMA_ASSERT(time >= 0);
+
+    // Generate replay name
+    std::string level_name;
+    if (internal_index) {
+        level_name = std::format("{:02}", internal_index);
+    } else {
+        level_name = external_filename;
+        level_name.erase(level_name.size() - 4); // crop ".lev"
+    }
+
+    char player = State->player1[0];
+    int i = 1;
+
+    // Check for replay name conflicts
+    std::string path = format_rec_name(level_name, player, time, i);
+    if (path.empty()) {
+        return std::nullopt;
+    }
+    while (std::filesystem::exists(std::format("rec/{}", path))) {
+        i++;
+        path = format_rec_name(level_name, player, time, i);
+        if (path.empty()) {
+            return std::nullopt;
+        }
+    }
+
+    // Save replay
+    LOG_INFO("Auto-saving rec: {}", path);
+    recorder::save_rec_file(path.c_str(), lev.level_id);
+    return path;
+}
+
 static text_line ExtraTimeText[14];
 
 MenuLevel menu_level(int internal_index, bool nav_on_play_next, int time, const char* time_message,
-                     const char* external_filename) {
+                     int rank, const char* external_filename) {
     bool external_level = external_filename != nullptr;
 
-    if (!Rec1->is_empty()) {
-        recorder::save_rec_file(LAST_REC_FILENAME, Level->level_id);
-    }
+    std::optional<std::string> auto_name =
+        auto_save_rec(*Level, rank, internal_index, external_filename, time);
 
     player* player1 = State->get_player(State->player1);
     player* player2 = State->get_player(State->player2);
@@ -345,6 +429,11 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, int time, const 
                 util::text::centiseconds_to_string(time2, time_text2);
                 nav.add_overlay(std::string(time_text2), 440 + dx, y2);
             }
+        }
+
+        if (auto_name) {
+            nav.add_overlay(std::format("Saved {}", *auto_name), 320, 539,
+                            OverlayAlignment::Centered);
         }
 
         nav.x_left = 230;
@@ -455,7 +544,7 @@ static void play_internal(int internal_index) {
         }
 
         char time_message[100] = "";
-        update_top_ten(time, time_message, internal_index, nullptr);
+        int rank = update_top_ten(time, time_message, internal_index, nullptr);
 
         // Check to see if we unlock a new internal level (only available in singleplayer)
         int unlocked_new_level = 0;
@@ -472,7 +561,7 @@ static void play_internal(int internal_index) {
         }
 
         MenuLevel choice =
-            menu_level(internal_index, unlocked_new_level, time, time_message, nullptr);
+            menu_level(internal_index, unlocked_new_level, time, time_message, rank, nullptr);
         Rec1->erase(filename);
         Rec2->erase(filename);
 

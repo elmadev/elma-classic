@@ -9,6 +9,7 @@
 #include "platform/implementation.h"
 #include "platform/scancode.h"
 #include "renderer/render.h"
+#include "util/stopwatch.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -40,8 +41,6 @@ void init_menu_pictures() {
     BackgroundTileMain = new pic8("szoveg1.pcx"); // "text1"
     BackgroundTileBall = new pic8("szoveg2.pcx"); // "text2"
     MenuFont = new abc8("menu.abc", 2, 33);
-
-    ErrorGraphicsLoaded = true;
 
     pic8* helmet_tmp = new pic8("sisak.pcx"); // "helmet"
     helmet_tmp->vertical_flip();
@@ -464,7 +463,11 @@ static std::vector<std::string> word_wrap(const std::string& text, size_t max_le
     return lines;
 }
 
-void render_error(const std::string& text) {
+bool render_error(const std::string& text) {
+    if (!BackgroundTileMain || !MenuFont) {
+        return false;
+    }
+
     // Tile the background vertically
     int y = 0;
     int odd_row = 0;
@@ -494,4 +497,5 @@ void render_error(const std::string& text) {
     if (MenuPalette) {
         MenuPalette->set();
     }
+    return true;
 }

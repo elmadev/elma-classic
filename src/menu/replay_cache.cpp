@@ -2,6 +2,7 @@
 #include "debug/profiler.h"
 #include "game/recorder.h"
 #include "main.h"
+#include "util/util.h"
 #include <filesystem>
 #include <unordered_set>
 

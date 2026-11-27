@@ -1,6 +1,7 @@
 #include "util/file_iter.h"
 #include "main.h"
 #include "platform/utils.h"
+#include "util/util.h"
 #include <cstring>
 #include <filesystem>
 

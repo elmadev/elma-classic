@@ -3,9 +3,9 @@
 
 #include "game/driver.h"
 #include "level/level.h"
-#include "main.h"
 #include "physics/init.h"
 #include "pic/pic8.h"
+#include "util/util.h"
 #include <cstdint>
 #include <deque>
 #include <optional>

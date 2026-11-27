@@ -21,6 +21,8 @@ using json = nlohmann::ordered_json;
 
 #define SETTINGS_JSON "settings.json"
 
+eol_settings* EolSettings = nullptr;
+
 template <typename T> Default<T>::operator T() const { return value; }
 
 template <typename T> Default<T>& Default<T>::operator=(T v) {
@@ -59,6 +61,7 @@ template struct Default<RendererType>;
 template struct Default<FullscreenMode>;
 template struct Default<ChatVisibility>;
 template struct Default<ShownTo>;
+template struct Default<AutoSaveReplay>;
 template struct Default<DikScancode>;
 template struct Default<combo_scancode>;
 template struct Default<std::string>;
@@ -374,6 +377,37 @@ void from_json(const json& j, ShownTo& h) {
     }
 }
 
+void to_json(json& j, const AutoSaveReplay& s) {
+    switch (s) {
+    case AutoSaveReplay::Never:
+        j = "never";
+        break;
+    case AutoSaveReplay::BestTime:
+        j = "best time";
+        break;
+    case AutoSaveReplay::TopTen:
+        j = "top ten";
+        break;
+    case AutoSaveReplay::Finished:
+        j = "finished";
+        break;
+    }
+}
+
+void from_json(const json& j, AutoSaveReplay& s) {
+    if (j == "never") {
+        s = AutoSaveReplay::Never;
+    } else if (j == "best time") {
+        s = AutoSaveReplay::BestTime;
+    } else if (j == "top ten") {
+        s = AutoSaveReplay::TopTen;
+    } else if (j == "finished") {
+        s = AutoSaveReplay::Finished;
+    } else {
+        throw("[json.exception.type_error.302] (/auto_save_replay) invalid value");
+    }
+}
+
 void to_json(json& j, const combo_scancode& r) { j = (unsigned long long)(r); }
 
 void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned long long)(j)); }
@@ -512,7 +546,8 @@ void from_json(const json& j, combo_scancode& r) { r = combo_scancode((unsigned 
                                                                                                    \
     JSON_FIELD(table_alignment)                                                                    \
     JSON_FIELD(chat_visibility)                                                                    \
-    JSON_FIELD(shown_to)
+    JSON_FIELD(shown_to)                                                                           \
+    JSON_FIELD(automatically_save_replay)
 
 #define JSON_FIELD(name)                                                                           \
     void eol_settings::persist_##name(decltype(eol_settings::name##_.value) v) {                   \

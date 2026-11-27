@@ -1,7 +1,6 @@
 #include "menu/options.h"
 #include "eol/settings.h"
 #include "game/state.h"
-#include "main.h"
 #include "menu/ball.h"
 #include "menu/controls.h"
 #include "menu/dialog.h"
@@ -589,6 +588,14 @@ void menu_options() {
             std::pair{eol_table::Align::Right, "Right"},
         };
         ENUM_OPTION("Table Alignment:", table_alignment, TABLE_ALIGNMENT);
+
+        static constexpr std::array AUTO_SAVE_REPLAY{
+            std::pair{AutoSaveReplay::Never, "Never"},
+            std::pair{AutoSaveReplay::BestTime, "Best Time Only"},
+            std::pair{AutoSaveReplay::TopTen, "Top Ten Only"},
+            std::pair{AutoSaveReplay::Finished, "All Finished"},
+        };
+        ENUM_OPTION("Auto Save Replay:", automatically_save_replay, AUTO_SAVE_REPLAY);
 
         choice = nav.navigate();
 

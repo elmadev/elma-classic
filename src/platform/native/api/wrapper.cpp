@@ -1,4 +1,4 @@
-#include "api/curl_wrapper.h"
+#include "platform/native/api/wrapper.h"
 #include "log.h"
 #include "main.h"
 #include <filesystem>

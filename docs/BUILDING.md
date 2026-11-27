@@ -278,3 +278,14 @@ To use these configurations:
 Both configurations automatically run the compile task before launching.
 
 ---
+
+## Emscripten (Web)
+
+You can configure a build for a website build by following the following instructions:
+
+1. Download Emscripten and follow installation instructions: https://emscripten.org/docs/getting_started/downloads.html
+2. Make sure `/emsdk/upstream/emscripten/` is added to your PATH
+3. Configure the meson build directory: `meson setup build-em --cross-file emscripten.ini`
+4. Optionally, add extra files to `data/`: state.dat, settings.json, lev/file.lev, etc
+5. Compile the project: `meson compile -C build-em`
+6. Run the test webserver: `emrun build-em/output.html`

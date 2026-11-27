@@ -265,30 +265,30 @@ std::string format_rec_name(const std::string& level_name, char player, int time
     return ret;
 }
 
-void auto_save_rec(level& lev, int rank, int internal_index, const char* external_filename,
-                   int time) {
+std::optional<std::string> auto_save_rec(level& lev, int rank, int internal_index,
+                                         const char* external_filename, int time) {
     if (Rec1->is_empty()) {
-        return;
+        return std::nullopt;
     }
     recorder::save_rec_file(LAST_REC_FILENAME, lev.level_id);
 
     // Check if we should auto save replay
     switch (EolSettings->automatically_save_replay()) {
     case AutoSaveReplay::Never:
-        return;
+        return std::nullopt;
     case AutoSaveReplay::Finished:
         if (rank < 0) {
-            return;
+            return std::nullopt;
         }
         break;
     case AutoSaveReplay::TopTen:
         if (rank < 0 || rank > 9) {
-            return;
+            return std::nullopt;
         }
         break;
     case AutoSaveReplay::BestTime:
         if (rank != 0) {
-            return;
+            return std::nullopt;
         }
     }
     ELMA_ASSERT(time >= 0);
@@ -308,19 +308,20 @@ void auto_save_rec(level& lev, int rank, int internal_index, const char* externa
     // Check for replay name conflicts
     std::string path = format_rec_name(level_name, player, time, i);
     if (path.empty()) {
-        return;
+        return std::nullopt;
     }
     while (std::filesystem::exists(std::format("rec/{}", path))) {
         i++;
         path = format_rec_name(level_name, player, time, i);
         if (path.empty()) {
-            return;
+            return std::nullopt;
         }
     }
 
     // Save replay
     LOG_INFO("Auto-saving rec: {}", path);
     recorder::save_rec_file(path.c_str(), lev.level_id);
+    return path;
 }
 
 static text_line ExtraTimeText[14];
@@ -329,7 +330,8 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, int time, const 
                      int rank, const char* external_filename) {
     bool external_level = external_filename != nullptr;
 
-    auto_save_rec(*Level, rank, internal_index, external_filename, time);
+    std::optional<std::string> auto_name =
+        auto_save_rec(*Level, rank, internal_index, external_filename, time);
 
     player* player1 = State->get_player(State->player1);
     player* player2 = State->get_player(State->player2);
@@ -427,6 +429,11 @@ MenuLevel menu_level(int internal_index, bool nav_on_play_next, int time, const 
                 util::text::centiseconds_to_string(time2, time_text2);
                 nav.add_overlay(std::string(time_text2), 440 + dx, y2);
             }
+        }
+
+        if (auto_name) {
+            nav.add_overlay(std::format("Saved {}", *auto_name), 320, 539,
+                            OverlayAlignment::Centered);
         }
 
         nav.x_left = 230;

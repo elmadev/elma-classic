@@ -329,12 +329,14 @@ test(
 test_sources = base_sources + files(
     'tests/main.cpp',
     'tests/test_main.cpp',
+    'tests/test_menu_play.cpp',
     'tests/test_util_util.cpp',
 )
 
 test_list = [
-    'test_util_util_text_parse_ascii_digit',
     'test_main_internal_error',
+    'test_menu_play_update_top_ten',
+    'test_util_util_text_parse_ascii_digit',
 ]
 
 test_macro = ''

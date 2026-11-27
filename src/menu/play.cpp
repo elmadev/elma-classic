@@ -5,6 +5,7 @@
 #include "game/level_load.h"
 #include "game/recorder.h"
 #include "level/level.h"
+#include "log.h"
 #include "main.h"
 #include "menu/best_times.h"
 #include "menu/dialog.h"
@@ -133,71 +134,46 @@ void update_top_ten(int time, char* time_message, int internal_index,
         tten = &tten_set->multi;
     }
 
-    // Not in top ten?
-    if (tten->times_count == MAX_TIMES && tten->times[MAX_TIMES - 1] <= time) {
-        return;
-    }
-
     if (external_level && Level->file_has_changed(external_filename)) {
         menu_dialog("The level file has changed", "after it was loaded!",
                     "The time was not saved.");
         return;
     }
 
-    // First and only time?
-    if (tten->times_count == 0) {
-        tten->times_count = 1;
-        tten->times[0] = time;
-        strncpy(tten->names1[0], State->player1, sizeof(player_name));
-        strncpy(tten->names2[0], State->player2, sizeof(player_name));
-        strcat(time_message, "     Best Time!");
-        if (external_level) {
-            Level->save_topten(external_filename);
+    // Calculate top ten position
+    int rank = 0;
+    while (rank < tten->times_count) {
+        if (tten->times[rank] > time) {
+            break;
         }
+        rank++;
+    }
+
+    if (rank >= MAX_TIMES) {
+        // Not in top ten
         return;
     }
-
-    // Check Best Time, middle time, or last time
-    bool not_last = tten->times[tten->times_count - 1] > time;
-    if (tten->times[0] > time) {
+    if (rank == 0) {
         strcat(time_message, "     Best Time!");
-    } else {
-        if (not_last) {
-            strcat(time_message, "     You Made the Top Ten");
+    } else if (rank != tten->times_count) {
+        strcat(time_message, "     You Made the Top Ten");
+    }
+
+    // Shift existing times over by 1 rank
+    for (int i = tten->times_count - 1; i >= rank; i--) {
+        if (i >= MAX_TIMES - 1) {
+            continue;
         }
+        tten->times[i + 1] = tten->times[i];
+        strncpy(tten->names1[i + 1], tten->names1[i], sizeof(player_name));
+        strncpy(tten->names2[i + 1], tten->names2[i], sizeof(player_name));
     }
 
-    // Add your time to the end of the best time list
-    if (tten->times_count == MAX_TIMES) {
-        tten->times[MAX_TIMES - 1] = time;
-        strncpy(tten->names1[MAX_TIMES - 1], State->player1, sizeof(player_name));
-        strncpy(tten->names2[MAX_TIMES - 1], State->player2, sizeof(player_name));
-    } else {
-        tten->times[int(tten->times_count)] = time;
-        strncpy(tten->names1[int(tten->times_count)], State->player1, sizeof(player_name));
-        strncpy(tten->names2[int(tten->times_count)], State->player2, sizeof(player_name));
-        tten->times_count++;
-    }
-
-    // Bubble sort your time to the right position
-    for (int i = 0; i < MAX_TIMES + 1; i++) {
-        for (int j = 0; j < tten->times_count - 1; j++) {
-            if (tten->times[j] > tten->times[j + 1]) {
-                int tmp = tten->times[j];
-                tten->times[j] = tten->times[j + 1];
-                tten->times[j + 1] = tmp;
-
-                player_name tmp_name;
-                strncpy(tmp_name, tten->names1[j], sizeof(player_name));
-                strncpy(tten->names1[j], tten->names1[j + 1], sizeof(player_name));
-                strncpy(tten->names1[j + 1], tmp_name, sizeof(player_name));
-
-                strncpy(tmp_name, tten->names2[j], sizeof(player_name));
-                strncpy(tten->names2[j], tten->names2[j + 1], sizeof(player_name));
-                strncpy(tten->names2[j + 1], tmp_name, sizeof(player_name));
-            }
-        }
-    }
+    // Add new time
+    tten->times[rank] = time;
+    strncpy(tten->names1[rank], State->player1, sizeof(player_name));
+    strncpy(tten->names2[rank], State->player2, sizeof(player_name));
+    tten->times_count = std::min(MAX_TIMES, tten->times_count + 1);
 
     // Save external levels (state.dat is not saved)
     if (external_level) {

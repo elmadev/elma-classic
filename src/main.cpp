@@ -1,5 +1,6 @@
 #include "main.h"
 #include "api/api.h"
+#include "api/lgr_list.h"
 #include "editor/canvas.h"
 #include "eol/eol.h"
 #include "eol/settings.h"
@@ -52,6 +53,28 @@ int main() {
     EolClient->connect();
 
     eol_api::init();
+
+    // Start fetch in background
+    LgrInfo.fetch();
+    auto result = LgrInfo.get_data(); // result not yet available
+    ELMA_ASSERT(result == nullptr);
+
+    // Sync fetch (waits for previous fetch to finish)
+    LgrInfo.await_fetch();
+    auto info = LgrInfo.get_data(); // result is available
+    for (const auto& entry : *info) {
+        LOG_DEBUG("LGRName: {} (CRC: {})", entry.LGRName, entry.CRC);
+    }
+
+    // Reset data
+    LgrInfo.clear_cache();
+    auto result2 = LgrInfo.get_data(); // result no longer available
+    ELMA_ASSERT(result2 == nullptr);
+
+    // Sync fetch (starts a new fetch)
+    LgrInfo.await_fetch();
+    auto result3 = LgrInfo.get_data(); // result is available
+    ELMA_ASSERT(result3 != nullptr);
 
     menu_intro();
 }

@@ -3,8 +3,10 @@
 
 #include "main.h"
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string>
+#include <vector>
 
 #define NOMINMAX
 #include <curl/curl.h>
@@ -19,6 +21,18 @@ class share_interface {
     friend class easy_handle;
 
     CURLSH* share = nullptr;
+
+    struct {
+        std::mutex share;
+        std::mutex cookie;
+        std::mutex dns;
+        std::mutex ssl;
+        std::mutex connect;
+    } locks;
+
+    static void lock_callback_function(CURL* handle, curl_lock_data data, curl_lock_access access,
+                                       void* clientp);
+    static void unlock_callback_function(CURL* handle, curl_lock_data data, void* clientp);
 
     static std::string error_message(CURLSHcode code);
 
@@ -45,8 +59,13 @@ class easy_handle {
     std::string file_name;
     FILE* file_h = nullptr;
 
+    // Download to buffer
+    bool data_first_callback = false;
+    std::vector<unsigned char> data_buffer;
+
     static std::size_t write_callback_filesystem(char* ptr, size_t size, size_t nmemb,
                                                  void* userdata);
+    static std::size_t write_callback_buffer(char* ptr, size_t size, size_t nmemb, void* userdata);
 
     std::string error_message(CURLcode code);
 
@@ -68,13 +87,16 @@ class easy_handle {
     // Save target to file. Return an error message if fails
     std::optional<std::string> perform_to_filesystem();
 
+    // Return a vector of bytes or an error message if download fails
+    std::pair<std::vector<unsigned char>, std::string> perform_to_buffer();
+
     // Copy the settings of `base`, or create a new default handle if nullptr
     // Optionally provide a share interface for faster connections
     easy_handle(easy_handle* base, share_interface* share);
     ~easy_handle();
 
-    // Set file destination target
     void setopt_write_to_filesystem(std::string destination);
+    void setopt_write_to_buffer();
 };
 
 #endif

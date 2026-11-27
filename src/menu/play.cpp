@@ -81,8 +81,8 @@ static void menu_save_play(int internal_index, const char* external_filename, in
     }
 }
 
-void update_top_ten(int time, char* time_message, int internal_index,
-                    const char* external_filename) {
+int update_top_ten(int time, char* time_message, int internal_index,
+                   const char* external_filename) {
     // Check if internal or external
     bool external_level = external_filename != nullptr;
 
@@ -90,7 +90,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
 
     if (OutOfBounds) {
         strcpy(time_message, "You Went Out of Bounds!");
-        return;
+        return -1;
     }
 
     // Dead
@@ -102,7 +102,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
         if (WhoDiedFirst == 2) {
             strcat(time_message, "    (B died first)");
         }
-        return;
+        return -1;
     }
 
     if (!external_level) {
@@ -137,7 +137,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
     if (external_level && Level->file_has_changed(external_filename)) {
         menu_dialog("The level file has changed", "after it was loaded!",
                     "The time was not saved.");
-        return;
+        return 10;
     }
 
     // Calculate top ten position
@@ -151,7 +151,7 @@ void update_top_ten(int time, char* time_message, int internal_index,
 
     if (rank >= MAX_TIMES) {
         // Not in top ten
-        return;
+        return rank;
     }
     if (rank == 0) {
         strcat(time_message, "     Best Time!");
@@ -179,6 +179,8 @@ void update_top_ten(int time, char* time_message, int internal_index,
     if (external_level) {
         Level->save_topten(external_filename);
     }
+
+    return rank;
 }
 
 void replay_previous_run() {

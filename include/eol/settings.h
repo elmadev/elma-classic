@@ -12,6 +12,7 @@ enum class MapAlignment { None, Left, Middle, Right };
 enum class RendererType { Software, OpenGL };
 enum class FullscreenMode { Windowed, Fullscreen, FullscreenDesktop };
 enum class ChatVisibility { Shown, PublicHidden, Hidden };
+enum class AutoSaveReplay { Never, BestTime, TopTen, Finished };
 
 template <typename T> struct Default {
     T value;
@@ -225,6 +226,7 @@ class eol_settings {
     Default<eol_table::Align> table_alignment_{eol_table::Align::Center};
     Default<ChatVisibility> chat_visibility_{ChatVisibility::Shown};
     Default<ShownTo> shown_to_{ShownTo::Everyone};
+    Default<AutoSaveReplay> automatically_save_replay_{AutoSaveReplay::Never};
 
   public:
     static void read_settings();
@@ -368,6 +370,7 @@ class eol_settings {
     DECLARE_SETTING(table_alignment);
     DECLARE_SETTING(chat_visibility);
     DECLARE_SETTING_CUSTOM(shown_to);
+    DECLARE_SETTING(automatically_save_replay);
 };
 
 #undef SETTING_VALUE_TYPE

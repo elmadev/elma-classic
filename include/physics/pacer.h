@@ -1,7 +1,8 @@
 #ifndef PHYSICS_PACER_H
 #define PHYSICS_PACER_H
 
-#include "main.h"
+#include "util/stopwatch.h"
+#include <string>
 
 namespace pacer {
 

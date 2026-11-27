@@ -5,7 +5,6 @@
 #include "game/level_load.h"
 #include "game/recorder.h"
 #include "level/level.h"
-#include "main.h"
 #include "menu/best_times.h"
 #include "menu/dialog.h"
 #include "menu/nav.h"

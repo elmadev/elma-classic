@@ -1,7 +1,7 @@
 #ifndef RENDERER_TIMER_H
 #define RENDERER_TIMER_H
 
-#include "main.h"
+#include "util/stopwatch.h"
 
 class pic8;
 

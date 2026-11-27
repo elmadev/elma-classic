@@ -11,6 +11,7 @@
 #include "menu/play.h"
 #include "platform/implementation.h"
 #include "util/file_iter.h"
+#include "util/util.h"
 #include <cstring>
 #include <string>
 

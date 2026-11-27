@@ -1,7 +1,6 @@
 #include "menu/options.h"
 #include "eol/settings.h"
 #include "game/state.h"
-#include "main.h"
 #include "menu/ball.h"
 #include "menu/controls.h"
 #include "menu/dialog.h"

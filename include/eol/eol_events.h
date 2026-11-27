@@ -3,7 +3,7 @@
 
 #include "eol/eol_types.h"
 #include "eol/kuski.h"
-#include "main.h"
+#include "util/util.h"
 #include <cstdint>
 #include <span>
 #include <string>

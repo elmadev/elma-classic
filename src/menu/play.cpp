@@ -217,15 +217,119 @@ void replay_from_file(const char* filename) {
     }
 }
 
+std::string format_rec_name(const std::string& level_name, char player, int time, int i) {
+    // Excel column style numbering, except "a" is ""
+    // "", "b", "c", ..., "z", "aa", "ab"
+    const auto base26 = [](int value) -> std::string {
+        if (value == 1) {
+            return "";
+        }
+        std::string result = "";
+        while (value > 0) {
+            int mod = (value - 1) % 26;
+            result.insert(result.begin(), static_cast<char>('a' + mod));
+            value = (value - mod) / 26;
+        }
+        return result;
+    };
+
+    const auto format_time = [](int time) -> std::string {
+        char text[100];
+        util::text::centiseconds_to_string(time, text, true, true);
+        std::string result = text;
+        if (time >= 60000) {
+            // Drop centiseconds if time is over 10 minutes
+            result.erase(result.size() - 3);
+        }
+        // Remove colons
+        std::erase(result, ':');
+        return result;
+    };
+
+    std::string version = base26(i);
+    std::string time_str = format_time(time);
+
+    // Trim down the length of the replay file to fit within the maximum length
+    int len = level_name.length() + sizeof(player) + time_str.length() +
+              std::max(1, (int)version.length());
+    int overflow = len - MAX_REPLAY_NAME_LEN;
+    if (overflow > 0 && overflow < time_str.size()) {
+        time_str.erase(time_str.size() - overflow);
+    }
+
+    std::string ret = std::format("{}{}{}{}.rec", level_name, player, time_str, version);
+    if (ret.length() > MAX_REPLAY_EXT_LEN) {
+        LOG_ERROR("Unable to auto save replay filename {}", ret);
+        return "";
+    }
+    return ret;
+}
+
+void auto_save_rec(level& lev, int rank, int internal_index, const char* external_filename,
+                   int time) {
+    if (Rec1->is_empty()) {
+        return;
+    }
+    recorder::save_rec_file(LAST_REC_FILENAME, lev.level_id);
+
+    // Check if we should auto save replay
+    switch (EolSettings->automatically_save_replay()) {
+    case AutoSaveReplay::Never:
+        return;
+    case AutoSaveReplay::Finished:
+        if (rank < 0) {
+            return;
+        }
+        break;
+    case AutoSaveReplay::TopTen:
+        if (rank < 0 || rank > 9) {
+            return;
+        }
+        break;
+    case AutoSaveReplay::BestTime:
+        if (rank != 0) {
+            return;
+        }
+    }
+    ELMA_ASSERT(time >= 0);
+
+    // Generate replay name
+    std::string level_name;
+    if (internal_index) {
+        level_name = std::format("{:02}", internal_index);
+    } else {
+        level_name = external_filename;
+        level_name.erase(level_name.size() - 4); // crop ".lev"
+    }
+
+    char player = State->player1[0];
+    int i = 1;
+
+    // Check for replay name conflicts
+    std::string path = format_rec_name(level_name, player, time, i);
+    if (path.empty()) {
+        return;
+    }
+    while (std::filesystem::exists(std::format("rec/{}", path))) {
+        i++;
+        path = format_rec_name(level_name, player, time, i);
+        if (path.empty()) {
+            return;
+        }
+    }
+
+    // Save replay
+    LOG_INFO("Auto-saving rec: {}", path);
+    recorder::save_rec_file(path.c_str(), lev.level_id);
+}
+
 static text_line ExtraTimeText[14];
 
 MenuLevel menu_level(int internal_index, bool nav_on_play_next, int time, const char* time_message,
-                     const char* external_filename) {
+                     int rank, const char* external_filename) {
     bool external_level = external_filename != nullptr;
 
-    if (!Rec1->is_empty()) {
-        recorder::save_rec_file(LAST_REC_FILENAME, Level->level_id);
-    }
+    auto_save_rec(*Level, rank, internal_index, external_filename, time);
 
     player* player1 = State->get_player(State->player1);
     player* player2 = State->get_player(State->player2);
@@ -433,7 +537,7 @@ static void play_internal(int internal_index) {
         }
 
         char time_message[100] = "";
-        update_top_ten(time, time_message, internal_index, nullptr);
+        int rank = update_top_ten(time, time_message, internal_index, nullptr);
 
         // Check to see if we unlock a new internal level (only available in singleplayer)
         int unlocked_new_level = 0;
@@ -450,7 +554,7 @@ static void play_internal(int internal_index) {
         }
 
         MenuLevel choice =
-            menu_level(internal_index, unlocked_new_level, time, time_message, nullptr);
+            menu_level(internal_index, unlocked_new_level, time, time_message, rank, nullptr);
         Rec1->erase(filename);
         Rec2->erase(filename);
 

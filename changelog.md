@@ -32,6 +32,7 @@
 - When saving an internal replay, the internal number and name will be shown instead of QWQUU0XX.lev
 - !levinfo prints basic information about the current level
 - Save play is enabled for internal level 55 (More Levels)
+- Replay saving reminder feature is replaced with Replay autosave feature
 - F6 table title now shows the battle attributes Allow starter, Others Shown and Apple Bugs
 - Speedometer works in 2-player mode
 - Timer and minimap default visibility for player A may be toggled via Options
